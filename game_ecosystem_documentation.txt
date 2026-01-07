@@ -1,0 +1,836 @@
+================================================================================
+BLACKJACK: THE COMPLETE GAME ECOSYSTEM DOCUMENTATION
+================================================================================
+Generated on: 2026-01-07 05:24:59
+
+This document contains a comprehensive breakdown of every event,
+mechanic, item, and system in the game. Use this as a reference
+to understand the full scope of what can happen during gameplay.
+
+================================================================================
+
+TABLE OF CONTENTS
+----------------------------------------
+1. Game Overview
+2. Wealth Tiers & Balance Ranges
+3. Day Events by Tier
+4. Night Events by Tier
+5. Secret Events & Hidden Triggers
+6. One-Time Story Events
+7. Conditional Events
+8. Medical Events & Conditions
+9. Car Trouble Events
+10. Ending Paths
+11. Items & Collectibles
+12. Status Effects & Injuries
+13. Companions System
+14. Achievement System
+15. Sanity System
+16. Locations & Shops
+17. NPC Encyclopedia
+18. Event Odds Calculator
+
+================================================================================
+1. GAME OVERVIEW
+================================================================================
+
+PREMISE:
+----------------------------------------
+You are a gambler living in your station wagon, trying to win $1,000,000
+at the local casino's blackjack table. Each day consists of:
+
+  MORNING/AFTERNOON: Random events occur based on your current wealth tier
+  EVENING: You travel to the casino (if you have a working car)
+  NIGHT: You play blackjack against The Dealer
+  LATE NIGHT: Night events can occur as you return to your car
+
+CORE MECHANICS:
+----------------------------------------
+  - HEALTH (0-100): Your physical wellbeing. Reaches 0 = Death
+  - SANITY (0-100): Your mental state. Low sanity causes hallucinations
+  - BALANCE ($): Your current money. Goal is $1,000,000
+  - INVENTORY: Items that provide benefits or are required for events
+  - STATUS EFFECTS: Temporary conditions affecting gameplay
+  - INJURIES: Physical wounds that may require medical attention
+  - COMPANIONS: Pets that provide bonuses and restore sanity
+
+WIN CONDITION: Reach $1,000,000
+LOSE CONDITIONS: Health reaches 0, certain bad endings, giving up
+
+================================================================================
+2. WEALTH TIERS & BALANCE RANGES
+================================================================================
+
+Your current balance determines which tier of events you experience.
+Higher tiers have more dramatic events with bigger risks and rewards.
+
+TIER              | BALANCE RANGE        | DESCRIPTION
+----------------------------------------------------------------------
+POOR              | $1 - $1,000          | Scraping by, desperate survival
+CHEAP             | $1,000 - $10,000     | Getting somewhere, still struggling
+MODEST            | $10,000 - $100,000   | Comfortable, but not safe
+RICH              | $100,000 - $500,000  | Living well, high stakes
+DOUGHMAN          | $500,000 - $900,000  | Almost there, maximum pressure
+NEARLY THERE      | $900,000 - $999,999  | The final stretch, destiny awaits
+
+NOTE: Each tier has its own unique pool of events. Events from lower
+tiers may still occur occasionally at higher tiers.
+
+================================================================================
+3. DAY EVENTS BY TIER
+================================================================================
+
+Day events occur every morning/afternoon. They are selected randomly
+from your current wealth tier's event pool.
+
+----------------------------------------------------------------------
+TIER: POOR ($1 - $1,000)
+----------------------------------------------------------------------
+Total Events in Pool: 16
+Base Odds per Event: 1/16 = 6.25%
+
+  EVERYTIME EVENTS (can repeat):
+    • Ant Invasion
+    • Bird Droppings
+    • Estranged Dog
+    • Flat Tire
+    • Freight Truck
+    • Left Window Down
+    • Morning Stretch
+    • Seat Cash
+
+  CONDITIONAL EVENTS (require specific conditions):
+    • Hungry Cockroach
+    • Sore Throat
+    • Spider Bite
+
+  ONE-TIME EVENTS (story events, only happen once):
+    • Interrogation
+    • Lone Cowboy
+    • Whats My Name
+
+----------------------------------------------------------------------
+TIER: CHEAP ($1,000 - $10,000)
+----------------------------------------------------------------------
+Total Events in Pool: 11
+Base Odds per Event: 1/11 = 9.09%
+
+  ONE-TIME EVENTS (story events, only happen once):
+    • The Bridge Angel
+    • Tom The Mechanic
+
+----------------------------------------------------------------------
+TIER: MODEST ($10,000 - $100,000)
+----------------------------------------------------------------------
+Total Events in Pool: 6
+Base Odds per Event: 1/6 = 16.67%
+
+  ONE-TIME EVENTS (story events, only happen once):
+    • Frank The Bartender
+
+----------------------------------------------------------------------
+TIER: RICH ($100,000 - $500,000)
+----------------------------------------------------------------------
+Total Events in Pool: 5
+Base Odds per Event: 1/5 = 20.00%
+
+  ONE-TIME EVENTS (story events, only happen once):
+    • The Rival
+
+----------------------------------------------------------------------
+TIER: DOUGHMAN ($500,000 - $900,000)
+----------------------------------------------------------------------
+Total Events in Pool: 5
+Base Odds per Event: 1/5 = 20.00%
+
+  ONE-TIME EVENTS (story events, only happen once):
+    • The Veteran
+
+----------------------------------------------------------------------
+TIER: NEARLY THERE ($900,000+)
+----------------------------------------------------------------------
+Total Events in Pool: 10
+Base Odds per Event: 1/10 = 10.00%
+
+================================================================================
+4. NIGHT EVENTS BY TIER
+================================================================================
+
+Night events occur after the casino, as you return to your car.
+These tend to be more atmospheric and sometimes more dangerous.
+
+----------------------------------------------------------------------
+TIER: POOR ($1 - $1,000)
+----------------------------------------------------------------------
+Total Events in Pool: 5
+Base Odds per Event: 1/5 = 20.00%
+
+  • Chase The Rabbit
+  • Ditched Wallet
+  • Stargazing
+  • Went Jogging
+  • Woodlands Path
+
+----------------------------------------------------------------------
+TIER: CHEAP ($1,000 - $10,000)
+----------------------------------------------------------------------
+Total Events in Pool: 5
+Base Odds per Event: 1/5 = 20.00%
+
+  • Chase The Second Rabbit
+  • Swamp Stroll
+  • Whats My Favorite Color
+  • Woodlands Field
+  • Woodlands River
+
+----------------------------------------------------------------------
+TIER: MODEST ($10,000 - $100,000)
+----------------------------------------------------------------------
+Total Events in Pool: 4
+Base Odds per Event: 1/4 = 25.00%
+
+  • Beach Stroll
+  • Chase The Third Rabbit
+  • Swamp Swim
+  • Swamp Wade
+
+----------------------------------------------------------------------
+TIER: RICH ($100,000 - $500,000)
+----------------------------------------------------------------------
+Total Events in Pool: 5
+Base Odds per Event: 1/5 = 20.00%
+
+  • Beach Dive
+  • Beach Swim
+  • Chase The Fourth Rabbit
+  • City Streets
+  • Whats My Favorite Animal
+
+----------------------------------------------------------------------
+TIER: DOUGHMAN ($500,000 - $900,000)
+----------------------------------------------------------------------
+Total Events in Pool: 3
+Base Odds per Event: 1/3 = 33.33%
+
+  • Chase The Fifth Rabbit
+  • City Park
+  • City Stroll
+
+----------------------------------------------------------------------
+TIER: NEARLY THERE ($900,000+)
+----------------------------------------------------------------------
+Total Events in Pool: 3
+Base Odds per Event: 1/3 = 33.33%
+
+  • Beach Adventure
+  • Swamp Adventure
+  • Woodlands Adventure
+
+================================================================================
+5. SECRET EVENTS & HIDDEN TRIGGERS
+================================================================================
+
+Secret events are triggered by specific conditions, often related to
+your exact balance or meeting certain hidden requirements.
+
+----------------------------------------------------------------------
+BALANCE-TRIGGERED SECRETS:
+----------------------------------------------------------------------
+
+  $21 exactly:        'Perfect Hand' - Blackjack reference
+  $50 exactly:        'Fifty Fifty' - Coin flip event
+  $100 exactly:       'Benjamin's Blessing' - Hundred dollar bonus
+  $111 exactly:       'Triple Ones' - Lucky angel numbers
+  $666 exactly:       'Devil's Deal' - Dark bargain opportunity
+  $777 exactly:       'Triple Sevens' - Slot machine luck
+  $1,000 exactly:     'Milestone' - Wealth tier celebration
+  $1,111 exactly:     'Angel Numbers' - Spiritual encounter
+  $7,777 exactly:     'Lucky Seven Grand' - Major luck event
+  $10,000 exactly:    'Five Figures' - Milestone event
+  $13,013 exactly:    'Unlucky Number' - Bad omen event
+  $21,000 exactly:    'Blackjack Jackpot' - Special bonus
+  $50,000 exactly:    'Halfway There' - Major milestone
+  $100,000 exactly:   'Six Figures' - Life-changing threshold
+  $250,000 exactly:   'Quarter Million' - The Offer event
+  $500,000 exactly:   'Half Million' - Doughman initiation
+  $777,777 exactly:   'Lucky Sevens Jackpot' - Ultimate luck
+  $999,999 exactly:   'One Dollar Away' - Dramatic finale trigger
+
+----------------------------------------------------------------------
+CONDITION-TRIGGERED SECRETS:
+----------------------------------------------------------------------
+
+  All 3 Dream Sequences Complete: 'All Dreams Complete' - Full backstory
+  Sanity below 25 for 5+ days:    'Madness Confrontation' - Battle yourself
+  Met all NPCs:                   'Social Butterfly' achievement event
+  5 Companions at once:           'Noah's Ark' - Animal gathering
+  Rabbit chase 5+ attempts:       'The Mystical Rabbit' - Final catch
+  Suzy storyline complete:        'Gift From Suzy' or 'Suzy the Snitch'
+
+================================================================================
+6. ONE-TIME STORY EVENTS
+================================================================================
+
+These events only happen once per playthrough and typically involve
+meeting important NPCs or experiencing key story moments.
+
+----------------------------------------------------------------------
+POOR TIER
+----------------------------------------------------------------------
+  • Lone Cowboy
+    → Meet a lone cowboy with tales of the road
+  • Whats My Name
+    → Suzy introduces herself and asks your name
+  • Interrogation
+    → The Interrogator in the red suit questions you
+  • Old Man Jenkins
+    → Old Man Jenkins shares his wisdom
+  • The Mime
+    → A mysterious mime appears with a message
+
+----------------------------------------------------------------------
+CHEAP TIER
+----------------------------------------------------------------------
+  • Tom The Mechanic
+    → Meet Tom at his Trucks & Tires shop
+  • Whats My Favorite Color
+    → Suzy asks about your favorite color
+  • The Bridge Angel
+    → Save someone at the bridge (affects ending)
+  • Stray Cat Adopt
+    → Adopt a stray cat as companion
+
+----------------------------------------------------------------------
+MODEST TIER
+----------------------------------------------------------------------
+  • Frank The Bartender
+    → Meet Frank at the Watering Hole
+  • Whats My Favorite Animal
+    → Suzy asks about your favorite animal
+  • The Photographer
+    → A photographer documents your journey
+  • Street Performer Friend
+    → Befriend a street performer
+
+----------------------------------------------------------------------
+RICH TIER
+----------------------------------------------------------------------
+  • The Rival
+    → Victoria challenges you as a rival gambler
+  • High Roller Invitation
+    → Get invited to a high stakes room
+  • Luxury Car Offer
+    → Someone offers to buy your story
+
+----------------------------------------------------------------------
+DOUGHMAN TIER
+----------------------------------------------------------------------
+  • The Veteran
+    → Meet a veteran gambler with advice
+  • The Journalist
+    → A journalist wants to interview you
+  • Victoria Returns
+    → The Rival returns for round 2
+
+----------------------------------------------------------------------
+NEARLY THERE TIER
+----------------------------------------------------------------------
+  • The Warning
+    → A prophet warns about your path
+  • The Offer
+    → A mysterious offer to double your money
+  • Final Dream
+    → The ultimate dream sequence
+  • Gift From Suzy
+    → Suzy's final gift (good path)
+  • Suzy The Snitch
+    → Suzy betrays you (bad path)
+
+================================================================================
+7. CONDITIONAL EVENTS
+================================================================================
+
+These events only trigger if specific conditions are met.
+If conditions aren't met, another event is selected instead.
+
+EVENT NAME                    REQUIREMENT                        EFFECT
+----------------------------------------------------------------------------------------------------
+Sore Throat                   Status: No 'Sore Throat'           Get sick with a sore throat
+Spider Bite                   Danger: 'Spider' present           Get bitten by a car spider
+Hungry Cockroach              Danger: 'Cockroach' present        Cockroach eats your money
+Ant Bite                      Danger: 'Ants' present             Ant infestation bites you
+Knife Wound Infection         Injury: 'Knife Wound'              Wound gets infected
+Stray Cat Sick                Companion: Stray Cat, 7+ days      Cat gets sick
+Stray Cat Dies                Companion: Sick Cat, 3+ days       Cat dies if untreated
+Cow Army                      Met: 'Betsy', Danger: 'Betsy Army' Army of cows attack
+Final Interrogation           Met: 'Interrogator', Danger: 'Final Interrogation'Phil's final confrontation
+Painkiller Withdrawal         Status: 'Addicted to Painkillers', No pillsSuffer withdrawal
+Cocaine Crash                 Status: 'Cocaine High' expired     Crash after cocaine high
+Soulless Emptiness            Status: 'Soulless'                 Feel empty inside
+Victoria Returns              Met: 'The Rival'                   Rival gambler returns
+
+================================================================================
+8. MEDICAL EVENTS & CONDITIONS
+================================================================================
+
+Medical events add various illnesses, injuries, and conditions.
+Many require visiting the Doctor to cure or treat.
+
+----------------------------------------------------------------------
+INFECTIOUS DISEASES:
+----------------------------------------------------------------------
+CONDITION           EFFECT                   CURE
+----------------------------------------------------------------------
+Pneumonia           -15 HP, -2 Sanity        Rest + Doctor
+Bronchitis          -8 HP                    Rest + Medicine
+Strep Throat        -10 HP                   Antibiotics required
+Stomach Flu         -12 HP, -1 Sanity        Time + Fluids
+Ear Infection       -5 HP                    Antibiotics
+Sinus Infection     -6 HP                    Time or Antibiotics
+UTI                 -8 HP                    Antibiotics required
+Pink Eye            -3 HP                    Eye drops
+Mononucleosis       -20 HP, -3 Sanity        Rest (months)
+Shingles            -18 HP, -2 Sanity        Antivirals
+Lyme Disease        -15 HP, -2 Sanity        Antibiotics ASAP
+Tetanus             -25 HP, -3 Sanity        Antitoxin required
+Measles             -18 HP, -2 Sanity        Quarantine + Time
+
+----------------------------------------------------------------------
+INJURIES:
+----------------------------------------------------------------------
+INJURY              EFFECT                   TREATMENT
+----------------------------------------------------------------------
+Broken Ribs         -20 HP, -2 Sanity        6+ weeks rest
+Broken Ankle        -15 HP, -2 Sanity        Cast + Crutches
+Broken Wrist        -12 HP, -1 Sanity        Cast
+Broken Hand         -15 HP, -2 Sanity        Surgery likely
+Concussion          -15 HP, -4 Sanity        Rest + Monitoring
+Torn ACL            -20 HP, -3 Sanity        Surgery + Rehab
+Herniated Disc      -18 HP, -3 Sanity        Rest or Surgery
+Dislocated Shoulder -18 HP, -2 Sanity        Reduction needed
+Deep Laceration     -22 HP                   Stitches
+Skull Fracture      -40 HP, -6 Sanity        Emergency Surgery
+Ruptured Spleen     -35 HP, -4 Sanity        Emergency Surgery
+
+================================================================================
+9. CAR TROUBLE EVENTS
+================================================================================
+
+Car trouble can waste your entire afternoon, preventing travel.
+Having the right items can fix problems instantly.
+
+EVENT                         ITEMS THAT HELP                    CONSEQUENCE
+----------------------------------------------------------------------------------------------------
+Dead Battery Afternoon        Jumper Cables, Portable Charger    Wastes afternoon if no items
+Engine Overheating            Coolant, Antifreeze, Water Bottles $200 repair without items
+Tire Blowout                  Spare Tire + Car Jack              $150 tow without items
+Alternator Failing            None (must pay $350)               Car dies completely
+Ran Out Of Gas                Gas Can                            $35 + 2 hours without item
+Brake Fluid Leak              Brake Fluid                        Cannot drive without fix
+Radiator Leak                 Radiator Stop Leak                 $200-400 repair
+Frozen Door Locks             Lock De-Icer, Lighter              1 hour delay
+Catalytic Converter Stolen    None (must replace)                $1000-2500 replacement
+Transmission Slipping         Transmission Fluid                 Thousands to repair
+
+================================================================================
+10. ENDING PATHS
+================================================================================
+
+The game has multiple endings based on your choices and conditions.
+
+----------------------------------------------------------------------
+GOOD ENDINGS:
+----------------------------------------------------------------------
+
+  SALVATION (Best Ending)
+    Requirement: Call Rebecca at Tom's, choose to go home
+    Outcome: Return to family, live a full life, watch kids grow
+
+  MILLIONAIRE (Goal Ending)
+    Requirement: Reach $1,000,000
+    Outcome: Achieve your goal, various epilogues possible
+
+----------------------------------------------------------------------
+NEUTRAL ENDINGS:
+----------------------------------------------------------------------
+
+  RESURRECTION
+    Requirement: Refuse to go home when given the chance
+    Outcome: Continue gambling forever, outcome unknown
+
+  THE OFFER ACCEPTED
+    Requirement: Accept the mysterious offer at $900k+
+    Outcome: Get double your money, but banned from casinos
+
+----------------------------------------------------------------------
+BAD ENDINGS:
+----------------------------------------------------------------------
+
+  DEATH (Multiple Causes)
+    - Health reaches 0
+    - Killed by NPCs (Cow Army, Phil, Loan Shark)
+    - Medical emergencies untreated
+    - Car accidents
+    - Random deadly events
+
+  MADNESS ENDING
+    Requirement: Fail the Madness Confrontation at low sanity
+    Outcome: Your mind shatters, something else takes control
+    Note: This is a secret ending with extensive narrative
+
+  SUZY THE SNITCH
+    Requirement: Complete Suzy storyline on bad path
+    Outcome: Suzy reports you to police, arrested
+
+================================================================================
+11. ITEMS & COLLECTIBLES
+================================================================================
+
+----------------------------------------------------------------------
+HEALING ITEMS:
+----------------------------------------------------------------------
+  First Aid Kit             +30 HP                         Source: Convenience Store
+  Bandages                  +15 HP                         Source: Convenience Store
+  Pain Killers              +10 HP, Risk of Addiction      Source: Convenience Store
+  Energy Drink              +5 HP, Temporary Energy        Source: Convenience Store
+  Sandwich                  +10 HP                         Source: Random events
+  Granny's Swamp Nectar     +25-50 HP (random)             Source: Swamp events
+
+----------------------------------------------------------------------
+CAR REPAIR ITEMS:
+----------------------------------------------------------------------
+  Jumper Cables             Fix dead battery               Source: Tom's Shop
+  Spare Tire                Fix flat tire                  Source: Tom's Shop
+  Motor Oil                 Refill empty oil               Source: Gas Station
+  Coolant                   Fix overheating                Source: Gas Station
+  Tool Kit                  DIY repairs                    Source: Tom's Shop
+  Gas Can                   Emergency fuel                 Source: Gas Station
+  WD-40                     Fix stuck parts                Source: Convenience Store
+
+----------------------------------------------------------------------
+COLLECTIBLES (Sell to Gus):
+----------------------------------------------------------------------
+  Golden Trident            Value: $80,000
+  Kraken Pearl              Value: $100,000
+  Mermaid's Scale           Value: $50,000
+  Captain's Compass         Value: $45,000
+  Pirate's Eye Patch        Value: $10,000
+  Treasure Map              Value: $35,000
+  Ancient Coin              Value: $20,000
+  Crystal Skull             Value: $75,000
+  Dragon's Tooth            Value: $90,000
+
+----------------------------------------------------------------------
+SPECIAL/UNIQUE ITEMS:
+----------------------------------------------------------------------
+  Grandfather Clock         Running joke item, Dealer comments on it
+  Suzy's Gift               Heartwarming stuffed animal from Suzy
+  Witch's Favor             Single-use emergency help
+  Map                       Unlocks Marvin's Mystical Merchandise
+  Quiet Sneakers            Avoid bear attacks, has durability
+  Gambler's Charm           Luck bonus at blackjack
+  Gator Tooth Necklace      Gators respect you in swamp
+  Bear King's Respect       Bears won't attack you
+
+================================================================================
+12. STATUS EFFECTS & INJURIES
+================================================================================
+
+----------------------------------------------------------------------
+POSITIVE STATUS EFFECTS:
+----------------------------------------------------------------------
+  Lucky                     Increased blackjack win chance
+  At Peace                  Sanity restores faster
+  Energized                 Temporary health regeneration
+  Witch's Blessing          Good fortune in events
+  Fairy Lucky               Enhanced luck from fairy
+  Dog Blessed               Companion bonuses enhanced
+
+----------------------------------------------------------------------
+NEGATIVE STATUS EFFECTS:
+----------------------------------------------------------------------
+  Sore Throat               Minor discomfort
+  Spider Bite               Slow health drain
+  Hepatitis                 Serious illness, needs treatment
+  Addicted to Painkillers   Withdrawal if no pills
+  Soulless                  Random sanity effects
+  Marked                    Bad luck from witch
+  Paranoid                  Extra negative events
+
+================================================================================
+13. COMPANIONS SYSTEM
+================================================================================
+
+Companions provide sanity restoration and special bonuses.
+They need to be fed their favorite food to stay happy.
+
+NAME           TYPE                FOOD           BONUSES
+--------------------------------------------------------------------------------
+Squirrelly     Squirrel            Bag of Acorns  +2 Sanity/day, +1 Luck
+Whiskers       Alley Cat           Cat Food       +3 Sanity/day, Danger Warning
+Lucky          Three-Legged Dog    Dog Food       +5 Sanity/day, Protection
+Mr. Pecks      Crow                Birdseed       +1 Sanity/day, Finds Money
+Patches        Opossum             Garbage        +2 Sanity/day, Night Bonus
+Rusty          Raccoon             Anything       +2 Sanity/day, Steal Chance
+Slick          Rat                 Cheese         +1 Sanity/day, Danger Warning
+Hopper         Rabbit              Carrot         +2 Sanity/day, +3 Luck
+
+COMPANION HAPPINESS:
+  - Happiness decreases if not fed
+  - Unhappy companions may leave
+  - Bonding increases over time with feeding
+  - Max bond unlocks special events
+
+================================================================================
+14. ACHIEVEMENT SYSTEM
+================================================================================
+
+----------------------------------------------------------------------
+MONEY MILESTONES
+----------------------------------------------------------------------
+  [Baby Steps] - Reach $1,000
+  [Getting Somewhere] - Reach $10,000
+  [Big Spender] - Reach $100,000
+  [Almost There] - Reach $500,000
+  [The Dream] - Reach $1,000,000
+
+----------------------------------------------------------------------
+SURVIVAL
+----------------------------------------------------------------------
+  [Still Kicking] - Survive 7 days
+  [Stubborn] - Survive 30 days
+  [The Long Road] - Survive 100 days
+  [Clinging to Life] - Survive with 10 HP
+
+----------------------------------------------------------------------
+GAMBLING
+----------------------------------------------------------------------
+  [Blackjack Master] - Hit 10 blackjacks
+  [Hot Streak] - Win 5 hands in a row
+  [Card Shark] - Play 100 hands
+  [High Roller] - Win $10,000+ in one hand
+
+----------------------------------------------------------------------
+COMPANIONS
+----------------------------------------------------------------------
+  [First Friend] - Get first companion
+  [Animal Lover] - Have 3+ companions
+  [Best Friends] - Max bond with companion
+
+----------------------------------------------------------------------
+SPECIAL
+----------------------------------------------------------------------
+  [Rock Bottom] - Lose all money and recover
+  [Devil's Deal] - Make deal with devil
+  [Debt Free] - Pay off loan shark
+
+================================================================================
+15. SANITY SYSTEM
+================================================================================
+
+Sanity ranges from 0-100 and affects your perception of events.
+
+----------------------------------------------------------------------
+SANITY THRESHOLDS:
+----------------------------------------------------------------------
+  100-76: Normal - No effects
+  75-51:  Uneasy - Occasional unsettling thoughts
+  50-26:  Disturbed - Hallucinations, altered perception
+  25-1:   Broken - Severe effects, madness confrontation risk
+  0:      Catatonic - Cannot function
+
+----------------------------------------------------------------------
+SANITY EFFECTS:
+----------------------------------------------------------------------
+  - Low sanity changes event descriptions
+  - Hallucinations appear as fake events
+  - Companions may appear to speak
+  - The Dealer's dialogue becomes more sinister
+  - At very low sanity, the Madness Confrontation occurs
+
+----------------------------------------------------------------------
+RESTORING SANITY:
+----------------------------------------------------------------------
+  - Companions restore sanity daily
+  - Positive events can restore sanity
+  - Good sleep restores sanity
+  - Certain items restore sanity
+  - The Doctor can prescribe treatment
+
+================================================================================
+16. LOCATIONS & SHOPS
+================================================================================
+
+----------------------------------------------------------------------
+The Casino
+----------------------------------------------------------------------
+  Main gameplay location, blackjack tables
+
+----------------------------------------------------------------------
+Your Wagon
+----------------------------------------------------------------------
+  Home base, where events occur
+
+----------------------------------------------------------------------
+Tom's Trucks & Tires
+----------------------------------------------------------------------
+  Car repairs, story events with Tom
+
+----------------------------------------------------------------------
+The Watering Hole
+----------------------------------------------------------------------
+  Bar with Frank, story events
+
+----------------------------------------------------------------------
+Gus's Pawn Shop
+----------------------------------------------------------------------
+  Sell collectibles, buy items
+
+----------------------------------------------------------------------
+Marvin's Mystical Merchandise
+----------------------------------------------------------------------
+  Secret shop, requires Map
+
+----------------------------------------------------------------------
+The Doctor
+----------------------------------------------------------------------
+  Heal injuries, cure illnesses
+
+----------------------------------------------------------------------
+Convenience Store
+----------------------------------------------------------------------
+  Basic supplies
+
+----------------------------------------------------------------------
+Gas Station
+----------------------------------------------------------------------
+  Fuel, car supplies
+
+----------------------------------------------------------------------
+Vinnie's Corner
+----------------------------------------------------------------------
+  Loan shark, desperate measures
+
+================================================================================
+17. NPC ENCYCLOPEDIA
+================================================================================
+
+  The Dealer (Antagonist)
+    The mysterious casino dealer with a jade eye and a dark past
+
+  Tom (Friendly)
+    Owner of Tom's Trucks & Tires, has 3 dream sequences
+
+  Frank (Neutral)
+    Bartender at The Watering Hole, has 3 dream sequences
+
+  Oswald (Mysterious)
+    Strange figure, has 3 dream sequences about the casino
+
+  Suzy (Innocent)
+    Jump-roping girl with a storyline that can end good or bad
+
+  Victoria (Rival)
+    Fellow gambler who challenges you at higher tiers
+
+  Phil/Interrogator (Antagonist)
+    Man in red suit who harasses homeless people
+
+  Betsy (Animal)
+    A cow who becomes an army leader if wronged
+
+  Vinnie (Loan Shark)
+    Provides loans with escalating consequences
+
+  Gus (Merchant)
+    Pawn shop owner who buys collectibles
+
+  Marvin (Mysterious)
+    Runs secret mystical shop, sells unusual items
+
+  Rebecca (Family)
+    Your wife, crucial to the Salvation ending
+
+  Nathan (Family)
+    Your son, learned to walk, first word was 'Dada'
+
+================================================================================
+18. EVENT ODDS CALCULATOR
+================================================================================
+
+This section shows the probability of encountering each event type.
+Odds are calculated based on event pool sizes.
+
+----------------------------------------------------------------------
+POOR TIER ODDS:
+----------------------------------------------------------------------
+  Day Events Pool: 16 events
+  Base odds per day event: 1/16 = 6.25%
+  Night Events Pool: 5 events
+  Base odds per night event: 1/5 = 20.00%
+
+  NOTE: Conditional events may redirect if conditions not met,
+  effectively increasing odds of other events.
+
+----------------------------------------------------------------------
+CHEAP TIER ODDS:
+----------------------------------------------------------------------
+  Day Events Pool: 11 events
+  Base odds per day event: 1/11 = 9.09%
+  Night Events Pool: 5 events
+  Base odds per night event: 1/5 = 20.00%
+
+  NOTE: Conditional events may redirect if conditions not met,
+  effectively increasing odds of other events.
+
+----------------------------------------------------------------------
+MODEST TIER ODDS:
+----------------------------------------------------------------------
+  Day Events Pool: 6 events
+  Base odds per day event: 1/6 = 16.67%
+  Night Events Pool: 4 events
+  Base odds per night event: 1/4 = 25.00%
+
+  NOTE: Conditional events may redirect if conditions not met,
+  effectively increasing odds of other events.
+
+----------------------------------------------------------------------
+RICH TIER ODDS:
+----------------------------------------------------------------------
+  Day Events Pool: 5 events
+  Base odds per day event: 1/5 = 20.00%
+  Night Events Pool: 5 events
+  Base odds per night event: 1/5 = 20.00%
+
+  NOTE: Conditional events may redirect if conditions not met,
+  effectively increasing odds of other events.
+
+----------------------------------------------------------------------
+DOUGHMAN TIER ODDS:
+----------------------------------------------------------------------
+  Day Events Pool: 5 events
+  Base odds per day event: 1/5 = 20.00%
+  Night Events Pool: 3 events
+  Base odds per night event: 1/3 = 33.33%
+
+  NOTE: Conditional events may redirect if conditions not met,
+  effectively increasing odds of other events.
+
+----------------------------------------------------------------------
+NEARLY TIER ODDS:
+----------------------------------------------------------------------
+  Day Events Pool: 10 events
+  Base odds per day event: 1/10 = 10.00%
+  Night Events Pool: 3 events
+  Base odds per night event: 1/3 = 33.33%
+
+  NOTE: Conditional events may redirect if conditions not met,
+  effectively increasing odds of other events.
+
+----------------------------------------------------------------------
+SECRET EVENT ODDS:
+----------------------------------------------------------------------
+  Balance-triggered secrets: 100% when exact balance is reached
+  Madness Confrontation: Triggers when sanity < 25 for 5+ consecutive days
+  Dream sequences: 1/10 chance when conditions met
+  Rare event variants: Typically 3-5% chance
