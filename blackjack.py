@@ -152,24 +152,38 @@ class Blackjack:
             print("\n")
 
         # Makes the dealer a bit happier, as a new day has started
-        self.calm_dealer(random.choice([5, 7, 10]), False)
-        if self.__player.has_item("Delight Manipulator"):
-            type.fast("Your " + bright(cyan("Delight Manipulator")) + " hums with power.")
+        # BUT NOT if he has too much fake cash from the player
+        if not self.__player.has_too_much_fake_cash():
+            self.calm_dealer(random.choice([5, 7, 10]), False)
+            if self.__player.has_item("Delight Manipulator"):
+                type.fast("Your " + bright(cyan("Delight Manipulator")) + " hums with power.")
+                print()
+                type.fast("The Dealer has calmed down since you've last seen him!")
+                print()
+                self.delight_indicator()
+                print("\n")
+            elif self.__player.has_item("Delight Indicator"):
+                type.fast("Your " + bright(magenta("Delight Indicator")) + " begins to flash.")
+                print()
+                type.fast("The Dealer has calmed down since you've last seen him!")
+                print()
+                self.delight_indicator()
+                print("\n")
+        else:
+            type.fast(yellow("The Dealer looks at you strangely. His jade eye narrows."))
             print()
-            type.fast("The Dealer has calmed down since you've last seen him!")
-            print()
-            self.delight_indicator()
+            type.fast(yellow("He does NOT seem pleased to see you tonight."))
             print("\n")
-        elif self.__player.has_item("Delight Indicator"):
-            type.fast("Your " + bright(magenta("Delight Indicator")) + " begins to flash.")
-            print()
-            type.fast("The Dealer has calmed down since you've last seen him!")
-            print()
-            self.delight_indicator()
+        
+        # GIFT DELIVERY SYSTEM - Automatically give gift if player has one
+        if self.__player.has_gift_wrapped():
+            self.__player.deliver_gift_to_dealer()
             print("\n")
 
         # Tells the player their balance.
         type.fast("You have " + green(bright("${:,}".format(self.__balance))))
+        if self.__player.get_fraudulent_cash() > 0:
+            type.fast(" (+ " + yellow(bright("${:,}".format(self.__player.get_fraudulent_cash()))) + " " + yellow("fraudulent") + ")")
         print()
 
         for _ in range(count):
@@ -352,8 +366,13 @@ class Blackjack:
 
     def bet(self):
         bet = None
+        fraudulent_portion = 0
+        total_available = self.__balance + self.__player.get_fraudulent_cash()
+        
         while bet is None:
             type.fast("The Dealer expects you to bet at least " + green(bright("${:,}".format(self.__min_bet))))
+            if self.__player.get_fraudulent_cash() > 0:
+                type.fast(" " + yellow(f"(You have ${self.__player.get_fraudulent_cash():,} fraudulent cash to blend)"))
             print("")
             type.fast("How much would you like to bet? ")
             try:
@@ -365,8 +384,16 @@ class Blackjack:
 
         print("")
 
-        if(self.__min_bet<=int(bet)<=self.__balance):
+        if(self.__min_bet<=int(bet)<=total_available):
             self.__bet = bet
+            # Calculate fraudulent portion (blend fake with real)
+            if bet > self.__balance and self.__player.get_fraudulent_cash() > 0:
+                fraudulent_portion = min(bet - self.__balance, self.__player.get_fraudulent_cash())
+                real_portion = bet - fraudulent_portion
+                # Blend the fraudulent cash through the system
+                self.__player.blend_fraudulent_cash(fraudulent_portion)
+                type.fast(yellow(f"(Blending ${fraudulent_portion:,} fraudulent cash with ${real_portion:,} real money)"))
+                print("\n")
             return True
         elif((int(bet) < self.__min_bet)):
             if self.__dealer_happiness >= 30: type.slow(red("The Dealer doesn't like that bet."))

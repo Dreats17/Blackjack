@@ -29,6 +29,7 @@ class Lists:
         self.__companion_types = self.make_companion_types()
         self.__pawn_shop_prices = self.make_pawn_shop_prices()
         self.__loan_shark_dialogue = self.make_loan_shark_dialogue()
+        self.__dealer_betrayal_list = self.make_dealer_betrayal_dialogue_list()
 
     # ==========================================
     # ACHIEVEMENT SYSTEM DATA
@@ -37,52 +38,340 @@ class Lists:
     def make_achievements_dict(self):
         """All achievements in the game"""
         return {
-            # Money Milestones
+            # Common - Money Milestones (easy)
             "first_thousand": {"name": "Baby Steps", "description": "Reach $1,000 for the first time."},
             "first_ten_thousand": {"name": "Getting Somewhere", "description": "Reach $10,000 for the first time."},
-            "hundred_thousand": {"name": "Big Spender", "description": "Reach $100,000 for the first time."},
-            "half_million": {"name": "Almost There", "description": "Reach $500,000 for the first time."},
-            "millionaire": {"name": "The Dream", "description": "Reach $1,000,000 and complete your goal."},
+            "fifty_thousand": {"name": "Halfway to Modest", "description": "Reach $50,000."},
             
-            # Survival Milestones
+            # Common - Survival Milestones (easy)
+            "three_days": {"name": "The Third Day", "description": "Survive 3 days."},
             "week_survivor": {"name": "Still Kicking", "description": "Survive 7 days."},
+            
+            # Common - Basic Gambling (easy)
+            "first_blackjack": {"name": "Twenty-One!", "description": "Hit your first blackjack."},
+            "ten_hands": {"name": "Getting the Hang of It", "description": "Play 10 hands of blackjack."},
+            "first_win": {"name": "Beginner's Luck", "description": "Win your first hand."},
+            
+            # Common - Social (easy)
+            "meet_suzy": {"name": "Hello, Suzy", "description": "Meet Suzy for the first time."},
+            "first_mechanic": {"name": "Roadside Assistance", "description": "Visit a mechanic."},
+            "first_shop": {"name": "Window Shopping", "description": "Visit any shop."},
+            
+            # Uncommon - Money (medium)
+            "hundred_thousand": {"name": "Big Spender", "description": "Reach $100,000 for the first time."},
+            "quarter_million": {"name": "Getting Serious", "description": "Reach $250,000."},
+            "broke_to_rich": {"name": "Rags to Riches", "description": "Go from under $100 to over $10,000 in one day."},
+            
+            # Uncommon - Survival (medium)
+            "two_weeks": {"name": "Fortnight Fighter", "description": "Survive 14 days."},
             "month_survivor": {"name": "Stubborn", "description": "Survive 30 days."},
-            "hundred_days": {"name": "The Long Road", "description": "Survive 100 days."},
+            "near_death_survivor": {"name": "Not Today, Death", "description": "Survive with less than 5 health."},
             
-            # Gambling Achievements
-            "blackjack_master": {"name": "Blackjack Master", "description": "Hit 10 blackjacks."},
-            "hot_streak": {"name": "Hot Streak", "description": "Win 5 hands in a row."},
+            # Uncommon - Gambling (medium)
+            "fifty_hands": {"name": "Card Counter", "description": "Play 50 hands of blackjack."},
             "card_shark": {"name": "Card Shark", "description": "Play 100 hands of blackjack."},
-            "high_roller": {"name": "High Roller", "description": "Win a single hand worth $10,000+."},
+            "blackjack_master": {"name": "Blackjack Master", "description": "Hit 10 blackjacks."},
+            "three_streak": {"name": "Triple Threat", "description": "Win 3 hands in a row."},
             "comeback_kid": {"name": "Comeback Kid", "description": "Win after having less than $100."},
+            "big_bet": {"name": "High Roller Moment", "description": "Win a hand worth $1,000+."},
             
-            # Companion Achievements
+            # Uncommon - Items & Collection (medium)
+            "first_item": {"name": "Packrat Begins", "description": "Acquire your first item."},
+            "five_items": {"name": "Starting Collection", "description": "Collect 5 different items."},
+            "first_flask": {"name": "Alchemist's Apprentice", "description": "Use your first flask."},
+            "treasure_hunter": {"name": "Treasure Hunter", "description": "Sell 5 collectibles to Gus."},
+            
+            # Uncommon - Companions (medium)
             "first_friend": {"name": "First Friend", "description": "Befriend your first companion."},
-            "animal_lover": {"name": "Animal Lover", "description": "Have 3 or more companions."},
-            "best_friends": {"name": "Best Friends", "description": "Fully bond with a companion."},
-            "loyal_companion": {"name": "Loyal Companion", "description": "Keep a companion for 30 days."},
+            "companion_bond": {"name": "Bonding Time", "description": "Reach 50 happiness with any companion."},
             
-            # Danger Achievements
+            # Uncommon - Misc (medium)
+            "rock_bottom": {"name": "Rock Bottom", "description": "Lose all your money and recover."},
+            "sanity_saved": {"name": "Sanity Saved", "description": "Recover from below 25 sanity to above 75."},
+            "broken_but_alive": {"name": "Broken But Breathing", "description": "Survive the broken state."},
+            "devils_deal": {"name": "Devil's Deal", "description": "Make a deal with the devil and survive."},
+            
+            # Rare - Money (hard)
+            "half_million": {"name": "Almost There", "description": "Reach $500,000 for the first time."},
+            "nine_hundred": {"name": "So Close", "description": "Reach $900,000."},
+            "yo_yo": {"name": "Economic Yo-Yo", "description": "Gain and lose $100,000 multiple times."},
+            
+            # Rare - Survival (hard)
+            "hundred_days": {"name": "The Long Road", "description": "Survive 100 days."},
+            "injured_survival": {"name": "Walking Wounded", "description": "Survive 7 days with an injury."},
+            "sick_survival": {"name": "Plague Bearer", "description": "Survive 7 days while sick."},
             "cheated_death": {"name": "Cheated Death", "description": "Survive 3 near-death experiences."},
             "clinging_to_life": {"name": "Clinging to Life", "description": "Survive with 10 or less health."},
             "scarred_survivor": {"name": "Scarred Survivor", "description": "Have 5 different injuries at once."},
             
-            # Collection Achievements
-            "collector": {"name": "Collector", "description": "Collect 10 different items."},
-            "hoarder": {"name": "Hoarder", "description": "Collect 25 different items."},
-            "treasure_hunter": {"name": "Treasure Hunter", "description": "Sell 5 collectibles to Gus."},
+            # Rare - Gambling (hard)
+            "hot_streak": {"name": "Hot Streak", "description": "Win 5 hands in a row."},
+            "blackjack_legend": {"name": "Natural Master", "description": "Hit 25 blackjacks."},
+            "two_hundred_hands": {"name": "Veteran Player", "description": "Play 200 hands."},
+            "high_roller": {"name": "High Roller", "description": "Win a single hand worth $10,000+."},
+            "blackjack_streak": {"name": "Natural Streak", "description": "Hit 3 blackjacks in 10 hands."},
+            "comeback_master": {"name": "Phoenix Rising", "description": "Win 5 hands in a row after a 5-loss streak."},
             
-            # Social Achievements
+            # Rare - Collection (hard)
+            "collector": {"name": "Collector", "description": "Collect 10 different items."},
+            "flask_connoisseur": {"name": "Flask Connoisseur", "description": "Use 10 different flask types."},
+            "item_hoarder": {"name": "Hoarder", "description": "Have 15 items at once."},
+            
+            # Rare - Companions (hard)
+            "animal_lover": {"name": "Animal Lover", "description": "Have 3 or more companions."},
+            "best_friends": {"name": "Best Friends", "description": "Reach 90 happiness with a companion."},
+            "loyal_companion": {"name": "Loyal Companion", "description": "Keep a companion for 30 days."},
+            "pet_cemetery": {"name": "They All Leave Eventually", "description": "Have 3 companions run away."},
+            
+            # Rare - Social & Events (hard)
             "social_butterfly": {"name": "Social Butterfly", "description": "Meet 20 different people."},
             "regular": {"name": "Regular", "description": "Visit the casino 50 times."},
-            "debt_free": {"name": "Debt Free", "description": "Pay off a loan shark debt completely."},
-            
-            # Special Achievements
-            "rock_bottom": {"name": "Rock Bottom", "description": "Lose all your money and recover."},
-            "sanity_saved": {"name": "Sanity Saved", "description": "Recover from below 25 sanity to above 75."},
             "night_owl": {"name": "Night Owl", "description": "Experience 20 night events."},
             "morning_person": {"name": "Morning Person", "description": "Experience 20 morning events."},
-            "devils_deal": {"name": "Devil's Deal", "description": "Make a deal with the devil and survive."},
+            "event_collector": {"name": "Story Seeker", "description": "Experience 50 unique events."},
+            
+            # Rare - Specific Events (hard)
+            "rabbit_chaser": {"name": "Down the Rabbit Hole", "description": "Complete all rabbit chase events."},
+            "dream_walker": {"name": "Dream Walker", "description": "Experience all three dream sequences."},
+            "suzy_story": {"name": "Pigtails and Promises", "description": "Complete Suzy's full story arc."},
+            
+            # Epic - Money (very hard)
+            "millionaire": {"name": "The Dream", "description": "Reach $1,000,000 and complete your goal."},
+            "multi_millionaire": {"name": "Overachiever", "description": "Reach $2,000,000."},
+            "near_miss": {"name": "So Close Yet So Far", "description": "Reach $950,000 and then go broke."},
+            
+            # Epic - Survival (very hard)
+            "two_hundred_days": {"name": "Endless Grind", "description": "Survive 200 days."},
+            "low_health_master": {"name": "Living on the Edge", "description": "Survive 10 days under 25 health."},
+            "sanity_master": {"name": "Mind Over Matter", "description": "Survive 20 days under 30 sanity."},
+            "debt_free": {"name": "Debt Free", "description": "Pay off a loan shark debt of $30,000+."},
+            "beaten_and_bloody": {"name": "Beaten and Bloody", "description": "Survive all loan shark violence tiers."},
+            
+            # Epic - Gambling (very hard)
+            "win_streak_10": {"name": "Unstoppable", "description": "Win 10 hands in a row."},
+            "five_hundred_hands": {"name": "Gambling Addiction", "description": "Play 500 hands of blackjack."},
+            "fifty_blackjacks": {"name": "Card Counting Suspicion", "description": "Hit 50 blackjacks."},
+            "big_spender": {"name": "Whale Status", "description": "Win a single hand worth $50,000+."},
+            "no_bust_streak": {"name": "Perfect Control", "description": "Play 20 hands without busting."},
+            
+            # Epic - Collection (very hard)
+            "master_collector": {"name": "Museum Curator", "description": "Collect 20 different items."},
+            "full_house": {"name": "Full House", "description": "Own every collectible item at once."},
+            "flask_master": {"name": "Potion Master", "description": "Have 5 active flask effects at once."},
+            "item_master": {"name": "Item Master", "description": "Use every item in the game."},
+            
+            # Epic - Companions (very hard)
+            "max_companions": {"name": "Noah's Wagon", "description": "Have 5 companions at once."},
+            "companion_loyalty": {"name": "Unbreakable Bond", "description": "Keep a companion for 60 days."},
+            "sanctuary_finder": {"name": "The Animal Shepherd", "description": "Find the secret companion sanctuary ending."},
+            
+            # NEW COMPANION ACHIEVEMENTS
+            "zookeeper": {"name": "Zookeeper", "description": "Befriend 10 different animals."},
+            "noahs_ark": {"name": "Noah's Ark", "description": "Befriend 20 different animals."},
+            "disney_princess": {"name": "Disney Princess", "description": "Befriend all forest creatures."},
+            "marine_biologist": {"name": "Marine Biologist", "description": "Befriend all water creatures."},
+            
+            # Epic - Misc (very hard)
+            "iron_will": {"name": "Iron Will", "description": "Never drop below 50 sanity."},
+            "doctor_regular": {"name": "Medical Marvel", "description": "Visit the doctor 20 times."},
+            "mechanic_loyal": {"name": "Mechanic Loyalty", "description": "Visit the same mechanic 15 times."},
+            
+            # Legendary - Ultimate Challenges (extremely rare)
+            "year_survivor": {"name": "The Long Con", "description": "Survive 365 days."},
+            "perfect_record": {"name": "Perfect Record", "description": "Reach $100,000 without losing a hand."},
+            "lottery_winner": {"name": "Against All Odds", "description": "Win the lottery jackpot."},
+            "death_defier": {"name": "Death Defier", "description": "Survive 10 near-death experiences."},
+            "true_gambler": {"name": "True Gambler", "description": "Play 1,000 hands of blackjack."},
+            "philanthropist": {"name": "Robin Hood", "description": "Give away $100,000 in total."},
+            "cursed_survival": {"name": "Cursed But Alive", "description": "Survive 30 days with a cursed item."},
+            "casino_legend": {"name": "Casino Legend", "description": "Visit the casino 200 times."},
+            "all_endings": {"name": "Fate Collector", "description": "Experience all game endings."},
+            "speedrunner": {"name": "Speedrunner", "description": "Reach $1,000,000 in under 30 days."},
+            
+            # Secret/Dark Endings - The Betrayal Path
+            "first_sale": {"name": "First Blood", "description": "Sell your first companion to Gus."},
+            "three_sales": {"name": "The Product", "description": "Sell 3 companions. Learn about the processing plant."},
+            "five_sales": {"name": "Meat Cubes", "description": "Sell 5 companions. Learn the truth about what happens to them."},
+            "seven_sales": {"name": "The Menu", "description": "Sell 7 companions. Gus describes the flavors."},
+            "ten_sales": {"name": "Production Run", "description": "Sell 10 companions. Receive the factory's business card."},
+            "cube_master": {"name": "The Factory", "description": "Sell 15 companions. Become part of the machine."},
+            
+            # Gift System & Dealer Happiness
+            "gift_giver": {"name": "Bearer of Gifts", "description": "Give your first gift to the Dealer."},
+            "perfect_gift": {"name": "Perfect Gift", "description": "Give a gift that increases Dealer happiness by 25+."},
+            "death_wish": {"name": "Death Wish", "description": "Give the Dealer a gift that kills you."},
+            "dealer_pleased": {"name": "In His Good Graces", "description": "Reach 100 Dealer happiness."},
+            "dealer_furious": {"name": "On Thin Ice", "description": "Drop Dealer happiness to 10 or below."},
+            
+            # Fraudulent Cash System
+            "money_launderer": {"name": "Money Launderer", "description": "Successfully blend $10,000 in fraudulent cash."},
+            "master_launderer": {"name": "Master Launderer", "description": "Blend $100,000 in fraudulent cash total."},
+            "caught_red_handed": {"name": "Caught Red-Handed", "description": "Have the Dealer stop gaining happiness due to fake cash."},
+            "vinnie_regular": {"name": "Vinnie's Best Customer", "description": "Take 5 loans from the loan shark."},
+            
+            # Pawn Shop
+            "first_garble": {"name": "Into the Machine", "description": "Garble your first collectible."},
+            "grime_addict": {"name": "Grime Addict", "description": "Garble 20 collectibles."},
+            "gus_trusted": {"name": "Gus Trusts You", "description": "Reach 75+ reputation at the pawn shop."},
+            
+            # Specific Item Discoveries
+            "animal_whisperer": {"name": "Animal Whisperer", "description": "Find the Animal Whistle."},
+            "grimoire_keeper": {"name": "Keeper of Records", "description": "Acquire the Gambler's Grimoire."},
+            "oracle_ascended": {"name": "Oracle Ascended", "description": "Upgrade to Oracle's Tome."},
+            "fully_upgraded": {"name": "Maximum Upgrade", "description": "Have 5 fully upgraded items at once."},
+            
+            # Unique Deaths
+            "dealer_executed": {"name": "The Dealer's Justice", "description": "Be killed by the Dealer for angering him."},
+            "tony_visited": {"name": "Tony's Collection", "description": "Survive a visit from Tony the enforcer."},
+            "madness_consumed": {"name": "Lost to Madness", "description": "Die from the madness ending."},
+            
+            # Social Achievements
+            "suzy_romance": {"name": "Suzy's Heart", "description": "Complete Suzy's full storyline."},
+            "all_mechanics": {"name": "Mechanic Connoisseur", "description": "Visit all three mechanics."},
+            "marvin_customer": {"name": "Believer in Magic", "description": "Purchase from Marvin's shop."},
+            "kyle_regular": {"name": "Kyle's Buddy", "description": "Purchase 10 items from the convenience store."},
+            
+            # Rare Events
+            "rabbit_chaser": {"name": "Down the Rabbit Hole", "description": "Complete all rabbit chase events."},
+            "kraken_encounter": {"name": "Leviathan's Blessing", "description": "Befriend the Kraken."},
+            "moon_touched": {"name": "Moonlit", "description": "Experience the moon rabbit event."},
+            "mermaid_met": {"name": "Song of the Sea", "description": "Meet the mermaid."},
+            "witch_wisdom": {"name": "Witch's Wisdom", "description": "Complete witch doctor's riddle."},
+            
+            # Gameplay Mastery
+            "never_bust": {"name": "Controlled Gambler", "description": "Win 50 hands without busting once."},
+            "insurance_expert": {"name": "Insurance Expert", "description": "Collect insurance 10 times."},
+            "split_master": {"name": "Split Master", "description": "Win both hands of a split 5 times."},
+            "double_down_king": {"name": "Double Down King", "description": "Win 20 double downs."},
+            "surrender_survivor": {"name": "Strategic Retreat", "description": "Surrender 10 hands."},
+            "blackjack_natural": {"name": "Natural Talent", "description": "Get 10 natural blackjacks."},
+            "perfect_split": {"name": "Perfect Split", "description": "Get blackjack on both split hands."},
+            "high_roller_bet": {"name": "High Roller", "description": "Bet $50,000 on a single hand."},
+            "all_in_win": {"name": "All In", "description": "Bet your entire balance and win."},
+            "comeback_king": {"name": "The Comeback", "description": "Go from under $100 to over $10,000 in one session."},
+            
+            # Money Extremes
+            "penny_pincher": {"name": "Penny Pincher", "description": "Survive 10 days with under $100."},
+            "zero_balance": {"name": "Rock Bottom", "description": "Reach exactly $0."},
+            "money_hoarder": {"name": "Dragon's Hoard", "description": "Hold $500,000 without spending."},
+            "big_spender": {"name": "Big Spender", "description": "Spend $100,000 at shops in total."},
+            "never_shop": {"name": "Minimalist", "description": "Reach day 50 without buying anything."},
+            "debt_collector": {"name": "In the Red", "description": "Owe $100,000 to the loan shark."},
+            
+            # Companion Variety
+            "cat_person": {"name": "Cat Person", "description": "Have 5 cat companions at once."},
+            "dog_person": {"name": "Dog Person", "description": "Have 5 dog companions at once."},
+            "aquarium": {"name": "Living Aquarium", "description": "Have 10 aquatic companions."},
+            "aviary": {"name": "Aviary Keeper", "description": "Have 10 bird companions."},
+            "mythical_menagerie": {"name": "Mythical Menagerie", "description": "Have 5 mythical creature companions."},
+            "lone_wolf": {"name": "Lone Wolf", "description": "Reach day 100 without any companions."},
+            
+            # Death & Failure
+            "first_death": {"name": "First Blood (Yours)", "description": "Die for the first time."},
+            "death_collector": {"name": "Death Collector", "description": "Die 10 different ways."},
+            "quick_death": {"name": "Speed Run (Death%)", "description": "Die within 5 days."},
+            "serial_dier": {"name": "Glutton for Punishment", "description": "Die 50 times total."},
+            "loan_shark_victim": {"name": "Sleeping with the Fishes", "description": "Be killed by the loan shark."},
+            
+            # Location Mastery
+            "casino_rat": {"name": "Casino Rat", "description": "Visit the casino 100 times."},
+            "shop_hopper": {"name": "Window Shopping", "description": "Visit all shops in one day."},
+            "hermit": {"name": "Hermit", "description": "Stay at camp for 20 days straight."},
+            "nomad": {"name": "Nomad", "description": "Visit 5 different locations in one day."},
+            
+            # Special Card Combinations
+            "lucky_sevens": {"name": "Lucky Sevens", "description": "Get three 7s in one hand."},
+            "unlucky_thirteen": {"name": "Unlucky Thirteen", "description": "Bust with exactly 13."},
+            "twenty_one_push": {"name": "So Close", "description": "Push with 21 five times."},
+            "dealer_bust_streak": {"name": "Dealer's Nightmare", "description": "Win 10 hands in a row by dealer bust."},
+            
+            # Rare Item Interactions
+            "cursed_collector": {"name": "Cursed Collector", "description": "Own 5 cursed items at once."},
+            "blessing_hoarder": {"name": "Blessed Beyond Measure", "description": "Have 10 active blessings."},
+            "trinket_master": {"name": "Trinket Master", "description": "Collect every trinket type."},
+            "weapon_dealer": {"name": "Armed and Dangerous", "description": "Own 5 weapons at once."},
+            
+            # NPC Relationships
+            "dealer_friend": {"name": "The Dealer's Equal", "description": "Maintain 90+ happiness for 20 days."},
+            "gus_partner": {"name": "Business Partners", "description": "Reach max reputation with Gus."},
+            "oswald_masterwork": {"name": "Oswald's Masterpiece", "description": "Have Oswald upgrade an item 10 times."},
+            "marvin_believer": {"name": "True Believer", "description": "Buy everything from Marvin."},
+            "kyle_confidant": {"name": "Late Night Talks", "description": "Visit Kyle 50 times."},
+            
+            # Time-Based
+            "speedrunner_rich": {"name": "Speedrunner", "description": "Reach $100,000 before day 30."},
+            "marathon_man": {"name": "Marathon Man", "description": "Survive 200 days."},
+            "centurion": {"name": "Centurion", "description": "Play 100 sessions."},
+            "time_loop": {"name": "Déjà Vu", "description": "Experience the same event 3 days in a row."},
+            
+            # Secret/Meta
+            "fourth_wall": {"name": "Breaking the Fourth Wall", "description": "Discover a meta secret."},
+            "completionist": {"name": "Completionist", "description": "Unlock 90% of all achievements."},
+            "achievement_hunter": {"name": "Achievement Hunter", "description": "Check your achievements 100 times."},
+            "true_ending": {"name": "True Ending", "description": "Find the secret true ending."},
+            "new_game_plus": {"name": "New Game+", "description": "Start a new run after getting all endings."},
+            
+            # Insane Challenges
+            "lose_streak": {"name": "Professional Loser", "description": "Lose 50 hands in a row."},
+            "bust_master": {"name": "Bust Master", "description": "Bust 100 times."},
+            "million_lost": {"name": "Burning Money", "description": "Lose $1,000,000 total."},
+            "no_item_millionaire": {"name": "Pure Skill", "description": "Reach $1,000,000 without buying any items."},
+            "cursed_millionaire": {"name": "Cursed Millionaire", "description": "Reach $1,000,000 while holding only cursed items."},
+            "zero_happiness_survivor": {"name": "Edge of Death", "description": "Survive 10 days with Dealer happiness under 5."},
+            "fake_money_king": {"name": "Counterfeit King", "description": "Have $500,000 in fraudulent cash at once."},
+            "debt_spiral": {"name": "Debt Spiral", "description": "Take a loan to pay off another loan 5 times."},
+            "broke_millionaire": {"name": "Broke Millionaire", "description": "Reach $1,000,000 then lose it all to $0."},
+            "bankruptcy_expert": {"name": "Bankruptcy Expert", "description": "Go from $100,000+ to $0 in one day."},
+            
+            # Absurd Combinations
+            "zoo_betrayal": {"name": "The Ultimate Betrayal", "description": "Befriend 30 companions then sell them all."},
+            "gift_of_death": {"name": "Gift of Death", "description": "Give the Dealer 5 gifts that lower his happiness."},
+            "happiness_rollercoaster": {"name": "Emotional Rollercoaster", "description": "Change Dealer happiness by 100+ points in one day."},
+            "all_shops_one_day": {"name": "Shopping Spree", "description": "Buy from every shop in a single day."},
+            "item_hoarder": {"name": "Hoarder", "description": "Own 50 items at once."},
+            "collector_betrayer": {"name": "Collector Betrayer", "description": "Collect every animal type then sell them all."},
+            
+            # Dark Humor
+            "meat_cube_connoisseur": {"name": "Meat Cube Connoisseur", "description": "After The Factory ending, eat a meat cube."},
+            "dealer_tormentor": {"name": "Dealer Tormentor", "description": "Lower Dealer happiness to 0 five times."},
+            "loan_shark_best_friend": {"name": "Vinnie's Soulmate", "description": "Take 50 loans total."},
+            "tony_survivor": {"name": "Tony's Punching Bag", "description": "Survive Tony's visits 10 times."},
+            "death_tourist": {"name": "Death Tourist", "description": "Experience all unique death scenes."},
+            "suicide_gambler": {"name": "Suicide Gambler", "description": "Bet your last dollar 100 times."},
+            
+            # Extreme Grinds
+            "ten_thousand_hands": {"name": "Card Counter", "description": "Play 10,000 hands of blackjack."},
+            "millennium_survivor": {"name": "Millennium Bug", "description": "Survive 1,000 days."},
+            "every_item": {"name": "Item Encyclopedia", "description": "Own every item in the game at least once."},
+            "every_companion": {"name": "Zookeeper Supreme", "description": "Befriend every companion type."},
+            "all_endings_perfect": {"name": "Fate Master", "description": "Get all endings with perfect conditions."},
+            "max_everything": {"name": "Perfection", "description": "Max out all stats, relationships, and money."},
+            
+            # Specific Insanity
+            "split_inception": {"name": "Split Inception", "description": "Win a split where both hands also split."},
+            "twenty_one_loss": {"name": "The Impossible Loss", "description": "Lose with 21 against Dealer's 21 five times."},
+            "dealer_blackjack_victim": {"name": "Dealer's Blackjack Victim", "description": "Lose to Dealer blackjack 50 times."},
+            "insurance_failure": {"name": "Insurance Scam", "description": "Take insurance when Dealer doesn't have blackjack 20 times."},
+            "surrender_addiction": {"name": "Surrender Addiction", "description": "Surrender 100 hands."},
+            "push_master": {"name": "Push Master", "description": "Push 100 hands."},
+            
+            # Self-Imposed Handicaps
+            "pacifist_run": {"name": "Pacifist", "description": "Reach day 100 without owning any weapons."},
+            "vegan_run": {"name": "Vegan", "description": "Complete the game without eating any meat items."},
+            "no_loans": {"name": "Debt Free", "description": "Reach $1,000,000 without ever taking a loan."},
+            "no_gifts": {"name": "No Presents", "description": "Reach day 100 without giving the Dealer any gifts."},
+            "casino_only": {"name": "Casino Purist", "description": "Reach $100,000 visiting only the casino."},
+            "minimum_bet": {"name": "Minimum Bet Master", "description": "Reach $100,000 betting minimum only."},
+            
+            # Ridiculous Feats
+            "one_million_bet": {"name": "YOLO", "description": "Bet $1,000,000 on a single hand."},
+            "win_million_hand": {"name": "Whale Victory", "description": "Win a hand worth $1,000,000+."},
+            "perfect_day": {"name": "Perfect Day", "description": "Win every hand in a day (minimum 10 hands)."},
+            "worst_day": {"name": "Worst Day Ever", "description": "Lose every hand in a day (minimum 10 hands)."},
+            "all_naturals": {"name": "All Naturals", "description": "Get 5 blackjacks in a row."},
+            "all_busts": {"name": "All Busts", "description": "Bust 10 hands in a row."},
+            "companion_army": {"name": "Companion Army", "description": "Have 50 companions at once."},
+            "item_minimalist": {"name": "Empty Pockets", "description": "Reach $1,000,000 with 0 items in inventory."},
         }
     
     def get_achievement_data(self, achievement_id):
@@ -90,6 +379,10 @@ class Lists:
     
     def get_total_achievements(self):
         return len(self.__achievements)
+    
+    def get_all_achievement_ids(self):
+        """Return list of all achievement IDs"""
+        return list(self.__achievements.keys())
 
     # ==========================================
     # COMPANION SYSTEM DATA
@@ -325,8 +618,88 @@ class Lists:
             ]
         }
     
+    def make_loan_shark_greeting_list(self):
+        a_list = []
+        a_list.append("Back so soon? The cash is calling you, huh?")
+        a_list.append("Fresh face looking for fresh money. I can work with that.")
+        a_list.append("You got the look of someone who needs capital. Lucky for you, I got capital.")
+        a_list.append("Money problems? Vinnie's got solutions. Expensive solutions, but solutions.")
+        a_list.append("You need cash, I got cash. Simple transaction between friends.")
+        random.shuffle(a_list)
+        return a_list
+    
+    def make_loan_shark_warning_list(self):
+        a_list = []
+        a_list.append("Hey, uh, you're a little behind on payments. Not a big deal... yet.")
+        a_list.append("Look, I like you, but the interest is adding up. Just saying.")
+        a_list.append("The clock's ticking on that debt, friend. Tick tock.")
+        a_list.append("You're overdue. I'm being nice about it now. Won't always be nice.")
+        a_list.append("Debt doesn't just go away. It grows. Like a tumor. A very expensive tumor.")
+        random.shuffle(a_list)
+        return a_list
+    
+    def make_loan_shark_threat_list(self):
+        a_list = []
+        a_list.append("You're testing my patience. And Tony's. Especially Tony's.")
+        a_list.append("I've been MORE than reasonable. That generosity? It's running out.")
+        a_list.append("You know what happens to people who don't pay? Bad things. Creative bad things.")
+        a_list.append("The interest is compounding. So is my frustration.")
+        a_list.append("Pay up soon, or we're gonna have to have a different kind of conversation.")
+        random.shuffle(a_list)
+        return a_list
+    
+    def make_loan_shark_violence_list(self):
+        a_list = []
+        a_list.append("Tony sends his regards. And by regards, I mean his fists. Soon.")
+        a_list.append("You've crossed the line. Tony's getting his tools ready.")
+        a_list.append("I tried to be nice. You didn't listen. Now? Now it gets ugly.")
+        a_list.append("Last warning. Next time I see you, Tony's with me.")
+        a_list.append("You think you can just avoid me? Tony will find you. He always does.")
+        random.shuffle(a_list)
+        return a_list
+    
+    def make_loan_shark_collecting_list(self):
+        a_list = []
+        a_list.append("Tony's here. You see him? Yeah. He sees you too.")
+        a_list.append("Too late for words. Way too late. Tony, do your thing.")
+        a_list.append("You had your chances. All of them. Tony's gonna collect now.")
+        a_list.append("Payment time. And Tony prefers to be paid in pain.")
+        a_list.append("I gave you every opportunity. Now? Now we take it from you.")
+        random.shuffle(a_list)
+        return a_list
+    
+    def make_loan_shark_dialogue(self):
+        """Central dialogue dictionary for loan shark"""
+        return {
+            "greeting": self.make_loan_shark_greeting_list(),
+            "warning_1": self.make_loan_shark_warning_list(),
+            "warning_2": self.make_loan_shark_warning_list(),
+            "threat": self.make_loan_shark_threat_list(),
+            "violence": self.make_loan_shark_violence_list(),
+            "collecting": self.make_loan_shark_collecting_list()
+        }
+    
     def get_loan_shark_dialogue(self, dialogue_type):
-        return random.choice(self.__loan_shark_dialogue.get(dialogue_type, ["Vinnie stares at you."]))
+        dialogue_list = self.__loan_shark_dialogue.get(dialogue_type, None)
+        if dialogue_list and len(dialogue_list) > 0:
+            return dialogue_list.pop(0)
+        # If list is empty, remake it
+        if dialogue_type == "greeting":
+            self.__loan_shark_dialogue["greeting"] = self.make_loan_shark_greeting_list()
+            return self.__loan_shark_dialogue["greeting"].pop(0)
+        elif dialogue_type in ["warning_1", "warning_2"]:
+            self.__loan_shark_dialogue[dialogue_type] = self.make_loan_shark_warning_list()
+            return self.__loan_shark_dialogue[dialogue_type].pop(0)
+        elif dialogue_type == "threat":
+            self.__loan_shark_dialogue["threat"] = self.make_loan_shark_threat_list()
+            return self.__loan_shark_dialogue["threat"].pop(0)
+        elif dialogue_type == "violence":
+            self.__loan_shark_dialogue["violence"] = self.make_loan_shark_violence_list()
+            return self.__loan_shark_dialogue["violence"].pop(0)
+        elif dialogue_type == "collecting":
+            self.__loan_shark_dialogue["collecting"] = self.make_loan_shark_collecting_list()
+            return self.__loan_shark_dialogue["collecting"].pop(0)
+        return "Vinnie stares at you."
 
 
 # This is a lot of similar code, but each list is a unique set of events
@@ -1864,6 +2237,26 @@ class Lists:
         a_list.append("Come, sit down, we have a game to play.")
         a_list.append("Are you ready to play some Blackjack?")
         a_list.append("Nightfall again, huh? Well, you know what's next.")
+        a_list.append("Another night. Another dance with chance.")
+        a_list.append("The cards have been waiting for you.")
+        a_list.append("You keep coming back. Interesting.")
+        a_list.append("Sit. Let's see what fate has in store tonight.")
+        a_list.append("The table is set. The cards are ready. Are you?")
+        a_list.append("Night falls. The game begins.")
+        a_list.append("You look... determined. Or desperate. Hard to tell.")
+        a_list.append("Still alive? Good. The cards would be disappointed otherwise.")
+        a_list.append("Another gambler. Another story waiting to unfold.")
+        a_list.append("The casino never sleeps. Neither do you, it seems.")
+        a_list.append("Take your seat. The wheel of fortune turns for no one.")
+        a_list.append("You smell like daylight and poor decisions. Sit.")
+        a_list.append("Back for more? The cards appreciate your persistence.")
+        a_list.append("The night is young. Your wallet, however...")
+        a_list.append("Ready to play? The question is always yes, isn't it?")
+        a_list.append("You've got that look in your eye. Hope. Or madness. Sometimes they're the same.")
+        a_list.append("The green felt remembers you. So do I.")
+        a_list.append("Shuffle. Deal. Win. Lose. Repeat. Shall we?")
+        a_list.append("Each night you return. Each night, the cards wait.")
+        a_list.append("Welcome back to the only place that never judges your choices.")
         random.shuffle(a_list)
         return a_list
     
@@ -1871,6 +2264,32 @@ class Lists:
         if len(self.__dealer_welcome_list)==0:
             self.__dealer_welcome_list = self.make_dealer_welcome_list()
         return self.__dealer_welcome_list.pop()
+    
+    def make_dealer_betrayal_dialogue_list(self):
+        """Dealer's reactions to player selling companions - varied and haunting"""
+        a_list = []
+        a_list.append("You reek of it.")
+        a_list.append("Betrayal. Blood. Industrial processing. The stench is unmistakable.")
+        a_list.append("The cards can smell what you've done. So can I.")
+        a_list.append("Fifteen souls. Ground into cubes. Packaged. Sold. Consumed.")
+        a_list.append("Don't. There's nothing to say. You know what you are.")
+        a_list.append("Some people play cards. Some people chase money. And some people... some people feed the machine.")
+        a_list.append("The game continues. It always does. But you're not playing anymore.")
+        a_list.append("You're just... existing. In the space between the factory and the table.")
+        a_list.append("I've seen many things in this casino. But you... you're something different.")
+        a_list.append("Every creature had a name. You remember their names, don't you?")
+        a_list.append("The van comes at night. You know the schedule now. You're part of the supply chain.")
+        a_list.append("Cube Processing Inc. sends their regards. And their gratitude.")
+        a_list.append("They trusted you. All of them. That makes it worse, you know.")
+        a_list.append("The business card in your pocket is burning a hole. You can feel it, can't you?")
+        a_list.append("You've crossed a threshold most people don't even know exists.")
+        random.shuffle(a_list)
+        return a_list
+    
+    def get_dealer_betrayal_dialogue(self):
+        if len(self.__dealer_betrayal_list)==0:
+            self.__dealer_betrayal_list = self.make_dealer_betrayal_dialogue_list()
+        return self.__dealer_betrayal_list.pop()
     
     def make_prayers_list(self):
         a_list = []
@@ -2125,6 +2544,229 @@ class Lists:
         if len(self.__advice_list)==0:
             self.__advice_list = self.make_advice_list()
         return self.__advice_list.pop()
+    
+    def make_rank_comment_list(self, rank):
+        """Varied comments for each wealth rank"""
+        a_list = []
+        if rank == 0:  # Poor ($1-1,000)
+            a_list.append("Let's not get too far ahead of ourselves though, you're still quite poor.")
+            a_list.append("You're basically living paycheck to paycheck. Except there's no paycheck.")
+            a_list.append("Poor? Yes. Defeated? Not yet.")
+            a_list.append("Hey, at least you can afford... some things. Not many things. But some.")
+            a_list.append("You're in the 'ramen noodle' tax bracket.")
+        elif rank == 1:  # Modest ($1,001-10,000)
+            a_list.append("You definitely have some money. The keyword is 'some'.")
+            a_list.append("Not rich, not poor. Perfectly mediocre.")
+            a_list.append("You've got a cushion now. A very small, uncomfortable cushion.")
+            a_list.append("Middle class in a wagon. Living the dream.")
+            a_list.append("You're doing okay. And okay is honestly pretty good these days.")
+        elif rank == 2:  # Well-off ($10,001-100,000)
+            a_list.append("You've amassed significant earnings. Nicely done.")
+            a_list.append("Look at you, making money moves. Actual money. Not just coins.")
+            a_list.append("You're starting to look like someone who's got their life together. Don't worry, it's an illusion.")
+            a_list.append("Five figures. Not bad for someone living in a car.")
+            a_list.append("You've got 'treat yourself to gas station sushi' money now.")
+        elif rank == 3:  # Rich ($100,001-500,000)
+            a_list.append("You must have some heavy pockets, huh.")
+            a_list.append("Six figures. In a wagon. The duality of man.")
+            a_list.append("You're rich enough to fix the car. But you won't. Because you're you.")
+            a_list.append("This is 'I could stay at a hotel but I won't' money.")
+            a_list.append("Wealthy and homeless. An interesting combination.")
+        elif rank == 4:  # Very Rich ($500,001-899,999)
+            a_list.append("Where do you even keep all that?")
+            a_list.append("That's a down payment on a house. Too bad you live in a car.")
+            a_list.append("Half a million dollars. Still sleeping in a wagon. Fascinating life choices.")
+            a_list.append("You're basically Scrooge McDuck, but with worse real estate.")
+            a_list.append("This is 'the car is a choice, not a necessity' money. Right? ...Right?")
+        elif rank == 5:  # Almost Millionaire ($900,000-999,999)
+            a_list.append("So close to being a millionaire! Can you do it?")
+            a_list.append("The millionaire's club is within reach. You can almost taste it.")
+            a_list.append("Nine hundred thousand. One more good night and you've made it.")
+            a_list.append("You're knocking on the millionaire's door. Will it open?")
+            a_list.append("This is it. This is the home stretch. Don't blow it now.")
+        random.shuffle(a_list)
+        return a_list
+    
+    def get_rank_comment(self, rank):
+        return random.choice(self.make_rank_comment_list(rank))
+    
+    # ==========================================
+    # DEALER GIFT REACTION SYSTEM
+    # ==========================================
+    
+    def get_dealer_gift_reaction(self, item_name):
+        """Return Dealer's reaction to gifts - mysterious, quick, eerie, aware"""
+        reactions = {
+            # POSITIVE REACTIONS (happiness gain)
+            "Ace of Spades": {
+                "dialogue": [
+                    "\"The Ace. The beginning and the end.\"",
+                    "\"You understand the game better than I thought.\"",
+                    "\"This pleases me.\""
+                ],
+                "happiness": 25,
+                "kills_you": False
+            },
+            "Dealer's Joker": {
+                "dialogue": [
+                    "\"My card. Returned to me.\"",
+                    "\"Interesting. You found what was lost.\"",
+                    "\"The joker always comes home.\""
+                ],
+                "happiness": 30,
+                "kills_you": False
+            },
+            "Golden Compass": {
+                "dialogue": [
+                    "\"Direction. Purpose. Meaning.\"",
+                    "\"This points toward something I lost long ago.\"",
+                    "He stares at it for a long moment.",
+                    "\"Thank you.\""
+                ],
+                "happiness": 20,
+                "kills_you": False
+            },
+            "Mirror of Duality": {
+                "dialogue": [
+                    "\"Two faces. Like mine.\"",
+                    "He looks into it. Both eyes—jade and human—stare back.",
+                    "\"You see too much.\""
+                ],
+                "happiness": 15,
+                "kills_you": False
+            },
+            
+            # NEUTRAL REACTIONS (no happiness change, but interesting dialogue)
+            "Lucky Coin": {
+                "dialogue": [
+                    "\"Luck. The gambler's crutch.\"",
+                    "He flips it once. Catches it. Doesn't look at the result.",
+                    "\"Luck is a lie we tell ourselves.\""
+                ],
+                "happiness": 0,
+                "kills_you": False
+            },
+            "Pocket Watch": {
+                "dialogue": [
+                    "\"Time. Always time with you people.\"",
+                    "\"The casino has no clocks. Did you ever wonder why?\"",
+                    "\"Time stops here. Only the cards move.\""
+                ],
+                "happiness": 5,
+                "kills_you": False
+            },
+            "Gambler's Grimoire": {
+                "dialogue": [
+                    "\"A book of statistics. How quaint.\"",
+                    "He flips through it.",
+                    "\"The numbers never tell the whole story.\""
+                ],
+                "happiness": 10,
+                "kills_you": False
+            },
+            
+            # NEGATIVE REACTIONS (happiness loss)
+            "Cursed Coin": {
+                "dialogue": [
+                    "\"You bring CURSES to my table?\"",
+                    "His jade eye flares.",
+                    "\"Bold. Foolish. But bold.\""
+                ],
+                "happiness": -15,
+                "kills_you": False
+            },
+            "Necronomicon": {
+                "dialogue": [
+                    "\"Dark magic. Here. At MY table.\"",
+                    "The air grows cold.",
+                    "\"You're testing boundaries you don't understand.\""
+                ],
+                "happiness": -20,
+                "kills_you": False
+            },
+            "Voodoo Doll": {
+                "dialogue": [
+                    "\"You think this works on ME?\"",
+                    "He crushes it in one hand.",
+                    "\"I am not bound by such trivial magic.\""
+                ],
+                "happiness": -25,
+                "kills_you": False
+            },
+            
+            # DANGEROUS REACTIONS (might kill you)
+            "Dealer's Grudge": {
+                "dialogue": [
+                    "\"MY grudge. You bring MY grudge. To ME.\"",
+                    "The temperature drops.",
+                    "\"Did you think this was funny?\""
+                ],
+                "happiness": -40,
+                "kills_you": True
+            },
+            "Stolen Watch": {
+                "dialogue": [
+                    "\"Stolen goods. At my table.\"",
+                    "\"You insult me with theft.\"",
+                    "\"We're done here.\""
+                ],
+                "happiness": -50,
+                "kills_you": True
+            },
+            
+            # FOOD ITEMS (mostly neutral/slightly positive)
+            "Sandwich": {
+                "dialogue": [
+                    "\"Food. I don't... eat.\"",
+                    "He sets it aside.",
+                    "\"But the gesture is noted.\""
+                ],
+                "happiness": 3,
+                "kills_you": False
+            },
+            "Energy Drink": {
+                "dialogue": [
+                    "\"Energy. As if I need more.\"",
+                    "\"I haven't slept in... how long?\"",
+                    "He doesn't remember."
+                ],
+                "happiness": 2,
+                "kills_you": False
+            },
+            
+            # MYSTERIOUS ITEMS (cryptic reactions)
+            "Mysterious Lockbox": {
+                "dialogue": [
+                    "\"Locked. Like so many things.\"",
+                    "He doesn't try to open it.",
+                    "\"Some boxes should stay closed.\""
+                ],
+                "happiness": 8,
+                "kills_you": False
+            },
+            "Moon Shard": {
+                "dialogue": [
+                    "\"From above. From beyond.\"",
+                    "It hums in his hand.",
+                    "\"The moon sees everything. Even this place.\""
+                ],
+                "happiness": 15,
+                "kills_you": False
+            },
+            
+            # DEFAULT for unlisted items
+            "_default": {
+                "dialogue": [
+                    "He examines it carefully.",
+                    "\"Curious.\"",
+                    "He sets it beside the deck of cards."
+                ],
+                "happiness": 5,
+                "kills_you": False
+            }
+        }
+        
+        return reactions.get(item_name, reactions["_default"])
     
     def make_quote_setup_list(self):
         a_list = []

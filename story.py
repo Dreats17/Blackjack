@@ -38,6 +38,9 @@ def bright(text):
 def italic(text):
     return (Style.DIM + text + Style.NORMAL)
 
+def item(text):
+    return magenta(bright(text))
+
 def open_quote(text):
     return ("\"" + text)
 
@@ -64,7 +67,10 @@ class Player:
                  "__faced_madness", "__is_broken", "__gambling_stats",
                  # NEW SYSTEMS
                  "__achievements", "__statistics", "__companions", "__loan_shark_debt",
-                 "__loan_shark_days_overdue", "__loan_shark_warning_level", "__pawn_shop_reputation"]
+                 "__loan_shark_days_overdue", "__loan_shark_warning_level", "__pawn_shop_reputation",
+                 "__companions_sold_count", "__fraudulent_cash", "__dealer_fake_cash_total",
+                 "__dealer_happiness", "__gift_wrapped_item", "__convenience_store_purchases",
+                 "__gift_system_unlocked"]
 
     def __init__(self):
         self.__name = None
@@ -172,6 +178,21 @@ class Player:
         # PAWN SHOP REPUTATION
         self.__pawn_shop_reputation = 50  # 0-100, affects prices
         
+        # COMPANION BETRAYAL TRACKING
+        self.__companions_sold_count = 0  # Track how many companions sold to Gus for the dark ending
+        
+        # FRAUDULENT CASH SYSTEM (Loan Shark)
+        self.__fraudulent_cash = 0  # Fake money from loan shark - needs to be "blended" through gambling
+        self.__dealer_fake_cash_total = 0  # How much fake cash the Dealer has accumulated
+        
+        # DEALER HAPPINESS SYSTEM
+        self.__dealer_happiness = 50  # 0-100, affects his behavior and dialogue
+        
+        # GIFT WRAPPING SYSTEM (Kyle's Convenience Store)
+        self.__gift_wrapped_item = None  # Currently wrapped gift to give to Dealer
+        self.__convenience_store_purchases = 0  # Track purchases to unlock gift system
+        self.__gift_system_unlocked = False  # Unlocks after 3-5 purchases + out of poor rank
+        
         self.__lists = lists.Lists(self)
 
     def kill(self, cause_of_death=None):
@@ -263,6 +284,7 @@ class Player:
             print()
             type.slow("You met your fate with a final balance of " + green(bright("${:,}".format(self.__balance))))
             print()
+            self.display_final_achievements()
             type.slow("The police were able to recover your body, but nobody cared enough to show up to your funeral.")
             quit()
         elif (self.__balance == 0):
@@ -275,6 +297,7 @@ class Player:
             print()
             type.slow("With no cash left to play Blackjack, your source of income has been rendered useless.")
             print()
+            self.display_final_achievements()
             type.slow("You spend your remaining days going hungry, wondering what life could've been, if you didn't lose that one hand.")
             quit()
         elif (self.__balance >= 1000000) and (not self.__is_millionaire):
@@ -492,11 +515,12 @@ class Player:
     def get_all_collectibles_list(self):
         """Returns the master list of all collectibles Gus will buy"""
         return [
-            # Underwater/Beach Adventure (16 items)
+            # Underwater/Beach Adventure (18 items)
             "Golden Trident", "Kraken Pearl", "Mermaid Crown", "Kraken's Memory",
             "Ancient Sea Map", "Deep Stone", "Pirate Treasure", "Treasure Coordinates",
             "Captain's Compass", "Cannon Gem", "Sailor's Lockbox", "Mermaid's Pearl",
             "Mermaid Pearl", "Matched Pearls", "Pink Pearl", "Giant Oyster",
+            "Live Fish", "Moon Shard",
             # Beach Events (7 items)
             "Golden Shovel", "Underwater Camera", "Crab Racing Trophy", 
             "Championship Medal", "Antique Ring", "Treasure Chest", "Midnight Rose",
@@ -539,6 +563,8 @@ class Player:
             "Matched Pearls": 5000,
             "Pink Pearl": 3000,
             "Giant Oyster": 2000,
+            "Live Fish": 1000,
+            "Moon Shard": 15000,
             # Beach Events
             "Golden Shovel": 15000,
             "Underwater Camera": 1500,
@@ -1310,18 +1336,9 @@ class Player:
     # ==========================================
     
     def unlock_achievement(self, achievement_id):
-        """Unlock an achievement and show notification"""
+        """Unlock an achievement (silent - only shown on death)"""
         if achievement_id not in self.__achievements:
             self.__achievements.add(achievement_id)
-            achievement_data = self.__lists.get_achievement_data(achievement_id)
-            if achievement_data:
-                print("\n")
-                type.fast(yellow(bright("★ ACHIEVEMENT UNLOCKED ★")))
-                print()
-                type.fast(yellow(bright(achievement_data["name"])))
-                print()
-                type.type(achievement_data["description"])
-                print("\n")
     
     def has_achievement(self, achievement_id):
         return achievement_id in self.__achievements
@@ -1329,48 +1346,208 @@ class Player:
     def get_achievement_count(self):
         return len(self.__achievements)
     
+    def display_final_achievements(self):
+        """Display all unlocked achievements on death"""
+        if len(self.__achievements) == 0:
+            return
+        
+        print()
+        type.slow(bright(yellow("═" * 50)))
+        type.slow(bright(yellow("              ACHIEVEMENTS UNLOCKED")))
+        type.slow(bright(yellow("═" * 50)))
+        print()
+        
+        # Sort achievements by rarity (hardest first)
+        achievement_order = self.get_sorted_achievements()
+        
+        for ach_id in achievement_order:
+            if ach_id in self.__achievements:
+                ach_data = self.__lists.get_achievement_data(ach_id)
+                if ach_data:
+                    rarity = self.get_achievement_rarity(ach_id)
+                    rarity_color = self.get_rarity_color(rarity)
+                    type.fast(rarity_color("★ ") + bright(ach_data["name"]) + rarity_color(" [" + rarity.upper() + "]"))
+                    type.fast("  " + ach_data["description"])
+                    print()
+        
+        total_achievements = self.__lists.get_total_achievements()
+        completion = (len(self.__achievements) / total_achievements * 100) if total_achievements > 0 else 0
+        
+        print()
+        type.slow(bright(f"Total: {len(self.__achievements)}/{total_achievements} ({completion:.1f}%)"))
+        print()
+    
+    def get_achievement_rarity(self, ach_id):
+        """Return rarity tier for achievement"""
+        # Legendary (hardest)
+        legendary = ["year_survivor", "perfect_record", "lottery_winner", "death_defier", "item_master", 
+                    "true_gambler", "philanthropist", "cursed_survival", "master_collector", "casino_legend",
+                    "judas"]  # Dark ending
+        # Epic
+        epic = ["hundred_days", "half_million", "millionaire", "blackjack_legend", "win_streak_10", 
+               "comeback_master", "near_miss", "full_house", "max_companions", "sanity_master", "debt_free",
+               "noahs_ark", "disney_princess", "marine_biologist"]
+        # Rare
+        rare = ["month_survivor", "hundred_thousand", "blackjack_master", "hot_streak", "card_shark",
+               "animal_lover", "cheated_death", "collector", "social_butterfly", "night_owl", "morning_person",
+               "zookeeper"]
+        # Uncommon
+        uncommon = ["week_survivor", "first_ten_thousand", "comeback_kid", "first_friend", "clinging_to_life",
+                   "treasure_hunter", "regular", "rock_bottom", "sanity_saved", "devils_deal", "broken_but_alive"]
+        
+        if ach_id in legendary:
+            return "legendary"
+        elif ach_id in epic:
+            return "epic"
+        elif ach_id in rare:
+            return "rare"
+        elif ach_id in uncommon:
+            return "uncommon"
+        return "common"
+    
+    def get_rarity_color(self, rarity):
+        """Return color function for rarity"""
+        if rarity == "legendary":
+            return lambda x: magenta(bright(x))
+        elif rarity == "epic":
+            return lambda x: cyan(bright(x))
+        elif rarity == "rare":
+            return lambda x: yellow(bright(x))
+        elif rarity == "uncommon":
+            return lambda x: green(x)
+        return lambda x: x  # common = white
+    
+    def get_sorted_achievements(self):
+        """Return achievements sorted by rarity (rarest first)"""
+        all_achievements = list(self.__lists.get_all_achievement_ids())
+        return sorted(all_achievements, key=lambda x: 
+                     {"legendary": 0, "epic": 1, "rare": 2, "uncommon": 3, "common": 4}[self.get_achievement_rarity(x)])
+
     def check_achievements(self):
         """Check all achievement conditions and unlock any earned"""
-        # Money milestones
+        # Common - Money milestones
         if self.__balance >= 1000 and not self.has_achievement("first_thousand"):
             self.unlock_achievement("first_thousand")
         if self.__balance >= 10000 and not self.has_achievement("first_ten_thousand"):
             self.unlock_achievement("first_ten_thousand")
+        if self.__balance >= 50000 and not self.has_achievement("fifty_thousand"):
+            self.unlock_achievement("fifty_thousand")
         if self.__balance >= 100000 and not self.has_achievement("hundred_thousand"):
             self.unlock_achievement("hundred_thousand")
+        if self.__balance >= 250000 and not self.has_achievement("quarter_million"):
+            self.unlock_achievement("quarter_million")
         if self.__balance >= 500000 and not self.has_achievement("half_million"):
             self.unlock_achievement("half_million")
+        if self.__balance >= 900000 and not self.has_achievement("nine_hundred"):
+            self.unlock_achievement("nine_hundred")
         if self.__balance >= 1000000 and not self.has_achievement("millionaire"):
             self.unlock_achievement("millionaire")
+        if self.__balance >= 2000000 and not self.has_achievement("multi_millionaire"):
+            self.unlock_achievement("multi_millionaire")
         
-        # Day milestones
+        # Common - Day milestones
+        if self.__day >= 3 and not self.has_achievement("three_days"):
+            self.unlock_achievement("three_days")
         if self.__day >= 7 and not self.has_achievement("week_survivor"):
             self.unlock_achievement("week_survivor")
+        if self.__day >= 14 and not self.has_achievement("two_weeks"):
+            self.unlock_achievement("two_weeks")
         if self.__day >= 30 and not self.has_achievement("month_survivor"):
             self.unlock_achievement("month_survivor")
         if self.__day >= 100 and not self.has_achievement("hundred_days"):
             self.unlock_achievement("hundred_days")
+        if self.__day >= 200 and not self.has_achievement("two_hundred_days"):
+            self.unlock_achievement("two_hundred_days")
+        if self.__day >= 365 and not self.has_achievement("year_survivor"):
+            self.unlock_achievement("year_survivor")
         
         # Gambling milestones
         stats = self.__gambling_stats
-        if stats["blackjacks"] >= 10 and not self.has_achievement("blackjack_master"):
-            self.unlock_achievement("blackjack_master")
-        if stats["best_win_streak"] >= 5 and not self.has_achievement("hot_streak"):
-            self.unlock_achievement("hot_streak")
+        if stats["blackjacks"] >= 1 and not self.has_achievement("first_blackjack"):
+            self.unlock_achievement("first_blackjack")
+        if stats["total_hands"] >= 10 and not self.has_achievement("ten_hands"):
+            self.unlock_achievement("ten_hands")
+        if stats["total_hands"] >= 50 and not self.has_achievement("fifty_hands"):
+            self.unlock_achievement("fifty_hands")
         if stats["total_hands"] >= 100 and not self.has_achievement("card_shark"):
             self.unlock_achievement("card_shark")
+        if stats["total_hands"] >= 200 and not self.has_achievement("two_hundred_hands"):
+            self.unlock_achievement("two_hundred_hands")
+        if stats["total_hands"] >= 500 and not self.has_achievement("five_hundred_hands"):
+            self.unlock_achievement("five_hundred_hands")
+        if stats["total_hands"] >= 1000 and not self.has_achievement("true_gambler"):
+            self.unlock_achievement("true_gambler")
+        
+        if stats["blackjacks"] >= 10 and not self.has_achievement("blackjack_master"):
+            self.unlock_achievement("blackjack_master")
+        if stats["blackjacks"] >= 25 and not self.has_achievement("blackjack_legend"):
+            self.unlock_achievement("blackjack_legend")
+        if stats["blackjacks"] >= 50 and not self.has_achievement("fifty_blackjacks"):
+            self.unlock_achievement("fifty_blackjacks")
+        
+        if stats["best_win_streak"] >= 3 and not self.has_achievement("three_streak"):
+            self.unlock_achievement("three_streak")
+        if stats["best_win_streak"] >= 5 and not self.has_achievement("hot_streak"):
+            self.unlock_achievement("hot_streak")
+        if stats["best_win_streak"] >= 10 and not self.has_achievement("win_streak_10"):
+            self.unlock_achievement("win_streak_10")
+        
+        if stats["biggest_win"] >= 1000 and not self.has_achievement("big_bet"):
+            self.unlock_achievement("big_bet")
+        if stats["biggest_win"] >= 10000 and not self.has_achievement("high_roller"):
+            self.unlock_achievement("high_roller")
+        if stats["biggest_win"] >= 50000 and not self.has_achievement("big_spender"):
+            self.unlock_achievement("big_spender")
+        
+        if stats["wins"] >= 1 and not self.has_achievement("first_win"):
+            self.unlock_achievement("first_win")
         
         # Companion achievements
         if len(self.__companions) >= 1 and not self.has_achievement("first_friend"):
             self.unlock_achievement("first_friend")
         if len(self.__companions) >= 3 and not self.has_achievement("animal_lover"):
             self.unlock_achievement("animal_lover")
+        if len(self.__companions) >= 5 and not self.has_achievement("max_companions"):
+            self.unlock_achievement("max_companions")
         
-        # Survival achievements
+        # NEW COLLECTION ACHIEVEMENTS
+        if len(self.__companions) >= 10 and not self.has_achievement("zookeeper"):
+            self.unlock_achievement("zookeeper")
+        if len(self.__companions) >= 20 and not self.has_achievement("noahs_ark"):
+            self.unlock_achievement("noahs_ark")
+        
+        # Health/Survival achievements
         if self.__statistics["near_death_experiences"] >= 3 and not self.has_achievement("cheated_death"):
             self.unlock_achievement("cheated_death")
+        if self.__statistics["near_death_experiences"] >= 10 and not self.has_achievement("death_defier"):
+            self.unlock_achievement("death_defier")
+        
         if self.__health <= 10 and self.__alive and not self.has_achievement("clinging_to_life"):
             self.unlock_achievement("clinging_to_life")
+        if self.__health <= 5 and self.__alive and not self.has_achievement("near_death_survivor"):
+            self.unlock_achievement("near_death_survivor")
+        
+        if self.__is_broken and not self.has_achievement("broken_but_alive"):
+            self.unlock_achievement("broken_but_alive")
+        
+        # Social achievements
+        if len(self.__met) >= 20 and not self.has_achievement("social_butterfly"):
+            self.unlock_achievement("social_butterfly")
+        
+        if self.has_met("Suzy") and not self.has_achievement("meet_suzy"):
+            self.unlock_achievement("meet_suzy")
+        
+        # Item achievements
+        if len(self.__inventory) >= 1 and not self.has_achievement("first_item"):
+            self.unlock_achievement("first_item")
+        if len(self.__inventory) >= 5 and not self.has_achievement("five_items"):
+            self.unlock_achievement("five_items")
+        if len(self.__inventory) >= 10 and not self.has_achievement("collector"):
+            self.unlock_achievement("collector")
+        if len(self.__inventory) >= 15 and not self.has_achievement("item_hoarder"):
+            self.unlock_achievement("item_hoarder")
+        if len(self.__inventory) >= 20 and not self.has_achievement("master_collector"):
+            self.unlock_achievement("master_collector")
         
         # Track highest balance
         if self.__balance > self.__statistics["highest_balance"]:
@@ -1581,6 +1758,328 @@ class Player:
             type.fast(f"  Days Together: {data['days_owned']}")
             print()
         print()
+    
+    def companion_afternoon_dialogue(self):
+        """Interactive afternoon dialogue with all companions"""
+        living_companions = self.get_all_companions()
+        
+        if len(living_companions) == 0:
+            type.type("You have no companions to spend time with.")
+            print("\n")
+            self.start_night()
+            return
+        
+        type.type(cyan(bright("═══ AFTERNOON WITH YOUR COMPANIONS ═══")))
+        print("\n")
+        
+        # List all companions
+        companion_names = list(living_companions.keys())
+        for i, name in enumerate(companion_names, 1):
+            companion = living_companions[name]
+            happiness_indicator = "♥" if companion["happiness"] >= 80 else ("~" if companion["happiness"] >= 50 else "...")
+            type.type(f"{i}. {bright(name)} ({companion['type']}) {happiness_indicator}")
+        
+        type.type(f"{len(companion_names) + 1}. Spend time with all of them")
+        type.type(f"{len(companion_names) + 2}. Skip and head out")
+        print("\n")
+        
+        choice = input("Who do you want to interact with? ").strip()
+        
+        try:
+            choice_num = int(choice)
+            if choice_num == len(companion_names) + 2:
+                type.type("You wave goodbye to your companions and head out.")
+                print("\n")
+                self.start_night()
+                return
+            elif choice_num == len(companion_names) + 1:
+                # Group activity
+                type.type("You gather all your companions together. This is... quite a sight.")
+                print("\n")
+                if len(companion_names) >= 10:
+                    type.type("You've basically got a zoo at this point. A traveling menagerie. A Disney Princess situation.")
+                elif len(companion_names) >= 5:
+                    type.type("The Noah's Ark energy is strong. You're collecting two of everything at this rate.")
+                else:
+                    type.type("Your little found family settles around you. Each one chose you. That means something.")
+                print("\n")
+                
+                # Feed everyone
+                type.type("You share what food you have. It's not much, but it's enough.")
+                for name in companion_names:
+                    self.feed_companion(name)
+                    self.pet_companion(name)
+                
+                self.restore_sanity(10)
+                self.heal(15)
+                
+                type.type("You spend the afternoon together - a strange, beautiful collection of souls. ")
+                type.type("For a little while, you're not just a gambler on the run. You're someone who matters to others.")
+                print("\n")
+                
+                # Check for collection achievements
+                self.check_companion_achievements()
+                
+            elif 1 <= choice_num <= len(companion_names):
+                name = companion_names[choice_num - 1]
+                self.interact_with_companion(name)
+            else:
+                type.type("Not a valid choice.")
+                print("\n")
+        except:
+            type.type("Not a valid choice.")
+            print("\n")
+        
+        self.start_night()
+    
+    def interact_with_companion(self, name):
+        """Detailed interaction with a specific companion"""
+        companion = self.get_companion(name)
+        if not companion:
+            return
+        
+        type.type(f"You spend time with {cyan(bright(name))} the {companion['type']}.")
+        print("\n")
+        
+        # Companion-specific dialogue
+        companion_type = companion['type']
+        happiness = companion['happiness']
+        
+        # Unique dialogue for each companion type
+        if name == "Whiskers":
+            if happiness >= 70:
+                type.type("Whiskers purrs loudly and kneads your lap with their paws. They've chosen you as their human.")
+            else:
+                type.type("Whiskers sits just out of reach, tail swishing. Feed me, human.")
+        
+        elif name == "Lucky":
+            if happiness >= 70:
+                type.type("Lucky's tail wags so hard his whole body shakes. Despite having three legs, he spins in circles of pure joy.")
+            else:
+                type.type("Lucky limps over and whines softly. He's hungry.")
+        
+        elif name == "Chomper":
+            if happiness >= 70:
+                type.type("Chomper does that thing alligators do where they just float with their eyes above water, watching you protectively.")
+                type.type("It should be creepy but it's... kind of sweet?")
+            else:
+                type.type("Chomper snaps their jaws once. Feed. Me. Now.")
+        
+        elif name == "Grace":
+            if happiness >= 70:
+                type.type("Grace and her fawns approach. She nuzzles your hand while the babies play around your feet.")
+                type.type("This is the most peaceful you've felt in weeks.")
+                self.restore_sanity(5)
+            else:
+                type.type("Grace keeps her distance, watchful. The fawns stay close to her.")
+        
+        elif name == "Bruno" or name == "Ursus":
+            if happiness >= 70:
+                type.type("The massive bear sits down next to you, close enough that you can feel the warmth radiating from their fur.")
+                type.type("You lean against them. They let you. You're protected.")
+            else:
+                type.type("The bear grunts and huffs. Not aggressive, but not friendly either. Bears need food.")
+        
+        elif name == "Squawk":
+            if happiness >= 70:
+                type.type("FRIEND! FRIEND! MINE! Squawk lands on your head and makes happy seagull noises.")
+                type.type("It's annoying. You love it.")
+            else:
+                type.type("FOOD! FOOD! MINE! Squawk pecks at your pockets demandingly.")
+        
+        elif name == "Deathclaw":
+            if happiness >= 70:
+                type.type("Deathclaw does a little sideways victory dance. For a crab, it's surprisingly endearing.")
+            else:
+                type.type("Deathclaw waves their pincers aggressively. Feed crab. Crab hungry.")
+        
+        elif name == "Speedy":
+            if happiness >= 70:
+                type.type("Speedy extends their head from their shell and makes a tiny satisfied squeak.")
+                type.type("You pet their shell. They close their eyes contentedly. Time moves slower with tortoises. That's okay.")
+            else:
+                type.type("Speedy retreats into their shell. You'll have to earn their trust back.")
+        
+        elif name == "Noodle":
+            if happiness >= 70:
+                type.type("Noodle coils around your arm and flicks their tongue against your cheek. Snake kisses.")
+            else:
+                type.type("Noodle hisses softly. Not a threat, but a complaint. Hungry snake is grumpy snake.")
+        
+        elif name == "Squirrelly":
+            if happiness >= 70:
+                type.type("Squirrelly chitters excitedly and presents you with an acorn they found. It's a gift.")
+                type.type("You pocket it solemnly. This is valuable squirrel currency.")
+            else:
+                type.type("Squirrelly throws an acorn at your head. Pay attention to me!")
+        
+        elif name == "Don Coo" or name == "General Quackers":
+            if happiness >= 70:
+                type.type(f"{name} struts proudly and gives you a respectful salute/bow.")
+                type.type("You're the boss. They're the lieutenant. This is how it works.")
+            else:
+                type.type(f"{name} makes disapproving bird noises. The troops are restless. You need to lead better.")
+        
+        elif name == "Thunder":
+            if happiness >= 70:
+                type.type("Thunder nuzzles your shoulder and makes that soft horse sound - a nicker.")
+                type.type("You run your hands through their mane. This is a bond that transcends words.")
+            else:
+                type.type("Thunder stamps their hooves and tosses their head. Horses need care, human.")
+        
+        elif name == "Betsy":
+            if happiness >= 70:
+                type.type("Betsy moos contentedly and lets you lean against her warm flank.")
+                type.type("She smells like grass and sunshine. It's nice.")
+            else:
+                type.type("Betsy moos insistently and stares at your wallet. Old habits die hard.")
+        
+        elif name == "Scooter":
+            if happiness >= 70:
+                type.type("Scooter floats on their back and makes happy chirping noises while doing little flips.")
+                type.type("Otters are the happiest creatures on earth and you'll fight anyone who says otherwise.")
+            else:
+                type.type("Scooter makes grumpy otter sounds and splashes water at you. Rude.")
+        
+        elif name == "Kraken":
+            if happiness >= 70:
+                type.type("A massive tentacle emerges from nearby water and gently pats your head.")
+                type.type("You have befriended something ancient and terrible and it's... nice?")
+                self.restore_sanity(8)
+            else:
+                type.type("You sense the Kraken's displeasure from the deep. Best not to anger a legend.")
+        
+        elif name == "Shellbert":
+            if happiness >= 70:
+                type.type("Shellbert extends their ancient head and gazes at you with wise, patient eyes.")
+                type.type("In that moment, you understand: everything will be okay. Maybe not today. But eventually.")
+                self.restore_sanity(6)
+            else:
+                type.type("Shellbert withdraws into their shell. Even ancient wisdom needs sustenance.")
+        
+        elif name == "Moonwhisker":
+            if happiness >= 70:
+                type.type("Moonwhisker hops in a circle around you, leaving glowing pawprints that fade after a few seconds.")
+                type.type("The magical rabbit nuzzles your hand. You feel... blessed? Enchanted? Something good.")
+                self.restore_sanity(7)
+            else:
+                type.type("Moonwhisker's glow is dim. Even magical creatures need care.")
+        
+        elif name == "Bubbles":
+            if happiness >= 70:
+                type.type("Bubbles swims in lazy circles in their bowl, scales shimmering like liquid gold.")
+                type.type("Watching them is meditative. Peaceful. The world slows down.")
+                self.restore_sanity(4)
+            else:
+                type.type("Bubbles floats at the bottom of the bowl, looking sad. Fish can look sad. Trust you.")
+        
+        elif name == "Hopper":
+            if happiness >= 70:
+                type.type("Hopper does little bunny binkies - those joyful jumps rabbits do when they're happy.")
+                type.type("Their nose twitches. You boop it. Life is good.")
+                self.restore_sanity(5)
+            else:
+                type.type("Hopper thumps their back leg - rabbit language for 'I'm displeased.' Point taken.")
+        
+        elif name == "Don":
+            if happiness >= 70:
+                type.type("Don the Raccoon Boss chitters approvingly and hands you a shiny bottlecap as tribute.")
+                type.type("In raccoon culture, this is the highest honor. You're basically family now.")
+                self.restore_sanity(6)
+            else:
+                type.type("Don crosses his little arms and chatters angrily. The mafia is not pleased.")
+        
+        elif name == "Echo":
+            if happiness >= 70:
+                type.type("Echo leaps from nearby water (how is there always water nearby?) and chirps happily.")
+                type.type("Dolphins are possibly the smartest creatures on Earth. Echo knows exactly how much you needed this.")
+                self.restore_sanity(10)
+                self.heal(10)
+            else:
+                type.type("Echo's clicks sound... disappointed? Can dolphins be disappointed? Yes. Yes they can.")
+        
+        elif name == "Patches":
+            if happiness >= 70:
+                type.type("Patches waddles over and doesn't play dead. This is the highest form of trust for an opossum.")
+                type.type("They climb onto your lap and make a weird purring sound. You feel blessed.")
+                self.restore_sanity(5)
+            else:
+                type.type("Patches immediately plays dead. You're not fooled but it still hurts.")
+        
+        else:
+            # Generic dialogue for any other companions
+            if happiness >= 70:
+                type.type(f"{name} seems genuinely happy to see you. The feeling is mutual.")
+            else:
+                type.type(f"{name} seems hungry and a bit distant. You should take better care of them.")
+        
+        print("\n")
+        
+        # Interaction options
+        type.type("What would you like to do?")
+        type.type("1. Feed them")
+        type.type("2. Pet/Play with them")
+        type.type("3. Just sit together")
+        type.type("4. Leave them be")
+        print("\n")
+        
+        action = input("Choose: ").strip()
+        
+        if action == "1":
+            if self.feed_companion(name):
+                type.type(f"You share your food with {name}. They eat happily.")
+                self.heal(5)
+            else:
+                type.type(f"You've already fed {name} today. They're content.")
+        elif action == "2":
+            self.pet_companion(name)
+            type.type(f"You spend time playing with {name}. Simple moments like these make life worth living.")
+            self.restore_sanity(3)
+        elif action == "3":
+            type.type(f"You sit in comfortable silence with {name}. Sometimes that's enough.")
+            self.restore_sanity(5)
+            self.heal(10)
+        else:
+            type.type(f"You give {name} space. They understand.")
+        
+        print("\n")
+    
+    def check_companion_achievements(self):
+        """Check and unlock companion collection achievements"""
+        companions = self.get_all_companions()
+        num_companions = len(companions)
+        
+        # Zookeeper (10 companions)
+        if num_companions >= 10 and not self.has_achievement("zookeeper"):
+            self.unlock_achievement("zookeeper")
+            type.type(cyan(bright("🏆 ACHIEVEMENT UNLOCKED: Zookeeper - 10 companions!")))
+            print("\n")
+        
+        # Noah's Ark (20 companions)
+        if num_companions >= 20 and not self.has_achievement("noahs_ark"):
+            self.unlock_achievement("noahs_ark")
+            type.type(cyan(bright("🏆 EPIC ACHIEVEMENT: Noah's Ark - 20 companions!")))
+            type.type("You're basically running an ark at this point. Where's the flood?")
+            print("\n")
+        
+        # Check for themed achievements
+        water_animals = ["Chomper", "Scooter", "Kraken", "Shellbert", "Deathclaw"]
+        forest_animals = ["Grace", "Bruno", "Ursus", "Noodle", "Squirrelly"]
+        
+        # Marine Biologist (all water animals)
+        water_count = sum(1 for name in water_animals if self.has_companion(name))
+        if water_count >= len(water_animals) and not self.has_achievement("marine_biologist"):
+            self.unlock_achievement("marine_biologist")
+            type.type(cyan(bright("🏆 EPIC ACHIEVEMENT: Marine Biologist - All water creatures!")))
+            print("\n")
+        
+        # Disney Princess (all forest animals)
+        forest_count = sum(1 for name in forest_animals if self.has_companion(name))
+        if forest_count >= len(forest_animals) and not self.has_achievement("disney_princess"):
+            self.unlock_achievement("disney_princess")
+            type.type(cyan(bright("🏆 EPIC ACHIEVEMENT: Disney Princess - All forest creatures!")))
+            type.type("Birds land on your shoulders. Deer follow you. Squirrels present you with acorns. This is your life now.")
+            print("\n")
 
     # ==========================================
     # LOAN SHARK SYSTEM
@@ -1590,14 +2089,20 @@ class Player:
         return self.__loan_shark_debt
     
     def take_loan(self, amount):
-        """Take a loan from the loan shark"""
+        """Take a loan from the loan shark - gives FRAUDULENT cash"""
         self.__loan_shark_debt += amount
-        self.__balance += amount
+        self.add_fraudulent_cash(amount)
         self.__loan_shark_days_overdue = 0
         self.__statistics["loans_taken"] += 1
-        type.type("Vinnie hands you " + green(bright("${:,}".format(amount))) + " in cash.")
+        type.type("Vinnie hands you " + yellow(bright("${:,}".format(amount))) + " in cash.")
         print()
-        type.type("The interest is 20% per week. Don't be late.")
+        type.type("It feels... off. The bills are too smooth. Too perfect.")
+        print()
+        type.type(quote("Don't worry about it. Money is money. Just don't let anyone look too close."))
+        print()
+        type.type(quote("Gamble with it. Blend it in with your real cash. No one will know the difference."))
+        print()
+        type.type(quote("Oh, and the interest is 20% per week. Don't be late."))
         print("\n")
     
     def repay_loan(self, amount):
@@ -1678,6 +2183,185 @@ class Player:
         """Get price modifier based on reputation (0.5 to 1.2)"""
         return 0.5 + (self.__pawn_shop_reputation / 200)
     
+    # ==========================================
+    # FRAUDULENT CASH SYSTEM (Loan Shark)
+    # ==========================================
+    
+    def get_fraudulent_cash(self):
+        return self.__fraudulent_cash
+    
+    def add_fraudulent_cash(self, amount):
+        """Add fake money from loan shark"""
+        self.__fraudulent_cash += amount
+    
+    def blend_fraudulent_cash(self, amount):
+        """Convert fake cash to real through gambling - track what Dealer gets"""
+        if amount > self.__fraudulent_cash:
+            amount = self.__fraudulent_cash
+        self.__fraudulent_cash -= amount
+        self.__dealer_fake_cash_total += amount
+        return amount
+    
+    def get_dealer_fake_cash_total(self):
+        return self.__dealer_fake_cash_total
+    
+    def has_too_much_fake_cash(self):
+        """Dealer stops gaining happiness if he has too much fake money - threshold based on rank"""
+        # Lower ranks: Higher threshold (Dealer isn't sophisticated, doesn't notice)
+        # Higher ranks: Lower threshold (Dealer is sharp, notices fake cash quickly)
+        thresholds = {
+            0: 50000,    # Poor - Dealer doesn't care much, it's all pennies to him
+            1: 30000,    # Modest - Still fairly lenient
+            2: 15000,    # Well-off - Starting to scrutinize
+            3: 5000,     # Rich - Very attentive to larger sums
+            4: 2000,     # Very Rich - Expert eye, notices quickly
+            5: 500       # Almost Millionaire - Dealer VERY suspicious of high roller money
+        }
+        threshold = thresholds.get(self.__rank, 15000)
+        return self.__dealer_fake_cash_total >= threshold
+    
+    # ==========================================
+    # DEALER HAPPINESS SYSTEM
+    # ==========================================
+    
+    def get_dealer_happiness(self):
+        return self.__dealer_happiness
+    
+    def change_dealer_happiness(self, amount):
+        """Change dealer happiness (0-100)"""
+        self.__dealer_happiness = max(0, min(100, self.__dealer_happiness + amount))
+        if self.__dealer_happiness <= 0:
+            self.dealer_kills_you()
+    
+    def dealer_kills_you(self):
+        """Dealer has had enough and kills you"""
+        print("\n")
+        type.slow(red(bright("═" * 50)))
+        type.slow(red(bright("           THE DEALER'S JUDGMENT")))
+        type.slow(red(bright("═" * 50)))
+        print("\n")
+        time.sleep(1)
+        type.slow("The Dealer sets down the cards. Slowly. Deliberately.")
+        print("\n")
+        type.slow(red("\"Enough.\""))
+        print("\n")
+        type.slow("His jade eye catches the dim casino light. It doesn't blink.")
+        print("\n")
+        type.slow(red("\"You've tested my patience for the last time.\""))
+        print("\n")
+        time.sleep(2)
+        type.slow("You try to stand. To leave. To run.")
+        print("\n")
+        type.slow("Your legs won't move.")
+        print("\n")
+        type.slow(red("\"The game is over. YOU are over.\""))
+        print("\n")
+        time.sleep(2)
+        type.slow("The last thing you see is his hand reaching across the table.")
+        print("\n")
+        type.slow("Then darkness.")
+        print("\n")
+        type.slow("Then nothing.")
+        print("\n")
+        time.sleep(2)
+        type.slow(red(bright("The Dealer does not forgive. The Dealer does not forget.")))
+        print("\n")
+        self.kill("The Dealer's wrath")
+    
+    # ==========================================
+    # GIFT WRAPPING SYSTEM (Kyle's Store)
+    # ==========================================
+    
+    def increment_store_purchases(self):
+        self.__convenience_store_purchases += 1
+        # Unlock gift system after 3-5 purchases AND out of poor rank
+        if not self.__gift_system_unlocked:
+            if self.__convenience_store_purchases >= random.randint(3, 5) and self.__rank >= 1:
+                self.__gift_system_unlocked = True
+                return True  # Signal to show Kyle's dialogue
+        return False
+    
+    def is_gift_system_unlocked(self):
+        return self.__gift_system_unlocked
+    
+    def has_gift_wrapped(self):
+        return self.__gift_wrapped_item is not None
+    
+    def wrap_item_as_gift(self, item_name, wrap_cost=10):
+        """Wrap an item as a gift for the Dealer"""
+        if self.__gift_wrapped_item is not None:
+            return False  # Already have a gift
+        if not self.has_item(item_name):
+            return False
+        if self.__balance < wrap_cost:
+            return False
+        
+        self.use_item(item_name)
+        self.__gift_wrapped_item = item_name
+        self.__balance -= wrap_cost
+        return True
+    
+    def get_wrapped_gift(self):
+        return self.__gift_wrapped_item
+    
+    def clear_wrapped_gift(self):
+        self.__gift_wrapped_item = None
+    
+    def deliver_gift_to_dealer(self):
+        """Automatically deliver wrapped gift to Dealer at casino"""
+        if not self.__gift_wrapped_item:
+            return
+        
+        item = self.__gift_wrapped_item
+        self.__gift_wrapped_item = None
+        
+        print("\n")
+        type.slow("You approach the table with a wrapped package.")
+        print("\n")
+        type.slow("The Dealer's jade eye fixes on it.")
+        print("\n")
+        type.slow(red("\"What is this?\""))
+        print("\n")
+        type.type("You slide the gift across the table.")
+        print("\n")
+        time.sleep(1)
+        
+        # Get reaction from lists.py
+        reaction_data = self.__lists.get_dealer_gift_reaction(item)
+        
+        # Display unwrapping
+        type.slow("He unwraps it slowly. Deliberately.")
+        print("\n")
+        time.sleep(1)
+        
+        # Display the reveal
+        type.slow(f"Inside: " + bright(yellow(item)))
+        print("\n")
+        time.sleep(1)
+        
+        # Display dealer reaction
+        for line in reaction_data["dialogue"]:
+            type.slow(red(line))
+            print("\n")
+            time.sleep(0.5)
+        
+        # Apply happiness change
+        happiness_change = reaction_data["happiness"]
+        if happiness_change != 0:
+            self.change_dealer_happiness(happiness_change)
+            if happiness_change > 0:
+                type.slow(green(f"The Dealer seems... pleased? (Happiness +{happiness_change})"))
+            else:
+                type.slow(red(f"The Dealer does NOT look happy. (Happiness {happiness_change})"))
+            print("\n")
+        
+        # Check if gift causes death
+        if reaction_data.get("kills_you", False):
+            time.sleep(2)
+            type.slow(red(bright("His hand moves faster than you can see.")))
+            print("\n")
+            self.kill(f"The Dealer's reaction to {item}")
+    
     def sell_item_to_pawn(self, item_name, base_price):
         """Sell an item to the pawn shop"""
         modifier = self.get_pawn_price_modifier()
@@ -1745,6 +2429,10 @@ class Player:
             self.end_day_car_fixed()
 
         print("\n")
+        type.fast(bright(green("═" * 50)))
+        type.fast(bright(green("            ~ ~ ~ Day Summary ~ ~ ~")))
+        type.fast(bright(green("═" * 50)))
+        print("\n")
 
         self.update_dirty_old_hat_durability()
         self.update_golden_watch_durability()
@@ -1780,13 +2468,7 @@ class Player:
         # Tells you your current balance
         type.type("That brings you to a grand total of " + green(bright("$" + str(self.__balance))) + "! ")
 
-        match self.__rank:
-            case 0: type.type("Let's not get too far ahead of ourselves though, you're still quite poor.")
-            case 1: type.type("You definitely have some money. The keyword is 'some'.")
-            case 2: type.type("You've amassed significant earnings. Nicely done.")
-            case 3: type.type("You must have some heavy pockets, huh.")
-            case 4: type.type("Where do you even keep all that?")
-            case 5: type.type("So close to being a millionaire! Can you do it?")
+        type.type(self.__lists.get_rank_comment(self.__rank))
 
         print("\n")
 
@@ -1903,6 +2585,12 @@ class Player:
         type.type("You've never seen the dealer quite so angry. Fortunately, you make it back to your car, and immediately pass out for the night. It's time to rest.")
 
     def start_night(self):
+        print("\n")
+        type.fast(bright(red("═" * 50)))
+        type.fast(bright(red("            ~ ~ ~ Evening: The Casino ~ ~ ~")))
+        type.fast(bright(red("═" * 50)))
+        print("\n")
+        
         if(self.__day==1):
             self.start_night_1()
         elif self.has_travel_restriction("Wind"):
@@ -2069,6 +2757,19 @@ class Player:
             type.type("You're woken by excited yipping. A small corgi is doing zoomies around your car, clearly having the time of its life. ")
             type.type("When you open the door, it immediately jumps into your lap and starts covering your face in kisses.")
         print("\n")
+        
+        # Animal Whistle auto-befriend
+        if self.has_item("Animal Whistle") and not self.has_companion("Buddy"):
+            type.type("The " + magenta(bright("Animal Whistle")) + " hums softly in your pocket. The dog's ears perk up.")
+            print()
+            type.type("Something changes in its eyes. Recognition. Trust. It sits beside you, leaning against your leg.")
+            print()
+            type.type("This dog... it's not leaving. It's choosing to stay.")
+            print()
+            self.add_companion("Buddy", "Stray Dog")
+            self.heal(random.choice([15, 20]))
+            return
+        
         if self.has_item("Dog Treat"):
             self.use_item("Dog Treat")
             type.type("You throw your " + bright(magenta("Dog Treat")) + " into the air, ")
@@ -2236,6 +2937,30 @@ class Player:
         type.type("He's riding a magnificent horse, muscular, but nimble, each step powerful, but precise. ")
         type.type("The man reaches your window, and in a deep southern accent, he begins to talk to you.")
         print("\n")
+        
+        # Animal Whistle lets you befriend the horse
+        if self.has_item("Animal Whistle") and not self.has_companion("Thunder"):
+            type.type("The " + magenta(bright("Animal Whistle")) + " resonates from your pocket. The horse whinnies and stamps its hooves.")
+            print("\n")
+            type.type("Jameson looks surprised. " + quote("Well I'll be. My horse NEVER acts like this. He... he likes you!"))
+            print("\n")
+            type.type("The horse nuzzles your hand through the window. Jameson dismounts, shaking his head in wonder.")
+            print("\n")
+            type.type(quote("I've had Thunder for ten years, and I've never seen him bond with anyone like this. "))
+            type.type(quote("Tell ya what, partner - Thunder's yours now. He's chosen you. "))
+            type.type(quote("You treat him right, ya hear?"))
+            print("\n")
+            type.type("You've just been given a HORSE by a cowboy. The horse's name is " + cyan(bright("Thunder")) + ".")
+            print("\n")
+            type.type("Jameson tips his hat, wipes a tear, and walks off down the road whistling. ")
+            type.type("Thunder follows your wagon now, proud and free.")
+            self.add_companion("Thunder", "Horse")
+            self.increment_statistic("companions_befriended")
+            self.unlock_achievement("first_friend")
+            self.add_item("Carrot")  # He still gives you the carrot
+            print("\n")
+            return
+        
         type.type(open_quote("Howdy, partner! The name's Jameson. Davey Jameson. "))
         type.type(quote("I happen to notice you were admiring my steed. He's a beauty, isn't he. "))
         type.type(quote("You see, it's common courtesy when a cowboy rides by, "))
@@ -2867,6 +3592,22 @@ class Player:
             print("\n")
             type.type("The Raccoon Mafia wants tribute.")
             print("\n")
+            
+            # Animal Whistle befriends the boss
+            if self.has_item("Animal Whistle") and not self.has_companion("Don"):
+                type.type("The " + magenta(bright("Animal Whistle")) + " suddenly glows bright in the moonlight.")
+                print()
+                type.type("The boss raccoon's ears perk up. It stops chattering. Its gang falls silent.")
+                print()
+                type.type("The boss hops off your hood and approaches. It sniffs the whistle, then... bows.")
+                print()
+                type.type("The entire raccoon mafia bows with it. You've earned their respect.")
+                print()
+                type.type("The boss raccoon-now " + cyan(bright("Don")) + "-climbs into your car. The gang disperses.")
+                print()
+                self.add_companion("Don", "Raccoon Boss")
+                return
+            
             tribute = random.randint(100, 300)
             type.type("You reluctantly throw " + green(bright("${:,}".format(tribute))) + " out the window. The leader inspects it, nods, and the whole gang scurries away.")
             print("\n")
@@ -3184,6 +3925,26 @@ class Player:
         type.type("You park near a river. The water is clear, and you can see fish swimming lazily beneath the surface.")
         print("\n")
         
+        # Animal Whistle lets you befriend a fish
+        if self.has_item("Animal Whistle") and not self.has_companion("Bubbles"):
+            type.type("The " + magenta(bright("Animal Whistle")) + " resonates with the water. The fish stop swimming and rise to the surface.")
+            print("\n")
+            type.type("One particularly large, golden koi swims right up to you. It splashes, then opens its mouth - like it's talking.")
+            print("\n")
+            type.type("You dip your hand in the water. The koi nuzzles your palm. It's... following you?")
+            print("\n")
+            type.type("The koi leaps into a bucket you didn't realize you had. Magic is weird.")
+            print("\n")
+            type.type("You've befriended a fish. You decide to call it " + cyan(bright("Bubbles")) + ".")
+            print("\n")
+            type.type("Bubbles will travel with you in a perpetually full bucket. Don't ask how it works.")
+            self.add_companion("Bubbles", "Koi Fish")
+            self.increment_statistic("companions_befriended")
+            self.unlock_achievement("first_friend")
+            self.restore_sanity(5)
+            print("\n")
+            return
+        
         if self.has_item("Fishing Line"):
             type.type("You have " + magenta(bright("Fishing Line")) + "! Time to try your luck.")
             print("\n")
@@ -3400,6 +4161,23 @@ class Player:
         print("\n")
         type.type("For a long moment, you both stare.")
         print("\n")
+        
+        # Animal Whistle befriend with Carrot bonus
+        if self.has_item("Animal Whistle") and not self.has_companion("Clover"):
+            type.type("The " + magenta(bright("Animal Whistle")) + " around your neck begins to glow softly.")
+            print()
+            type.type("The rabbit's eyes widen. It hops closer, cautiously at first, then with more confidence.")
+            print()
+            if self.has_item("Carrot"):
+                self.use_item("Carrot")
+                type.type("You offer the " + magenta(bright("Carrot")) + ". The rabbit accepts it gently, then nuzzles your hand.")
+                print()
+            type.type("The rabbit sits beside you. This is no ordinary rabbit. This is luck incarnate.")
+            print()
+            self.add_companion("Clover", "Lucky Rabbit")
+            self.add_status("Lucky")
+            return
+        
         type.type("The rabbit makes a sound that might be a sigh, then hops away.")
         print("\n")
         type.type("You feel... guilty? But also lucky. Definitely lucky.")
@@ -3665,6 +4443,26 @@ class Player:
         type.type("You wake up to your whole car shaking. As you jump up from your seat, you see a beautiful black and white cow, staring you down through your window. ")
         type.type("The cow moos at you aggressively, and you open the door. On its back is a note that reads 'This is Betsy. Betsy gets hungry. Please feed Betsy.'")
         print("\n")
+        
+        # Animal Whistle befriends Betsy
+        if self.has_item("Animal Whistle") and not self.has_companion("Betsy"):
+            type.type("The " + magenta(bright("Animal Whistle")) + " chimes. Betsy's aggressive moo turns into a gentle lowing.")
+            print("\n")
+            type.type("The cow approaches slowly, then... headbutts you gently. Affectionately. Like a giant, bovine cat.")
+            print("\n")
+            type.type("Betsy doesn't want your money. Betsy wants your friendship.")
+            print("\n")
+            type.type("You pat Betsy's head. She moos happily and settles down next to your wagon.")
+            print("\n")
+            type.type("You've befriended a cow. Her name is " + cyan(bright("Betsy")) + ", according to the note.")
+            print("\n")
+            type.type("Betsy will follow you around now, occasionally providing milk and existential cow wisdom.")
+            self.add_companion("Betsy", "Cow")
+            self.increment_statistic("companions_befriended")
+            self.unlock_achievement("first_friend")
+            print("\n")
+            return
+        
         type.type("Betsy stares into your soul, then looks over at the seat next to you. It appears Betsy is interested in your pile of money. ")
         print()
         type.type("Do you feed Betsy? ")
@@ -3831,6 +4629,28 @@ class Player:
             return
 
         self.lose_danger("Squirrel")
+        
+        # Animal Whistle automatically befriends the squirrel without needing acorns
+        if self.has_item("Animal Whistle") and not self.has_met("Squirrelly") and not self.has_met("Dead Squirrely"):
+            type.type("You wake up to the sound of something rummaging through your car. ")
+            type.type("Looking in the backseat, you notice a little squirrel, chittering away.")
+            print("\n")
+            type.type("The " + magenta(bright("Animal Whistle")) + " sings softly. The squirrel stops, ears perked.")
+            print("\n")
+            type.type("The squirrel bounds over to you and climbs onto your shoulder, chattering excitedly. ")
+            type.type("It finds an acorn in your hair (where did that come from?) and offers it to you.")
+            print("\n")
+            type.type("You've been adopted by a squirrel. You decide to call it " + cyan(bright("Squirrelly")) + ".")
+            print("\n")
+            type.type("Squirrelly will ride around in your car now, hiding acorns in increasingly creative places.")
+            self.add_item("Squirrelly")
+            self.add_companion("Squirrelly")
+            self.increment_statistic("companions_befriended")
+            self.unlock_achievement("first_friend")
+            self.mark_day("Squirrely Fed")
+            print("\n")
+            return
+        
         if self.has_item("Bag of Acorns"):
             self.use("Bag of Acorns")
             type.type("You wake up to the sound of something rummaging through your car. ")
@@ -4224,6 +5044,21 @@ class Player:
         print("\n")
         type.type("The rat jumps up onto your backseat, and begins to laugh at you. Now that's just cruel. This rat must be crazy.")
         print("\n")
+        
+        # Animal Whistle befriend the laughing rat
+        if self.has_item("Animal Whistle") and not self.has_companion("Slick"):
+            type.type("Wait. The " + magenta(bright("Animal Whistle")) + " vibrates against your chest.")
+            print()
+            type.type("The rat stops laughing. It tilts its head, looking at you with intelligent eyes.")
+            print()
+            type.type("Slowly, it approaches. Sniffs your hand. Then... climbs onto your shoulder.")
+            print()
+            type.type("This rat isn't crazy. It's brilliant. And it's yours now.")
+            print()
+            self.add_companion("Slick", "Clever Rat")
+            self.lose_danger("Rat")
+            return
+        
         self.lose_sanity(random.choice([1, 2, 3]))  # A laughing rat? That's unsettling
         if self.has_item("Pest Control"):
             self.kill_pests()
@@ -5957,6 +6792,24 @@ class Player:
             type.type("You put your hand out, and pet the mother deer. She makes a happy squeak noise, and wags her tail. ")
             type.type("She touches her head to yours, then continues down the path, with her two children following.")
             print("\n")
+            
+            # Animal Whistle makes the deer stay as a companion
+            if self.has_item("Animal Whistle") and not self.has_companion("Grace"):
+                type.type("But then - the " + magenta(bright("Animal Whistle")) + " sings softly. The mother deer stops.")
+                print("\n")
+                type.type("She turns back, her two fawns at her side. She looks at you with those deep, gentle eyes.")
+                print("\n")
+                type.type("You kneel down and the deer family approaches. The mother nuzzles your cheek. The fawns play around your feet.")
+                print("\n")
+                type.type("They've accepted you into their herd. You decide to call the mother " + cyan(bright("Grace")) + ".")
+                print("\n")
+                type.type("Grace and her fawns will follow your journey now, bringing peace wherever they go.")
+                self.add_companion("Grace", "Deer")
+                self.increment_statistic("companions_befriended")
+                self.unlock_achievement("first_friend")
+                self.restore_sanity(8)  # Bonus sanity for magical deer moment
+                print("\n")
+            
             type.type("Eventually, you get to the end of the path, and find the main road. You follow it back to your wagon, and take a seat, to rest for a moment.")
             print("\n")
             return
@@ -6043,6 +6896,29 @@ class Player:
         random_chance = random.randrange(3)
         if random_chance == 0:
             type.type("As you walk further, you stumble across a large brown bear, bathing in the river. ")
+            
+            # Animal Whistle can befriend the bear
+            if self.has_item("Animal Whistle") and not self.has_companion("Bruno"):
+                print("\n")
+                type.type("The " + magenta(bright("Animal Whistle")) + " pulses warmly in your pocket. The bear's ears twitch.")
+                print("\n")
+                type.type("The massive creature turns its head toward you. For a moment, you lock eyes.")
+                print("\n")
+                type.type("Then, slowly, the bear stands up from the water - not threatening, but... curious. ")
+                type.type("It approaches you with surprising gentleness, water dripping from its thick fur.")
+                print("\n")
+                type.type("The bear sits down in front of you like an enormous dog. You reach out and touch its wet nose. ")
+                type.type("It makes a low, contented sound and leans into your hand.")
+                print("\n")
+                type.type("You've just made friends with a brown bear. You decide to call it " + cyan(bright("Bruno")) + ".")
+                print("\n")
+                type.type("Bruno shakes off the water (drenching you in the process) and follows you back to your wagon.")
+                self.add_companion("Bruno", "Brown Bear")
+                self.increment_statistic("companions_befriended")
+                self.unlock_achievement("first_friend")
+                print("\n")
+                return
+            
             if self.has_item("Quiet Bunny Slippers"):
                 print("\n")
                 type.type("Thank goodness you're wearing your " + cyan(bright("Quiet Bunny Slippers")) + "!")
@@ -6207,6 +7083,24 @@ class Player:
         if random_chance == 0:
             type.type("A massive snake, thick as your arm, slithers across your path. It stops, coils, and watches you.")
             print("\n")
+            
+            # Animal Whistle befriends the snake
+            if self.has_item("Animal Whistle") and not self.has_companion("Noodle"):
+                type.type("The " + magenta(bright("Animal Whistle")) + " hums, low and steady. The snake's tongue flicks out, tasting the air.")
+                print("\n")
+                type.type("Slowly, the snake uncoils and approaches. You hold out your hand - terrifying, but somehow right.")
+                print("\n")
+                type.type("The snake slides up your arm, coiling gently around your shoulders. Warm. Smooth. Alive.")
+                print("\n")
+                type.type("You've just befriended a swamp serpent. You decide to call it " + cyan(bright("Noodle")) + ".")
+                print("\n")
+                type.type("Noodle will ride with you now, a living scarf that occasionally hisses at strangers.")
+                self.add_companion("Noodle", "Snake")
+                self.increment_statistic("companions_befriended")
+                self.unlock_achievement("first_friend")
+                print("\n")
+                return
+            
             type.type("Do you try to go around it, or wait for it to move?")
             choice = input("(around/wait): ").strip().lower()
             if choice == "around":
@@ -6486,8 +7380,26 @@ class Player:
         
         event = random.choice(["alligator", "treasure", "witch", "fishing_shack", "none"])
         if event == "alligator":
+            # Animal Whistle automatically befriends the gator
+            if self.has_item("Animal Whistle") and not self.has_companion("Chomper"):
+                type.type("You surface for air and find yourself face-to-face with a pair of ancient, unblinking eyes. An alligator. At least ten feet long.")
+                print("\n")
+                type.type("The " + magenta(bright("Animal Whistle")) + " hums from your pocket. The water itself seems to vibrate with the tone.")
+                print("\n")
+                type.type("The gator's eyes soften. It swims closer, then gently bumps its massive snout against your arm - like a dog asking for pets.")
+                print("\n")
+                type.type("You reach out and run your hand along its ancient, armored head. It rumbles contentedly, a sound like distant thunder.")
+                print("\n")
+                type.type("The gator has chosen you. You decide to call it " + cyan(bright("Chomper")) + ".")
+                print("\n")
+                type.type("Chomper follows you back to shore and settles near your wagon like a prehistoric guard dog.")
+                self.add_companion("Chomper", "Alligator")
+                self.increment_statistic("companions_befriended")
+                self.unlock_achievement("first_friend")
+                print("\n")
+                return
             # Gator Tooth Necklace makes gators respect you
-            if self.has_item("Gator Tooth Necklace"):
+            elif self.has_item("Gator Tooth Necklace"):
                 type.type("You surface for air and find yourself face-to-face with a pair of ancient, unblinking eyes. An alligator. At least ten feet long.")
                 print("\n")
                 type.type("But then it sees your necklace - teeth from one of its own. It lets out a low rumble... and slowly backs away.")
@@ -6737,6 +7649,31 @@ class Player:
         type.type("It twitches its nose at you, almost daring you to try.")
         print("\n")
         
+        # Animal Whistle can befriend the magical rabbit
+        if self.has_item("Animal Whistle") and not self.has_companion("Moonwhisker"):
+            type.type("The " + magenta(bright("Animal Whistle")) + " begins to glow with an ethereal light.")
+            print("\n")
+            type.type("The rabbit's ears perk up. Its eyes, which were red, suddenly flash with iridescent colors.")
+            print("\n")
+            type.type("This is no ordinary rabbit. This is a creature of magic and moonlight.")
+            print("\n")
+            type.type("The rabbit hops toward you, not fleeing for once. It circles you three times, leaving a trail of shimmering sparkles.")
+            print("\n")
+            type.type("Then it poops - but instead of coins, it poops a small glowing crystal. A " + magenta(bright("Moon Shard")) + ".")
+            print("\n")
+            type.type("The rabbit... smiles? Do rabbits smile? This one does. It hops onto your shoulder.")
+            print("\n")
+            type.type("You've befriended a magical moon rabbit. You call it " + cyan(bright("Moonwhisker")) + ".")
+            print("\n")
+            self.add_companion("Moonwhisker", "Moon Rabbit")
+            self.add_item("Moon Shard")
+            self.restore_sanity(12)
+            self.increment_statistic("companions_befriended")
+            self.unlock_achievement("first_friend")
+            self.advance_rabbit_chase()
+            print("\n")
+            return
+        
         if self.has_item("Carrot"):
             type.type("Wait. You have a " + magenta(bright("Carrot")) + " in your pocket. Maybe you can lure it?")
             print("\n")
@@ -6864,6 +7801,25 @@ class Player:
             print("\n")
             type.type("You kick wildly - and your foot connects with something that squeaks and lets go. A sea otter surfaces, looking offended.")
             print("\n")
+            
+            # Animal Whistle befriends the sea otter
+            if self.has_item("Animal Whistle") and not self.has_companion("Scooter"):
+                type.type("The " + magenta(bright("Animal Whistle")) + " sings out across the water. The otter's expression changes.")
+                print("\n")
+                type.type("It paddles closer, curious now instead of offended. Then it rolls onto its back and floats there, waiting.")
+                print("\n")
+                type.type("You reach out and the otter takes your hand with its tiny paws. It chirps happily.")
+                print("\n")
+                type.type("You've befriended a sea otter. You decide to call it " + cyan(bright("Scooter")) + ".")
+                print("\n")
+                type.type("Scooter will follow your adventures now, occasionally bringing you shiny rocks and shellfish.")
+                self.add_companion("Scooter", "Sea Otter")
+                self.increment_statistic("companions_befriended")
+                self.unlock_achievement("first_friend")
+                self.heal(random.randint(10, 20))
+                print("\n")
+                return
+            
             type.type("It floats there, staring at you with its little hands folded on its chest, like you ruined its evening.")
             print("\n")
             type.type(quote("Sorry, buddy."))
@@ -6983,6 +7939,43 @@ class Player:
                     type.type("You make it out, but your side is scraped raw. Could have been so much worse.")
                     print("\n")
         elif random_chance == 3:
+            # Dolphin encounter
+            type.type("A sudden movement catches your eye - something large, gliding through the water with effortless grace.")
+            print("\n")
+            type.type("A DOLPHIN. It circles you once, twice, clicking and chirping. Curious. Playful.")
+            print("\n")
+            
+            # Animal Whistle can befriend the dolphin
+            if self.has_item("Animal Whistle") and not self.has_companion("Echo"):
+                type.type("The " + magenta(bright("Animal Whistle")) + " resonates underwater, creating ripples of sound.")
+                print("\n")
+                type.type("The dolphin's eyes widen. It chirps excitedly and begins circling you faster, swimming loops around your body.")
+                print("\n")
+                type.type("You reach out. The dolphin nudges your hand with its rostrum - gentle, intelligent, aware.")
+                print("\n")
+                type.type("This creature understands you. And you understand it.")
+                print("\n")
+                type.type("You surface together, and the dolphin leaps clear out of the water, spinning in the air before splashing back down.")
+                print("\n")
+                type.type("You've befriended a wild dolphin. You decide to call them " + cyan(bright("Echo")) + ".")
+                print("\n")
+                type.type("Echo will follow your wagon when you're near the coast, surfing in the waves alongside the road.")
+                self.add_companion("Echo", "Dolphin")
+                self.restore_sanity(15)
+                self.heal(20)
+                self.increment_statistic("companions_befriended")
+                self.unlock_achievement("first_friend")
+                print("\n")
+                return
+            
+            type.type("You swim alongside it for a moment - a brief, magical connection. Then it dives deep and is gone.")
+            print("\n")
+            type.type("You float there, grinning like an idiot. You just swam with a dolphin. Life is amazing sometimes.")
+            self.restore_sanity(12)
+            self.heal(15)
+            print("\n")
+        
+        elif random_chance == 4:
             type.type("You find a coral formation, alive with color and movement. ")
             type.type("Fish dart in and out of the crevices. An octopus watches you from its den, changing colors nervously.")
             print("\n")
@@ -7523,6 +8516,26 @@ class Player:
             type.type("You find yourself at the park's pond, a mirror of black water reflecting the city lights. ")
             type.type("Ducks sleep along the edge. Koi fish circle lazily in the shallows. A turtle watches you from a rock.")
             print("\n")
+            
+            # Animal Whistle lets you befriend the pond turtle
+            if self.has_item("Animal Whistle") and not self.has_companion("Shellbert"):
+                type.type("The " + magenta(bright("Animal Whistle")) + " hums. The dignified turtle turns its ancient head toward you.")
+                print("\n")
+                type.type("Slowly - very slowly - the turtle slides into the water and paddles over to you.")
+                print("\n")
+                type.type("It climbs onto the bank at your feet and extends its head. You pet its shell. The turtle closes its eyes contentedly.")
+                print("\n")
+                type.type("You've befriended the pond's wisest resident. You call it " + cyan(bright("Shellbert")) + ".")
+                print("\n")
+                type.type("Shellbert will accompany you now, offering ancient wisdom at a glacial pace.")
+                self.add_companion("Shellbert", "Wise Turtle")
+                self.increment_statistic("companions_befriended")
+                self.unlock_achievement("first_friend")
+                self.heal(random.randint(20, 35))
+                self.restore_sanity(8)
+                print("\n")
+                return
+            
             type.type("Do you feed the ducks, skip stones, or just... sit and breathe?")
             choice = input("(feed/skip/sit): ").strip().lower()
             if choice == "feed":
@@ -7789,6 +8802,29 @@ class Player:
             type.type("Then it emerges from the darkness - a bear the size of a truck, its eyes glowing amber in the moonlight. ")
             type.type("This isn't a normal bear. This is something OLD.")
             print("\n")
+            
+            # Animal Whistle can befriend even legendary beasts
+            if self.has_item("Animal Whistle") and not self.has_companion("Ursus"):
+                type.type("The " + magenta(bright("Animal Whistle")) + " begins to glow, brighter than you've ever seen. ")
+                type.type("The air hums with ancient power.")
+                print("\n")
+                type.type("The massive bear stops. Its glowing eyes fix on you, but there's no aggression - only recognition.")
+                print("\n")
+                type.type("It approaches slowly, each step making the earth tremble. When it reaches you, it lowers its enormous head.")
+                print("\n")
+                type.type("You place your hand on its snout. Warm. Real. Alive. The bear closes its eyes and makes a sound - ")
+                type.type("deep and resonant, like the voice of the forest itself.")
+                print("\n")
+                type.type("You've just bonded with a bear of legend. You call it " + cyan(bright("Ursus")) + " - the Bear King.")
+                print("\n")
+                type.type("Ursus will walk with you now. Where you go, the wild things will know you. Where you sleep, nothing will dare harm you.")
+                self.add_companion("Ursus", "Giant Bear")
+                self.increment_statistic("companions_befriended")
+                self.unlock_achievement("first_friend")
+                self.add_status("Beast Master")
+                print("\n")
+                return
+            
             type.type(yellow("=== CONFRONTATION: THE BEAST ==="))
             print("\n")
             type.type("The bear rises on its hind legs. It must be twelve feet tall. It sniffs the air, then looks directly at you.")
@@ -8048,6 +9084,25 @@ class Player:
             print("\n")
             type.type("The tortoises are lined up: Ol' Mossy (the favorite), Lightning Lou (young and fast), Shellshock Sally (unpredictable), and Mud Monster (the underdog).")
             print("\n")
+            
+            # Animal Whistle lets you befriend City Slicker after racing
+            if self.has_item("Animal Whistle") and not self.has_companion("Speedy") and self.get_balance() >= 2000:
+                type.type("The " + magenta(bright("Animal Whistle")) + " hums softly. The tortoises all poke their heads out and look at you.")
+                print("\n")
+                type.type("The toothless man notices. " + quote("Well I'll be. They like you. Tell ya what - race for free, and if City Slicker bonds with ya, he's yours to keep."))
+                print("\n")
+                type.type("You're handed City Slicker. He immediately extends his neck and gently bumps your hand.")
+                print("\n")
+                type.type("City Slicker has chosen you. You decide to call him " + cyan(bright("Speedy")) + " - ironically.")
+                print("\n")
+                type.type("Speedy becomes your companion. The man tips his hat. " + quote("He'll bring ya good luck, that one."))
+                self.add_companion("Speedy", "Tortoise")
+                self.increment_statistic("companions_befriended")
+                self.unlock_achievement("first_friend")
+                self.add_status("Tortoise Luck")
+                print("\n")
+                return
+            
             action = input("(race/bet/watch): ").strip().lower()
             
             if action == "race":
@@ -8932,6 +9987,26 @@ class Player:
             print("\n")
             type.type("A sun-weathered man holds up a bucket. " + quote("$500 to race! Pick your crab! Winner takes the pot - $5,000!"))
             print("\n")
+            
+            # Animal Whistle lets you befriend a racing crab
+            if self.has_item("Animal Whistle") and not self.has_companion("Deathclaw"):
+                type.type("The " + magenta(bright("Animal Whistle")) + " hums. Every crab in the bucket stops moving and looks up at you.")
+                print("\n")
+                type.type("The man blinks. " + quote("Well I'll be damned. Never seen 'em do that before."))
+                print("\n")
+                type.type("A large purple crab climbs out of the bucket and scuttles over to you. It raises one claw - like a salute.")
+                print("\n")
+                type.type("You've been chosen by Deathclaw himself. The man whistles. " + quote("That crab's never taken to anyone. You must be special."))
+                print("\n")
+                type.type("Deathclaw becomes your companion. You decide to keep the name " + cyan(bright("Deathclaw")) + ".")
+                print("\n")
+                type.type("The man waves you off. " + quote("No charge. Consider it destiny."))
+                self.add_companion("Deathclaw", "Racing Crab")
+                self.increment_statistic("companions_befriended")
+                self.unlock_achievement("first_friend")
+                print("\n")
+                return
+            
             action = input("(race/bet/catch_own/watch): ").strip().lower()
             
             if action == "race":
@@ -9465,6 +10540,29 @@ class Player:
         elif event == "giant_octopus":
             type.type("The water grows dark. Something MASSIVE moves in the depths. Eight tentacles, each thicker than your body, unfurl from the abyss.")
             print("\n")
+            
+            # Animal Whistle can befriend even the Kraken
+            if self.has_item("Animal Whistle") and not self.has_companion("Kraken"):
+                type.type("The " + magenta(bright("Animal Whistle")) + " pulses with deep oceanic power. The water vibrates.")
+                print("\n")
+                type.type("The massive octopus stops. Its enormous eye fixes on you, but there's no hunger now - only curiosity.")
+                print("\n")
+                type.type("A tentacle extends, gently wrapping around your arm. Not threatening. Questioning.")
+                print("\n")
+                type.type("You place your hand on its rubbery skin. The kraken makes a sound - deep, resonant, almost... joyful?")
+                print("\n")
+                type.type("You've bonded with a legendary sea creature. You call it " + cyan(bright("Kraken")) + ".")
+                print("\n")
+                type.type("The Kraken will watch over your journeys from the deep. It gifts you a pearl of immense value before sinking away.")
+                self.add_companion("Kraken", "Giant Octopus")
+                self.increment_statistic("companions_befriended")
+                self.unlock_achievement("first_friend")
+                self.add_item("Kraken Pearl")
+                self.change_balance(random.randint(40000, 70000))
+                self.add_status("Kraken Friend")
+                print("\n")
+                return
+            
             type.type(yellow("=== BOSS ENCOUNTER: THE KRAKEN ==="))
             print("\n")
             type.type("A giant octopus - ancient, intelligent, and HUNGRY. Its eye, the size of a dinner plate, focuses on YOU.")
@@ -11452,7 +12550,28 @@ class Player:
         print("\n")
 
     def seagull_attack(self):
-        type.type("A seagull dive-bombs your car and steals your breakfast right out of your hand.")
+        type.type("A seagull dive-bombs your car")
+        
+        # Animal Whistle turns an attack into friendship
+        if self.has_item("Animal Whistle") and not self.has_companion("Squawk"):
+            type.type(" - but the " + magenta(bright("Animal Whistle")) + " hums and the bird pulls up at the last second!")
+            print("\n")
+            type.type("The seagull lands on your hood, head tilted, examining you with one beady eye.")
+            print("\n")
+            type.type("FRIEND? FRIEND! FRIEND!")
+            print("\n")
+            type.type("You toss it some of your breakfast. The seagull wolfs it down and does a little dance on your hood.")
+            print("\n")
+            type.type("You've just gained the loyalty of a seagull. You decide to call it " + cyan(bright("Squawk")) + ".")
+            print("\n")
+            type.type("Squawk will ride on your roof now, screaming at anyone who looks at you funny.")
+            self.add_companion("Squawk", "Seagull")
+            self.increment_statistic("companions_befriended")
+            self.unlock_achievement("first_friend")
+            print("\n")
+            return
+        
+        type.type(" and steals your breakfast right out of your hand.")
         print("\n")
         type.type("MINE! MINE! MINE!")
         print("\n")
@@ -12526,6 +13645,25 @@ class Player:
         print("\n")
         type.type("The lead duck - wearing what appears to be a tiny top hat - stops in front of you and quacks authoritatively.")
         print("\n")
+        
+        # Animal Whistle befriends the duck general
+        if self.has_item("Animal Whistle") and not self.has_companion("General Quackers"):
+            type.type("The " + magenta(bright("Animal Whistle")) + " sounds. All thirty ducks stop and turn toward you in perfect unison.")
+            print("\n")
+            type.type("The top hat duck waddles forward and salutes with one wing. The entire army salutes.")
+            print("\n")
+            type.type("The general has recognized you as their commander. The duck waddles up and settles at your feet.")
+            print("\n")
+            type.type("You've been given command of a duck army. The general's name is " + cyan(bright("General Quackers")) + ".")
+            print("\n")
+            type.type("General Quackers will ride with you now. The rest of the army disperses, awaiting your orders.")
+            self.add_companion("General Quackers", "Duck Commander")
+            self.increment_statistic("companions_befriended")
+            self.unlock_achievement("first_friend")
+            self.restore_sanity(5)
+            print("\n")
+            return
+        
         answer = ask.yes_or_no("Follow the duck parade? ")
         if answer == "yes":
             type.type("You fall in line behind the ducks. People stare. You don't care.")
@@ -12623,6 +13761,26 @@ class Player:
         print("\n")
         type.type("It coos menacingly.")
         print("\n")
+        
+        # Animal Whistle befriends the pigeon boss
+        if self.has_item("Animal Whistle") and not self.has_companion("Don Coo"):
+            type.type("The " + magenta(bright("Animal Whistle")) + " hums. All thirty pigeons go silent. They look at each other in confusion.")
+            print("\n")
+            type.type("The boss pigeon tilts its tiny-hatted head. Then, slowly, it bows.")
+            print("\n")
+            type.type("You've earned the respect of the Pigeon Mafia. The boss pigeon hops onto your shoulder.")
+            print("\n")
+            type.type("You decide to call the pigeon boss " + cyan(bright("Don Coo")) + ".")
+            print("\n")
+            type.type("Don Coo will ride with you now. The other pigeons salute as you drive away. ")
+            type.type("You're protected by the family now.")
+            self.add_companion("Don Coo", "Pigeon Boss")
+            self.increment_statistic("companions_befriended")
+            self.unlock_achievement("first_friend")
+            self.add_status("Pigeon King")
+            print("\n")
+            return
+        
         type.type("Somehow, you understand perfectly: this is pigeon territory. You owe the pigeon boss.")
         print("\n")
         answer = ask.yes_or_no("Throw them some bread/money as tribute? ")
@@ -16598,7 +17756,11 @@ class Player:
             self.__prereqs_done[0] = True
 
     def start_day(self):
+        print("\n")
+        type.slow(bright(yellow("═" * 50)))
         type.typeover("Press a key to continue:", bright(yellow("~ ~ ~ Morning, Day " + str(self.__day) + " ~ ~ ~ ")), True)
+        type.slow(bright(yellow("═" * 50)))
+        print("\n")
 
         # ============================================
         # DAILY SYSTEM UPDATES
@@ -17325,6 +18487,18 @@ class Player:
             self.millionaire_afternoon()
             
         elif self.has_item("Car"):
+            # CHECK FOR COMPANION INTERACTIONS
+            if len(self.get_all_companions()) > 0 and not self.has_travel_restriction("Skip Companion Dialogue"):
+                type.type("Your companions gather around as the afternoon sun filters through your wagon.")
+                print("\n")
+                answer = ask.yes_or_no("Spend time with your companions? ")
+                if answer == "yes":
+                    self.companion_afternoon_dialogue()
+                    return  # Afternoon spent with companions
+                else:
+                    type.type("You'll catch up with them later. For now, you have places to be.")
+                    print("\n")
+            
             choice = None
             shops = self.__lists.make_shop_list()
             adventure_areas = self.get_unlocked_adventure_areas()
@@ -17427,6 +18601,16 @@ class Player:
         print("\n")
         type.type("Hey there champ! How are you? Doing all right? Let's check you out and make sure you're all up to snuff.")
         print()
+        
+        # Doctor comments on player's mental state (implicit sanity warning)
+        if self.__sanity < 30:
+            type.type("You know... I've seen a lot of patients, and you've got that look. The distant eyes. The shaking hands. ")
+            type.type("I patch up bodies, not minds. You should talk to someone. Not me. A professional. Someone who knows about... this kind of thing.")
+            print()
+        elif self.__sanity < 50:
+            type.type("You seem... off today. Stressed maybe? I can stitch cuts and set bones, but whatever's weighing on you, that's not my department.")
+            print()
+        
         if (self.len_status() == 0) and (self.__health == 100):
             type.type("Why, you look just as healthy as the day I met you, fresh from your mother's womb! Let me just give you this lollipop and you'll be free to go.")
         elif (self.len_status() == 0):
@@ -20076,7 +21260,45 @@ class Player:
                 self.start_night()
                 return
             
-            items_bought+=1
+            # Track purchase and check for gift system unlock
+            items_bought += 1
+            self.change_balance(-price)
+            gift_unlocked = self.increment_store_purchases()
+            
+            # Check if gift wrapping system just unlocked
+            if gift_unlocked:
+                print("\n")
+                time.sleep(1)
+                type.slow("Kyle puts down his phone and looks at you seriously.")
+                print("\n")
+                type.slow(quote("Hey, uh... you've been coming here a lot."))
+                print("\n")
+                type.slow(quote("I've noticed you're doing better. Got more money now, huh?"))
+                print("\n")
+                type.slow(quote("Listen, I got a side business. Gift wrapping. Classy stuff."))
+                print("\n")
+                type.slow(quote("You want me to wrap something? Make it look all fancy?"))
+                print("\n")
+                type.slow(quote("Costs ten bucks. But hey, presentation matters, right?"))
+                print("\n")
+                type.slow(yellow(bright("GIFT WRAPPING UNLOCKED! You can now wrap items at Kyle's store.")))
+                print("\n")
+                time.sleep(1)
+            
+            # Offer gift wrapping if system is unlocked and item is wrappable
+            if self.is_gift_system_unlocked() and not self.has_gift_wrapped():
+                print("\n")
+                wrap_choice = ask.yes_or_no("Want me to gift wrap that for you? ($10) ")
+                if wrap_choice == "yes" and self.__balance >= 10:
+                    if self.wrap_item_as_gift(item, 10):
+                        type.type("Kyle wraps it up nice. Real professional-like.")
+                        print("\n")
+                        type.type(yellow("You now have a wrapped gift. It will automatically be given to the Dealer at the casino."))
+                        print("\n")
+                elif wrap_choice == "yes":
+                    type.type("You don't have enough for the wrapping. Sorry, dude.")
+                    print("\n")
+            
             print("\n")
 
             if items_bought == 1:
@@ -20301,8 +21523,17 @@ class Player:
         print()
         type.type("2. Start selling")
         print()
-        type.type("3. Leave")
-        print()
+        
+        # DARK OPTION: Sell companions (only if you have 3+)
+        companion_count = len([c for c in self.companions if c['alive']])
+        if companion_count >= 3:
+            type.type("3. Ask about... other merchandise")
+            print()
+            type.type("4. Leave")
+            print()
+        else:
+            type.type("3. Leave")
+            print()
         
         choice = input("Choose: ").strip()
         
@@ -20337,6 +21568,26 @@ class Player:
                 self.start_night()
                 return
             self.visit_pawn_shop_sell(sellable_items, collectible_prices)
+            return
+        
+        elif choice == "3":
+            # Check if this is the "other merchandise" option or leave option
+            companion_count = len([c for c in self.companions if c['alive']])
+            if companion_count >= 3:
+                # Dark option - sell companions
+                self.pawn_shop_dark_option()
+                return
+            else:
+                # Regular leave option
+                type.type(quote("Come back when you've got the goods."))
+                print("\n")
+                self.start_night()
+                return
+        
+        elif choice == "4":
+            type.type(quote("Come back when you've got the goods."))
+            print("\n")
+            self.start_night()
             return
         
         else:
@@ -20395,6 +21646,8 @@ class Player:
             "Matched Pearls": "A matching pair! The ocean hates giving up pairs. You must've impressed someone down there.",
             "Pink Pearl": "Pink for love, they say. Or pink for blood diluted in seawater. Depends who you ask.",
             "Giant Oyster": "Still sealed? Bold. Could be a pearl in there. Could be a tiny angry crab.",
+            "Live Fish": "A LIVE fish? In your pocket? HOW? You know what, I don't wanna know. Tank's in the back.",
+            "Moon Shard": "This fell from the MOON? It's humming. It's HUMMING. I'm both terrified and fascinated.",
             # Beach Events
             "Golden Shovel": "Solid gold? For DIGGING? Someone had more money than sense. My kind of customer.",
             "Underwater Camera": "Full of someone else's memories. I'll sell 'em to the highest bidder.",
@@ -20544,6 +21797,431 @@ class Player:
         type.type(quote("Now get out of my shop. I need to be alone with my feelings."))
         print("\n")
         self.start_night()
+    
+    def pawn_shop_dark_option(self):
+        """Selling companions one by one to Gus"""
+        print("\n")
+        type.type("You hesitate. Your mouth feels dry. The words come out quieter than you intended.")
+        print("\n")
+        type.type(quote("What about... I mean... do you buy..."))
+        print("\n")
+        type.type("Gus looks up from his newspaper. His yellow teeth disappear. For once, he's not smiling.")
+        print("\n")
+        type.type(quote("Animals?"))
+        print("\n")
+        type.type("The word hangs in the air like a noose.")
+        print("\n")
+        type.type("You nod.")
+        print("\n")
+        type.type("Gus sets down his paper very slowly. He studies you with eyes that have seen too much.")
+        print("\n")
+        type.type(quote("I do. Exotic pet trade. Research facilities. Some questions-not-asked situations."))
+        print("\n")
+        type.type("He drums his grimy fingers on the counter.")
+        print("\n")
+        type.type(quote("Payment depends on the animal. Rarity. Condition. Temperament. Bring 'em in one at a time and we'll talk numbers."))
+        print("\n")
+        type.type("Your stomach churns.")
+        print("\n")
+        
+        answer = ask.yes_or_no("Continue? ")
+        
+        if answer != "yes":
+            type.type("You step back from the counter.")
+            print("\n")
+            type.type(quote("I... I can't. They're not merchandise."))
+            print("\n")
+            type.type("Gus nods slowly. Something like respect crosses his face.")
+            print("\n")
+            type.type(quote("Good. GOOD. Maybe you're not as far gone as I thought."))
+            print("\n")
+            self.restore_sanity(10)
+            self.start_night()
+            return
+        
+        # Show companion selling menu
+        self.pawn_shop_sell_companions()
+    
+    def pawn_shop_sell_companions(self):
+        """Menu for selling companions one by one"""
+        living_companions = self.get_all_companions()
+        
+        if len(living_companions) == 0:
+            type.type(quote("You got no animals left. Funny how that happened."))
+            print("\n")
+            type.type("The shop feels colder than it should.")
+            print("\n")
+            self.start_night()
+            return
+        
+        print("\n")
+        type.type(yellow(bright("═══ YOUR COMPANIONS ═══")))
+        print("\n")
+        
+        companion_list = list(living_companions.items())
+        for i, (name, data) in enumerate(companion_list, 1):
+            comp_type = data['type']
+            type.type(f"{i}. {cyan(name)} ({comp_type})")
+            print()
+        
+        type.type(f"{len(companion_list) + 1}. Leave")
+        print("\n")
+        
+        choice = input("Who do you want to sell? ").strip()
+        
+        try:
+            choice_num = int(choice)
+            if choice_num == len(companion_list) + 1:
+                type.type("You leave quickly, before you can change your mind.")
+                print("\n")
+                self.start_night()
+                return
+            elif 1 <= choice_num <= len(companion_list):
+                name, data = companion_list[choice_num - 1]
+                self.sell_single_companion(name, data)
+                return
+        except:
+            pass
+        
+        type.type("Invalid choice.")
+        print("\n")
+        self.pawn_shop_sell_companions()
+    
+    def sell_single_companion(self, name, data):
+        """Sell a single companion to Gus"""
+        comp_type = data['type']
+        
+        print("\n")
+        type.type(f"You bring {cyan(bright(name))} to the counter.")
+        print("\n")
+        type.type("Gus examines them with cold, professional eyes.")
+        print("\n")
+        
+        # Gus's fun/dark descriptions for each animal type
+        gus_descriptions = {
+            "Cat": "A cat, huh? Research labs love these. Something about their nervous systems. I don't ask questions.",
+            "Dog": "Three-legged dog? That actually INCREASES the value. Sympathy buyers pay more. Don't look at me like that.",
+            "Alligator": "An ALLIGATOR? In a WAGON? You're crazier than I thought. But I know a guy who runs a roadside zoo...",
+            "Deer": "Deer with FAWNS? Oh man. Some rich guy's gonna put this in his private menagerie. Easy sale.",
+            "Brown Bear": "A bear. A whole bear. You understand this is several kinds of illegal, right? ...I'll give you cash.",
+            "Giant Bear": "A GIANT BEAR? The Bear King himself? Do you know what collectors will pay for this? Do you WANT to know?",
+            "Seagull": "It's a seagull. A SEAGULL. You want money for a SEAGULL? ...Fine. Pest control will take it.",
+            "Racing Crab": "Racing crab, purple shell, championship bloodline. Underground crab fighting circuit wants this bad.",
+            "Tortoise": "Slow, steady, probably gonna outlive both of us. Exotic pet market. Easy money.",
+            "Snake": "Living scarf, huh? Snake handler I know will take it. He's only missing three fingers. You'll be fine.",
+            "Sea Otter": "Otters are endangered. That means VALUABLE. I know a private aquarium in Dubai...",
+            "Giant Octopus": "A KRAKEN? AN ACTUAL KRAKEN? I... I need to make some calls. Don't go anywhere.",
+            "Duck Commander": "Thirty trained ducks? THIRTY? There's a circus that'll pay top dollar for this act.",
+            "Turtle": "Ancient turtle, probably wise, definitely valuable. Collectors love the mystical angle.",
+            "Squirrel": "You're selling Squirrelly? The squirrel that's been with you since the start? ...Your choice, friend.",
+            "Pigeon Boss": "Organized pigeon mafia? That's... actually incredible. I know a guy who trains birds for movies.",
+            "Horse": "Beautiful horse, strong bloodline. Rancher up north wants breeding stock. Won't ask how you got it.",
+            "Cow": "A cow that used to charge money? That's hilarious. Dairy farm will take it. Probably.",
+            "Moon Rabbit": "This rabbit GLOWS. It GLOWS. Magic is real and I'm holding it. How much do I pay for MAGIC?",
+            "Koi Fish": "Koi fish, golden scales. Feng shui consultants pay stupid money for these. Your loss.",
+            "Rabbit": "Fluffy rabbit, good temperament. Pet store will take it. Kids love rabbits. Until they don't.",
+            "Raccoon Boss": "Raccoon mafia don? Complete with gang? I've seen everything now. This is worth $3000 easy.",
+            "Opossum": "Opossum that plays dead? They all do that. But this one's trained? Neat trick. I'll take it.",
+            "Dolphin": "A DOLPHIN? That follows your CAR? The marine park will pay ANYTHING for this. ANYTHING.",
+        }
+        
+        # Get description
+        description = gus_descriptions.get(comp_type, "Interesting creature. I know buyers for this sort of thing.")
+        type.type(quote(description))
+        print("\n")
+        
+        # Calculate value based on type
+        if comp_type in ["Giant Octopus", "Giant Bear", "Moon Rabbit", "Dolphin"]:
+            value = random.randint(15000, 30000)
+        elif comp_type in ["Brown Bear", "Horse", "Kraken", "Deer"]:
+            value = random.randint(5000, 12000)
+        elif comp_type in ["Alligator", "Snake", "Racing Crab", "Sea Otter", "Raccoon Boss", "Duck Commander"]:
+            value = random.randint(2000, 6000)
+        else:
+            value = random.randint(500, 3000)
+        
+        type.type(quote("I'll give you ") + green(bright("${:,}".format(value))) + quote(" for it. Cash. Right now."))
+        print("\n")
+        
+        answer = ask.yes_or_no(f"Sell {name}? ")
+        
+        if answer != "yes":
+            type.type(f"You pull {name} back. Not yet. Maybe not ever.")
+            print("\n")
+            self.restore_sanity(5)
+            self.pawn_shop_sell_companions()
+            return
+        
+        # THE SALE
+        print("\n")
+        type.slow("Gus makes a phone call. A van arrives within minutes.")
+        print("\n")
+        type.slow(f"{name} looks at you as they're taken away.")
+        print("\n")
+        
+        # Specific reactions for memorable companions
+        if name == "Lucky":
+            type.slow("Lucky's tail wags once. Still trusting. Even now.")
+        elif name == "Whiskers":
+            type.slow("Whiskers hisses and fights. The last sound you hear is her screaming.")
+        elif name == "Grace":
+            type.slow("Grace's eyes hold yours. The fawns cry out. You look away first.")
+        elif name == "Kraken":
+            type.slow("The Kraken's ancient eyes judge you. You will be remembered.")
+        elif name == "Thunder":
+            type.slow("Thunder whinnies once. A sound of betrayal. Of broken trust.")
+        elif name == "Squirrelly":
+            type.slow("Squirrelly drops the acorn they were holding. It rolls toward you. You don't pick it up.")
+        elif name == "Don Coo":
+            type.slow("Don Coo's pigeons scatter in panic. The boss never panics. But he looks back. Once.")
+        else:
+            type.slow("They don't understand. They probably never will.")
+        
+        print("\n")
+        type.slow("The van drives away.")
+        print("\n")
+        
+        # Remove companion and give money
+        self.companion_dies(name, "sold")
+        self.change_balance(value)
+        self.lose_sanity(15)
+        
+        # Track sales
+        self.__companions_sold_count += 1
+        sold_count = self.__companions_sold_count
+        
+        # Progressive Gus dialogue based on how many sold
+        print("\n")
+        if sold_count == 1:
+            type.type("Gus counts out the money. His hands are steady. Professional.")
+            print("\n")
+            type.type(quote("First time's always the hardest. Gets easier after this."))
+            print("\n")
+            self.unlock_achievement("first_sale")
+        elif sold_count == 3:
+            type.type("Gus counts out the money, then pauses.")
+            print("\n")
+            type.type(quote("You know what I do with these, right? The animals?"))
+            print("\n")
+            type.type("You don't answer.")
+            print("\n")
+            type.type(quote("Processing plant. Out west. They turn 'em into... product."))
+            print("\n")
+            type.type("Product. The word hangs in the air.")
+            print("\n")
+            self.unlock_achievement("three_sales")
+        elif sold_count == 5:
+            type.type("Gus slides the money across the counter slowly.")
+            print("\n")
+            type.type(quote("Five. That's enough for a batch."))
+            print("\n")
+            type.type("You look at him.")
+            print("\n")
+            type.type(quote("Meat cubes. That's what they call it. Little frozen cubes. Pet food, mostly. But some of it... other uses."))
+            print("\n")
+            type.type("Your stomach turns.")
+            print("\n")
+            type.type(quote("Don't look at me like that. You BROUGHT them here. I'm just the middleman."))
+            print("\n")
+            self.unlock_achievement("five_sales")
+        elif sold_count == 7:
+            type.type("Gus doesn't look at you as he counts the money.")
+            print("\n")
+            type.type(quote("The plant pays extra for variety. Different animals make different... flavors."))
+            print("\n")
+            type.type("You feel sick.")
+            print("\n")
+            type.type(quote("Alligator's got a kick to it. Bear's rich, gamey. The little ones - rabbits, cats - those are tender."))
+            print("\n")
+            type.type("He's DESCRIBING them. Like a menu.")
+            print("\n")
+            self.unlock_achievement("seven_sales")
+        elif sold_count == 10:
+            type.type("Gus pulls out a business card. Hands it to you.")
+            print("\n")
+            type.type("It reads: " + yellow("'CUBE PROCESSING INC. - Pet Nutrition Solutions'"))
+            print("\n")
+            type.type(quote("Ten animals. That's a full production run. They're gonna send you a thank you card."))
+            print("\n")
+            type.type("A thank you card. For murder.")
+            print("\n")
+            type.type(quote("Keep bringing them. The plant's always hungry."))
+            print("\n")
+            self.unlock_achievement("ten_sales")
+        elif sold_count >= 15:
+            # Trigger the ending at 15
+            self.betrayal_ending_meat_cubes()
+            return
+        else:
+            type.type("Gus counts out the money. His face is blank.")
+            print("\n")
+            type.type(quote("Anything else you want to sell?"))
+            print("\n")
+        
+        # Check companion achievement milestones
+        self.check_betrayal_achievements()
+        
+        # Continue the menu
+        self.pawn_shop_sell_companions()
+    
+    def check_betrayal_achievements(self):
+        """Check and unlock betrayal milestone achievements"""
+        count = self.__companions_sold_count
+        if count >= 1 and not self.has_achievement("first_sale"):
+            self.unlock_achievement("first_sale")
+        if count >= 3 and not self.has_achievement("three_sales"):
+            self.unlock_achievement("three_sales")
+        if count >= 5 and not self.has_achievement("five_sales"):
+            self.unlock_achievement("five_sales")
+        if count >= 7 and not self.has_achievement("seven_sales"):
+            self.unlock_achievement("seven_sales")
+        if count >= 10 and not self.has_achievement("ten_sales"):
+            self.unlock_achievement("ten_sales")
+        if count >= 15 and not self.has_achievement("cube_master"):
+            self.unlock_achievement("cube_master")
+    
+    def betrayal_ending_meat_cubes(self):
+        """Ending triggered after selling 15 companions - the meat cube factory revelation"""
+        print("\n")
+        type.slow(red(bright("═" * 50)))
+        type.slow(red(bright("           THE FACTORY")))
+        type.slow(red(bright("═" * 50)))
+        print("\n")
+        
+        time.sleep(1)
+        
+        type.slow("Gus sets down the money. Then he pulls out a folder.")
+        print("\n")
+        type.slow(quote("Fifteen. That's the threshold."))
+        print("\n")
+        type.slow("He opens the folder. Inside are photos.")
+        print("\n")
+        type.slow(quote("Cube Processing Inc. They want to meet you. Personally."))
+        print("\n")
+        
+        time.sleep(2)
+        
+        type.slow("The first photo: A massive industrial building. Gray. Windowless.")
+        print("\n")
+        type.slow("The second photo: A production line. Stainless steel. Machinery. Conveyor belts.")
+        print("\n")
+        type.slow("The third photo: Boxes. Thousands of boxes. Each labeled " + yellow("'Premium Pet Nutrition Cubes'."))
+        print("\n")
+        
+        time.sleep(2)
+        
+        type.slow(quote("They process about 200 animals a month. Your contributions have been... significant."))
+        print("\n")
+        type.slow("You stare at the photos. You can't look away.")
+        print("\n")
+        type.slow(quote("The company wants to offer you a partnership. Supply chain coordinator. You'd get a percentage of sales."))
+        print("\n")
+        
+        time.sleep(2)
+        
+        type.slow("Your hands are shaking.")
+        print("\n")
+        type.slow(quote("Think about it. You've already proven you have the stomach for it. Fifteen animals. That's more than most people manage in a lifetime."))
+        print("\n")
+        type.slow("He slides a business card across the counter.")
+        print("\n")
+        type.slow(yellow("'CUBE PROCESSING INC. - Industrial Facility #7'"))
+        print("\n")
+        type.slow(yellow("'WHERE ANIMALS BECOME PRODUCT'"))
+        print("\n")
+        
+        time.sleep(3)
+        
+        type.slow("You take the card. You don't know why. Your fingers move on their own.")
+        print("\n")
+        type.slow(quote("The van comes tonight. They'll pick up the last batch. Then... well. The door's open if you want it."))
+        print("\n")
+        
+        time.sleep(2)
+        
+        type.slow(red(bright("~ ~ ~ LATER THAT NIGHT ~ ~ ~")))
+        print("\n")
+        
+        time.sleep(1)
+        
+        type.slow("You drive to the casino. You don't know what else to do.")
+        print("\n")
+        type.slow("The Dealer looks up as you sit down. His jade eye catches the light.")
+        print("\n")
+        type.slow(red(self.__lists.get_dealer_betrayal_dialogue()))
+        print("\n")
+        type.slow("You look at your hands.")
+        print("\n")
+        type.slow(red(self.__lists.get_dealer_betrayal_dialogue()))
+        print("\n")
+        type.slow("He doesn't touch the cards. He just watches you.")
+        print("\n")
+        type.slow(red(self.__lists.get_dealer_betrayal_dialogue()))
+        print("\n")
+        
+        time.sleep(2)
+        
+        type.slow("You open your mouth to explain. To justify. To—")
+        print("\n")
+        type.slow(red(self.__lists.get_dealer_betrayal_dialogue()))
+        print("\n")
+        type.slow("The business card burns in your pocket.")
+        print("\n")
+        type.slow(red(self.__lists.get_dealer_betrayal_dialogue()))
+        print("\n")
+        
+        time.sleep(3)
+        
+        type.slow("You want to leave. But your legs won't move.")
+        print("\n")
+        type.slow("The Dealer finally picks up the cards. Shuffles. Slow. Deliberate.")
+        print("\n")
+        type.slow(red(self.__lists.get_dealer_betrayal_dialogue()))
+        print("\n")
+        type.slow(red(self.__lists.get_dealer_betrayal_dialogue()))
+        print("\n")
+        
+        time.sleep(2)
+        
+        type.slow("Days blur together. Weeks. Months.")
+        print("\n")
+        type.slow("You never call the number on the card. But you never throw it away either.")
+        print("\n")
+        type.slow("Sometimes, late at night, you hear machinery. Grinding. Processing. Cubing.")
+        print("\n")
+        type.slow("It's not real. You know it's not real.")
+        print("\n")
+        type.slow("But you hear it anyway.")
+        print("\n")
+        
+        time.sleep(3)
+        
+        type.slow("The scratching at your car door has stopped.")
+        print("\n")
+        type.slow("They're not coming back.")
+        print("\n")
+        type.slow("They've been processed.")
+        print("\n")
+        
+        time.sleep(2)
+        
+        type.slow(red(bright("You fed fifteen living creatures into an industrial meat grinder.")))
+        print("\n")
+        type.slow(red(bright("For money. For cards. For nothing.")))
+        print("\n")
+        type.slow(red(bright("The factory is always hungry.")))
+        print("\n")
+        type.slow(red(bright("And you know where to find more.")))
+        print("\n")
+        
+        # Unlock final achievement
+        self.unlock_achievement("cube_master")
+        self.display_final_achievements()
+        
+        type.slow(bright(yellow("~ ~ ~ THE END ~ ~ ~")))
+        print("\n")
+        type.slow("Thank you for playing.")
+        quit()
 
     # Loan Shark Interaction
     def visit_loan_shark(self):
@@ -21511,7 +23189,31 @@ class Player:
 
 
     def salvation(self):
-        type.slow("\"Yes, yes, yes of course I'll come home!\" Tears begin to stream from your eyes. \"I, I don't know what's gotten over me, I'm so, so incredibly sorry.\" A rush of adrenaline, no, realization comes over you. This whole time, you've been wasting your life away in a beat up wagon, trying to make a living off of gambling at a Blackjack table, while your family was trying, and struggling, to imagine a life without you. Immediately, you run out of Tom's Trusty Trucks and Tires, and you never look back.")
+        type.slow("\"Yes, yes, yes of course I'll come home!\" Tears begin to stream from your eyes. \"I, I don't know what's gotten over me, I'm so, so incredibly sorry.\" A rush of adrenaline, no, realization comes over you. This whole time, you've been wasting your life away in a beat up wagon, trying to make a living off of gambling at a Blackjack table, while your family was trying, and struggling, to imagine a life without you.")
+        print("\n")
+        
+        # Acknowledge companions before leaving
+        companion_count = len([c for c in self.companions if c['alive']])
+        if companion_count > 0:
+            type.slow("You look back at the wagon. At the companions you've gathered on this strange journey.")
+            print("\n")
+            companion_names = [c['name'] for c in self.companions if c['alive']]
+            if companion_count <= 3:
+                names_str = ", ".join(companion_names)
+            else:
+                names_str = companion_names[0] + ", " + companion_names[1] + ", and " + str(companion_count-2) + " others"
+            type.slow(f"{names_str} watch you with understanding. They know you have to go.")
+            print("\n")
+            type.slow("\"I'll find good homes for all of you,\" you promise. \"You saved me. Now I have to save myself.\"")
+            print("\n")
+            if self.has_companion("Thunder"):
+                type.slow("Thunder whinnies softly, nuzzling your shoulder one last time. Horses understand loyalty. Understand sacrifice.")
+                print("\n")
+            if self.has_companion("Whiskers") or self.has_companion("Lucky"):
+                type.slow("A wet nose presses into your palm. A final goodbye from a friend who asked for nothing but love.")
+                print("\n")
+        
+        type.slow("Immediately, you run out of Tom's Trusty Trucks and Tires, and you never look back.")
         print("\n")
 
         type.slow("\"Wait! You forgotcha wallet, yunno!\" Tom lifts your wallet, and opens it, and his eyes grow wide. \"Holy bejesus! My oh my, this generation is so peculiar. Welp, finder's keepers, I suppose. Guess this old Trucks and Tires shop's boutta get some upgrades, ya hear!\"")
@@ -21578,6 +23280,39 @@ class Player:
         print("\n")
 
         type.slow("As Nathan releases his grasp, the world around you begins to fade. You look around the room at everyone's faces, one last time. Everyone's leaning onto the bed, to be with you for your final moments. Rebecca and Dianne holding your right hand, Nathan holding your left. Kelly's arm is around Nathan's shoulder, and Thomas and Marissa sit on the blankets, right above your leg. You squeeze your hands tight, holding your family close, before letting go of your grasp, and fading away to eternal darkness...")
+        
+        # COMPANION ENDING ENHANCEMENTS
+        companions = self.get_all_companions()
+        if len(companions) > 0:
+            print("\n")
+            type.slow("But just before the darkness takes you completely, one final vision appears...")
+            print("\n")
+            type.slow("You see all the companions from your journey. Every creature that chose you, that trusted you, that loved you.")
+            print("\n")
+            
+            # Name specific companions
+            if self.has_companion("Grace"):
+                type.slow("Grace the deer, walking with her fawns through golden meadows.")
+            if self.has_companion("Bruno") or self.has_companion("Ursus"):
+                type.slow("The bears - protectors, guardians, ancient and true.")
+            if self.has_companion("Chomper"):
+                type.slow("Even Chomper the alligator, floating peacefully in warm waters.")
+            if self.has_companion("Kraken"):
+                type.slow("The Kraken, rising from the deep to witness your passing.")
+            if self.has_companion("Thunder"):
+                type.slow("Thunder the horse, running free across endless plains.")
+            if self.has_companion("Whiskers") or self.has_companion("Lucky"):
+                type.slow("Your loyal friends from the streets - Whiskers purring, Lucky's tail wagging.")
+            
+            print("\n")
+            type.slow("They all came to you in your darkest moments. They saw something in you worth saving.")
+            print("\n")
+            type.slow("You weren't just a gambler. You were someone who cared for the forgotten, the lost, the wounded.")
+            print("\n")
+            type.slow("You were loved. By your family. By creatures great and small.")
+            print("\n")
+            type.slow("That's not a bad legacy to leave behind.")
+            print("\n")
 
 
     def resurrection(self):
@@ -21590,7 +23325,27 @@ class Player:
         type.slow("\"You're a monster. You're completely pathetic. Don't even think about coming back. Not now, not ever. You will never see or hear from your son again, do you understand? YOU'RE DEAD TO ME JOHNATHAN. DEAD TO ME. ROT IN HELL, YOU FUCKING BASTA-")
         print("\n")
 
-        type.slow("And with that, you hang up the phone. Your ears are ringing, your face is numb, and while Tom appears to be trying to console you after that phone call from hell, you just can't seem to hear a single word coming out of his mouth. In fact, you don't feel anything. Nothing but the ringing in your ears, and sheer hatred for the man you've become. And yet somehow throughout all of this, your legs beneath you begin to carry your body, out the door, into your car, and down the road towards that lonely casino, sitting on top of the little hill, at the end of the dirt road. As though infected by a parasite, you can't help but come back here, to this place, where you were stranded all those days ago. With your money in hand, you get out of the car, and slam the door. You walk towards the little shack, each step more determined than the last. You can prove her wrong, no, you have to prove her wrong.") 
+        type.slow("And with that, you hang up the phone. Your ears are ringing, your face is numb, and while Tom appears to be trying to console you after that phone call from hell, you just can't seem to hear a single word coming out of his mouth.")
+        print("\n")
+        
+        # Acknowledge companions in the darkness
+        companion_count = len([c for c in self.companions if c['alive']])
+        if companion_count > 0:
+            type.slow("You stumble back to the wagon. Your companions watch you with confused, worried eyes.")
+            print("\n")
+            if self.has_companion("Lucky"):
+                type.slow("Lucky limps over, trying to lick your hand. Trying to comfort you. But you push him away.")
+                print("\n")
+            if self.has_companion("Whiskers"):
+                type.slow("Whiskers meows softly, rubbing against your leg. But you don't feel it. You don't feel anything.")
+                print("\n")
+            type.slow("They don't understand. They can't understand. You're not worth saving. Never were.")
+            print("\n")
+        
+        type.slow("In fact, you don't feel anything. Nothing but the ringing in your ears, and sheer hatred for the man you've become. And yet somehow throughout all of this, your legs beneath you begin to carry your body, out the door, into your car, and down the road towards that lonely casino, sitting on top of the little hill, at the end of the dirt road.")
+        print("\n")
+        
+        type.slow("As though infected by a parasite, you can't help but come back here, to this place, where you were stranded all those days ago. With your money in hand, you get out of the car, and slam the door. You walk towards the little shack, each step more determined than the last. You can prove her wrong, no, you have to prove her wrong.") 
         print("\n")
 
         type.slow(red("Welcome back. You don't look too well. Do you need something to drink? Perhaps some water?"))
@@ -22230,6 +23985,9 @@ class Player:
         type.slow(green(bright("You found bliss.")))
         print("\n")
         
+        # Display achievements earned
+        self.display_final_achievements()
+        
         type.slow(bright(yellow("~ ~ ~ THE END ~ ~ ~")))
         print("\n")
         
@@ -22366,6 +24124,26 @@ class Player:
         type.slow("You spend your days tending to animals. Teaching others. Finding peace in the simple rhythms of life.")
         print("\n")
         
+        # Enhanced companion-specific sanctuary moments
+        if self.has_companion("Grace"):
+            type.slow("Grace's fawns have grown. They bring you wildflowers every morning.")
+            print("\n")
+        if self.has_companion("Ursus") or self.has_companion("Bruno"):
+            type.slow("The bears guard the valley at night. Nothing dares approach when they patrol.")
+            print("\n")
+        if self.has_companion("Kraken"):
+            type.slow("The Kraken visits sometimes, emerging from the river's deepest pool just to say hello.")
+            print("\n")
+        if self.has_companion("Thunder"):
+            type.slow("Thunder carries children on rides through the meadows. They squeal with laughter.")
+            print("\n")
+        if self.has_companion("Squawk") or self.has_companion("General Quackers"):
+            type.slow("The birds organize aerial shows for entertainment. They're surprisingly coordinated.")
+            print("\n")
+        if companion_count >= 15:
+            type.slow("Your corner of the Sanctuary is the loudest, most chaotic, most loved. People come from all over just to see your collection.")
+            print("\n")
+        
         type.slow("Sometimes, late at night, you hear the distant call of cards shuffling.")
         print("\n")
         
@@ -22380,6 +24158,9 @@ class Player:
         
         type.slow(magenta(bright("You found sanctuary.")))
         print("\n")
+        
+        # Display achievements earned
+        self.display_final_achievements()
         
         type.slow(bright(yellow("~ ~ ~ SECRET ENDING: THE SHEPHERD ~ ~ ~")))
         print("\n")
@@ -22820,6 +24601,24 @@ class Player:
         type.slow("Sometimes, late at night, you drive out to where the casino used to be. There's nothing left but scorched earth and memories.")
         print("\n")
         
+        # Acknowledge companions in the destruction
+        companion_count = len([c for c in self.companions if c['alive']])
+        if companion_count > 0:
+            type.slow("Your companions are gone. Frank said they 'got in the way'. You don't ask what that means. You don't want to know.")
+            print("\n")
+            if self.has_companion("Lucky"):
+                type.slow("You remember Lucky's three legs. The way he used to limp over, tail wagging, whenever you were sad.")
+                print("\n")
+                type.slow("They didn't even let you bury him.")
+                print("\n")
+            if self.has_companion("Whiskers"):
+                type.slow("Whiskers always knew when something was wrong. She'd hide under the seat, watching you with wide eyes.")
+                print("\n")
+                type.slow("She tried to hide that night too. It didn't work.")
+                print("\n")
+            type.slow("You killed more than the Dealer that night. You killed everything good that was still left in you.")
+            print("\n")
+        
         type.slow("You sit in your car, staring at the darkness, and you ask yourself the same question over and over again:")
         print("\n")
         
@@ -22840,6 +24639,9 @@ class Player:
         
         type.slow(green(bright("You destroyed the Dealer. But at what cost?")))
         print("\n")
+        
+        # Display achievements earned
+        self.display_final_achievements()
         
         type.slow(bright(yellow("~ ~ ~ THE END ~ ~ ~")))
         print("\n")
@@ -23027,6 +24829,23 @@ class Player:
         type.slow("You do good things with your money. You build shelters for people who have nowhere else to go. You fund scholarships for kids who never had a chance. You stand up, again and again, when it would be easier to sit down.")
         print("\n")
         
+        # Acknowledge companions in retribution
+        companion_count = len([c for c in self.companions if c['alive']])
+        if companion_count > 0:
+            type.slow("Your companions lived. That's what matters. When Frank's boys came for them, the Dealer protected them.")
+            print("\n")
+            if self.has_companion("Lucky"):
+                type.slow("Lucky still limps over every morning, tail wagging. He knows you saved him that night.")
+                print("\n")
+            if self.has_companion("Thunder"):
+                type.slow("Thunder stands proud in the sanctuary you built. He gives rides to children who've never known gentleness.")
+                print("\n")
+            if self.has_companion("Grace"):
+                type.slow("Grace's fawns roam free on your land. Protected. Safe. Growing into something beautiful.")
+                print("\n")
+            type.slow("You saved the Dealer. But you also saved them. And in saving them, you saved yourself.")
+            print("\n")
+        
         type.slow("Sometimes, when things get hard, you reach into your pocket and feel the jade chip. And you remember the night you became the person you were always meant to be.")
         print("\n")
         
@@ -23065,6 +24884,9 @@ class Player:
         
         type.slow(green(bright("You chose justice. You earned the Dealer's respect.")))
         print("\n")
+        
+        # Display achievements earned
+        self.display_final_achievements()
         
         type.slow(bright(yellow("~ ~ ~ THE END ~ ~ ~")))
         print("\n")
@@ -23270,6 +25092,23 @@ class Player:
         type.slow("The words come out of your mouth, but they're not your words. They're his words. The Dealer's words. The words that have been spoken a million times before, by a thousand different mouths, across centuries of cards and chips and broken dreams.")
         print("\n")
         
+        # Acknowledge companions in transcendence
+        companion_count = len([c for c in self.companions if c['alive']])
+        if companion_count > 0:
+            type.slow("Your companions are somewhere in the casino. You gave them rooms. Fed them. But you never visit anymore.")
+            print("\n")
+            if self.has_companion("Lucky"):
+                type.slow("Lucky waits by the door of your office every night. He's still waiting. He always will be.")
+                print("\n")
+            if self.has_companion("Whiskers"):
+                type.slow("Whiskers sleeps on your desk chair. The one you used to sit in. Back when you were still you.")
+                print("\n")
+            if self.has_companion("Thunder"):
+                type.slow("Thunder paces in his stall. He hasn't been ridden in months. Years. He doesn't understand.")
+                print("\n")
+            type.slow("They're still alive. But you're not. You died the moment you sat down at this table.")
+            print("\n")
+        
         if self.has_item("Squirrely"):
             type.slow("On your shoulder, Squirrely sits perfectly still. He's wearing a tiny dealer's visor. He's become the casino mascot, his face on the chips and the signs and the uniforms.")
             print("\n")
@@ -23319,6 +25158,9 @@ class Player:
         
         type.slow(green(bright("You became the Dealer.")))
         print("\n")
+        
+        # Display achievements earned
+        self.display_final_achievements()
         
         type.slow(bright(yellow("~ ~ ~ THE END ~ ~ ~")))
         print("\n")
@@ -23634,6 +25476,9 @@ class Player:
         type.slow(green(bright("You transcended humanity itself.")))
         print("\n")
         
+        # Display achievements earned
+        self.display_final_achievements()
+        
         type.slow(bright(yellow("~ ~ ~ THE END ~ ~ ~")))
         print("\n")
         type.slow("Thank you for playing.")
@@ -23948,6 +25793,24 @@ class Player:
         type.slow("It counts the money with fingers that used to be yours. It straightens the clothes on a body that used to be yours. It checks the rearview mirror with eyes that used to be yours.")
         print("\n")
         
+        # Acknowledge companions in madness
+        companion_count = len([c for c in self.companions if c['alive']])
+        if companion_count > 0:
+            type.slow("The thing looks at your companions in the back seat. They whimper. They know.")
+            print("\n")
+            if self.has_companion("Lucky"):
+                type.slow("Lucky is growling. He never growled at you before. But he knows you're not you anymore.")
+                print("\n")
+            if self.has_companion("Whiskers"):
+                type.slow("Whiskers' fur is standing on end. Cats can sense evil. She's terrified.")
+                print("\n")
+            type.slow(quote("Don't worry, pets. We'll still feed you. We'll still need you. But you're not HIS anymore. You're MINE."))
+            print("\n")
+            type.slow("The thing wearing your face smiles at them. And deep inside, in that tiny prison where you're trapped, you scream for them to run.")
+            print("\n")
+            type.slow("But they can't hear you. They'll never hear you again.")
+            print("\n")
+        
         type.slow("And deep inside, in the tiny dark corner where you still exist, you scream.")
         print("\n")
         
@@ -23999,6 +25862,9 @@ class Player:
         
         type.slow(red(bright("And the Dealer... the Dealer remembers.")))
         print("\n")
+        
+        # Display achievements earned
+        self.display_final_achievements()
         
         type.slow(bright(yellow("~ ~ ~ THE END ~ ~ ~")))
         print("\n")

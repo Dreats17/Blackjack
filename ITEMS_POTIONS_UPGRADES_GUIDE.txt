@@ -1,0 +1,668 @@
+================================================================================
+COMPLETE ITEMS, POTIONS, UPGRADES & COLLECTIBLES GUIDE
+================================================================================
+
+Total Items in Game: 150+
+Categories:
+- Healing Items (20+)
+- Tools & Equipment (30+)
+- Collectibles (40+)
+- Special Items (25+)
+- Cursed Items (10+)
+- Blessed Items (8+)
+- Potions/Flasks (12 types)
+- Upgrades (18 items)
+
+================================================================================
+SECTION 1: HEALING & CONSUMABLE ITEMS
+================================================================================
+
+FOOD ITEMS (Healing + Companion Care)
+--------------------------------------
+
+1. DOG FOOD
+   Source: Kyle's Convenience Store ($8)
+   Effect: Feed Lucky (dog companion)
+   Healing: +5 HP if you eat it (desperate)
+   Uses: Required to befriend Lucky
+   Notes: Companions need daily feeding
+
+2. CAT FOOD  
+   Source: Kyle's Convenience Store ($6)
+   Effect: Feed Whiskers (cat companion)
+   Healing: +3 HP if eaten
+   Uses: Required to befriend Whiskers
+   Notes: Keep stocked for cat companions
+
+3. BIRD SEED
+   Source: Kyle's Convenience Store ($4)
+   Effect: Feed Marvin (parrot) or other birds
+   Healing: +1 HP if eaten (not recommended)
+   Uses: Bird companion care
+   Notes: Birds need this daily
+
+4. PROTEIN BAR
+   Source: Kyle's Convenience Store ($5)
+   Effect: +10 HP immediately
+   Hunger: Reduces hunger
+   Notes: Quick healing, portable
+
+5. SANDWICH
+   Source: Kyle's Convenience Store ($7), Gas stations
+   Effect: +15 HP
+   Hunger: Satisfying meal
+   Notes: Better than protein bar
+
+6. HOT DOG
+   Source: Gas stations ($3), Street vendors
+   Effect: +8 HP
+   Hunger: Light meal
+   Notes: Cheap option
+
+7. PIZZA SLICE
+   Source: Convenience stores ($6), City
+   Effect: +12 HP
+   Hunger: Decent meal
+   Notes: Filling
+
+8. ENERGY DRINK
+   Source: Kyle's Convenience Store ($4)
+   Effect: +5 HP, +3 Sanity
+   Special: Can trigger heart palpitations if used excessively
+   Notes: Temporary energy boost
+
+9. COFFEE
+   Source: Gas stations ($2), Coffee shops ($4)
+   Effect: +3 HP, +2 Sanity
+   Special: Morning ritual
+   Notes: Cheapest hot beverage
+
+10. FANCY COFFEE
+    Source: Upscale coffee shops ($7)
+    Effect: +5 HP, +5 Sanity
+    Special: +2 Sanity bonus for treating yourself
+    Notes: Expensive but worth it occasionally
+
+MEDICAL ITEMS
+--------------
+
+11. COLD MEDICINE
+    Source: Convenience stores ($12), Pharmacy ($10)
+    Effect: Cures "Cold" status
+    Healing: +5 HP
+    Notes: Cheaper than doctor visit ($40)
+
+12. FLU MEDICINE
+    Source: Pharmacy ($25)
+    Effect: Helps with "Flu", doesn't cure immediately
+    Healing: +10 HP, reduces duration
+    Notes: Still need rest
+
+13. PAIN KILLERS
+    Source: Convenience stores ($8), Pharmacy ($6)
+    Effect: +10 HP, reduces pain from injuries
+    Special: Can lead to addiction if overused
+    Warning: Repeated use triggers painkiller_dealer event
+
+14. ANTIHISTAMINE
+    Source: Pharmacy ($10)
+    Effect: Treats allergic reactions, spider bites
+    Healing: +8 HP
+    Notes: Good for insect-related ailments
+
+15. BANDAGES
+    Source: Convenience stores ($5), Pharmacy ($4)
+    Effect: +5 HP, helps treat minor injuries
+    Notes: Basic first aid
+
+16. FIRST AID KIT
+    Source: Pharmacy ($30), Tom's shop ($25)
+    Effect: +25 HP, can treat multiple minor injuries
+    Uses: 3 uses per kit
+    Notes: Best value for healing
+
+17. ANTIBIOTICS
+    Source: Doctor only (prescription)
+    Effect: Cures bacterial infections (Strep Throat, etc.)
+    Healing: Full cure for bacterial illness
+    Notes: Can't buy over counter
+
+18. ANTI-VENOM POTION
+    Source: Witch Doctor ($50), Oswald ($60)
+    Effect: Cures poison status, snake bites
+    Healing: +15 HP
+    Special: Magical item
+    Notes: One of the flask potions
+
+19. ANTI-VIRUS POTION
+    Source: Witch Doctor ($50), Oswald ($60)
+    Effect: Cures viral infections
+    Healing: +15 HP
+    Special: Magical cure
+    Notes: Flask potion type
+
+20. HEALING POTION (Generic)
+    Source: Witch Doctor ($40)
+    Effect: +30 HP immediately
+    Notes: Magical healing, expensive but effective
+
+================================================================================
+SECTION 2: TOOLS & EQUIPMENT
+================================================================================
+
+CAR MAINTENANCE TOOLS
+---------------------
+
+21. SPARE TIRE
+    Source: Tom's shop ($60), Auto parts store ($75)
+    Effect: Fix flat tire yourself (free repairs)
+    Durability: Single use per flat
+    Notes: Saves $50 per flat tire
+
+22. JUMPER CABLES
+    Source: Tom's shop ($35), Auto parts store ($40)
+    Effect: Jump start car when battery dies
+    Durability: Permanent
+    Notes: Can also help strangers (random events)
+
+23. COOLANT
+    Source: Tom's shop ($15), Auto parts store ($15)
+    Effect: Fix overheating temporarily
+    Durability: Single use
+    Notes: Prevents engine damage
+
+24. OIL CHANGE KIT
+    Source: Tom's shop ($25), Auto parts store ($30)
+    Effect: Change oil yourself, maintain engine
+    Durability: Single use
+    Notes: Saves money on oil changes
+
+25. BASIC TOOL KIT
+    Source: Tom's shop ($50), Pawn shop ($40)
+    Effect: Enables minor car repairs
+    Durability: Permanent
+    Notes: Required for many DIY fixes
+
+26. SUNSHADE
+    Source: Auto parts store ($15), Gas stations ($20)
+    Effect: Prevents heat damage, +2 HP on hot days
+    Durability: Permanent
+    Notes: Prevents "Scorching Sun" damage
+
+27. BUG REPELLENT
+    Source: Convenience stores ($8)
+    Effect: Prevents mosquito swarms
+    Durability: Lasts 7 days
+    Notes: Prevents "Mosquito Swarm" event
+
+28. RAID (Pest Spray)
+    Source: Convenience stores ($10)
+    Effect: Kills ants, roaches, spiders
+    Durability: Single use per infestation
+    Notes: Removes pest dangers immediately
+
+SURVIVAL ITEMS
+---------------
+
+29. SLEEPING BAG
+    Source: Camping store ($45), Pawn shop ($30)
+    Effect: +5 HP per night, warmer sleep
+    Durability: Permanent
+    Notes: Mitigates cold weather damage
+
+30. BLANKET
+    Source: Thrift store ($10), Pawn shop ($8)
+    Effect: +3 HP per night
+    Durability: Permanent
+    Notes: Basic warmth
+
+31. PILLOW
+    Source: Thrift store ($8)
+    Effect: +2 HP per night, better sleep quality
+    Durability: Permanent
+    Notes: Comfort item
+
+32. WATER BOTTLE (Reusable)
+    Source: Convenience stores ($5)
+    Effect: +5 HP when filled, hydration tracking
+    Durability: Permanent, refillable
+    Notes: Can refill at gas stations (free)
+
+33. FLASHLIGHT
+    Source: Convenience stores ($12), Hardware store ($10)
+    Effect: Enables night exploration, safety +10%
+    Durability: Permanent (needs batteries)
+    Notes: Required for some night events
+
+34. BATTERIES
+    Source: Convenience stores ($4)
+    Effect: Powers flashlight
+    Durability: 5 uses
+    Notes: Keep spares
+
+35. PHONE CHARGER (Car)
+    Source: Electronics store ($15), Gas stations ($20)
+    Effect: Keep phone charged (call Rebecca, etc.)
+    Durability: Permanent
+    Notes: Required for some story events
+
+36. PORTABLE RADIO
+    Source: Electronics store ($25), Pawn shop ($15)
+    Effect: +2 Sanity per use, entertainment
+    Durability: Permanent
+    Notes: Morale booster
+
+37. BOOK (Various Titles)
+    Source: Library (free), Bookstore ($10), Pawn shop ($5)
+    Effect: +3 Sanity per reading session
+    Durability: Permanent
+    Notes: Multiple books available
+
+38. FISHING ROD
+    Source: Sporting goods ($40), Pawn shop ($25)
+    Effect: Enables fishing at river, free food
+    Durability: Permanent
+    Notes: Catch fish = free +10 HP meals
+
+39. KNIFE (Utility)
+    Source: Camping store ($20), Hardware store ($15)
+    Effect: Cutting tool, enables certain events
+    Durability: Permanent
+    Notes: Required for some crafting/events
+
+40. LIGHTER/MATCHES
+    Source: Gas stations ($2-3)
+    Effect: Fire source, enables certain events
+    Durability: Matches (10 uses), Lighter (refillable)
+    Notes: Required for campfire events
+
+================================================================================
+SECTION 3: SPECIAL & UNIQUE ITEMS
+================================================================================
+
+ITEMS FROM EVENTS
+------------------
+
+41. REBECCA'S PHONE NUMBER
+    Source: Tom gives it to you (story event)
+    Effect: Enables calling Rebecca
+    Special: Required for Salvation ending
+    Notes: Can lose it if you throw it away
+
+42. MYSTERIOUS NOTE
+    Source: Found on windshield (mysterious_note event)
+    Effect: Lore item, cryptic message
+    Notes: "They're watching you"
+
+43. JADE EYE REPLICA
+    Source: Collectible, various sources
+    Effect: +5 Luck
+    Special: Replica of Dealer's jade eye
+    Notes: Rare collectible
+
+44. RABBIT'S FOOT
+    Source: Complete rabbit chase questline (good ending)
+    Effect: +10 Luck permanently
+    Special: Legendary item
+    Notes: Only one per playthrough
+
+45. SUZY'S GIFT
+    Source: Gift from Suzy ending
+    Effect: +20 max Sanity permanently
+    Special: Ending reward
+    Notes: If you're kind to Suzy
+
+46. OLD PHOTO (Family)
+    Source: Found in car (story event)
+    Effect: -5 Sanity when looking at it (painful memories)
+    Special: Can throw away or keep
+    Notes: Represents your past life
+
+47. JENKINS' TWENTY DOLLARS
+    Source: Old Man Jenkins gives it (story event)
+    Effect: $20 cash with note "Buy something warm"
+    Special: Has sentimental value
+    Notes: Some players keep it, never spend
+
+48. THE COWBOY'S CARD
+    Source: Lone Cowboy gives it (story event)
+    Effect: Has phone number, never answers
+    Special: Mysterious lore item
+    Notes: Calling it plays strange message
+
+49. DEALER'S TOKEN
+    Source: Special casino event
+    Effect: One free blackjack hand (dealer skips his turn)
+    Special: One-time use
+    Notes: Extremely rare
+
+50. GOLDEN TICKET
+    Source: Vending machine luck event
+    Effect: Free entry to high roller room
+    Special: One-time use
+    Notes: Usually costs $10,000
+
+================================================================================
+SECTION 4: COLLECTIBLES (Trade to Gus for Money)
+================================================================================
+
+COMMON COLLECTIBLES ($10-50 at pawn shop)
+-------------------------------------------
+
+51. DIRTY OLD HAT
+    Find: Various locations
+    Value: $15
+    Description: Weathered baseball cap
+
+52. RUSTY COMPASS
+    Find: Woodland adventures
+    Value: $25
+    Description: Old compass, still works
+
+53. TATTERED CLOAK
+    Find: Swamp adventures
+    Value: $20
+    Description: Moth-eaten fabric
+
+54. WORN GLOVES
+    Find: City streets
+    Value: $18
+    Description: Leather work gloves
+
+55. WHITE FEATHER
+    Find: Beach, woodland
+    Value: $30
+    Description: Pristine white feather
+
+UNCOMMON COLLECTIBLES ($50-200)
+---------------------------------
+
+56. POCKET WATCH
+    Find: Underwater adventure, time loop event
+    Value: $150
+    Description: Tarnished pocket watch, engraved
+
+57. GOLDEN WATCH
+    Find: Underwater adventure (rare)
+    Value: $500
+    Description: Solid gold timepiece
+
+58. TWIN'S LOCKET
+    Find: Various story events
+    Value: $200
+    Description: Locket with two photos inside
+
+59. LUCKY COIN
+    Find: Ditched wallet, lucky penny event
+    Value: $100
+    Effect: +5 Luck if kept
+    Description: Ancient coin with strange symbols
+
+60. ENCHANTING SILVER BAR
+    Find: Underwater adventure, yard sale
+    Value: $800 (varies with silver prices)
+    Effect: Value updates based on silver market
+    Description: Pure silver bar, mystical properties
+
+RARE COLLECTIBLES ($200-1000)
+-------------------------------
+
+61. DELIGHT INDICATOR
+    Find: Extremely rare random events
+    Value: $1,000
+    Effect: +10 to all stats if kept
+    Description: Mysterious device, glows faintly
+
+62. GAMBLER'S CHALICE
+    Find: High roller room, casino comps
+    Value: $750
+    Effect: +15 Luck if kept
+    Description: Ornate chalice from old casino
+
+63. DEALER'S GRUDGE
+    Find: Special Dealer events
+    Value: $500
+    Effect: -10 Dealer Happiness, cursed
+    Description: Token of Dealer's anger
+    Warning: Keeping this angers Dealer
+
+64. GAMBLER'S GRIMOIRE
+    Find: Mysterious package, witch doctor
+    Value: Priceless (can't sell)
+    Effect: View detailed gambling statistics
+    Description: Leather-bound book, tracks every bet
+    Special: Enables grimoire_full_report
+
+CURSED COLLECTIBLES (Special)
+-------------------------------
+
+65. CURSED COIN
+    Find: Blood moon event, dark rituals
+    Value: $100
+    Effect: -5 HP per day, +20 Luck
+    Description: Coin that pulses with dark energy
+    Warning: Drains health but boosts luck
+    Removal: Witch Doctor ($100 cleansing)
+
+66. NECRONOMICON (Replica)
+    Find: Occult bookstore, witch doctor
+    Value: $300
+    Effect: Triggers sanity events, -2 Sanity/day
+    Description: "Replica" of the cursed book
+    Warning: Reading it lowers sanity
+    Special: Apply_necronomicon_effects
+
+================================================================================
+SECTION 5: POTIONS & FLASKS (Magic Items from Oswald)
+================================================================================
+
+All flasks have 3 uses before depleting. Available from Oswald's Upgrade Shop.
+
+67. NO-BUST POTION
+    Cost: $500
+    Effect: Next hand, cannot bust (even if over 21)
+    Uses: 3
+    Strategy: Use on risky splits or hitting 17+
+
+68. IMMINENT BLACKJACK POTION  
+    Cost: $800
+    Effect: Greatly increases blackjack chance next hand
+    Uses: 3
+    Strategy: Use with big bets
+
+69. DEALER'S WHISPERS POTION
+    Cost: $600
+    Effect: See Dealer's hole card for one hand
+    Uses: 3
+    Strategy: Perfect information gambling
+
+70. BONUS FORTUNE POTION
+    Cost: $400
+    Effect: +50% winnings on next won hand
+    Uses: 3
+    Strategy: Combine with big bets
+
+71. FORTUNATE DAY POTION
+    Cost: $300
+    Effect: +Luck for entire day of gambling
+    Uses: 3 days
+    Strategy: All-day advantage
+
+72. FORTUNATE NIGHT POTION
+    Cost: $300
+    Effect: +Luck for entire night of gambling
+    Uses: 3 nights
+    Strategy: Night session advantage
+
+73. SECOND CHANCE POTION
+    Cost: $1,000
+    Effect: If you lose hand, redo it once
+    Uses: 3
+    Strategy: Insurance against bad luck
+
+74. SPLIT SERUM POTION
+    Cost: $600
+    Effect: Triple split instead of double (3 hands)
+    Uses: 3
+    Strategy: Pairs become 3 hands
+
+75. DEALER'S HESITATION POTION
+    Cost: $700
+    Effect: Dealer must hit on 17 (instead of stand)
+    Uses: 3
+    Strategy: Dealer more likely to bust
+
+76. POCKET ACES POTION
+    Cost: $900
+    Effect: Guarantees you get an Ace in starting hand
+    Uses: 3
+    Strategy: Blackjack setup
+
+77. ANTI-VENOM FLASK
+    Cost: $50
+    Effect: Cures poison
+    Uses: 3
+    Notes: Same as medical anti-venom
+
+78. ANTI-VIRUS FLASK
+    Cost: $50
+    Effect: Cures viral infections
+    Uses: 3
+    Notes: Same as medical anti-virus
+
+================================================================================
+SECTION 6: OSWALD'S UPGRADEABLE ITEMS (Permanent Improvements)
+================================================================================
+
+Total Upgradeable Items: 18
+Max Upgrade Level: +10 each
+Cost: Increases per level (starts $100, increases by $50 per level)
+
+79. DELIGHT INDICATOR (Upgradeable)
+    Base Effect: +1 to all stats per level
+    Max Upgrade (+10): +10 HP, +10 Sanity, +10 Luck daily
+
+80. HEALTH INDICATOR (Upgradeable)
+    Base Effect: +2 max HP per level
+    Max Upgrade (+10): +20 max HP (total 120 HP)
+
+81. SANITY INDICATOR (Upgradeable)
+    Base Effect: +2 max Sanity per level
+    Max Upgrade (+10): +20 max Sanity (total 120 Sanity)
+
+82. DIRTY OLD HAT (Upgradeable)
+    Base Effect: +1 Luck per level
+    Max Upgrade (+10): +10 Luck
+
+83. GOLDEN WATCH (Upgradeable)
+    Base Effect: +2% gambling winnings per level
+    Max Upgrade (+10): +20% gambling winnings
+
+84. ENCHANTING SILVER BAR (Upgradeable)
+    Base Effect: +$10/day passive income per level
+    Max Upgrade (+10): +$100/day passive income
+
+85. SNEAKY PEEKY SHADES (Upgradeable)
+    Find: City adventures, pawn shop
+    Base Effect: +1% chance to see dealer's card per level
+    Max Upgrade (+10): +10% chance to see hole card
+
+86. QUIET SNEAKERS (Upgradeable)
+    Find: Thrift store, pawn shop
+    Base Effect: +2% stealth per level
+    Max Upgrade (+10): +20% stealth (avoid danger events)
+
+87. FAULTY INSURANCE (Upgradeable)
+    Find: Insurance salesman event
+    Base Effect: +5% survival chance per level
+    Max Upgrade (+10): +50% survival at 0 HP
+
+88. LUCKY COIN (Upgradeable)
+    Base Effect: +1 Luck per level
+    Max Upgrade (+10): +10 Luck
+
+89. WORN GLOVES (Upgradeable)
+    Base Effect: +1% blackjack chance per level
+    Max Upgrade (+10): +10% blackjack chance
+
+90. TATTERED CLOAK (Upgradeable)
+    Base Effect: +2% evasion per level
+    Max Upgrade (+10): +20% avoid negative events
+
+91. RUSTY COMPASS (Upgradeable)
+    Base Effect: +5% find rate per level
+    Max Upgrade (+10): +50% find collectibles
+
+92. POCKET WATCH (Upgradeable)
+    Base Effect: +1% gambling speed per level
+    Max Upgrade (+10): +10% gambling speed (more hands)
+
+93. GAMBLER'S CHALICE (Upgradeable)
+    Base Effect: +2 Luck per level
+    Max Upgrade (+10): +20 Luck
+
+94. TWIN'S LOCKET (Upgradeable)
+    Base Effect: +1 Companion Happiness per level
+    Max Upgrade (+10): +10 Companion Happiness daily
+
+95. WHITE FEATHER (Upgradeable)
+    Base Effect: +5% peaceful events per level
+    Max Upgrade (+10): +50% positive event rate
+
+96. DEALER'S GRUDGE (Upgradeable - CURSED)
+    Base Effect: -1 Dealer Happiness, +2 Luck per level
+    Max Upgrade (+10): -10 Dealer Happiness, +20 Luck
+    Warning: Dangerous upgrade path
+
+97. GAMBLER'S GRIMOIRE (Special - Not Traditionally Upgradeable)
+    Effect: Provides increasingly detailed statistics
+    Special: Unlocks hidden gambling insights
+
+98. SUZY'S GIFT (If Received)
+    Effect: Cannot be upgraded
+    Permanent: +20 max Sanity
+
+================================================================================
+SECTION 7: GIFT ITEMS (For Dealer Happiness System)
+================================================================================
+
+Items that can be gift-wrapped at Kyle's Convenience Store ($5 wrapping fee)
+and given to The Dealer to increase Dealer Happiness.
+
+GIFT CATEGORIES & REACTIONS:
+
+CHEAP GIFTS ($1-20) - Minor Happiness
+99. Candy Bar → Dealer: "...Thanks, I guess." (+2 Happiness)
+100. Soda → Dealer: "Not my preferred brand." (+3 Happiness)
+101. Lottery Ticket → Dealer: "Ironic." (+5 Happiness)
+
+MODERATE GIFTS ($20-100) - Good Happiness
+102. Quality Cigars → Dealer: "Now we're talking." (+10 Happiness)
+103. Whiskey Bottle → Dealer: "You have good taste." (+15 Happiness)
+104. Nice Watch → Dealer: "Thoughtful." (+12 Happiness)
+
+EXPENSIVE GIFTS ($100-500) - Great Happiness
+105. Gold Cufflinks → Dealer: "Excellent choice." (+20 Happiness)
+106. Vintage Wine → Dealer: "You surprise me." (+25 Happiness)
+107. Designer Sunglasses → Dealer: "I'll wear these." (+18 Happiness)
+
+PERFECT GIFTS ($500+) - Maximum Happiness
+108. Jade Necklace → Dealer: "You... remembered." (+40 Happiness)
+109. Custom Suit → Dealer: "Perfect fit. How did you know?" (+35 Happiness)
+110. Rare Book → Dealer: "This is... meaningful." (+30 Happiness)
+
+SPECIAL REACTIONS:
+
+JOKE GIFTS (Negative Happiness)
+111. Whoopee Cushion → Dealer: "Really?" (-10 Happiness, insult)
+112. Fake Money → Dealer: "Don't insult me." (-20 Happiness, danger)
+113. Dead Flower → Dealer: "Are you mocking me?" (-15 Happiness)
+
+SENTIMENTAL GIFTS (Unlocked Later)
+114. Family Photo (Dealer's) → Dealer: "Where did you find this?" (Special event)
+115. Jade Eye Replica → Dealer: "You know what this means?" (Major story event)
+
+================================================================================
+TOTAL ITEMS DOCUMENTED: 115+ with more available in-game
+CONTINUE TO SHOPS & NPCS GUIDE FOR PURCHASING LOCATIONS
+================================================================================

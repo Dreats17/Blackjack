@@ -286,6 +286,17 @@ class Type:
 
 type = Type()
 class Ask:
+    def single_word(self, prompt=""):
+        """Get a single word input (no spaces allowed). Returns the first word if multiple are entered."""
+        while True:
+            user_input = input(prompt).strip()
+            if user_input:
+                # Take only the first word (split on spaces)
+                word = user_input.split()[0]
+                return word
+            # If empty, just return empty string
+            return ""
+    
     def choose_a_number(self, a, b, guess=False):
         while True:
             lucky_number = None
@@ -317,6 +328,17 @@ class Ask:
                 if (choice == option.lower()) or (choice == option[0].lower()):
                     return option
             type.type(reiterate) # type: ignore
+    
+    def option(self, prompt, options):
+        """Standardized choice input - takes prompt and list of options"""
+        while True:
+            choice = input(prompt).strip().lower()
+            for option in options:
+                if choice == option.lower() or (len(option) > 0 and choice == option[0].lower()):
+                    return option
+            # If no match, show options again
+            type.type("Choose: " + "/".join(options))
+            print()
 
     def yes_or_no(self, reiterate="What? "):
         while True:

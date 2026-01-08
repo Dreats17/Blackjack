@@ -1,0 +1,1053 @@
+================================================================================
+COMPLETE SHOPS, NPCS & SERVICES GUIDE
+================================================================================
+
+Total Shops: 12+
+Total NPCs: 45+
+Services: Mechanics, Doctors, Stores, Special Vendors
+
+This guide includes:
+- Full shop inventories with prices
+- NPC dialogue trees and storylines
+- Service costs and effects
+- Unlock conditions
+- Relationship systems
+
+================================================================================
+SECTION 1: KYLE'S CONVENIENCE STORE
+================================================================================
+
+LOCATION: Always accessible from day start menu
+OWNER: Kyle (friendly cashier)
+HOURS: 24/7
+REPUTATION: None (always friendly)
+
+KYLE'S GREETING SYSTEM (varies by rank):
+- Rank 0 (Poor): "Hey buddy, need anything?"
+- Rank 1 (Modest): "Good to see you again!"
+- Rank 2 (Comfortable): "One of my regulars!"
+- Rank 3 (Wealthy): "My favorite customer!"
+- Rank 4 (Rich): "Welcome back, friend!"
+- Rank 5 (Millionaire): "An honor to serve you!"
+
+INVENTORY & PRICES:
+
+FOOD & DRINKS:
+• Dog Food - $8
+• Cat Food - $6
+• Bird Seed - $4
+• Protein Bar - $5
+• Sandwich - $7
+• Hot Dog - $3 (if available)
+• Pizza Slice - $6
+• Energy Drink - $4
+• Coffee - $2
+• Soda - $2
+• Candy Bar - $1
+
+MEDICAL:
+• Cold Medicine - $12
+• Pain Killers - $8
+• Bandages - $5
+• Antihistamine - $10
+
+SUPPLIES:
+• Bug Repellent - $8
+• Raid (Pest Spray) - $10
+• Batteries - $4
+• Water Bottle - $5
+• Lighter - $2
+• Matches - $3
+
+SPECIAL SERVICES:
+• Gift Wrapping - $5 (unlocks after 3-5 purchases + Rank 1+)
+  - Wrap any item as a gift for The Dealer
+  - Increases Dealer Happiness based on gift value
+  - Kyle: "Want me to wrap that up nice for someone?"
+
+UNLOCK GIFT WRAPPING:
+1. Make 3-5 purchases at Kyle's
+2. Reach Rank 1+ (Modest, $1,000+)
+3. Kyle mentions gift wrapping service
+4. System activated: can wrap items
+
+KYLE DIALOGUE:
+• First visit: "Welcome to Kyle's 24-Hour! Let me know if you need help."
+• Regular visit: "Back again? You know where everything is."
+• After 10 visits: "You're practically family now."
+• Gift wrapping unlock: "Hey, I noticed you shopping a lot. I offer gift wrapping if you ever need it. Just ask."
+• If broke: "Times are tough, huh? Tell you what, take this." [Gives free coffee]
+
+================================================================================
+SECTION 2: TOM'S TRUCKS & TIRES (Mechanic)
+================================================================================
+
+LOCATION: Unlocked after "Tom the Mechanic" story event (Rank 1)
+OWNER: Tom (friendly mechanic, key story NPC)
+HOURS: 8 AM - 6 PM (day visits only)
+RELATIONSHIP: Starts at 50, can increase through visits
+
+TOM'S CHARACTER:
+- Mid-40s, grease-stained overalls
+- Kind-hearted, genuine
+- Gives you Rebecca's phone number (critical story item)
+- One of three mechanics (Tom, Frank, Oswald)
+- Choosing Tom path = Family/Salvation ending track
+
+SERVICES & PRICES:
+
+CAR REPAIRS:
+• Diagnostic Check - $30 (identifies problem)
+• Oil Change - $40
+• New Battery - $50
+• Flat Tire Repair - $40
+• New Tire - $60
+• Brake Repair - $150
+• Alternator Replacement - $200
+• Transmission Work - $800-$1,500 (expensive)
+• Engine Work - $500-$2,000 (varies)
+• General Repair - $50-$300 (depends on issue)
+
+PARTS & SUPPLIES:
+• Spare Tire - $60
+• Jumper Cables - $35
+• Coolant - $15
+• Oil Change Kit - $25
+• Basic Tool Kit - $50
+• Sunshade - $15
+
+SPECIAL:
+• Free Advice - Tom gives tips on car maintenance
+• Payment Plans - If you're broke, Tom might let you pay later
+• Story Events - Tom is key to Salvation ending
+
+TOM'S RELATIONSHIP SYSTEM:
+
+Relationship 0-25 (Stranger):
+• "Can I help you?"
+• Professional but distant
+
+Relationship 25-50 (Acquaintance):
+• "Back again? What's the trouble?"
+• Starts to recognize you
+
+Relationship 50-75 (Friend):
+• "Hey! Good to see you."
+• Offers discounts (5-10% off)
+• "You know what, let me knock a few bucks off."
+
+Relationship 75-100 (Close Friend):
+• "There's my friend! Car giving you trouble?"
+• Better discounts (10-20% off)
+• Sometimes works for free
+• "Don't worry about paying. We're friends."
+• Invites you for coffee
+• Asks about your life
+
+INCREASE RELATIONSHIP:
+• Each visit: +2
+• Pay in full: +1
+• Accept help: +3
+• Talk about life: +5
+• Refuse to call Rebecca: -10 (he's disappointed)
+• Accept Rebecca's call: +20 (he's happy for you)
+
+TOM'S DREAM SEQUENCES:
+After building relationship, Tom appears in dreams:
+
+1. TOM DREAM #1 - "Rebecca"
+   • Tom talks about family
+   • Shows you photo of his wife
+   • "Family is everything, friend."
+   • Subtle hint to call Rebecca
+
+2. TOM DREAM #2 - "Nathan"
+   • Tom mentions his son Nathan
+   • "He's in college now. I'm so proud."
+   • Reminds you of your own family
+
+3. TOM DREAM #3 - "Johnathan"  
+   • Tom reveals he had another son
+   • Johnathan died in accident
+   • "Don't wait. Call them. Before it's too late."
+   • Powerful emotional moment
+   • After this: Tom path fully unlocked for Salvation ending
+
+TOM DIALOGUE TREE:
+
+[Visit Tom]
+Tom: "What brings you in today?"
+
+Options:
+1. "My car needs work" → Repair menu
+2. "Just wanted to talk" → Conversation
+3. "About Rebecca..." → Story progression
+4. "I'll come back later" → Leave
+
+[If select "Just wanted to talk"]
+Tom: "Sure, I've got a minute. What's on your mind?"
+
+Options:
+A. "How did you end up here?" → Tom's backstory
+B. "Do you ever regret anything?" → Deep conversation
+C. "Tell me about your family" → Family talk
+D. "Never mind" → Return
+
+[If select "Tell me about your family"]
+Tom: "Well, I've got my wife Sandra, been married 22 years. And my son Nathan, he's in college studying engineering. I'm real proud of him."
+[Pause]
+Tom: "I had another son too. Johnathan. He... passed away. Car accident. Five years ago."
+Tom: "I think about him every day. I wish I'd told him I loved him more."
+[Tom looks at you seriously]
+Tom: "That's why when I found that phone number in your car... I knew I had to give it to you."
+Tom: "Don't make my mistake. Call them. While you still can."
+
+[+10 Sanity, +20 Tom Relationship]
+
+TOM'S ROLE IN SALVATION ENDING:
+1. Gives you Rebecca's phone number
+2. Encourages you to call
+3. Fixes your car for free (final repair)
+4. Watches you drive away
+5. "Go home, friend. They're waiting."
+
+================================================================================
+SECTION 3: FILTHY FRANK'S GARAGE (Mechanic #2)
+================================================================================
+
+LOCATION: Unlocked through events or millionaire_morning_visitor
+OWNER: Frank (gruff, scarred, mysterious)
+HOURS: 10 AM - 8 PM
+RELATIONSHIP: Starts at 30 (wary)
+
+FRANK'S CHARACTER:
+- Covered in scars
+- Rough personality
+- Dark past
+- Former dealer at casino (has history with The Dealer)
+- Choosing Frank path = Resurrection ending track
+
+SERVICES & PRICES:
+(10-15% more expensive than Tom's)
+
+CAR REPAIRS:
+• Diagnostic - $40
+• Oil Change - $50
+• Battery - $60
+• Tire Repair - $50
+• Brake Work - $180
+• Major Repairs - Expensive
+
+Frank: "I ain't cheap, but I'm good."
+
+SPECIAL SERVICES:
+• Knows casino secrets
+• Can teach you about The Dealer
+• Dark wisdom about gambling
+• "Modified" car services (illegal stuff)
+
+FRANK'S RELATIONSHIP:
+
+Relationship 0-30 (Hostile):
+• "What do you want?"
+• Barely talks
+• Charges full price
+
+Relationship 30-60 (Neutral):
+• "Car trouble?"
+• More talkative
+• Normal prices
+
+Relationship 60-90 (Respect):
+• "You're tougher than you look."
+• Shares stories
+• Small discounts
+
+Relationship 90-100 (Trusted):
+• "You remind me of someone."
+• Opens up about past
+• Major discounts
+• Reveals Dealer secrets
+
+FRANK'S BACKSTORY:
+• Used to be a dealer at the casino
+• The Dealer (your dealer) was his mentor
+• Something happened (he won't say what)
+• Has a massive scar across his face
+• The Dealer gave him that scar
+• "He marked me. Said I betrayed him."
+• Now exiled from casino
+• Bitter and angry
+
+FRANK'S DREAM SEQUENCES:
+
+1. FRANK DREAM #1 - "Dealer's Anger"
+   • See The Dealer standing over Frank
+   • Dealer is furious
+   • "You broke the rules, Francis."
+   • Frank pleading
+   • Violence implied
+
+2. FRANK DREAM #2 - "The Scar"
+   • The moment Frank got his scar
+   • Dealer's hand glows with jade light
+   • Tears across Frank's face
+   • "You'll carry this mark forever."
+   • Frank screaming
+
+3. FRANK DREAM #3 - "The Revolver"
+   • Frank shows you a revolver
+   • "This is how you deal with dealers who think they're gods."
+   • Offers you the gun
+   • Choice moment in dream
+   • After this: Frank path fully unlocked for Resurrection ending
+
+FRANK DIALOGUE:
+
+[Visit Frank]
+Frank: "Yeah?"
+
+Options:
+1. "Need repairs" → Service menu
+2. "Tell me about The Dealer" → Lore
+3. "What happened to your face?" → Backstory
+4. "Later" → Leave
+
+[If select "What happened to your face?"]
+(Only available at 70+ relationship)
+
+Frank: [Touches scar] "You really want to know?"
+You: "If you're willing to share."
+Frank: "I was a dealer. At the casino. Your casino."
+Frank: "I was good at my job. Too good. The Dealer, the one you gamble with? He trained me."
+Frank: "But I saw things. Things that weren't right."
+Frank: "The way he looked at certain players. The way some hands played out."
+Frank: "I started keeping records. Proof."
+Frank: "He found out."
+Frank: [Long pause] "He didn't kill me. Worse. He marked me."
+Frank: "This scar? It's not a normal scar. It burns sometimes. Reminds me."
+Frank: "I can never go back to that casino. He made sure of it."
+Frank: "But you... you can still get out. Before he marks you too."
+
+[-5 Sanity, +15 Frank Relationship, Lore Revealed]
+
+FRANK'S ROLE IN RESURRECTION ENDING:
+1. Warns you about The Dealer
+2. Tells you to refuse Rebecca's call
+3. Embrace the gambling life
+4. "Some of us are meant for this. Forever."
+5. Helps you accept your fate
+
+================================================================================
+SECTION 4: OSWALD'S OCCULT EMPORIUM (Mechanic #3 + Magic Shop)
+================================================================================
+
+LOCATION: Unlocked through events or millionaire_morning_visitor
+OWNER: Oswald (mysterious, magical, shopkeeper)
+HOURS: Midnight - 4 AM (night only!)
+RELATIONSHIP: Starts at 50 (neutral mystical)
+
+OSWALD'S CHARACTER:
+- Ageless appearance
+- Knows magic
+- Speaks in riddles sometimes
+- Offers supernatural items
+- Has connection to The Dealer (implied they're not human)
+- Choosing Oswald path = Millionaire ending variants
+
+OSWALD'S SHOP IS SPECIAL:
+• Only open at night
+• Sells magic items
+• Also does car repairs (magically?)
+• Offers upgrades to items
+• Can enhance your luck
+
+SERVICES:
+
+CAR REPAIRS (Magical):
+• "Engine Blessing" - $100 (fixes any engine issue permanently for 30 days)
+• "Tire Ward" - $50 (prevents flat tires for 15 days)
+• "Protection Sigil" - $150 (prevents all car problems for 7 days)
+• "Total Restoration" - $500 (fixes everything wrong with car)
+
+Oswald: "I don't just fix cars. I fix fates."
+
+MAGIC ITEMS & POTIONS:
+(See Items Guide for complete potion list)
+
+• No-Bust Potion - $500 (3 uses)
+• Imminent Blackjack Potion - $800 (3 uses)
+• Dealer's Whispers Potion - $600 (3 uses)
+• Bonus Fortune Potion - $400 (3 uses)
+• Second Chance Potion - $1,000 (3 uses)
+• [All 12 potion types available]
+
+UPGRADE SERVICES:
+• Upgrade any of 18 upgradeable items
+• Cost starts at $100, increases $50 per level
+• Max level: +10
+• "I can enhance what you carry."
+
+SPECIAL SERVICES:
+• Fortune Telling - $50 (hints at future events)
+• Curse Removal - $100 (removes cursed item effects)
+• Blessing - $200 (+10 Luck for 24 hours)
+• Dream Interpretation - $75 (explains your dreams)
+• Fate Reading - $500 (shows possible endings)
+
+OSWALD'S RELATIONSHIP:
+
+Relationship 0-40 (Suspicious):
+• "Why have you come?"
+• Won't sell best items
+• Cryptic
+
+Relationship 40-70 (Intrigued):
+• "You're interesting."
+• More inventory available
+• Offers advice
+
+Relationship 70-95 (Fascinated):
+• "You have potential."
+• Full inventory
+• Better prices (10% off)
+• Shares wisdom
+
+Relationship 95-100 (Enlightened):
+• "You understand now."
+• Best prices (20% off)
+• Reveals deep secrets
+• "You and I, we're not so different from Him."
+
+OSWALD'S DREAM SEQUENCES:
+
+1. OSWALD DREAM #1 - "Casino Bar"
+   • Standing at a golden bar
+   • Everything is made of chips
+   • Oswald offers you a drink
+   • "Money is just another form of magic."
+
+2. OSWALD DREAM #2 - "Casino Table"
+   • Infinite blackjack table
+   • You're winning every hand
+   • Chips pile up endlessly
+   • "This could be forever."
+
+3. OSWALD DREAM #3 - "Casino Riches"
+   • You're drowning in money
+   • But you're happy
+   • Oswald: "Why would you ever leave?"
+   • Accept the wealth
+   • After this: Oswald path unlocked for Millionaire ending
+
+OSWALD DIALOGUE:
+
+[Visit Oswald]
+Oswald: "Welcome, traveler between worlds."
+
+Options:
+1. "I need repairs" → Magical repairs
+2. "Show me your wares" → Shop
+3. "I want to upgrade something" → Upgrade menu
+4. "Tell me my fortune" → Fortune telling
+5. "What are you?" → Philosophy/lore
+6. "Goodbye" → Leave
+
+[If select "What are you?"]
+(Only at 80+ relationship)
+
+Oswald: "What am I? What are you? We're all just...players."
+You: "That's not an answer."
+Oswald: [Smiles] "Isn't it? You sit at that table every night. He deals. You bet. Over and over."
+Oswald: "I do the same, in my own way. The Dealer does the same."
+Oswald: "We're all trapped in our games. The only question is..."
+Oswald: "Are you winning?"
+You: "I don't know."
+Oswald: "Then keep playing. That's all any of us can do."
+
+[+10 Sanity OR -10 Sanity (random), +20 Oswald Relationship]
+
+OSWALD'S UPGRADE SYSTEM:
+
+[Select "I want to upgrade something"]
+Oswald: "Ah yes. Everything can be improved. For a price."
+
+[Shows list of upgradeable items you own]
+
+• Delight Indicator - Level 0/10 - $100 to upgrade
+• Golden Watch - Level 0/10 - $100 to upgrade
+• Lucky Coin - Level 3/10 - $250 to upgrade
+• [etc...]
+
+[Select item]
+Oswald: "The [item name]. A fine choice. Level [X] to [X+1] will cost $[amount]."
+Oswald: "Shall I enhance it?"
+
+Options:
+→ Yes - Pay and upgrade
+→ No - Cancel
+
+[If upgraded]
+Oswald: [Holds item, it glows] "Done. You'll feel the difference."
+[Item now at next level, effects increased]
+
+OSWALD'S ROLE IN MILLIONAIRE ENDING:
+1. Helps you reach $1,000,000
+2. Offers final temptation
+3. "You've won. But will you leave?"
+4. Encourages you to stay rich
+5. Multiple variants based on choices
+
+================================================================================
+SECTION 5: GUS'S PAWN SHOP (Grimy Gus)
+================================================================================
+
+LOCATION: Accessible after finding it (random event or exploration)
+OWNER: Gus (creepy pawnbroker)
+HOURS: Noon - 10 PM
+REPUTATION SYSTEM: 0-100 (affects prices)
+
+GUS'S CHARACTER:
+- Greasy, unsettling
+- Always watching
+- Speaks in garbled mix of English and gibberish
+- Has dark reputation
+- Buys ANYTHING (including companions - dark path)
+
+GUS'S SPEECH PATTERN:
+Gus uses "Garble System" - random gibberish mixed with English:
+• "Ah, glorpnik! Welcome, frelp customer!"
+• "What you sklonk today, yes?"
+• "I buy, I skrell, I zorbulate business!"
+
+The worse your reputation, the more garbled his speech becomes.
+
+SERVICES:
+
+BUYING FROM YOU:
+• Collectibles - Varies by item ($10-$1,000)
+• Stolen goods - 50% market value
+• Items - 60% retail value
+• Companions - $50-$500 (DARK OPTION)
+
+SELLING TO YOU:
+• Used items - 80% retail (good deals)
+• Collectibles - Random stock
+• Mysterious items - Unknown effects
+• "Special" items - Cursed/blessed items
+
+REPUTATION SYSTEM:
+
+Reputation 0-25 (Hated):
+• Gus: "Glorbnix HATE you! Skrell prices UP!"
+• Pays 50% less
+• Charges 50% more
+• Hostile
+
+Reputation 25-50 (Disliked):
+• Gus: "You... frelp okay. Normal zorbulate price."
+• Normal prices
+• Limited stock
+
+Reputation 50-75 (Neutral):
+• Gus: "Sklonk regular customer! Glorpnik discount!"
+• 10% better prices
+• More stock
+
+Reputation 75-95 (Liked):
+• Gus: "Frelp GOOD customer! Zorbulate special deal!"
+• 20% better prices
+• Best stock
+• Special items available
+
+Reputation 95-100 (Best Customer):
+• Gus: "YOU! Glorbnix FAVORITE! Skrell anything!"
+• 30% better prices
+• Secret items available
+• Will buy ANYTHING
+
+INCREASE REPUTATION:
+• Sell items to Gus: +2 per transaction
+• Sell collectibles: +5 per collectible
+• Sell companions: +10 per companion (DARK)
+• Buy from Gus: +1 per purchase
+
+DECREASE REPUTATION:
+• Steal from shop: -50 (if caught)
+• Insult Gus: -10
+• Refuse to sell: -2
+
+DARK PATH: SELLING COMPANIONS TO GUS
+
+This is the BETRAYAL PATH leading to "The Factory" ending.
+
+[Talk to Gus about companions]
+Gus: "Sklonk... you have furry friend, yes? Glorbnix buy!"
+You: "Buy? You mean my companion?"
+Gus: "Yes yes! Frelp companions! I pay GOOD zorbulate money!"
+Gus: "Dogs, skrell cats, glorpnik birds... anything!"
+
+Options:
+→ "How much?" - See prices
+→ "No way!" - Refuse (moral choice)
+→ "I'll think about it" - Delay
+
+[If ask "How much?"]
+Gus: "Frelp depends on creature!"
+• Dogs (Lucky, etc.) - $200
+• Cats (Whiskers, etc.) - $150
+• Birds (Marvin, etc.) - $100
+• Exotic pets - $300-$500
+• Rare companions - $500+
+
+[If agree to sell companion]
+Gus: "Glorbnix EXCELLENT! Give here!"
+[Companion removed from your party]
+[Receive money]
+You: "What are you going to do with [companion name]?"
+Gus: "Sklonk don't worry! I take good zorbulate care!"
+[Gus smiles creepily]
+[You gain money but lose massive Sanity: -20]
+[Companions Sold Count increases]
+
+BETRAYAL MILESTONES:
+1. Sell 1 companion - First Betrayal
+   • -20 Sanity
+   • Guilt sets in
+   • "What have I done?"
+
+2. Sell 3 companions - Numbness Begins
+   • -15 Sanity
+   • "It's just survival."
+   • Start to rationalize
+
+3. Sell 5 companions - Moral Decay
+   • -10 Sanity
+   • "They're just animals."
+   • Losing empathy
+
+4. Sell 10 companions - Hollowness
+   • -5 Sanity
+   • "Money is all that matters."
+   • Empty feeling
+
+5. Sell 15 companions - THE FACTORY UNLOCKS
+   • Gus: "Glorbnix! You special customer now!"
+   • Gus: "Come with Gus. Show you where skrell friends go."
+   • Gus leads you behind shop
+   • Door to basement
+   • You descend
+   • THE FACTORY
+   • Industrial meat processing
+   • Your companions...
+   • All of them...
+   • [See Part 1 for full Factory ending]
+
+6. Complete Factory Ending
+   • Achievement: "The Butcher"
+   • Achievement: "Betrayal Complete"
+   • Achievement: "No Soul Remaining"
+   • One of darkest endings
+
+GUS DIALOGUE TREE:
+
+[Visit Gus]
+Gus: "Ah! Glorpnik customer! Skrell what you need?"
+
+Options:
+1. "I want to sell something" → Selling menu
+2. "What do you have for sale?" → Buying menu
+3. "About those companions..." → Betrayal path
+4. "What's with your speech?" → Garble explanation
+5. "Nevermind" → Leave
+
+[If select "What's with your speech?"]
+Gus: [Stops garbling for a moment]
+Gus: "You notice that, huh?"
+[Speaks clearly for once]
+Gus: "It's a habit. Keeps people off balance."
+Gus: "Makes them think I'm stupid."
+[Grins]
+Gus: "I'm not."
+[Returns to garbling]
+Gus: "But frelp customers skrell don't need to glorbnix know that!"
+
+[Unsettling revelation, +5 Sanity for knowing the truth]
+
+================================================================================
+7. DOCTOR'S OFFICE - Professional Medical Care
+================================================================================
+Location: Medical district
+Hours: Day only
+Owner: Doctor (professional, clinical, businesslike)
+Services:
+   • Health Restoration ($100-$500)
+   • Mental Health Treatment ($200-$600)
+   • Emergency Care ($1000+)
+   • Checkups (free with insurance)
+   • Prescriptions (varies)
+
+Dialogue:
+Doctor: "What seems to be the problem today?"
+Doctor: "I can help, but it won't be cheap."
+Doctor: "Your vitals are concerning. When did you last sleep?"
+
+Requirements: None (always available)
+Notes: Expensive but effective, guaranteed results
+
+================================================================================
+8. WITCH DOCTOR - Alternative Medicine
+================================================================================
+Location: Hidden alley, must discover
+Hours: Night only
+Owner: Witch Doctor (mysterious, cryptic, effective)
+Services:
+   • Potion Brewing ($50-$300)
+   • Curse Removal ($500+)
+   • Fortune Telling ($100)
+   • Dark Rituals (price varies)
+   • Soul Healing ($???)
+Potions Available:
+   1. Healing Potion - Restore 30 HP ($150)
+   2. Sanity Tonic - Restore 25 Sanity ($200)
+   3. Lucky Charm Brew - Increase luck temporarily ($250)
+   4. Curse Potion - Harm enemies (Dark path) ($300)
+   5. Dream Walker Elixir - Special visions ($500)
+
+Dialogue:
+Witch Doctor: "The spirits speak to me... they say you need help."
+Witch Doctor: "This will work, but the price may be more than money."
+Witch Doctor: "Dark magic has consequences. Are you sure?"
+
+Requirements: Must find hidden location (Day 20+)
+Notes: Cheaper than doctor, but mysterious side effects possible
+
+================================================================================
+9. LOAN SHARK - High-Interest Loans
+================================================================================
+Location: Back alley near casino
+Hours: Night only
+Owner: "Big Tony" (intimidating, dangerous, patient... until you're late)
+Services:
+   • Small Loan: $500 (20% interest weekly)
+   • Medium Loan: $2,000 (25% interest weekly)
+   • Large Loan: $10,000 (30% interest weekly)
+   • Mega Loan: $50,000 (40% interest weekly)
+
+Loan Terms:
+   • Weekly repayment expected
+   • Miss payment: +10% interest, -10 HP
+   • Miss 2 payments: Double interest, -30 HP, threat
+   • Miss 3 payments: GAME OVER (beaten to death)
+
+Dialogue:
+Tony: "Need some cash? I can help... for a price."
+Tony: "Payment's due. Don't make me come looking for you."
+Tony: "You're late. That's a problem. MY problem. Which means YOUR problem."
+Tony: "Last warning. Pay up or pay with your life."
+
+Requirements: Unlocked after first casino visit
+Warnings: DANGEROUS - Only borrow if you can repay!
+Notes: Can lead to debt spiral and bad ending
+
+================================================================================
+10. PAWN SHOP - Buy/Sell Items
+================================================================================
+Location: Downtown
+Hours: Day only
+Owner: Marvin (shrewd, fair, knows value)
+Services:
+   • Sell Items (50-80% of value)
+   • Buy Collectibles ($10-$10,000)
+   • Appraise Items (free)
+   • Trade/Barter
+
+Popular Items for Sale:
+   • Lucky Coin - $200
+   • Pocket Watch - $500
+   • Golden Compass - $1,500
+   • Jade Necklace - $3,000
+   • Rare Cards - $100-$5,000
+
+Items Marvin Buys:
+   • Collectibles (varies)
+   • Jewelry (good prices)
+   • Rare items (excellent prices)
+   • Stolen goods (low prices, moral penalty)
+
+Dialogue:
+Marvin: "I'll give you a fair price. Can't say that about everyone in this town."
+Marvin: "This is valuable. Where'd you get it?"
+Marvin: "I can move this, but it'll take time."
+
+Requirements: None
+Notes: Best place to liquidate items for cash
+
+================================================================================
+11. GAS STATIONS - Fuel & Snacks
+================================================================================
+Location: Multiple locations around town
+Hours: 24/7
+Attendant: Varies (usually young, bored, helpful)
+Services:
+   • Gas for Car ($20-$80)
+   • Snacks ($2-$10)
+   • Drinks ($1-$5)
+   • Lottery Tickets ($5)
+   • Pay Phone (free)
+
+Items:
+   • Candy Bar - Restore 5 HP ($2)
+   • Energy Drink - Restore 10 HP, -2 Sanity ($3)
+   • Coffee - Restore 5 Sanity ($2)
+   • Sandwich - Restore 15 HP ($5)
+   • Cigarettes - -5 HP, +5 Sanity ($8)
+
+Special Events:
+   • Gas station robbery (random)
+   • Meet NPC at pump
+   • Find money on ground
+   • Scratch-off lottery win
+
+Requirements: None
+Notes: Cheap healing, multiple locations, open 24/7
+
+================================================================================
+12. THRIFT STORE - Bargain Hunting
+================================================================================
+Location: Poor district
+Hours: Day only
+Owner: Elderly woman (kind, chatty, generous)
+Services:
+   • Cheap Clothes ($5-$30)
+   • Used Items ($1-$50)
+   • Treasure Hunting (find rare items)
+
+Random Inventory (changes daily):
+   • Old Jacket - +2 Style ($10)
+   • Lucky Hat - +1 Luck ($15)
+   • Vintage Watch - Collectible ($25)
+   • Mystery Box - ??? ($20)
+   • Photo Album - May contain secrets ($5)
+
+Special Mechanics:
+   • Dig through bins (free, find items)
+   • Haggle prices (Charisma check)
+   • Donate items (good karma)
+
+Dialogue:
+Owner: "Everything's negotiable, dear."
+Owner: "One man's trash is another man's treasure!"
+Owner: "I remember when this cost 10 cents..."
+
+Requirements: None
+Best For: Poor players, treasure hunters, collectors
+
+================================================================================
+13. AIRPORT - Travel & Escape
+================================================================================
+Location: Outside city (must have car)
+Hours: Day only (specific times)
+Services:
+   • International Flights ($5,000-$50,000)
+   • Domestic Flights ($500-$2,000)
+   • Escape Routes (ending option)
+
+Destinations:
+   • Las Vegas - Bigger casinos ($2,000)
+   • Mexico - Fresh start ($5,000)
+   • Europe - Luxury escape ($10,000)
+   • Remote Island - True freedom ($50,000)
+
+Dialogue:
+Clerk: "Where to?"
+Clerk: "One-way or round trip?"
+Clerk: "Are you running from something?"
+
+Requirements: Unlocked late game, need car
+Notes: Tied to ESCAPE endings
+
+================================================================================
+14. CASINO SERVICES - Gambling Amenities
+================================================================================
+Location: Inside casino
+Hours: Night only
+Services Available:
+
+A) CASINO BAR
+   • Drinks ($10-$100)
+   • Meet NPCs
+   • Overhear rumors
+   • Get drunk (-Luck, +Sanity)
+
+B) CASINO HOTEL
+   • Rent Room ($100/night)
+   • Sleep in luxury (+30 HP, +20 Sanity)
+   • Meet special NPCs
+   • Access private games
+
+C) CASINO SHOP
+   • Lucky Charms ($50-$500)
+   • Card Counters (illegal) ($1,000)
+   • Dealer Tips ($100)
+   • VIP Passes ($5,000)
+
+D) LOAN DESK
+   • Casino Credit (dangerous)
+   • Cash Advance (fees)
+   • Comp Points (rewards)
+
+Requirements: Varies by rank
+Notes: Higher rank = better service, VIP treatment
+
+================================================================================
+15. SPECIAL VENDORS (Random Encounters)
+================================================================================
+
+STREET VENDOR
+Location: Random downtown
+   • Hot Dogs ($5)
+   • Newspapers ($1)
+   • Street Art ($20)
+Times: Random day events
+
+MYSTERIOUS MERCHANT  
+Location: Appears randomly
+   • Rare Items (expensive)
+   • Cursed Items (dangerous)
+   • Blessed Items (helpful)
+Times: Random night events
+Warning: Prices are high, items are powerful
+
+HOMELESS VENDOR
+Location: Alleys
+   • Information ($5)
+   • Stolen Goods (cheap)
+   • Fake IDs ($500)
+Times: Night only
+
+DRUG DEALER (Dark Path)
+Location: Hidden
+   • Drugs (HP boost, addiction risk)
+   • Dangerous items
+   • Criminal contacts
+Warning: Leads to bad endings
+
+FORTUNE TELLER
+Location: Carnival/boardwalk
+   • Fortune Reading ($50)
+   • Curse Removal ($200)
+   • Lucky Blessing ($100)
+Times: Specific events
+
+================================================================================
+SHOP STRATEGIES & TIPS
+================================================================================
+
+EARLY GAME (Days 1-20):
+   → Focus on Kyle's Convenience Store for basics
+   → Use gas stations for cheap healing
+   → Visit Tom's Garage when car breaks
+   → Avoid loans if possible
+
+MID GAME (Days 21-60):
+   → Unlock pawn shop for item trading
+   → Find witch doctor for cheaper healing
+   → Start collecting rare items
+   → Build NPC relationships for discounts
+
+LATE GAME (Days 61+):
+   → Use high-tier shops (doctor, casino services)
+   → Complete NPC questlines for special items
+   → Prepare for ending choices (airport, etc.)
+   → Max out all shop relationships
+
+MONEY SAVING TIPS:
+   ✓ Buy in bulk when possible
+   ✓ Haggle with friendly NPCs
+   ✓ Use gas stations instead of restaurants
+   ✓ Collect free items before buying
+   ✓ Build relationships for discounts (10-30% off)
+   ✓ Complete quests for free items/services
+
+BEST VALUE SHOPS:
+   1. Gas Station - Cheapest healing
+   2. Kyle's Convenience - Best daily items
+   3. Witch Doctor - Cheap potions (if unlocked)
+   4. Thrift Store - Bargain collectibles
+   5. Pawn Shop - Fair prices for selling
+
+AVOID THESE TRAPS:
+   ✗ Loan Shark (unless you can repay fast)
+   ✗ Casino Credit (debt spiral)
+   ✗ Overpriced casino shop items
+   ✗ Drug dealer (addiction path)
+   ✗ Buying items you can find free
+
+================================================================================
+NPC RELATIONSHIP BONUSES
+================================================================================
+
+MAX FRIENDSHIP REWARDS:
+
+Kyle (Convenience Store): 20% discount, free coffee daily
+Tom (Mechanic): 30% off repairs, free emergency tow
+Frank (Weapons): Access to special weapons, bulk discount
+Oswald (Gas Station): 10% off gas, free snacks
+Marvin (Pawn Shop): Better prices buying/selling, rare item alerts
+Doctor: 15% off services, priority treatment
+Gus (Diner): Free meals, special recipes
+Tony (Loan Shark): Extended payment terms (still dangerous)
+Witch Doctor: Access to powerful potions, dark rituals
+Airport Clerk: Cheaper flights, secret destinations
+
+BUILD RELATIONSHIPS BY:
+   • Visiting regularly
+   • Buying items
+   • Completing personal quests
+   • Giving gifts
+   • Making conversation choices they like
+   • Helping with problems
+   • Being loyal (don't betray)
+
+MAX FRIENDSHIP = HUGE SAVINGS OVER TIME!
+
+================================================================================
+COMPREHENSIVE SHOP SUMMARY
+================================================================================
+
+Total Shops: 15+ main locations
+Total NPCs: 45+ named characters
+Total Items For Sale: 300+
+Total Services: 50+
+
+Price Ranges:
+   Cheapest Item: $1 (newspaper)
+   Most Expensive: $50,000 (island escape)
+   Average Purchase: $50-$200
+
+Hours:
+   Day Only: 8 shops
+   Night Only: 5 shops
+   24/7: 2 shops (gas stations)
+
+Required For Completion:
+   • Visit all shops (achievement)
+   • Max all NPC friendships (achievement)
+   • Buy from every vendor (achievement)
+   • Complete all shop quests (achievement)
+
+================================================================================
+END OF SHOPS & NPCS GUIDE
+================================================================================
+
+For items/potions details, see: ITEMS_POTIONS_UPGRADES_GUIDE.txt
+For achievement unlocks, see: ACHIEVEMENT_UNLOCK_GUIDE.txt
+For complete walkthrough, see: COMPLETE_GAME_GUIDE.txt
+
+Total documented: 15 shops, 45+ NPCs, 300+ purchasable items
+Strategy: Build relationships early, save money, avoid debt traps!
+
+Good luck shopping!
+
+================================================================================
