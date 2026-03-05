@@ -49,11 +49,840 @@ def space_quote(text):
     return ("\"" + text + "\" ")
 
 class AdventuresMixin:
-    """Large adventure areas unlocked at Nearly There rank ($900,000+).
+    """Adventure areas unlocked as the player progresses.
     
-    Includes: Woodlands, Swamp, Beach, Underwater, City adventures
+    Includes: The Road (rank 2+), Woodlands, Swamp, Beach, Underwater, City adventures
     and the final rabbit chase event.
     """
+
+    # Modest Afternoons (10,000+)
+    def road_adventure(self):
+        self.meet("Road Adventure Event")
+        self.add_fatigue(random.randint(5, 10))
+        type.type("You don't drive anywhere in particular. You just... drive. ")
+        type.type("The wagon rattles along a stretch of highway that doesn't seem to end. ")
+        type.type("No destination. No map. Just you and the dotted yellow line disappearing under your hood.")
+        print("\n")
+        type.type("Eventually, the gas gauge reminds you that freedom isn't free, and you pull over. ")
+        type.type("But the road has something for you today.")
+        print("\n")
+        type.type(yellow(bright("=== THE ROAD ===")))
+        print("\n")
+        event = random.choice([
+            "street_dice", "hitchhiker", "roadside_shrine", "broken_down_bus", "road_dog", "casual_walk"
+        ])
+
+        if event == "street_dice":
+            type.type("Under an overpass, where the concrete pillars are covered in old graffiti and older prayers, you see them. ")
+            type.type("Four guys hunched in a circle, sitting on milk crates and overturned buckets. ")
+            type.type("The sound of dice hitting pavement echoes off the walls.")
+            print("\n")
+            type.type("One of them looks up. Missing teeth, sunburned face, eyes that have seen better decades. ")
+            type.type("He grins.")
+            print("\n")
+            type.type(quote("Well, well. Another lost soul. You wanna roll, or you just here to watch us be poor?"))
+            print("\n")
+            type.type("The game is " + yellow(bright("Cee-lo")) + " — street dice. Three dice, simple rules. ")
+            type.type("Roll 4-5-6 and you win automatically. Roll 1-2-3 and you lose automatically. ")
+            type.type("Roll a pair and the odd die out is your point. Highest point wins. Trips are instant winners.")
+            print("\n")
+            type.type("The pot in the middle is a sad pile of crumpled bills and loose change. ")
+            type.type("These guys aren't playing for glory. They're playing because it's the only game left.")
+            print("\n")
+
+            action = input("(play/watch/leave): ").strip().lower()
+
+            if action == "play":
+                type.type("You squat down and join the circle. The concrete is warm from the afternoon sun. ")
+                type.type("The guy with no teeth - they call him " + cyan("Dice") + " - hands you three worn dice. One of them has a chipped corner.")
+                print("\n")
+                type.type(quote("Ante up. Minimum's fifty bucks. Maximum's whatever you got the guts to put down."))
+                print("\n")
+
+                try:
+                    bet = int(input("Your bet: $"))
+                    if bet < 50:
+                        type.type("Dice shakes his head. " + quote("Fifty minimum, chief. We ain't rolling for pennies."))
+                        print("\n")
+                        return
+                    if bet > self.get_balance():
+                        type.type("Dice counts the bills you put down and laughs. " + quote("You ain't got that, brother. I can smell broke from a mile away."))
+                        print("\n")
+                        return
+                except:
+                    type.type("Dice stares at you. " + quote("You gonna bet or you gonna stutter?"))
+                    print("\n")
+                    return
+
+                self.change_balance(-bet)
+
+                # Opponent bets
+                type.type("Dice matches your bet from the group pot. The other three lean in. One of them lights a cigarette that smells like regret.")
+                print("\n")
+
+                # === ROUND 1: THE ROLL ===
+                type.type(yellow("=== ROUND 1: YOUR ROLL ==="))
+                print("\n")
+                type.type("You shake the dice in your fist. The sound is almost musical. You let them fly.")
+                print("\n")
+
+                d1, d2, d3 = random.randint(1,6), random.randint(1,6), random.randint(1,6)
+                dice_sorted = sorted([d1, d2, d3])
+                type.type("The dice tumble across the concrete: " + yellow(bright(str(d1) + " - " + str(d2) + " - " + str(d3))))
+                print("\n")
+
+                # Evaluate player roll
+                player_result = self._evaluate_ceelo(dice_sorted)
+
+                if player_result == "instant_win":
+                    if dice_sorted == [4, 5, 6]:
+                        type.type(yellow(bright("4-5-6! That's an automatic WIN!")))
+                    else:
+                        type.type(yellow(bright("TRIPS! " + str(dice_sorted[0]) + "-" + str(dice_sorted[1]) + "-" + str(dice_sorted[2]) + "! Automatic WIN!")))
+                    print("\n")
+                    type.type("Dice's jaw drops. The other three start hollering.")
+                    print("\n")
+                    type.type(quote("Oh you GOTTA be kidding me. First roll? FIRST ROLL?"))
+                    print("\n")
+                    winnings = bet * 2
+                    type.type("You scoop " + green(bright("${:,}".format(winnings))) + " off the concrete.")
+                    self.change_balance(winnings)
+                    print("\n")
+
+                    # Double or nothing?
+                    type.type("Dice leans forward. His eyes have that look — the one you know too well.")
+                    print("\n")
+                    type.type(quote("Double or nothing. One more roll. You and me."))
+                    print("\n")
+                    again = input("(double/walk): ").strip().lower()
+                    if again == "double":
+                        type.type("You're both idiots. This is how it always starts.")
+                        print("\n")
+                        self._ceelo_showdown(bet * 2)
+                    else:
+                        type.type("You stand up, pocketing the cash. Dice nods slowly.")
+                        print("\n")
+                        type.type(quote("Smart man. Smarter than me, anyway. That's a low bar."))
+                    print("\n")
+
+                elif player_result == "instant_loss":
+                    type.type(red(bright("1-2-3. Automatic LOSS.")))
+                    print("\n")
+                    type.type("The circle erupts. One guy slaps the concrete. Dice grins like Christmas morning.")
+                    print("\n")
+                    type.type(quote("Ohhh that's ROUGH, brother. The road giveth and the road taketh."))
+                    print("\n")
+                    type.type("Your " + red("${:,}".format(bet)) + " is gone.")
+                    print("\n")
+
+                    # Offer to try again
+                    type.type("Dice sees the look on your face. He knows that look.")
+                    print("\n")
+                    type.type(quote("You wanna go again? Same stakes?"))
+                    again = input("(again/leave): ").strip().lower()
+                    if again == "again" and self.get_balance() >= bet:
+                        self.change_balance(-bet)
+                        type.type("You're chasing losses under an overpass with strangers. Rock bottom has a basement.")
+                        print("\n")
+                        self._ceelo_showdown(bet)
+                    else:
+                        type.type("You stand up and dust off your knees. The concrete has left marks.")
+                        print("\n")
+                        type.type(quote("See you around, chief. The road always brings people back."))
+                    print("\n")
+
+                else:
+                    # Player got a point
+                    player_point = player_result
+                    type.type("Your point is " + yellow(bright(str(player_point))) + ".")
+                    print("\n")
+                    type.type("Now it's Dice's turn. He blows on the dice, kisses them, whispers something you can't hear.")
+                    print("\n")
+
+                    # Dice rolls
+                    self._ceelo_showdown_with_point(bet, player_point)
+
+            elif action == "watch":
+                type.type("You lean against a pillar and watch. The game is hypnotic — the rattle of dice, the slap of bills, the groans and cheers.")
+                print("\n")
+                type.type("Dice is good. Really good. He reads the other players like a book, knows when to push, when to fold. ")
+                type.type("But even he loses sometimes. The dice don't care about skill.")
+                print("\n")
+                type.type("After an hour, one of the players goes bust. He stands up, stares at his empty hands, and walks away without a word. ")
+                type.type("Nobody watches him go. They've all been him.")
+                print("\n")
+                type.type("Dice sees you watching and nods. " + quote("You learn more from the rail than the table, yunno. ") + "He flips you a coin. " + quote("For the education."))
+                self.change_balance(random.randint(10, 50))
+                self.restore_sanity(3)
+                print("\n")
+
+            else:
+                type.type("You walk past. The sound of dice on concrete follows you for a while, then fades. ")
+                type.type("Some games aren't worth playing. Some are.")
+                print("\n")
+
+        elif event == "hitchhiker":
+            type.type("You spot her on the shoulder of the road about a quarter mile ahead. Thumb out, backpack sagging, hair whipping in the wind from passing trucks.")
+            print("\n")
+            type.type("As you get closer, you can see she's young — maybe 19, maybe 25, hard to tell. Sun-worn. Road-worn. Life-worn.")
+            print("\n")
+            type.type("She sees your wagon slowing down and her face does that thing — hope battling with the knowledge that hope is dangerous.")
+            print("\n")
+            action = input("(stop/honk/drive_past): ").strip().lower()
+
+            if action == "stop":
+                type.type("You pull over. She jogs up, opens the door, and slides in before you can change your mind.")
+                print("\n")
+                type.type(quote("Thanks. Name's Marla. I've been out here since dawn."))
+                print("\n")
+                type.type("She smells like sunscreen and gas station coffee. Her backpack clinks with what sounds like canned food.")
+                print("\n")
+                type.type(quote("Where you headed?"))
+                print("\n")
+                type.type("You tell her the truth. Nowhere. Everywhere. The casino, eventually.")
+                print("\n")
+                type.type("She laughs. It sounds like it surprises her.")
+                print("\n")
+                type.type(quote("A gambler, huh? My dad was a gambler. Lost everything. The house, the car, us. "))
+                type.type(quote("He used to say the next hand would fix everything. It never did."))
+                print("\n")
+                type.type("The car is quiet for a while. Just the engine and the road.")
+                print("\n")
+                type.type(quote("You can drop me at the next town. There's a shelter there I've been to before. They know me."))
+                print("\n")
+                type.type("What do you do?")
+                print("\n")
+                action2 = input("(drop_her_off/give_money/offer_food/talk_more): ").strip().lower()
+
+                if action2 == "give_money":
+                    type.type("You pull out some cash. She stares at it.")
+                    print("\n")
+                    amount = random.choice([50, 100, 200])
+                    type.type(quote("I can't take that."))
+                    print("\n")
+                    type.type(quote("Yeah you can."))
+                    print("\n")
+                    type.type("She takes it. Folds it carefully. Puts it in her shoe — not her pocket. She's been robbed before.")
+                    self.change_balance(-amount)
+                    print("\n")
+                    type.type(quote("You're not like my dad. He never gave anything away. Just took and took and took."))
+                    print("\n")
+                    type.type("She gets out at the next town. Waves once. Disappears into a building with no sign on it.")
+                    print("\n")
+                    type.type("You drive back feeling lighter. Or heavier. Hard to tell the difference sometimes.")
+                    self.restore_sanity(8)
+                    print("\n")
+
+                elif action2 == "offer_food":
+                    if self.has_item("Turkey Sandwich") or self.has_item("Beef Jerky") or self.has_item("Granola Bar"):
+                        food = None
+                        if self.has_item("Turkey Sandwich"):
+                            food = "Turkey Sandwich"
+                        elif self.has_item("Beef Jerky"):
+                            food = "Beef Jerky"
+                        else:
+                            food = "Granola Bar"
+                        type.type("You hand her your " + magenta(bright(food)) + ". She unwraps it immediately and eats like she hasn't in days. Because she probably hasn't.")
+                        self.use_item(food)
+                        print("\n")
+                        type.type(quote("God, that's good. You have no idea."))
+                        print("\n")
+                        type.type("She finishes every crumb. Wipes her mouth with the back of her hand. Looks at you like you just saved her life. Maybe you did.")
+                        self.restore_sanity(5)
+                    else:
+                        type.type("You don't have any food to give. She notices you checking your pockets and shakes her head.")
+                        print("\n")
+                        type.type(quote("It's okay. I'm used to it."))
+                        print("\n")
+                        type.type("That sentence hits harder than it should.")
+                    print("\n")
+                    type.type("You drop her off at the shelter. She thanks you quietly and walks inside.")
+                    self.restore_sanity(3)
+                    print("\n")
+
+                elif action2 == "talk_more":
+                    type.type("You drive slow. She talks. You listen.")
+                    print("\n")
+                    type.type("She tells you about her father. How he'd come home at 4 AM smelling like cigarettes and carpet cleaner — the casino kind. ")
+                    type.type("How her mother would be asleep on the couch with the TV on, pretending she hadn't been waiting up. ")
+                    type.type("How one day he just didn't come home at all.")
+                    print("\n")
+                    type.type(quote("I think he loved the cards more than us. Not because he was a bad person. "))
+                    type.type(quote("Because the cards never asked him to be better. They just let him be."))
+                    print("\n")
+                    type.type("You don't say anything. What could you say?")
+                    print("\n")
+                    type.type("She gets out at the shelter. Pauses with the door open.")
+                    print("\n")
+                    type.type(quote("Hey. Whatever you're running from — it'll still be there when the money runs out. You know that, right?"))
+                    print("\n")
+                    type.type("The door closes. You sit there for a long time before you start driving again.")
+                    self.restore_sanity(12)
+                    self.add_fatigue(5)
+                    print("\n")
+
+                else:
+                    type.type("You drop her at the shelter. She thanks you, grabs her backpack, and disappears inside. ")
+                    type.type("Simple. Clean. No strings.")
+                    print("\n")
+                    type.type("You drive away wondering if that's what kindness is supposed to feel like — easy and forgettable. ")
+                    type.type("You hope it's not forgettable for her.")
+                    self.restore_sanity(3)
+                    print("\n")
+
+            elif action == "honk":
+                type.type("You lay on the horn as you pass. She flinches, then flips you off with both hands.")
+                print("\n")
+                type.type("Fair enough.")
+                print("\n")
+                type.type("In the rearview mirror, she's already got her thumb back out. Resilient. More than you, probably.")
+                print("\n")
+
+            else:
+                type.type("You drive past. Don't even slow down. Her face blurs into all the other faces you've driven past.")
+                print("\n")
+                type.type("A mile later, you pull over anyway. Not to go back. Just to sit there and wonder what kind of person you're becoming.")
+                print("\n")
+                type.type("The engine idles. You idle with it.")
+                self.drain_sanity(3)
+                print("\n")
+
+        elif event == "roadside_shrine":
+            type.type("You almost miss it. A small wooden cross on the shoulder, surrounded by plastic flowers that have faded from red to pink to almost white. ")
+            type.type("Someone died here. A long time ago, judging by the state of things.")
+            print("\n")
+            type.type("But there's something else. Behind the cross, half-hidden by weeds, is a stone. ")
+            type.type("Not a gravestone. Something older. Smoother. Covered in symbols you don't recognize.")
+            print("\n")
+            type.type("The air around it feels... thick. Heavy. Like the space between heartbeats.")
+            print("\n")
+            type.type(yellow("=== ROADSIDE SHRINE ==="))
+            print("\n")
+            action = input("(touch_stone/pray/leave_offering/read_symbols/walk_away): ").strip().lower()
+
+            if action == "touch_stone":
+                type.type("You reach out. Your fingertips brush the surface.")
+                print("\n")
+                type.type("The world... stutters. Like a skipping record. For half a second, you're somewhere else — a road that stretches forever, ")
+                type.type("lined with the ghosts of every car that ever broke down, every driver who ever got lost, every passenger who was never found.")
+                print("\n")
+                outcome = random.randrange(4)
+                if outcome == 0:
+                    type.type("The vision breaks. You're back. But something is different — you feel LUCKY. Impossibly, dangerously lucky. ")
+                    type.type("Like the road itself has decided to protect you. For now.")
+                    self.add_status("Road Blessed")
+                    self.heal(random.randint(15, 30))
+                    print("\n")
+                elif outcome == 1:
+                    type.type("The stone burns. You yank your hand back. There's a mark on your palm — a symbol that fades even as you watch it.")
+                    print("\n")
+                    type.type("Your head pounds. Your vision swims. Something was given to you, but something was also taken.")
+                    self.drain_sanity(random.randint(5, 10))
+                    self.change_balance(random.randint(1000, 5000))
+                    print("\n")
+                elif outcome == 2:
+                    type.type("Nothing happens. The stone is just a stone. Or maybe it already gave you what it wanted to give, and you won't know until later.")
+                    print("\n")
+                else:
+                    type.type("A voice. In your skull, not your ears. One word, in a language you don't speak but somehow understand:")
+                    print("\n")
+                    type.slow(yellow(bright("\"ENDURE.\"")))
+                    print("\n")
+                    type.type("The mark fades. You feel healed. Changed. Afraid. All at once.")
+                    self.heal(random.randint(30, 50))
+                    self.restore_sanity(10)
+                    print("\n")
+
+            elif action == "pray":
+                type.type("You kneel. You're not sure who you're praying to — God, the universe, the road, whoever left that cross here. ")
+                type.type("It doesn't matter. The act of kneeling is what matters.")
+                print("\n")
+                type.type("You close your eyes. For a moment, everything is still. No wind. No traffic. No thoughts.")
+                print("\n")
+                if random.random() < 0.5:
+                    type.type("When you open your eyes, there's a coin on the stone that wasn't there before. Old. Heavy. Warm.")
+                    print("\n")
+                    type.type("You pocket it. It feels like permission.")
+                    self.change_balance(random.randint(500, 2000))
+                    self.restore_sanity(8)
+                else:
+                    type.type("When you open your eyes, nothing has changed. But you feel lighter. The weight you've been carrying — some of it is gone.")
+                    print("\n")
+                    type.type("Not all of it. Never all of it. But enough to keep walking.")
+                    self.restore_sanity(15)
+                    self.heal(random.randint(10, 20))
+                print("\n")
+
+            elif action == "leave_offering":
+                type.type("You dig through your pockets. What do you leave?")
+                print("\n")
+                if self.get_balance() >= 100:
+                    type.type("You lay a hundred-dollar bill under the cross. The wind tries to take it, but it stays. Like it's supposed to be there.")
+                    self.change_balance(-100)
+                    print("\n")
+                    if random.random() < 0.6:
+                        type.type("The plastic flowers seem to get a little brighter. Probably the sunlight. Probably.")
+                        print("\n")
+                        type.type("As you walk back to your wagon, you find something in the grass — a keychain with a small rabbit's foot attached. Lucky, supposedly.")
+                        self.add_item("Road Talisman")
+                        self.restore_sanity(5)
+                    else:
+                        type.type("Nothing happens. The money sits there. The dead stay dead. But you did a decent thing, and maybe that's worth more than whatever you could've bought with it.")
+                        self.restore_sanity(8)
+                else:
+                    type.type("You don't have anything worth leaving. You stand there, empty-pocketed, feeling useless.")
+                    print("\n")
+                    type.type("You leave a pebble instead. It's the thought that counts. It has to be.")
+                    self.restore_sanity(3)
+                print("\n")
+
+            elif action == "read_symbols":
+                type.type("You squat down and study the stone. The symbols are worn, but you can make out patterns — circles within circles, lines that branch like trees or veins or cracks in the road.")
+                print("\n")
+                type.type("You pull out your phone to take a picture, but the camera refuses to focus. The symbols seem to shift when you look at them from different angles.")
+                print("\n")
+                if random.random() < 0.4:
+                    type.type("Then you see it. One symbol you recognize — it's the same shape as the crack in your windshield. The exact same shape.")
+                    print("\n")
+                    type.type("Your blood runs cold. You back away from the stone.")
+                    print("\n")
+                    type.type("Some things are better left unread.")
+                    self.drain_sanity(5)
+                else:
+                    type.type("After a while, they start to look like directions. A map, maybe. Or a warning. Hard to tell the difference on the road.")
+                    print("\n")
+                    type.type("You memorize what you can and head back. The symbols stay in your head all day, rearranging themselves behind your eyelids.")
+                    self.restore_sanity(3)
+                print("\n")
+
+            else:
+                type.type("You leave the shrine alone. Some things are sacred. Some things are dangerous. Some things are both, and you're too tired to figure out which.")
+                print("\n")
+                type.type("The plastic flowers watch you go. Or they don't. They're plastic flowers. Get a grip.")
+                print("\n")
+
+        elif event == "broken_down_bus":
+            type.type("A Greyhound bus sits dead on the shoulder, hazard lights blinking weakly. The driver is on the hood, staring at the engine like it owes him money.")
+            print("\n")
+            type.type("About fifteen passengers are scattered along the roadside. Some sitting on luggage, some pacing, some arguing into phones that may or may not have signal.")
+            print("\n")
+            type.type("A woman with two kids is trying to keep them from running into traffic. An old man is asleep against the rear tire. A teenager is filming everything for social media.")
+            print("\n")
+            type.type("The driver sees you and waves you over.")
+            print("\n")
+            type.type(quote("Hey! Hey, you got jumper cables? A phone? Anything?"))
+            print("\n")
+            action = input("(help/sell_water/entertain/rob/ignore): ").strip().lower()
+
+            if action == "help":
+                type.type("You pull over and pop your hood. Between your wagon and the bus, maybe you can jury-rig something.")
+                print("\n")
+                if self.has_item("Duct Tape") or self.has_item("Tool Kit"):
+                    tool = "Tool Kit" if self.has_item("Tool Kit") else "Duct Tape"
+                    type.type("Your " + magenta(bright(tool)) + " comes in handy. You and the driver spend an hour under the hood, ")
+                    type.type("sweating, cursing, and performing what can only be described as mechanical prayer.")
+                    print("\n")
+                    type.type("The engine coughs. Sputters. Then ROARS to life. The passengers cheer. The driver grabs your hand and shakes it like he's trying to detach it.")
+                    print("\n")
+                    type.type(quote("You're a goddamn saint! Here — the passengers pooled together."))
+                    print("\n")
+                    tip = random.randint(200, 800)
+                    type.type("He presses " + green(bright("${:,}".format(tip))) + " into your palm.")
+                    self.change_balance(tip)
+                    self.restore_sanity(10)
+                    print("\n")
+                    type.type("The woman with the kids mouths " + quote("thank you") + " through the window as the bus pulls away. ")
+                    type.type("The old man is still asleep.")
+                    print("\n")
+                else:
+                    type.type("You don't have any tools, but you try anyway. You stare at the engine. It stares back.")
+                    print("\n")
+                    type.type("After twenty minutes of pretending you know what you're doing, a tow truck arrives. The driver thanks you for trying.")
+                    print("\n")
+                    type.type(quote("Effort counts for something, man. Here."))
+                    tip = random.randint(50, 150)
+                    type.type("He gives you " + green(bright("$" + str(tip))) + ".")
+                    self.change_balance(tip)
+                    self.restore_sanity(5)
+                print("\n")
+
+            elif action == "sell_water":
+                type.type("You have a case of bottled water in the back of the wagon. It's warm, but it's wet.")
+                print("\n")
+                type.type("The sun is brutal. These people are desperate. You could be a saint or an entrepreneur.")
+                print("\n")
+                type.type("How much per bottle?")
+                print("\n")
+                price_choice = input("($1/free/$5): ").strip().lower()
+                if price_choice == "free":
+                    type.type("You hand out water to everyone who needs it. The mother almost cries. The old man wakes up long enough to drink and nod at you before falling back asleep.")
+                    print("\n")
+                    type.type("The teenager films you and calls you " + quote("lowkey a W human being") + " to his 47 followers.")
+                    print("\n")
+                    type.type("You don't get paid, but something in your chest unclenches. Something you didn't know was tight.")
+                    self.restore_sanity(15)
+                    self.heal(random.randint(5, 10))
+                    print("\n")
+                elif price_choice == "$5":
+                    type.type("Five bucks a bottle in this heat. You're not proud of it.")
+                    print("\n")
+                    type.type("Most of them pay. The mother hesitates. You watch her count coins. She buys one bottle and splits it between her two kids.")
+                    print("\n")
+                    earnings = random.randint(40, 75)
+                    type.type("You make " + green(bright("$" + str(earnings))) + ". It feels like less than that.")
+                    self.change_balance(earnings)
+                    self.drain_sanity(5)
+                    print("\n")
+                else:
+                    type.type("A dollar a bottle. Fair. Human. The passengers are grateful without being indebted. The driver buys three.")
+                    print("\n")
+                    earnings = random.randint(12, 20)
+                    type.type("You make " + green(bright("$" + str(earnings))) + " and a clean conscience.")
+                    self.change_balance(earnings)
+                    self.restore_sanity(5)
+                    print("\n")
+
+            elif action == "entertain":
+                type.type("You don't have cables or tools, but you've got a mouth and too much free time. You start talking to people.")
+                print("\n")
+                if self.has_item("Deck of Cards"):
+                    type.type("You pull out your " + magenta(bright("Deck of Cards")) + " and start doing tricks for the kids. They're terrible tricks, but the kids don't know that.")
+                    print("\n")
+                    type.type("The mother laughs — a real laugh, not the polite kind. The teenager puts his phone down. The old man opens one eye and smirks.")
+                    print("\n")
+                    type.type("You spend an hour doing card tricks, telling road stories, and making an old man laugh so hard he coughs.")
+                    print("\n")
+                    type.type("When the tow truck finally comes, the mother presses something into your hand. " + quote("For being kind when you didn't have to be."))
+                    tip = random.randint(100, 300)
+                    self.change_balance(tip)
+                    self.restore_sanity(12)
+                    print("\n")
+                else:
+                    type.type("You tell stories. Road stories. Gambling stories. The one about the time you almost hit a deer at 3 AM. ")
+                    type.type("The one about the Dealer who definitely wanted to kill you.")
+                    print("\n")
+                    type.type("People listen. Not because the stories are good, but because waiting is worse than listening.")
+                    print("\n")
+                    type.type("The tow truck comes. People disperse. Nobody tips you, but the old man winks as he boards the replacement bus.")
+                    self.restore_sanity(6)
+                print("\n")
+
+            elif action == "rob":
+                type.type("The luggage is just sitting there. Unattended. Everyone's distracted.")
+                print("\n")
+                type.type("You don't think about it. You just do it. Grab a bag, walk to your wagon, and drive.")
+                print("\n")
+                if random.random() < 0.6:
+                    type.type("Nobody notices. Or if they do, they're too exhausted to chase you.")
+                    print("\n")
+                    loot = random.randint(100, 500)
+                    type.type("Inside the bag: clothes you'll never wear, a phone charger, and " + green(bright("$" + str(loot))) + " in a wallet.")
+                    self.change_balance(loot)
+                    self.drain_sanity(10)
+                    print("\n")
+                    type.type("You drive away fast. The rearview mirror shows you the mother, still trying to keep her kids safe, now with one less bag.")
+                    print("\n")
+                    type.type("The guilt hits about three miles later. It doesn't leave.")
+                    print("\n")
+                else:
+                    type.type("The teenager sees you. " + quote("YO! THAT GUY'S STEALING!"))
+                    print("\n")
+                    type.type("The driver — who is apparently built like a linebacker in his spare time — tackles you before you reach your wagon.")
+                    self.hurt(random.randint(15, 30))
+                    self.drain_sanity(8)
+                    print("\n")
+                    type.type("He takes the bag back. The passengers stare at you with a mixture of disgust and pity. ")
+                    type.type("You slink back to your wagon and drive away, bruised in more ways than one.")
+                    print("\n")
+
+            else:
+                type.type("You drive past. Fifteen people watch your taillights disappear.")
+                print("\n")
+                type.type("None of them are surprised. This is what the road teaches you — most people keep going.")
+                print("\n")
+
+        elif event == "road_dog":
+            type.type("You see it from a hundred yards away. A dog, walking the white line of the road like it's a tightrope. Methodical. Patient. Alone.")
+            print("\n")
+            type.type("It's a mutt — some kind of shepherd mix, big paws, one ear up and one ear down. Ribs showing. ")
+            type.type("But it's not running. Not scared. Just... walking. Like it has somewhere to be.")
+            print("\n")
+
+            if self.has_item("Animal Whistle") and not self.has_companion("Asphalt"):
+                type.type("The " + magenta(bright("Animal Whistle")) + " vibrates in your pocket. Not a song this time — a low, steady hum. Like a heartbeat.")
+                print("\n")
+                type.type("You pull over. The dog stops. Turns its head. Looks at you with one brown eye and one blue eye.")
+                print("\n")
+                type.type("You get out of the wagon. The dog doesn't run. Doesn't flinch. Just waits, like it's been waiting for exactly you.")
+                print("\n")
+                type.type("You kneel. The dog walks over, slow and deliberate, and sits at your feet. Its tail wags once. Twice. Then it presses its head into your palm.")
+                print("\n")
+                type.type("This dog has walked a thousand miles. You can see it in the pads of its paws, worn smooth as river stones. ")
+                type.type("It chose the road a long time ago. Just like you.")
+                print("\n")
+                type.type("You call it " + cyan(bright("Asphalt")) + ". Because that's where you found each other.")
+                print("\n")
+                type.type("Asphalt hops into the wagon like he's done it before. He curls up in the passenger seat, sighs once, and closes his eyes. ")
+                type.type("Home isn't a place. It's whoever stops for you.")
+                self.add_companion("Asphalt", "Dog")
+                self.increment_statistic("companions_befriended")
+                self.unlock_achievement("first_friend")
+                self.restore_sanity(10)
+                print("\n")
+                return
+
+            type.type("You slow down. The dog glances at your wagon, considers it, and keeps walking. It has its own business.")
+            print("\n")
+            action = input("(stop/toss_food/follow/drive_past): ").strip().lower()
+
+            if action == "stop":
+                type.type("You pull over and get out. The dog stops and watches you from twenty feet away.")
+                print("\n")
+                type.type("You crouch. Hold out your hand. The universal language of " + quote("I'm not gonna hurt you."))
+                print("\n")
+                if random.random() < 0.5:
+                    type.type("The dog approaches. Sniffs your hand. Licks it once.")
+                    print("\n")
+                    type.type("Then it turns and keeps walking. It wasn't looking for a friend. It was just being polite.")
+                    print("\n")
+                    type.type("You watch it disappear around a bend. Some things walk alone by choice. You understand that.")
+                    self.restore_sanity(5)
+                else:
+                    type.type("The dog comes all the way over. Sits at your feet. You scratch behind its one-up ear and it leans into it.")
+                    print("\n")
+                    type.type("It follows you back to the wagon. Hops in the passenger seat.")
+                    print("\n")
+                    type.type("It stays with you for the drive back. When you park, it gets out, stretches, and trots off into the brush without looking back.")
+                    print("\n")
+                    type.type("You sit there for a minute, staring at the warm spot it left in the seat.")
+                    self.restore_sanity(8)
+                    self.heal(random.randint(5, 10))
+                print("\n")
+
+            elif action == "toss_food":
+                if self.has_item("Beef Jerky") or self.has_item("Hot Dog"):
+                    food = "Beef Jerky" if self.has_item("Beef Jerky") else "Hot Dog"
+                    type.type("You toss your " + magenta(bright(food)) + " out the window. The dog stops, sniffs, and eats it in two bites.")
+                    self.use_item(food)
+                    print("\n")
+                    type.type("It looks at your wagon. Looks at the road. Looks back at your wagon.")
+                    print("\n")
+                    type.type("It chooses the road. But it barks once — a thank-you bark, if such a thing exists.")
+                    self.restore_sanity(5)
+                else:
+                    type.type("You don't have anything to toss. You make throwing motions out the window anyway. The dog is not fooled.")
+                print("\n")
+
+            elif action == "follow":
+                type.type("You idle the wagon behind the dog, matching its pace. Five miles an hour. ")
+                type.type("The dog doesn't seem to mind. Or maybe it doesn't care.")
+                print("\n")
+                type.type("You follow it for almost a mile before it turns off the road and disappears into a field. ")
+                type.type("For a second, silhouetted against the sky, it looks like every dog from every painting of loneliness you've ever seen.")
+                print("\n")
+                type.type("Then it's gone. And you're alone on the road again. Same as always.")
+                self.restore_sanity(3)
+                self.add_fatigue(3)
+                print("\n")
+
+            else:
+                type.type("You drive past. The dog doesn't watch you go. It's already looking ahead. ")
+                type.type("Road dogs don't look back. Maybe you should learn from that.")
+                print("\n")
+
+        else:
+            # casual_walk
+            type.type("You walk along the shoulder of the road for a while. No destination. No purpose. Just movement for the sake of movement.")
+            print("\n")
+            type.type("A semi blows past and nearly takes your hat off. A crow watches you from a power line. ")
+            type.type("Somewhere in the distance, a train horn sounds — long and low and full of places you'll never go.")
+            print("\n")
+            type.type("You find a guardrail and sit on it. The metal is warm from the sun. ")
+            type.type("You watch the heat shimmer on the asphalt and think about all the people driving past who have somewhere to be. ")
+            type.type("Houses. Jobs. Families.")
+            print("\n")
+            type.type("You have a wagon with a cracked windshield and a gambling problem. But you also have this — ")
+            type.type("a warm guardrail, a patient crow, and an afternoon that belongs to nobody but you.")
+            print("\n")
+            type.type("Sometimes that's enough. Not often. But sometimes.")
+            self.heal(random.randint(10, 25))
+            self.restore_sanity(random.randint(5, 10))
+            print("\n")
+
+    def _evaluate_ceelo(self, dice_sorted):
+        """Evaluate a Cee-lo roll. Returns 'instant_win', 'instant_loss', or the point value (1-6)."""
+        d1, d2, d3 = dice_sorted
+        # 4-5-6 = instant win
+        if dice_sorted == [4, 5, 6]:
+            return "instant_win"
+        # 1-2-3 = instant loss
+        if dice_sorted == [1, 2, 3]:
+            return "instant_loss"
+        # Trips = instant win
+        if d1 == d2 == d3:
+            return "instant_win"
+        # Pair + point
+        if d1 == d2:
+            return d3
+        if d2 == d3:
+            return d1
+        if d1 == d3:
+            return d2
+        # No pair, no sequence = re-roll (meaningless, treat as low point)
+        return 0
+
+    def _ceelo_showdown(self, pot):
+        """A full Cee-lo showdown round — both roll, compare results."""
+        type.type(yellow("=== SHOWDOWN ==="))
+        print("\n")
+
+        # Player roll
+        type.type("You shake and throw.")
+        print("\n")
+        p1, p2, p3 = random.randint(1,6), random.randint(1,6), random.randint(1,6)
+        p_sorted = sorted([p1, p2, p3])
+        type.type("Your dice: " + yellow(bright(str(p1) + " - " + str(p2) + " - " + str(p3))))
+        print("\n")
+        p_result = self._evaluate_ceelo(p_sorted)
+
+        # Opponent roll
+        type.type("Dice blows on his knuckles, rattles the dice, and lets 'em fly.")
+        print("\n")
+        o1, o2, o3 = random.randint(1,6), random.randint(1,6), random.randint(1,6)
+        o_sorted = sorted([o1, o2, o3])
+        type.type("Dice's dice: " + red(bright(str(o1) + " - " + str(o2) + " - " + str(o3))))
+        print("\n")
+        o_result = self._evaluate_ceelo(o_sorted)
+
+        # Compare
+        self._ceelo_compare(p_result, o_result, pot)
+
+    def _ceelo_showdown_with_point(self, pot, player_point):
+        """Opponent rolls against the player's established point."""
+        # Opponent may need multiple rolls to establish a point
+        max_rolls = 3
+        for i in range(max_rolls):
+            o1, o2, o3 = random.randint(1,6), random.randint(1,6), random.randint(1,6)
+            o_sorted = sorted([o1, o2, o3])
+            type.type("Dice rolls: " + red(bright(str(o1) + " - " + str(o2) + " - " + str(o3))))
+            print("\n")
+            o_result = self._evaluate_ceelo(o_sorted)
+
+            if o_result == "instant_win":
+                type.type(red(bright("Dice hits an automatic winner!")))
+                print("\n")
+                type.type(quote("Read 'em and weep, chief."))
+                print("\n")
+                type.type("Your " + red("${:,}".format(pot)) + " belongs to the concrete now.")
+                print("\n")
+                return
+            elif o_result == "instant_loss":
+                type.type(yellow(bright("Dice rolls 1-2-3! Automatic LOSS!")))
+                print("\n")
+                type.type("Dice slams his palm on the ground. " + quote("Are you SERIOUS right now?!"))
+                print("\n")
+                winnings = pot * 2
+                type.type("You scoop " + green(bright("${:,}".format(winnings))) + " off the ground.")
+                self.change_balance(winnings)
+                print("\n")
+                return
+            elif o_result == 0:
+                if i < max_rolls - 1:
+                    type.type("No point. Dice rolls again.")
+                    print("\n")
+                else:
+                    type.type("No point after three rolls. " + quote("Dice forfeits!"))
+                    print("\n")
+                    winnings = pot * 2
+                    type.type("You win " + green(bright("${:,}".format(winnings))) + " by default!")
+                    self.change_balance(winnings)
+                    print("\n")
+                    return
+            else:
+                opponent_point = o_result
+                type.type("Dice's point: " + red(bright(str(opponent_point))))
+                print("\n")
+                if player_point > opponent_point:
+                    type.type(yellow(bright(str(player_point) + " beats " + str(opponent_point) + "! You WIN!")))
+                    print("\n")
+                    type.type("Dice shakes his head. " + quote("Man. You got the touch today."))
+                    print("\n")
+                    winnings = pot * 2
+                    type.type("You collect " + green(bright("${:,}".format(winnings))) + ".")
+                    self.change_balance(winnings)
+                elif player_point < opponent_point:
+                    type.type(red(bright(str(opponent_point) + " beats " + str(player_point) + ". You LOSE.")))
+                    print("\n")
+                    type.type(quote("Better luck next time, chief. The road's always here."))
+                    print("\n")
+                    type.type("Your " + red("${:,}".format(pot)) + " is gone.")
+                else:
+                    type.type(cyan(bright("Tied! " + str(player_point) + " vs " + str(opponent_point) + ". Push — money goes back.")))
+                    print("\n")
+                    type.type(quote("A tie? On the ROAD? That's gotta be an omen."))
+                    self.change_balance(pot)
+                print("\n")
+                return
+
+    def _ceelo_compare(self, p_result, o_result, pot):
+        """Compare two Cee-lo results and resolve the pot."""
+        # Both instant
+        if p_result == "instant_win" and o_result == "instant_win":
+            type.type(cyan(bright("DOUBLE AUTOMATICS! It's a push!")))
+            print("\n")
+            type.type(quote("I ain't never seen that before. Take your money back."))
+            self.change_balance(pot)
+            print("\n")
+            return
+        if p_result == "instant_win":
+            type.type(yellow(bright("Your automatic beats everything!")))
+            print("\n")
+            winnings = pot * 2
+            type.type("You collect " + green(bright("${:,}".format(winnings))) + "!")
+            self.change_balance(winnings)
+            print("\n")
+            return
+        if o_result == "instant_win":
+            type.type(red(bright("Dice hits an automatic winner. You're done.")))
+            print("\n")
+            type.type(quote("Nothing personal, chief. Just dice."))
+            print("\n")
+            return
+        if p_result == "instant_loss" and o_result == "instant_loss":
+            type.type(cyan(bright("You BOTH rolled 1-2-3?! Push!")))
+            type.type(quote("The road is drunk today."))
+            self.change_balance(pot)
+            print("\n")
+            return
+        if p_result == "instant_loss":
+            type.type(red(bright("Your 1-2-3 is an automatic loss.")))
+            print("\n")
+            return
+        if o_result == "instant_loss":
+            type.type(yellow(bright("Dice rolls 1-2-3! You win!")))
+            winnings = pot * 2
+            self.change_balance(winnings)
+            print("\n")
+            return
+
+        # Both got points (or 0)
+        p_val = p_result if isinstance(p_result, int) else 0
+        o_val = o_result if isinstance(o_result, int) else 0
+        if p_val > o_val:
+            type.type(yellow(bright(str(p_val) + " beats " + str(o_val) + "! You WIN!")))
+            print("\n")
+            winnings = pot * 2
+            type.type("You take " + green(bright("${:,}".format(winnings))) + ".")
+            self.change_balance(winnings)
+        elif o_val > p_val:
+            type.type(red(bright(str(o_val) + " beats " + str(p_val) + ". You lose.")))
+            print("\n")
+            type.type(quote("Tough break, brother."))
+        else:
+            type.type(cyan(bright("Tied at " + str(p_val) + ". Push.")))
+            self.change_balance(pot)
+        print("\n")
+
 
     # Nearly There Nights (900,000+)
     def woodlands_adventure(self):

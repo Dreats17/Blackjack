@@ -95,7 +95,11 @@ class EventDispatchMixin:
         # COMPANION PASSIVE BONUSES - Applied each day
         self.apply_companion_day_bonuses()
         
-        dayEvent = getattr(self, self._lists.get_day_event())
+        dayEvent = getattr(self, self._lists.get_day_event(), None)
+        if dayEvent is None:
+            type.type("The day passes uneventfully.")
+            print("\n")
+            return
         dayEvent()
         return
 
@@ -121,7 +125,15 @@ class EventDispatchMixin:
             print("\n")
             time.sleep(1)
         
-        nightEvent = getattr(self, self._lists.get_night_event())
+        nightEvent = getattr(self, self._lists.get_night_event(), None)
+        if nightEvent is None:
+            type.type("The night passes quietly.")
+            print("\n")
+            self.add_fatigue(random.randint(2, 6))
+            self.apply_companion_night_bonuses()
+            self.update_rank()
+            self.start_night()
+            return
         nightEvent()
 
         # Night events add mild fatigue (staying up doing things)

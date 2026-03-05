@@ -880,13 +880,34 @@ class DayEventsMixin:
     def got_a_cold(self):
         # EVENT: You wake up with a cold
         # CONDITION: Only triggers if you don't already have "Cold" status
-        # EFFECTS: Adds "Cold" status
+        # EFFECTS: Adds "Cold" status; Cough Drops prevent it
         if self.has_status("Cold"):
             self.day_event()
             return
         
-        type.type("A sneeze rips through you in your car seat, followed by your nose running, droplets falling down from your chin and onto your shirt. Damn, must be a cold.")
+        variant = random.randrange(3)
+        if variant == 0:
+            type.type("A sneeze rips through you in your car seat, followed by your nose running, droplets falling down from your chin and onto your shirt. Damn, must be a cold.")
+        elif variant == 1:
+            type.type("You wake up and your throat feels like sandpaper wrapped in barbed wire. Your nose is a faucet. Your head is a bowling ball.")
+            print("\n")
+            type.type("Cold. The boring, inevitable kind. The kind that reminds you that living in a car has consequences.")
+        else:
+            type.type("The first sneeze catches you off guard. The second one rattles your teeth. By the fifth, you've accepted your fate.")
+            print("\n")
+            type.type("You're sick. Nose running, eyes watering, the whole miserable package.")
         print("\n")
+        if self.has_item("Cough Drops"):
+            type.type("You pop a " + magenta(bright("Cough Drop")) + " and let it dissolve. Menthol floods your sinuses like a chemical sunrise.")
+            print("\n")
+            type.type("It's not a cure, but it takes the edge off. You might dodge the worst of this.")
+            print("\n")
+            if random.randrange(2) == 0:
+                type.type("The cough drop does its job. By afternoon, you feel almost human. Crisis averted.")
+                print("\n")
+                return
+            else:
+                type.type("But the cold is stubborn. It settles in despite your best efforts. At least it's not as bad as it could be.")
         self.add_status("Cold")
         self.mark_day("Cold")
         print("\n")
@@ -1971,11 +1992,31 @@ class DayEventsMixin:
     # Everytime
     def left_door_open(self):
         # EVENT: Car door was left open all night
-        # EFFECTS: 50% chance Spider danger, 17% chance Squirrel danger
-        type.type("A chill runs through your entire body. ")
-        type.type("Had the passenger door really been open all night? ")
-        type.type("Hopefully nothing had gotten in. ")
-        type.type("You reach over and close the door, just to be safe.")
+        # EFFECTS: 50% chance Spider danger, 17% chance Squirrel danger; Pest Control can prevent infestation
+        variant = random.randrange(3)
+        if variant == 0:
+            type.type("A chill runs through your entire body. ")
+            type.type("Had the passenger door really been open all night? ")
+            type.type("The seat is cold. There are leaves on the floor. Something was definitely in here.")
+            print("\n")
+            type.type("You reach over and close the door, trying not to think about what might still be under the seat.")
+        elif variant == 1:
+            type.type("You jolt awake to the sound of birds. Not outside birds. INSIDE birds. No wait — that's a squirrel.")
+            print("\n")
+            type.type("The passenger door is wide open. Nature has accepted your invitation.")
+            print("\n")
+            type.type("You shoo everything out — or try to — and slam the door shut. Your heart is racing.")
+        else:
+            type.type("Morning light pours through the open passenger door. The WIDE open passenger door.")
+            print("\n")
+            type.type("How long has it been like that? All night? Your entire car is basically a motel room with no door.")
+            print("\n")
+            type.type("You close it and check every surface for stowaways.")
+        print("\n")
+        if self.has_item("Pest Control"):
+            type.type("You give the interior a precautionary spray with your " + magenta(bright("Pest Control")) + ". Whatever crawled in is about to regret it.")
+            print("\n")
+            return
         random_chance = random.randrange(6)
         if random_chance <= 2:
                 self.add_danger("Spider")
@@ -2398,11 +2439,29 @@ class DayEventsMixin:
     # Everytime
     def left_trunk_open(self):
         # EVENT: Trunk was left open all night
-        # EFFECTS: 33% chance Rat danger, 33% chance Termite danger
-        type.type("A cold draft fills the whole wagon. ")
-        type.type("Had the trunk really been open all night? ")
-        type.type("Hopefully nothing had gotten in. ")
-        type.type("You get out of the car and close the trunk, just to be safe.")
+        # EFFECTS: 33% chance Rat danger, 33% chance Termite danger; Pest Control prevents infestation
+        variant = random.randrange(3)
+        if variant == 0:
+            type.type("A cold draft fills the whole wagon. ")
+            type.type("Had the trunk really been open all night? ")
+            type.type("You get out and walk around back. Yep. Wide open. Like a gaping invitation to every critter in a five-mile radius.")
+        elif variant == 1:
+            type.type("You hear a THUNK from the back. Then scratching. Then silence.")
+            print("\n")
+            type.type("The trunk is open. Something was in there. Maybe still is.")
+            print("\n")
+            type.type("You close it slowly, carefully, like defusing a bomb made of wildlife.")
+        else:
+            type.type("The trunk latch must have popped in the night. It's happened before, but this time the smell of damp earth wafts through the car.")
+            print("\n")
+            type.type("Something tracked mud into the trunk. Paw prints. Small ones. You close it and hope for the best.")
+        print("\n")
+        if self.has_item("Pest Control"):
+            type.type("You give the trunk a thorough blast of " + magenta(bright("Pest Control")) + ". Chemical warfare. Nothing survives.")
+            print("\n")
+            type.type("Whatever was in there, it's not anymore. Or it's dead. Either works.")
+            print("\n")
+            return
         random_chance = random.randrange(6)
         if random_chance < 2:
                 self.add_danger("Rat")
@@ -2965,9 +3024,7 @@ class DayEventsMixin:
     # Everytime
     def thunderstorm(self):
         # EVENT: Major thunderstorm traps you in your car for the day
-        # EFFECTS: Adds "Rain" travel restriction, preventing casino travel
-        self.add_travel_restriction("Rain")
-        # Alt dialogue for repeated event
+        # EFFECTS: Adds "Rain" travel restriction, preventing casino travel; Umbrella/Poncho can override
         variant = random.randrange(3)
         if variant == 0:
             type.type("Raindrops begin hitting the roof of your wagon. ")
@@ -2988,6 +3045,16 @@ class DayEventsMixin:
             print("\n")
             type.type("You watch a trash can blow down the street like a tumbleweed. Nature is angry today.")
         print("\n")
+        if self.has_item("Umbrella") or self.has_item("Poncho"):
+            gear = "Poncho" if self.has_item("Poncho") else "Umbrella"
+            type.type("Good thing you've got that " + magenta(bright(gear)) + ". You're not letting a little apocalyptic weather ruin your plans.")
+            print("\n")
+            type.type("You suit up, step out into the deluge, and walk to the casino like a soggy but determined lunatic.")
+            print("\n")
+            type.type("People in the parking lot stare at you. You don't care. You have places to be and money to lose.")
+            print("\n")
+            return
+        self.add_travel_restriction("Rain")
         return
     
     # ==========================================
@@ -9433,49 +9500,144 @@ class DayEventsMixin:
 
     # === RANDOM SMALL EVENTS ===
     def found_twenty(self):
-        type.type("You step out of your car and find a $20 bill on the ground. No one around. Just luck.")
+        variant = random.randrange(4)
+        if variant == 0:
+            type.type("You step out of your car and your shoe lands on something papery. A twenty, face-up, staring at you like Andrew Jackson himself is offering it.")
+            print("\n")
+            type.type("No one around. No wallet in sight. Just the universe cutting you a break for once.")
+        elif variant == 1:
+            type.type("The wind picks up and slaps a bill against your windshield. You peel it off. Twenty bucks.")
+            print("\n")
+            type.type("Somewhere, someone is cursing the wind. But that's not your problem.")
+        elif variant == 2:
+            type.type("You're digging between the seats for a pen — don't ask why — and your fingers close around a crumpled bill.")
+            print("\n")
+            type.type("A twenty. Past-you was apparently a squirrel, hiding nuts for winter.")
+        else:
+            type.type("A twenty-dollar bill tumbles across the parking lot like a tumbleweed. You chase it. Step on it. Victory.")
+            print("\n")
+            type.type("An old man on a bench watches you celebrate catching a piece of paper. He doesn't judge. He's been there.")
         self.change_balance(20)
-        type.type(" Nice.")
         print("\n")
 
     def lost_wallet(self):
         if self.get_balance() < 50:
             self.day_event()
             return
-        type.type("You shift in your car seat and realize your pocket feels light. Your wallet is gone.")
+        variant = random.randrange(3)
+        if variant == 0:
+            type.type("You shift in your car seat and realize your pocket feels light. Your wallet is gone.")
+            print("\n")
+            type.type("You check the other pocket. Under the seat. Between the cushions. Nothing. NOTHING.")
+            print("\n")
+            type.type("That sinking feeling in your stomach? That's not hunger. That's the universe pickpocketing you.")
+        elif variant == 1:
+            type.type("You reach for your wallet at the gas station. It's not there. You check again. Not there.")
+            print("\n")
+            type.type("You pat every pocket. Turn your pants inside out in the parking lot. A woman shields her child's eyes.")
+            print("\n")
+            type.type("It's gone. Must have fallen out. Or been pulled out.")
+        else:
+            type.type("Your wallet has vanished. Poof. Gone. Like it never existed.")
+            print("\n")
+            type.type("You spend twenty minutes on your hands and knees searching the car, the pavement, the bushes. You find a quarter. Not helpful.")
         print("\n")
-        type.type("You retrace your steps. Nothing. Someone must have taken it.")
         lost = min(self.get_balance(), random.randint(50, 200))
-        type.type(" You lost " + red(bright("$" + str(int(lost)))) + ".")
+        type.type("You lost " + red(bright("${:,}".format(int(lost)))) + ".")
         self.change_balance(-lost)
         self.lose_sanity(10)
         print("\n")
 
     def sunburn(self):
-        type.type("You fell asleep with the window cracked. In direct sunlight.")
-        print("\n")
-        type.type("Your arm is bright red. Blistering. You look like a lobster.")
+        if self.has_item("Cheap Sunscreen") or self.has_item("Premium Sunscreen"):
+            screen = "Premium Sunscreen" if self.has_item("Premium Sunscreen") else "Cheap Sunscreen"
+            type.type("You fell asleep with the window cracked. In direct sunlight. Like an idiot.")
+            print("\n")
+            type.type("But past-you was smarter than present-you — the " + magenta(bright(screen)) + " on your arm took the hit.")
+            print("\n")
+            type.type("Slight redness. Could've been way worse. Thank you, past-you.")
+            self.hurt(3)
+            print("\n")
+            return
+        if self.has_item("Umbrella"):
+            type.type("You fell asleep with the window cracked, but your " + magenta(bright("Umbrella")) + " was propped against the window.")
+            print("\n")
+            type.type("Half your arm is burnt, half is fine. The umbrella line is visible. You look ridiculous but functional.")
+            self.hurt(7)
+            print("\n")
+            return
+        variant = random.randrange(3)
+        if variant == 0:
+            type.type("You fell asleep with the window cracked. In direct sunlight.")
+            print("\n")
+            type.type("Your arm is bright red. Blistering. You look like a lobster who made bad life choices.")
+        elif variant == 1:
+            type.type("The sun found you. Through the cracked window, it cooked your forearm like a steak on a dashboard grill.")
+            print("\n")
+            type.type("You peel your arm off the armrest. Some skin stays behind. Lovely.")
+        else:
+            type.type("You wake up and immediately know something is wrong. Your neck is on fire. Not metaphorically.")
+            print("\n")
+            type.type("Sunburn. The kind that hurts when you think about it. The kind where shirts become your enemy.")
         self.hurt(15)
         print("\n")
 
     def mosquito_bite_infection(self):
-        type.type("You scratch your arm in the car. That mosquito bite you kept scratching? It's infected now.")
+        variant = random.randrange(3)
+        if variant == 0:
+            type.type("You scratch your arm in the car. That mosquito bite you kept scratching? It's infected now.")
+            print("\n")
+            type.type("Red, swollen, oozing. You know you shouldn't have scratched it. But you did. Because you're you.")
+        elif variant == 1:
+            type.type("Your arm itches. It's been itching for two days. You finally look at it.")
+            print("\n")
+            type.type("The mosquito bite has turned into something that belongs in a medical textbook. The gross chapter.")
+        else:
+            type.type("Remember that mosquito? The one you let bite you because you were too tired to swat it?")
+            print("\n")
+            type.type("Well, it left you a gift. An angry, infected, weeping gift. On your elbow. Right where the seat rubs.")
         print("\n")
-        type.type("Red, swollen, oozing. You need to stop scratching it.")
-        self.hurt(10)
+        if self.has_item("First Aid Kit"):
+            type.type("Good thing you have that " + magenta(bright("First Aid Kit")) + ". You clean it, disinfect it, bandage it. Almost like a real adult.")
+            self.hurt(3)
+        else:
+            type.type("You don't have anything to treat it with. You tear off a piece of your shirt and wrap it. Field medicine at its finest.")
+            self.hurt(10)
         print("\n")
 
     def good_hair_day(self):
-        type.type("You check yourself in the car mirror. Against all odds, your hair looks good today. How is that possible?")
-        print("\n")
-        type.type("You live in a car. You shower at truck stops. But today? Fabulous.")
+        variant = random.randrange(3)
+        if variant == 0:
+            type.type("You check yourself in the car mirror. Against all odds, your hair looks good today.")
+            print("\n")
+            type.type("You live in a car. You shower at truck stops. But today? You could be on a magazine cover. A very specific, niche magazine. But still.")
+        elif variant == 1:
+            type.type("The truck stop shower this morning had actual water pressure. REAL water pressure. Like a normal person shower.")
+            print("\n")
+            type.type("Your hair is clean, fluffy, and cooperating. You keep touching it. Is this what happiness feels like?")
+        else:
+            type.type("You catch your reflection in the side mirror and do a double take. Who IS that handsome devil?")
+            print("\n")
+            type.type("Oh. It's you. With inexplicably great hair. The Dealer's gonna be intimidated tonight.")
         self.restore_sanity(5)
         print("\n")
 
     def bad_hair_day(self):
-        type.type("You glance in the car mirror. Your hair is a disaster. A matted, greasy catastrophe.")
-        print("\n")
-        type.type("You try to fix it. Make it worse. Give up.")
+        variant = random.randrange(3)
+        if variant == 0:
+            type.type("You glance in the car mirror. Your hair is a disaster. A matted, greasy catastrophe.")
+            print("\n")
+            type.type("You try to fix it. Somehow make it worse. The laws of physics should not allow what your hair is doing right now.")
+        elif variant == 1:
+            type.type("A bird lands on your car. Sees your hair. Considers building a nest in it.")
+            print("\n")
+            type.type("You shoo it away, but you can't shoo away the truth: you look like you were electrocuted in your sleep.")
+        else:
+            type.type("You haven't looked in a mirror in three days. You finally do.")
+            print("\n")
+            type.type("Your hair has formed an alliance with gravity, grease, and the concept of defeat. It hangs there, mocking you.")
+            print("\n")
+            type.type("You put on a hat. Problem solved. Problem hidden.")
         self.lose_sanity(3)
         print("\n")
 
@@ -9487,22 +9649,70 @@ class DayEventsMixin:
         print("\n")
 
     def car_battery_dead(self):
-        type.type("Your car won't start. Dead battery. Of course.")
+        variant = random.randrange(3)
+        if variant == 0:
+            type.type("You turn the key. Click. Click. Nothing. The battery is dead. Stone dead.")
+            print("\n")
+            type.type("You try again. And again. As if the fifteenth attempt will be the charm. It won't.")
+        elif variant == 1:
+            type.type("The engine makes a sound like a dying animal and gives up. Battery.")
+            print("\n")
+            type.type("You left the interior light on all night. Again. Because you're your own worst enemy.")
+        else:
+            type.type("Nothing. Not a sound. Not a click. Not a whimper. The car is dead and it's your fault.")
+            print("\n")
+            type.type("You sit there for a minute, key in the ignition, staring at the dashboard like it betrayed you. It didn't. You betrayed it.")
         print("\n")
-        type.type("You spend an hour trying to get someone to give you a jump.")
-        print("\n")
-        type.type("Finally, a kind trucker helps you out. Crisis averted.")
-        self.lose_sanity(8)
+        if self.has_item("Tool Kit"):
+            type.type("Luckily, your " + magenta(bright("Tool Kit")) + " has cables in it. You flag someone down and get a jump in ten minutes.")
+            print("\n")
+            type.type("Having tools makes you feel like a competent human being. The bar is low, but you cleared it.")
+            self.lose_sanity(2)
+        else:
+            type.type("You stand on the roadside, holding imaginary cables, hoping someone takes pity on you.")
+            print("\n")
+            random_chance = random.randrange(3)
+            if random_chance == 0:
+                type.type("A trucker pulls over after an hour. Doesn't say much. Just jumps you and drives off. Angels come in 18-wheelers.")
+            elif random_chance == 1:
+                type.type("It takes two hours. TWO. You stand there like a scarecrow holding a sign that says " + quote("PLEASE.") + " Finally, a minivan stops.")
+                self.lose_sanity(5)
+            else:
+                type.type("Nobody stops. For three hours. You end up walking to a gas station and buying a jump pack for $40.")
+                if self.get_balance() >= 40:
+                    self.change_balance(-40)
+                else:
+                    type.type("...which you can't afford. The attendant takes pity and lets you borrow one. Humiliating.")
+                    self.lose_sanity(8)
+            self.lose_sanity(3)
         print("\n")
 
     def flat_tire_again(self):
-        type.type("Another flat tire. You're starting to think the universe hates you.")
+        variant = random.randrange(3)
+        if variant == 0:
+            type.type("Another flat tire. You're starting to think the universe has a personal vendetta against your wheels.")
+        elif variant == 1:
+            type.type("You step out of the wagon and immediately feel the lean. Flat. Again. You don't even get mad anymore.")
+        else:
+            type.type("THWAP. That sound. You know that sound. It's the sound of your afternoon disappearing into a rubber pancake.")
         print("\n")
-        if self.get_balance() >= 50:
-            type.type("You pay a guy $50 to fix it. Whatever. Just fix it.")
+        if self.has_item("Spare Tire"):
+            type.type("But wait — you've got a " + magenta(bright("Spare Tire")) + ". Twenty minutes of grunting and swearing later, you're back on four wheels.")
+            print("\n")
+            type.type("Competence feels good. Rare, but good.")
+            self.use_item("Spare Tire")
+        elif self.has_item("Duct Tape"):
+            type.type("You look at the tire. You look at your " + magenta(bright("Duct Tape")) + ". You look at the tire again.")
+            print("\n")
+            type.type("This is a terrible idea. You do it anyway. It holds. Barely. You drive like you're transporting a soufflé.")
+            self.hurt(3)
+        elif self.get_balance() >= 50:
+            type.type("You flag down a guy with a truck. He fixes it for $50. Doesn't make conversation. Doesn't need to.")
             self.change_balance(-50)
         else:
-            type.type("You can't afford to fix it. You sleep with a flat tire. Again.")
+            type.type("You can't afford to fix it. No spare. No tape. No money. No options.")
+            print("\n")
+            type.type("You sit on the curb next to your crippled wagon and watch the traffic go by. Everyone else is going somewhere.")
             self.lose_sanity(10)
         print("\n")
 
@@ -9554,20 +9764,69 @@ class DayEventsMixin:
         print("\n")
 
     def someone_stole_your_stuff(self):
-        type.type("Someone broke into your car while you were at the casino.")
-        print("\n")
-        type.type("They didn't take money—you had that on you. But they took... things.")
-        print("\n")
-        type.type("A jacket. Some food. Your sense of security.")
+        if self.has_item("Padlock") or self.has_item("Car Alarm Rigging"):
+            device = "Car Alarm Rigging" if self.has_item("Car Alarm Rigging") else "Padlock"
+            variant = random.randrange(2)
+            if variant == 0:
+                type.type("You come back to the wagon and see scratch marks around the door handle. Someone tried to break in.")
+                print("\n")
+                type.type("Tried. Your " + magenta(bright(device)) + " held. There's a screwdriver on the ground — they dropped it and ran.")
+                print("\n")
+                type.type("Nice try, buddy. Not today.")
+            else:
+                type.type("A shadow moves away from your wagon as you approach. Someone was casing it.")
+                print("\n")
+                type.type("They see your " + magenta(bright(device)) + " and think better of it. Smart.")
+                print("\n")
+                type.type("You make a mental note to sleep lighter anyway.")
+            self.lose_sanity(3)
+            print("\n")
+            return
+        variant = random.randrange(3)
+        if variant == 0:
+            type.type("Someone broke into your car while you were at the casino.")
+            print("\n")
+            type.type("They didn't take money — you had that on you. But they took... things.")
+            print("\n")
+            type.type("A jacket. Some food. Your sense of security. That last one hurts the most.")
+        elif variant == 1:
+            type.type("The window is smashed. Glass everywhere. Your stuff is tossed around like a tornado hit.")
+            print("\n")
+            type.type("They took your blanket. Your BLANKET. What kind of monster steals a homeless man's blanket?")
+            print("\n")
+            type.type("You spend the afternoon cleaning glass out of your seat. Every piece is a little shard of betrayal.")
+        else:
+            type.type("Everything's wrong. The glove box is open. The trunk is popped. Stuff is missing.")
+            print("\n")
+            type.type("You do a mental inventory. Food — gone. Spare clothes — gone. That weird rock you liked — gone.")
+            print("\n")
+            type.type("The rock hurts the most. You'd had it since day one. It was a good rock.")
         self.lose_sanity(15)
         self.hurt(5)
         print("\n")
 
     def back_pain(self):
-        type.type("Your back is KILLING you. Sleeping in a car seat isn't good for the spine.")
+        variant = random.randrange(3)
+        if variant == 0:
+            type.type("Your back is KILLING you. Sleeping in a car seat isn't good for the spine. Shocking revelation.")
+            print("\n")
+            type.type("You try to straighten up. Something pops. Not the good kind of pop. The kind that makes you question your mortality.")
+        elif variant == 1:
+            type.type("You can't turn your neck. At all. It's locked in place, like your spine has unionized and is staging a protest.")
+            print("\n")
+            type.type("Every movement is a negotiation with pain. Pain is winning.")
+        else:
+            type.type("Getting out of the car takes three attempts. Your lower back has decided it hates you. Specifically you. Personally.")
+            print("\n")
+            type.type("You stand in the parking lot bent at a 45-degree angle like a question mark. People stare. You deserve it.")
         print("\n")
-        type.type("You're getting old. And broken. This life is breaking you.")
-        self.hurt(15)
+        if self.has_item("First Aid Kit"):
+            type.type("You dig out the " + magenta(bright("First Aid Kit")) + " and find a heat pack buried in the bottom. You slap it on your lower back.")
+            print("\n")
+            type.type("It's not physical therapy, but it's the next best thing when your chiropractor is a steering wheel.")
+            self.hurt(5)
+        else:
+            self.hurt(15)
         print("\n")
 
     def stretching_helps(self):
@@ -9579,49 +9838,144 @@ class DayEventsMixin:
         print("\n")
 
     def random_kindness(self):
-        type.type("Someone hands you a bag of groceries. Doesn't say anything. Just smiles and leaves.")
-        print("\n")
-        type.type("Inside: bread, peanut butter, water bottles. Basic stuff.")
-        print("\n")
-        type.type("Your eyes are wet. When did you become someone who needs charity?")
+        variant = random.randrange(4)
+        if variant == 0:
+            type.type("Someone hands you a bag of groceries. Doesn't say anything. Just smiles and leaves.")
+            print("\n")
+            type.type("Inside: bread, peanut butter, water bottles. Basic stuff.")
+            print("\n")
+            type.type("Your eyes are wet. When did you become someone who needs charity?")
+        elif variant == 1:
+            type.type("An old woman knocks on your window. You flinch. She holds up a thermos.")
+            print("\n")
+            type.type(quote("Coffee. Cream and sugar already in it. You looked like you needed it."))
+            print("\n")
+            type.type("She walks away before you can say thank you. The coffee is perfect. Impossibly perfect.")
+            print("\n")
+            type.type("You drink it slowly, because some things shouldn't be rushed.")
+        elif variant == 2:
+            type.type("A guy in a pickup pulls up beside you and tosses a blanket through the window.")
+            print("\n")
+            type.type(quote("Been there, brother.") + " That's all he says. Then he drives off.")
+            print("\n")
+            type.type("The blanket smells like fabric softener. You bury your face in it and breathe deep.")
+            print("\n")
+            type.type("Three words and a blanket. That's all it takes to remind you that people can be good.")
+        else:
+            type.type("You're counting change in the gas station parking lot. A woman watches you from across the lot.")
+            print("\n")
+            type.type("She walks over, tucks a twenty into your shirt pocket, and squeezes your shoulder.")
+            print("\n")
+            type.type(quote("You're gonna be alright.") + " Her eyes are so certain. Like she knows something you don't.")
+            print("\n")
+            type.type("You almost believe her.")
+            self.change_balance(20)
         self.heal(20)
         self.restore_sanity(10)
         self.lose_sanity(5)  # Mixed feelings
         print("\n")
 
     def random_cruelty(self):
-        type.type("Some teenagers throw something at your car. Laughing. Running away.")
-        print("\n")
-        type.type("It's a milkshake. All over your windshield. Sticky and dripping.")
-        print("\n")
-        type.type("You clean it up in silence. What else can you do?")
+        variant = random.randrange(4)
+        if variant == 0:
+            type.type("Some teenagers throw something at your car. Laughing. Running away.")
+            print("\n")
+            type.type("It's a milkshake. All over your windshield. Sticky and dripping.")
+            print("\n")
+            type.type("You get out. They're already gone. Just the sound of their laughter echoing off the parking garage.")
+        elif variant == 1:
+            type.type("Someone keyed your car. A long, deep scratch from the hood to the trunk.")
+            print("\n")
+            type.type("It's not even a good car. Who keys a car this bad? What did they gain from this?")
+            print("\n")
+            type.type("You run your finger along the scratch. It's the only straight line in your life right now.")
+        elif variant == 2:
+            type.type("A group of college kids walks by your wagon. One of them takes a picture.")
+            print("\n")
+            type.type(quote("Bro, look at this guy. Living in a car. L-M-A-O."))
+            print("\n")
+            type.type("They laugh. You hear it through the window. They're not trying to be quiet about it.")
+            print("\n")
+            type.type("You slide lower in your seat and wait for them to leave. They take their time.")
+        else:
+            type.type("Somebody stuck a note under your wiper blade. You pull it off, hopeful. Maybe it's kind. Maybe someone noticed you.")
+            print("\n")
+            type.type("It reads: " + quote("GET A JOB, LOSER."))
+            print("\n")
+            type.type("You crumple it up. Hold it for a while. Then let it drop.")
         self.lose_sanity(12)
         print("\n")
 
     def prayer_answered(self):
-        type.type("You're sitting in your car. You prayed last night. For something. Anything.")
-        print("\n")
-        type.type("Today, things went your way. Small things. But things.")
-        print("\n")
-        type.type("Coincidence? Divine intervention? Does it matter?")
+        variant = random.randrange(3)
+        if variant == 0:
+            type.type("You're sitting in your car. You prayed last night. For something. Anything.")
+            print("\n")
+            type.type("Today, things went your way. Small things. But things.")
+            print("\n")
+            type.type("The gas station had free coffee. A stranger held the door. Nobody looked at you like you were garbage.")
+            print("\n")
+            type.type("Coincidence? Divine intervention? Does it matter?")
+        elif variant == 1:
+            type.type("Last night you whispered into the dark: " + quote("Just let tomorrow be better. That's it. Just... better."))
+            print("\n")
+            type.type("And it was. Not great. Not fixed. But better. The sun came out. Your back didn't hurt as much. You found a $5 bill in the cupholder.")
+            print("\n")
+            type.type("Is someone listening? You look up at the sky. It doesn't answer. But it doesn't rain, either.")
+            self.change_balance(5)
+        else:
+            type.type("You prayed last night. Not to anyone specific. Just... out into the universe.")
+            print("\n")
+            type.type("Today, a butterfly landed on your steering wheel. Sat there for ten minutes. Orange and black and utterly unbothered by your problems.")
+            print("\n")
+            type.type("It's not what you asked for. It's not money or shelter or a way out. But it's something. Proof that beauty exists even in parking lots.")
         self.restore_sanity(15)
         print("\n")
 
     def prayer_ignored(self):
-        type.type("You're sitting in your car. You prayed last night. Begged, really. For help.")
-        print("\n")
-        type.type("Today was worse than yesterday. The heavens are silent.")
-        print("\n")
-        type.type("Maybe no one's listening. Or maybe you're not worth listening to.")
+        variant = random.randrange(3)
+        if variant == 0:
+            type.type("You're sitting in your car. You prayed last night. Begged, really. For help. For a sign. For anything.")
+            print("\n")
+            type.type("Today was worse than yesterday. The heavens are silent.")
+            print("\n")
+            type.type("Maybe no one's listening. Or maybe you're not worth listening to.")
+        elif variant == 1:
+            type.type("Last night you said the words. All of them. The please and the help me and the I'll do anything.")
+            print("\n")
+            type.type("The ceiling of your car stared back. Same as always.")
+            print("\n")
+            type.type("Today a bird crapped on your windshield. If that's a sign, you don't want to decode it.")
+        else:
+            type.type("You prayed for a miracle. Got a parking ticket instead.")
+            print("\n")
+            type.type("You crumple the ticket up. What are they going to do, take your car? You live in it. That's cruel and unusual punishment, probably.")
+            print("\n")
+            type.type("You look up at the sky. " + quote("Very funny.") + " The sky says nothing. As usual.")
         self.lose_sanity(10)
         print("\n")
 
     def found_old_photo(self):
-        type.type("You find an old photo in your glove box. You forgot it was there.")
-        print("\n")
-        type.type("It's you. From before. Smiling. Happy. With people who loved you.")
-        print("\n")
-        type.type("You stare at it for a long time. Who was that person?")
+        variant = random.randrange(3)
+        if variant == 0:
+            type.type("You find an old photo in your glove box. You forgot it was there.")
+            print("\n")
+            type.type("It's you. From before. Smiling. Happy. With people who loved you.")
+            print("\n")
+            type.type("You stare at it for a long time. Who was that person? Where did they go? Are they in here somewhere, buried under the gambling and the car-sleeping and the existential dread?")
+        elif variant == 1:
+            type.type("A photo slips out from behind the sun visor. Lands in your lap. Face up.")
+            print("\n")
+            type.type("You in a kitchen. Flour on your nose. Laughing at something someone said. The light through the window is warm and golden.")
+            print("\n")
+            type.type("You can't remember what was funny. You can't remember whose kitchen. But you remember the feeling. And feeling it again, even just the echo, hurts more than any bust at the table.")
+        else:
+            type.type("While digging for napkins, your fingers close on a Polaroid.")
+            print("\n")
+            type.type("It's faded. Overexposed. A birthday party. Yours, maybe. There's a cake. Candles. Hands around you.")
+            print("\n")
+            type.type("You hold the photo at arm's length, like it might bite. The past is a country you were deported from.")
+        self.mark_met("Found Old Photo")
         self.lose_sanity(10)
         self.restore_sanity(5)  # Bittersweet
         print("\n")
@@ -9643,7 +9997,32 @@ class DayEventsMixin:
         print("\n")
 
     def empty_event(self):
-        type.type("This day's events are empty. Therefore, this played. Thank you.")
+        variant = random.randrange(5)
+        if variant == 0:
+            type.type("Nothing happens today. Not a single thing. You sit in your car and exist.")
+            print("\n")
+            type.type("It should be peaceful. Instead, it's terrifying. When nothing happens, you have to think. And thinking is dangerous.")
+            self.lose_sanity(2)
+        elif variant == 1:
+            type.type("The day passes like a held breath. Morning becomes afternoon becomes evening, and you've done nothing.")
+            print("\n")
+            type.type("Not because you couldn't. Because you didn't want to. The weight of it all just... pinned you to the seat.")
+            self.lose_sanity(3)
+        elif variant == 2:
+            type.type("You stare at the ceiling of your wagon for six straight hours. You count the stains. Forty-seven.")
+            print("\n")
+            type.type("At some point, you fall asleep with your eyes open. When you snap out of it, the sun is setting.")
+            print("\n")
+            type.type("Where did the day go? Where did any of them go?")
+        elif variant == 3:
+            type.type("A quiet day. Suspiciously quiet. Like the world is loading the next catastrophe.")
+            print("\n")
+            type.type("You spend it waiting for the other shoe to drop. It doesn't. Somehow that's worse.")
+        else:
+            type.type("You do laundry at a laundromat. Watch your clothes spin. It's oddly meditative.")
+            print("\n")
+            type.type("Warm clothes out of a dryer might be the closest thing to a hug you've had in weeks.")
+            self.restore_sanity(3)
         print("\n")
 
     # ==========================================
@@ -11842,4 +12221,4284 @@ class DayEventsMixin:
             self.hurt(random.choice([8, 10, 12]))
             self.add_fatigue(3)
             print("\n")
+
+    # ==========================================
+    # CHAIN 1: THE HERMIT'S TRAIL (5 events)
+    # Worn Map → find hermit camp → Journal → 
+    # Walking Stick → Herbal Pouch → Hollow Tree Stash
+    # ==========================================
+
+    def hermit_trail_discovery(self):
+        """First event: finding the trail marked on the Worn Map"""
+        if not self.has_item("Worn Map"):
+            self.day_event()
+            return
+        if self.has_met("Hermit Trail Found"):
+            self.day_event()
+            return
+        
+        type.type("You're parked near the edge of town when you remember the " + cyan(bright("Worn Map")) + " you bought.")
+        print("\n")
+        type.type("You unfold it on the hood. The paper is brittle, the ink faded to brown. ")
+        type.type("But the trails are clear — someone drew these from memory, over and over, perfecting the routes.")
+        print("\n")
+        type.type("One trail is marked with a star. Just a few miles from here.")
+        print("\n")
+        type.type("1. Follow the trail")
+        print()
+        type.type("2. Not worth the risk")
+        print()
+        type.type("Choose: ")
+        choice = None
+        while choice is None:
+            try:
+                choice = int(input())
+            except ValueError:
+                type.type("Pick a number: ")
+        print()
+        
+        if choice == 1:
+            type.type("You lock the car and head into the woods. The trail is overgrown but followable.")
+            print("\n")
+            type.type("After twenty minutes of pushing through brush, you find it: a small clearing. ")
+            type.type("There's a fire pit, long cold. A lean-to made of branches and tarp. ")
+            type.type("Someone lived here. For a long time.")
+            print("\n")
+            type.type("On a flat rock near the fire pit, weighted down with a stone, is a leather-bound journal.")
+            print("\n")
+            type.type("You pick it up. It's dense with handwriting. Drawings. Recipes. Survival notes.")
+            print("\n")
+            type.type("You found the " + cyan(bright("Hermit's Journal")) + ".")
+            self.add_item("Hermit's Journal")
+            self.meet("Hermit Trail Found")
+            self.add_danger("Hermit Camp Return")
+            self.restore_sanity(5)
+            print("\n")
+        else:
+            type.type("You fold the map back up. Maybe another day.")
+            print("\n")
+
+    def hermit_camp_return(self):
+        """Second event: returning to the camp and finding a walking stick"""
+        if not self.has_met("Hermit Trail Found") or not self.has_danger("Hermit Camp Return"):
+            self.day_event()
+            return
+        
+        type.type("Something's been nagging at you. The hermit's camp. There was more to find there.")
+        print("\n")
+        type.type("You drive back to the trailhead and follow the path again. Easier this time — you know the way.")
+        print("\n")
+        type.type("The camp looks different in this light. You notice things you missed before.")
+        print("\n")
+        type.type("Leaning against the lean-to is a hand-carved walking stick. ")
+        type.type("The wood is smooth, polished by years of use. There are notches carved into it — ")
+        type.type("hundreds of them. Days? Miles? Memories?")
+        print("\n")
+        type.type("You take the " + cyan(bright("Carved Walking Stick")) + ". It feels right in your hand.")
+        self.add_item("Carved Walking Stick")
+        self.lose_danger("Hermit Camp Return")
+        self.add_danger("Hermit Journal Study")
+        self.restore_sanity(3)
+        print("\n")
+        
+        type.type("As you leave, you notice boot prints in the mud. Fresh ones. ")
+        type.type("Someone else has been here recently.")
+        self.lose_sanity(2)
+        print("\n")
+
+    def hermit_journal_study(self):
+        """Third event: reading the journal reveals herbal medicine knowledge"""
+        if not self.has_item("Hermit's Journal") or not self.has_danger("Hermit Journal Study"):
+            self.day_event()
+            return
+        
+        type.type("You spend the morning reading the " + cyan(bright("Hermit's Journal")) + " in the front seat of your car.")
+        print("\n")
+        type.type("The handwriting changes over the years. Starts shaky, gets confident, then shaky again.")
+        print("\n")
+        type.type("The hermit was a pharmacist. Before everything fell apart. ")
+        type.type("The journal is full of herbal remedy recipes — plants that grow wild around here.")
+        print("\n")
+        type.type("You tear out a few pages of instructions and gather what you can from the roadside:")
+        print("\n")
+        type.type("Plantain leaves for cuts. Willow bark for pain. Chamomile for sleep. ")
+        type.type("You bundle them into a cloth and tie it shut.")
+        print("\n")
+        type.type("You made a " + cyan(bright("Herbal Pouch")) + ".")
+        self.add_item("Herbal Pouch")
+        self.lose_danger("Hermit Journal Study")
+        self.add_danger("Hermit Trail Stranger")
+        self.heal(10)
+        self.restore_sanity(5)
+        print("\n")
+        
+        type.type("The last entry in the journal reads: " + quote("If you found this, check the hollow oak. Third trail marker. I left something for the next one."))
+        print("\n")
+
+    def hermit_trail_stranger(self):
+        """Fourth event: encountering someone else who's been following the trail"""
+        if not self.has_danger("Hermit Trail Stranger"):
+            self.day_event()
+            return
+        
+        type.type("You're heading back to the hermit trail when you see someone already there.")
+        print("\n")
+        type.type("A woman in a park ranger jacket, kneeling at the fire pit. She's studying it.")
+        print("\n")
+        type.type("She sees you and stands up fast. Her hand goes to her belt.")
+        print("\n")
+        type.type(quote("This is private land. What are you doing out here?"))
+        print("\n")
+        
+        has_journal = self.has_item("Hermit's Journal")
+        has_stick = self.has_item("Carved Walking Stick")
+        
+        if has_journal and has_stick:
+            type.type("She notices the " + cyan(bright("Carved Walking Stick")) + " in your hand. Her expression changes.")
+            print("\n")
+            type.type(quote("Wait. You have his walking stick? And the journal?"))
+            print("\n")
+            type.type("She relaxes. Sits down on a rock. Looks tired.")
+            print("\n")
+            type.type(quote("His name was Edgar. He was my father. He disappeared three years ago."))
+            print("\n")
+            type.type(quote("I've been looking for his camp for months. You found it before I did."))
+            print("\n")
+            type.type("1. Give her the journal")
+            print()
+            type.type("2. Keep it (you need it more)")
+            print()
+            type.type("Choose: ")
+            choice = None
+            while choice is None:
+                try:
+                    choice = int(input())
+                except ValueError:
+                    type.type("Pick a number: ")
+            print()
+            
+            if choice == 1:
+                type.type("You hand her the journal. She holds it like it's made of glass.")
+                print("\n")
+                type.type(quote("Thank you. You have no idea what this means to me."))
+                print("\n")
+                type.type("She reaches into her pack and pulls out a pair of " + cyan(bright("Night Vision Scope")) + ".")
+                print("\n")
+                type.type(quote("My dad's. He used them for stargazing. Take them. Please."))
+                self.use_item("Hermit's Journal")
+                self.add_item("Night Vision Scope")
+                self.meet("Hermit Daughter Met")
+                self.restore_sanity(10)
+                print("\n")
+            else:
+                type.type("You shake your head. " + quote("I'm sorry. I need this. Survival stuff."))
+                print("\n")
+                type.type("She stares at you. Not angry. Just... sad.")
+                print("\n")
+                type.type(quote("I understand. You're living out here too, aren't you?"))
+                print("\n")
+                type.type("She tells you about the hollow oak anyway. Third trail marker.")
+                self.lose_sanity(3)
+                print("\n")
+        else:
+            type.type(quote("I'm just passing through,") + " you say.")
+            print("\n")
+            type.type("She doesn't believe you. But she doesn't press it.")
+            print("\n")
+            type.type(quote("Well, if you see anything unusual out here — journals, campsites — let me know. ") +
+                      quote("I'm looking for someone."))
+            print("\n")
+            type.type("She hands you a card. " + yellow("Ranger Diana Marsh."))
+            self.meet("Ranger Diana")
+            print("\n")
+        
+        self.lose_danger("Hermit Trail Stranger")
+        self.add_danger("Hermit Hollow Oak")
+
+    def hermit_hollow_oak(self):
+        """Fifth event (finale): finding the hollow oak stash"""
+        if not self.has_danger("Hermit Hollow Oak"):
+            self.day_event()
+            return
+        if self.has_met("Hollow Oak Found"):
+            self.day_event()
+            return
+        
+        type.type("Third trail marker. You've been counting.")
+        print("\n")
+        type.type("There it is — a massive oak tree, split by lightning long ago. The trunk is hollow.")
+        print("\n")
+        
+        if self.has_item("Carved Walking Stick"):
+            type.type("You use the " + cyan(bright("Carved Walking Stick")) + " to poke inside the hollow. ")
+            type.type("Nothing bites you. Good start.")
+            print("\n")
+        
+        type.type("You reach inside. Your hand closes around a waterproof bag, wedged deep in the bark.")
+        print("\n")
+        type.type("Inside the bag:")
+        print("\n")
+        
+        cash = random.randint(100, 300)
+        type.type("• " + green("${:,}".format(cash)) + " in weathered bills")
+        print()
+        type.type("• A small survival tin with matches, wire, and a compass")
+        print()
+        type.type("• A note: " + quote("For whoever needs this next. Pass it on. — E."))
+        print("\n")
+        
+        self.change_balance(cash)
+        self.add_item("Hollow Tree Stash")
+        self.meet("Hollow Oak Found")
+        self.lose_danger("Hermit Hollow Oak")
+        self.restore_sanity(8)
+        
+        if self.has_met("Hermit Daughter Met"):
+            type.type("You think about Diana. Her father left this for strangers. ")
+            type.type("He spent his last years taking care of people he'd never meet.")
+            print("\n")
+            type.type("You sit at the base of the oak for a while. The world feels a little less cruel.")
+            self.restore_sanity(5)
+        else:
+            type.type("You sit at the base of the oak. The forest is quiet. The money helps. ")
+            type.type("But the note helps more.")
+        print("\n")
+
+    # ==========================================
+    # CHAIN 2: THE MIDNIGHT RADIO (5 events)
+    # Signal Booster → strange broadcast → 
+    # Strange Frequency Dial → Static Recorder →
+    # Pirate Radio Flyer → Tinfoil Hat
+    # ==========================================
+
+    def midnight_radio_signal(self):
+        """First event: picking up a strange broadcast"""
+        if not self.has_item("Signal Booster"):
+            self.day_event()
+            return
+        if self.has_met("Midnight Radio"):
+            self.day_event()
+            return
+        
+        type.type("As the sun goes down, you're fiddling with your car radio. The " + cyan(bright("Signal Booster")) + " you attached is pulling in stations from miles away.")
+        print("\n")
+        type.type("Classical music. Talk radio. Static. Static. More static.")
+        print("\n")
+        type.type("Then — something. Between stations. A voice, calm and measured:")
+        print("\n")
+        type.type(quote("...if you can hear this, you're closer than you think. Frequency 108.7. Midnight. Every night..."))
+        print("\n")
+        type.type("The signal cuts out. Just static again.")
+        print("\n")
+        type.type("You try to find it again. Gone. But you remember the number: " + yellow(bright("108.7")) + ".")
+        print("\n")
+        self.meet("Midnight Radio")
+        self.add_danger("Midnight Radio Frequency")
+        self.lose_sanity(2)
+        self.restore_sanity(4)  # Net positive — curiosity is exciting
+        print("\n")
+
+    def midnight_radio_frequency(self):
+        """Second event: tuning in at midnight"""
+        if not self.has_danger("Midnight Radio Frequency"):
+            self.day_event()
+            return
+        
+        type.type("Midnight. You tune to 108.7. Your hands are shaking slightly. Why are you nervous?")
+        print("\n")
+        type.type("Static. Static. Then...")
+        print("\n")
+        type.type("The voice returns. Clearer this time.")
+        print("\n")
+        type.type(quote("Welcome back, night owl. You found us again. That means you're listening."))
+        print("\n")
+        type.type(quote("This is Radio Nowhere. We broadcast for the ones who can't sleep. ") +
+                  quote("The ones living in their cars, their couches, their failures."))
+        print("\n")
+        type.type(quote("Tonight's topic: what do you hold onto when everything else is gone?"))
+        print("\n")
+        type.type("The broadcast continues for an hour. Stories from callers. Anonymous voices sharing their truths.")
+        print("\n")
+        type.type("At the end, the host says: " + quote("If you want to find us, check the telephone pole on 5th and Birch. We left you something."))
+        print("\n")
+        
+        type.type("A small " + cyan(bright("Strange Frequency Dial")) + " is taped to your antenna when you wake up.")
+        print("\n")
+        type.type("Someone was here. While you slept. They knew where you were.")
+        self.add_item("Strange Frequency Dial")
+        self.lose_danger("Midnight Radio Frequency")
+        self.add_danger("Midnight Radio Pole")
+        self.lose_sanity(3)
+        print("\n")
+
+    def midnight_radio_pole(self):
+        """Third event: checking the telephone pole"""
+        if not self.has_danger("Midnight Radio Pole"):
+            self.day_event()
+            return
+        
+        type.type("5th and Birch. You drive there in the afternoon. It's a normal intersection.")
+        print("\n")
+        type.type("Except for the telephone pole. It's covered in layers of old flyers, stapled over each other.")
+        print("\n")
+        type.type("You peel them back. Under decades of yard sale ads and lost cat posters, you find it:")
+        print("\n")
+        type.type("A " + cyan(bright("Pirate Radio Flyer")) + ". Hand-drawn. It shows a map to a building downtown.")
+        print("\n")
+        type.type(quote("Radio Nowhere. We see you. Come see us. Bring the dial."))
+        print("\n")
+        self.add_item("Pirate Radio Flyer")
+        self.lose_danger("Midnight Radio Pole")
+        self.add_danger("Midnight Radio Visit")
+        self.restore_sanity(2)
+        print("\n")
+
+    def midnight_radio_visit(self):
+        """Fourth event: visiting the pirate radio station"""
+        if not self.has_danger("Midnight Radio Visit"):
+            self.day_event()
+            return
+        if not self.has_item("Pirate Radio Flyer") or not self.has_item("Strange Frequency Dial"):
+            self.day_event()
+            return
+        
+        type.type("You follow the map on the " + cyan(bright("Pirate Radio Flyer")) + ". ")
+        type.type("It leads to a condemned building downtown. Boarded windows. Graffiti.")
+        print("\n")
+        type.type("There's a door in the back. You knock.")
+        print("\n")
+        type.type("A slot opens. Eyes peer out.")
+        print("\n")
+        type.type(quote("You got the dial?"))
+        print("\n")
+        type.type("You hold up the " + cyan(bright("Strange Frequency Dial")) + ". The slot closes. The door opens.")
+        print("\n")
+        type.type("Inside: a full pirate radio setup. Speakers, wires, a mixing board made of scrap parts. ")
+        type.type("Three people sit around a microphone. They look like you — tired, worn, but alive.")
+        print("\n")
+        type.type("The host — a woman with silver hair and kind eyes — stands and extends her hand.")
+        print("\n")
+        type.type(quote("I'm Vera. Welcome to Radio Nowhere. We've been hoping you'd come."))
+        print("\n")
+        type.type(quote("Everyone who listens long enough, finds us. That's how we know you're one of us."))
+        print("\n")
+        
+        type.type("They offer you something to eat. Real food. Hot coffee.")
+        print("\n")
+        type.type("For the first time in a long time, you feel like you belong somewhere.")
+        print("\n")
+        
+        type.type("Vera gives you a " + cyan(bright("Static Recorder")) + " — a small device for recording messages to broadcast.")
+        print("\n")
+        type.type(quote("Record something when you're ready. Your story. Your truth. Whenever you need to be heard."))
+        self.add_item("Static Recorder")
+        self.meet("Radio Nowhere Member")
+        self.lose_danger("Midnight Radio Visit")
+        self.add_danger("Midnight Radio Broadcast")
+        self.heal(10)
+        self.restore_sanity(15)
+        print("\n")
+
+    def midnight_radio_broadcast(self):
+        """Fifth event (finale): recording your own broadcast"""
+        if not self.has_danger("Midnight Radio Broadcast"):
+            self.day_event()
+            return
+        if not self.has_item("Static Recorder"):
+            self.day_event()
+            return
+        if self.has_met("Radio Broadcast Done"):
+            self.day_event()
+            return
+        
+        type.type("It's evening. You're sitting in the car. The " + cyan(bright("Static Recorder")) + " is in your hand.")
+        print("\n")
+        type.type("You've been staring at it for twenty minutes. The red record button glows in the dark.")
+        print("\n")
+        type.type("1. Record your story")
+        print()
+        type.type("2. Not ready yet (skip for now)")
+        print()
+        type.type("Choose: ")
+        choice = None
+        while choice is None:
+            try:
+                choice = int(input())
+            except ValueError:
+                type.type("Pick a number: ")
+        print()
+        
+        if choice == 2:
+            type.type("You put the recorder down. Not tonight. Maybe tomorrow.")
+            print("\n")
+            return  # Don't remove the danger — event can fire again
+        
+        type.type("You press record. The light turns solid red.")
+        print("\n")
+        type.type("And you talk.")
+        print("\n")
+        type.type("You talk about the car. The blackjack tables. The convenience store kid who knows your name. ")
+        type.type("The animal you adopted. The things you've lost. The things you've found.")
+        print("\n")
+        type.type("You talk about the nights when you couldn't sleep and the mornings when you couldn't wake up.")
+        print("\n")
+        chain_details = []
+        if self.has_met("Hermit Trail Found"):
+            chain_details.append("the map")
+        if self.has_met("Junkyard Artisan Met"):
+            chain_details.append("the junkyard")
+        if self.has_met("Missing Dogs Found"):
+            chain_details.append("the dogs")
+        if chain_details:
+            type.type("You talk about " + ", ".join(chain_details) + ". Things you've seen out here.")
+            print("\n")
+        type.type("When you stop, the recorder clicks off automatically. You're crying. When did that start?")
+        print("\n")
+        type.type("Later that night, you tune to 108.7. And you hear yourself.")
+        print("\n")
+        type.type("Your voice, out there in the dark, reaching whoever needs it. The next one. The next person in their car.")
+        print("\n")
+        
+        type.type("Vera's voice follows yours: " + quote("That was our newest member. You're not alone out there. Radio Nowhere. Signing off."))
+        print("\n")
+        
+        type.type("You also find a " + cyan(bright("Tinfoil Hat")) + " in your glove compartment with a note from Vera: ")
+        type.type(quote("For the bad signal days. — V"))
+        self.add_item("Tinfoil Hat")
+        self.meet("Radio Broadcast Done")
+        self.lose_danger("Midnight Radio Broadcast")
+        self.restore_sanity(20)
+        print("\n")
+
+    # ==========================================
+    # CHAIN 3: THE JUNKYARD ARTISAN (5 events)
+    # Welding Goggles → meet artisan → learn craft →
+    # Scrap Metal Rose → Artisan's Toolkit → Junkyard Crown
+    # ==========================================
+
+    def junkyard_artisan_meet(self):
+        """First event: discovering the artisan at the junkyard"""
+        if not self.has_item("Welding Goggles"):
+            self.day_event()
+            return
+        if self.has_met("Junkyard Artisan Met"):
+            self.day_event()
+            return
+        
+        type.type("You're poking around the junkyard behind the shopping plaza, looking for useful scraps.")
+        print("\n")
+        type.type("That's when you hear it — a rhythmic clanging. Metal on metal. Someone's working back here.")
+        print("\n")
+        type.type("You follow the sound to a corner of the yard where an old man is bent over a workbench. ")
+        type.type("He's welding something. Sparks fly like fireflies.")
+        print("\n")
+        type.type("He doesn't look up. " + quote("You gonna stand there or you gonna make yourself useful?"))
+        print("\n")
+        type.type("He glances at your " + cyan(bright("Welding Goggles")) + ". His eyebrows go up.")
+        print("\n")
+        type.type(quote("Well, well. You came prepared. That's more than most. Name's Gideon."))
+        print("\n")
+        type.type("He shows you what he's making: a bird made entirely of bent nails and bottle caps. It's beautiful.")
+        print("\n")
+        type.type(quote("Junk becomes art if you care enough. Most people don't. Do you?"))
+        print("\n")
+        type.type("1. " + quote("Teach me."))
+        print()
+        type.type("2. " + quote("I'm just looking for scrap."))
+        print()
+        type.type("Choose: ")
+        choice = None
+        while choice is None:
+            try:
+                choice = int(input())
+            except ValueError:
+                type.type("Pick a number: ")
+        print()
+        
+        if choice == 1:
+            type.type("Gideon smiles. It transforms his whole face.")
+            print("\n")
+            type.type(quote("Good answer. Come back when you're ready to learn. Bring something to work with."))
+            self.meet("Junkyard Artisan Met")
+            self.add_danger("Junkyard Lesson One")
+            self.restore_sanity(5)
+        else:
+            type.type(quote("Fair enough. But the offer stands. I'm here every day."))
+            self.meet("Junkyard Artisan Met")
+            self.add_danger("Junkyard Lesson One")
+        print("\n")
+
+    def junkyard_lesson_one(self):
+        """Second event: first lesson — making a scrap metal rose"""
+        if not self.has_danger("Junkyard Lesson One"):
+            self.day_event()
+            return
+        
+        type.type("You find Gideon at his workbench, sanding a piece of copper pipe. He nods when he sees you.")
+        print("\n")
+        type.type(quote("Today's lesson: beauty from nothing. We're making a rose."))
+        print("\n")
+        type.type("He hands you a hammer, tin snips, and a piece of sheet metal. ")
+        type.type("For the next two hours, he guides you through cutting petals, curving them, layering them.")
+        print("\n")
+        type.type("Your hands hurt. Your fingers get nicked. But slowly, impossibly, a rose takes shape.")
+        print("\n")
+        type.type("It's rough. Imperfect. But it's yours.")
+        print("\n")
+        type.type("You made a " + cyan(bright("Scrap Metal Rose")) + ".")
+        self.add_item("Scrap Metal Rose")
+        self.lose_danger("Junkyard Lesson One")
+        self.add_danger("Junkyard Lesson Two")
+        self.restore_sanity(8)
+        print("\n")
+        
+        type.type("Gideon looks at it critically. Then nods.")
+        print("\n")
+        type.type(quote("Not bad. Not good either. But not bad. Come back. We'll make you better."))
+        print("\n")
+
+    def junkyard_lesson_two(self):
+        """Third event: second lesson — real craftsmanship, earns Artisan's Toolkit"""
+        if not self.has_danger("Junkyard Lesson Two"):
+            self.day_event()
+            return
+        
+        type.type("Gideon has a new project today. He's building a lamp from old car parts.")
+        print("\n")
+        type.type(quote("You made a flower last time. Today, we make something functional. ") +
+                  quote("Art that works. That's the goal."))
+        print("\n")
+        type.type("He teaches you about joints, rivets, load-bearing connections. ")
+        type.type("How to read metal — which pieces flex, which shatter, which hold.")
+        print("\n")
+        type.type("By the end, you haven't just made a lamp. You've learned a philosophy.")
+        print("\n")
+        type.type(quote("Things break. People break. But breaking isn't ending. ") +
+                  quote("It's just... disassembly before reassembly."))
+        print("\n")
+        type.type("Gideon pulls out a leather roll of tools — hammers, files, pliers, a small welding torch.")
+        print("\n")
+        type.type(quote("These were mine when I was learning. Now they're yours."))
+        print("\n")
+        type.type("You got the " + cyan(bright("Artisan's Toolkit")) + ".")
+        self.add_item("Artisan's Toolkit")
+        self.lose_danger("Junkyard Lesson Two")
+        self.add_danger("Junkyard Gideon Story")
+        self.restore_sanity(10)
+        self.heal(3)
+        print("\n")
+
+    def junkyard_gideon_story(self):
+        """Fourth event: Gideon's backstory and a deeper connection"""
+        if not self.has_danger("Junkyard Gideon Story"):
+            self.day_event()
+            return
+        
+        type.type("When you arrive at the junkyard, Gideon isn't working. He's sitting in a lawn chair, staring at the sky.")
+        print("\n")
+        type.type("He doesn't greet you. Just says:")
+        print("\n")
+        type.type(quote("Sit down. I want to tell you something."))
+        print("\n")
+        type.type("You sit. He talks.")
+        print("\n")
+        type.type(quote("I had a shop once. Twenty employees. Custom metalwork. Rich people paid me thousands ") +
+                  quote("for gates, railings, sculptures."))
+        print("\n")
+        type.type(quote("Then my wife got sick. Then my business got sued. Then I got evicted. ") +
+                  quote("Lost everything in eighteen months."))
+        print("\n")
+        type.type(quote("I lived in a van for three years. Right here in this junkyard. The owner let me stay ") +
+                  quote("if I kept the scrap organized."))
+        print("\n")
+        type.type(quote("I started making things again because I had to do SOMETHING or my brain would eat itself alive."))
+        print("\n")
+        type.type("He looks at you.")
+        print("\n")
+        type.type(quote("Sound familiar?"))
+        print("\n")
+        type.type("You nod. It sounds very familiar.")
+        print("\n")
+        type.type(quote("You're gonna be okay. You know how I know? Because you're still showing up. ") +
+                  quote("That's the whole secret. Just keep showing up."))
+        print("\n")
+        self.lose_danger("Junkyard Gideon Story")
+        self.add_danger("Junkyard Masterpiece")
+        self.restore_sanity(15)
+        print("\n")
+
+    def junkyard_masterpiece(self):
+        """Fifth event (finale): creating a masterpiece together"""
+        if not self.has_danger("Junkyard Masterpiece"):
+            self.day_event()
+            return
+        if self.has_met("Junkyard Crown Made"):
+            self.day_event()
+            return
+        
+        type.type("Gideon greets you with something you've never seen from him: excitement.")
+        print("\n")
+        type.type(quote("I've been saving the good scrap. The chrome bumper pieces. The copper wire. ") +
+                  quote("The brass fittings from that old boat engine."))
+        print("\n")
+        type.type(quote("Today, we make a masterpiece. Together."))
+        print("\n")
+        type.type("You work side by side for four hours. Cutting, bending, welding, polishing.")
+        print("\n")
+        type.type("What emerges is extraordinary: a crown. Made of twisted metal, gears, springs, and wire. ")
+        type.type("It catches the light like jewelry. It weighs almost nothing.")
+        print("\n")
+        type.type("Gideon places it on your head.")
+        print("\n")
+        type.type(quote("Every king started as a pauper. You're not where you were. Remember that."))
+        print("\n")
+        type.type("You got the " + cyan(bright("Junkyard Crown")) + ".")
+        self.add_item("Junkyard Crown")
+        self.meet("Junkyard Crown Made")
+        self.lose_danger("Junkyard Masterpiece")
+        self.restore_sanity(20)
+        self.heal(5)
+        print("\n")
+        
+        if self.has_item("Scrap Metal Rose"):
+            type.type("Gideon looks at the " + cyan(bright("Scrap Metal Rose")) + " you still carry.")
+            print("\n")
+            type.type(quote("You kept that? From your first lesson?"))
+            print("\n")
+            type.type("You nod.")
+            print("\n")
+            type.type("He looks away. You pretend not to see him wipe his eyes.")
+            self.restore_sanity(5)
+            print("\n")
+
+    # ==========================================
+    # CHAIN 4: THE LOST DOG FLYERS (5 events)
+    # Dog Whistle → Stack of Flyers → find first dog →
+    # find second dog → Torn Collar mystery →
+    # Reunion Photo
+    # ==========================================
+
+    def lost_dog_flyers_found(self):
+        """First event: finding lost dog flyers everywhere"""
+        if self.has_met("Lost Dog Flyers"):
+            self.day_event()
+            return
+        
+        type.type("They're everywhere. Taped to lampposts, pinned to bulletin boards, shoved under windshield wipers.")
+        print("\n")
+        type.type("Lost dog flyers. Five different dogs. All missing from the same neighborhood.")
+        print("\n")
+        type.type("Each flyer has a phone number. Each number is the same: a local shelter.")
+        print("\n")
+        type.type("You grab a " + cyan(bright("Stack of Flyers")) + ". Something about this doesn't feel right. ")
+        type.type("Five dogs from one block? That's not coincidence. That's a pattern.")
+        self.add_item("Stack of Flyers")
+        self.meet("Lost Dog Flyers")
+        self.add_danger("Lost Dog Investigation")
+        print("\n")
+
+    def lost_dog_investigation(self):
+        """Second event: investigating the disappearances"""
+        if not self.has_danger("Lost Dog Investigation"):
+            self.day_event()
+            return
+        
+        type.type("You drive to the neighborhood from the flyers. Nice street. Manicured lawns. Quiet.")
+        print("\n")
+        type.type("Too quiet, actually. No barking. No dogs at all.")
+        print("\n")
+        type.type("You knock on a door. A worried-looking woman answers.")
+        print("\n")
+        type.type(quote("Are you from the shelter? Did you find Biscuit?"))
+        print("\n")
+        type.type("You show her the flyers. She tears up immediately.")
+        print("\n")
+        type.type(quote("Biscuit disappeared Tuesday. Mrs. Huang's poodle was gone Monday. The Petersons' lab — Wednesday. ") +
+                  quote("Something is taking them. At night."))
+        print("\n")
+        
+        if self.has_item("Dog Whistle"):
+            type.type("You mention your " + cyan(bright("Dog Whistle")) + ". Her eyes light up.")
+            print("\n")
+            type.type(quote("Try the park behind the community center. If they're nearby, maybe they'll hear it. ") +
+                      quote("Dogs can hear that thing from blocks away."))
+            self.add_danger("Lost Dog Whistle Search")
+        else:
+            type.type("She gives you a description of each dog. You promise to keep an eye out.")
+            self.add_danger("Lost Dog Whistle Search")
+        
+        self.lose_danger("Lost Dog Investigation")
+        print("\n")
+
+    def lost_dog_whistle_search(self):
+        """Third event: searching for the dogs"""
+        if not self.has_danger("Lost Dog Whistle Search"):
+            self.day_event()
+            return
+        
+        type.type("The park behind the community center. It's dusk. The grass is wet.")
+        print("\n")
+        
+        if self.has_item("Dog Whistle"):
+            type.type("You blow the " + cyan(bright("Dog Whistle")) + ". ")
+            type.type("The sound is silent to you, but you feel the vibration in your teeth.")
+            print("\n")
+            type.type("Thirty seconds pass. Nothing.")
+            print("\n")
+            type.type("Then — barking. Distant, muffled, but unmistakable. Coming from under the old utility shed.")
+            print("\n")
+            type.type("You pull open the shed door. Inside, huddled together in the dark: three dogs. ")
+            type.type("A poodle, a chocolate lab, and a small beagle. Skinny, scared, but alive.")
+            print("\n")
+            type.type("They've been trapped in here. The door locks from the outside.")
+            print("\n")
+            type.type("This wasn't an accident. Someone locked them in.")
+            print("\n")
+            type.type("On the ground near the dogs, you find a " + cyan(bright("Torn Collar")) + " — ")
+            type.type("ripped off violently. The tag reads " + yellow("BISCUIT") + ".")
+            self.add_item("Torn Collar")
+            self.meet("Dogs Rescued")
+            self.restore_sanity(10)
+        else:
+            type.type("You search the park for an hour. Calling. Looking. Nothing.")
+            print("\n")
+            type.type("As you're about to leave, you hear whimpering from the utility shed. The door is jammed.")
+            print("\n")
+            if self.has_item("Pocket Knife") or self.has_item("Tool Kit"):
+                tool = "Pocket Knife" if self.has_item("Pocket Knife") else "Tool Kit"
+                type.type("You use your " + item(tool) + " to pry the latch. Inside: three dogs, scared but alive.")
+                self.meet("Dogs Rescued")
+                self.restore_sanity(8)
+            else:
+                type.type("You can't get it open. You call the number on the flyer and leave a message about the shed.")
+                type.type(" Hopefully someone gets there in time.")
+                self.lose_sanity(3)
+        
+        self.lose_danger("Lost Dog Whistle Search")
+        self.add_danger("Lost Dog Culprit")
+        print("\n")
+
+    def lost_dog_culprit(self):
+        """Fourth event: discovering who was taking the dogs"""
+        if not self.has_danger("Lost Dog Culprit"):
+            self.day_event()
+            return
+        
+        if self.has_met("Dogs Rescued"):
+            type.type("The neighborhood is buzzing. Three of the five dogs are back home safe. Two are still missing.")
+            print("\n")
+            type.type("But now people are talking. And they're angry.")
+            print("\n")
+            type.type("You drive past the park and see a crowd gathered around the utility shed. Police are there.")
+            print("\n")
+            type.type("A teenager in a hoodie is sitting on the curb, handcuffed. He looks terrified.")
+            print("\n")
+            type.type("One of the officers approaches you.")
+            print("\n")
+            type.type(quote("You the one who found the dogs? We got a tip from the shelter."))
+            print("\n")
+            type.type("The kid wasn't trying to hurt them. He was hoarding them. Taking them home, one by one, ")
+            type.type("because his parents wouldn't let him have a pet. Keeping them in the shed with food and water.")
+            print("\n")
+            type.type("Stupid. Dangerous. But not malicious. Just a lonely kid who wanted someone to love him back.")
+            print("\n")
+            
+            if self.has_item("Torn Collar"):
+                type.type("You hand the officer the " + cyan(bright("Torn Collar")) + ". " + quote("This belongs to Biscuit."))
+                print("\n")
+                type.type(quote("We'll get it back to the family. Thank you."))
+                print("\n")
+                self.use_item("Torn Collar")
+        else:
+            type.type("You hear through the neighborhood grapevine: the dogs were found. A teenager had them.")
+            print("\n")
+            type.type("A lonely kid hoarding pets because his parents wouldn't let him have one. ")
+            type.type("The dogs are safe. The kid is in trouble. The story is sadder than you expected.")
+        
+        self.lose_danger("Lost Dog Culprit")
+        self.add_danger("Lost Dog Reunion")
+        self.restore_sanity(3)
+        print("\n")
+
+    def lost_dog_reunion(self):
+        """Fifth event (finale): the neighborhood reunion"""
+        if not self.has_danger("Lost Dog Reunion"):
+            self.day_event()
+            return
+        if self.has_met("Missing Dogs Found"):
+            self.day_event()
+            return
+        
+        type.type("You get a call. Somehow, the shelter got your number from the flyers. ")
+        type.type("All five dogs are home safe. The neighborhood wants to say thank you.")
+        print("\n")
+        type.type("You drive back to the block. And you can't believe what you see.")
+        print("\n")
+        type.type("They set up a party. A " + yellow(bright("block party")) + ". For YOU.")
+        print("\n")
+        type.type("Dogs running everywhere. Kids with balloons. Biscuit the beagle runs straight to you ")
+        type.type("and nearly knocks you over with love.")
+        print("\n")
+        
+        if self.has_met("Dogs Rescued"):
+            type.type("Mrs. Huang presses a plate of homemade dumplings into your hands. ")
+            type.type("The Petersons give you a blanket — a real one, thick and warm. ")
+            type.type("Someone hands you " + green("${:,}".format(150)) + " in a card that says 'THANK YOU, DOG HERO.'")
+            self.change_balance(150)
+            self.add_item("Blanket") if not self.has_item("Blanket") else None
+            self.heal(15)
+        else:
+            type.type("They thank you for caring. For trying. For making those calls. ")
+            type.type("Someone hands you " + green("$50") + " and a plate of food.")
+            self.change_balance(50)
+            self.heal(10)
+        
+        print("\n")
+        type.type("As you're leaving, Biscuit's owner runs up to you with a camera.")
+        print("\n")
+        type.type(quote("One picture! Please! For the community board!"))
+        print("\n")
+        type.type("You pose with five dogs piled around you. Everyone's smiling. Even you.")
+        print("\n")
+        type.type("She gives you a copy: the " + cyan(bright("Reunion Photo")) + ". ")
+        type.type("You tuck it into your visor. Best picture you've ever been in.")
+        self.add_item("Reunion Photo")
+        self.meet("Missing Dogs Found")
+        self.lose_danger("Lost Dog Reunion")
+        self.restore_sanity(20)
+        print("\n")
+
+    # ==========================================
+    # INTERCONNECTED BONUS EVENTS
+    # Events that fire when you have items/flags
+    # from MULTIPLE chains
+    # ==========================================
+
+    def crossover_radio_hermit(self):
+        """If you've done both the Radio and Hermit chains"""
+        if not self.has_met("Radio Broadcast Done") or not self.has_met("Hermit Trail Found"):
+            self.day_event()
+            return
+        if self.has_met("Radio Hermit Crossover"):
+            self.day_event()
+            return
+        
+        type.type("You tune to 108.7. Vera is interviewing someone.")
+        print("\n")
+        type.type(quote("...and my father, Edgar, lived in the woods for years. A listener found his camp, his journal. ") +
+                  quote("They even found a stash he left behind. For strangers. That was my dad."))
+        print("\n")
+        type.type("It's Diana. Ranger Diana. On Radio Nowhere.")
+        print("\n")
+        type.type("Vera asks: " + quote("What would you say to the person who found it?"))
+        print("\n")
+        type.type("Diana pauses. Then: " + quote("Thank you. For not just walking past it. For caring about a dead man's story."))
+        print("\n")
+        type.type("You're sitting in the dark, in your car, listening to someone talk about you on the radio. ")
+        type.type("They don't know you're listening. But you are. And it matters.")
+        self.meet("Radio Hermit Crossover")
+        self.restore_sanity(10)
+        print("\n")
+
+    def crossover_artisan_rose_gift(self):
+        """If you have the Scrap Metal Rose and meet someone from another chain"""
+        if not self.has_item("Scrap Metal Rose"):
+            self.day_event()
+            return
+        if not self.has_met("Radio Nowhere Member") and not self.has_met("Missing Dogs Found"):
+            self.day_event()
+            return
+        if self.has_met("Rose Gift Given"):
+            self.day_event()
+            return
+        
+        if self.has_met("Radio Nowhere Member"):
+            type.type("You're at Radio Nowhere. Vera is having a rough night.")
+            print("\n")
+            type.type(quote("Some nights I wonder if anyone's actually listening. If this matters."))
+            print("\n")
+            type.type("You pull the " + cyan(bright("Scrap Metal Rose")) + " from your pocket. You set it on the mixing board.")
+            print("\n")
+            type.type("Vera picks it up. Turns it over. Traces the petals.")
+            print("\n")
+            type.type(quote("You made this?"))
+            print("\n")
+            type.type("You nod. " + quote("Someone taught me that junk can become art. If you care enough."))
+            print("\n")
+            type.type("She puts it next to the microphone. It stays there permanently.")
+        else:
+            type.type("You drive past the neighborhood where you found the dogs. ")
+            type.type("Biscuit's owner is sitting on her porch, looking tired.")
+            print("\n")
+            type.type("You hand her the " + cyan(bright("Scrap Metal Rose")) + ".")
+            print("\n")
+            type.type(quote("What's this for?"))
+            print("\n")
+            type.type(quote("For being part of the good part of this story."))
+            print("\n")
+            type.type("She smiles. First real smile you've seen from her.")
+        
+        self.use_item("Scrap Metal Rose")
+        self.meet("Rose Gift Given")
+        self.restore_sanity(12)
+        print("\n")
+
+    def crossover_night_vision_bonus(self):
+        """Night Vision Scope helps in other situations"""
+        if not self.has_item("Night Vision Scope"):
+            self.day_event()
+            return
+        if self.has_met("Night Vision Bonus Used"):
+            self.day_event()
+            return
+        
+        type.type("Something is moving near your car in the pitch black. Again.")
+        print("\n")
+        type.type("But this time you have the " + cyan(bright("Night Vision Scope")) + " from Edgar's daughter.")
+        print("\n")
+        type.type("You press it to your eye. The world turns green and sharp.")
+        print("\n")
+        
+        sight = random.randrange(4)
+        if sight == 0:
+            type.type("It's a deer. A beautiful doe, picking through the garbage cans delicately. ")
+            type.type("She looks up, right at you, then goes back to eating. Not afraid. Just... existing.")
+            self.restore_sanity(5)
+        elif sight == 1:
+            type.type("A person. Casing cars. Trying door handles one by one.")
+            print("\n")
+            type.type("They try yours. Locked. They move on. You got the plate number.")
+            self.restore_sanity(3)
+        elif sight == 2:
+            type.type("Raccoons. An army of them. Having what can only be described as a board meeting around a dumpster.")
+            print("\n")
+            type.type("You watch them for twenty minutes. It's the best TV you've seen in months.")
+            self.restore_sanity(4)
+        else:
+            type.type("Nothing. Nothing at all. But now you KNOW it's nothing. ")
+            type.type("And knowing is the difference between fear and peace.")
+            self.restore_sanity(3)
+        
+        self.meet("Night Vision Bonus Used")
+        print("\n")
+
+    def crossover_all_chains_complete(self):
+        """Special event if you've completed all 4 chains"""
+        if not self.has_met("Hollow Oak Found"):
+            self.day_event()
+            return
+        if not self.has_met("Radio Broadcast Done"):
+            self.day_event()
+            return
+        if not self.has_met("Junkyard Crown Made"):
+            self.day_event()
+            return
+        if not self.has_met("Missing Dogs Found"):
+            self.day_event()
+            return
+        if self.has_met("All Chains Complete"):
+            self.day_event()
+            return
+        
+        type.type("You're sitting on the hood of your car at sunset. Taking stock.")
+        print("\n")
+        type.type("The " + cyan(bright("Junkyard Crown")) + " sits on the dashboard.") if self.has_item("Junkyard Crown") else None
+        type.type(" The " + cyan(bright("Reunion Photo")) + " is tucked in the visor.") if self.has_item("Reunion Photo") else None
+        type.type(" Radio Nowhere plays softly from the speakers.")
+        print("\n")
+        type.type("You think about the hermit who left a stash for strangers. ")
+        type.type("About Gideon, who taught you that breaking isn't ending. ")
+        type.type("About Vera, who gave you a voice. ")
+        type.type("About five dogs and one lonely kid.")
+        print("\n")
+        type.type("You came to this town with nothing. Living in your car. Playing blackjack to survive.")
+        print("\n")
+        type.type("You still live in your car. You still play blackjack.")
+        print("\n")
+        type.type("But you're not nothing anymore. You're the person who shows up. ")
+        type.type("The person who follows the map, answers the radio, picks up the tools, and finds the dogs.")
+        print("\n")
+        type.type(yellow(bright("You are somebody. You always were.")))
+        print("\n")
+        
+        reward = random.randint(200, 500)
+        type.type("A " + green("${:,}".format(reward)) + " tip shows up from a stranger at the casino who heard your broadcast.")
+        self.change_balance(reward)
+        self.meet("All Chains Complete")
+        self.restore_sanity(25)
+        self.heal(10)
+        print("\n")
+
+    # ==========================================
+    # RECURRING CHAIN ITEM EVENTS
+    # Passive bonuses from chain items
+    # ==========================================
+
+    def herbal_pouch_remedy(self):
+        """Herbal Pouch provides healing during illness"""
+        if not self.has_item("Herbal Pouch"):
+            self.day_event()
+            return
+        
+        type.type("You're feeling off today. Headache. Nausea. The usual.")
+        print("\n")
+        type.type("You open the " + cyan(bright("Herbal Pouch")) + " and brew a quick tea from the dried herbs.")
+        print("\n")
+        teas = [
+            "Chamomile tea. The steam rises and you breathe it in. The headache fades like fog in sunlight.",
+            "Willow bark tea. Bitter as regret, but effective. The pain recedes within minutes.",
+            "Mint and plantain leaf tea. It tastes like a garden and settles your stomach immediately.",
+            "A blend of everything in the pouch. You have no idea what it is. But it works. That's enough.",
+        ]
+        type.type(random.choice(teas))
+        self.heal(random.choice([8, 10, 12]))
+        self.restore_sanity(2)
+        print("\n")
+
+    def walking_stick_hike(self):
+        """Carved Walking Stick makes exploration events better"""
+        if not self.has_item("Carved Walking Stick"):
+            self.day_event()
+            return
+        
+        type.type("You take a walk with the " + cyan(bright("Carved Walking Stick")) + ". ")
+        type.type("Your pace is steady. Your grip is sure. The notches press against your palm.")
+        print("\n")
+        
+        hike_events = [
+            ("You climb a hill you'd never have attempted without the stick. At the top: a view of the whole valley. Worth every step.",
+             5, 0),
+            ("A loose trail gives way under your foot. The stick catches you, jams into the dirt, holds you upright. " +
+             "Without it, you'd have twisted an ankle.",
+             3, 5),
+            ("You use the stick to ford a shallow creek. On the other side: blackberry bushes, heavy with fruit. Free food.",
+             4, 8),
+            ("An aggressive stray dog blocks the trail. You plant the stick and stand tall. The dog backs off. " +
+             "Confidence is a weapon.",
+             4, 0),
+            ("You walk for two hours. No destination. Just walking. The stick marks a rhythm. Step, tap, step, tap. " +
+             "Meditation with your legs.",
+             6, 0),
+        ]
+        
+        event = random.choice(hike_events)
+        type.type(event[0])
+        self.restore_sanity(event[1])
+        if event[2] > 0:
+            self.heal(event[2])
+        print("\n")
+
+    def tinfoil_hat_event(self):
+        """Tinfoil Hat from Radio Nowhere — weird protection"""
+        if not self.has_item("Tinfoil Hat"):
+            self.day_event()
+            return
+        
+        type.type("You put on the " + cyan(bright("Tinfoil Hat")) + ". Just for a minute. Nobody's watching.")
+        print("\n")
+        
+        hat_events = [
+            "Immediately, the intrusive thoughts stop. Complete silence. Either the hat works or the placebo effect is incredible. Either way: peace.",
+            "A conspiracy theorist on the street corner sees you and gives you a solemn nod. " +
+            quote("One of us.") + " You nod back. You've never felt more accepted.",
+            "You wear it while tuning the radio. Station 108.7 comes in crystal clear. " +
+            "Vera's voice: " + quote("Tinfoil crew, checking in.") + " You laugh. First real laugh in days.",
+            "A kid sees you and yells: " + quote("COOL HAT!") + " You give them a thumbs up. They give you one back. " +
+            "Adulthood could learn something from kids.",
+            "You catch your reflection in the car window. Tinfoil hat. Wrinkled clothes. Five-day stubble. " +
+            "And the biggest smile you've worn in weeks. You look ridiculous. You look happy.",
+        ]
+        type.type(random.choice(hat_events))
+        self.restore_sanity(random.choice([3, 4, 5]))
+        print("\n")
+
+    def junkyard_crown_moment(self):
+        """Junkyard Crown provides dignity moments"""
+        if not self.has_item("Junkyard Crown"):
+            self.day_event()
+            return
+        
+        type.type("The " + cyan(bright("Junkyard Crown")) + " sits on your dashboard, catching the morning light.")
+        print("\n")
+        
+        crown_events = [
+            "A kid at the gas station sees it and gasps. " + quote("ARE YOU A KING?") +
+            " You pause. " + quote("Some days.") + " The kid nods like that's the most reasonable answer in the world.",
+            "You put it on before walking into the casino. The pit boss gives you a look. " +
+            "The dealer gives you a grin. " + quote("Nice crown.") + " You tip your head regally.",
+            "Gideon would be proud. You've kept it polished. The gears and springs gleam. " +
+            "Every piece of junk in it used to be something else. Just like you.",
+            "You hold it in your hands. Feel the weight of it. The brass fittings from a boat. " +
+            "The copper wire from a lamp. The springs from a watch. Time. Water. Light. " +
+            "All compressed into something that fits on your head.",
+        ]
+        type.type(random.choice(crown_events))
+        self.restore_sanity(random.choice([3, 4, 5]))
+        print("\n")
+
+    def reunion_photo_comfort(self):
+        """Reunion Photo provides comfort during tough times"""
+        if not self.has_item("Reunion Photo"):
+            self.day_event()
+            return
+        
+        type.type("You flip down the visor and the " + cyan(bright("Reunion Photo")) + " falls into your lap.")
+        print("\n")
+        
+        photo_events = [
+            "Five dogs. One you. Everyone smiling. You remember that day — the block party, the dumplings, " +
+            "the blanket. People who didn't have to be kind, choosing to be kind anyway.",
+            "Biscuit's little beagle face stares up at you from the photo. That dog loved everyone. " +
+            "Even the kid who took them. Maybe especially the kid who took them.",
+            "You look at your own face in the photo. Who IS that person? They look... happy. " +
+            "You didn't know you could still look like that.",
+            "The photo is getting worn at the edges from being handled so much. " +
+            "That's okay. That's what photos are for.",
+        ]
+        type.type(random.choice(photo_events))
+        self.restore_sanity(random.choice([3, 4]))
+        print("\n")
+
+    def scrap_armor_event(self):
+        """If you have Artisan's Toolkit you can make Scrap Armor at the junkyard"""
+        if not self.has_item("Artisan's Toolkit"):
+            self.day_event()
+            return
+        if self.has_item("Scrap Armor"):
+            self.day_event()
+            return
+        if self.has_met("Scrap Armor Made"):
+            self.day_event()
+            return
+        
+        type.type("You're at the junkyard with the " + cyan(bright("Artisan's Toolkit")) + ". Gideon isn't here today.")
+        print("\n")
+        type.type("But you know what you're doing now. You eye the scrap pile. Car panels. Steel mesh. Rivets.")
+        print("\n")
+        type.type("An idea forms. It's stupid. It's brilliant. It's both.")
+        print("\n")
+        type.type("You spend three hours cutting, bending, and riveting. When you're done, you're holding ")
+        type.type("a crude but functional vest made of layered metal strips and mesh.")
+        print("\n")
+        type.type("It won't stop a bullet. But it'll absorb a punch, deflect a dog bite, keep you warmer than your jacket.")
+        print("\n")
+        type.type("You made " + cyan(bright("Scrap Armor")) + ". Gideon would be proud.")
+        self.add_item("Scrap Armor")
+        self.meet("Scrap Armor Made")
+        self.restore_sanity(5)
+        print("\n")
+
+
+    # ============================================
+    # CAR TROUBLE EVENTS (integrated from car_events.py)
+    # Vehicle breakdowns, repairs, and consequences
+    # ============================================
+
+
+    def contract_cold(self):
+        type.type("It started with a tickle in your throat. Then the sniffles. Then the coughing.")
+        print("\n")
+        type.type("Your nose is running like a faucet. Your head feels stuffed with cotton.")
+        print("\n")
+        type.type("Just a common " + red("cold") + ". Nothing serious, but you feel miserable.")
+        self.add_status("Cold")
+        self.damage(5)
+        self.start_night()
+
+    def contract_flu(self):
+        type.type("It hits you like a truck. One moment you're fine, the next you can barely move.")
+        print("\n")
+        type.type("Fever. Chills. Body aches so severe you can't get comfortable in any position.")
+        print("\n")
+        type.type("Your throat is raw. Your cough is painful. This is the " + red("flu") + " - the real deal.")
+        self.add_status("Flu")
+        self.damage(12)
+        self.lose_sanity(1)
+        self.start_night()
+
+    # ==========================================
+    # CAR TROUBLE AFTERNOON EVENTS
+    # These can waste days and require items to fix
+    # ==========================================
+
+    # === BATTERY ISSUES ===
+    def dead_battery_afternoon(self):
+        type.type("You try to start your car to head somewhere. Click. Click. Click. Nothing.")
+        print("\n")
+        type.type("The battery is dead. Completely dead.")
+        print("\n")
+        if self.has_item("Jumper Cables"):
+            type.type("But wait - you have " + magenta(bright("Jumper Cables")) + "!")
+            print("\n")
+            type.type("You flag down a passing driver who agrees to give you a jump.")
+            type.type(" After a few minutes, your engine roars back to life.")
+            print("\n")
+            type.type("Crisis averted. But you should probably get that battery looked at.")
+            self.restore_sanity(3)
+        elif self.has_item("Portable Battery Charger"):
+            type.type("Luckily, you have a " + magenta(bright("Portable Battery Charger")) + "!")
+            print("\n")
+            type.type("You hook it up and wait. After twenty minutes, your car starts.")
+            print("\n")
+            type.type("Thank God for preparation.")
+            self.restore_sanity(5)
+        else:
+            type.type("You have no way to jump it. You're stuck.")
+            print("\n")
+            type.type("You spend the entire afternoon trying to flag someone down for help.")
+            print("\n")
+            type.type("By the time someone finally helps, " + yellow("the sun is setting") + ".")
+            print("\n")
+            type.type("You've wasted the whole day.")
+            self.add_travel_restriction("Wasted Afternoon")
+            self.lose_sanity(8)
+        print("\n")
+
+    def corroded_battery_terminals(self):
+        type.type("Your car starts sluggishly. The engine sounds weak, struggling.")
+        print("\n")
+        type.type("You pop the hood and see the problem - the battery terminals are covered in white-green corrosion.")
+        print("\n")
+        if self.has_item("Battery Terminal Cleaner") or self.has_item("Baking Soda"):
+            item = "Battery Terminal Cleaner" if self.has_item("Battery Terminal Cleaner") else "Baking Soda"
+            type.type("Good thing you have " + magenta(bright(item)) + ".")
+            print("\n")
+            type.type("You clean off the corrosion and the car starts perfectly.")
+            print("\n")
+            type.type("Preventive maintenance pays off.")
+            if item == "Baking Soda":
+                self.use_item("Baking Soda")
+        else:
+            type.type("You try scraping it off with a rock, but it's caked on thick.")
+            print("\n")
+            type.type("The car barely runs. You limp to a mechanic who charges you " + red("$75") + " for a five-minute fix.")
+            self.change_balance(-75)
+            type.type("Afternoon wasted.")
+            self.add_travel_restriction("Wasted Afternoon")
+        print("\n")
+
+    def battery_acid_leak(self):
+        type.type("There's a strange smell coming from under your hood. Acidic. Burning.")
+        print("\n")
+        type.type("You open it up and see battery acid dripping. The battery casing is cracked.")
+        print("\n")
+        type.type("This is dangerous. The acid could damage your engine components.")
+        print("\n")
+        if self.get_balance() >= 150:
+            type.type("You rush to an auto shop. New battery: " + red("$150") + ".")
+            print("\n")
+            type.type("Expensive, but necessary. Your afternoon is gone.")
+            self.change_balance(-150)
+            self.add_travel_restriction("Wasted Afternoon")
+        else:
+            type.type("You can't afford a new battery. You try to contain the leak with duct tape.")
+            print("\n")
+            type.type("It's a temporary fix at best. And dangerous.")
+            self.add_danger("Leaking Battery")
+            self.lose_sanity(10)
+        print("\n")
+
+    # === ENGINE PROBLEMS ===
+    def engine_overheating(self):
+        type.type("Steam billows from under your hood. Your temperature gauge is in the red.")
+        print("\n")
+        type.type("The engine is overheating. You pull over immediately.")
+        print("\n")
+        if self.has_item("Coolant") or self.has_item("Antifreeze"):
+            item = "Coolant" if self.has_item("Coolant") else "Antifreeze"
+            type.type("You have " + magenta(bright(item)) + ". Smart.")
+            print("\n")
+            type.type("You wait for the engine to cool, add the fluid, and you're back on the road.")
+            print("\n")
+            type.type("Lost an hour, but could have been much worse.")
+            self.use_item(item)
+        elif self.has_item("Water Bottles"):
+            type.type("You pour your " + magenta(bright("Water Bottles")) + " into the radiator as an emergency fix.")
+            print("\n")
+            type.type("It's not ideal, but it'll get you somewhere.")
+            print("\n")
+            type.type("The engine makes concerning noises, but holds.")
+            self.use_item("Water Bottles")
+            self.add_danger("Cooling System Damage")
+        else:
+            type.type("You have nothing to cool it down. You sit and wait.")
+            print("\n")
+            type.type("And wait. And wait. Hours pass.")
+            print("\n")
+            type.type("Eventually the engine cools enough to limp to a mechanic. " + red("$200") + " for repairs.")
+            if self.get_balance() >= 200:
+                self.change_balance(-200)
+            else:
+                type.type("You can't afford it. The mechanic takes your watch as collateral.")
+                self.add_danger("Unpaid Mechanic Debt")
+            self.add_travel_restriction("Wasted Afternoon")
+            self.lose_sanity(10)
+        print("\n")
+
+    def check_engine_light_on(self):
+        type.type("The check engine light comes on. That ominous orange glow.")
+        print("\n")
+        type.type("Could be nothing. Could be catastrophic. No way to know without a diagnostic.")
+        print("\n")
+        if self.has_item("OBD Scanner"):
+            type.type("You have an " + magenta(bright("OBD Scanner")) + ". You plug it in.")
+            print("\n")
+            codes = random.choice([
+                ("loose gas cap", 0, True),
+                ("oxygen sensor failing", 85, True),
+                ("catalytic converter issue", 300, False),
+                ("misfiring cylinder", 150, True),
+                ("mass airflow sensor", 120, True)
+            ])
+            type.type("Code reads: " + codes[0] + ".")
+            print("\n")
+            if codes[1] == 0:
+                type.type("You tighten your gas cap. Light goes off. Crisis averted.")
+            elif codes[2]:
+                type.type("Not cheap, but at least you know what's wrong.")
+                self.add_danger("Engine Issue: " + codes[0])
+            else:
+                type.type("That's a big problem. Expensive to fix.")
+                self.add_danger("Serious Engine Issue")
+        else:
+            type.type("You have no way to read the code. You just have to hope it's nothing serious.")
+            print("\n")
+            chance = random.randrange(5)
+            if chance == 0:
+                type.type("Your car suddenly dies in the middle of the road.")
+                print("\n")
+                type.type("It was serious. Very serious. You spend the afternoon getting towed.")
+                self.add_travel_restriction("Wasted Afternoon")
+                self.add_danger("Major Engine Failure")
+                self.lose_sanity(15)
+            else:
+                type.type("For now, the car keeps running. But that light haunts you.")
+        print("\n")
+
+    def engine_wont_turn_over(self):
+        type.type("You turn the key. The engine tries to catch but fails. Again and again.")
+        print("\n")
+        type.type("It's not the battery - you can hear it trying. Something else is wrong.")
+        print("\n")
+        problem = random.choice(["starter motor", "fuel pump", "ignition coil", "spark plugs"])
+        type.type("After some investigation, you suspect it's the " + problem + ".")
+        print("\n")
+        if problem == "spark plugs" and self.has_item("Spare Spark Plugs"):
+            type.type("Good thing you have " + magenta(bright("Spare Spark Plugs")) + "!")
+            print("\n")
+            type.type("You swap them out. The engine roars to life.")
+            self.use_item("Spare Spark Plugs")
+        elif self.has_item("Tool Kit"):
+            type.type("With your " + magenta(bright("Tool Kit")) + ", you attempt a DIY fix.")
+            print("\n")
+            if random.randrange(3) == 0:
+                type.type("You actually fix it! You surprise yourself.")
+                self.restore_sanity(5)
+            else:
+                type.type("You make it worse. Much worse. Time to call a tow truck.")
+                self.add_travel_restriction("Wasted Afternoon")
+                self.add_danger("Engine Damage")
+                self.lose_sanity(12)
+        else:
+            type.type("You have no tools, no knowledge. Just frustration.")
+            print("\n")
+            type.type("You call for help. The afternoon evaporates waiting for a mechanic.")
+            self.add_travel_restriction("Wasted Afternoon")
+            self.lose_sanity(8)
+        print("\n")
+
+    def strange_engine_noise(self):
+        type.type("Your engine is making a noise. A bad noise. Grinding? Clicking? Whining?")
+        print("\n")
+        noise = random.choice(["grinding", "clicking", "whining", "knocking", "squealing"])
+        type.type("It's " + noise + ". Definitely " + noise + ".")
+        print("\n")
+        if noise == "squealing":
+            type.type("Probably a belt. Could snap at any moment.")
+            if self.has_item("Serpentine Belt"):
+                type.type(" But you have a spare " + magenta(bright("Serpentine Belt")) + "!")
+                print("\n")
+                type.type("You swap it out. Noise gone. You're a genius.")
+                self.use_item("Serpentine Belt")
+            else:
+                type.type(" Every mile you drive, you're gambling on that belt holding.")
+                self.add_danger("Failing Belt")
+        elif noise == "knocking":
+            type.type("That's bad. Really bad. That's internal engine damage.")
+            print("\n")
+            type.type("You might be looking at a complete engine rebuild. Or a new car.")
+            self.add_danger("Engine Knock")
+            self.lose_sanity(15)
+        else:
+            type.type("Could be many things. None of them good.")
+            if random.randrange(3) == 0:
+                type.type(" You ignore it. The noise stops. Lucky.")
+            else:
+                type.type(" You ignore it. The noise gets worse. Much worse.")
+                self.add_danger("Mysterious Engine Problem")
+        print("\n")
+
+    def engine_oil_empty(self):
+        type.type("You check your oil level. The dipstick comes up bone dry.")
+        print("\n")
+        type.type("No oil. None. How long have you been driving like this?")
+        print("\n")
+        if self.has_item("Motor Oil"):
+            type.type("Thank God you have " + magenta(bright("Motor Oil")) + ".")
+            print("\n")
+            type.type("You pour it in. The engine sounds happier immediately.")
+            self.use_item("Motor Oil")
+        else:
+            type.type("You need to get oil immediately or your engine will seize.")
+            print("\n")
+            type.type("You walk to the nearest gas station. It takes two hours.")
+            print("\n")
+            type.type("Oil: " + red("$30") + ". Time lost: priceless.")
+            if self.get_balance() >= 30:
+                self.change_balance(-30)
+            else:
+                type.type("You can't even afford oil. You beg. Someone takes pity.")
+            self.add_travel_restriction("Wasted Afternoon")
+            self.lose_sanity(5)
+        print("\n")
+
+    def oil_leak_spotted(self):
+        type.type("There's a dark puddle under your car. You touch it. Oil. Thick and black.")
+        print("\n")
+        type.type("You have an oil leak. Could be a gasket, could be worse.")
+        print("\n")
+        if self.has_item("Oil Stop Leak"):
+            type.type("You add your " + magenta(bright("Oil Stop Leak")) + " and hope for the best.")
+            print("\n")
+            type.type("The leak slows. Not fixed, but manageable.")
+            self.use_item("Oil Stop Leak")
+        else:
+            type.type("You'll need to keep adding oil until you can afford a real fix.")
+            self.add_danger("Oil Leak")
+            type.type(" Every day you don't fix this costs you more.")
+        print("\n")
+
+    # === TIRE PROBLEMS ===
+    def slow_tire_leak(self):
+        type.type("Your steering feels off. You get out and check - one tire is low. Not flat, but definitely losing air.")
+        print("\n")
+        if self.has_item("Tire Patch Kit"):
+            type.type("You have a " + magenta(bright("Tire Patch Kit")) + ". You find the nail, pull it, patch the hole.")
+            print("\n")
+            type.type("Good as new. Well, good enough.")
+            self.use_item("Tire Patch Kit")
+        elif self.has_item("Fix-a-Flat"):
+            type.type("You use your " + magenta(bright("Fix-a-Flat")) + " to seal it temporarily.")
+            print("\n")
+            type.type("Should hold for a while. Maybe.")
+            self.use_item("Fix-a-Flat")
+        else:
+            type.type("You have to keep stopping to put air in. Every gas station. Every hour.")
+            print("\n")
+            type.type("Your afternoon becomes a series of air pump visits.")
+            self.add_travel_restriction("Wasted Afternoon")
+            self.add_danger("Slow Tire Leak")
+        print("\n")
+
+    def tire_blowout(self):
+        type.type("BANG! Your car jerks violently to one side. A tire just blew out.")
+        print("\n")
+        type.type("You fight the wheel, heart pounding, and manage to pull to the shoulder.")
+        print("\n")
+        if self.has_item("Spare Tire") and self.has_item("Car Jack"):
+            type.type("You have a " + magenta(bright("Spare Tire")) + " and a " + magenta(bright("Car Jack")) + ".")
+            print("\n")
+            type.type("You change the tire yourself. It takes an hour, but you're back on the road.")
+            self.use_item("Spare Tire")
+        elif self.has_item("Spare Tire"):
+            type.type("You have a spare, but no jack. You spend hours flagging down help.")
+            print("\n")
+            type.type("A trucker finally stops and helps. Afternoon gone.")
+            self.use_item("Spare Tire")
+            self.add_travel_restriction("Wasted Afternoon")
+        else:
+            type.type("No spare. No jack. You're completely stranded.")
+            print("\n")
+            type.type("You call a tow truck. " + red("$150") + " and four hours later, you have a new tire.")
+            if self.get_balance() >= 150:
+                self.change_balance(-150)
+            else:
+                type.type("You can't afford it. The driver leaves you by the road.")
+                self.add_danger("Stranded")
+            self.add_travel_restriction("Wasted Afternoon")
+            self.lose_sanity(15)
+        print("\n")
+
+    def bald_tires_noticed(self):
+        type.type("You look at your tires and wince. The tread is almost gone. Bald spots everywhere.")
+        print("\n")
+        type.type("These tires are dangerous. One good rain and you'll hydroplane.")
+        print("\n")
+        type.type("New tires cost around " + red("$400") + " minimum. You don't have that.")
+        print("\n")
+        type.type("You'll have to risk it. But every drive is now a gamble.")
+        self.add_danger("Bald Tires")
+        self.lose_sanity(5)
+        print("\n")
+
+    def nail_in_tire(self):
+        type.type("Thump. Thump. Thump. Something's wrong with one of your tires.")
+        print("\n")
+        type.type("You pull over and find it - a nail, embedded deep in the rubber.")
+        print("\n")
+        type.type("The tire is holding for now, but if you pull it out, it'll go flat instantly.")
+        print("\n")
+        answer = ask.option("What do you do? ", ["pull it out", "leave it", "drive to shop"])
+        if answer == "pull it out":
+            if self.has_item("Tire Patch Kit"):
+                type.type("You pull the nail and quickly apply your " + magenta(bright("Tire Patch Kit")) + ".")
+                print("\n")
+                type.type("The patch holds. Nice save.")
+                self.use_item("Tire Patch Kit")
+            else:
+                type.type("PSSSSSSS. The air rushes out. You have a flat tire now.")
+                print("\n")
+                if self.has_item("Spare Tire"):
+                    type.type("Time to put on that spare.")
+                    self.use_item("Spare Tire")
+                    self.add_travel_restriction("Wasted Afternoon")
+                else:
+                    type.type("No spare. You're stuck.")
+                    self.add_travel_restriction("Wasted Afternoon")
+                    self.lose_sanity(10)
+        elif answer == "leave it":
+            type.type("You leave the nail. Every drive, you wonder if today's the day it fails.")
+            self.add_danger("Nail in Tire")
+        else:
+            type.type("You drive very slowly to the nearest tire shop. They fix it for " + red("$25") + ".")
+            if self.get_balance() >= 25:
+                self.change_balance(-25)
+                type.type("Afternoon gone, but tire fixed.")
+            else:
+                type.type("You can't afford it. You leave with the nail still in.")
+                self.add_danger("Nail in Tire")
+            self.add_travel_restriction("Wasted Afternoon")
+        print("\n")
+
+    # === ELECTRICAL ISSUES ===
+    def headlights_burned_out(self):
+        type.type("Your headlights flicker and die. Both of them. At the same time.")
+        print("\n")
+        type.type("You can't drive at night without headlights. That's illegal and suicidal.")
+        print("\n")
+        if self.has_item("Spare Headlight Bulbs"):
+            type.type("You have " + magenta(bright("Spare Headlight Bulbs")) + ". Smart thinking.")
+            print("\n")
+            type.type("You replace them in the parking lot. You're back in business.")
+            self.use_item("Spare Headlight Bulbs")
+        else:
+            type.type("Auto parts store. " + red("$40") + " for new bulbs. Plus an hour of fumbling in the engine bay.")
+            if self.get_balance() >= 40:
+                self.change_balance(-40)
+                self.add_travel_restriction("Wasted Afternoon")
+            else:
+                type.type("You can't afford them. You'll have to stay put until you can.")
+                self.add_travel_restriction("No Headlights")
+                self.add_danger("No Headlights")
+        print("\n")
+
+    def alternator_failing(self):
+        type.type("Your dashboard dims. Your headlights flicker. Your radio cuts out.")
+        print("\n")
+        type.type("The alternator is dying. Without it, your battery won't charge.")
+        print("\n")
+        type.type("You might have 30 minutes of driving left. Maybe less.")
+        print("\n")
+        if self.get_balance() >= 350:
+            type.type("You race to a mechanic. New alternator: " + red("$350") + ". Your whole afternoon and then some.")
+            self.change_balance(-350)
+            self.add_travel_restriction("Wasted Afternoon")
+        else:
+            type.type("You can't afford a new alternator. Your car dies in a parking lot.")
+            print("\n")
+            type.type("You're stuck here until you can afford repairs.")
+            self.add_travel_restriction("Dead Alternator")
+            self.add_danger("Dead Alternator")
+            self.lose_sanity(15)
+        print("\n")
+
+    def fuse_blown(self):
+        type.type("Something electrical stopped working. Radio? Wipers? Power windows? Something.")
+        print("\n")
+        type.type("You check the fuse box and find a blown fuse.")
+        print("\n")
+        if self.has_item("Spare Fuses"):
+            type.type("You pop in a spare from your " + magenta(bright("Spare Fuses")) + " kit. Fixed in seconds.")
+            self.use_item("Spare Fuses")
+        else:
+            type.type("You don't have a spare. You drive to an auto shop.")
+            print("\n")
+            type.type("$5 for a fuse, but an hour of your life wasted.")
+            if self.get_balance() >= 5:
+                self.change_balance(-5)
+            self.add_travel_restriction("Wasted Afternoon")
+        print("\n")
+
+    def car_alarm_malfunction(self):
+        type.type("Your car alarm starts going off. For no reason. At 2 PM.")
+        print("\n")
+        type.type("BEEP BEEP BEEP BEEP BEEP BEEP BEEP BEEP")
+        print("\n")
+        type.type("You try the remote. Nothing. You try starting the car. Nothing. It just keeps screaming.")
+        print("\n")
+        type.type("People are staring. Someone calls the cops. This is a nightmare.")
+        print("\n")
+        if self.has_item("Tool Kit"):
+            type.type("You grab your " + magenta(bright("Tool Kit")) + " and disconnect the battery to stop the noise.")
+            print("\n")
+            type.type("Silence. Sweet silence. But now you need to figure out the real problem.")
+            self.add_travel_restriction("Wasted Afternoon")
+        else:
+            type.type("You have no way to disable it. The alarm runs until the battery dies.")
+            print("\n")
+            type.type("Three hours. Three hours of beeping. Your sanity doesn't survive intact.")
+            self.add_travel_restriction("Wasted Afternoon")
+            self.lose_sanity(20)
+        print("\n")
+
+    def starter_motor_grinding(self):
+        type.type("When you turn the key, there's a horrible grinding noise from under the hood.")
+        print("\n")
+        type.type("The starter motor is dying. Every start could be its last.")
+        print("\n")
+        type.type("Starter motors cost around " + red("$200-400") + " to replace.")
+        print("\n")
+        type.type("For now, it still works. Barely. Loudly. Worryingly.")
+        self.add_danger("Failing Starter Motor")
+        self.lose_sanity(5)
+        print("\n")
+
+    # === BRAKE PROBLEMS ===
+    def brakes_squealing(self):
+        type.type("Your brakes are squealing. That metal-on-metal sound that means trouble.")
+        print("\n")
+        type.type("The brake pads are worn. If you don't replace them, you'll damage the rotors.")
+        print("\n")
+        if self.has_item("Brake Pads"):
+            type.type("You have spare " + magenta(bright("Brake Pads")) + " and the knowledge to install them.")
+            print("\n")
+            type.type("An hour of work later, your brakes are like new.")
+            self.use_item("Brake Pads")
+        else:
+            type.type("New brake pads: " + red("$150-300") + " at a shop. Money you don't have.")
+            print("\n")
+            type.type("You drive carefully, knowing your brakes could fail.")
+            self.add_danger("Worn Brake Pads")
+        print("\n")
+
+    def brake_fluid_leak(self):
+        type.type("You press the brake pedal. It goes all the way to the floor. Almost no resistance.")
+        print("\n")
+        type.type("That's brake fluid leaking. That's extremely dangerous.")
+        print("\n")
+        if self.has_item("Brake Fluid"):
+            type.type("You add " + magenta(bright("Brake Fluid")) + " to the reservoir. It's a temporary fix.")
+            print("\n")
+            type.type("The leak will continue. You need real repairs.")
+            self.use_item("Brake Fluid")
+            self.add_danger("Brake Fluid Leak")
+        else:
+            type.type("You cannot drive this car. Not safely. Not at all.")
+            print("\n")
+            type.type("You're stuck until you can fix this.")
+            self.add_travel_restriction("Brake Failure")
+            self.add_danger("Brake Failure")
+            self.lose_sanity(15)
+        print("\n")
+
+    def abs_light_on(self):
+        type.type("The ABS warning light comes on. Your anti-lock brakes have a problem.")
+        print("\n")
+        type.type("Regular brakes still work. Probably. But in an emergency...")
+        print("\n")
+        type.type("You add it to the list of things wrong with your car.")
+        self.add_danger("ABS Malfunction")
+        self.lose_sanity(3)
+        print("\n")
+
+    # === FUEL SYSTEM ISSUES ===
+    def ran_out_of_gas(self):
+        type.type("Your car sputters. Coughs. Dies. You coast to a stop.")
+        print("\n")
+        type.type("Out of gas. Completely out. How did you not notice?")
+        print("\n")
+        if self.has_item("Gas Can"):
+            type.type("You have an emergency " + magenta(bright("Gas Can")) + ". Enough to get to a station.")
+            print("\n")
+            type.type("Crisis averted by preparation.")
+            self.use_item("Gas Can")
+        else:
+            type.type("You have to walk to a gas station. Buy a can. Fill it. Walk back.")
+            print("\n")
+            type.type("Two hours of your life, gone. Plus the cost of the can and gas: " + red("$35") + ".")
+            if self.get_balance() >= 35:
+                self.change_balance(-35)
+                self.add_item("Gas Can")  # At least you now own a can
+            else:
+                type.type("You can't even afford gas. You beg strangers. Someone eventually helps.")
+                self.lose_sanity(10)
+            self.add_travel_restriction("Wasted Afternoon")
+        print("\n")
+
+    def fuel_pump_whining(self):
+        type.type("There's a whining noise when your car runs. Coming from the fuel tank area.")
+        print("\n")
+        type.type("The fuel pump is failing. When it goes completely, your car won't run at all.")
+        print("\n")
+        type.type("Fuel pumps cost " + red("$400-600") + " to replace. Plus labor.")
+        print("\n")
+        type.type("Every time you start your car, you wonder if this is the last time.")
+        self.add_danger("Failing Fuel Pump")
+        self.lose_sanity(8)
+        print("\n")
+
+    def clogged_fuel_filter(self):
+        type.type("Your car hesitates when accelerating. Stutters. Struggles.")
+        print("\n")
+        type.type("Could be a clogged fuel filter. Cheap fix if you catch it early.")
+        print("\n")
+        if self.has_item("Fuel Filter"):
+            type.type("You have a spare " + magenta(bright("Fuel Filter")) + ". You swap it out.")
+            print("\n")
+            type.type("The car runs smoother immediately.")
+            self.use_item("Fuel Filter")
+        else:
+            type.type("You'll need to get one. " + red("$15-30") + " for the part, plus your time.")
+            if self.get_balance() >= 30:
+                self.change_balance(-30)
+            self.add_travel_restriction("Wasted Afternoon")
+        print("\n")
+
+    # === TRANSMISSION PROBLEMS ===
+    def transmission_slipping(self):
+        type.type("Your car revs high but barely accelerates. The transmission is slipping.")
+        print("\n")
+        type.type("This is bad. Transmission repairs are the most expensive fixes there are.")
+        print("\n")
+        if self.has_item("Transmission Fluid"):
+            type.type("You check the fluid level. Low. You add " + magenta(bright("Transmission Fluid")) + ".")
+            print("\n")
+            type.type("It helps. Temporarily. The damage is already done.")
+            self.use_item("Transmission Fluid")
+        else:
+            type.type("You don't even want to know what this costs to fix. Thousands. Easily.")
+            print("\n")
+            type.type("You drive gently and pray.")
+            self.add_danger("Transmission Damage")
+            self.lose_sanity(20)
+        print("\n")
+
+    def stuck_in_gear(self):
+        type.type("Your car is stuck in second gear. It won't shift up or down.")
+        print("\n")
+        type.type("You can drive, technically, but not fast. And not well.")
+        print("\n")
+        type.type("Every other car on the road is passing you, honking angrily.")
+        print("\n")
+        type.type("You limp to a mechanic. " + red("$300") + " to fix a linkage issue.")
+        if self.get_balance() >= 300:
+            self.change_balance(-300)
+            type.type(" At least it wasn't the transmission itself.")
+        else:
+            type.type(" You can't afford it. You'll have to drive like this.")
+            self.add_danger("Stuck In Second")
+        self.add_travel_restriction("Wasted Afternoon")
+        print("\n")
+
+    # === COOLING SYSTEM ===
+    def radiator_leak(self):
+        type.type("Green fluid is pooling under your car. Antifreeze. Your radiator is leaking.")
+        print("\n")
+        if self.has_item("Radiator Stop Leak"):
+            type.type("You pour in " + magenta(bright("Radiator Stop Leak")) + " and cross your fingers.")
+            print("\n")
+            type.type("The leak slows. Not stopped, but manageable.")
+            self.use_item("Radiator Stop Leak")
+            self.add_danger("Radiator Damage")
+        else:
+            type.type("Without coolant, your engine will overheat. And die.")
+            print("\n")
+            type.type("Radiator repair: " + red("$200-400") + ". Time to start begging.")
+            if self.get_balance() >= 200:
+                self.change_balance(-200)
+                self.add_travel_restriction("Wasted Afternoon")
+            else:
+                type.type("You can't afford it. Your car is essentially undriveable.")
+                self.add_travel_restriction("Radiator Failure")
+                self.add_danger("Radiator Failure")
+            self.lose_sanity(10)
+        print("\n")
+
+    def thermostat_stuck(self):
+        type.type("Your temperature gauge is acting weird. Too cold. Too hot. Wildly swinging.")
+        print("\n")
+        type.type("The thermostat is stuck. It's not regulating properly.")
+        print("\n")
+        if self.has_item("Thermostat"):
+            type.type("You have a spare " + magenta(bright("Thermostat")) + ". You swap it out.")
+            print("\n")
+            type.type("Temperature stable again. Good catch.")
+            self.use_item("Thermostat")
+        else:
+            type.type("It's a cheap part but takes time to replace. " + red("$50") + " at a shop.")
+            if self.get_balance() >= 50:
+                self.change_balance(-50)
+            self.add_travel_restriction("Wasted Afternoon")
+        print("\n")
+
+    def water_pump_failing(self):
+        type.type("There's a grinding noise from your water pump. And your car is starting to overheat.")
+        print("\n")
+        type.type("When the water pump goes completely, your engine will follow.")
+        print("\n")
+        type.type("Water pump replacement: " + red("$300-500") + ". Not optional.")
+        print("\n")
+        if self.get_balance() >= 300:
+            type.type("You get it fixed immediately. Afternoon gone, but car saved.")
+            self.change_balance(-300)
+            self.add_travel_restriction("Wasted Afternoon")
+        else:
+            type.type("You can't afford it. You drive with one eye on the temperature gauge.")
+            self.add_danger("Failing Water Pump")
+            self.lose_sanity(12)
+        print("\n")
+
+    # === STEERING/SUSPENSION ===
+    def power_steering_failure(self):
+        type.type("The steering wheel suddenly becomes incredibly hard to turn.")
+        print("\n")
+        type.type("Power steering is out. Driving is now an arm workout.")
+        print("\n")
+        if self.has_item("Power Steering Fluid"):
+            type.type("You check the reservoir. Empty. You add " + magenta(bright("Power Steering Fluid")) + ".")
+            print("\n")
+            type.type("Steering returns to normal. There's probably a leak though.")
+            self.use_item("Power Steering Fluid")
+            self.add_danger("Power Steering Leak")
+        else:
+            type.type("You can technically still drive. It just takes all your strength.")
+            print("\n")
+            type.type("Your arms are going to be very sore tomorrow.")
+            self.add_danger("No Power Steering")
+            self.hurt(10)
+        print("\n")
+
+    def wheel_alignment_off(self):
+        type.type("Your car pulls hard to one side. You have to fight the wheel to go straight.")
+        print("\n")
+        type.type("Alignment is off. Probably from all those potholes.")
+        print("\n")
+        type.type("Alignment service: " + red("$75-100") + ". Plus the time.")
+        print("\n")
+        if self.get_balance() >= 75:
+            type.type("You get it done. Afternoon spent, but car drives straight again.")
+            self.change_balance(-75)
+            self.add_travel_restriction("Wasted Afternoon")
+        else:
+            type.type("You'll have to live with it. Your tires will wear unevenly.")
+            self.add_danger("Bad Alignment")
+        print("\n")
+
+    def suspension_creaking(self):
+        type.type("Every bump makes your car creak and groan like an old house.")
+        print("\n")
+        type.type("The suspension is worn. Shocks, struts, something.")
+        print("\n")
+        type.type("Suspension work is expensive. " + red("$500-1000") + " or more.")
+        print("\n")
+        type.type("You add it to the list of things you can't afford to fix.")
+        self.add_danger("Worn Suspension")
+        self.lose_sanity(5)
+        print("\n")
+
+    def broken_ball_joint(self):
+        type.type("There's a terrifying clunk from your front wheel when you turn.")
+        print("\n")
+        type.type("Ball joint. If that breaks while driving, you lose the wheel. Literally.")
+        print("\n")
+        type.type("This isn't optional. This is fix-now-or-die territory.")
+        print("\n")
+        if self.get_balance() >= 200:
+            type.type("You get it fixed immediately. " + red("$200") + ". Afternoon gone.")
+            self.change_balance(-200)
+            self.add_travel_restriction("Wasted Afternoon")
+        else:
+            type.type("You can't afford it. You drive at 10 mph, praying with every turn.")
+            self.add_danger("Broken Ball Joint")
+            self.lose_sanity(15)
+        print("\n")
+
+    # === EXHAUST SYSTEM ===
+    def exhaust_leak_loud(self):
+        type.type("Your car sounds like a motorcycle. Or a tractor. Incredibly loud.")
+        print("\n")
+        type.type("Exhaust leak. Could be a hole in the pipe or a bad muffler.")
+        print("\n")
+        type.type("Everyone stares at you. Cops give you looks.")
+        print("\n")
+        if self.has_item("Exhaust Tape"):
+            type.type("You use " + magenta(bright("Exhaust Tape")) + " to patch the hole temporarily.")
+            print("\n")
+            type.type("It's quieter. Mostly. Still louder than normal.")
+            self.use_item("Exhaust Tape")
+            self.add_danger("Patched Exhaust")
+        else:
+            type.type("Muffler replacement: " + red("$100-200") + ". Plus the embarrassment of driving there.")
+            if self.get_balance() >= 100:
+                self.change_balance(-100)
+                self.add_travel_restriction("Wasted Afternoon")
+            else:
+                type.type("You'll have to drive loud and proud. Or ashamed. Mostly ashamed.")
+                self.add_danger("Loud Exhaust")
+        print("\n")
+
+    def catalytic_converter_stolen(self):
+        type.type("You start your car and it sounds like a dragster. Way too loud.")
+        print("\n")
+        type.type("You look under the car. Your catalytic converter is GONE. Someone stole it.")
+        print("\n")
+        type.type("Catalytic converters contain precious metals. Thieves love them.")
+        print("\n")
+        type.type("Replacement: " + red("$1000-2500") + ". You're going to be loud for a while.")
+        self.add_danger("Missing Catalytic Converter")
+        self.lose_sanity(20)
+        type.type(" You feel violated. Someone was under your car while you slept.")
+        print("\n")
+
+    # === WEATHER DAMAGE ===
+    def hail_damage(self):
+        type.type("Last night's storm left your car covered in dents. Hail damage.")
+        print("\n")
+        type.type("Your hood, roof, and trunk look like a golf ball. Dimpled everywhere.")
+        print("\n")
+        type.type("Cosmetic damage. Car still runs. But your pride took a hit.")
+        self.add_danger("Hail Damage")
+        self.lose_sanity(8)
+        print("\n")
+
+    def flooded_engine(self):
+        type.type("You drove through a deep puddle. Your engine sputtered and died.")
+        print("\n")
+        type.type("Water got into the intake. The engine is hydrolocked.")
+        print("\n")
+        type.type("This could be catastrophic or just need time to dry out.")
+        print("\n")
+        chance = random.randrange(5)
+        if chance == 0:
+            type.type("The engine is destroyed. Water doesn't compress. Pistons bent.")
+            print("\n")
+            type.type("Your car is dead. You need a new engine or a new car.")
+            self.add_danger("Hydrolocked Engine")
+            self.add_travel_restriction("Destroyed Engine")
+            self.lose_sanity(30)
+        else:
+            type.type("After a few hours of drying, the engine starts again. Lucky.")
+            print("\n")
+            type.type("There might be lingering damage. Time will tell.")
+            self.add_travel_restriction("Wasted Afternoon")
+            self.lose_sanity(10)
+        print("\n")
+
+    def windshield_cracked(self):
+        type.type("A rock kicked up by a truck just hit your windshield. CRACK.")
+        print("\n")
+        type.type("A spiderweb of cracks spreads across your field of vision.")
+        print("\n")
+        type.type("Windshield replacement: " + red("$200-400") + ". You can't afford that.")
+        print("\n")
+        type.type("You'll drive with cracks. It'll get worse in the cold.")
+        self.add_danger("Cracked Windshield")
+        self.lose_sanity(5)
+        print("\n")
+
+    def frozen_door_locks(self):
+        if self.has_danger("It's Summer"):
+            return  # Skip in summer
+        type.type("The temperature dropped overnight. Your door locks are frozen solid.")
+        print("\n")
+        type.type("You can't get into your own car.")
+        print("\n")
+        if self.has_item("Lock De-Icer"):
+            type.type("You spray " + magenta(bright("Lock De-Icer")) + " into the keyhole. A minute later, you're in.")
+            self.use_item("Lock De-Icer")
+        elif self.has_item("Lighter"):
+            type.type("You heat your key with your " + magenta(bright("Lighter")) + " and carefully thaw the lock.")
+            print("\n")
+            type.type("Primitive, but effective.")
+        else:
+            type.type("You spend an hour breathing on the lock, rubbing it with your hands.")
+            print("\n")
+            type.type("Eventually it thaws. But you've lost precious time.")
+            self.add_travel_restriction("Wasted Afternoon")
+            self.hurt(5)  # Cold damage
+        print("\n")
+
+    def frozen_fuel_line(self):
+        if self.has_danger("It's Summer"):
+            return
+        type.type("Your car won't start. The fuel line is frozen.")
+        print("\n")
+        type.type("This happens when there's water in the fuel system and it freezes.")
+        print("\n")
+        if self.has_item("Fuel Line Antifreeze"):
+            type.type("You add " + magenta(bright("Fuel Line Antifreeze")) + " and wait for it to work.")
+            print("\n")
+            type.type("After twenty minutes, the car starts.")
+            self.use_item("Fuel Line Antifreeze")
+        else:
+            type.type("You have to wait for it to thaw naturally. Hours pass.")
+            print("\n")
+            type.type("Your entire day is spent huddled in your cold, non-running car.")
+            self.add_travel_restriction("Wasted Afternoon")
+            self.hurt(15)
+            self.lose_sanity(10)
+        print("\n")
+
+    # === RANDOM BREAKDOWNS ===
+    def mystery_breakdown(self):
+        type.type("Your car just... stops. No warning. No sound. Just dead.")
+        print("\n")
+        type.type("You try everything. Key. Lights. Radio. Nothing responds.")
+        print("\n")
+        type.type("It's like the entire electrical system died at once.")
+        print("\n")
+        chance = random.randrange(5)
+        if chance == 0:
+            type.type("After sitting for an hour, it mysteriously starts again. Cars are weird.")
+            self.add_travel_restriction("Wasted Afternoon")
+        else:
+            type.type("The car is completely dead. You need a tow. " + red("$100") + " minimum.")
+            if self.get_balance() >= 100:
+                self.change_balance(-100)
+            else:
+                type.type("You can't afford a tow. You push the car to the shoulder and hope.")
+            self.add_travel_restriction("Wasted Afternoon")
+            self.add_danger("Mystery Electrical Problem")
+            self.lose_sanity(15)
+        print("\n")
+
+    def key_wont_turn(self):
+        type.type("You put your key in the ignition. It won't turn. At all.")
+        print("\n")
+        type.type("You wiggle it, jiggle it, curse at it. Nothing.")
+        print("\n")
+        if self.has_item("WD-40"):
+            type.type("You spray " + magenta(bright("WD-40")) + " into the ignition. After some working, it turns.")
+            self.use_item("WD-40")
+        else:
+            type.type("Ignition cylinder is worn. This is going to be an expensive fix.")
+            print("\n")
+            type.type("After an hour of trying, it finally turns. But this will happen again.")
+            self.add_danger("Worn Ignition")
+            self.add_travel_restriction("Wasted Afternoon")
+        print("\n")
+
+    def car_wont_go_in_reverse(self):
+        type.type("You try to back out of a parking spot. The car won't go in reverse.")
+        print("\n")
+        type.type("Forward? Fine. Reverse? Absolutely not.")
+        print("\n")
+        type.type("This is going to make parking very interesting.")
+        print("\n")
+        type.type("Transmission linkage or cable. " + red("$150-300") + " to fix.")
+        print("\n")
+        type.type("For now, you Austin Powers your way out of the spot.")
+        self.add_danger("No Reverse Gear")
+        self.add_travel_restriction("Wasted Afternoon")
+        print("\n")
+
+    def window_wont_roll_up(self):
+        type.type("You roll down your window. It won't roll back up.")
+        print("\n")
+        type.type("The motor is dead. Your window is stuck down.")
+        print("\n")
+        if self.has_item("Plastic Wrap") or self.has_item("Garbage Bag"):
+            item = "Plastic Wrap" if self.has_item("Plastic Wrap") else "Garbage Bag"
+            type.type("You tape " + magenta(bright(item)) + " over the opening as a temporary fix.")
+            print("\n")
+            type.type("You look homeless. More homeless than usual.")
+            self.use_item(item)
+            self.add_danger("Broken Window")
+        else:
+            type.type("Rain, bugs, thieves - everything can get in now.")
+            print("\n")
+            type.type("Window motor replacement: " + red("$150-250") + ". Another thing you can't afford.")
+            self.add_danger("Open Window")
+            self.lose_sanity(8)
+        print("\n")
+
+    def trunk_wont_close(self):
+        type.type("Your trunk latch is broken. The trunk won't stay closed.")
+        print("\n")
+        type.type("It bounces open every time you hit a bump.")
+        print("\n")
+        if self.has_item("Bungee Cords") or self.has_item("Rope"):
+            item = "Bungee Cords" if self.has_item("Bungee Cords") else "Rope"
+            type.type("You tie it shut with " + magenta(bright(item)) + ". Ghetto, but it works.")
+            self.add_danger("Broken Trunk Latch")
+        else:
+            type.type("You drive holding the trunk with one arm out the window.")
+            print("\n")
+            type.type("This is not sustainable.")
+            self.add_travel_restriction("Wasted Afternoon")
+            self.add_danger("Open Trunk")
+        print("\n")
+
+    def gas_pedal_sticking(self):
+        type.type("Your gas pedal is sticking. When you push it, it doesn't always come back up.")
+        print("\n")
+        type.type("That's absolutely terrifying.")
+        print("\n")
+        type.type("You're essentially driving a weapon that doesn't always respond to your commands.")
+        print("\n")
+        if self.has_item("WD-40"):
+            type.type("You spray " + magenta(bright("WD-40")) + " on the linkage. It helps. Mostly.")
+            self.use_item("WD-40")
+            self.add_danger("Sticky Gas Pedal")
+        else:
+            type.type("You drive with your foot ready to yank the pedal up at any moment.")
+            self.add_danger("Sticky Gas Pedal")
+            self.lose_sanity(15)
+        print("\n")
+
+    def parking_brake_stuck(self):
+        type.type("You release the parking brake. Nothing happens. It's stuck on.")
+        print("\n")
+        type.type("Your wheels barely turn. You can hear the grinding.")
+        print("\n")
+        type.type("Something is seized in the mechanism.")
+        print("\n")
+        if self.has_item("Tool Kit"):
+            type.type("With your " + magenta(bright("Tool Kit")) + ", you manually release the mechanism.")
+            print("\n")
+            type.type("The parking brake might not work normally anymore, but you can drive.")
+            self.add_danger("Broken Parking Brake")
+        else:
+            type.type("You can't drive like this. You need a mechanic.")
+            self.add_travel_restriction("Wasted Afternoon")
+            self.add_danger("Stuck Parking Brake")
+            self.lose_sanity(10)
+        print("\n")
+
+    # === FOLLOW-UP DANGER EVENTS ===
+    def leaking_battery_worsens(self):
+        if not self.has_danger("Leaking Battery"):
+            return
+        type.type("That battery leak you've been ignoring? It got worse.")
+        print("\n")
+        type.type("Acid has eaten through your battery cables. No power. No start.")
+        print("\n")
+        type.type("New battery plus cables: " + red("$200") + ".")
+        if self.get_balance() >= 200:
+            self.change_balance(-200)
+            self.remove_danger("Leaking Battery")
+            type.type(" Fixed. Finally.")
+        else:
+            type.type(" You can't afford it. You're stranded again.")
+            self.add_travel_restriction("Dead Battery")
+        self.add_travel_restriction("Wasted Afternoon")
+        print("\n")
+
+    def bald_tires_hydroplane(self):
+        if not self.has_danger("Bald Tires"):
+            return
+        type.type("It's raining. And your bald tires finally betray you.")
+        print("\n")
+        type.type("Your car hydroplanes, spinning out of control.")
+        print("\n")
+        chance = random.randrange(5)
+        if chance == 0:
+            type.type("You crash into a ditch. The car is damaged but driveable.")
+            print("\n")
+            type.type("You're shaken but alive.")
+            self.hurt(20)
+            self.add_danger("Crash Damage")
+            self.lose_sanity(15)
+        elif chance < 3:
+            type.type("You somehow regain control. Your heart is pounding.")
+            print("\n")
+            type.type("That was close. Too close.")
+            self.lose_sanity(10)
+        else:
+            type.type("You slide into another car. Minor collision.")
+            print("\n")
+            type.type("The other driver is furious. You exchange information.")
+            self.hurt(10)
+            self.add_danger("Insurance Claim")
+            self.add_travel_restriction("Wasted Afternoon")
+        print("\n")
+
+    def engine_knock_worsens(self):
+        if not self.has_danger("Engine Knock"):
+            return
+        type.type("That knocking from your engine? It's getting louder. Much louder.")
+        print("\n")
+        type.type("The engine is dying. Every mile could be its last.")
+        print("\n")
+        chance = random.randrange(5)
+        if chance == 0:
+            type.type("BANG. The engine seizes. Smoke pours from under the hood.")
+            print("\n")
+            type.type("Your car is dead. Completely dead.")
+            self.remove_danger("Engine Knock")
+            self.add_danger("Seized Engine")
+            self.add_travel_restriction("No Engine")
+            self.lose_sanity(25)
+        else:
+            type.type("Still running. Barely. Loudly. Terrifyingly.")
+        print("\n")
+
+    def nail_in_tire_blows(self):
+        if not self.has_danger("Nail in Tire"):
+            return
+        type.type("Remember that nail you left in your tire? It finally won.")
+        print("\n")
+        type.type("The tire is flat. Completely flat. You woke up to it.")
+        print("\n")
+        self.remove_danger("Nail in Tire")
+        if self.has_item("Spare Tire"):
+            type.type("Time to use that spare.")
+            self.use_item("Spare Tire")
+        else:
+            type.type("No spare. You're stuck until you can get this fixed.")
+            self.add_travel_restriction("Flat Tire")
+            self.lose_sanity(10)
+        print("\n")
+
+    def failing_fuel_pump_dies(self):
+        if not self.has_danger("Failing Fuel Pump"):
+            return
+        chance = random.randrange(5)
+        if chance == 0:
+            type.type("Your fuel pump finally gave up the ghost.")
+            print("\n")
+            type.type("Your car is dead in the middle of nowhere.")
+            print("\n")
+            type.type("Fuel pump replacement: " + red("$500") + " minimum. Plus towing.")
+            self.remove_danger("Failing Fuel Pump")
+            self.add_danger("Dead Fuel Pump")
+            self.add_travel_restriction("Dead Car")
+            self.lose_sanity(20)
+        else:
+            type.type("Your fuel pump is still whining. Still working. For now.")
+        print("\n")
+
+    def broken_ball_joint_breaks(self):
+        if not self.has_danger("Broken Ball Joint"):
+            return
+        chance = random.randrange(10)
+        if chance == 0:
+            type.type("The ball joint snapped while you were driving.")
+            print("\n")
+            type.type("Your wheel literally fell off the car.")
+            print("\n")
+            type.type("You crash. Hard.")
+            self.hurt(40)
+            self.add_injury("Whiplash")
+            self.remove_danger("Broken Ball Joint")
+            self.add_danger("Serious Crash Damage")
+            self.add_travel_restriction("Totaled Car")
+            self.lose_sanity(25)
+        else:
+            type.type("The ball joint is hanging on by a thread. Every turn is terrifying.")
+        print("\n")
+
+    def failing_starter_dies(self):
+        if not self.has_danger("Failing Starter Motor"):
+            return
+        chance = random.randrange(5)
+        if chance == 0:
+            type.type("Your starter motor has finally died. No more grinding. Just silence.")
+            print("\n")
+            type.type("Starter replacement: " + red("$300") + ". You're stuck until then.")
+            self.remove_danger("Failing Starter Motor")
+            self.add_danger("Dead Starter")
+            self.add_travel_restriction("Car Won't Start")
+            self.lose_sanity(15)
+        else:
+            type.type("The starter still works. Barely. The grinding is ear-splitting.")
+        print("\n")
+
+
+    # ============================================
+    # MEDICAL EVENTS (integrated from medical.py)
+    # Illnesses, injuries, and medical conditions
+    # ============================================
+
+
+    def contract_pneumonia(self):
+        # EVENT: Contract pneumonia from exposure/weakened immune system
+        # EFFECTS: Adds "Pneumonia" status, 15 damage, 2 sanity loss
+        # NOTE: Requires doctor visit to treat
+        type.type("You wake up coughing. Deep, rattling coughs that feel like they're coming from the bottom of your lungs.")
+        print("\n")
+        type.type("Your chest hurts. Every breath is a struggle. You're burning up with fever but shivering uncontrollably.")
+        print("\n")
+        type.type("This isn't just a cold. This is " + red("pneumonia") + ".")
+        print("\n")
+        type.type("You need a doctor. Soon.")
+        self.add_status("Pneumonia")
+        self.damage(15)
+        self.lose_sanity(2)
+        self.start_night()
+
+    def contract_bronchitis(self):
+        # EVENT: Contract bronchitis - persistent coughing with mucus
+        # EFFECTS: Adds "Bronchitis" status, 8 damage
+        type.type("The coughing started a few days ago. Now it won't stop.")
+        print("\n")
+        type.type("Every cough produces thick, yellow mucus. Your throat is raw. Your chest aches.")
+        print("\n")
+        type.type("You can barely speak without triggering another coughing fit.")
+        print("\n")
+        type.type(red("Bronchitis") + " has set in.")
+        self.add_status("Bronchitis")
+        self.damage(8)
+        self.start_night()
+
+    def contract_strep_throat(self):
+        # EVENT: Contract strep throat - severe throat infection
+        # EFFECTS: Adds "Strep Throat" status, 10 damage; needs antibiotics
+        type.type("Your throat feels like it's being scraped with broken glass.")
+        print("\n")
+        type.type("Swallowing is agony. Your tonsils are swollen and covered in white patches.")
+        print("\n")
+        type.type("Fever. Headache. Body aches. This is " + red("strep throat") + ".")
+        print("\n")
+        type.type("Without antibiotics, this could get much, much worse.")
+        self.add_status("Strep Throat")
+        self.damage(10)
+        self.start_night()
+
+    def contract_stomach_flu(self):
+        # EVENT: Contract stomach flu - violent gastrointestinal distress
+        # EFFECTS: Adds "Stomach Flu" status, 12 damage, 1 sanity loss
+        type.type("It started with nausea. Then came the vomiting. Then the other end started.")
+        print("\n")
+        type.type("You've spent the last several hours in the bathroom, alternating between the toilet and the cold floor.")
+        print("\n")
+        type.type("Your body is expelling everything. You're getting dehydrated fast.")
+        print("\n")
+        type.type(red("Stomach flu") + " has you in its grip.")
+        self.add_status("Stomach Flu")
+        self.damage(12)
+        self.lose_sanity(1)
+        self.start_night()
+
+    def contract_ear_infection(self):
+        # EVENT: Contract ear infection - painful infection with hearing loss
+        # EFFECTS: Adds "Ear Infection" status, 5 damage
+        type.type("The pain in your ear is unbearable. A deep, throbbing ache that radiates through your skull.")
+        print("\n")
+        type.type("You can barely hear out of that side. Everything sounds muffled, underwater.")
+        print("\n")
+        type.type("Yellow fluid is starting to leak out.")
+        print("\n")
+        type.type(red("Ear infection") + ". Nasty one.")
+        self.add_status("Ear Infection")
+        self.damage(5)
+        self.start_night()
+
+    def contract_sinus_infection(self):
+        # EVENT: Contract sinus infection - severe facial pressure and mucus
+        # EFFECTS: Adds "Sinus Infection" status, 6 damage
+        type.type("Your face feels like it's going to explode. The pressure behind your eyes, your cheeks, your forehead - it's immense.")
+        print("\n")
+        type.type("Thick green mucus drains down your throat constantly. Your head pounds with every heartbeat.")
+        print("\n")
+        type.type("The " + red("sinus infection") + " has fully taken hold.")
+        self.add_status("Sinus Infection")
+        self.damage(6)
+        self.start_night()
+
+    def contract_uti(self):
+        # EVENT: Contract urinary tract infection - painful and potentially serious
+        # EFFECTS: Adds "UTI" status, 8 damage; can spread to kidneys if untreated
+        type.type("It started as a slight burning sensation. Now every trip to the bathroom is torture.")
+        print("\n")
+        type.type("You have to go constantly, but barely anything comes out. What does is cloudy and smells wrong.")
+        print("\n")
+        type.type("Your lower back aches. You might have a fever.")
+        print("\n")
+        type.type(red("Urinary tract infection") + ". If it spreads to your kidneys...")
+        self.add_status("UTI")
+        self.damage(8)
+        self.start_night()
+
+    def contract_pink_eye(self):
+        # EVENT: Contract conjunctivitis (pink eye) - contagious eye infection
+        # EFFECTS: Adds "Pink Eye" status, 3 damage
+        type.type("You wake up and can't open your left eye. It's crusted shut with dried discharge.")
+        print("\n")
+        type.type("Once you manage to pry it open, you see the white of your eye is bright pink. Bloodshot veins everywhere.")
+        print("\n")
+        type.type("It itches like crazy. Tears stream down constantly.")
+        print("\n")
+        type.type(red("Conjunctivitis") + ". Pink eye. Extremely contagious.")
+        self.add_status("Pink Eye")
+        self.damage(3)
+        self.start_night()
+
+    def contract_mono(self):
+        # EVENT: Contract mononucleosis - extreme fatigue for months
+        # EFFECTS: Adds "Mononucleosis" status, 20 damage, 3 sanity loss
+        type.type("The exhaustion is unlike anything you've ever felt. You slept fourteen hours and woke up more tired than when you went to bed.")
+        print("\n")
+        type.type("Your throat is sore. Your lymph nodes are swollen. Your spleen aches.")
+        print("\n")
+        type.type("The doctor would tell you it's " + red("mononucleosis") + ". The kissing disease.")
+        print("\n")
+        type.type("It could take months to fully recover.")
+        self.add_status("Mononucleosis")
+        self.damage(20)
+        self.lose_sanity(3)
+        self.start_night()
+
+    def contract_shingles(self):
+        # EVENT: Shingles outbreak from dormant chickenpox virus
+        # EFFECTS: Adds "Shingles" status, 18 damage, 2 sanity loss; can cause permanent nerve damage
+        type.type("The rash appeared yesterday. Today, it's on fire.")
+        print("\n")
+        type.type("Blisters have formed in a band across your torso, following the path of a nerve. The pain is excruciating.")
+        print("\n")
+        type.type("Burning. Stabbing. Constant. You had chickenpox as a kid - the virus never left.")
+        print("\n")
+        type.type(red("Shingles") + ". And without treatment, the nerve damage could be permanent.")
+        self.add_status("Shingles")
+        self.damage(18)
+        self.lose_sanity(2)
+        self.start_night()
+
+    def contract_lyme_disease(self):
+        # EVENT: Contract Lyme disease from tick bite
+        # EFFECTS: Adds "Lyme Disease" status, 15 damage, 2 sanity loss; devastating if untreated
+        type.type("You notice the rash first. A perfect bullseye - red ring, clear center, red outer ring.")
+        print("\n")
+        type.type("Then come the joint pains. The fatigue. The brain fog that makes it hard to think.")
+        print("\n")
+        type.type("You must have been bitten by a tick at some point. Didn't even notice.")
+        print("\n")
+        type.type(red("Lyme disease") + ". Caught early, treatable. Left untreated... devastating.")
+        self.add_status("Lyme Disease")
+        self.damage(15)
+        self.lose_sanity(2)
+        self.start_night()
+
+    def contract_ringworm(self):
+        # EVENT: Contract ringworm fungal infection
+        # EFFECTS: Adds "Ringworm" status, 3 damage; contagious and spreading
+        type.type("The itchy patch on your arm has grown. What started as a small red spot is now a perfect red ring.")
+        print("\n")
+        type.type("It's not actually a worm - it's a fungal infection. But that doesn't make it less disgusting.")
+        print("\n")
+        type.type(red("Ringworm") + ". Contagious. Spreading. Needs treatment.")
+        self.add_status("Ringworm")
+        self.damage(3)
+        self.start_night()
+
+    def contract_scabies(self):
+        # EVENT: Contract scabies - mites burrowing under skin
+        # EFFECTS: Adds "Scabies" status, 5 damage, 2 sanity loss; maddening itch
+        type.type("The itching is maddening. Especially at night. Tiny burrows appearing between your fingers, on your wrists, in your armpits.")
+        print("\n")
+        type.type("Microscopic mites have burrowed into your skin. They're laying eggs under your flesh.")
+        print("\n")
+        type.type("You scratch until you bleed, but the relief is only momentary.")
+        print("\n")
+        type.type(red("Scabies") + ". Your skin is infested.")
+        self.add_status("Scabies")
+        self.damage(5)
+        self.lose_sanity(2)
+        self.start_night()
+
+    def contract_staph_infection(self):
+        # EVENT: Contract staph infection from wound - potentially fatal
+        # EFFECTS: Adds "Staph Infection" status, 20 damage, 1 sanity loss; can kill if reaches bloodstream
+        type.type("What started as a small cut has become something much worse.")
+        print("\n")
+        type.type("The wound is hot, swollen, and filled with pus. Red streaks are spreading outward from the site.")
+        print("\n")
+        type.type("The area around it is hard to the touch. You're developing a fever.")
+        print("\n")
+        type.type(red("Staph infection") + ". If it gets into your bloodstream, it could kill you.")
+        self.add_status("Staph Infection")
+        self.damage(20)
+        self.lose_sanity(1)
+        self.start_night()
+
+    def contract_tetanus(self):
+        # EVENT: Contract tetanus (lockjaw) from rusty wound - life threatening
+        # EFFECTS: Adds "Tetanus" status, 25 damage, 3 sanity loss; needs antitoxin or death
+        type.type("You stepped on that rusty nail a few days ago. You thought it was fine.")
+        print("\n")
+        type.type("Now your jaw is stiffening. Your muscles are cramping. You're having trouble swallowing.")
+        print("\n")
+        type.type("Your back arches involuntarily. Spasms rack your body.")
+        print("\n")
+        type.type(red("Tetanus") + ". Lockjaw. Without antitoxin, the spasms will get worse until you can't breathe.")
+        self.add_status("Tetanus")
+        self.damage(25)
+        self.lose_sanity(3)
+        self.start_night()
+
+    def contract_rabies_scare(self):
+        # EVENT: Possible rabies infection from animal bite - almost always fatal once symptoms appear
+        # EFFECTS: Adds "Possible Rabies" status, 10 damage, 5 sanity loss; time-critical treatment needed
+        type.type("That animal that bit you last week - you never did find out if it was rabid.")
+        print("\n")
+        type.type("Now you're having headaches. Fever. You feel anxious, confused.")
+        print("\n")
+        type.type("Is it just paranoia? Or is the virus already in your brain?")
+        print("\n")
+        type.type("Once symptoms appear, " + red("rabies") + " is almost always fatal. But maybe there's still time...")
+        self.add_status("Possible Rabies")
+        self.damage(10)
+        self.lose_sanity(5)
+        self.start_night()
+
+    def contract_measles(self):
+        # EVENT: Contract measles - serious viral infection with rash and fever
+        # EFFECTS: Adds "Measles" status, 18 damage, 2 sanity loss
+        type.type("The rash covers your entire body now. Red, blotchy, spreading across your face and trunk.")
+        print("\n")
+        type.type("Your eyes are red and watering. Light is painful. You've had a high fever for days.")
+        print("\n")
+        type.type("Small white spots have appeared inside your mouth.")
+        print("\n")
+        type.type(red("Measles") + ". You thought it was eradicated. You were wrong.")
+        self.add_status("Measles")
+        self.damage(18)
+        self.lose_sanity(2)
+        self.start_night()
+
+    # CHRONIC CONDITIONS
+    def develop_diabetes_symptoms(self):
+        # EVENT: Develop uncontrolled diabetes symptoms
+        # EFFECTS: Adds "Uncontrolled Diabetes" status, 15 damage; needs medication
+        type.type("You've been drinking water constantly. Gallons a day. And yet your mouth is always dry.")
+        print("\n")
+        type.type("You're losing weight despite eating more than ever. You're exhausted. Your vision is blurry.")
+        print("\n")
+        type.type("You've been urinating constantly. The symptoms point to one thing.")
+        print("\n")
+        type.type(red("Diabetes") + ". Your blood sugar is out of control. You need medication.")
+        self.add_status("Uncontrolled Diabetes")
+        self.damage(15)
+        self.start_night()
+
+    def high_blood_pressure_crisis(self):
+        # EVENT: Hypertensive crisis - dangerously high blood pressure
+        # EFFECTS: Adds "Blood Pressure Crisis" status, 20 damage, 2 sanity loss; stroke risk
+        type.type("The headache hits like a hammer. Your vision swims. You feel your pulse pounding in your temples.")
+        print("\n")
+        type.type("Your face is flushed. Nosebleed starts. You're dizzy, disoriented.")
+        print("\n")
+        type.type("This is a " + red("hypertensive crisis") + ". Your blood pressure is dangerously high.")
+        print("\n")
+        type.type("Without intervention, you could stroke out any minute.")
+        self.add_status("Blood Pressure Crisis")
+        self.damage(20)
+        self.lose_sanity(2)
+        self.start_night()
+
+    def severe_allergic_reaction(self):
+        # EVENT: Anaphylactic shock - life-threatening allergic reaction
+        # EFFECTS: Adds "Anaphylaxis" status, 30 damage, 3 sanity loss; needs epinephrine immediately
+        type.type("It happens fast. One moment you're fine. The next, your throat is closing.")
+        print("\n")
+        type.type("Hives break out across your body. Your face swells. Your lips balloon.")
+        print("\n")
+        type.type("You can barely breathe. The wheezing gets louder.")
+        print("\n")
+        type.type(red("Anaphylaxis") + ". You need epinephrine. NOW.")
+        self.add_status("Anaphylaxis")
+        self.damage(30)
+        self.lose_sanity(3)
+        self.start_night()
+
+    def asthma_attack(self):
+        # EVENT: Severe asthma attack - can't breathe
+        # EFFECTS: Adds asthma status, needs nebulizer treatment; life-threatening
+        type.type("You can't breathe. You can't breathe. YOU CAN'T BREATHE.")
+        print("\n")
+        type.type("Your airways have constricted. Every breath is a whistle, a wheeze, barely any air getting through.")
+        print("\n")
+        type.type("Your lips are turning blue. You're panicking, which makes it worse.")
+        print("\n")
+        type.type(red("Asthma attack") + ". Severe one. You need a nebulizer treatment.")
+        self.add_status("Severe Asthma")
+        self.damage(20)
+        self.lose_sanity(3)
+        self.start_night()
+
+    def kidney_stones(self):
+        type.type("The pain is unlike anything you've ever experienced.")
+        print("\n")
+        type.type("It started in your back and radiated around to your front, down toward your groin. Waves of agony.")
+        print("\n")
+        type.type("You're vomiting from the pain. There's blood in your urine.")
+        print("\n")
+        type.type(red("Kidney stone") + ". Trying to pass through a tube not meant for jagged rocks.")
+        self.add_status("Kidney Stones")
+        self.damage(25)
+        self.lose_sanity(4)
+        self.start_night()
+
+    def gallbladder_attack(self):
+        type.type("After that greasy meal, the pain starts. Upper right abdomen, radiating to your back and shoulder blade.")
+        print("\n")
+        type.type("It's constant, not crampy. You're nauseous, sweating. The pain lasts for hours.")
+        print("\n")
+        type.type("Your gallbladder is full of stones. And one is blocking the duct.")
+        print("\n")
+        type.type(red("Gallbladder attack") + ". You might need surgery.")
+        self.add_status("Gallbladder Attack")
+        self.damage(20)
+        self.lose_sanity(2)
+        self.start_night()
+
+    def appendicitis_attack(self):
+        type.type("It started around your belly button. Dull ache. Now it's moved to your lower right side.")
+        print("\n")
+        type.type("The pain is sharp, constant, getting worse by the hour. You can't stand up straight.")
+        print("\n")
+        type.type("Pressing on your abdomen makes it worse. Releasing quickly - even worse.")
+        print("\n")
+        type.type(red("Appendicitis") + ". If it ruptures, you'll die of sepsis.")
+        self.add_status("Appendicitis")
+        self.damage(30)
+        self.lose_sanity(3)
+        self.start_night()
+
+    def blood_clot_in_leg(self):
+        type.type("Your calf is swollen, red, and warm to the touch. It aches deeply.")
+        print("\n")
+        type.type("You've been sitting too much. Not moving enough. The blood pooled and clotted.")
+        print("\n")
+        type.type(red("Deep vein thrombosis") + ". A blood clot in your leg.")
+        print("\n")
+        type.type("If it breaks loose and travels to your lungs, it's called a pulmonary embolism. And it can kill you in seconds.")
+        self.add_status("DVT")
+        self.damage(15)
+        self.lose_sanity(3)
+        self.start_night()
+
+    def migraine_severe(self):
+        type.type("The aura started an hour ago. Zigzag lines dancing across your vision.")
+        print("\n")
+        type.type("Now the pain has arrived. A sledgehammer behind your left eye. Light is agony. Sound is torture.")
+        print("\n")
+        type.type("You're nauseous. Vomiting. Lying in darkness, praying for it to end.")
+        print("\n")
+        type.type(red("Migraine") + ". Severe. You're completely incapacitated.")
+        self.add_status("Severe Migraine")
+        self.damage(10)
+        self.lose_sanity(4)
+        self.start_night()
+
+    def vertigo_episode(self):
+        type.type("The room is spinning. No - YOU'RE spinning. Everything is tilted, rotating, impossible to focus on.")
+        print("\n")
+        type.type("You can't stand. You can't walk. Moving your head makes it exponentially worse.")
+        print("\n")
+        type.type("You vomit from the dizziness. This isn't just being lightheaded.")
+        print("\n")
+        type.type(red("Vertigo") + ". Something is wrong with your inner ear.")
+        self.add_status("Vertigo")
+        self.damage(5)
+        self.lose_sanity(3)
+        self.start_night()
+
+    def seizure_episode(self):
+        type.type("You feel it coming. The strange taste in your mouth. The déjà vu. The rising sense of dread.")
+        print("\n")
+        type.type("Then everything goes blank.")
+        print("\n")
+        type.type("...")
+        print("\n")
+        type.type("You wake up on the ground. Your tongue is bloody where you bit it. Your pants are wet.")
+        print("\n")
+        type.type("People are staring. Paramedics are being called.")
+        print("\n")
+        type.type(red("Seizure") + ". Grand mal. You don't know when the next one will come.")
+        self.add_status("Seizure Disorder")
+        self.damage(20)
+        self.lose_sanity(5)
+        self.start_night()
+
+    def pancreatitis_attack(self):
+        type.type("The pain is centered in your upper abdomen and radiates straight through to your back.")
+        print("\n")
+        type.type("It's constant, severe, made worse by eating. You're vomiting, running a fever.")
+        print("\n")
+        type.type("You've been drinking too much. Or maybe it's gallstones. Either way...")
+        print("\n")
+        type.type(red("Pancreatitis") + ". Your pancreas is inflamed. It's eating itself.")
+        self.add_status("Pancreatitis")
+        self.damage(25)
+        self.lose_sanity(3)
+        self.start_night()
+
+    # INJURIES AND TRAUMA
+    def severe_burn_injury(self):
+        type.type("The burn covers a large portion of your arm. The skin is blistered, weeping, raw.")
+        print("\n")
+        type.type("Some areas are white and waxy - third degree. You can't feel those parts. That's not a good sign.")
+        print("\n")
+        type.type("The pain in the surrounding areas is excruciating.")
+        print("\n")
+        type.type(red("Severe burns") + ". Risk of infection. Possible need for skin grafts.")
+        self.add_injury("Severe Burns")
+        self.damage(25)
+        self.lose_sanity(3)
+        self.start_night()
+
+    def concussion_injury(self):
+        type.type("Your head hit hard. Too hard.")
+        print("\n")
+        type.type("Now everything is fuzzy. Light hurts. Sound hurts. You can't remember what happened before the impact.")
+        print("\n")
+        type.type("Nausea. Dizziness. You're not supposed to fall asleep, but you're so tired...")
+        print("\n")
+        type.type(red("Concussion") + ". Your brain bounced around inside your skull.")
+        self.add_injury("Concussion")
+        self.damage(15)
+        self.lose_sanity(4)
+        self.start_night()
+
+    def broken_ribs_injury(self):
+        type.type("Every breath is agony. You can feel the bones grinding against each other in your chest.")
+        print("\n")
+        type.type("Three ribs, at least. Maybe more. You can't take a deep breath without crying out.")
+        print("\n")
+        type.type("Laughing, coughing, sneezing - all torture. Sleeping is nearly impossible.")
+        print("\n")
+        type.type(red("Broken ribs") + ". Nothing to do but wait for them to heal. And pray they don't puncture a lung.")
+        self.add_injury("Broken Ribs")
+        self.damage(20)
+        self.lose_sanity(2)
+        self.start_night()
+
+    def dislocated_shoulder(self):
+        type.type("Your arm is hanging at a wrong angle. The shoulder joint has popped out of its socket.")
+        print("\n")
+        type.type("The pain is overwhelming. You can't move the arm at all. Every jostle is excruciating.")
+        print("\n")
+        type.type("Someone needs to put it back in. The longer you wait, the worse the muscle damage.")
+        print("\n")
+        type.type(red("Dislocated shoulder") + ". Needs reduction immediately.")
+        self.add_injury("Dislocated Shoulder")
+        self.damage(18)
+        self.lose_sanity(2)
+        self.start_night()
+
+    def broken_hand(self):
+        type.type("Your hand is swelling up like a balloon. The fingers are bent at unnatural angles.")
+        print("\n")
+        type.type("Multiple metacarpal fractures. You can see the bones misaligned under the skin.")
+        print("\n")
+        type.type("Picking up anything is impossible. Making a fist is impossible. Doing anything is impossible.")
+        print("\n")
+        type.type(red("Broken hand") + ". Going to need surgery to pin those bones.")
+        self.add_injury("Broken Hand")
+        self.damage(15)
+        self.lose_sanity(2)
+        self.start_night()
+
+    def broken_wrist(self):
+        type.type("You landed wrong. All your weight came down on your outstretched hand.")
+        print("\n")
+        type.type("Your wrist is already purple and misshapen. You can feel the bones grinding.")
+        print("\n")
+        type.type("Moving it sends bolts of white-hot pain up your arm.")
+        print("\n")
+        type.type(red("Broken wrist") + ". Colles fracture. Classic. Painful.")
+        self.add_injury("Broken Wrist")
+        self.damage(12)
+        self.lose_sanity(1)
+        self.start_night()
+
+    def broken_ankle(self):
+        type.type("You heard the snap when it happened. Felt it too.")
+        print("\n")
+        type.type("Your ankle is already swelling, turning purple. You can't put any weight on it at all.")
+        print("\n")
+        type.type("Walking is out of the question. You're going to need crutches. Maybe a boot. Maybe surgery.")
+        print("\n")
+        type.type(red("Broken ankle") + ". You're not going anywhere fast.")
+        self.add_injury("Broken Ankle")
+        self.damage(15)
+        self.lose_sanity(2)
+        self.start_night()
+
+    def torn_acl(self):
+        type.type("You pivoted wrong and felt the pop. Knew immediately something was very wrong.")
+        print("\n")
+        type.type("Your knee buckled. You went down. Now the joint is swelling rapidly.")
+        print("\n")
+        type.type("The knee feels unstable. Like it could give out at any moment.")
+        print("\n")
+        type.type(red("Torn ACL") + ". Going to need reconstruction surgery. And months of rehab.")
+        self.add_injury("Torn ACL")
+        self.damage(20)
+        self.lose_sanity(3)
+        self.start_night()
+
+    def herniated_disc(self):
+        type.type("You lifted something heavy and felt your back give out.")
+        print("\n")
+        type.type("Now there's shooting pain down your leg. Numbness. Tingling. Weakness.")
+        print("\n")
+        type.type("The disc between your vertebrae has ruptured, pressing on your spinal nerves.")
+        print("\n")
+        type.type(red("Herniated disc") + ". Every movement is agony. You might need surgery.")
+        self.add_injury("Herniated Disc")
+        self.damage(18)
+        self.lose_sanity(3)
+        self.start_night()
+
+    def deep_laceration(self):
+        type.type("The cut is deep. Really deep. You can see layers of tissue you're not supposed to see.")
+        print("\n")
+        type.type("Blood is pulsing out in rhythm with your heartbeat. That means an artery.")
+        print("\n")
+        type.type("You're applying pressure, but it keeps seeping through. You need stitches. Many of them.")
+        print("\n")
+        type.type(red("Deep laceration") + ". Maybe nicked an artery. Definitely needs sutures.")
+        self.add_injury("Deep Laceration")
+        self.damage(22)
+        self.start_night()
+
+    def puncture_wound(self):
+        type.type("The object went in clean. Small entry wound. But the damage is internal.")
+        print("\n")
+        type.type("Blood is pooling inside. You can feel things that shouldn't be damaged... damaged.")
+        print("\n")
+        type.type("The wound is barely bleeding on the outside. That's actually worse.")
+        print("\n")
+        type.type(red("Puncture wound") + ". Internal bleeding likely. Needs imaging. Needs surgery maybe.")
+        self.add_injury("Puncture Wound")
+        self.damage(25)
+        self.lose_sanity(2)
+        self.start_night()
+
+    def second_degree_burns(self):
+        type.type("The blisters cover your forearm. Large, fluid-filled, ready to pop.")
+        print("\n")
+        type.type("The skin around them is angry red. The pain is constant, throbbing.")
+        print("\n")
+        type.type("Every accidental brush against anything makes you gasp.")
+        print("\n")
+        type.type(red("Second degree burns") + ". Going to scar. Risk of infection is high.")
+        self.add_status("Second Degree Burns")
+        self.damage(15)
+        self.start_night()
+
+    def frostbite(self):
+        type.type("Your fingers and toes have gone white. Then grayish-blue. Now they're turning black at the tips.")
+        print("\n")
+        type.type("At first they hurt. Then they went numb. Now the feeling is coming back - and it's agony.")
+        print("\n")
+        type.type("Blood blisters are forming. The tissue is dying.")
+        print("\n")
+        type.type(red("Frostbite") + ". You might lose those extremities.")
+        self.add_injury("Frostbite")
+        self.damage(20)
+        self.lose_sanity(3)
+        self.start_night()
+
+    def heat_stroke(self):
+        type.type("You stopped sweating an hour ago. That was the first sign.")
+        print("\n")
+        type.type("Your skin is hot and dry. Your temperature is spiking - 104, 105, climbing.")
+        print("\n")
+        type.type("You're confused, disoriented. Your heart is racing. Muscles cramping.")
+        print("\n")
+        type.type(red("Heat stroke") + ". Your body can't cool itself. You're cooking from the inside.")
+        self.add_status("Heat Stroke")
+        self.damage(25)
+        self.lose_sanity(4)
+        self.start_night()
+
+    def hypothermia(self):
+        type.type("You can't stop shivering. No, wait - you stopped shivering. That's worse.")
+        print("\n")
+        type.type("Your fingers are clumsy, numb. Your thoughts are slowing. Everything seems so... far away.")
+        print("\n")
+        type.type("You're so tired. Just want to lie down. Just for a minute...")
+        print("\n")
+        type.type(red("Hypothermia") + ". Your core temperature is dropping. You're dying of cold.")
+        self.add_status("Hypothermia")
+        self.damage(25)
+        self.lose_sanity(5)
+        self.start_night()
+
+    def crush_injury(self):
+        type.type("The weight came down on your leg. You were trapped for hours before help came.")
+        print("\n")
+        type.type("Now that you're free, the real danger begins. Crush syndrome.")
+        print("\n")
+        type.type("Toxins from your damaged muscles are flooding your bloodstream. Your kidneys are failing.")
+        print("\n")
+        type.type(red("Crush injury") + ". You need dialysis. You need it now.")
+        self.add_injury("Crush Injury")
+        self.damage(35)
+        self.lose_sanity(5)
+        self.start_night()
+
+    def chemical_burn(self):
+        type.type("The substance ate through your clothes and into your skin.")
+        print("\n")
+        type.type("The burning sensation won't stop. You've rinsed it but the damage is done.")
+        print("\n")
+        type.type("The affected area is white, then red, then blistering. Layers of skin sloughing off.")
+        print("\n")
+        type.type(red("Chemical burn") + ". Acid or base, it doesn't matter. The tissue is destroyed.")
+        self.add_injury("Chemical Burn")
+        self.damage(22)
+        self.lose_sanity(2)
+        self.start_night()
+
+    def electrical_burn(self):
+        type.type("The entry wound is small. The exit wound is larger. But the real damage is inside.")
+        print("\n")
+        type.type("The current passed through your body, cooking tissue from within.")
+        print("\n")
+        type.type("Your heart rhythm was disrupted. You're still feeling palpitations. Muscles ache deeply.")
+        print("\n")
+        type.type(red("Electrical burn") + ". Internal damage unknown. Cardiac monitoring required.")
+        self.add_injury("Electrical Burns")
+        self.damage(28)
+        self.lose_sanity(3)
+        self.start_night()
+
+    def whiplash_injury(self):
+        type.type("The impact threw your head forward, then back, violently.")
+        print("\n")
+        type.type("Now your neck is stiff, painful. You can barely turn your head.")
+        print("\n")
+        type.type("Headaches. Dizziness. Your shoulders ache. Symptoms might last months.")
+        print("\n")
+        type.type(red("Whiplash") + ". Neck sprain. Might be worse - need imaging to know.")
+        self.add_injury("Whiplash")
+        self.damage(12)
+        self.lose_sanity(1)
+        self.start_night()
+
+    def jaw_fracture(self):
+        type.type("Your jaw won't close properly. Pain radiates through your face with every movement.")
+        print("\n")
+        type.type("You can feel the bones grinding against each other. The swelling is massive.")
+        print("\n")
+        type.type("Eating is impossible. Talking is agony.")
+        print("\n")
+        type.type(red("Fractured jaw") + ". Going to need wiring. Liquid diet for weeks.")
+        self.add_injury("Fractured Jaw")
+        self.damage(18)
+        self.lose_sanity(2)
+        self.start_night()
+
+    def skull_fracture(self):
+        type.type("You can feel the depression in your skull where the bone gave way.")
+        print("\n")
+        type.type("Clear fluid is leaking from your nose and ear. That's cerebrospinal fluid. That's bad.")
+        print("\n")
+        type.type("Your pupils are different sizes. You're losing consciousness intermittently.")
+        print("\n")
+        type.type(red("Skull fracture") + ". Brain swelling likely. Emergency surgery required.")
+        self.add_injury("Skull Fracture")
+        self.damage(40)
+        self.lose_sanity(6)
+        self.start_night()
+
+    def collapsed_lung(self):
+        type.type("You can only breathe with half your lungs. The other half has collapsed.")
+        print("\n")
+        type.type("Sharp chest pain. Shortness of breath. Your oxygen is dropping.")
+        print("\n")
+        type.type("The trauma to your chest forced air into the space around your lung.")
+        print("\n")
+        type.type(red("Pneumothorax") + ". Collapsed lung. Needs a chest tube. Now.")
+        self.add_injury("Collapsed Lung")
+        self.damage(30)
+        self.lose_sanity(4)
+        self.start_night()
+
+    def ruptured_spleen(self):
+        type.type("The blow to your abdomen didn't seem that bad at first.")
+        print("\n")
+        type.type("But now your left shoulder hurts - referred pain. Your abdomen is rigid, distended.")
+        print("\n")
+        type.type("You're getting pale, sweaty, heart racing. Internal bleeding.")
+        print("\n")
+        type.type(red("Ruptured spleen") + ". You're bleeding out internally. Surgery. Immediately.")
+        self.add_injury("Ruptured Spleen")
+        self.damage(35)
+        self.lose_sanity(4)
+        self.start_night()
+
+    def liver_laceration(self):
+        type.type("Right upper quadrant pain. Severe. Getting worse by the minute.")
+        print("\n")
+        type.type("You're bleeding internally. The liver is one of the most vascular organs.")
+        print("\n")
+        type.type("Blood pressure dropping. Consciousness fading. You need an OR. NOW.")
+        print("\n")
+        type.type(red("Liver laceration") + ". Every second counts.")
+        self.add_injury("Liver Laceration")
+        self.damage(40)
+        self.lose_sanity(5)
+        self.start_night()
+
+    def ruptured_eardrum(self):
+        type.type("The explosion of pain in your ear was followed by sudden deafness.")
+        print("\n")
+        type.type("Blood and fluid are draining out. The ringing is constant, overwhelming.")
+        print("\n")
+        type.type("You're dizzy, nauseous. Your balance is off.")
+        print("\n")
+        type.type(red("Ruptured eardrum") + ". May heal on its own. May need surgery. Hearing loss possible.")
+        self.add_injury("Ruptured Eardrum")
+        self.damage(10)
+        self.lose_sanity(3)
+        self.start_night()
+
+    def detached_retina(self):
+        type.type("It started with flashing lights in your vision. Then floating spots.")
+        print("\n")
+        type.type("Now there's a shadow creeping across your visual field. A curtain closing.")
+        print("\n")
+        type.type("Your retina is peeling away from the back of your eye.")
+        print("\n")
+        type.type(red("Retinal detachment") + ". Without surgery, permanent blindness in that eye.")
+        self.add_injury("Detached Retina")
+        self.damage(8)
+        self.lose_sanity(5)
+        self.start_night()
+
+    def orbital_fracture(self):
+        type.type("The blow to your face was devastating.")
+        print("\n")
+        type.type("The bone around your eye socket has fractured. Your eye is sunken, not tracking properly.")
+        print("\n")
+        type.type("Double vision. Numbness in your cheek. Blood pooling in the white of your eye.")
+        print("\n")
+        type.type(red("Orbital fracture") + ". Your eye socket is broken. Reconstructive surgery needed.")
+        self.add_injury("Orbital Fracture")
+        self.damage(20)
+        self.lose_sanity(4)
+        self.start_night()
+
+    def broken_nose(self):
+        type.type("The crunch was audible. Blood immediately poured from both nostrils.")
+        print("\n")
+        type.type("Your nose is clearly bent to one side now. Swelling is distorting your face.")
+        print("\n")
+        type.type("Breathing through your nose is impossible. The pain throbs with every heartbeat.")
+        print("\n")
+        type.type(red("Broken nose") + ". Needs to be set before it heals crooked.")
+        self.add_injury("Broken Nose")
+        self.damage(8)
+        self.lose_sanity(1)
+        self.start_night()
+
+    def broken_collarbone(self):
+        type.type("You can see the bump where your collarbone is no longer aligned.")
+        print("\n")
+        type.type("Moving your arm on that side is excruciating. The bone grinds audibly.")
+        print("\n")
+        type.type("Your shoulder is drooping forward. Supporting the arm helps the pain.")
+        print("\n")
+        type.type(red("Broken clavicle") + ". Going to need a sling for weeks. Maybe surgery.")
+        self.add_injury("Broken Collarbone")
+        self.damage(15)
+        self.lose_sanity(2)
+        self.start_night()
+
+    def tooth_abscess(self):
+        type.type("The toothache has become unbearable. Throbbing, constant, radiating through your jaw.")
+        print("\n")
+        type.type("Your face is swelling. You can taste the infection - pus draining into your mouth.")
+        print("\n")
+        type.type("Fever. Chills. The infection is spreading.")
+        print("\n")
+        type.type(red("Tooth abscess") + ". If it reaches your bloodstream or your brain, you're dead.")
+        self.add_status("Tooth Abscess")
+        self.damage(15)
+        self.lose_sanity(3)
+        self.start_night()
+
+    def blood_poisoning(self):
+        type.type("That wound got infected. And now the infection is in your blood.")
+        print("\n")
+        type.type("Red streaks are spreading from the site. You're burning with fever, shaking with chills.")
+        print("\n")
+        type.type("Your heart is racing. Blood pressure dropping. Organs starting to fail.")
+        print("\n")
+        type.type(red("Sepsis") + ". Blood poisoning. Without IV antibiotics, you'll be dead within hours.")
+        self.add_status("Sepsis")
+        self.damage(35)
+        self.lose_sanity(5)
+        self.start_night()
+
+    def severe_dehydration(self):
+        type.type("Your mouth is bone dry. Your skin has lost elasticity - when pinched, it stays tented.")
+        print("\n")
+        type.type("You're dizzy, confused. Heart racing. Haven't urinated in hours.")
+        print("\n")
+        type.type("Your blood is thickening. Your kidneys are shutting down.")
+        print("\n")
+        type.type(red("Severe dehydration") + ". You need IV fluids. Lots of them.")
+        self.add_status("Severe Dehydration")
+        self.damage(20)
+        self.lose_sanity(3)
+        self.start_night()
+
+    def malnutrition(self):
+        type.type("You've been eating poorly. Or not at all. For too long.")
+        print("\n")
+        type.type("Your hair is falling out. Your nails are brittle. Wounds won't heal.")
+        print("\n")
+        type.type("You're exhausted, weak. Your immune system is compromised.")
+        print("\n")
+        type.type(red("Malnutrition") + ". Your body is eating itself to survive.")
+        self.add_status("Malnutrition")
+        self.damage(15)
+        self.lose_sanity(2)
+        self.start_night()
+
+    def nerve_damage(self):
+        type.type("The injury damaged something important. A nerve bundle.")
+        print("\n")
+        type.type("Parts of your body are numb. Other parts are on fire with phantom pain.")
+        print("\n")
+        type.type("Some muscles won't respond at all. The signals just don't get through.")
+        print("\n")
+        type.type(red("Nerve damage") + ". May be permanent. May need surgery. May never fully recover.")
+        self.add_injury("Nerve Damage")
+        self.damage(12)
+        self.lose_sanity(4)
+        self.start_night()
+
+    def tendon_rupture(self):
+        type.type("You felt the snap. Like a rubber band breaking inside your limb.")
+        print("\n")
+        type.type("The muscle bunched up, detached from where it should connect.")
+        print("\n")
+        type.type("You can't move the affected part. The power just isn't there.")
+        print("\n")
+        type.type(red("Ruptured tendon") + ". Needs surgical reattachment. Months of recovery.")
+        self.add_injury("Ruptured Tendon")
+        self.damage(18)
+        self.lose_sanity(2)
+        self.start_night()
+
+    def muscle_tear(self):
+        type.type("The pop in your leg was followed by searing pain.")
+        print("\n")
+        type.type("A lump has formed where the muscle has bunched up. The area is bruising rapidly.")
+        print("\n")
+        type.type("Walking is nearly impossible. Every step is agony.")
+        print("\n")
+        type.type(red("Muscle tear") + ". Grade III. Complete rupture. Surgery likely.")
+        self.add_injury("Muscle Tear")
+        self.damage(15)
+        self.lose_sanity(1)
+        self.start_night()
+
+    def gangrene_infection(self):
+        type.type("The wound has turned black. The tissue is dying, rotting while still attached to your body.")
+        print("\n")
+        type.type("The smell is unmistakable. Sweet, sickly, the odor of death.")
+        print("\n")
+        type.type("It's spreading. Every hour, more tissue dies.")
+        print("\n")
+        type.type(red("Gangrene") + ". Amputation may be the only option to save your life.")
+        self.add_status("Gangrene")
+        self.damage(30)
+        self.lose_sanity(6)
+        self.start_night()
+
+    # MENTAL HEALTH CONDITIONS (Doctor can help with these too)
+    def severe_anxiety_attack(self):
+        type.type("Your heart is pounding out of your chest. You can't breathe. You're dying - you're sure of it.")
+        print("\n")
+        type.type("Except you're not. This is a panic attack. But it feels like death.")
+        print("\n")
+        type.type("Trembling, sweating, derealization. The world doesn't feel real.")
+        print("\n")
+        type.type(red("Severe anxiety disorder") + ". You need medication. Therapy. Something.")
+        self.add_status("Anxiety Disorder")
+        self.lose_sanity(5)
+        self.start_night()
+
+    def severe_depression_episode(self):
+        type.type("You can't get out of bed. Not 'don't want to' - literally cannot.")
+        print("\n")
+        type.type("Everything is gray. Nothing matters. You haven't showered in days. Eaten in longer.")
+        print("\n")
+        type.type("The weight on your chest is crushing. You're drowning in numbness.")
+        print("\n")
+        type.type(red("Major depressive episode") + ". You need help. If you can just reach out...")
+        self.add_status("Severe Depression")
+        self.lose_sanity(8)
+        self.start_night()
+
+    def insomnia_chronic(self):
+        type.type("You haven't slept properly in weeks. Months maybe. The hours blur together.")
+        print("\n")
+        type.type("Your eyes burn. Your thoughts are sluggish. You're making mistakes constantly.")
+        print("\n")
+        type.type("Every night you lie there, exhausted but wired, watching the hours tick by.")
+        print("\n")
+        type.type(red("Chronic insomnia") + ". Your body is breaking down without rest.")
+        self.add_status("Chronic Insomnia")
+        self.damage(10)
+        self.lose_sanity(5)
+        self.start_night()
+
+    def ptsd_flashback(self):
+        type.type("The sound triggers it. Or was it a smell? Suddenly you're THERE again.")
+        print("\n")
+        type.type("Not a memory - you're LIVING it. The fear is immediate, overwhelming.")
+        print("\n")
+        type.type("Your body reacts as if the trauma is happening NOW. Heart racing. Sweating. Shaking.")
+        print("\n")
+        type.type("When you come back to the present, you're curled on the floor. Hours have passed.")
+        print("\n")
+        type.type(red("PTSD flashback") + ". The trauma lives in your body. You need specialized help.")
+        self.add_status("PTSD")
+        self.lose_sanity(7)
+        self.start_night()
+
+    # EVENTS THAT CAUSE THESE CONDITIONS
+    def dirty_needle_stick(self):
+        type.type("You weren't paying attention. The needle went right into your hand.")
+        print("\n")
+        type.type("It wasn't clean. Rusty. Used. You don't know where it came from.")
+        print("\n")
+        type.type("Blood is beading at the puncture site. Your heart is racing with dread.")
+        print("\n")
+        type.type("What was on that needle? Hepatitis? HIV? " + red("Tetanus") + "?")
+        print("\n")
+        type.type("You need to get to a doctor. Get tested. Get prophylaxis. NOW.")
+        self.add_status("Needle Exposure")
+        self.add_danger("Possible Blood Disease")
+        self.damage(5)
+        self.lose_sanity(4)
+        self.start_night()
+
+    def bad_oysters(self):
+        type.type("The oysters tasted... off. You ate them anyway.")
+        print("\n")
+        type.type("Big mistake.")
+        print("\n")
+        type.type("Within hours, you're violently ill. Vomiting, diarrhea, fever, chills.")
+        print("\n")
+        type.type(red("Shellfish poisoning") + ". Vibrio bacteria. Could be fatal without treatment.")
+        self.add_status("Shellfish Poisoning")
+        self.damage(20)
+        self.lose_sanity(2)
+        self.start_night()
+
+    def rat_bite(self):
+        type.type("The rat came out of nowhere. Cornered, scared, it bit down HARD on your hand.")
+        print("\n")
+        type.type("The wound is deep, ragged. Rat teeth are dirty - full of bacteria.")
+        print("\n")
+        type.type("Within days, you're running a fever. Red streaks spreading from the bite.")
+        print("\n")
+        type.type(red("Rat bite fever") + ". Without antibiotics, this could kill you.")
+        self.add_status("Rat Bite Fever")
+        self.add_injury("Rat Bite")
+        self.damage(15)
+        self.start_night()
+
+    def bad_mushrooms(self):
+        type.type("You thought they were the safe kind. They were not.")
+        print("\n")
+        type.type("First came the nausea. Then the vomiting. Then the liver failure symptoms.")
+        print("\n")
+        type.type("Your skin is turning yellow. Your urine is dark brown. You're dying.")
+        print("\n")
+        type.type(red("Amanita poisoning") + ". Death cap mushroom. You need a liver transplant or you're dead.")
+        self.add_status("Mushroom Poisoning")
+        self.damage(40)
+        self.lose_sanity(5)
+        self.start_night()
+
+    def unclean_water(self):
+        type.type("The water looked clear. But it was from a contaminated source.")
+        print("\n")
+        type.type("Giardia. Cryptosporidium. E. coli. Something got into your gut.")
+        print("\n")
+        type.type("The cramping is severe. The diarrhea is watery, foul. You're getting dehydrated fast.")
+        print("\n")
+        type.type(red("Waterborne illness") + ". You need treatment before you lose too many fluids.")
+        self.add_status("Waterborne Illness")
+        self.damage(18)
+        self.start_night()
+
+    def mold_exposure(self):
+        # EVENT: Toxic black mold exposure - chronic respiratory and cognitive issues
+        # EFFECTS: Adds "Mold Toxicity" status, 12 damage, 3 sanity loss
+        type.type("The building you stayed in was full of black mold. You didn't realize until too late.")
+        print("\n")
+        type.type("Now you're coughing constantly. Wheezing. Your sinuses are on fire.")
+        print("\n")
+        type.type("Headaches. Fatigue. Brain fog. Memory problems.")
+        print("\n")
+        type.type(red("Toxic mold exposure") + ". The spores are in your lungs. This could be chronic.")
+        self.add_status("Mold Toxicity")
+        self.damage(12)
+        self.lose_sanity(3)
+        self.start_night()
+
+    def bee_sting_allergy(self):
+        # EVENT: Severe allergic reaction to bee sting - anaphylaxis
+        # EFFECTS: Adds "Anaphylaxis" status, 30 damage, 3 sanity loss; needs EpiPen immediately
+        type.type("One sting. That's all it took.")
+        print("\n")
+        type.type("Your throat is closing. Hives everywhere. Heart racing, blood pressure dropping.")
+        print("\n")
+        type.type("You're going into anaphylactic shock. Without an EpiPen, you have minutes.")
+        print("\n")
+        type.type(red("Severe bee allergy") + ". You need epinephrine NOW.")
+        self.add_status("Anaphylaxis")
+        self.damage(30)
+        self.lose_sanity(3)
+        self.start_night()
+
+    def lead_poisoning(self):
+        # EVENT: Lead poisoning from old paint/pipes - neurological damage
+        # EFFECTS: Adds "Lead Poisoning" status, 15 damage, 4 sanity loss; needs chelation therapy
+        type.type("The paint was old. The pipes were ancient. You didn't think about it.")
+        print("\n")
+        type.type("But the lead built up in your system over time. Now the symptoms are showing.")
+        print("\n")
+        type.type("Abdominal pain. Confusion. Fatigue. The blue-gray line on your gums.")
+        print("\n")
+        type.type(red("Lead poisoning") + ". Your brain is being damaged. You need chelation therapy.")
+        self.add_status("Lead Poisoning")
+        self.damage(15)
+        self.lose_sanity(4)
+        self.start_night()
+
+    def asbestos_exposure(self):
+        # EVENT: Asbestos fiber inhalation - permanent lung damage and cancer risk
+        # EFFECTS: Adds "Asbestos Damage" status + "Cancer Risk" danger, 15 damage, 5 sanity loss
+        type.type("You worked in that old building for months. Inhaling the dust.")
+        print("\n")
+        type.type("Now you're coughing. Short of breath. Chest pain.")
+        print("\n")
+        type.type("The X-ray shows scarring in your lungs. Plaques on your pleura.")
+        print("\n")
+        type.type(red("Asbestos exposure") + ". The fibers are embedded in your lungs forever. Mesothelioma is possible.")
+        self.add_status("Asbestos Damage")
+        self.add_danger("Cancer Risk")
+        self.damage(15)
+        self.lose_sanity(5)
+        self.start_night()
+
+    def mercury_poisoning(self):
+        # EVENT: Mercury poisoning from fish consumption - neurological damage
+        # EFFECTS: Adds "Mercury Poisoning" status, 18 damage, 4 sanity loss; may be permanent
+        type.type("You've been eating too much fish. The wrong kind. Mercury-laden.")
+        print("\n")
+        type.type("The tremors started first. Then the numbness in your hands and feet.")
+        print("\n")
+        type.type("Memory problems. Mood swings. Your vision is narrowing.")
+        print("\n")
+        type.type(red("Mercury poisoning") + ". Heavy metal toxicity. Neurological damage may be permanent.")
+        self.add_status("Mercury Poisoning")
+        self.damage(18)
+        self.lose_sanity(4)
+        self.start_night()
+
+    # ============================================
+    # SITUATIONAL MEDICAL EVENTS - THINGS THAT CAUSE CONDITIONS
+    # Accidents and injuries that result from everyday activities
+    # ============================================
+
+    def gym_accident(self):
+        # EVENT: Weight lifting accident - herniated disc from ego lifting
+        # EFFECTS: Adds "Herniated Disc" injury, 20 damage, 3 sanity loss
+        type.type("You decide to hit the gym. Get in shape. How hard could it be?")
+        print("\n")
+        type.type("You load up the barbell with way too much weight. Ego lifting.")
+        print("\n")
+        type.type("On the third rep, something gives. Your back spasms. You drop the weight.")
+        print("\n")
+        type.type("You're on the ground, unable to move. People are gathering around.")
+        print("\n")
+        type.type(red("Herniated disc") + ". Your gym career is over before it started.")
+        self.add_injury("Herniated Disc")
+        self.damage(20)
+        self.lose_sanity(3)
+        self.start_night()
+
+    def slip_in_shower(self):
+        # EVENT: Slip and fall in shower - concussion and head laceration
+        # EFFECTS: Adds "Concussion" + "Deep Laceration" injuries, 25 damage, 3 sanity loss
+        type.type("The shower floor is wet. Obviously. You reach for the shampoo...")
+        print("\n")
+        type.type("Your foot slips. You go down HARD.")
+        print("\n")
+        type.type("Your head bounces off the tile. Everything goes dark for a moment.")
+        print("\n")
+        type.type("You wake up with water pelting your face, blood mixing with the drain.")
+        print("\n")
+        type.type(red("Concussion") + " and a nasty gash on your head.")
+        self.add_injury("Concussion")
+        self.add_injury("Deep Laceration")
+        self.damage(25)
+        self.lose_sanity(3)
+        self.start_night()
+
+    def fall_down_stairs(self):
+        # EVENT: Fall down a flight of stairs - broken collarbone and ribs
+        # EFFECTS: Adds "Broken Collarbone" + "Broken Ribs" injuries, 30 damage, 3 sanity loss
+        type.type("You miss the top step. Just one moment of inattention.")
+        print("\n")
+        type.type("You tumble down the entire flight, hitting every step on the way.")
+        print("\n")
+        type.type("When you reach the bottom, you can't move your arm. Your ribs scream with every breath.")
+        print("\n")
+        type.type(red("Broken collarbone") + ". Possibly broken ribs too.")
+        self.add_injury("Broken Collarbone")
+        self.add_injury("Broken Ribs")
+        self.damage(30)
+        self.lose_sanity(3)
+        self.start_night()
+
+    def car_accident_minor(self):
+        # EVENT: Minor car accident - whiplash and possible broken ribs
+        # EFFECTS: Adds "Whiplash" injury + 33% chance "Broken Ribs", 22 damage, 2 sanity loss
+        type.type("The other car comes out of nowhere. You slam on the brakes but it's too late.")
+        print("\n")
+        type.type("CRUNCH. Your airbag deploys, slamming into your face.")
+        print("\n")
+        type.type("You're alive. But your neck... your neck won't turn. The seat belt bruised your chest badly.")
+        print("\n")
+        type.type(red("Whiplash") + " and possible broken ribs from the impact.")
+        self.add_injury("Whiplash")
+        if random.randint(1, 3) == 1:
+            self.add_injury("Broken Ribs")
+            type.type(" Those ribs are definitely cracked.")
+        self.damage(22)
+        self.lose_sanity(2)
+        self.start_night()
+
+    def construction_site_accident(self):
+        # EVENT: Fall into construction pit - broken ankle
+        # EFFECTS: Adds "Broken Ankle" injury, 18 damage, 2 sanity loss
+        type.type("You're walking past a construction site when the barrier gives way.")
+        print("\n")
+        type.type("You fall into the pit. It's not deep, but your ankle folds under you.")
+        print("\n")
+        type.type("The snap echoes off the concrete walls. You scream.")
+        print("\n")
+        type.type(red("Broken ankle") + ". The workers rush over, but the damage is done.")
+        self.add_injury("Broken Ankle")
+        self.damage(18)
+        self.lose_sanity(2)
+        self.start_night()
+
+    def bar_fight_aftermath(self):
+        type.type("You don't remember who started it. You remember the fist connecting with your face.")
+        print("\n")
+        type.type("Blood sprays from your nose. You go down. Someone stomps on your hand.")
+        print("\n")
+        type.type("When security finally breaks it up, you're a mess.")
+        print("\n")
+        type.type(red("Broken nose") + ". " + red("Broken hand") + ". Maybe a black eye too.")
+        self.add_injury("Broken Nose")
+        self.add_injury("Broken Hand")
+        self.damage(25)
+        self.lose_sanity(3)
+        self.start_night()
+
+    def kitchen_accident(self):
+        type.type("You're chopping vegetables when your phone buzzes. You look away for one second...")
+        print("\n")
+        type.type("The knife goes straight through your finger. You can see bone.")
+        print("\n")
+        type.type("Blood is everywhere. You're going to need stitches. Probably surgery.")
+        print("\n")
+        type.type(red("Deep laceration") + ". Nearly severed your finger.")
+        self.add_injury("Deep Laceration")
+        self.damage(15)
+        self.start_night()
+
+    def grease_fire(self):
+        type.type("You're frying something when the oil catches fire. Panicking, you throw water on it.")
+        print("\n")
+        type.type("The fireball that erupts catches you full in the face and arms.")
+        print("\n")
+        type.type("You scream as your skin blisters and chars.")
+        print("\n")
+        type.type(red("Second degree burns") + " covering your arms. Some might be third degree.")
+        self.add_status("Second Degree Burns")
+        self.damage(25)
+        self.lose_sanity(4)
+        self.start_night()
+
+    def sports_injury(self):
+        type.type("You're playing basketball when you pivot to shoot...")
+        print("\n")
+        type.type("POP.")
+        print("\n")
+        type.type("You heard it before you felt it. Your knee buckles. You go down clutching your leg.")
+        print("\n")
+        type.type(red("Torn ACL") + ". Season over. Maybe career over.")
+        self.add_injury("Torn ACL")
+        self.damage(20)
+        self.lose_sanity(3)
+        self.start_night()
+
+    def motorcycle_crash(self):
+        type.type("The car didn't see you. Pulled right out in front of you.")
+        print("\n")
+        type.type("You lay the bike down, sliding across the pavement. Your leg gets trapped under the motorcycle.")
+        print("\n")
+        type.type("Road rash everywhere. But worse - your leg is mangled. You can see the bone.")
+        print("\n")
+        type.type(red("Broken leg") + ". " + red("Severe burns") + " from the friction and exhaust.")
+        self.add_injury("Broken Leg")
+        self.add_injury("Severe Burns")
+        self.damage(40)
+        self.lose_sanity(5)
+        self.start_night()
+
+    def dog_attack_severe(self):
+        type.type("The dog was loose. No leash. No owner in sight.")
+        print("\n")
+        type.type("It lunges at you before you can react. Teeth sink into your forearm.")
+        print("\n")
+        type.type("You fight it off but the damage is done. Your arm is torn to shreds.")
+        print("\n")
+        type.type(red("Deep lacerations") + ". Possible " + red("rabies exposure") + ". Definitely need stitches.")
+        self.add_injury("Deep Laceration")
+        self.add_status("Possible Rabies")
+        self.damage(28)
+        self.lose_sanity(4)
+        self.start_night()
+
+    def pool_diving_accident(self):
+        type.type("The pool looked deeper than it was. You dive in headfirst.")
+        print("\n")
+        type.type("Your head hits the bottom. Your neck compresses. Everything goes numb for a terrifying moment.")
+        print("\n")
+        type.type("You surface, panicking, but find you can still move. Barely.")
+        print("\n")
+        type.type(red("Fractured spine") + ". You're lucky you're not paralyzed.")
+        self.add_injury("Fractured Spine")
+        self.damage(35)
+        self.lose_sanity(6)
+        self.start_night()
+
+    def chemical_spill(self):
+        type.type("The bottle wasn't labeled. You opened it and it splashed on your skin.")
+        print("\n")
+        type.type("Immediately, burning. Intense, searing burning. Your skin is bubbling.")
+        print("\n")
+        type.type("You rinse and rinse but the damage is done.")
+        print("\n")
+        type.type(red("Chemical burn") + ". Whatever that was, it ate through your flesh.")
+        self.add_injury("Chemical Burn")
+        self.damage(22)
+        self.lose_sanity(3)
+        self.start_night()
+
+    def electric_shock(self):
+        type.type("The wire was exposed. You didn't see it.")
+        print("\n")
+        type.type("The jolt throws you across the room. Your heart stutters. Your muscles seize.")
+        print("\n")
+        type.type("You come to on the floor, smoking slightly, your hand charred where you touched it.")
+        print("\n")
+        type.type(red("Electrical burns") + ". Internal damage unknown. Your heart is still skipping beats.")
+        self.add_injury("Electrical Burns")
+        self.damage(30)
+        self.lose_sanity(4)
+        self.start_night()
+
+    def workplace_injury(self):
+        type.type("The machinery caught your arm. Before you could pull away, it crushed everything.")
+        print("\n")
+        type.type("Bones shattered. Muscles pulped. You screamed until you passed out.")
+        print("\n")
+        type.type("When you wake up in the hospital, your arm is heavily bandaged. The doctor looks grim.")
+        print("\n")
+        type.type(red("Crush injury") + ". They saved the arm. Barely. Function uncertain.")
+        self.add_injury("Crush Injury")
+        self.damage(40)
+        self.lose_sanity(6)
+        self.start_night()
+
+    def assault_aftermath(self):
+        type.type("They came out of nowhere. Multiple attackers. You didn't stand a chance.")
+        print("\n")
+        type.type("The beating was brutal. When they left, you couldn't move.")
+        print("\n")
+        type.type("Broken ribs. Concussion. Internal bleeding. You're barely conscious when help arrives.")
+        print("\n")
+        type.type(red("Multiple injuries") + ". You might have a " + red("ruptured spleen") + ".")
+        self.add_injury("Broken Ribs")
+        self.add_injury("Concussion")
+        if random.randint(1, 2) == 1:
+            self.add_injury("Ruptured Spleen")
+        self.damage(45)
+        self.lose_sanity(7)
+        self.start_night()
+
+    def caught_in_fire(self):
+        type.type("The building is on fire. You're trapped.")
+        print("\n")
+        type.type("You run through the flames, your clothes igniting. The smoke fills your lungs.")
+        print("\n")
+        type.type("You make it out. Barely. Your skin is charred. You can't stop coughing.")
+        print("\n")
+        type.type(red("Severe burns") + ". Smoke inhalation. " + red("Collapsed lung") + " from the heat damage.")
+        self.add_injury("Severe Burns")
+        self.add_injury("Collapsed Lung")
+        self.damage(45)
+        self.lose_sanity(6)
+        self.start_night()
+
+    def frozen_outdoors(self):
+        type.type("You got lost. The temperature dropped. You couldn't find shelter.")
+        print("\n")
+        type.type("By the time they found you, your extremities were black. Your core temperature was dangerously low.")
+        print("\n")
+        type.type("You survived. But your fingers and toes...")
+        print("\n")
+        type.type(red("Frostbite") + ". Amputation might be necessary. " + red("Hypothermia") + " damage to your organs.")
+        self.add_injury("Frostbite")
+        self.add_status("Hypothermia")
+        self.damage(35)
+        self.lose_sanity(5)
+        self.start_night()
+
+    def heat_exhaustion_collapse(self):
+        type.type("You were outside too long. Too hot. Not enough water.")
+        print("\n")
+        type.type("First you stopped sweating. Then you got dizzy. Then you collapsed.")
+        print("\n")
+        type.type("When you wake up, you're in an ambulance, ice packs covering your body.")
+        print("\n")
+        type.type(red("Heat stroke") + ". Your body temperature hit 106. You're lucky to be alive.")
+        self.add_status("Heat Stroke")
+        self.damage(30)
+        self.lose_sanity(4)
+        self.start_night()
+
+    def drug_overdose_survival(self):
+        type.type("You took too much. You knew immediately.")
+        print("\n")
+        type.type("Your heart raced. Or maybe it slowed. You couldn't tell. Everything was wrong.")
+        print("\n")
+        type.type("You woke up in the ER with someone pulling a tube out of your throat.")
+        print("\n")
+        type.type(red("Overdose") + ". They gave you Narcan. Or charcoal. Whatever it took to save your life.")
+        self.add_status("Severe Dehydration")
+        self.add_status("Seizure Disorder")
+        self.damage(35)
+        self.lose_sanity(8)
+        self.start_night()
+
+    def allergic_reaction_restaurant(self):
+        type.type("They said there were no nuts in the dish. They lied.")
+        print("\n")
+        type.type("Within minutes, your throat is closing. Hives everywhere. You can't breathe.")
+        print("\n")
+        type.type("Someone stabs you with an EpiPen. You're rushed to the hospital.")
+        print("\n")
+        type.type(red("Anaphylaxis") + ". Severe allergic reaction. You almost died in that restaurant.")
+        self.add_status("Anaphylaxis")
+        self.damage(25)
+        self.lose_sanity(5)
+        self.start_night()
+
+    def botched_surgery(self):
+        type.type("The surgery was supposed to be routine. It wasn't.")
+        print("\n")
+        type.type("When you wake up, something is wrong. Terribly wrong.")
+        print("\n")
+        type.type("They nicked an artery. They left something inside. Something went septic.")
+        print("\n")
+        type.type(red("Surgical complications") + ". Now you're fighting for your life instead of recovering.")
+        self.add_status("Sepsis")
+        self.add_injury("Puncture Wound")
+        self.damage(40)
+        self.lose_sanity(6)
+        self.start_night()
+
+    def dental_disaster(self):
+        type.type("You've been ignoring that toothache for weeks. Months. It's gotten worse.")
+        print("\n")
+        type.type("Now your face is swollen. You can feel pus draining into your mouth. The fever is high.")
+        print("\n")
+        type.type("The infection is spreading toward your brain.")
+        print("\n")
+        type.type(red("Tooth abscess") + " gone systemic. " + red("Sepsis") + " is setting in.")
+        self.add_status("Tooth Abscess")
+        self.add_status("Sepsis")
+        self.damage(35)
+        self.lose_sanity(5)
+        self.start_night()
+
+    def gym_collapse(self):
+        type.type("You're on the treadmill, pushing hard. Too hard.")
+        print("\n")
+        type.type("Your chest tightens. Your left arm goes numb. You stumble off the machine.")
+        print("\n")
+        type.type("Is this... a heart attack? At your age?")
+        print("\n")
+        type.type(red("Cardiac event") + ". You need help. NOW.")
+        self.add_status("Blood Pressure Crisis")
+        self.add_danger("Heart Condition")
+        self.damage(30)
+        self.lose_sanity(5)
+        self.start_night()
+
+    def food_truck_nightmare(self):
+        type.type("The food truck looked sketchy but you were hungry. Big mistake.")
+        print("\n")
+        type.type("Hours later, you're praying to the porcelain god. Both ends. Simultaneously.")
+        print("\n")
+        type.type("The cramping is severe. There's blood in the diarrhea. This is serious.")
+        print("\n")
+        type.type(red("Severe food poisoning") + ". E. coli or Salmonella. You need IV fluids.")
+        self.add_status("Stomach Flu")
+        self.add_status("Severe Dehydration")
+        self.damage(25)
+        self.lose_sanity(3)
+        self.start_night()
+
+    def public_pool_infection(self):
+        type.type("The public pool was crowded. Too crowded. The water was... questionable.")
+        print("\n")
+        type.type("A week later, your ear is killing you. Burning when you urinate. Eye is crusty.")
+        print("\n")
+        type.type("You picked up everything in that cesspool.")
+        print("\n")
+        type.type(red("Ear infection") + ". " + red("Pink eye") + ". Possibly a " + red("UTI") + ".")
+        self.add_status("Ear Infection")
+        self.add_status("Pink Eye")
+        if random.randint(1, 2) == 1:
+            self.add_status("UTI")
+        self.damage(12)
+        self.start_night()
+
+    def hiking_disaster(self):
+        type.type("The hike was supposed to be easy. Then the trail gave way.")
+        print("\n")
+        type.type("You tumbled down the ravine, bouncing off rocks, trying to protect your head.")
+        print("\n")
+        type.type("When you stop falling, you can't move your ankle. Your wrist is bent wrong. You're bleeding from somewhere.")
+        print("\n")
+        type.type(red("Broken ankle") + ". " + red("Broken wrist") + ". Miles from help.")
+        self.add_injury("Broken Ankle")
+        self.add_injury("Broken Wrist")
+        self.damage(30)
+        self.lose_sanity(4)
+        self.start_night()
+
+    def wasp_nest_encounter(self):
+        type.type("You didn't see the nest. Not until it was too late.")
+        print("\n")
+        type.type("The swarm descends on you. Stings everywhere. You run, but they follow.")
+        print("\n")
+        type.type("By the time you escape, you've been stung dozens of times. Your throat is tightening...")
+        print("\n")
+        type.type(red("Multiple wasp stings") + ". Possible " + red("anaphylaxis") + ".")
+        self.add_status("Anaphylaxis")
+        self.damage(30)
+        self.lose_sanity(4)
+        self.start_night()
+
+    def camping_tick_bite(self):
+        type.type("You find the tick embedded in your skin days after the camping trip.")
+        print("\n")
+        type.type("It's engorged. Been feeding for a while. You pull it out, but the damage is done.")
+        print("\n")
+        type.type("Weeks later, the symptoms start. Joint pain. Fatigue. The telltale rash.")
+        print("\n")
+        type.type(red("Lyme disease") + ". That one tick has changed your life.")
+        self.add_status("Lyme Disease")
+        self.damage(15)
+        self.lose_sanity(3)
+        self.start_night()
+
+    def homeless_shelter_outbreak(self):
+        type.type("You stayed at the shelter when you had nowhere else to go.")
+        print("\n")
+        type.type("The beds were close together. Too close. Someone was coughing all night.")
+        print("\n")
+        type.type("Within days, you're coughing too. Deep, rattling coughs. Fever. Night sweats.")
+        print("\n")
+        type.type(red("Pneumonia") + ". Maybe something worse. The conditions were ripe for disease.")
+        self.add_status("Pneumonia")
+        self.damage(18)
+        self.lose_sanity(2)
+        self.start_night()
+
+    def prison_shiv_wound(self):
+        type.type("Wrong place. Wrong time. Wrong look at the wrong guy.")
+        print("\n")
+        type.type("The sharpened toothbrush went into your gut before you even saw it coming.")
+        print("\n")
+        type.type("You're on the ground, holding your intestines in, as guards finally respond.")
+        print("\n")
+        type.type(red("Puncture wound") + ". Perforated bowel. " + red("Sepsis") + " is a certainty without immediate surgery.")
+        self.add_injury("Puncture Wound")
+        self.add_status("Sepsis")
+        self.damage(45)
+        self.lose_sanity(6)
+        self.start_night()
+
+    def daycare_plague(self):
+        type.type("Your kid brought home something from daycare. Now everyone has it.")
+        print("\n")
+        type.type("First the stomach flu spread through the family. Then the ear infections. Then the pink eye.")
+        print("\n")
+        type.type("You're exhausted, sick, and covered in various bodily fluids.")
+        print("\n")
+        type.type(red("Multi-infection") + ". Kids are disease vectors. You're patient zero's victim.")
+        self.add_status("Stomach Flu")
+        self.add_status("Ear Infection")
+        self.add_status("Pink Eye")
+        self.damage(20)
+        self.lose_sanity(3)
+        self.start_night()
+
+    def bad_tattoo_infection(self):
+        type.type("The tattoo parlor was cheap. Too cheap. Now you know why.")
+        print("\n")
+        type.type("The fresh ink is swollen, oozing pus. Red lines spreading outward.")
+        print("\n")
+        type.type("The artist didn't sterilize properly. Or used contaminated ink.")
+        print("\n")
+        type.type(red("Staph infection") + " from a dirty needle. Your new tattoo might kill you.")
+        self.add_status("Staph Infection")
+        self.damage(18)
+        self.lose_sanity(2)
+        self.start_night()
+
+    def mma_fight_aftermath(self):
+        type.type("You thought you could handle yourself in a fight. You were wrong.")
+        print("\n")
+        type.type("The armbar hyperextended your elbow. The chokehold knocked you out. The ground and pound did the rest.")
+        print("\n")
+        type.type("You leave the cage on a stretcher.")
+        print("\n")
+        type.type(red("Dislocated shoulder") + ". " + red("Concussion") + ". " + red("Broken ribs") + ".")
+        self.add_injury("Dislocated Shoulder")
+        self.add_injury("Concussion")
+        self.add_injury("Broken Ribs")
+        self.damage(40)
+        self.lose_sanity(5)
+        self.start_night()
+
+    def covid_complications(self):
+        type.type("It started like a cold. Then you couldn't breathe.")
+        print("\n")
+        type.type("Your oxygen levels dropped. Your lungs filled with fluid. You were intubated for two weeks.")
+        print("\n")
+        type.type("You survived. But the damage...")
+        print("\n")
+        type.type(red("Severe respiratory infection") + ". " + red("DVT") + " from lying in bed. Long-term effects unknown.")
+        self.add_status("Pneumonia")
+        self.add_status("DVT")
+        self.damage(35)
+        self.lose_sanity(6)
+        self.start_night()
+
+    def earthquake_injury(self):
+        type.type("The building shook. The ceiling came down.")
+        print("\n")
+        type.type("You were trapped under debris for hours. Concrete pinning your legs.")
+        print("\n")
+        type.type("When they pulled you out, the real danger began - crush syndrome.")
+        print("\n")
+        type.type(red("Crush injury") + ". Toxins flooding your system. Kidneys failing.")
+        self.add_injury("Crush Injury")
+        self.damage(40)
+        self.lose_sanity(7)
+        self.start_night()
+
+    def carnival_ride_accident(self):
+        type.type("The ride malfunctioned. The safety bar wasn't locked properly.")
+        print("\n")
+        type.type("You were thrown from the car, hitting multiple surfaces on the way down.")
+        print("\n")
+        type.type("The crowd screams. You can't feel your legs.")
+        print("\n")
+        type.type(red("Fractured spine") + ". " + red("Broken collarbone") + ". Internal injuries unknown.")
+        self.add_injury("Fractured Spine")
+        self.add_injury("Broken Collarbone")
+        self.damage(45)
+        self.lose_sanity(8)
+        self.start_night()
+
+    def window_crash(self):
+        type.type("Someone pushed you. Or you fell. The glass shattered around you.")
+        print("\n")
+        type.type("You're covered in cuts. Some are deep - arterial spurting. Glass is embedded everywhere.")
+        print("\n")
+        type.type("You're losing blood fast.")
+        print("\n")
+        type.type(red("Multiple lacerations") + ". " + red("Puncture wounds") + " from glass shards.")
+        self.add_injury("Deep Laceration")
+        self.add_injury("Puncture Wound")
+        self.damage(35)
+        self.lose_sanity(4)
+        self.start_night()
+
+    def trampoline_disaster(self):
+        type.type("You're never too old for trampolines. That's what you told yourself.")
+        print("\n")
+        type.type("You landed wrong. Your knee went in a direction knees don't go.")
+        print("\n")
+        type.type("The pop was audible. The pain was indescribable.")
+        print("\n")
+        type.type(red("Torn ACL") + ". Also " + red("dislocated kneecap") + ". Reconstruction required.")
+        self.add_injury("Torn ACL")
+        self.damage(25)
+        self.lose_sanity(3)
+        self.start_night()
+
+    def explosion_nearby(self):
+        type.type("The explosion threw you ten feet. Your ears are ringing. Blood coming from everywhere.")
+        print("\n")
+        type.type("Shrapnel. Burns. Concussion. You don't know which direction is up.")
+        print("\n")
+        type.type("Everything is muffled. Everything hurts.")
+        print("\n")
+        type.type(red("Ruptured eardrums") + ". " + red("Concussion") + ". " + red("Second degree burns") + ". " + red("Shrapnel wounds") + ".")
+        self.add_injury("Ruptured Eardrum")
+        self.add_injury("Concussion")
+        self.add_status("Second Degree Burns")
+        self.add_injury("Puncture Wound")
+        self.damage(45)
+        self.lose_sanity(7)
+        self.start_night()
+
+    def botched_piercing(self):
+        type.type("The piercing didn't heal right. It got infected. Then REALLY infected.")
+        print("\n")
+        type.type("Your ear is swollen, hot, draining pus. The cartilage might be damaged.")
+        print("\n")
+        type.type("All for a little hole.")
+        print("\n")
+        type.type(red("Staph infection") + " from improper aftercare. Possible permanent ear deformity.")
+        self.add_status("Staph Infection")
+        self.damage(12)
+        self.lose_sanity(2)
+        self.start_night()
+
+    def weight_dropping(self):
+        type.type("You're spotting someone at the gym. They lose control of the weight.")
+        print("\n")
+        type.type("The barbell comes down on your hand before you can move.")
+        print("\n")
+        type.type("You hear the bones crack before you feel it.")
+        print("\n")
+        type.type(red("Broken hand") + ". Multiple metacarpal fractures. Surgical repair needed.")
+        self.add_injury("Broken Hand")
+        self.damage(18)
+        self.lose_sanity(2)
+        self.start_night()
+
+    def bad_sushi(self):
+        type.type("The sushi was a day old. Maybe two. You ate it anyway.")
+        print("\n")
+        type.type("The food poisoning hits hard. But there's something else. Parasites.")
+        print("\n")
+        type.type("You can feel something moving in your gut. Something alive.")
+        print("\n")
+        type.type(red("Parasitic infection") + ". Anisakis worms from raw fish. They're eating you from inside.")
+        self.add_status("Waterborne Illness")
+        self.add_status("Stomach Flu")
+        self.damage(22)
+        self.lose_sanity(5)
+        self.start_night()
+
+    def coma_awakening(self):
+        type.type("You don't remember the accident. You don't remember the last three weeks.")
+        print("\n")
+        type.type("You wake up in a hospital bed, tubes everywhere. Muscles atrophied. Confused.")
+        print("\n")
+        type.type("The doctors tell you you're lucky to be alive. You don't feel lucky.")
+        print("\n")
+        type.type(red("Severe injuries") + " from an event you can't recall. " + red("Nerve damage") + ". " + red("DVT") + " from bed rest.")
+        self.add_injury("Nerve Damage")
+        self.add_status("DVT")
+        self.add_status("Malnutrition")
+        self.damage(30)
+        self.lose_sanity(8)
+        self.start_night()
+
+    def stress_breakdown(self):
+        type.type("It's all too much. The gambling. The stress. The fear. The debt.")
+        print("\n")
+        type.type("Your heart starts racing and won't stop. You can't breathe. You're dying. You're sure of it.")
+        print("\n")
+        type.type("Hours later, still trembling, you realize it was a panic attack. But it felt real.")
+        print("\n")
+        type.type(red("Severe anxiety disorder") + ". " + red("Chronic insomnia") + ". Your mind is breaking.")
+        self.add_status("Anxiety Disorder")
+        self.add_status("Chronic Insomnia")
+        self.lose_sanity(10)
+        self.start_night()
+
+    def trauma_flashback(self):
+        type.type("Something triggers it. A sound. A smell. Suddenly you're THERE again.")
+        print("\n")
+        type.type("The casino. The Dealer. The losses. The fear. You relive it all in an instant.")
+        print("\n")
+        type.type("When you come back to reality, you're curled on the floor, shaking.")
+        print("\n")
+        type.type(red("PTSD episode") + ". The trauma is embedded in your nervous system.")
+        self.add_status("PTSD")
+        self.lose_sanity(8)
+        self.start_night()
+
+    def sleep_deprivation_crisis(self):
+        type.type("How long since you slept? Three days? Four? You've lost count.")
+        print("\n")
+        type.type("You're seeing things. Hearing things. Your thoughts don't connect properly.")
+        print("\n")
+        type.type("Your body is shutting down from lack of rest.")
+        print("\n")
+        type.type(red("Chronic insomnia") + " induced psychosis. " + red("Severe depression") + ". You need medical intervention.")
+        self.add_status("Chronic Insomnia")
+        self.add_status("Severe Depression")
+        self.damage(15)
+        self.lose_sanity(12)
+        self.start_night()
+
+    # ============================================
+    # MECHANIC INTRODUCTIONS
+    # ============================================
+
+    def trusty_tom(self):
+        self.meet("Tom Event")
+        type.type("A blaring engine roars down the road towards you. ")
+        type.type("As you scratch your eyes awake, you read \'Tom's Trusty Trucks and Tires\' painted on the hood of a bright gold truck. ")
+        type.type("Waving the vehicle down, the truck slows, then halts, and an old, jolly man jumps out. ")
+        print("\n")
+        type.type("\"Well, howdy! The name's Tom. It appears you've gotten yourself in a bit of a pickle, ya think?\" ")
+        type.type("Tom pulls a big red wrench out of his pocket, and walks to the hood of your beaten down wagon. ")
+        repair_price = random.choice([150, 200, 250, 300, 350])
+        type.type("\"Yep, this thing's busted alright! Tell ya what, for, I don't know, " + green(bright(str(repair_price) + " bucks")) + ", ")
+        type.type("I'll get this thing replaced for ya, good as new! Whaddya say?\" ")
+        while(True):
+            yes_or_no = input("").lower()
+            print()
+            if(yes_or_no == "n") or (yes_or_no == "no"):
+                type.type("\"Really? No dice, huh. Yunno, I think you're makin' a mistake, but I ain't one to judge. You have a nice day now.\" ")
+                type.type("Tom has a sad look in his eye. It's clear that he wanted to help you. ")
+                type.type("You watch as his big golden truck stutters, starts, then drives away.")
+                print("\n")
+                return
+            elif((yes_or_no == "y") or (yes_or_no == "yes")):
+                if self._balance >= repair_price:
+                    self.meet("Tom")
+                    type.type("\"Really? Awesome! I'll be the best dang mechanic this ol' automobile has ever seen!\" ")
+                    type.type("You watch in awe, as Tom, a man who has clearly perfected his craft, fixes up your wagon in no time. Sweet. ")
+                    self.change_balance(-repair_price)
+                    self.add_item("Car")
+                    type.type(magenta(bright("Your car has been fixed! You can now drive around!")))
+                    print("\n")
+                    type.type("\"Well, gee, this has been fun. Be seein' you around, ya know?\" ")
+                    type.type("And with that, you watch as his big golden truck stutters, starts, then drives away.")
+                    print("\n")
+                    return
+                else:
+                    type.type("\"Aww man, sorry to tell you, but you just don't got enough funds for this, yunno?\" ")
+                    random_chance = random.randrange(2)
+                    # Broke, and Tom offers discount
+                    if random_chance == 0:
+                        print("\n")
+                        type.type("\"You know what? I'm feelin' generous, and the shop's been doing well lately. ")
+                        type.type("Tell ya what, I can take the offer down " + green(bright(str(50) + " dollars")) + " just for you. ")
+                        type.type("Could ya do " + green(bright(str(repair_price-50) + " bucks")) + "?\" ")
+                        while True:
+                            yes_or_no_2 = input("").lower()
+                            print()
+                            # Declining Tom's second offer
+                            if(yes_or_no_2 == "n") or (yes_or_no_2=="no"):
+                                print()
+                                type.type("\"Really? No dice, huh. Even with the discount? Yunno, I think you're makin' a mistake, but I ain't one to judge. You have a nice day now.\" ")
+                                type.type("Tom has a dissapointed look in his eye. It's clear that he wanted to help you. ")
+                                type.type("You watch as his big golden truck stutters, starts, then drives away.")
+                                print("\n")
+                                return
+                            elif((yes_or_no_2 == "y") or (yes_or_no_2 == "yes")):
+                                if self._balance >= (repair_price-50):
+                                    self.meet("Tom")
+                                    type.type("\"Really? Awesome! I'll be the best dang mechanic this ol' automobile has ever seen!\" ")
+                                    type.type("You watch in awe, as Tom, a man who has clearly perfected his craft, fixes up your wagon in no time. Sweet. ")
+                                    self.change_balance(-(repair_price-50))
+                                    self.add_item("Car")
+                                    type.type(magenta(bright("Your car has been fixed! You can now drive around!")))
+                                    print("\n")
+                                    type.type("\"Well, gee, this has been fun. Be seein' you around, ya know?\" ")
+                                    type.type("And with that, you watch as his big golden truck stutters, starts, then drives away.")
+                                    print("\n")
+                                    return
+                                else:
+                                    type.type("\"Still can't afford it? That's a real shame. I really wish there was something I could do. Best of luck my friend. Be seeing ya around, ya know?\" ")
+                                    type.type("And with that, you watch as his big golden truck stutters, starts, then drives away.")
+                                    print("\n")
+                                return
+                            else:
+                                type.type("\"Whaddya say?\" ")
+
+                    # Broke, and Tom can't offer discount
+                    elif random_chance == 1:
+                        print("\n")
+                        type.type("\"I really wish there was something I could do. Best of luck my friend. Be seeing ya around, ya know?\" ")
+                        type.type("And with that, you watch as his big golden truck stutters, starts, then drives away.")
+                        print("\n")
+                        return
+            else:
+                type.type("\"Whaddya say?\" ")
+
+    def filthy_frank(self):
+        self.meet("Frank Event")
+        type.type("A roaring engine blasts into your eardrums. ")
+        type.type("As you jump up out of the front seat, you read \'Filthy Frank's Flawless Fixtures\' painted on the hood of a...well...a beater. ")
+        type.type("Waving the vehicle down, the beater slows, then appears to break down, ")
+        type.type("and an old man with tattoo sleeves and long black hair steps out. ")
+        type.type("He kicks his car, and the engine starts blaring once more. ")
+        print("\n")
+        type.type("\"Hello, the name's Frank. Now I've got a baseball game to catch, but it looks like you could use some help.\" ")
+        type.type("Frank pulls a shiny silver hammer out of his pocket, and walks to the hood of your beaten down wagon. ")
+        repair_price = random.choice([50, 75, 100])
+        type.type("\"My god. This is just awful. Tell you what, I can fix this up for like " + green(bright(str(repair_price) + " bucks")) + ", ")
+        type.type("and your engine will be runnin' just as good as mine. You game?\" ")
+        while(True):
+            yes_or_no = input("").lower()
+            print()
+            if(yes_or_no == "n") or (yes_or_no == "no"):
+                type.type("\"What?! How could you not accept my service? I'm the cheapest damn autoshop worker on this here planet! ")
+                type.type("But NOOOO, NOT FRANK! Never Frank. He Voted For Trump! ")
+                type.type("Let's all ridicule frank for his political party. You god damn liberals.\" ")
+                type.type("Frank spits in your face, and get back in his truck. ")
+                print("\n")
+                type.type("You watch as he revs his engine, gets out of his truck, kicks his beater, gets back in, revs his engine, and speeds off into the horizon. ")
+                print("\n")
+                return
+            elif((yes_or_no == "y") or (yes_or_no == "yes")):
+                if self._balance >= repair_price:
+                    type.type("\"Darn tootin! Lemme just do my thing.\" ")
+                    type.type("You watch in terror as Frank takes the hammer, and begins to beat the living daylight out of your wagon's engine. ")
+                    type.type("Each swing causes you to wince more and more. ")
+                    self.change_balance(-repair_price)
+                    random_chance = random.randrange(5)
+                    if random_chance < 2:
+                        self.meet("Frank")
+                        self.add_item("Car")
+                        type.type(magenta(bright("Your car has been fixed! You can now drive around!")))
+                        print("\n")
+                        type.type("\"Ah, I love fixin people's cars. You sure do drive a shitty vehicle, ")
+                        type.type("but I'm just glad I can help get you back up and going to your job every day. ")
+                        type.type("Gotta do something to help in this economy, you know?\" ")
+                        print("\n")
+                        type.type("And with that, you watch as he revs his engine, gets out of his truck, kicks his beater, gets back in, revs his engine, and speeds off into the horizon.")
+                        print("\n")
+                        return
+                    else: 
+                        type.type("You notice Frank beginning to sweat while trying to fix your car. ")
+                        type.type("Each swing of his hammer is getting louder and louder, and Frank is clearly beginning to panic. ")
+                        type.type("Frank turns towards you, with tears streaming down his face. Or maybe it's just sweat.")
+                        print("\n")
+                        type.type("\"Oh man, listen, I'm so sorry about this, you know? I really thought if I just gave it the old hammer whirl that would do the trick. ")
+                        type.type("Hold on, maybe I have something in my truck. Stay right here!\"")
+                        print("\n")
+                        type.type("You watch Frank runs over to his truck, kicks the side of it, gets in, revs his engine, and speeds off into the horizon. God Dammit.")
+                        print("\n")
+                        return
+                else:
+                    self.add_danger("Frank")
+                    type.type("\"Are you tryna rip me off? Clearly you don't have enough money to afford my services, which is honestly pathetic, since I have the cheapest services around! ")
+                    type.type("I don't get what it is with you young folk and not working, just staying home and smoking weed. ")
+                    type.type("It's miserable. You're miserable. Dontchu know I know people on the inside! I'll remember this one.\"")
+                    print("\n")
+                    type.type("You watch as he revs his engine, gets out of his truck, kicks his beater, gets back in, revs his engine, and speeds off into the horizon.")
+                    print("\n")
+                    return
+            else:
+                type.type("\"Speak up! You're mumbling. \" ")
+
+    def optimal_oswald(self):
+        self.meet("Oswald Event")
+        type.type("A glossy black limousine is quietly approaching your wagon. ")
+        type.type("As you sit up from your slumber, you read \'Oswald's Optimal Outoparts\' cursively engraved in gold letters on the side of the limo. ")
+        type.type("Waving the vehicle down, the limo slows, then stops before you. ")
+        type.type("The door opens vertically, and a large red carpet is rolled out onto the street. ")
+        type.type("You watch in awe as a man, with a combover and a tuxedo, walks out before you. He coughs, then speaks.")
+        print("\n")
+        type.type("\"Why hello there! The name's Oswald, as you can see by my nametag. ")
+        type.type("Do you like my bowtie? Well of course you do! It appears your limousine has broken down.\" ")
+        type.type("Oswald pulls a gold whistle out of his pocket, and blows into it deeply. ")
+        type.type("\"Oh Stuart!\" You watch as a bald man in a tailcoat suit, no taller than 4 feet, hobbles over to Oswald's side.")
+        print("\n")
+        type.type("\"This is Stuart! He will fix your limousine up for a fair price. ")
+        type.type("Let's say, I don't know, I suppose a fair price is " + green(bright("500,000 dollars")) + ". ")
+        repair_price = random.choice([800, 850, 900])
+        type.type("Okay, the look on your face says that I'm making a big mistake. ")
+        type.type("Let's try " + green(bright("$" + str(repair_price))) + ", and Stuart here will get you back on the road! Do you accept?\" ")
+        while(True):
+            yes_or_no = input("").lower()
+            print()
+            if(yes_or_no == "n") or (yes_or_no == "no"):
+                type.type("\"Really? You don't want my services? I'm so sorry Stuart, But it appears they don't want our services.\" ")
+                type.type("Stuart begins to break down into tears, and he runs quickly back into the limo. ")
+                type.type("\"Shame on you! Shame on you! I hope to never see the likes of you again.\"")
+                print("\n")
+                type.type("You watch as Oswald rolls up the red carpet, gets back in the limo, and drives off into the distance.")
+                print("\n")
+                return
+            elif((yes_or_no == "y") or (yes_or_no == "yes")):
+                if self._balance >= repair_price:
+                    self.meet("Oswald")
+                    type.type("\"Jolly good! Stuart!\" ")
+                    type.type("You watch as the little man walks to the front of your wagon, opens the hood, and jumps in. ")
+                    type.type("You can't really see what's going on, but after a couple of minutes, Stuart jumps back out, covered in oil.")
+                    self.change_balance(-repair_price)
+                    self.add_item("Car")
+                    type.type(magenta(bright("Your car has been fixed! You can now drive around!")))
+                    print("\n")
+                    type.type("\"Oh my Stuart! Someone got a little too excited, didn't you? ")
+                    type.type("Yep, you're getting a bath as soon as we get back to the shop. ")
+                    type.type("Thanks again, stranger, it's been a pleasure doing business with you. ")
+                    type.type("I recall it's good custom to tip after events like this, yes? Here, take this.\" ")
+                    tip = random.choice([50, 100])
+                    type.type("Oswald hands you a bright green bill, worth " + green(bright("$" + str(tip))) + ".")
+                    self.change_balance(tip)
+                    type.type("And with that, you watch as Stuart rolls up the red carpet. Oswald and Stuart get back in the limo, and drive off into the distance.")
+                    print("\n")
+                    return
+                else:
+                    type.type("\"Why, it appears you're far too poor to attain my services. I'm truly sorry about this. ")
+                    type.type("Tell you what, here's a little something to get you back on your feet.\" ")
+                    tip = random.choice([50, 100])
+                    type.type("Oswald hands you a bright green bill, worth " + green(bright("$" + str(tip))) + ".")
+                    self.change_balance(tip)
+                    type.type("And with that, you watch as Stuart rolls up the red carpet. Oswald and Stuart get back in the limo, and drive off into the distance. ")
+                    if self._balance > repair_price:
+                        type.type("Looking down, you see that after Oswald's tip, you had enough money to pay for the repair service after all, but it was too late. Oh well.")
+                    print("\n")
+                    return
+            else:
+                type.type("\"Come again?\" ")
 

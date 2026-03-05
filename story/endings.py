@@ -51,417 +51,6 @@ def space_quote(text):
 class EndingsMixin:
     """Endings: All game endings - mechanic endings, millionaire path, madness"""
 
-    def goodbye_tom(self):
-        type.type("You get in your wagon and drive to Tom's Trusty Trucks and Tires.")
-        print("\n")
-        type.type("The golden truck is parked out front, gleaming in the afternoon sun.")
-        print("\n")
-        type.type("Tom is waiting for you outside, a knowing look in his eyes.")
-        print("\n")
-        
-        type.type(quote("I knew you'd come, yunno. A million bucks, huh? That's somethin' special."))
-        print("\n")
-        
-        type.type("He scratches his chin.")
-        print("\n")
-        
-        type.type(quote("But I gotta ask... what about that family of yours? You ever think about goin' back?"))
-        print("\n")
-        
-        type.type("Tom pulls out a phone - your phone. The one you left here days ago.")
-        print("\n")
-        
-        type.type(quote("There's been someone tryin' to reach ya. A lot. Think it might be important."))
-        print("\n")
-        
-        answer = ask.yes_or_no("Take the phone call? ")
-        
-        if answer == "yes":
-            type.type("You take the phone. Your hands are trembling.")
-            print("\n")
-            type.type("Tom gives you some space, walking back into the garage.")
-            print("\n")
-            type.type("You press the call button.")
-            print("\n")
-            type.type("It rings once. Twice. Then-")
-            print("\n")
-            
-            type.slow(quote("John? John, is that you?"))
-            print("\n")
-            
-            type.slow("The voice on the other end is unmistakable. It's Rebecca. Your wife.")
-            print("\n")
-        else:
-            type.type(quote("Well, suit yourself. The phone'll be here if you change your mind."))
-            print("\n")
-            type.type("You leave Tom's shop. Maybe someday you'll be ready to face that call.")
-            print("\n")
-            return
-
-        type.slow(quote("Do you hear that? That's your son, Nathan. He learned to walk a couple months ago. His first word was 'Dada'. God, I wish you were here for that. He needs you in his life, he needs you as a father figure. He remembers you. Sometimes, I pull up old pictures of you, and he reaches out to touch your face. All I want is for you to be here, to make more memories with me and my son. But you can be here, if you come back, come home. We can raise our son together, if you just come back home, to be with me and Nathan. I can forgive you for all of it. I do, I forgive you for everything. None of it matters now, it's all in the past. Just please…come home."))
-        print("\n")
-
-        type.slow("The sobs through the phone are piercing, and Tom has a sad look on his face. He clearly feels sorry for you, for all the pain you've both caused and gone through. ")
-        print("\n")
-
-        type.slow(quote("Dada…dada come back!"))
-        print("\n")
-
-        type.slow(quote("Could you do that for us?"))
-
-        answer = ask.yes_or_no("\"Will you come back home?\"")
-
-        if answer == "yes":
-            self.salvation()
-        else:
-            self.resurrection()
-
-
-    def salvation(self):
-        type.slow("\"Yes, yes, yes of course I'll come home!\" Tears begin to stream from your eyes. \"I, I don't know what's gotten over me, I'm so, so incredibly sorry.\" A rush of adrenaline, no, realization comes over you. This whole time, you've been wasting your life away in a beat up wagon, trying to make a living off of gambling at a Blackjack table, while your family was trying, and struggling, to imagine a life without you.")
-        print("\n")
-        
-        # Acknowledge companions before leaving
-        companion_count = len([c for c in self.companions if c['alive']])
-        if companion_count > 0:
-            type.slow("You look back at the wagon. At the companions you've gathered on this strange journey.")
-            print("\n")
-            companion_names = [c['name'] for c in self.companions if c['alive']]
-            if companion_count <= 3:
-                names_str = ", ".join(companion_names)
-            else:
-                names_str = companion_names[0] + ", " + companion_names[1] + ", and " + str(companion_count-2) + " others"
-            type.slow(f"{names_str} watch you with understanding. They know you have to go.")
-            print("\n")
-            type.slow("\"I'll find good homes for all of you,\" you promise. \"You saved me. Now I have to save myself.\"")
-            print("\n")
-            if self.has_companion("Thunder"):
-                type.slow("Thunder whinnies softly, nuzzling your shoulder one last time. Horses understand loyalty. Understand sacrifice.")
-                print("\n")
-            if self.has_companion("Whiskers") or self.has_companion("Lucky"):
-                type.slow("A wet nose presses into your palm. A final goodbye from a friend who asked for nothing but love.")
-                print("\n")
-        
-        type.slow("Immediately, you run out of Tom's Trusty Trucks and Tires, and you never look back.")
-        print("\n")
-
-        type.slow("\"Wait! You forgotcha wallet, yunno!\" Tom lifts your wallet, and opens it, and his eyes grow wide. \"Holy bejesus! My oh my, this generation is so peculiar. Welp, finder's keepers, I suppose. Guess this old Trucks and Tires shop's boutta get some upgrades, ya hear!\"")
-        print("\n")
-
-        type.slow("You put the pedal to the medal in the old wagon, hugging the twists and turns in the road, without a thought in your mind but your family. As you slowly begin to recognize the buildings around you, the wagon takes just a few more turns, before pulling into your driveway. You get out, and knock on the door, and in that moment, nothing feels better than watching the handle turn, hearing the hinges creak, and seeing the biggest smile on your wife's face, with your son in her hands, and you lean in for a warm embrace.")
-        print("\n")
-
-        type.slow("Many years go by, and the whole experience of being stranded in your car slowly fades from your mind. You get to experience things in life you never thought you'd one day see. Your son's first football game, the birth of your lovely daughter, Dianne. You and Rebecca renew your vows, and couldn't be any happier. After a long and sincere apology to your old boss Howard, you go back to your desk job, selling high quality printers to people in low income housing. It ain't much, but it's honest work.")
-        print("\n")
-
-        type.slow("Rebecca continues to raise the kids in her image. They're smart, caring, and just downright adorable. Once Nathan gets to high school he tries out for the Varsity team, and makes it as a freshman. He would go on to be the highest scoring wide receiver the high school ever had, and you got to be in the seat for every game. His touchdown celebration always ended with a point to you, and a nod, as though he's telling the world \'Yep, that's my Dad\'.")
-        print("\n")
-
-        type.slow("As you age more and more, your body slowly deteriorates. You aren't sure if the long and unhealthy lifestyle of living on the road was to blame, but you didn't ever bother giving the thought any time of day. You know, deep down inside, that you made the right choice.")
-        print("\n")
-
-        type.slow("Nathan played football in college, before retiring to run his personal business selling decorated carpets. It was in this very building where he would go on to meet his future wife, Kelly, who ended up being his perfect match. Meanwhile, Dianne kept working at being a straight A's student in high school, taking every accelerated English course they had to offer.")
-        print("\n")
-
-        type.slow("When Dianne's career as an author made national television, Nathan was in the hospital, with his wife Kelly, along with you and Rebecca. You'll never forget the day you witnessed the birth of your grandson, Thomas, while Dianne was on the tv in that very room, being watched by millions around the world. You gave Rebecca a hug and a kiss, and you both cried tears of joy together, being able to appreciate such a special life with one another.")
-        print("\n")
-
-        type.slow("But, as all good things do, it eventually had to come to an end, and when the doctor diagnosed you with chronic obstructive pulmonary disease at age 49, you knew that you were knocking on death's doorstep. After your doctor told you that your lungs were failing on you due to some kind of air pollutants, you came to the realization that you might've left your car running a few too many days. And all that exposure to the exhaust of your old wagon seems to have finally caught up to you.")
-        print("\n")
-
-        type.slow("You lay dormant in the hospital bed, with tubes up your nose, and a glossy look over your eyes. There are many bouquets of flowers by your bedside, as well as a few balloons that read 'Get Well Soon!', and 'You Can Beat This!' You hear a knock on the door, and perk up. The doctor walks in, and leads a parade of guests. It seems as though your whole family has come to visit you. There's Rebecca! And Dianne! And Nathan and Kelly, along with Thomas, and their newly born daughter Marissa. You missed her birth, as the doctors had to keep an eye on you, but they sent you lots of pictures. Now, you finally get to see her in person. It makes you so happy that you get to see your granddaughter in person. You weren't sure if you'd ever get the chance.")
-        print("\n")
-
-        type.slow("\"Dad, hey, how are you? Hanging in there?\" Nathan has tears streaming down his face, but his voice stays sturdy. It's clear that he, and the rest of your family, hate to see you like this.")
-        print("\n")
-
-        type.slow("You cough, then sit up.")
-        print("\n")
-
-        type.slow("\"You know, I'm doing pretty amazing, really.\" This gets a light chuckle from your family, but the mood quickly returns to solemn. Rebecca leans in closer to you, and gives you a hug.")
-        print("\n")
-
-        type.slow("\"You're my everything. I love you so much, John.\" You hug her back with as much force as you can give, hoping she could feel just a touch of it.")
-        print("\n")
-
-        type.slow("\"Dad, I wrote a book about you.\" Dianne half whispers, before showing it to you. \"It's about the battle between you and gambling, and how you overcame it, for us. You really are the strongest person I know. I love you.\" Dianne begins to sob harder, and quickly gives you a big hug.")
-        print("\n")
-
-        type.slow("\"Can I see my grandchildren?\" you ask, through your raspy voice.")
-        print("\n")
-
-        type.slow("\"Sure thing, Dad\" Nathan picks up Thomas, and Kelly picks up Marissa, and they both walk to your side, so you can get a closer look.")
-        print("\n")
-
-        type.slow("\"Gram..Grampy!\" Thomas belches.")
-        print("\n")
-
-        type.slow("\"Yes, that's your Grampy!\" Nathan responds, with a smile.")
-        print("\n")
-
-        type.slow("\"They're…so beautiful\", you manage to spew these words out, before delving into a coughing fit.")
-        print("\n")
-
-        type.slow("Nathan puts Thomas down and gives you a big hug.")
-        print("\n")
-
-        type.slow("\"I love you so much, Dad.\"")
-        print("\n")
-
-        type.slow("As Nathan releases his grasp, the world around you begins to fade. You look around the room at everyone's faces, one last time. Everyone's leaning onto the bed, to be with you for your final moments. Rebecca and Dianne holding your right hand, Nathan holding your left. Kelly's arm is around Nathan's shoulder, and Thomas and Marissa sit on the blankets, right above your leg. You squeeze your hands tight, holding your family close, before letting go of your grasp, and fading away to eternal darkness...")
-        
-        # COMPANION ENDING ENHANCEMENTS
-        companions = self.get_all_companions()
-        if len(companions) > 0:
-            print("\n")
-            type.slow("But just before the darkness takes you completely, one final vision appears...")
-            print("\n")
-            type.slow("You see all the companions from your journey. Every creature that chose you, that trusted you, that loved you.")
-            print("\n")
-            
-            # Name specific companions
-            if self.has_companion("Grace"):
-                type.slow("Grace the deer, walking with her fawns through golden meadows.")
-            if self.has_companion("Bruno") or self.has_companion("Ursus"):
-                type.slow("The bears - protectors, guardians, ancient and true.")
-            if self.has_companion("Chomper"):
-                type.slow("Even Chomper the alligator, floating peacefully in warm waters.")
-            if self.has_companion("Kraken"):
-                type.slow("The Kraken, rising from the deep to witness your passing.")
-            if self.has_companion("Thunder"):
-                type.slow("Thunder the horse, running free across endless plains.")
-            if self.has_companion("Whiskers") or self.has_companion("Lucky"):
-                type.slow("Your loyal friends from the streets - Whiskers purring, Lucky's tail wagging.")
-            
-            print("\n")
-            type.slow("They all came to you in your darkest moments. They saw something in you worth saving.")
-            print("\n")
-            type.slow("You weren't just a gambler. You were someone who cared for the forgotten, the lost, the wounded.")
-            print("\n")
-            type.slow("You were loved. By your family. By creatures great and small.")
-            print("\n")
-            type.slow("That's not a bad legacy to leave behind.")
-            print("\n")
-
-
-    def resurrection(self):
-        type.slow("\"Wha…what? Excuse me? John, I've been trying to reach you for months now, and the only thing you're going to say to me is 'no'? Do you not care at all about me? About Nathan? Why, why would you do this to us? After everything I've done for you. I covered for you when you needed me, I hid this addiction for years. Years! And for what? So you could run away from your family to keep hitting the tables? You sick, twisted fuck. To think that I honestly believed somewhere, deep down inside of you, you actually cared about me. That you actually cared about YOUR OWN GODDAMN SON.\" Your wife is screaming through the phone.")
-        print("\n")
-
-        type.slow("\"Dada…I love you…why dada gone?")
-        print("\n")
-
-        type.slow("\"You're a monster. You're completely pathetic. Don't even think about coming back. Not now, not ever. You will never see or hear from your son again, do you understand? YOU'RE DEAD TO ME JOHNATHAN. DEAD TO ME. ROT IN HELL, YOU FUCKING BASTA-")
-        print("\n")
-
-        type.slow("And with that, you hang up the phone. Your ears are ringing, your face is numb, and while Tom appears to be trying to console you after that phone call from hell, you just can't seem to hear a single word coming out of his mouth.")
-        print("\n")
-        
-        # Acknowledge companions in the darkness
-        companion_count = len([c for c in self.companions if c['alive']])
-        if companion_count > 0:
-            type.slow("You stumble back to the wagon. Your companions watch you with confused, worried eyes.")
-            print("\n")
-            if self.has_companion("Lucky"):
-                type.slow("Lucky limps over, trying to lick your hand. Trying to comfort you. But you push him away.")
-                print("\n")
-            if self.has_companion("Whiskers"):
-                type.slow("Whiskers meows softly, rubbing against your leg. But you don't feel it. You don't feel anything.")
-                print("\n")
-            type.slow("They don't understand. They can't understand. You're not worth saving. Never were.")
-            print("\n")
-        
-        type.slow("In fact, you don't feel anything. Nothing but the ringing in your ears, and sheer hatred for the man you've become. And yet somehow throughout all of this, your legs beneath you begin to carry your body, out the door, into your car, and down the road towards that lonely casino, sitting on top of the little hill, at the end of the dirt road.")
-        print("\n")
-        
-        type.slow("As though infected by a parasite, you can't help but come back here, to this place, where you were stranded all those days ago. With your money in hand, you get out of the car, and slam the door. You walk towards the little shack, each step more determined than the last. You can prove her wrong, no, you have to prove her wrong.") 
-        print("\n")
-
-        type.slow(red("Welcome back. You don't look too well. Do you need something to drink? Perhaps some water?"))
-        print("\n")
-
-        type.slow("\"Bourbon, neat. The best you've got.\"")
-        print("\n")
-
-        type.slow(red("If you say so."))
-        print("\n")
-
-        type.slow("You watch as the Dealer gets up from his shadow, and as he stands, his jade green glass eye sparkes, around a terrible scar, from a fate that caused the left side of his face to be permanently disfigured. He walks across the room, and flicks on an old fashioned lamp, revealing a small bar, filled with any drink you could ask for. The Dealer's revolver hangs low on his waist, as though he's always prepared to use it at a moment's notice. Or, perhaps, he's just a cautious old man.")
-        print("\n")
-
-        type.slow("After about a minute, he comes back with your drink, and sets it down next to you. You pick up the glass, and take a swig, and then another, before slamming the empty glass down on the betting table.")
-        print("\n")
-
-        type.slow(red("That was awfully quick of you. Here, let me get you a refill."))
-        print("\n")
-
-        type.slow("\"Thanks, yeah, that would be great.\"")
-        print("\n")
-
-        type.slow("As he sets down your second glass, the Dealer sits back down in his seat, and begins to shuffle the cards. His thick fingers sometimes have trouble splitting the deck, but he riffles the cards like he's been doing it his whole life.")
-        print("\n")
-
-        type.slow(red("Are you ready to play a game of Blackjack?"))
-        print("\n")
-        
-        type.slow("\"So, what's with the glass eye? You lose a fight or something?\"")
-        print("\n")
-
-        type.slow("The Dealer squints his eyes, then sighs.")
-        print("\n")
-
-        type.slow(red("Oh, I lost a fight alright. With my dog, Scrappy. He was a great lad."))
-        print("\n")
-
-        type.slow("The Dealer opens a pack of cigarettes, puts one in his mouth, and lights it. Smoke fills the air, and dances around the hanging light, like two spirits, in an endless duel.")
-        print("\n")
-
-        type.slow(red("Jumped up on me while we were playing fetch in the yard. Bit the left half of my face clean off. It was a tragedy, really. Docs patched me up, and the second I got home, me and Scrappy took a car ride. We drove far away from that home, from my neighbors, from everyone. Down a long road, deep into the woods. I let him out, and he was happy, running free. Ducking under branches, jumping over fallen logs, biting at sticks and leaves. But as I walked back to the truck to leave him there, he followed. So, I threw him a stick to go fetch, but when I got to the front seat, there he was, jumping through the window to sit on my lap, licking my hands and wagging his tail. He didn't seem to get that I was leaving without him. That's what made it all the more difficult, when I finally dragged him out of the truck, pulled out my revolver, and shot three bullets into his head. Even still, he kept whimpering. I couldn't bear to watch him die, so I just drove off. Never even gave him a proper burial. It was a shame, really, but I guess not all stories are happy ones."))
-        print("\n")
-
-        type.slow("The Dealer ashes the cigarette into a brown ceramic bowl next to him, full of the ashes of many, many long gone cigarettes.")
-        print("\n")
-
-        type.slow("You take a swig of your bourbon, appreciating the warm feeling in your chest.")
-        print("\n")
-
-        type.slow("\"Let's get this over with.\"")
-        print("\n")
-
-        type.slow(red("How much for this first hand?"))
-        print("\n")
-
-        type.slow("\"500 thousand.\"")
-        print("\n")
-
-        type.slow(red("Oh boy, high roller tonight, are we?"))
-        print("\n")
-
-        type.slow("\"You bet.\" You down the rest of your drink, and you start to feel a bit dizzy.")
-        print("\n")
-
-        type.slow(red("Alright, let's see here. You got a Nine of Spades, and a Two of Diamonds. Meanwhile, I'm sitting pretty with this Four of Clubs. What say you?"))
-        print("\n")
-
-        type.slow("You tap the table with a firm finger. \"Hit me.\"")
-        print("\n")
-
-        type.slow(red("Alrighty. Your next card's a…welp, that's a Ten of Clubs. That's a hefty Blackjack you just got there."))
-        print("\n")
-
-        type.slow("Winning a hand with a bet like that, you begin to chuckle to yourself. You see the Dealer begin to sweat, and he starts to tap his foot.")
-        print("\n")
-
-        type.slow(red("How about I get you another drink?"))
-        print("\n")
-
-        type.slow("\"Go for it.\"")
-        print("\n")
-
-        type.slow("The Dealer pours you a third bourbon, and hands it to you. You down the whole drink, and start to laugh again.")
-        print("\n")
-
-        type.slow("\"So you're telling me, that you shot and killed a dog, because he bit you in the face? Like yeah, that's a bad scar, but how do you mess up playing fetch that badly?\"")
-        print("\n")
-
-        type.slow(red("Boy, I've put down a lot bigger for a lot less."))
-        print("\n")
-
-        type.slow("\"But god, a dog? For a bite? You didn't have to do that, you know. Animal shelters exist for a reason.\"")
-        print("\n")
-
-        type.slow(red("How much are you betting."))
-        print("\n")
-
-        type.slow("\"I mean, that's just despicable. Getting revenge on a dog over something it didn't even understand. If you really felt the need to kill it, you could've gone with euthanasia. Why'd that slip your mind?\"")
-        print("\n")
-
-        type.slow(red("Give me an amount, boy."))
-        print("\n")
-
-        type.slow("\"You know what I think? I think that you wanted to shoot that dog. You were never gonna let it free. You brought it to the woods and shot it, just so you could watch it squirm.\"")
-        print("\n")
-
-        type.slow(red("Put some money on the damn table."))
-        print("\n")
-
-        type.slow("\"You know, you're what's wrong with this world. I mean, you just hurt those that care about you, denying their love all because you can? What happened to forgive and forget?\"")
-        print("\n")
-
-        type.slow(red("BET. SOME. DAMN. MONEY."))
-        print("\n")
-
-        type.slow("\"Put me all in, old man.\"")
-        print("\n")
-
-        type.slow("The Dealer flips cards over, to you and him.")
-        print("\n")
-
-        type.slow(red("That's an Ace of Spades and an Eight of Spades. Deadman's hand, as far as Poker is concerned. I've got a Seven of Hearts. You hitting?"))
-        print("\n")
-
-        type.slow("You wave your hand above the table. \"I'll stay\"")
-        print("\n")
-
-        type.slow(red("If that's what you'd like. My other card's a Four of Diamonds."))
-        print("\n")
-        
-        type.slow("The dealer draws a card from the deck.")
-        print("\n")
-
-        type.slow(red("Damn, Three of Clubs. Would've been nice if you had that one, huh?"))
-        print("\n")
-
-        type.slow("The dealer draws yet another card.")
-        print("\n")
-
-        type.slow(red("Ace of Diamonds. That puts me at 15."))
-        print("\n")
-
-        type.slow("Your head begins to spin. Your stomach feels violently ill. Your breaths are getting deeper and deeper, but it feels like you're getting less and less oxygen each time. The dealer draws yet another card.")
-        print("\n")
-
-        type.slow(red("Yet another ace, this time the Ace of Clubs. Now I'm at 16, are you feeling the pressure yet?"))
-        print("\n")
-
-        type.slow("You watch as the Dealer's weathered finger goes down, touches the top card of the deck, lifts it up, then flips it over before you.")
-        print("\n")
-
-        type.slow(red("And that's the Five of Hearts that I needed! Blackjack for me, back to your car for you. I guess it's like they say, you win some, you lose some."))
-        print("\n")
-
-        type.slow("The Dealer's finger points towards the exit, and in a drunken stupor, you rise from the old wooden seat, and stumble your way to the door, with no money left in your pockets.")
-        print("\n")
-
-        type.slow("Right before walking out, you turn to the Dealer, who's once again cloaked in shadow. You knew you should've kept your mouth shut, but you couldn't help yourself.")
-        print("\n")
-
-        type.slow("\Rot in hell, you fucking bastard.\"")
-        print("\n")
-
-        type.slow("You get back into your wagon, and drive off, only faintly able to see the road. Is this really the life you live? You keep driving forward, for hours on end, never once looking back.")
-        print("\n")
-        
-        type.slow("Eventually, your old wagon shutters, then dies. \"Ugh, not again.\" Stranded on the road once more, and your money has gone dry. As you're about to give up hope completely, you're reminded of a distant memory. You reach over to your cup holder and rip it from the center console. Tucked away inside of the hole that once held your cup holder is an old card with a big turkey on the front, wearing a pilgrim hat. When opening it up, you read the message 'Gobble gobble gobble up some yummy food this Thanksgiving! Love, Grandma'. Inside the letter was a green 50 dollar bill. May she rest in peace.")
-        print("\n")
-
-        type.slow("The door of your wagon creaks open, and you step out into the night sky, coughing up the Bourbon from earlier that night. After pushing your car off the road and between the trees, there isn't much else left for you to do, so you begin to wander down the dark, lonely street.")
-        print("\n")
-
-        type.slow("But, at the end of the road, where concrete turned to stone turned to gravel, you notice a light up ahead, engulfed in a circle of forest.")
-        print("\n")
-
-        type.slow("As you waltz into the fancy, yet rundown log cabin, your eyes begin to light up with the fire of a thousand suns. Roulette wheels! Poker tables! And in a dark corner of the rundown casino, sits a dealer, shuffling cards for a new round of Blackjack. That 50 dollars might just come in handy after all. Thanks, Grandma!")
-        print("\n")
-
-        type.slow("As you go to sit down at the table, you hear the Dealer cough, then watch as he sits up.")
-        print("\n")
-
-        type.slow("In a deep, and yet strained voice, the Dealer, perched up in a ray of light from the ceiling fan above, poses a question to you.")
-        print("\n")
-
-        type.slow(yellow("Would you like to play a game of Blackjack? "))
-
     # ============================================
     # MILLIONAIRE ENDINGS
     # ============================================
@@ -1104,6 +693,416 @@ class EndingsMixin:
         
         quit()
 
+    def goodbye_tom(self):
+        type.type("You get in your wagon and drive to Tom's Trusty Trucks and Tires.")
+        print("\n")
+        type.type("The golden truck is parked out front, gleaming in the afternoon sun.")
+        print("\n")
+        type.type("Tom is waiting for you outside, a knowing look in his eyes.")
+        print("\n")
+        
+        type.type(quote("I knew you'd come, yunno. A million bucks, huh? That's somethin' special."))
+        print("\n")
+        
+        type.type("He scratches his chin.")
+        print("\n")
+        
+        type.type(quote("But I gotta ask... what about that family of yours? You ever think about goin' back?"))
+        print("\n")
+        
+        type.type("Tom pulls out a phone - your phone. The one you left here days ago.")
+        print("\n")
+        
+        type.type(quote("There's been someone tryin' to reach ya. A lot. Think it might be important."))
+        print("\n")
+        
+        answer = ask.yes_or_no("Take the phone call? ")
+        
+        if answer == "yes":
+            type.type("You take the phone. Your hands are trembling.")
+            print("\n")
+            type.type("Tom gives you some space, walking back into the garage.")
+            print("\n")
+            type.type("You press the call button.")
+            print("\n")
+            type.type("It rings once. Twice. Then-")
+            print("\n")
+            
+            type.slow(quote("John? John, is that you?"))
+            print("\n")
+            
+            type.slow("The voice on the other end is unmistakable. It's Rebecca. Your wife.")
+            print("\n")
+        else:
+            type.type(quote("Well, suit yourself. The phone'll be here if you change your mind."))
+            print("\n")
+            type.type("You leave Tom's shop. Maybe someday you'll be ready to face that call.")
+            print("\n")
+            return
+
+        type.slow(quote("Do you hear that? That's your son, Nathan. He learned to walk a couple months ago. His first word was 'Dada'. God, I wish you were here for that. He needs you in his life, he needs you as a father figure. He remembers you. Sometimes, I pull up old pictures of you, and he reaches out to touch your face. All I want is for you to be here, to make more memories with me and my son. But you can be here, if you come back, come home. We can raise our son together, if you just come back home, to be with me and Nathan. I can forgive you for all of it. I do, I forgive you for everything. None of it matters now, it's all in the past. Just please…come home."))
+        print("\n")
+
+        type.slow("The sobs through the phone are piercing, and Tom has a sad look on his face. He clearly feels sorry for you, for all the pain you've both caused and gone through. ")
+        print("\n")
+
+        type.slow(quote("Dada…dada come back!"))
+        print("\n")
+
+        type.slow(quote("Could you do that for us?"))
+
+        answer = ask.yes_or_no("\"Will you come back home?\"")
+
+        if answer == "yes":
+            self.salvation()
+        else:
+            self.resurrection()
+
+    def salvation(self):
+        type.slow("\"Yes, yes, yes of course I'll come home!\" Tears begin to stream from your eyes. \"I, I don't know what's gotten over me, I'm so, so incredibly sorry.\" A rush of adrenaline, no, realization comes over you. This whole time, you've been wasting your life away in a beat up wagon, trying to make a living off of gambling at a Blackjack table, while your family was trying, and struggling, to imagine a life without you.")
+        print("\n")
+        
+        # Acknowledge companions before leaving
+        companion_count = len(self.get_all_companions())
+        if companion_count > 0:
+            type.slow("You look back at the wagon. At the companions you've gathered on this strange journey.")
+            print("\n")
+            companion_names = list(self.get_all_companions().keys())
+            if companion_count <= 3:
+                names_str = ", ".join(companion_names)
+            else:
+                names_str = companion_names[0] + ", " + companion_names[1] + ", and " + str(companion_count-2) + " others"
+            type.slow(f"{names_str} watch you with understanding. They know you have to go.")
+            print("\n")
+            type.slow("\"I'll find good homes for all of you,\" you promise. \"You saved me. Now I have to save myself.\"")
+            print("\n")
+            if self.has_companion("Thunder"):
+                type.slow("Thunder whinnies softly, nuzzling your shoulder one last time. Horses understand loyalty. Understand sacrifice.")
+                print("\n")
+            if self.has_companion("Whiskers") or self.has_companion("Lucky"):
+                type.slow("A wet nose presses into your palm. A final goodbye from a friend who asked for nothing but love.")
+                print("\n")
+        
+        type.slow("Immediately, you run out of Tom's Trusty Trucks and Tires, and you never look back.")
+        print("\n")
+
+        type.slow("\"Wait! You forgotcha wallet, yunno!\" Tom lifts your wallet, and opens it, and his eyes grow wide. \"Holy bejesus! My oh my, this generation is so peculiar. Welp, finder's keepers, I suppose. Guess this old Trucks and Tires shop's boutta get some upgrades, ya hear!\"")
+        print("\n")
+
+        type.slow("You put the pedal to the medal in the old wagon, hugging the twists and turns in the road, without a thought in your mind but your family. As you slowly begin to recognize the buildings around you, the wagon takes just a few more turns, before pulling into your driveway. You get out, and knock on the door, and in that moment, nothing feels better than watching the handle turn, hearing the hinges creak, and seeing the biggest smile on your wife's face, with your son in her hands, and you lean in for a warm embrace.")
+        print("\n")
+
+        type.slow("Many years go by, and the whole experience of being stranded in your car slowly fades from your mind. You get to experience things in life you never thought you'd one day see. Your son's first football game, the birth of your lovely daughter, Dianne. You and Rebecca renew your vows, and couldn't be any happier. After a long and sincere apology to your old boss Howard, you go back to your desk job, selling high quality printers to people in low income housing. It ain't much, but it's honest work.")
+        print("\n")
+
+        type.slow("Rebecca continues to raise the kids in her image. They're smart, caring, and just downright adorable. Once Nathan gets to high school he tries out for the Varsity team, and makes it as a freshman. He would go on to be the highest scoring wide receiver the high school ever had, and you got to be in the seat for every game. His touchdown celebration always ended with a point to you, and a nod, as though he's telling the world \'Yep, that's my Dad\'.")
+        print("\n")
+
+        type.slow("As you age more and more, your body slowly deteriorates. You aren't sure if the long and unhealthy lifestyle of living on the road was to blame, but you didn't ever bother giving the thought any time of day. You know, deep down inside, that you made the right choice.")
+        print("\n")
+
+        type.slow("Nathan played football in college, before retiring to run his personal business selling decorated carpets. It was in this very building where he would go on to meet his future wife, Kelly, who ended up being his perfect match. Meanwhile, Dianne kept working at being a straight A's student in high school, taking every accelerated English course they had to offer.")
+        print("\n")
+
+        type.slow("When Dianne's career as an author made national television, Nathan was in the hospital, with his wife Kelly, along with you and Rebecca. You'll never forget the day you witnessed the birth of your grandson, Thomas, while Dianne was on the tv in that very room, being watched by millions around the world. You gave Rebecca a hug and a kiss, and you both cried tears of joy together, being able to appreciate such a special life with one another.")
+        print("\n")
+
+        type.slow("But, as all good things do, it eventually had to come to an end, and when the doctor diagnosed you with chronic obstructive pulmonary disease at age 49, you knew that you were knocking on death's doorstep. After your doctor told you that your lungs were failing on you due to some kind of air pollutants, you came to the realization that you might've left your car running a few too many days. And all that exposure to the exhaust of your old wagon seems to have finally caught up to you.")
+        print("\n")
+
+        type.slow("You lay dormant in the hospital bed, with tubes up your nose, and a glossy look over your eyes. There are many bouquets of flowers by your bedside, as well as a few balloons that read 'Get Well Soon!', and 'You Can Beat This!' You hear a knock on the door, and perk up. The doctor walks in, and leads a parade of guests. It seems as though your whole family has come to visit you. There's Rebecca! And Dianne! And Nathan and Kelly, along with Thomas, and their newly born daughter Marissa. You missed her birth, as the doctors had to keep an eye on you, but they sent you lots of pictures. Now, you finally get to see her in person. It makes you so happy that you get to see your granddaughter in person. You weren't sure if you'd ever get the chance.")
+        print("\n")
+
+        type.slow("\"Dad, hey, how are you? Hanging in there?\" Nathan has tears streaming down his face, but his voice stays sturdy. It's clear that he, and the rest of your family, hate to see you like this.")
+        print("\n")
+
+        type.slow("You cough, then sit up.")
+        print("\n")
+
+        type.slow("\"You know, I'm doing pretty amazing, really.\" This gets a light chuckle from your family, but the mood quickly returns to solemn. Rebecca leans in closer to you, and gives you a hug.")
+        print("\n")
+
+        type.slow("\"You're my everything. I love you so much, John.\" You hug her back with as much force as you can give, hoping she could feel just a touch of it.")
+        print("\n")
+
+        type.slow("\"Dad, I wrote a book about you.\" Dianne half whispers, before showing it to you. \"It's about the battle between you and gambling, and how you overcame it, for us. You really are the strongest person I know. I love you.\" Dianne begins to sob harder, and quickly gives you a big hug.")
+        print("\n")
+
+        type.slow("\"Can I see my grandchildren?\" you ask, through your raspy voice.")
+        print("\n")
+
+        type.slow("\"Sure thing, Dad\" Nathan picks up Thomas, and Kelly picks up Marissa, and they both walk to your side, so you can get a closer look.")
+        print("\n")
+
+        type.slow("\"Gram..Grampy!\" Thomas belches.")
+        print("\n")
+
+        type.slow("\"Yes, that's your Grampy!\" Nathan responds, with a smile.")
+        print("\n")
+
+        type.slow("\"They're…so beautiful\", you manage to spew these words out, before delving into a coughing fit.")
+        print("\n")
+
+        type.slow("Nathan puts Thomas down and gives you a big hug.")
+        print("\n")
+
+        type.slow("\"I love you so much, Dad.\"")
+        print("\n")
+
+        type.slow("As Nathan releases his grasp, the world around you begins to fade. You look around the room at everyone's faces, one last time. Everyone's leaning onto the bed, to be with you for your final moments. Rebecca and Dianne holding your right hand, Nathan holding your left. Kelly's arm is around Nathan's shoulder, and Thomas and Marissa sit on the blankets, right above your leg. You squeeze your hands tight, holding your family close, before letting go of your grasp, and fading away to eternal darkness...")
+        
+        # COMPANION ENDING ENHANCEMENTS
+        companions = self.get_all_companions()
+        if len(companions) > 0:
+            print("\n")
+            type.slow("But just before the darkness takes you completely, one final vision appears...")
+            print("\n")
+            type.slow("You see all the companions from your journey. Every creature that chose you, that trusted you, that loved you.")
+            print("\n")
+            
+            # Name specific companions
+            if self.has_companion("Grace"):
+                type.slow("Grace the deer, walking with her fawns through golden meadows.")
+            if self.has_companion("Bruno") or self.has_companion("Ursus"):
+                type.slow("The bears - protectors, guardians, ancient and true.")
+            if self.has_companion("Chomper"):
+                type.slow("Even Chomper the alligator, floating peacefully in warm waters.")
+            if self.has_companion("Kraken"):
+                type.slow("The Kraken, rising from the deep to witness your passing.")
+            if self.has_companion("Thunder"):
+                type.slow("Thunder the horse, running free across endless plains.")
+            if self.has_companion("Whiskers") or self.has_companion("Lucky"):
+                type.slow("Your loyal friends from the streets - Whiskers purring, Lucky's tail wagging.")
+            
+            print("\n")
+            type.slow("They all came to you in your darkest moments. They saw something in you worth saving.")
+            print("\n")
+            type.slow("You weren't just a gambler. You were someone who cared for the forgotten, the lost, the wounded.")
+            print("\n")
+            type.slow("You were loved. By your family. By creatures great and small.")
+            print("\n")
+            type.slow("That's not a bad legacy to leave behind.")
+            print("\n")
+
+    def resurrection(self):
+
+        type.slow("\"Wha…what? Excuse me? John, I've been trying to reach you for months now, and the only thing you're going to say to me is 'no'? Do you not care at all about me? About Nathan? Why, why would you do this to us? After everything I've done for you. I covered for you when you needed me, I hid this addiction for years. Years! And for what? So you could run away from your family to keep hitting the tables? You sick, twisted fuck. To think that I honestly believed somewhere, deep down inside of you, you actually cared about me. That you actually cared about YOUR OWN GODDAMN SON.\" Your wife is screaming through the phone.")
+        print("\n")
+
+        type.slow("\"Dada…I love you…why dada gone?")
+        print("\n")
+
+        type.slow("\"You're a monster. You're completely pathetic. Don't even think about coming back. Not now, not ever. You will never see or hear from your son again, do you understand? YOU'RE DEAD TO ME JOHNATHAN. DEAD TO ME. ROT IN HELL, YOU FUCKING BASTA-")
+        print("\n")
+
+        type.slow("And with that, you hang up the phone. Your ears are ringing, your face is numb, and while Tom appears to be trying to console you after that phone call from hell, you just can't seem to hear a single word coming out of his mouth.")
+        print("\n")
+        
+        # Acknowledge companions in the darkness
+        companion_count = len(self.get_all_companions())
+        if companion_count > 0:
+            type.slow("You stumble back to the wagon. Your companions watch you with confused, worried eyes.")
+            print("\n")
+            if self.has_companion("Lucky"):
+                type.slow("Lucky limps over, trying to lick your hand. Trying to comfort you. But you push him away.")
+                print("\n")
+            if self.has_companion("Whiskers"):
+                type.slow("Whiskers meows softly, rubbing against your leg. But you don't feel it. You don't feel anything.")
+                print("\n")
+            type.slow("They don't understand. They can't understand. You're not worth saving. Never were.")
+            print("\n")
+        
+        type.slow("In fact, you don't feel anything. Nothing but the ringing in your ears, and sheer hatred for the man you've become. And yet somehow throughout all of this, your legs beneath you begin to carry your body, out the door, into your car, and down the road towards that lonely casino, sitting on top of the little hill, at the end of the dirt road.")
+        print("\n")
+        
+        type.slow("As though infected by a parasite, you can't help but come back here, to this place, where you were stranded all those days ago. With your money in hand, you get out of the car, and slam the door. You walk towards the little shack, each step more determined than the last. You can prove her wrong, no, you have to prove her wrong.") 
+        print("\n")
+
+        type.slow(red("Welcome back. You don't look too well. Do you need something to drink? Perhaps some water?"))
+        print("\n")
+
+        type.slow("\"Bourbon, neat. The best you've got.\"")
+        print("\n")
+
+        type.slow(red("If you say so."))
+        print("\n")
+
+        type.slow("You watch as the Dealer gets up from his shadow, and as he stands, his jade green glass eye sparkes, around a terrible scar, from a fate that caused the left side of his face to be permanently disfigured. He walks across the room, and flicks on an old fashioned lamp, revealing a small bar, filled with any drink you could ask for. The Dealer's revolver hangs low on his waist, as though he's always prepared to use it at a moment's notice. Or, perhaps, he's just a cautious old man.")
+        print("\n")
+
+        type.slow("After about a minute, he comes back with your drink, and sets it down next to you. You pick up the glass, and take a swig, and then another, before slamming the empty glass down on the betting table.")
+        print("\n")
+
+        type.slow(red("That was awfully quick of you. Here, let me get you a refill."))
+        print("\n")
+
+        type.slow("\"Thanks, yeah, that would be great.\"")
+        print("\n")
+
+        type.slow("As he sets down your second glass, the Dealer sits back down in his seat, and begins to shuffle the cards. His thick fingers sometimes have trouble splitting the deck, but he riffles the cards like he's been doing it his whole life.")
+        print("\n")
+
+        type.slow(red("Are you ready to play a game of Blackjack?"))
+        print("\n")
+        
+        type.slow("\"So, what's with the glass eye? You lose a fight or something?\"")
+        print("\n")
+
+        type.slow("The Dealer squints his eyes, then sighs.")
+        print("\n")
+
+        type.slow(red("Oh, I lost a fight alright. With my dog, Scrappy. He was a great lad."))
+        print("\n")
+
+        type.slow("The Dealer opens a pack of cigarettes, puts one in his mouth, and lights it. Smoke fills the air, and dances around the hanging light, like two spirits, in an endless duel.")
+        print("\n")
+
+        type.slow(red("Jumped up on me while we were playing fetch in the yard. Bit the left half of my face clean off. It was a tragedy, really. Docs patched me up, and the second I got home, me and Scrappy took a car ride. We drove far away from that home, from my neighbors, from everyone. Down a long road, deep into the woods. I let him out, and he was happy, running free. Ducking under branches, jumping over fallen logs, biting at sticks and leaves. But as I walked back to the truck to leave him there, he followed. So, I threw him a stick to go fetch, but when I got to the front seat, there he was, jumping through the window to sit on my lap, licking my hands and wagging his tail. He didn't seem to get that I was leaving without him. That's what made it all the more difficult, when I finally dragged him out of the truck, pulled out my revolver, and shot three bullets into his head. Even still, he kept whimpering. I couldn't bear to watch him die, so I just drove off. Never even gave him a proper burial. It was a shame, really, but I guess not all stories are happy ones."))
+        print("\n")
+
+        type.slow("The Dealer ashes the cigarette into a brown ceramic bowl next to him, full of the ashes of many, many long gone cigarettes.")
+        print("\n")
+
+        type.slow("You take a swig of your bourbon, appreciating the warm feeling in your chest.")
+        print("\n")
+
+        type.slow("\"Let's get this over with.\"")
+        print("\n")
+
+        type.slow(red("How much for this first hand?"))
+        print("\n")
+
+        type.slow("\"500 thousand.\"")
+        print("\n")
+
+        type.slow(red("Oh boy, high roller tonight, are we?"))
+        print("\n")
+
+        type.slow("\"You bet.\" You down the rest of your drink, and you start to feel a bit dizzy.")
+        print("\n")
+
+        type.slow(red("Alright, let's see here. You got a Nine of Spades, and a Two of Diamonds. Meanwhile, I'm sitting pretty with this Four of Clubs. What say you?"))
+        print("\n")
+
+        type.slow("You tap the table with a firm finger. \"Hit me.\"")
+        print("\n")
+
+        type.slow(red("Alrighty. Your next card's a…welp, that's a Ten of Clubs. That's a hefty Blackjack you just got there."))
+        print("\n")
+
+        type.slow("Winning a hand with a bet like that, you begin to chuckle to yourself. You see the Dealer begin to sweat, and he starts to tap his foot.")
+        print("\n")
+
+        type.slow(red("How about I get you another drink?"))
+        print("\n")
+
+        type.slow("\"Go for it.\"")
+        print("\n")
+
+        type.slow("The Dealer pours you a third bourbon, and hands it to you. You down the whole drink, and start to laugh again.")
+        print("\n")
+
+        type.slow("\"So you're telling me, that you shot and killed a dog, because he bit you in the face? Like yeah, that's a bad scar, but how do you mess up playing fetch that badly?\"")
+        print("\n")
+
+        type.slow(red("Boy, I've put down a lot bigger for a lot less."))
+        print("\n")
+
+        type.slow("\"But god, a dog? For a bite? You didn't have to do that, you know. Animal shelters exist for a reason.\"")
+        print("\n")
+
+        type.slow(red("How much are you betting."))
+        print("\n")
+
+        type.slow("\"I mean, that's just despicable. Getting revenge on a dog over something it didn't even understand. If you really felt the need to kill it, you could've gone with euthanasia. Why'd that slip your mind?\"")
+        print("\n")
+
+        type.slow(red("Give me an amount, boy."))
+        print("\n")
+
+        type.slow("\"You know what I think? I think that you wanted to shoot that dog. You were never gonna let it free. You brought it to the woods and shot it, just so you could watch it squirm.\"")
+        print("\n")
+
+        type.slow(red("Put some money on the damn table."))
+        print("\n")
+
+        type.slow("\"You know, you're what's wrong with this world. I mean, you just hurt those that care about you, denying their love all because you can? What happened to forgive and forget?\"")
+        print("\n")
+
+        type.slow(red("BET. SOME. DAMN. MONEY."))
+        print("\n")
+
+        type.slow("\"Put me all in, old man.\"")
+        print("\n")
+
+        type.slow("The Dealer flips cards over, to you and him.")
+        print("\n")
+
+        type.slow(red("That's an Ace of Spades and an Eight of Spades. Deadman's hand, as far as Poker is concerned. I've got a Seven of Hearts. You hitting?"))
+        print("\n")
+
+        type.slow("You wave your hand above the table. \"I'll stay\"")
+        print("\n")
+
+        type.slow(red("If that's what you'd like. My other card's a Four of Diamonds."))
+        print("\n")
+        
+        type.slow("The dealer draws a card from the deck.")
+        print("\n")
+
+        type.slow(red("Damn, Three of Clubs. Would've been nice if you had that one, huh?"))
+        print("\n")
+
+        type.slow("The dealer draws yet another card.")
+        print("\n")
+
+        type.slow(red("Ace of Diamonds. That puts me at 15."))
+        print("\n")
+
+        type.slow("Your head begins to spin. Your stomach feels violently ill. Your breaths are getting deeper and deeper, but it feels like you're getting less and less oxygen each time. The dealer draws yet another card.")
+        print("\n")
+
+        type.slow(red("Yet another ace, this time the Ace of Clubs. Now I'm at 16, are you feeling the pressure yet?"))
+        print("\n")
+
+        type.slow("You watch as the Dealer's weathered finger goes down, touches the top card of the deck, lifts it up, then flips it over before you.")
+        print("\n")
+
+        type.slow(red("And that's the Five of Hearts that I needed! Blackjack for me, back to your car for you. I guess it's like they say, you win some, you lose some."))
+        print("\n")
+
+        type.slow("The Dealer's finger points towards the exit, and in a drunken stupor, you rise from the old wooden seat, and stumble your way to the door, with no money left in your pockets.")
+        print("\n")
+
+        type.slow("Right before walking out, you turn to the Dealer, who's once again cloaked in shadow. You knew you should've kept your mouth shut, but you couldn't help yourself.")
+        print("\n")
+
+        type.slow("\Rot in hell, you fucking bastard.\"")
+        print("\n")
+
+        type.slow("You get back into your wagon, and drive off, only faintly able to see the road. Is this really the life you live? You keep driving forward, for hours on end, never once looking back.")
+        print("\n")
+        
+        type.slow("Eventually, your old wagon shutters, then dies. \"Ugh, not again.\" Stranded on the road once more, and your money has gone dry. As you're about to give up hope completely, you're reminded of a distant memory. You reach over to your cup holder and rip it from the center console. Tucked away inside of the hole that once held your cup holder is an old card with a big turkey on the front, wearing a pilgrim hat. When opening it up, you read the message 'Gobble gobble gobble up some yummy food this Thanksgiving! Love, Grandma'. Inside the letter was a green 50 dollar bill. May she rest in peace.")
+        print("\n")
+
+        type.slow("The door of your wagon creaks open, and you step out into the night sky, coughing up the Bourbon from earlier that night. After pushing your car off the road and between the trees, there isn't much else left for you to do, so you begin to wander down the dark, lonely street.")
+        print("\n")
+
+        type.slow("But, at the end of the road, where concrete turned to stone turned to gravel, you notice a light up ahead, engulfed in a circle of forest.")
+        print("\n")
+
+        type.slow("As you waltz into the fancy, yet rundown log cabin, your eyes begin to light up with the fire of a thousand suns. Roulette wheels! Poker tables! And in a dark corner of the rundown casino, sits a dealer, shuffling cards for a new round of Blackjack. That 50 dollars might just come in handy after all. Thanks, Grandma!")
+        print("\n")
+
+        type.slow("As you go to sit down at the table, you hear the Dealer cough, then watch as he sits up.")
+        print("\n")
+
+        type.slow("In a deep, and yet strained voice, the Dealer, perched up in a ray of light from the ceiling fan above, poses a question to you.")
+        print("\n")
+
+        type.slow(yellow("Would you like to play a game of Blackjack? "))
+
     def goodbye_frank(self):
         type.slow("You get in your wagon and drive to Filthy Frank's Flawless Fixtures.")
         print("\n")
@@ -1531,7 +1530,7 @@ class EndingsMixin:
         print("\n")
         
         # Acknowledge companions in the destruction
-        companion_count = len([c for c in self.companions if c['alive']])
+        companion_count = len(self.get_all_companions())
         if companion_count > 0:
             type.slow("Your companions are gone. Frank said they 'got in the way'. You don't ask what that means. You don't want to know.")
             print("\n")
@@ -1759,7 +1758,7 @@ class EndingsMixin:
         print("\n")
         
         # Acknowledge companions in retribution
-        companion_count = len([c for c in self.companions if c['alive']])
+        companion_count = len(self.get_all_companions())
         if companion_count > 0:
             type.slow("Your companions lived. That's what matters. When Frank's boys came for them, the Dealer protected them.")
             print("\n")
@@ -2022,7 +2021,7 @@ class EndingsMixin:
         print("\n")
         
         # Acknowledge companions in transcendence
-        companion_count = len([c for c in self.companions if c['alive']])
+        companion_count = len(self.get_all_companions())
         if companion_count > 0:
             type.slow("Your companions are somewhere in the casino. You gave them rooms. Fed them. But you never visit anymore.")
             print("\n")
@@ -2723,7 +2722,7 @@ class EndingsMixin:
         print("\n")
         
         # Acknowledge companions in madness
-        companion_count = len([c for c in self.companions if c['alive']])
+        companion_count = len(self.get_all_companions())
         if companion_count > 0:
             type.slow("The thing looks at your companions in the back seat. They whimper. They know.")
             print("\n")
@@ -2799,12 +2798,3 @@ class EndingsMixin:
         print("\n")
         type.slow("Thank you for playing.")
         quit()
-
-    # ============================================
-    # MEDICAL EVENTS - SICKNESSES, ILLNESSES, INJURIES
-    # These events add status conditions that require treatment.
-    # Untreated conditions worsen over time and can cause death.
-    # ============================================
-
-    # INFECTIOUS DISEASES
-

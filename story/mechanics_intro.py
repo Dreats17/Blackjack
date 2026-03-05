@@ -135,8 +135,6 @@ class MechanicsIntroMixin:
             else:
                 type.type("\"Whaddya say?\" ")
 
-
-
     def filthy_frank(self):
         self.meet("Frank Event")
         type.type("A roaring engine blasts into your eardrums. ")
@@ -204,8 +202,6 @@ class MechanicsIntroMixin:
             else:
                 type.type("\"Speak up! You're mumbling. \" ")
 
-
-
     def optimal_oswald(self):
         self.meet("Oswald Event")
         type.type("A glossy black limousine is quietly approaching your wagon. ")
@@ -268,7 +264,6 @@ class MechanicsIntroMixin:
                     return
             else:
                 type.type("\"Come again?\" ")
-
 
     def update_story_event_prereqs(self):
         if(self._balance>=200):

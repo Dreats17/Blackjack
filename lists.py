@@ -407,6 +407,19 @@ class Lists:
             "all_busts": {"name": "All Busts", "description": "Bust 10 hands in a row."},
             "companion_army": {"name": "Companion Army", "description": "Have 50 companions at once."},
             "item_minimalist": {"name": "Empty Pockets", "description": "Reach $1,000,000 with 0 items in inventory."},
+            
+            # Interconnected Chain Achievements
+            "hermit_trail_complete": {"name": "The Hermit's Legacy", "description": "Find the Hollow Tree Stash at the end of the hermit's trail."},
+            "hermit_daughter": {"name": "Edgar's Daughter", "description": "Give Diana her father's journal."},
+            "radio_nowhere_member": {"name": "Radio Nowhere", "description": "Join the pirate radio station and meet Vera."},
+            "radio_broadcast": {"name": "Your Voice in the Dark", "description": "Record and broadcast your story on Radio Nowhere."},
+            "junkyard_apprentice": {"name": "Junkyard Apprentice", "description": "Learn to craft a Scrap Metal Rose from Gideon."},
+            "junkyard_crowned": {"name": "Crowned in Scrap", "description": "Create the Junkyard Crown with Gideon."},
+            "dog_hero": {"name": "Dog Hero", "description": "Rescue the missing dogs and attend the block party."},
+            "rose_gifted": {"name": "Art is Giving", "description": "Give the Scrap Metal Rose to someone who needed it."},
+            "all_chains_done": {"name": "Connected", "description": "Complete all four interconnected storyline chains."},
+            "night_vision_used": {"name": "Eyes in the Dark", "description": "Use the Night Vision Scope to see what lurks at night."},
+            "scrap_armor_crafted": {"name": "Junkyard Knight", "description": "Craft Scrap Armor on your own at the junkyard."},
         }
     
     def get_achievement_data(self, achievement_id):
@@ -861,6 +874,28 @@ class Lists:
             "Companion Bed": 15,
             "Pet Toy": 8,
             "Feeding Station": 10,
+            
+            # Chain Event Items
+            "Worn Map": 5,
+            "Hermit's Journal": 25,
+            "Carved Walking Stick": 30,
+            "Herbal Pouch": 20,
+            "Strange Frequency Dial": 15,
+            "Static Recorder": 20,
+            "Tinfoil Hat": 5,
+            "Pirate Radio Flyer": 10,
+            "Welding Goggles": 25,
+            "Scrap Metal Rose": 40,
+            "Artisan's Toolkit": 60,
+            "Junkyard Crown": 100,
+            "Stack of Flyers": 2,
+            "Dog Whistle": 15,
+            "Torn Collar": 5,
+            "Reunion Photo": 35,
+            "Hollow Tree Stash": 50,
+            "Night Vision Scope": 45,
+            "Signal Booster": 30,
+            "Scrap Armor": 55,
         }
     
     def get_pawn_price(self, item_name):
@@ -1325,6 +1360,7 @@ class Lists:
         a_list.append("stray_cat")
         a_list.append("three_legged_dog")
         a_list.append("opossum_in_trash")
+        a_list.append("raccoon_gang_raid")
         a_list.append("sewer_rat")
         a_list.append("conspiracy_theorist")
         a_list.append("dropped_ice_cream")
@@ -1435,7 +1471,6 @@ class Lists:
         a_list.append("fourth_wall_break")
         a_list.append("wrong_universe")
         # NEW CREATIVE EVENTS - DARK
-        a_list.append("the_collector")
         a_list.append("the_empty_room")
         a_list.append("blood_moon_bargain")
         # NEW CREATIVE EVENTS - GOOFY
@@ -1490,6 +1525,34 @@ class Lists:
         a_list.append("road_flare_torch_encounter")
         a_list.append("feeding_station_morning")
         a_list.append("splint_injury_event")
+        # Chain Starter Events
+        a_list.append("hermit_trail_discovery")
+        a_list.append("lost_dog_flyers_found")
+        a_list.append("lost_dog_investigation")
+        # Recurring Chain Item Events
+        a_list.append("herbal_pouch_remedy")
+        a_list.append("walking_stick_hike")
+        a_list.append("tinfoil_hat_event")
+        a_list.append("reunion_photo_comfort")
+        # CAR TROUBLE EVENTS - Poor Tier (minor breakdowns, cheap/no fix)
+        a_list.append("corroded_battery_terminals")
+        a_list.append("fuse_blown")
+        a_list.append("abs_light_on")
+        a_list.append("slow_tire_leak")
+        a_list.append("headlights_burned_out")
+        a_list.append("starter_motor_grinding")
+        a_list.append("windshield_cracked")
+        a_list.append("hail_damage")
+        a_list.append("key_wont_turn")
+        a_list.append("window_wont_roll_up")
+        a_list.append("trunk_wont_close")
+        a_list.append("bald_tires_noticed")
+        a_list.append("exhaust_leak_loud")
+        a_list.append("thermostat_stuck")
+        a_list.append("nail_in_tire")
+        # CAR TROUBLE FOLLOW-UPS - Poor Tier
+        a_list.append("nail_in_tire_blows")
+        a_list.append("failing_starter_dies")
         random.shuffle(a_list)
         return a_list
     
@@ -1510,7 +1573,6 @@ class Lists:
         a_list.append("nice_dream")
         a_list.append("nightmare")
         # Conditional Night
-        a_list.append("stray_cat_sick")
         a_list.append("stray_cat_dies")
         # One-Time (Rabbit)
         a_list.append("chase_the_rabbit")
@@ -1591,8 +1653,6 @@ class Lists:
         a_list.append("damaged_exhaust_again")
         a_list.append("atm_theft_police")
         a_list.append("heart_condition_flare")
-        a_list.append("shoulder_chronic_pain")
-        a_list.append("shoulder_painkiller_addiction")
         a_list.append("painkiller_withdrawal")
         a_list.append("painkiller_dealer_returns")
         a_list.append("painkiller_overdose")
@@ -1609,10 +1669,7 @@ class Lists:
         a_list.append("unpaid_tickets_boot")
         a_list.append("booted_car_impound")
         a_list.append("mystery_car_problem_worsens")
-        a_list.append("stray_cat_sick")
         a_list.append("stray_cat_has_kittens")
-        a_list.append("bridge_angel_returns")
-        a_list.append("call_bridge_angel")
         # Random Small Events
         a_list.append("found_twenty")
         a_list.append("lost_wallet")
@@ -1674,7 +1731,6 @@ class Lists:
         a_list.append("the_glitch")
         a_list.append("fourth_wall_break")
         a_list.append("wrong_universe")
-        a_list.append("the_collector")
         a_list.append("alien_abduction")
         a_list.append("blood_moon_bargain")
         # NEW SECRET EVENTS
@@ -1731,6 +1787,48 @@ class Lists:
         a_list.append("road_flare_torch_encounter")
         a_list.append("feeding_station_morning")
         a_list.append("splint_injury_event")
+        # Chain Starter Events
+        a_list.append("hermit_trail_discovery")
+        a_list.append("lost_dog_flyers_found")
+        a_list.append("lost_dog_investigation")
+        # Chain Progression Events
+        a_list.append("hermit_camp_return")
+        a_list.append("hermit_journal_study")
+        a_list.append("midnight_radio_signal")
+        a_list.append("midnight_radio_frequency")
+        a_list.append("lost_dog_whistle_search")
+        a_list.append("lost_dog_culprit")
+        a_list.append("lost_dog_reunion")
+        # Recurring Chain Item Events
+        a_list.append("herbal_pouch_remedy")
+        a_list.append("walking_stick_hike")
+        a_list.append("tinfoil_hat_event")
+        a_list.append("reunion_photo_comfort")
+        a_list.append("junkyard_crown_moment")
+        # CAR TROUBLE EVENTS - Cheap Tier (moderate breakdowns)
+        a_list.append("dead_battery_afternoon")
+        a_list.append("engine_oil_empty")
+        a_list.append("oil_leak_spotted")
+        a_list.append("brakes_squealing")
+        a_list.append("ran_out_of_gas")
+        a_list.append("car_alarm_malfunction")
+        a_list.append("frozen_door_locks")
+        a_list.append("parking_brake_stuck")
+        a_list.append("clogged_fuel_filter")
+        a_list.append("strange_engine_noise")
+        a_list.append("check_engine_light_on")
+        a_list.append("engine_overheating")
+        a_list.append("car_wont_go_in_reverse")
+        a_list.append("gas_pedal_sticking")
+        a_list.append("wheel_alignment_off")
+        a_list.append("suspension_creaking")
+        a_list.append("nail_in_tire")
+        # CAR TROUBLE FOLLOW-UPS - Cheap Tier
+        a_list.append("leaking_battery_worsens")
+        a_list.append("engine_knock_worsens")
+        a_list.append("bald_tires_hydroplane")
+        a_list.append("nail_in_tire_blows")
+        a_list.append("failing_starter_dies")
         random.shuffle(a_list)
         return a_list
     
@@ -1753,7 +1851,6 @@ class Lists:
         a_list.append("nice_dream")
         a_list.append("nightmare")
         # Conditional Night
-        a_list.append("stray_cat_sick")
         a_list.append("stray_cat_dies")
         a_list.append("stray_cat_has_kittens")
         # One-Time Conditional (Suzy)
@@ -1781,7 +1878,6 @@ class Lists:
         a_list.append("food_truck_festival")
         # Deadly Events
         a_list.append("back_alley_shortcut")
-        a_list.append("gas_station_robbery")
         a_list.append("heart_attack_scare")
         a_list.append("drug_dealer_encounter")
         # MEDICAL EVENTS - Modest Tier
@@ -1839,8 +1935,6 @@ class Lists:
         a_list.append("fuel_leak_fire")
         a_list.append("fuel_leak_fixed")
         a_list.append("heart_condition_flare")
-        a_list.append("shoulder_chronic_pain")
-        a_list.append("shoulder_painkiller_addiction")
         a_list.append("painkiller_withdrawal")
         a_list.append("painkiller_dealer_returns")
         a_list.append("painkiller_overdose")
@@ -1856,12 +1950,7 @@ class Lists:
         a_list.append("unpaid_tickets_boot")
         a_list.append("booted_car_impound")
         a_list.append("mystery_car_problem_worsens")
-        a_list.append("stray_cat_sick")
         a_list.append("stray_cat_has_kittens")
-        a_list.append("bridge_angel_returns")
-        a_list.append("call_bridge_angel")
-        a_list.append("gas_station_hero_recognized")
-        a_list.append("gas_station_hero_interview")
         a_list.append("old_rival_encounter")
         a_list.append("media_known_harassed")
         a_list.append("media_known_documentary")
@@ -1900,8 +1989,6 @@ class Lists:
         # One-Time
         a_list.append("the_photographer")
         a_list.append("the_food_truck")
-        # One-Time Conditional
-        a_list.append("further_interrogation")
         # Secret Events
         a_list.append("exactly_50000")
         # NEW CREATIVE EVENTS - Modest Tier
@@ -1975,6 +2062,59 @@ class Lists:
         a_list.append("road_flare_torch_encounter")
         a_list.append("feeding_station_morning")
         a_list.append("splint_injury_event")
+        # Hermit Chain
+        a_list.append("hermit_trail_discovery")
+        a_list.append("hermit_camp_return")
+        a_list.append("hermit_journal_study")
+        a_list.append("hermit_trail_stranger")
+        a_list.append("hermit_hollow_oak")
+        # Midnight Radio Chain
+        a_list.append("midnight_radio_signal")
+        a_list.append("midnight_radio_frequency")
+        a_list.append("midnight_radio_pole")
+        a_list.append("midnight_radio_visit")
+        a_list.append("midnight_radio_broadcast")
+        # Junkyard Artisan Chain
+        a_list.append("junkyard_artisan_meet")
+        a_list.append("junkyard_lesson_one")
+        a_list.append("junkyard_lesson_two")
+        # Lost Dog Chain
+        a_list.append("lost_dog_flyers_found")
+        a_list.append("lost_dog_investigation")
+        a_list.append("lost_dog_whistle_search")
+        a_list.append("lost_dog_culprit")
+        a_list.append("lost_dog_reunion")
+        # Recurring Chain Item Events
+        a_list.append("herbal_pouch_remedy")
+        a_list.append("walking_stick_hike")
+        a_list.append("tinfoil_hat_event")
+        a_list.append("reunion_photo_comfort")
+        a_list.append("junkyard_crown_moment")
+        a_list.append("scrap_armor_event")
+        # Crossover Events
+        a_list.append("crossover_night_vision_bonus")
+        # CAR TROUBLE EVENTS - Modest Tier (expensive repairs)
+        a_list.append("engine_wont_turn_over")
+        a_list.append("tire_blowout")
+        a_list.append("battery_acid_leak")
+        a_list.append("alternator_failing")
+        a_list.append("brake_fluid_leak")
+        a_list.append("fuel_pump_whining")
+        a_list.append("stuck_in_gear")
+        a_list.append("radiator_leak")
+        a_list.append("power_steering_failure")
+        a_list.append("frozen_fuel_line")
+        a_list.append("water_pump_failing")
+        a_list.append("dead_battery_afternoon")
+        a_list.append("engine_overheating")
+        a_list.append("car_alarm_malfunction")
+        # CAR TROUBLE FOLLOW-UPS - Modest Tier
+        a_list.append("leaking_battery_worsens")
+        a_list.append("engine_knock_worsens")
+        a_list.append("bald_tires_hydroplane")
+        a_list.append("failing_fuel_pump_dies")
+        a_list.append("broken_ball_joint_breaks")
+        a_list.append("failing_starter_dies")
         random.shuffle(a_list)
         return a_list
     
@@ -2049,7 +2189,6 @@ class Lists:
         a_list.append("gut_wound_complications")
         a_list.append("bridge_contemplation")
         a_list.append("heart_condition_flare")
-        a_list.append("shoulder_chronic_pain")
         a_list.append("painkiller_withdrawal")
         a_list.append("painkiller_dealer_returns")
         a_list.append("painkiller_overdose")
@@ -2063,10 +2202,6 @@ class Lists:
         a_list.append("weakened_immune_cold")
         a_list.append("weakened_immune_pneumonia")
         a_list.append("mystery_car_problem_worsens")
-        a_list.append("bridge_angel_returns")
-        a_list.append("call_bridge_angel")
-        a_list.append("gas_station_hero_recognized")
-        a_list.append("gas_station_hero_interview")
         a_list.append("old_rival_encounter")
         a_list.append("media_known_harassed")
         a_list.append("media_known_documentary")
@@ -2089,7 +2224,7 @@ class Lists:
         a_list.append("cigar_circle")
         a_list.append("lucky_rabbit_encounter")
         # Conditional
-        a_list.append("rat_bite")
+        a_list.append("wild_rat_attack")
         a_list.append("hungry_termites")
         a_list.append("wealth_anxiety")
         a_list.append("tax_man")
@@ -2100,8 +2235,6 @@ class Lists:
         a_list.append("old_friend_recognition")
         a_list.append("grimy_gus_discovery")
         a_list.append("the_gambler_ghost")
-        # One-Time Conditional
-        a_list.append("starving_cow")
         # Secret Events
         a_list.append("exactly_250000")
         # COMPANION DAY EVENTS
@@ -2146,6 +2279,58 @@ class Lists:
         a_list.append("road_flare_torch_encounter")
         a_list.append("feeding_station_morning")
         a_list.append("splint_injury_event")
+        # Hermit Chain
+        a_list.append("hermit_trail_discovery")
+        a_list.append("hermit_camp_return")
+        a_list.append("hermit_journal_study")
+        a_list.append("hermit_trail_stranger")
+        a_list.append("hermit_hollow_oak")
+        # Midnight Radio Chain
+        a_list.append("midnight_radio_signal")
+        a_list.append("midnight_radio_frequency")
+        a_list.append("midnight_radio_pole")
+        a_list.append("midnight_radio_visit")
+        a_list.append("midnight_radio_broadcast")
+        # Junkyard Artisan Chain
+        a_list.append("junkyard_artisan_meet")
+        a_list.append("junkyard_lesson_one")
+        a_list.append("junkyard_lesson_two")
+        a_list.append("junkyard_gideon_story")
+        a_list.append("junkyard_masterpiece")
+        # Lost Dog Chain
+        a_list.append("lost_dog_flyers_found")
+        a_list.append("lost_dog_investigation")
+        a_list.append("lost_dog_whistle_search")
+        a_list.append("lost_dog_culprit")
+        a_list.append("lost_dog_reunion")
+        # Recurring Chain Item Events
+        a_list.append("herbal_pouch_remedy")
+        a_list.append("walking_stick_hike")
+        a_list.append("tinfoil_hat_event")
+        a_list.append("reunion_photo_comfort")
+        a_list.append("junkyard_crown_moment")
+        a_list.append("scrap_armor_event")
+        # Crossover Events
+        a_list.append("crossover_radio_hermit")
+        a_list.append("crossover_artisan_rose_gift")
+        a_list.append("crossover_night_vision_bonus")
+        a_list.append("crossover_all_chains_complete")
+        # CAR TROUBLE EVENTS - Rich Tier (catastrophic breakdowns)
+        a_list.append("transmission_slipping")
+        a_list.append("broken_ball_joint")
+        a_list.append("catalytic_converter_stolen")
+        a_list.append("flooded_engine")
+        a_list.append("mystery_breakdown")
+        a_list.append("tire_blowout")
+        a_list.append("alternator_failing")
+        a_list.append("brake_fluid_leak")
+        a_list.append("water_pump_failing")
+        # CAR TROUBLE FOLLOW-UPS - Rich Tier
+        a_list.append("leaking_battery_worsens")
+        a_list.append("engine_knock_worsens")
+        a_list.append("bald_tires_hydroplane")
+        a_list.append("failing_fuel_pump_dies")
+        a_list.append("broken_ball_joint_breaks")
         random.shuffle(a_list)
         return a_list
     
@@ -2224,8 +2409,6 @@ class Lists:
         a_list.append("soulless_mirror")
         a_list.append("soulless_recognition")
         a_list.append("weakened_immune_pneumonia")
-        a_list.append("bridge_angel_returns")
-        a_list.append("call_bridge_angel")
         a_list.append("old_rival_encounter")
         a_list.append("media_known_harassed")
         a_list.append("media_known_documentary")
@@ -2246,8 +2429,6 @@ class Lists:
         a_list.append("the_journalist")
         a_list.append("the_offer_refused")
         a_list.append("the_doppelganger")
-        # One-Time Conditional
-        a_list.append("even_further_interrogation")
         # Secret Events
         a_list.append("exactly_777777")
         # NEW CREATIVE EVENTS - Doughman Tier
@@ -2332,6 +2513,53 @@ class Lists:
         a_list.append("road_flare_torch_encounter")
         a_list.append("feeding_station_morning")
         a_list.append("splint_injury_event")
+        # Hermit Chain
+        a_list.append("hermit_trail_discovery")
+        a_list.append("hermit_camp_return")
+        a_list.append("hermit_journal_study")
+        a_list.append("hermit_trail_stranger")
+        a_list.append("hermit_hollow_oak")
+        # Midnight Radio Chain
+        a_list.append("midnight_radio_signal")
+        a_list.append("midnight_radio_frequency")
+        a_list.append("midnight_radio_pole")
+        a_list.append("midnight_radio_visit")
+        a_list.append("midnight_radio_broadcast")
+        # Junkyard Artisan Chain
+        a_list.append("junkyard_artisan_meet")
+        a_list.append("junkyard_lesson_one")
+        a_list.append("junkyard_lesson_two")
+        a_list.append("junkyard_gideon_story")
+        a_list.append("junkyard_masterpiece")
+        # Lost Dog Chain
+        a_list.append("lost_dog_flyers_found")
+        a_list.append("lost_dog_investigation")
+        a_list.append("lost_dog_whistle_search")
+        a_list.append("lost_dog_culprit")
+        a_list.append("lost_dog_reunion")
+        # Recurring Chain Item Events
+        a_list.append("herbal_pouch_remedy")
+        a_list.append("walking_stick_hike")
+        a_list.append("tinfoil_hat_event")
+        a_list.append("reunion_photo_comfort")
+        a_list.append("junkyard_crown_moment")
+        a_list.append("scrap_armor_event")
+        # Crossover Events
+        a_list.append("crossover_radio_hermit")
+        a_list.append("crossover_artisan_rose_gift")
+        a_list.append("crossover_night_vision_bonus")
+        a_list.append("crossover_all_chains_complete")
+        # CAR TROUBLE EVENTS - Doughman Tier
+        a_list.append("catalytic_converter_stolen")
+        a_list.append("transmission_slipping")
+        a_list.append("mystery_breakdown")
+        a_list.append("flooded_engine")
+        a_list.append("broken_ball_joint")
+        # CAR TROUBLE FOLLOW-UPS - Doughman Tier
+        a_list.append("engine_knock_worsens")
+        a_list.append("failing_fuel_pump_dies")
+        a_list.append("broken_ball_joint_breaks")
+        a_list.append("bald_tires_hydroplane")
         random.shuffle(a_list)
         return a_list
     
@@ -2393,7 +2621,6 @@ class Lists:
         a_list.append("soulless_emptiness")
         a_list.append("soulless_mirror")
         a_list.append("soulless_recognition")
-        a_list.append("call_bridge_angel")
         a_list.append("media_known_documentary")
         a_list.append("high_roller_room_visit")
         a_list.append("high_roller_whale")
@@ -2402,14 +2629,10 @@ class Lists:
         a_list.append("prayer_ignored")
         # Conditional
         a_list.append("too_close_to_quit")
-        a_list.append("victoria_returns")
         # One-Time
         a_list.append("the_warning")
         a_list.append("the_celebration")
         a_list.append("the_offer")
-        # One-Time Conditional
-        a_list.append("cow_army")
-        a_list.append("final_interrogation")
         # One-Time Conditional (Suzy Finale)
         a_list.append("gift_from_suzy")
         # Secret Events
@@ -2493,6 +2716,51 @@ class Lists:
         a_list.append("road_flare_torch_encounter")
         a_list.append("feeding_station_morning")
         a_list.append("splint_injury_event")
+        # Hermit Chain
+        a_list.append("hermit_trail_discovery")
+        a_list.append("hermit_camp_return")
+        a_list.append("hermit_journal_study")
+        a_list.append("hermit_trail_stranger")
+        a_list.append("hermit_hollow_oak")
+        # Midnight Radio Chain
+        a_list.append("midnight_radio_signal")
+        a_list.append("midnight_radio_frequency")
+        a_list.append("midnight_radio_pole")
+        a_list.append("midnight_radio_visit")
+        a_list.append("midnight_radio_broadcast")
+        # Junkyard Artisan Chain
+        a_list.append("junkyard_artisan_meet")
+        a_list.append("junkyard_lesson_one")
+        a_list.append("junkyard_lesson_two")
+        a_list.append("junkyard_gideon_story")
+        a_list.append("junkyard_masterpiece")
+        # Lost Dog Chain
+        a_list.append("lost_dog_flyers_found")
+        a_list.append("lost_dog_investigation")
+        a_list.append("lost_dog_whistle_search")
+        a_list.append("lost_dog_culprit")
+        a_list.append("lost_dog_reunion")
+        # Recurring Chain Item Events
+        a_list.append("herbal_pouch_remedy")
+        a_list.append("walking_stick_hike")
+        a_list.append("tinfoil_hat_event")
+        a_list.append("reunion_photo_comfort")
+        a_list.append("junkyard_crown_moment")
+        a_list.append("scrap_armor_event")
+        # Crossover Events
+        a_list.append("crossover_radio_hermit")
+        a_list.append("crossover_artisan_rose_gift")
+        a_list.append("crossover_night_vision_bonus")
+        a_list.append("crossover_all_chains_complete")
+        # CAR TROUBLE EVENTS - Nearly There Tier
+        a_list.append("mystery_breakdown")
+        a_list.append("flooded_engine")
+        a_list.append("catalytic_converter_stolen")
+        # CAR TROUBLE FOLLOW-UPS - Nearly There Tier
+        a_list.append("engine_knock_worsens")
+        a_list.append("broken_ball_joint_breaks")
+        a_list.append("failing_fuel_pump_dies")
+        a_list.append("bald_tires_hydroplane")
         random.shuffle(a_list)
         return a_list
     
@@ -2664,6 +2932,8 @@ class Lists:
                 a_list.append(("Breath Mints", 3))
             if random.randrange(4) == 0 and not self.__player.has_item("Rubber Bands"):
                 a_list.append(("Rubber Bands", 2))
+            if random.randrange(6) == 0 and not self.__player.has_item("Worn Map"):
+                a_list.append(("Worn Map", 8))
         
         # === RANK 1 (Cheap): More options ===
         if rank == 1:
@@ -2681,6 +2951,8 @@ class Lists:
                 a_list.append(("Road Flares", 25))
             if random.randrange(4) == 0 and not self.__player.has_item("Air Freshener"):
                 a_list.append(("Air Freshener", 7))
+            if random.randrange(5) == 0 and not self.__player.has_item("Dog Whistle"):
+                a_list.append(("Dog Whistle", 22))
         
         # === RANK 2 (Modest): Quality items ===
         if rank == 2:
@@ -2698,6 +2970,10 @@ class Lists:
                 a_list.append(("Super Glue", 12))
             if random.randrange(4) == 0 and not self.__player.has_item("Hand Warmers"):
                 a_list.append(("Hand Warmers", 10))
+            if random.randrange(5) == 0 and not self.__player.has_item("Welding Goggles"):
+                a_list.append(("Welding Goggles", 40))
+            if random.randrange(6) == 0 and not self.__player.has_item("Signal Booster"):
+                a_list.append(("Signal Booster", 55))
         
         # === RANK 3 (Rich): Premium items ===
         if rank == 3:

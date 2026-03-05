@@ -1225,7 +1225,6 @@ class LocationsMixin:
         return
 
 
-
     # Frank's shop and interactions
     def frank_dialogue(self):
         if self._mechanic_visits == 0:
@@ -1650,7 +1649,6 @@ class LocationsMixin:
                         type.type("Speak up! You're mumbling. ")
         self.start_night()
         return
-
 
 
     # Oswald's shop and interactions
@@ -2286,6 +2284,7 @@ class LocationsMixin:
         time.sleep(2)
         
         self.eternity()
+
 
     # Convenience Store
     def update_convenience_store_inventory(self):
@@ -3209,6 +3208,26 @@ class LocationsMixin:
                 print()
                 type.type("Front set. When the squealing starts, you're prepared.")
                 self.add_item("Brake Pads")
+            elif item == "Worn Map":
+                type.type(bright(magenta("You got a Worn Map!")))
+                print()
+                type.type("It's old. Hand-drawn. The ink is faded but you can make out trails, landmarks, and... an X.")
+                self.add_item("Worn Map")
+            elif item == "Dog Whistle":
+                type.type(bright(magenta("You got a Dog Whistle!")))
+                print()
+                type.type("You blow it. Nothing happens. Or does it? You can't hear it, but something out there can.")
+                self.add_item("Dog Whistle")
+            elif item == "Welding Goggles":
+                type.type(bright(magenta("You got Welding Goggles!")))
+                print()
+                type.type("Heavy-duty. Makes you look like a post-apocalyptic mechanic. Which... isn't far off.")
+                self.add_item("Welding Goggles")
+            elif item == "Signal Booster":
+                type.type(bright(magenta("You got a Signal Booster!")))
+                print()
+                type.type("A small antenna attachment. Boosts radio reception. Who knows what you'll pick up.")
+                self.add_item("Signal Booster")
             
             elif item == "Home":
                 type.type("Suit yourself.")
@@ -3273,7 +3292,6 @@ class LocationsMixin:
                 print("\n")
                 self.start_night()
                 return
-
 
     # Marvin's Shop and interactions
     def visit_marvin(self):
@@ -3481,7 +3499,7 @@ class LocationsMixin:
         print()
         
         # DARK OPTION: Sell companions (only if you have 3+)
-        companion_count = len([c for c in self.companions if c['alive']])
+        companion_count = len(self.get_all_companions())
         if companion_count >= 3:
             type.type("3. Ask about... other merchandise")
             print()
@@ -3528,7 +3546,7 @@ class LocationsMixin:
         
         elif choice == "3":
             # Check if this is the "other merchandise" option or leave option
-            companion_count = len([c for c in self.companions if c['alive']])
+            companion_count = len(self.get_all_companions())
             if companion_count >= 3:
                 # Dark option - sell companions
                 self.pawn_shop_dark_option()
@@ -4575,5 +4593,3 @@ class LocationsMixin:
             type.type("You don't feel anything anymore.")
             print("\n")
             self.die("beaten to death by loan sharks")
-
-

@@ -38,7 +38,7 @@ def bright(text):
 
 
 class Blackjack:
-    __slots__=["__balance", "__bet", "__min_bet", "__dealer_happiness", "__deck", "__hand", "__dealer_hand", "__player", "__used_peek", "__dealer_warning", "__free_hand", "__used_second_chance", "__used_pocket_aces", "__lucky_coin_triggered", "__used_double_down", "__used_split", "__split_hand", "__used_surrender", "__insurance_bet"]
+    __slots__=["__balance", "__bet", "__min_bet", "__dealer_happiness", "__deck", "__hand", "__dealer_hand", "__player", "__used_peek", "__dealer_warning", "__free_hand", "__used_second_chance", "__used_pocket_aces", "__lucky_coin_triggered", "__used_double_down", "__used_split", "__split_hand", "__used_surrender", "__insurance_bet", "__bust_streak", "__min_bet_bust_count", "__dealer_forced_min_bet", "__dealer_forced_all_in"]
 
     def __init__(self, player):
         self.__balance = 50
@@ -199,10 +199,21 @@ class Blackjack:
                 else:
                     self.set_min_bet(self.__balance)
 
+                # Angry dealer can override the min bet
+                if self.__dealer_forced_min_bet > 0 and self.__dealer_forced_min_bet > self.__min_bet:
+                    self.__min_bet = self.__dealer_forced_min_bet
+
                 if(not self.__free_hand):
-                    player_betting = False
-                    while(not player_betting):
-                        player_betting = self.bet()
+                    # Dealer forced all-in — no choice
+                    if self.__dealer_forced_all_in:
+                        self.__bet = self.__balance
+                        type.slow(red(bright("You push everything to the center. " + green("${:,}".format(self.__bet)) + red(bright(". All of it.")))))
+                        print("\n")
+                        self.__dealer_forced_all_in = False  # Only forced once
+                    else:
+                        player_betting = False
+                        while(not player_betting):
+                            player_betting = self.bet()
 
                 if self.__player.is_religious():
                     type.fast(self.__player.lists().get_prayer())
@@ -279,6 +290,8 @@ class Blackjack:
     def dealer_status(self):
                 # Dealer happiness effects
                 self.__free_hand = False
+                self.__dealer_forced_all_in = False
+                self.__dealer_forced_min_bet = 0
                 if self.__dealer_happiness == 100:
                     random_chance = random.randrange(3)
                     if random_chance == 0:
@@ -305,9 +318,21 @@ class Blackjack:
                 if self.__dealer_happiness > 30:
                     self.__dealer_warning = False
 
+                # === ANGRY DEALER: FORCED ALL-IN (happiness 0) ===
                 if self.__dealer_happiness == 0:
-                    random_chance = random.randrange(2)
+                    random_chance = random.randrange(3)
                     if random_chance == 0:
+                        # Force all-in instead of outright kill
+                        type.slow(red(bright("The Dealer slams his fist on the table. The whole room goes quiet.")))
+                        print("\n")
+                        type.slow(red(bright("He leans in close. You can see the veins in his neck pulsing.")))
+                        print()
+                        type.slow(red(bright('"You think this is a game? ALL. IN. Every last cent. Right now."')))
+                        print("\n")
+                        type.slow(red(bright("The Dealer isn\'t asking. He\'s telling.")))
+                        print("\n")
+                        self.__dealer_forced_all_in = True
+                    elif random_chance == 1:
                         type.slow(red(bright("The Dealer's had it with you. He gets up from his chair, and fires three shots into your chest. You bleed out, and as you fade from reality, you see the Dealer reach into your pockets, and take every last penny from your lifeless body.")))
                         self.__player.kill()
                     else:
@@ -316,15 +341,25 @@ class Blackjack:
                         print("\n")
                         return
                 elif self.__dealer_happiness < 5:
-                    random_chance = random.randrange(5)
+                    random_chance = random.randrange(6)
                     if random_chance == 0:
+                        # Force all-in
+                        type.slow(red(bright('The Dealer locks eyes with you. "You know what? Let\'s make this interesting."')))
+                        print("\n")
+                        type.slow(red(bright('"Everything. On the table. Now."')))
+                        print("\n")
+                        self.__dealer_forced_all_in = True
+                    elif random_chance == 1:
                         type.slow(red(bright("The Dealer's had it with you. He gets up from his chair, and fires three shots into your chest. You bleed out, and as you fade from reality, you see the Dealer reach into your pockets, and take every last penny from your lifeless body.")))
                         self.__player.kill()
-                    elif random_chance == 1:
+                    elif random_chance == 2:
                         type.slow(red(bright("The Dealer's had it with you. He points aggressively towards the door. Scared to question his authority, you scurry out. It seems you just dodged a bullet.")))
                         self.__player.add_danger("Angry Dealer")
                         print("\n")
                         return
+                    else:
+                        # Angry min bet increase
+                        self.__dealer_forced_min_bet = self._calculate_angry_min_bet()
                 elif self.__dealer_happiness < 10:
                     random_chance = random.randrange(10)
                     if random_chance == 0:
@@ -335,6 +370,14 @@ class Blackjack:
                         self.__player.add_danger("Angry Dealer")
                         print("\n")
                         return
+                    elif random_chance < 5:
+                        # Angry min bet increase
+                        self.__dealer_forced_min_bet = self._calculate_angry_min_bet()
+                elif self.__dealer_happiness < 20:
+                    # Moderate anger: chance to raise min bet
+                    if random.randrange(4) == 0:
+                        self.__dealer_forced_min_bet = self._calculate_angry_min_bet()
+
                 if self.__dealer_happiness < 20 and not self.__dealer_warning:
                     self.__dealer_warning = True
                     type.slow(red(bright("The Dealer is visibly pissed. Perhaps you've been getting too lucky.")))
@@ -350,6 +393,44 @@ class Blackjack:
         self.__player.update_delight_indicator_durability()
 
 
+
+    def _calculate_angry_min_bet(self):
+        """Calculate an inflated min bet based on dealer anger level."""
+        # The angrier the dealer, the higher the forced min bet
+        if self.__dealer_happiness < 5:
+            # Extreme anger: 40-60% of balance
+            multiplier = random.uniform(0.4, 0.6)
+            anger_messages = [
+                '"You wanna play small? Not anymore."',
+                '"I set the rules. And the rules just changed."',
+                '"You think you can nickel-and-dime ME?"',
+                '"Oh, you\'ll bet big tonight. Trust me."'
+            ]
+        elif self.__dealer_happiness < 10:
+            # Very angry: 25-40% of balance
+            multiplier = random.uniform(0.25, 0.4)
+            anger_messages = [
+                '"The minimum just went up. Way up."',
+                '"I don\'t like your attitude. Bet bigger."',
+                '"Consider this a... tax. On my patience."'
+            ]
+        elif self.__dealer_happiness < 20:
+            # Angry: 15-25% of balance
+            multiplier = random.uniform(0.15, 0.25)
+            anger_messages = [
+                '"Let\'s raise the stakes a little, shall we?"',
+                '"I\'m feeling generous. Your minimum just doubled."',
+                '"Higher bets. Now."'
+            ]
+        else:
+            return 0
+
+        forced_min = max(int(self.__balance * multiplier), self.__min_bet + 1)
+        type.slow(red(bright(random.choice(anger_messages))))
+        print("\n")
+        type.slow(red("The Dealer sets your minimum bet to " + bright("${:,}".format(forced_min))))
+        print("\n")
+        return forced_min
 
     def set_min_bet(self, balance):
         balance_str = str(balance)
@@ -540,6 +621,47 @@ class Blackjack:
         extra_options = [o for o in options if o not in ["hit", "stand"]]
         if extra_options:
             options_display = "hit, stand, or " + "/".join(extra_options)
+        
+        # Dealer commentary based on game state
+        player_val = self.__hand.value()
+        if self.__hand.possible_hands() == 2:
+            player_val = self.__hand.ace_value()
+        happiness = self.__player.get_dealer_happiness()
+        
+        dealer_comment = ""
+        roll = random.randrange(5)  # 1 in 5 chance of a comment
+        if roll == 0:
+            if player_val >= 19:
+                comments = [
+                    "The Dealer glances at your hand. A flicker of something crosses his face. Respect? Fear? Indigestion? ",
+                    "The Dealer drums his fingers on the table. He knows your hand is strong. You can tell by the way he's not making eye contact. ",
+                    "The Dealer's smile tightens. Just a fraction. You're sitting pretty and he knows it. ",
+                ]
+                dealer_comment = random.choice(comments)
+            elif player_val >= 15 and player_val <= 16:
+                comments = [
+                    "The Dealer raises an eyebrow. The danger zone. Where heroes are made and fools are buried. ",
+                    "The Dealer watches you with interest. Fifteen-sixteen is where the sweat starts. He can smell it. ",
+                    "The Dealer leans forward, just barely. This is the hand that separates the gamblers from the pretenders. ",
+                ]
+                dealer_comment = random.choice(comments)
+            elif player_val <= 11:
+                comments = [
+                    "The Dealer waits patiently. You've got room to work with and he knows it. ",
+                    "The Dealer stifles a yawn. Low hand. Nothing exciting yet. Wake him up when it gets interesting. ",
+                ]
+                dealer_comment = random.choice(comments)
+            elif happiness < 20:
+                comments = [
+                    "The Dealer stares at you. Not blinking. Just... staring. Make your choice. ",
+                    "The Dealer's jaw is clenched. He's not in the mood for deliberation. ",
+                    "The Dealer taps the table. Once. Twice. Impatiently. ",
+                ]
+                dealer_comment = random.choice(comments)
+        
+        if dealer_comment:
+            type.type(dealer_comment)
+            print()
         
         type.fast("Would you like to " + options_display + "? ")
         choice = input().lower()
@@ -776,6 +898,24 @@ class Blackjack:
         print()
         if(len(self.__dealer_hand)>2):
             type.fast(red("The Dealer hits"))
+            # Occasional dealer commentary on subsequent hits
+            if random.randrange(4) == 0:
+                dealer_val = self.__dealer_hand.value()
+                if dealer_val >= 15:
+                    comments = [
+                        " — a bold choice. He's pushing it.",
+                        ". He doesn't look happy about it.",
+                        ". His hand hovers over the deck for just a moment too long before drawing.",
+                        ". Living dangerously. You almost respect it.",
+                    ]
+                    type.type(random.choice(comments))
+                else:
+                    comments = [
+                        " — no hesitation.",
+                        ". Mechanical. Practiced. He's done this a million times.",
+                        ". The card slides off the deck like it was waiting for him.",
+                    ]
+                    type.type(random.choice(comments))
             time.sleep(PAUSE)
         else:
             type.fast(red("The Dealer's hand has a value under 17 so they hit"))
@@ -822,7 +962,6 @@ class Blackjack:
         
     def end_round(self, status):
         print()
-        message = random.randrange(5)
 
         # Second Chance flask: replay a losing hand once per session
         if (self.__player.has_flask_effect("Second Chance") and 
@@ -866,11 +1005,15 @@ class Blackjack:
 
         match status:
             case "Player Blackjack": 
+                message = random.randrange(8)
                 if message==0: type.fast(yellow(bright("You got a Blackjack! You Win! Yay!")))
                 if message==1: type.fast(yellow(bright("Blackjack! What a moment! Mom, get the camera!")))
                 if message==2: type.fast(yellow(bright("WOOOOOOO!!! Blackjack!!! WOOOOOOOO!!!")))
                 if message==3: type.fast(yellow(bright("You hit Blackjack! What's cooking, good looking?")))
                 if message==4: type.fast(yellow(bright("Oh lord have mercy, you got a Blackjack!")))
+                if message==5: type.fast(yellow(bright("Twenty-one on the nose. The cards love you today.")))
+                if message==6: type.fast(yellow(bright("Blackjack! The Dealer's eye twitches. Beautiful.")))
+                if message==7: type.fast(yellow(bright("Natural 21. Clean. Surgical. The Dealer didn't even get to play.")))
                 print()
                 if self.__free_hand:
                     type.fast(yellow(bright("You had " + green("${:,}".format(self.__balance)) + yellow(", and with a free bet of ") + green("${:,}".format(self.__bet)) + yellow(", you've tripled it!"))))
@@ -881,11 +1024,15 @@ class Blackjack:
                 self.__balance += 2*self.__bet
 
             case "Player Wins":
+                message = random.randrange(8)
                 if message==0: type.fast(magenta(bright("Congrats! You Win! Get REKT, Dealer!")))
                 if message==1: type.fast(magenta(bright("You topple the Dealer! Are we witnessing a heist?")))
                 if message==2: type.fast(magenta(bright("You outplayed the Dealer to victory! Nice moves.")))
                 if message==3: type.fast(magenta(bright("You win...this time.")))
                 if message==4: type.fast(magenta(bright("Winner winner chicken dinner! Must be tasty.")))
+                if message==5: type.fast(magenta(bright("Your hand wins! The Dealer collects the cards without looking at you.")))
+                if message==6: type.fast(magenta(bright("You beat the house. For now. Enjoy it while it lasts.")))
+                if message==7: type.fast(magenta(bright("Victory! Small, fragile, temporary. But yours.")))
                 print()
                 if self.__free_hand:
                     type.fast(magenta(bright("You had " + green("${:,}".format(self.__balance)) + magenta(", and with a free bet of ") + green("${:,}".format(self.__bet)) + magenta(", you've doubled it!"))))
@@ -896,11 +1043,15 @@ class Blackjack:
                 self.__balance += self.__bet
 
             case "Dealer Bust":
+                message = random.randrange(8)
                 if message==0: type.fast(magenta(bright("The Dealer went over 21! Bust! You Win!")))
                 if message==1: type.fast(magenta(bright("Dealer's hand busts! Victory is yours!")))
                 if message==2: type.fast(magenta(bright("Dealer goes kaboom! Were they trying to bake a number cake?")))
                 if message==3: type.fast(magenta(bright("Dealer hand goes bust! You're one lucky lucy.")))
                 if message==4: type.fast(magenta(bright("The Dealer's over 21, which means you are the winner! Dope.")))
+                if message==5: type.fast(magenta(bright("The Dealer overcooked it. Busted! Karma is REAL.")))
+                if message==6: type.fast(magenta(bright("Bust! The Dealer slams the table. You pretend not to notice.")))
+                if message==7: type.fast(magenta(bright("Over 21. The Dealer exhales through his nose like a dragon who just lost a bet. Oh wait.")))
                 print()
                 if self.__free_hand:
                     type.fast(magenta(bright("You had " + green("${:,}".format(self.__balance)) + magenta(", and with a free bet of ") + green("${:,}".format(self.__bet)) + magenta(", you've doubled it!"))))
@@ -911,11 +1062,15 @@ class Blackjack:
                 self.__balance += self.__bet
 
             case "Dealer Blackjack":
+                message = random.randrange(8)
                 if message==0: type.fast(red(bright("The Dealer gets a Blackjack and wins! Too bad! So sad! Get good, kiddo!")))
                 if message==1: type.fast(red(bright("Dealer secures Blackjack! Game over for you, loser!")))
                 if message==2: type.fast(red(bright("Dealer's Blackjack! Well, butter my biscuit, what a surprise!")))
                 if message==3: type.fast(red(bright("HAHA you suck buddy. Living infinite money glitch.")))
                 if message==4: type.fast(red(bright("You just witnessed greatness. You only wish you were this good.")))
+                if message==5: type.fast(red(bright("Natural 21 for the house. The Dealer doesn't even celebrate. This is Tuesday for him.")))
+                if message==6: type.fast(red(bright("Dealer Blackjack. He flips the cards like he's bored. He IS bored. You're entertainment.")))
+                if message==7: type.fast(red(bright("21. No effort. No suspense. Just the house being the house.")))
                 print()
                 if self.__free_hand:
                     type.fast(red(bright("You had " + green("${:,}".format(self.__balance)) + red(" and lost your free bet of ") + green("${:,}".format(self.__bet)))))
@@ -933,11 +1088,15 @@ class Blackjack:
                     self.__balance -= self.__bet
 
             case "Dealer Wins":
+                message = random.randrange(8)
                 if message==0: type.fast(red(bright("The Dealer wins! Too bad! So sad! Stay mad!")))
                 if message==1: type.fast(red(bright("Dealer wins with the higher hand! Not your day, huh?")))
                 if message==2: type.fast(red(bright("You simply got outplayed on this one.")))
                 if message==3: type.fast(red(bright("Your hand is inferior to the Dealer's. Which means you lose.")))
                 if message==4: type.fast(red(bright("Dealer's number is higher, so I guess you lost. Unfortunate.")))
+                if message==5: type.fast(red(bright("The Dealer wins. He sweeps your chips away like crumbs off a table.")))
+                if message==6: type.fast(red(bright("Close, but close only counts in horseshoes. And this ain't horseshoes.")))
+                if message==7: type.fast(red(bright("The house always wins. Today, you're the proof.")))
                 print()
                 if self.__free_hand:
                     type.fast(red(bright("You had " + green("${:,}".format(self.__balance)) + red(" and lost your free bet of ") + green("${:,}".format(self.__bet)))))
@@ -955,11 +1114,15 @@ class Blackjack:
                     self.__balance -= self.__bet
 
             case "Player Bust":
+                message = random.randrange(8)
                 if message==0: type.fast(red(bright("Bust! The Dealer wins! Too bad! So sad! You suuuuck!")))
                 if message==1: type.fast(red(bright("Bust city! Did your cards get too excited?")))
                 if message==2: type.fast(red(bright("Busted! Did you think this was a game of 'who can count the highest'?")))
                 if message==3: type.fast(red(bright("Bust! Should've stopped while you were ahead.")))
                 if message==4: type.fast(red(bright("You busted! How'd it feel?")))
+                if message==5: type.fast(red(bright("Over 21. You flew too close to the sun. Icarus would be proud. And also broke.")))
+                if message==6: type.fast(red(bright("BUST. The most satisfying word in the Dealer's vocabulary.")))
+                if message==7: type.fast(red(bright("You busted. The Dealer barely glances at your cards. He already knew.")))
                 print()
 
                 if self.__free_hand:
@@ -978,11 +1141,15 @@ class Blackjack:
                     self.__balance -= self.__bet
 
             case "Tie":
+                message = random.randrange(8)
                 if message==0: type.fast(cyan(bright("You and the Dealer have the same value. It's a draw. So, so very lame.")))
                 if message==1: type.fast(cyan(bright("Standoff! Equal hands, no winner!")))
                 if message==2: type.fast(cyan(bright("Twinsies! You and the Dealer are matchy-matchy!")))
                 if message==3: type.fast(cyan(bright("Welp. Those numbers are the same. So much for that round.")))
                 if message==4: type.fast(cyan(bright("The lamest outcome possible, and yet here we are.")))
+                if message==5: type.fast(cyan(bright("Push. Nobody wins. Nobody loses. The universe yawns.")))
+                if message==6: type.fast(cyan(bright("A tie. The Dealer shrugs. You shrug. Everyone shrugs. Moving on.")))
+                if message==7: type.fast(cyan(bright("Same number, different people. The philosophical implications are staggering. And boring.")))
                 print()
                 if self.__free_hand:
                     type.fast(cyan(bright("You had " + green("${:,}".format(self.__balance)) + cyan(", and since this hand was free, your balance hasn't changed"))))
@@ -992,11 +1159,15 @@ class Blackjack:
                 type.fast(cyan(bright("Your balance is still " + green("${:,}".format(self.__balance)))))
 
             case "Tie Blackjack":
+                message = random.randrange(8)
                 if message==0: type.fast(cyan(bright("You and the Dealer both got a Blackjack. How boring.")))
                 if message==1: type.fast(cyan(bright("Stalemate with matching Blackjacks! Who coulda guessed?")))
                 if message==2: type.fast(cyan(bright("Double Blackjacks! What are the odds? (Don't answer that.)")))
                 if message==3: type.fast(cyan(bright("It's a Blackjack draw! Did you both use your one-time miracle for this?")))
                 if message==4: type.fast(cyan(bright("21 = 21. Sorry.")))
+                if message==5: type.fast(cyan(bright("Matching Blackjacks. The Dealer and you lock eyes. Respect? Contempt? Yes.")))
+                if message==6: type.fast(cyan(bright("Both 21. Both perfect. Both pointless. The house always finds a way to bore you.")))
+                if message==7: type.fast(cyan(bright("A draw at 21. The most exciting unexciting thing that can happen.")))
                 print()
                 if self.__free_hand:
                     type.fast(cyan(bright("You had " + green("${:,}".format(self.__balance)) + cyan(", and since this hand was free, your balance hasn't changed"))))
@@ -1063,6 +1234,61 @@ class Blackjack:
             modifier = 4
         elif self.__player.get_rank() == 5:
             modifier = 5
+
+        # === BUST STREAK DETECTION ===
+        if status == "Player Bust":
+            self.__bust_streak += 1
+
+            # Check for min-bet busting (throwing hands cheaply)
+            was_min_bet = (self.__bet <= self.__min_bet * 1.1)  # Within 10% of min bet
+            if was_min_bet:
+                self.__min_bet_bust_count += 1
+                if self.__min_bet_bust_count >= 3:
+                    # Dealer gets suspicious of cheap throwing
+                    print("\n")
+                    suspicious_lines = [
+                        '"You keep busting on minimum bets. You think I\'m stupid?"',
+                        '"Three min-bet busts in a row. You\'re either terrible or you\'re trying something."',
+                        '"I\'ve seen hustlers try this before. Lose small, keep me happy. Cute. Real cute."',
+                        '"You\' re tanking on purpose. I can smell it. You reek of strategy."'
+                    ]
+                    type.slow(red(bright(random.choice(suspicious_lines))))
+                    print("\n")
+                    self.anger_dealer(25)
+                    self.__min_bet_bust_count = 0  # Reset after punishment
+            else:
+                self.__min_bet_bust_count = 0  # Reset if bust wasn't at min bet
+
+            # 10 busts in a row — dealer thinks you're throwing
+            if self.__bust_streak == 10:
+                print("\n")
+                type.slow(red(bright("The Dealer leans back in his chair and stares at you. Hard.")))
+                print()
+                type.slow(red(bright('"Ten busts. In a row. TEN."')))
+                print()
+                type.slow(red(bright('"You\'re either the worst card player I\'ve ever seen, or you\'re throwing hands on purpose."')))
+                print()
+                type.slow(red(bright('"Either way, I don\'t like it."')))
+                print("\n")
+                self.__dealer_happiness = 20
+                if self.__player.has_item("Delight Indicator") or self.__player.has_item("Delight Manipulator"):
+                    self.delight_indicator()
+                    print()
+
+            # 11th bust — dealer snaps
+            elif self.__bust_streak >= 11:
+                print("\n")
+                type.slow(red(bright('"Eleven. ELEVEN. You know what? I\'m done playing nice."')))
+                print("\n")
+                self.__dealer_happiness = 0
+                self.__bust_streak = 0  # Reset streak
+                if self.__player.has_item("Delight Indicator") or self.__player.has_item("Delight Manipulator"):
+                    self.delight_indicator()
+                    print()
+        else:
+            # Any non-bust result resets both streaks
+            self.__bust_streak = 0
+            self.__min_bet_bust_count = 0
 
         match status:
             case "Player Blackjack": 

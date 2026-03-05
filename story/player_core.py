@@ -77,14 +77,11 @@ from story.day_cycle import DayCycleMixin
 from story.events_day import DayEventsMixin
 from story.events_night import NightEventsMixin
 from story.adventures import AdventuresMixin
-from story.mechanics_intro import MechanicsIntroMixin
 from story.game_flow import GameFlowMixin
 from story.locations import LocationsMixin
 from story.durability import DurabilityMixin
 from story.event_dispatch import EventDispatchMixin
 from story.endings import EndingsMixin
-from story.medical import MedicalMixin
-from story.car_events import CarEventsMixin
 
 class Player(
     SystemsMixin,
@@ -93,14 +90,11 @@ class Player(
     DayEventsMixin,
     NightEventsMixin,
     AdventuresMixin,
-    MechanicsIntroMixin,
     GameFlowMixin,
     LocationsMixin,
     DurabilityMixin,
     EventDispatchMixin,
     EndingsMixin,
-    MedicalMixin,
-    CarEventsMixin,
 ):
 
     def __init__(self):

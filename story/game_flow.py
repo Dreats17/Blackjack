@@ -123,9 +123,6 @@ class GameFlowMixin:
             self.sanity_indicator()
         
         self.update_rank()
-        self.update_story_event_prereqs()
-        ranStoryEvent = False
-
         # ============================================
         # WAKING UP (right before the morning event)
         # ============================================
@@ -152,29 +149,9 @@ class GameFlowMixin:
             self.update_rank()
             return
 
-        if((self._prereqs[0]) and not (self._prereqs_done[0])):
-            random_chance = random.randrange(3)
-            if random_chance == 0:
-                while((not self.has_met("Tom Event")) or (not self.has_met("Frank Event")) or (not self.has_met("Oswald Event"))):
-                    random_chance = random.randrange(3)
-                    if (random_chance == 0) and (not self.has_met("Tom Event")):
-                        self.trusty_tom()
-                        ranStoryEvent = True
-                        break
-                    elif (random_chance == 1) and (not self.has_met("Frank Event")):
-                        self.filthy_frank()
-                        ranStoryEvent = True
-                        break
-                    elif (random_chance == 2) and (not self.has_met("Oswald Event")):
-                        self.optimal_oswald()
-                        ranStoryEvent = True
-                        break
-
-        if ranStoryEvent == False:
-            self.day_event()
+        self.day_event()
 
         self.update_rank()
-
 
     def has_pests(self):
         if self.has_danger("Spider") or self.has_danger("Cockroach") or self.has_danger("Rat") or self.has_danger("Termite"):
@@ -316,7 +293,6 @@ class GameFlowMixin:
     def get_days_elapsed(self, mark):
         i = self.get_mark_index(mark)
         return self._day - self._counting_days[i]
-    
     
     def update_silver_value(self):
         if self.has_item("Enchanting Silver Bar"):
@@ -1066,11 +1042,11 @@ class GameFlowMixin:
                 self.restore_sanity(total_sanity_restore)
                 print("\n")
 
-
     def get_unlocked_adventure_areas(self):
         """Returns a list of adventure areas the player can walk to.
         
         Unlock requirements:
+        - The Road: Always available at rank 2+. No prerequisite events.
         - Woodlands: All 3 woodlands events (path, river, field) OR woodlands_adventure. Rank 3+ to walk.
         - Swamp: All 3 swamp events (stroll, wade, swim) OR swamp_adventure. Rank 4+ to walk.
         - Beach: All 3 beach events (stroll, swim, dive) OR beach_adventure. Rank 4+ to walk.
@@ -1080,6 +1056,10 @@ class GameFlowMixin:
         At rank 5, all adventures are available even if not yet visited."""
         areas = []
         rank = self.get_rank()
+        
+        # The Road - rank 2+ to walk, always available (no prerequisite events)
+        if rank >= 2:
+            areas.append(("The Road", "road_adventure"))
         
         # Check if player has completed all 3 events for each area
         all_woodlands_events = (self.has_met("Woodlands Path Event") and 
@@ -1130,5 +1110,3 @@ class GameFlowMixin:
                 areas.append(("The Ocean Depths", "underwater_adventure"))
         
         return areas
-
-

@@ -89,7 +89,7 @@ class StorylineSystem:
             # ==========================================
             
             "suzy": {
-                "stage": 0,  # 0=not started, 1=met (whats_my_name done), 2=color, 3=animal, 4=finale
+                "stage": 0,  # 0=name known (color ready), 1=color answered, 2=animal answered, 3=complete
                 "day_started": 0,
                 "completed": False,
                 "failed": False,
@@ -106,6 +106,7 @@ class StorylineSystem:
                 "min_gap": 4,
                 "base_chance": 0.12,
                 "escalation": 0.08,
+                "force_start_day": 8,  # Phil shows up to interrogate by day 8
             },
             
             "victoria": {
@@ -116,6 +117,7 @@ class StorylineSystem:
                 "min_gap": 5,
                 "base_chance": 0.15,
                 "escalation": 0.10,
+                "force_start_day": 20,  # Victoria confronts you by day 20 (if balance qualifies)
             },
             
             "betsy": {
@@ -126,6 +128,7 @@ class StorylineSystem:
                 "min_gap": 5,
                 "base_chance": 0.10,
                 "escalation": 0.08,
+                "force_start_day": 15,  # The cow finds you by day 15
             },
             
             "stray_cat": {
@@ -136,6 +139,7 @@ class StorylineSystem:
                 "min_gap": 3,
                 "base_chance": 0.15,
                 "escalation": 0.10,
+                "force_start_day": 8,  # The stray cat shows up by day 8
             },
             
             "bridge_angel": {
@@ -156,6 +160,7 @@ class StorylineSystem:
                 "min_gap": 3,
                 "base_chance": 0.15,
                 "escalation": 0.10,
+                "force_start_day": 15,  # The robbery happens by day 15
             },
             
             "painkiller": {
@@ -176,6 +181,7 @@ class StorylineSystem:
                 "min_gap": 5,
                 "base_chance": 0.10,
                 "escalation": 0.08,
+                "force_start_day": 20,  # The Collector finds you by day 20 (if balance qualifies)
             },
             
             "mechanic_dreams": {
@@ -200,6 +206,18 @@ class StorylineSystem:
                 "min_gap": 0,
                 "base_chance": 0.15,
                 "escalation": 0.10,
+                "force_start_day": 15,  # Grimy Gus is discovered by day 15 (if rank qualifies)
+            },
+            
+            "mechanics": {
+                "stage": 0,  # 0-2 = one mechanic intro per stage (random order); 3 = all introduced
+                "day_started": 0,
+                "completed": False,
+                "failed": False,
+                "min_gap": 2,
+                "base_chance": 0.40,
+                "escalation": 0.15,
+                "force_start_day": 5,  # First mechanic shows up by day 5 (if balance >= 200)
             },
             
             # ==========================================
@@ -244,6 +262,7 @@ class StorylineSystem:
                 "min_gap": 5,
                 "base_chance": 0.10,
                 "escalation": 0.08,
+                "force_start_day": 12,  # The mime performs by day 12
             },
             
             "jameson": {
@@ -254,6 +273,7 @@ class StorylineSystem:
                 "min_gap": 5,
                 "base_chance": 0.12,
                 "escalation": 0.08,
+                "force_start_day": 10,  # The lone cowboy rides through by day 10
             },
             
             "stuart": {
@@ -354,45 +374,109 @@ class StorylineSystem:
     def check_for_storyline_event(self):
         """
         Called once per day in start_day(), before the random event pool.
-        Returns a method reference if a storyline event should fire, else None.
+        Returns a callable if a storyline event should fire, else None.
         Only ONE storyline event per day.
+
+        Stage-0 start conditions live inline inside _get_stage_event() — returning
+        None means "not ready yet." Pool arcs (whose intro events are existing Player
+        methods that don't call sl.advance()) receive an auto-advance 0→1 after firing.
+        Standalone-function arcs advance themselves via sl.advance() inside the event.
         """
-        eligible = []
-        
+        # Pool arcs: intro events are plain Player methods with no sl.advance() inside.
+        # Must be auto-advanced to stage 1 after firing so follow-up stages can unlock.
+        _POOL_ARCS = frozenset({
+            "stray_cat", "jameson", "phil", "mime", "betsy",
+            "gas_station_hero", "collector", "victoria", "grimy_gus",
+        })
+
+        # Sync arcs whose stage-0 events may have fired via the random pool
+        self._sync_pool_triggered_arcs()
+        day = self.player.get_day()
+
+        # ── Phase 1: Forced introductions ──────────────────────────────────────
+        # Stage-0 arcs past their force_start_day take priority over the pool.
+        # Conditions are embedded in _get_stage_event(); None = still not ready.
+        forced = {}
+        for name, sl in self.storylines.items():
+            if sl["completed"] or sl["failed"] or sl["stage"] != 0:
+                continue
+            if day >= sl.get("force_start_day", 9999):
+                event = self._get_stage_event(name)
+                if event is not None:
+                    forced[name] = event
+
+        if forced:
+            chosen = random.choice(list(forced.keys()))
+            event = forced[chosen]
+            sl = self.storylines[chosen]
+            if chosen in _POOL_ARCS:
+                sl["stage"] = 1
+                sl["day_started"] = day
+            return event
+
+        # ── Phase 2: Normal eligible check ─────────────────────────────────────
+        eligible = {}
         for name, sl in self.storylines.items():
             if sl["completed"] or sl["failed"]:
                 continue
-            
-            # Check if this storyline can start (stage 0 → 1)
+
             if sl["stage"] == 0:
-                if self._can_start(name):
-                    eligible.append(name)
+                # Inline conditions in _get_stage_event() decide eligibility
+                event = self._get_stage_event(name)
+                if event is not None:
+                    eligible[name] = event
                 continue
-            
-            # Check if enough days have passed for next stage
-            days_since = self.player.get_day() - sl["day_started"]
+
+            # Stage > 0: check day gap, stage conditions, escalating probability
+            days_since = day - sl["day_started"]
             if days_since < sl["min_gap"]:
                 continue
-            
-            # Check stage-specific conditions
             if not self._stage_conditions_met(name):
                 continue
-            
-            # Escalating probability
             days_past_gap = days_since - sl["min_gap"]
             chance = sl["base_chance"] + (sl["escalation"] * days_past_gap)
-            chance = min(chance, 0.95)  # Cap at 95%
-            
+            chance = min(chance, 0.95)
             if random.random() < chance:
-                eligible.append(name)
-        
+                event = self._get_stage_event(name)
+                if event is not None:
+                    eligible[name] = event
+
         if not eligible:
             return None
-        
-        # Pick one randomly from eligible storylines
-        chosen = random.choice(eligible)
-        return self._get_stage_event(chosen)
-    
+
+        chosen = random.choice(list(eligible.keys()))
+        event = eligible[chosen]
+        sl = self.storylines[chosen]
+        # Auto-advance pool arcs (their intro events don't call sl.advance)
+        if sl["stage"] == 0 and chosen in _POOL_ARCS:
+            sl["stage"] = 1
+            sl["day_started"] = day
+        return event
+
+    def _sync_pool_triggered_arcs(self):
+        """
+        Advance stage-0 storylines whose intro event already fired via the random pool.
+        Called at the start of each day's storyline check to keep stage in sync with
+        the old has_met tracking system. Without this, arcs could double-fire.
+        """
+        p = self.player
+        syncs = [
+            ("stray_cat",        lambda: p.has_met("Stray Cat Fed")),
+            ("jameson",          lambda: p.has_met("Cowboy")),
+            ("phil",             lambda: p.has_met("Interrogator")),
+            ("mime",             lambda: p.has_met("Mime")),
+            ("betsy",            lambda: p.has_met("Betsy")),
+            ("gas_station_hero", lambda: p.has_met("Gas Station Hero")),
+            ("collector",        lambda: p.has_met("The Collector")),
+            ("victoria",         lambda: p.has_met("The Rival")),
+            ("grimy_gus",        lambda: p.has_met("Grimy Gus")),
+        ]
+        for name, met_fn in syncs:
+            sl = self.storylines.get(name)
+            if sl and sl["stage"] == 0 and not sl["completed"] and not sl["failed"] and met_fn():
+                sl["stage"] = 1
+                sl["day_started"] = p.get_day()
+
     def advance(self, name):
         """Advance a storyline to the next stage. Call from within event methods."""
         sl = self.storylines[name]
@@ -422,126 +506,6 @@ class StorylineSystem:
         self.storylines[name]["day_started"] = self.player.get_day()
     
     # ==========================================
-    # START CONDITIONS
-    # ==========================================
-    # Each storyline has different conditions to start (stage 0 → 1)
-    
-    def _can_start(self, name):
-        """Check if a storyline can start (transition from stage 0 to stage 1)."""
-        p = self.player
-        day = p.get_day()
-        
-        match name:
-            # --- EXISTING ARCS ---
-            
-            case "suzy":
-                # Suzy starts after whats_my_name has already played
-                # whats_my_name is kept in the poor pool as stage 0→1 trigger
-                return p.get_name() is not None and not p.has_met("Suzy Color")
-            
-            case "phil":
-                # Phil starts after day 3, random chance
-                return day >= 3 and random.random() < 0.12
-            
-            case "victoria":
-                # Victoria appears when you're doing well ($50k+)
-                return p.get_balance() >= 50000 and day >= 10
-            
-            case "betsy":
-                # Betsy appears randomly after day 5
-                return day >= 5 and random.random() < 0.10
-            
-            case "stray_cat":
-                # Stray cat can appear anytime after day 2
-                return day >= 2 and random.random() < 0.15
-            
-            case "bridge_angel":
-                # Bridge angel requires low health or sanity
-                return (p.get_health() < 30 or p.get_sanity() < 40) and day >= 7
-            
-            case "gas_station_hero":
-                # Gas station robbery, day 5+, modest rank+
-                return day >= 5 and p.get_rank() >= 1
-            
-            case "painkiller":
-                # Starts when player has Shoulder Destroyed or any severe injury
-                return p.has_danger("Shoulder Destroyed")
-            
-            case "collector":
-                # The Collector appears when you have $100k+
-                return p.get_balance() >= 100000 and day >= 15
-            
-            case "mechanic_dreams":
-                # Starts after meeting at least one mechanic
-                return (p.has_met("Tom") or p.has_met("Frank") or p.has_met("Oswald")) and day >= 5
-            
-            # --- UNLOCK EVENTS ---
-            
-            case "grimy_gus":
-                # Gus appears after day 7, any rank above poor
-                return not p.has_met("Grimy Gus") and day >= 7 and p.get_rank() >= 1
-            
-            # --- NEW ARCS ---
-            
-            case "kyle":
-                # Kyle arc starts after 3+ convenience store visits
-                return p.get_statistic("pawn_shop_visits") >= 0 and day >= 5  # After a few days
-            
-            case "martinez":
-                # Officer Martinez appears after day 4
-                return day >= 4 and random.random() < 0.10
-            
-            case "dr_feelgood":
-                # Starts after taking 20+ damage from a single injury event
-                return any(p.has_injury(i) for i in ["Broken Leg", "Broken Wrist", "Fractured Spine", "Severed Skin", "Deep Laceration"]) and day >= 5
-            
-            case "mime":
-                # The mime appears randomly after day 3
-                return day >= 3 and random.random() < 0.08
-            
-            case "jameson":
-                # Cowboy appears early game
-                return day >= 2 and random.random() < 0.10
-            
-            case "stuart":
-                # Stuart's arc requires meeting Oswald
-                return p.has_met("Oswald") and day >= 10
-            
-            case "grandma":
-                # Grandma calls if you have her number
-                return p.has_item("Grandma's Number")
-            
-            case "lucky_dog":
-                # Lucky dog arc starts after befriending Lucky
-                return p.has_companion("Lucky")
-            
-            case "dealer_past":
-                # Dealer's past unfolds after day 15 and having played many hands
-                return day >= 15 and p.get_gambling_stat("total_hands") >= 30
-            
-            case "sleep_paralysis":
-                # Sleep paralysis starts when sanity drops below 60
-                return p.get_sanity() < 60 and day >= 8
-            
-            case "radio_signal":
-                # Radio signal starts randomly after day 6
-                return day >= 6 and p.has_item("Car") and random.random() < 0.08
-            
-            case "graveyard":
-                # Graveyard arc starts after day 12
-                return day >= 12 and random.random() < 0.08
-            
-            case "carnival":
-                # Carnival arrives randomly after day 8, one-time
-                return day >= 8 and not p.has_met("Carnival") and random.random() < 0.06
-            
-            case "lockbox":
-                # Lockbox found after day 4
-                return day >= 4 and random.random() < 0.08
-        
-        return False
-    
-    # ==========================================
     # STAGE CONDITIONS
     # ==========================================
     
@@ -553,12 +517,18 @@ class StorylineSystem:
         
         match name:
             case "suzy":
-                if stage == 1:  # Ready for color question
-                    return p.get_favorite_color() is None
-                elif stage == 2:  # Ready for animal question
+                if stage == 1:  # Color answered, animal question next
                     return p.get_favorite_color() is not None and p.get_favorite_animal() is None
-                elif stage == 3:  # Ready for finale
-                    return p.get_favorite_animal() is not None
+                elif stage == 2:  # Animal answered, finale next
+                    return p.get_favorite_animal() is not None and not p.has_met("Suzy Finale")
+                return True
+            
+            case "mechanics":
+                # Complete once all three mechanics have been introduced
+                all_met = p.has_met("Tom Event") and p.has_met("Frank Event") and p.has_met("Oswald Event")
+                if all_met:
+                    self.complete("mechanics")
+                    return False
                 return True
             
             case "phil":
@@ -649,170 +619,284 @@ class StorylineSystem:
     
     def _get_stage_event(self, name):
         """
-        Return a callable for the next stage of a storyline.
-        For EXISTING events (already methods on Player), use getattr.
-        For NEW events (functions in this file), return a lambda wrapper.
+        Return a callable for the current stage of a storyline, or None if
+        start conditions are not met (stage 0) or no event is defined.
+
+        Stage-0 cases embed their own start conditions inline here — this is the
+        single source of truth for when each arc can begin.
+          - Pool arcs  → return getattr(p, method_name)  (existing Player method)
+          - Standalone → return _wrap(function)           (function defined in this file)
         """
         p = self.player
+        day = p.get_day()
         stage = self.storylines[name]["stage"]
-        sl_sys = self  # reference to pass into standalone functions
-        
-        # Helper: wrap a standalone function into a no-arg callable
+        sl_sys = self
+
         def _wrap(func):
             return lambda: func(p, sl_sys)
-        
+
         match name:
-            # --- EXISTING (methods already exist in story.py) ---
-            
+
+            # ── Pool arcs: stage-0 event is an existing Player method ──────────
+            # These events can also fire randomly from the day pool (lists.py).
+            # _sync_pool_triggered_arcs() advances the stage when the pool fires first.
+
             case "phil":
+                # Stage 0: Phil starts investigating you a few days in
+                if stage == 0:
+                    if p.has_met("Interrogator") or day < 3 or random.random() > 0.12:
+                        return None
                 events = ["interrogation", "further_interrogation", "even_further_interrogation", "final_interrogation"]
                 if stage < len(events):
                     return getattr(p, events[stage])
-            
+
             case "victoria":
+                # Stage 0: Victoria confronts you once you're succeeding ($50k+, day 10+)
+                if stage == 0:
+                    if p.has_met("The Rival") or p.get_balance() < 50000 or day < 10:
+                        return None
                 events = ["the_rival", "victoria_returns"]
                 if stage < len(events):
                     return getattr(p, events[stage])
-            
+
             case "betsy":
+                # Stage 0: A stray cow wanders into your life after day 5
+                if stage == 0:
+                    if p.has_met("Betsy") or day < 5 or random.random() > 0.10:
+                        return None
                 events = ["hungry_cow", "starving_cow", "cow_army"]
                 if stage < len(events):
                     return getattr(p, events[stage])
-            
+
             case "stray_cat":
+                # Stage 0: A stray cat appears at your car after day 2
+                if stage == 0:
+                    if p.has_met("Stray Cat Fed") or day < 2 or random.random() > 0.15:
+                        return None
                 events = ["stray_cat", "stray_cat_sick"]
                 if stage < len(events):
                     return getattr(p, events[stage])
-            
+
             case "bridge_angel":
+                # Stage 0: Despair brings you to the bridge (low health or sanity)
+                if stage == 0:
+                    if day < 7 or (p.get_health() >= 30 and p.get_sanity() >= 40):
+                        return None
                 events = ["bridge_contemplation", "bridge_angel_returns", "call_bridge_angel"]
                 if stage < len(events):
                     return getattr(p, events[stage])
-            
+
             case "gas_station_hero":
+                # Stage 0: You witness a robbery once you have some standing (rank 1+)
+                if stage == 0:
+                    if p.has_met("Gas Station Hero") or day < 5 or p.get_rank() < 1:
+                        return None
                 events = ["gas_station_robbery", "gas_station_hero_recognized", "gas_station_hero_interview"]
                 if stage < len(events):
                     return getattr(p, events[stage])
-            
+
             case "painkiller":
+                # Stage 0: Chronic pain sets in once the shoulder is destroyed
+                if stage == 0:
+                    if not p.has_danger("Shoulder Destroyed"):
+                        return None
                 events = ["shoulder_chronic_pain", "shoulder_painkiller_addiction"]
                 if stage < len(events):
                     return getattr(p, events[stage])
-            
+
             case "collector":
+                # Stage 0: The Collector finds you once you have real money ($100k+)
+                if stage == 0:
+                    if p.has_met("The Collector") or p.get_balance() < 100000 or day < 15:
+                        return None
                 events = ["the_collector"]
                 if stage < len(events):
                     return getattr(p, events[stage])
-            
+
             case "grimy_gus":
+                # Stage 0: Gus appears once you're off the streets (rank 1+, day 7+)
                 if stage == 0:
+                    if p.has_met("Grimy Gus") or day < 7 or p.get_rank() < 1:
+                        return None
                     return getattr(p, "grimy_gus_discovery")
-            
-            case "suzy":
-                # Stage 0 = whats_my_name already played, stages 1-3 are new storyline events
-                suzy_events = [None, _wrap(storyline_suzy_color), _wrap(storyline_suzy_animal), _wrap(storyline_suzy_finale)]
-                if stage < len(suzy_events) and suzy_events[stage] is not None:
-                    return suzy_events[stage]
-            
-            case "mechanic_dreams":
-                return _wrap(storyline_mechanic_dream)
-            
-            # --- NEW ARCS (standalone functions in this file) ---
-            
-            case "kyle":
-                kyle_events = [_wrap(storyline_kyle_regular), _wrap(storyline_kyle_problem), 
-                              _wrap(storyline_kyle_after_hours), _wrap(storyline_kyle_secret), 
-                              _wrap(storyline_kyle_finale)]
-                if stage < len(kyle_events):
-                    return kyle_events[stage]
-            
-            case "martinez":
-                martinez_events = [_wrap(storyline_martinez_license), _wrap(storyline_martinez_wellness),
-                                  _wrap(storyline_martinez_favor), _wrap(storyline_martinez_resolution)]
-                if stage < len(martinez_events):
-                    return martinez_events[stage]
-            
+
             case "mime":
-                # Stage 0 = the_mime (existing method on Player)
+                # Stage 0: A silent performer materializes after a few days
                 if stage == 0:
+                    if p.has_met("Mime") or day < 3 or random.random() > 0.08:
+                        return None
                     return getattr(p, "the_mime")
                 mime_events = [None, _wrap(storyline_mime_encore), _wrap(storyline_mime_message),
                               _wrap(storyline_mime_behind_paint), _wrap(storyline_mime_final_act)]
                 if stage < len(mime_events) and mime_events[stage] is not None:
                     return mime_events[stage]
-            
+
             case "jameson":
-                # Stage 0 = lone_cowboy (existing)
+                # Stage 0: A lone cowboy rides through early game
                 if stage == 0:
+                    if p.has_met("Cowboy") or day < 2 or random.random() > 0.10:
+                        return None
                     return getattr(p, "lone_cowboy")
-                jameson_events = [None, _wrap(storyline_jameson_horse_trouble), 
+                jameson_events = [None, _wrap(storyline_jameson_horse_trouble),
                                  _wrap(storyline_jameson_rustlers), _wrap(storyline_jameson_last_ride)]
                 if stage < len(jameson_events) and jameson_events[stage] is not None:
                     return jameson_events[stage]
-            
-            case "stuart":
-                stuart_events = [_wrap(storyline_stuart_psst), _wrap(storyline_stuart_good_deal),
-                                _wrap(storyline_stuart_bad_deal), _wrap(storyline_stuart_oswald_finds_out)]
-                if stage < len(stuart_events):
-                    return stuart_events[stage]
-            
-            case "grandma":
-                grandma_events = [_wrap(storyline_grandma_first_call), _wrap(storyline_grandma_recipe),
-                                 _wrap(storyline_grandma_bad_news), _wrap(storyline_grandma_gift),
-                                 _wrap(storyline_grandma_last_call)]
-                if stage < len(grandma_events):
-                    return grandma_events[stage]
-            
-            case "lucky_dog":
-                lucky_events = [_wrap(storyline_lucky_who_hurt_you), _wrap(storyline_lucky_previous_owner),
-                               _wrap(storyline_lucky_good_boy), _wrap(storyline_lucky_saves_your_life)]
-                if stage < len(lucky_events):
-                    return lucky_events[stage]
-            
-            case "dealer_past":
-                dealer_events = [_wrap(storyline_dealer_photo), _wrap(storyline_dealer_journal),
-                                _wrap(storyline_dealer_question), _wrap(storyline_dealer_answer),
-                                _wrap(storyline_dealer_choice)]
-                if stage < len(dealer_events):
-                    return dealer_events[stage]
-            
-            case "sleep_paralysis":
-                paralysis_events = [_wrap(storyline_paralysis_cant_move), _wrap(storyline_paralysis_speaks),
-                                   _wrap(storyline_paralysis_offer), _wrap(storyline_paralysis_resolution)]
-                if stage < len(paralysis_events):
-                    return paralysis_events[stage]
-            
-            case "radio_signal":
-                radio_events = [_wrap(storyline_radio_static), _wrap(storyline_radio_broadcast),
-                               _wrap(storyline_radio_source), _wrap(storyline_radio_whos_watching)]
-                if stage < len(radio_events):
-                    return radio_events[stage]
-            
-            case "graveyard":
-                graveyard_events = [_wrap(storyline_graveyard_wandering), _wrap(storyline_graveyard_digger),
-                                   _wrap(storyline_graveyard_your_plot), _wrap(storyline_graveyard_edgars_request)]
-                if stage < len(graveyard_events):
-                    return graveyard_events[stage]
-            
-            case "carnival":
-                carnival_events = [_wrap(storyline_carnival_lights), _wrap(storyline_carnival_fortune),
-                                  _wrap(storyline_carnival_game), _wrap(storyline_carnival_pack_up)]
-                if stage < len(carnival_events):
-                    return carnival_events[stage]
-            
-            case "lockbox":
-                lockbox_events = [_wrap(storyline_lockbox_found), _wrap(storyline_lockbox_key_hunt),
-                                 _wrap(storyline_lockbox_who_left_it)]
-                if stage < len(lockbox_events):
-                    return lockbox_events[stage]
-            
+
+            # ── Mechanics intro arc ────────────────────────────────────────────
+
+            case "mechanics":
+                # Conditions: balance >= 200 (enough to care about repair costs)
+                if p.get_balance() < 200:
+                    return None
+                # Stages 0-2: introduce whichever mechanic hasn't been met yet (random order)
+                unmet = []
+                if not p.has_met("Tom Event"):
+                    unmet.append(_wrap(storyline_mechanics_intro_tom))
+                if not p.has_met("Frank Event"):
+                    unmet.append(_wrap(storyline_mechanics_intro_frank))
+                if not p.has_met("Oswald Event"):
+                    unmet.append(_wrap(storyline_mechanics_intro_oswald))
+                if not unmet:
+                    return None
+                return random.choice(unmet)
+
+            # ── Suzy arc ──────────────────────────────────────────────────────
+
+            case "suzy":
+                # Stage 0: Color question — fires once your name is known (from whats_my_name)
+                if stage == 0:
+                    if p.get_name() is None or p.has_met("Suzy Color"):
+                        return None
+                    return _wrap(storyline_suzy_color)
+                elif stage == 1:
+                    return _wrap(storyline_suzy_animal)
+                elif stage == 2:
+                    return _wrap(storyline_suzy_finale)
+
+            # ── Mechanic dreams ────────────────────────────────────────────────
+
+            case "mechanic_dreams":
+                # Only begins after all three mechanics have been introduced
+                if stage == 0 and not self.storylines["mechanics"]["completed"]:
+                    return None
+                return _wrap(storyline_mechanic_dream)
+
+            # ── New narrative arcs (standalone functions) ──────────────────────
+
+            case "kyle":
+                # Stage 0: You notice the convenience store clerk is struggling (day 5+)
+                if stage == 0 and day < 5:
+                    return None
+                kyle_events = [_wrap(storyline_kyle_regular), _wrap(storyline_kyle_problem),
+                              _wrap(storyline_kyle_after_hours), _wrap(storyline_kyle_secret),
+                              _wrap(storyline_kyle_finale)]
+                if stage < len(kyle_events):
+                    return kyle_events[stage]
+
+            case "martinez":
+                # Stage 0: Officer Martinez pulls you over a few days in
+                if stage == 0 and (day < 4 or random.random() > 0.10):
+                    return None
+                martinez_events = [_wrap(storyline_martinez_license), _wrap(storyline_martinez_wellness),
+                                  _wrap(storyline_martinez_favor), _wrap(storyline_martinez_resolution)]
+                if stage < len(martinez_events):
+                    return martinez_events[stage]
+
             case "dr_feelgood":
+                # Stage 0: A sketchy doctor offers relief after a serious injury
+                if stage == 0:
+                    injuries = ["Broken Leg", "Broken Wrist", "Fractured Spine", "Severed Skin", "Deep Laceration"]
+                    if day < 5 or not any(p.has_injury(i) for i in injuries):
+                        return None
                 feelgood_events = [_wrap(storyline_feelgood_first_pill), _wrap(storyline_feelgood_better),
                                   _wrap(storyline_feelgood_price_up), _wrap(storyline_feelgood_rock_bottom),
                                   _wrap(storyline_feelgood_resolution)]
                 if stage < len(feelgood_events):
                     return feelgood_events[stage]
-        
+
+            case "stuart":
+                # Stage 0: Stuart's scheme starts after you've met Oswald (day 10+)
+                if stage == 0 and (not p.has_met("Oswald") or day < 10):
+                    return None
+                stuart_events = [_wrap(storyline_stuart_psst), _wrap(storyline_stuart_good_deal),
+                                _wrap(storyline_stuart_bad_deal), _wrap(storyline_stuart_oswald_finds_out)]
+                if stage < len(stuart_events):
+                    return stuart_events[stage]
+
+            case "grandma":
+                # Stage 0: Grandma calls once you have her number
+                if stage == 0 and not p.has_item("Grandma's Number"):
+                    return None
+                grandma_events = [_wrap(storyline_grandma_first_call), _wrap(storyline_grandma_recipe),
+                                 _wrap(storyline_grandma_bad_news), _wrap(storyline_grandma_gift),
+                                 _wrap(storyline_grandma_last_call)]
+                if stage < len(grandma_events):
+                    return grandma_events[stage]
+
+            case "lucky_dog":
+                # Stage 0: Lucky's story begins once he's your companion
+                if stage == 0 and not p.has_companion("Lucky"):
+                    return None
+                lucky_events = [_wrap(storyline_lucky_who_hurt_you), _wrap(storyline_lucky_previous_owner),
+                               _wrap(storyline_lucky_good_boy), _wrap(storyline_lucky_saves_your_life)]
+                if stage < len(lucky_events):
+                    return lucky_events[stage]
+
+            case "dealer_past":
+                # Stage 0: The dealer's past surfaces after many hands (day 15+, 30+ hands)
+                if stage == 0 and (day < 15 or p.get_gambling_stat("total_hands") < 30):
+                    return None
+                dealer_events = [_wrap(storyline_dealer_photo), _wrap(storyline_dealer_journal),
+                                _wrap(storyline_dealer_question), _wrap(storyline_dealer_answer),
+                                _wrap(storyline_dealer_choice)]
+                if stage < len(dealer_events):
+                    return dealer_events[stage]
+
+            case "sleep_paralysis":
+                # Stage 0: Low sanity opens the door (sanity < 60, day 8+)
+                if stage == 0 and (p.get_sanity() >= 60 or day < 8):
+                    return None
+                paralysis_events = [_wrap(storyline_paralysis_cant_move), _wrap(storyline_paralysis_speaks),
+                                   _wrap(storyline_paralysis_offer), _wrap(storyline_paralysis_resolution)]
+                if stage < len(paralysis_events):
+                    return paralysis_events[stage]
+
+            case "radio_signal":
+                # Stage 0: Something strange on the radio catches your attention (day 6+, has Car)
+                if stage == 0 and (day < 6 or not p.has_item("Car") or random.random() > 0.08):
+                    return None
+                radio_events = [_wrap(storyline_radio_static), _wrap(storyline_radio_broadcast),
+                               _wrap(storyline_radio_source), _wrap(storyline_radio_whos_watching)]
+                if stage < len(radio_events):
+                    return radio_events[stage]
+
+            case "graveyard":
+                # Stage 0: You find yourself wandering the cemetery one night (day 12+)
+                if stage == 0 and (day < 12 or random.random() > 0.08):
+                    return None
+                graveyard_events = [_wrap(storyline_graveyard_wandering), _wrap(storyline_graveyard_digger),
+                                   _wrap(storyline_graveyard_your_plot), _wrap(storyline_graveyard_edgars_request)]
+                if stage < len(graveyard_events):
+                    return graveyard_events[stage]
+
+            case "carnival":
+                # Stage 0: The carnival rolls into town (day 8+, one-time)
+                if stage == 0 and (day < 8 or p.has_met("Carnival") or random.random() > 0.06):
+                    return None
+                carnival_events = [_wrap(storyline_carnival_lights), _wrap(storyline_carnival_fortune),
+                                  _wrap(storyline_carnival_game), _wrap(storyline_carnival_pack_up)]
+                if stage < len(carnival_events):
+                    return carnival_events[stage]
+
+            case "lockbox":
+                # Stage 0: You stumble onto a mysterious lockbox (day 4+)
+                if stage == 0 and (day < 4 or random.random() > 0.08):
+                    return None
+                lockbox_events = [_wrap(storyline_lockbox_found), _wrap(storyline_lockbox_key_hunt),
+                                 _wrap(storyline_lockbox_who_left_it)]
+                if stage < len(lockbox_events):
+                    return lockbox_events[stage]
+
         return None
     
     # ==========================================
@@ -825,17 +909,16 @@ class StorylineSystem:
         """Sync storyline stages with existing player variables (for migration)."""
         p = self.player
         
-        # Suzy - check existing state
-        if p.get_favorite_animal() is not None:
-            if p.has_met("Suzy Finale"):
-                self.storylines["suzy"]["stage"] = 4
-                self.storylines["suzy"]["completed"] = True
-            else:
-                self.storylines["suzy"]["stage"] = 3
+        # Suzy - check existing state (stage 0=color ready, 1=animal ready, 2=finale ready, 3=complete)
+        if p.has_met("Suzy Finale"):
+            self.storylines["suzy"]["stage"] = 3
+            self.storylines["suzy"]["completed"] = True
+        elif p.get_favorite_animal() is not None:
+            self.storylines["suzy"]["stage"] = 2  # Animal answered, finale ready
         elif p.get_favorite_color() is not None:
-            self.storylines["suzy"]["stage"] = 2
+            self.storylines["suzy"]["stage"] = 1  # Color answered, animal question ready
         elif p.get_name() is not None:
-            self.storylines["suzy"]["stage"] = 1
+            self.storylines["suzy"]["stage"] = 0  # Name known, color question ready
         
         # Phil
         if p.has_met("Interrogator"):
@@ -875,6 +958,14 @@ class StorylineSystem:
         if p.get_tom_dreams() >= 3 and p.get_frank_dreams() >= 3 and p.get_oswald_dreams() >= 3:
             self.storylines["mechanic_dreams"]["completed"] = True
         
+        # Mechanics intros (Tom/Frank/Oswald)
+        met_count = sum([p.has_met("Tom Event"), p.has_met("Frank Event"), p.has_met("Oswald Event")])
+        if met_count == 3:
+            self.storylines["mechanics"]["stage"] = 3
+            self.storylines["mechanics"]["completed"] = True
+        elif met_count > 0:
+            self.storylines["mechanics"]["stage"] = met_count
+        
         # Cowboy / Jameson
         if p.has_met("Cowboy"):
             self.storylines["jameson"]["stage"] = 1
@@ -911,6 +1002,29 @@ class StorylineSystem:
 #
 # =====================================================================
 # =====================================================================
+
+
+# =====================================================================
+# MECHANICS INTRODUCTIONS - 3 wrapper events
+# Tom, Frank, and Oswald each get a personal intro through the storyline
+# system rather than the old _prereqs gate. Random order, 2-day min gap.
+# Each wrapper calls sl.advance("mechanics") then fires the existing Player method.
+# =====================================================================
+
+def storyline_mechanics_intro_tom(p, sl):
+    """Mechanics Intro: Trusty Tom appears for the first time."""
+    sl.advance("mechanics")
+    p.trusty_tom()
+
+def storyline_mechanics_intro_frank(p, sl):
+    """Mechanics Intro: Filthy Frank shows up on the road."""
+    sl.advance("mechanics")
+    p.filthy_frank()
+
+def storyline_mechanics_intro_oswald(p, sl):
+    """Mechanics Intro: Optimal Oswald makes his grand entrance."""
+    sl.advance("mechanics")
+    p.optimal_oswald()
 
 
 # =====================================================================

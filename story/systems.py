@@ -811,18 +811,21 @@ class SystemsMixin:
         # Legendary (hardest)
         legendary = ["year_survivor", "perfect_record", "lottery_winner", "death_defier", "item_master", 
                     "true_gambler", "philanthropist", "cursed_survival", "master_collector", "casino_legend",
-                    "judas"]  # Dark ending
+                    "judas", "all_chains_done"]  # Dark ending
         # Epic
         epic = ["hundred_days", "half_million", "millionaire", "blackjack_legend", "win_streak_10", 
                "comeback_master", "near_miss", "full_house", "max_companions", "sanity_master", "debt_free",
-               "noahs_ark", "disney_princess", "marine_biologist"]
+               "noahs_ark", "disney_princess", "marine_biologist",
+               "junkyard_crowned", "radio_broadcast"]
         # Rare
         rare = ["month_survivor", "hundred_thousand", "blackjack_master", "hot_streak", "card_shark",
                "animal_lover", "cheated_death", "collector", "social_butterfly", "night_owl", "morning_person",
-               "zookeeper"]
+               "zookeeper",
+               "hermit_trail_complete", "dog_hero", "radio_nowhere_member", "rose_gifted"]
         # Uncommon
         uncommon = ["week_survivor", "first_ten_thousand", "comeback_kid", "first_friend", "clinging_to_life",
-                   "treasure_hunter", "regular", "rock_bottom", "sanity_saved", "devils_deal", "broken_but_alive"]
+                   "treasure_hunter", "regular", "rock_bottom", "sanity_saved", "devils_deal", "broken_but_alive",
+                   "junkyard_apprentice", "hermit_daughter", "night_vision_used", "scrap_armor_crafted"]
         
         if ach_id in legendary:
             return "legendary"
@@ -977,6 +980,30 @@ class SystemsMixin:
             self.unlock_achievement("item_hoarder")
         if len(self._inventory) >= 20 and not self.has_achievement("master_collector"):
             self.unlock_achievement("master_collector")
+        
+        # Interconnected Chain Achievements
+        if self.has_met("Hollow Oak Found") and not self.has_achievement("hermit_trail_complete"):
+            self.unlock_achievement("hermit_trail_complete")
+        if self.has_met("Hermit Daughter Met") and not self.has_achievement("hermit_daughter"):
+            self.unlock_achievement("hermit_daughter")
+        if self.has_met("Radio Nowhere Member") and not self.has_achievement("radio_nowhere_member"):
+            self.unlock_achievement("radio_nowhere_member")
+        if self.has_met("Radio Broadcast Done") and not self.has_achievement("radio_broadcast"):
+            self.unlock_achievement("radio_broadcast")
+        if self.has_item("Scrap Metal Rose") and not self.has_achievement("junkyard_apprentice"):
+            self.unlock_achievement("junkyard_apprentice")
+        if self.has_met("Junkyard Crown Made") and not self.has_achievement("junkyard_crowned"):
+            self.unlock_achievement("junkyard_crowned")
+        if self.has_met("Missing Dogs Found") and not self.has_achievement("dog_hero"):
+            self.unlock_achievement("dog_hero")
+        if self.has_met("Rose Gift Given") and not self.has_achievement("rose_gifted"):
+            self.unlock_achievement("rose_gifted")
+        if self.has_met("All Chains Complete") and not self.has_achievement("all_chains_done"):
+            self.unlock_achievement("all_chains_done")
+        if self.has_met("Night Vision Bonus Used") and not self.has_achievement("night_vision_used"):
+            self.unlock_achievement("night_vision_used")
+        if self.has_met("Scrap Armor Made") and not self.has_achievement("scrap_armor_crafted"):
+            self.unlock_achievement("scrap_armor_crafted")
         
         # Track highest balance
         if self._balance > self._statistics["highest_balance"]:
