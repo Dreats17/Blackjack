@@ -1,0 +1,735 @@
+================================================================================
+PROJECT CONTEXT — BLACKJACK ROGUELIKE TERMINAL RPG
+================================================================================
+Purpose of this file: Train new AI agents on this project instantly.
+Last updated: 2026-03-05
+
+================================================================================
+1. WHAT IS THIS GAME?
+================================================================================
+A text-based roguelike RPG disguised as a Blackjack card game. The player is
+stranded with $50, discovers an abandoned casino with a mysterious Dealer, and
+must gamble their way to $1,000,000 to escape. Along the way they experience
+hundreds of random narrative events, collect items, adopt animal companions,
+manage health/sanity/fatigue, visit shops, complete multi-part storylines, and
+ultimately reach one of 10+ endings.
+
+Platform: Windows terminal (uses msvcrt for key input)
+Language: Python 3
+Dependencies: colorama (terminal colors), msvcrt (Windows keyboard), time, random, sys
+No database, no save system, no networking. Everything is in-memory per session.
+
+================================================================================
+2. TONE, PURPOSE & WRITING STYLE
+================================================================================
+
+THE CORE IDENTITY:
+This game is NOT a fun lighthearted card game. It is a survival horror roguelike
+wearing a card game as a mask. The player is TRAPPED. They are homeless, stranded,
+sleeping in a broken car, and gambling under the watch of an ancient, possibly
+immortal Dealer who will literally shoot them dead if they refuse to play. The
+entire experience is about being ground down — by poverty, by addiction, by
+loneliness, by a world that doesn't care — and finding meaning (or not) in that.
+
+THE TONAL BALANCE — THIS IS CRITICAL:
+The game oscillates between two modes constantly. Getting this balance right is
+the single most important thing when writing new content:
+
+  MODE 1: ABSURD DARK COMEDY (60% of events)
+    - Deadpan observational humor about being miserable
+    - The player's suffering is described with casual, almost bored detachment
+    - Absurd situations played completely straight
+    - Self-deprecating internal monologue
+    - Examples of the voice:
+      * "Your car starts, sputters, coughs, and dies. It sounds like it's given up on life. You relate."
+      * "You walk face-first into your own side mirror. Ow."
+      * "After ten minutes of wandering in circles, you find it again. That was embarrassing."
+      * "You wish for a million dollars. Obviously."
+      * "Old Man Jenkins rants for a solid ten minutes about the good old days of homelessness."
+      * "The Raccoon Mafia wants tribute."
+      * A mime silently acts out your sad life, including a dramatic death scene
+      * You carry a grandfather clock in your pocket and the Dealer mocks you for it
+      * The Dealer: "Is that a grandfather clock in your pocket, or are you just happy to see me? Wait. That's actually a grandfather clock. Why do you have that."
+
+  MODE 2: GENUINE DARKNESS AND EMOTIONAL WEIGHT (40% of events, all endings)
+    - When the game goes dark, it goes DARK. No jokes. No relief. Just raw.
+    - The Dealer's dog story: He shot his dog Scrappy in the woods after it bit his face off. "Even still, he kept whimpering. I couldn't bear to watch him die, so I just drove off."
+    - Holocaust references: The Dealer is a Holocaust survivor. "I've seen it before. In Germany. In Poland. In a hundred little towns just like this one, where men with small hearts and loud voices convinced themselves they had the right to decide who lives and who dies."
+    - Frank is revealed as a neo-Nazi who tries to recruit you. You can shoot him.
+    - The Retribution ending: "Six shots. Six bodies. Six men who thought they were gods, reduced to meat on the floor."
+    - The painkiller/Dr. Feelgood storylines deal directly with drug addiction, dependency, and withdrawal
+    - The Madness ending: Your own shadow takes over your body. "Cold fingers wrap around your throat. Your own fingers. Your own hands."
+    - The Broken state hallucinations: "You can hear the slot machines screaming. No one else seems to notice." / "Every patron in the casino has your face. You blink. They don't anymore. Did they ever?"
+    - The Eternity ending: You become a cyborg-god and crush Oswald's skull with your bare hands. "Gray matter. Blood. Bone fragments."
+    - Suicide and self-harm implications: "You notice blood on your hands. You don't remember how it got there."
+    - Companion death causes massive sanity loss. Selling companions to the pawn shop is explicitly framed as betrayal.
+
+THE TRANSITION BETWEEN MODES:
+The game does NOT signal when it's shifting. A silly raccoon event can be
+immediately followed by a sanity hallucination. The Dealer can joke about your
+hat one line and threaten to kill you the next. This whiplash IS the tone.
+Never telegraph that something dark is coming. Never apologize for it after.
+The player should constantly feel slightly off-balance — is this funny? Is this
+scary? Is this... both?
+
+THE DEALER'S VOICE:
+  - Always in red text, always type.slow()
+  - Speaks in complete sentences, often poetic or philosophical
+  - Dry, cutting wit — not sarcastic, just brutally honest
+  - Knows more than he lets on. Every line implies centuries of experience.
+  - Can be menacing: "Well that's just too bad, isn't it." *shoots you*
+  - Can be tender: "That... was unexpected." (voice different, softer, almost warm)
+  - Can be darkly funny: "Wind didn't blow any of your money away, did it? Anyways, let's play."
+  - Refers to himself obliquely. Smokes cigarettes. Carries a revolver always.
+  - His dialogue has weight — he doesn't waste words. Short sentences when serious.
+  - When he reveals his past (rare), his speech becomes longer, more vulnerable, almost pleading for understanding
+
+THE NARRATOR VOICE (second-person):
+  - "You" is the only pronoun. Never "I" unless quoting the player.
+  - Flat, observational, slightly detached — like a nature documentary about your suffering
+  - Mixes clinical description with sudden emotional gut-punches
+  - Uses present tense for immediacy: "You watch as he stands" not "You watched"
+  - Loves a good trailing sentence: "You lay down, and close your eyes. It's time to rest."
+  - Internal thoughts expressed without "you think": just stated as fact
+  - Physical sensations described in detail (warmth of bourbon, cold of the Dealer's hand)
+  - The broken/low-sanity narrator becomes UNRELIABLE — contradicts itself, second-guesses reality:
+    "The casino is upside down. No. It's not. It never was. You're fine. You're fine."
+
+DIALOGUE FORMAT:
+  - Player speech uses escaped quotes: quote("Let's get this over with.")
+  - Dealer speech uses red text: type.slow(red("How much for this first hand?"))
+  - NPC speech uses regular quotes: type.type(quote("Excuse me! We're trying to find the highway?"))
+  - The game has very little dialogue overall — most is narration. When characters speak, it matters.
+  - Speech tends to be clipped and natural, not flowery: "Thanks, yeah, that would be great."
+
+THINGS THE TONE IS NOT:
+  - Not ironic or meta (the game never winks at the player or breaks the 4th wall)
+  - Not grimdark for shock value (the violence serves the story, it's never gratuitous without purpose)
+  - Not uniformly nihilistic — but the nihilism is real, frequent, and often the point. The game's deepest trick
+    is using absurdist comedy as a delivery mechanism for genuine darkness. The best example is Phil (the interrogator
+    storyline): he begins as a pure joke — a man in a bright red suit with a fake FBI badge written in Comic Sans,
+    staring at the sun for 30 seconds before driving away. Four visits later, he's crying on the ground begging for
+    his family while a freight truck crushes him. The narration's response: "Phil might've been crazy, but at least
+    he was consistent." No sanity loss. No consequences. No lesson. You push his car into a lake and the game moves
+    on. Similarly, Betsy the cow ends events with "You won, Betsy, you won." Some endings offer genuine redemption
+    (Retribution, Salvation). Others offer none. Many events have no lesson and no silver lining — things just happen
+    to you, and the world doesn't care. The nihilism is not edgy or decorative. It's structural: the narration treats
+    horror and comedy with identical flatness, and THAT is the joke and the horror simultaneously.
+  - Not comedic at the expense of real suffering (the addiction storylines are treated with respect)
+  - Not a parody of anything — the card game is real, the stakes are real, the emotions are real
+
+COLOR/FORMATTING CONVENTIONS:
+  - Dealer speech: type.slow(red("..."))
+  - Danger/damage: red text
+  - Money/positive: green text + bright
+  - Base items: magenta + bright, via item("Item Name") helper
+  - Upgraded items: cyan + bright
+  - Day/rank info: yellow + bright
+  - Sanity effects/telepathy: cyan (not bright)
+  - Broken hallucinations: red
+  - Drama/emphasis: bright() wrapper
+  - Status announcements: yellow
+
+WHEN WRITING NEW CONTENT — CHECKLIST:
+  □ Does it sound like it could follow "Your car starts, sputters, coughs, and dies"?
+  □ If it's funny, is the humor deadpan and observational, not wacky or slapstick?
+  □ If it's dark, does it trust the reader to feel the weight without telling them how to feel?
+  □ Does the Dealer sound like a centuries-old gunslinger, not a sarcastic video game NPC?
+  □ Is the narrator flat and observational, not melodramatic?
+  □ Does it end with print("\n") after the last line of text?
+  □ If there's a choice, does it use ask.yes_or_no() or numbered menu?
+  □ Does it use the correct color functions for the context?
+
+================================================================================
+3. FILE STRUCTURE & ARCHITECTURE
+================================================================================
+
+Root files:
+  blackjackMain.py    (16 lines)   — Entry point. Creates Player + Blackjack, runs game loop.
+  blackjack.py        (1288 lines) — Blackjack class. All card game logic, betting, items during play.
+  deckOfCards.py       (106 lines)  — Deck and Card classes. Standard 52-card deck.
+  typer.py            (382 lines)  — Type class (typewriter text), Ask class (user input helpers).
+  lists.py            (4307 lines) — Lists class. Event pools, shop inventories, companion dialogue, quotes, all data lists.
+
+story/ package:
+  __init__.py         (6 lines)    — Exports Player class
+  player_core.py      (842 lines)  — Player class definition. ALL state variables. Mixin composition. hurt/heal/kill/status methods.
+  game_flow.py        (1135 lines) — GameFlowMixin: start_day(), daily item effects, adventure areas, pest control, car checks
+  day_cycle.py        (371 lines)  — DayCycleMixin: end_day() day summary, opening_lines(), start_night(), dream dispatch
+  economy.py          (117 lines)  — EconomyMixin: balance, rank calculation, selling
+  event_dispatch.py   (137 lines)  — EventDispatchMixin: day_event(), night_event() — random event dispatchers
+  events_day.py       (11141 lines)— DayEventsMixin: ALL day event methods (~300+ events, organized by wealth rank)
+  events_night.py     (2165 lines) — NightEventsMixin: ALL night event methods
+  locations.py        (4256 lines) — LocationsMixin: afternoon() choices, doctor, witch doctor, mechanics, convenience store, pawn shop, loan shark, phone calls, airport
+  adventures.py       (3311 lines) — AdventuresMixin: Beach, Forest, Mountain, City adventure areas with multi-stage events
+  car_events.py       (1182 lines) — CarEventsMixin: Random car trouble during afternoon, repairs, breakdowns
+  medical.py          (1808 lines) — MedicalMixin: Injuries, illnesses, doctor visits, treatments, witch doctor flasks
+  mechanics_intro.py  (279 lines)  — MechanicsIntroMixin: First-time meeting with Tom, Frank, Oswald mechanics
+  systems.py          (1881 lines) — SystemsMixin: Companion system, achievement system, gambling stats/grimoire, loan shark, pawn shop, dealer happiness, gift wrapping, durability helpers
+  durability.py       (484 lines)  — DurabilityMixin: Item durability tracking, breaking, repair
+  storylines.py       (4498 lines) — StorylineSystem class + all storyline event methods (20+ multi-part narratives)
+  endings.py          (2811 lines) — EndingsMixin: All ending sequences (Salvation, Resurrection, Bliss, Sanctuary, Tom/Frank/Oswald endings, Eternity, Madness, Broken)
+
+tools/ (dev utilities, not part of the game):
+  fix_quotes.py, game_documentation.py, interactive_event_runner.py, LottoTest.py, split_story.py, storylines_design.py, test_gameplay.py
+
+docs/ (player-facing documentation):
+  01-09 markdown guide files (see docs/ folder)
+
+TOTAL: ~36,000 lines of game code across 18 source files.
+
+================================================================================
+4. CLASS ARCHITECTURE — THE MIXIN PATTERN
+================================================================================
+The Player class is built from 14 mixins. This is the ONLY inheritance pattern.
+Defined in player_core.py:
+
+class Player(
+    SystemsMixin,        # Companions, achievements, gambling stats, loan shark, pawn shop, dealer happiness, gifts
+    EconomyMixin,        # Balance, rank, selling
+    DayCycleMixin,       # End day summary, opening, night start, dream dispatch
+    DayEventsMixin,      # ~300+ random day events
+    NightEventsMixin,    # ~100+ random night events
+    AdventuresMixin,     # Beach/Forest/Mountain/City adventure content
+    MechanicsIntroMixin, # First meetings with Tom/Frank/Oswald
+    GameFlowMixin,       # start_day(), daily item effects, pest control, car trouble
+    LocationsMixin,      # afternoon() location choices, all shop interactions
+    DurabilityMixin,     # Item durability tracking
+    EventDispatchMixin,  # day_event()/night_event() dispatchers
+    EndingsMixin,        # All ending sequences
+    MedicalMixin,        # Injuries, illness, doctor/witch doctor
+    CarEventsMixin,      # Random car trouble events
+):
+
+All mixins access player state via self._ prefixed attributes (single underscore, "protected").
+The Blackjack class is SEPARATE — it holds the card game logic and has a reference to the Player via self.__player.
+lists.py Lists class takes a player reference and builds all event/dialogue pools.
+
+================================================================================
+5. CORE GAME LOOP
+================================================================================
+In blackjackMain.py:
+
+    player = story.Player()
+    blackjackGame = blackjack.Blackjack(player)
+    player.opening_lines()           # Intro narrative, first night
+    while True:
+        blackjackGame.play_round()   # Gambling session (3-4 hands of blackjack)
+        player.end_day()             # Day summary OR dream event
+        player.start_day()           # Morning: companion updates, loan shark, achievements, item effects
+        player.afternoon()           # Location choices: shops, companions, adventure areas, OR travel restrictions
+
+Detailed flow per cycle:
+1. MORNING (start_day in game_flow.py):
+   - "Morning, Day X" banner
+   - update_companions_daily() — hunger decay, happiness checks, runaway risk
+   - update_loan_shark_daily() — interest, warning escalation
+   - check_achievements()
+   - Daily item effects (Suzy's Gift heals sanity, Necronomicon corrupts, Cursed Coin misfortune, etc.)
+   - Pest control check (cockroaches steal money if no Pest Control item)
+   - Car trouble check
+   - Status display (health bar, balance, rank)
+   - day_event() — Random event from wealth-rank-appropriate pool
+   - Storyline check — StorylineSystem may fire a multi-part narrative event
+
+2. AFTERNOON (afternoon in locations.py):
+   - If travel restriction (Wind, Rain, Battery, Engine, Wasted Afternoon): skip choices
+   - If millionaire + visitor came: millionaire_afternoon() (special ending path choices)
+   - If companions exist: option to spend time with them
+   - Otherwise: numbered menu of available locations:
+     * Doctor's Office, Witch Doctor's Tower, mechanics (Tom/Frank/Oswald), Convenience Store,
+       Marvin's shop, Pawn Shop, Loan Shark, Phone Calls, Car Workbench, Airport, adventure areas
+     * Or "Stay Home"
+   - Player picks a number, goes there, interacts
+
+3. EVENING/NIGHT (start_night in day_cycle.py):
+   - Dealer welcome line (red text)
+   - Broken state / low sanity flavor text
+   - Grandfather Clock joke dialogue (rare)
+
+4. GAMBLING (play_round in blackjack.py):
+   - update_player() syncs balance, resets per-session item flags
+   - Item announcement messages (watches, gloves, cloaks, etc.)
+   - Loop for 3-4 hands (based on items):
+     * Player places bet
+     * Cards dealt, player hits/stands/doubles/splits/surrenders
+     * Items activate during play (peek at dealer card, insurance, lucky coin, etc.)
+     * Win/lose/push resolved, balance updated, gambling stats tracked
+   - Broken state: hallucination text before gambling
+
+5. END OF DAY (end_day in day_cycle.py):
+   - Check for dream events (replace summary with narrative dream sequences)
+   - OR show day summary: days survived, balance change, current total, rank comment, advice, quote
+   - Heal 1-5 HP
+   - night_event() — Random night event
+   - Fatigue increase
+   - Companion night bonuses
+
+================================================================================
+6. PLAYER STATE — ALL VARIABLES (from player_core.py __init__)
+================================================================================
+Core stats:
+  _health = 100          # 0 = death. Healed by food, events, companions. Hurt by events, injuries.
+  _balance = 50          # Money. Start with $50. Goal: $1,000,000.
+  _sanity = 100          # 0 = Madness ending (40%) or Broken state (60%). Drained by losses, trauma. Restored by companions.
+  _fatigue = 0           # 0-100. High fatigue blocks events, affects sleep. Reduced by Energy Drinks, sleeping.
+  _rank = 0              # Wealth rank (0-5). Determines event pools, shop access, Dealer difficulty.
+  _day = 1               # Current day number. Increments each cycle.
+  _alive = True          # False = game over.
+
+Rank thresholds:
+  0 = Poor:        $1 - $999
+  1 = Cheap:       $1,000 - $9,999
+  2 = Modest:      $10,000 - $99,999
+  3 = Rich:        $100,000 - $499,999
+  4 = Doughman:    $500,000 - $899,999
+  5 = Nearly There: $900,000 - $999,999
+  $1,000,000+ triggers millionaire/ending paths
+
+Status tracking:
+  _is_sick = False              # Currently ill
+  _is_injured = False           # Currently injured
+  _is_religious = False         # Found religion (affects some events)
+  _is_millionaire = False       # Hit $1M at least once
+  _millionaire_visited = False  # Morning visitor came after hitting $1M
+  _chosen_mechanic = None       # "Tom", "Frank", or "Oswald" — determines ending path
+  _is_broken = False            # Sanity hit 0 and survived (permanent hallucination state)
+  _faced_madness = False        # Survived the shadow confrontation
+
+Collections (all sets):
+  _inventory                 # Current items (strings)
+  _broken_inventory          # Items currently broken (need repair)
+  _repairing_inventory       # Items being repaired at mechanic
+  _flask_effects             # Active flask potion effects
+  _status_effects            # Active status effects (Lucky, Cursed, etc.)
+  _injuries                  # Current injuries
+  _travel_restrictions       # Current travel blocks (Wind, Rain, etc.)
+  _dangers                   # Current dangers (Angry Dealer, etc.)
+  _met                       # NPCs/milestones encountered (for has_met checks)
+  _achievements              # Unlocked achievement names
+  _gus_items_sold            # Collectibles sold to pawn shop
+
+Numerical trackers:
+  _mechanic_visits = 0       # Total mechanic visits (3+ unlocks upgrades at Oswald's)
+  _tom_dreams = 0            # 0-3: Dream chain progress for Tom ending
+  _frank_dreams = 0          # 0-3: Dream chain progress for Frank ending  
+  _oswald_dreams = 0         # 0-3: Dream chain progress for Oswald ending
+  _rabbit_chase = 0          # 0-6: Rabbit chase event chain progress
+  _favorite_color = None     # Set during events, used in some storylines
+  _favorite_animal = None    # Set during events, used in companion events
+  _sanity_warnings_shown = 0
+  _convenience_store_purchases = 0  # Tracks purchases to unlock gift system
+  _gift_system_unlocked = False
+  _companions_sold_count = 0        # Dark path: selling companions to Gus
+  _previous_balance = 50
+
+Durability arrays (parallel to item list):
+  _item_durability = [0]*18   # Per-item durability counters
+  _flask_durability = [0]*12  # Per-flask durability counters
+
+Economy subsystems:
+  _fraudulent_cash = 0              # Fake money from loan shark
+  _dealer_fake_cash_total = 0       # How much fake cash Dealer has noticed
+  _dealer_happiness = 50            # 0=kills you, 100=max. Raised by gifts, lowered by annoying behavior.
+  _loan_shark_debt = 0
+  _loan_shark_days_overdue = 0
+  _loan_shark_warning_level = 0     # 0-4: escalating threats
+  _pawn_shop_reputation = 50        # 0-100: affects sell prices
+
+Complex state:
+  _gambling_stats = {...}            # Dict of 16+ gambling statistics
+  _statistics = {...}                # Dict of 20+ general game statistics
+  _companions = {}                   # Dict of companion_name -> {status, happiness, days_owned, fed_today, bonded}
+  _convenience_store_inventory = []  # Current store stock (refreshed daily)
+  _gift_wrapped_item = None          # Currently wrapped gift for Dealer
+  _counting_days = [0]*11            # Misc day counters for various systems
+
+Object references:
+  _lists = Lists(self)               # Data provider (event pools, dialogue, shop lists)
+  _storyline_system = StorylineSystem(self)  # Multi-part narrative manager
+
+================================================================================
+7. EVENT SYSTEM
+================================================================================
+Events are METHOD NAMES stored as strings in lists. The Lists class builds
+shuffled pools per wealth rank. EventDispatchMixin.day_event() calls:
+    dayEvent = getattr(self, self._lists.get_day_event())
+    dayEvent()
+
+So an event like "find_20_dollars" is a method on the Player class (via DayEventsMixin).
+When a pool is exhausted, it rebuilds. Events are shuffled so order is random.
+
+Event pools by rank:
+  Poor (0):        ~50 day events, ~20 night events
+  Cheap (1):       ~70 day events, ~25 night events
+  Modest (2):      ~70 day events, ~25 night events
+  Rich (3):        ~60 day events, ~20 night events
+  Doughman (4):    ~60 day events, ~20 night events
+  Nearly There (5):~50 day events, ~20 night events
+
+Events can: change balance, change health, change sanity, add/remove items,
+add/remove status effects, add injuries, trigger NPC meetings, start storylines,
+kill the player, adopt companions, and more. Most events are self-contained
+methods 10-80 lines long with typewriter text output.
+
+Secret events: Some events check exact conditions before running (exact balance
+amounts like $420, $7777, $69420; palindrome days; prime days; health=balance;
+etc.). If conditions aren't met, they silently redirect to a normal event.
+
+================================================================================
+8. STORYLINE SYSTEM (storylines.py)
+================================================================================
+StorylineSystem manages 20+ multi-part sequential narratives. Each storyline:
+  - Has multiple stages (1-5+)
+  - Has a base_chance (10-40%) that escalates each day by escalation_rate (6-25%)
+  - Has a min_gap between stages (1-5 days)
+  - Has start_conditions (balance thresholds, items owned, NPCs met, etc.)
+  - Fires during start_day() after the random day event
+  - Only one storyline can fire per day
+  - Progress is tracked per-storyline (current stage, days since last)
+
+Key storylines:
+  the_debt_collector     — Loan shark threats escalate
+  the_wandering_musician — Mysterious musician appears, teaches lessons
+  the_carnival           — Carnival comes to town, games and prizes
+  the_collectors_eye     — Rich collector wants to buy your items
+  franks_garage          — Frank's dark past unfolds
+  the_dealers_past       — Dealer's mysterious history revealed
+  rabbit_chase           — 7-part chain chasing a rabbit through the woods
+  the_mechanic_rivalry   — Tom vs Frank vs Oswald drama
+  the_graveyard          — Spooky cemetery discoveries
+  painkiller             — Substance abuse storyline (requires injury)
+  dr_feelgood            — Shady doctor experiments (requires severe injury)
+  the_heist              — Planning and executing a casino heist
+  the_revival            — Religious awakening
+  the_conspiracy         — Strange patterns in the casino
+  the_gambler_ghost      — Ghost of a past gambler haunts you
+
+================================================================================
+9. COMPANION SYSTEM (systems.py + lists.py)
+================================================================================
+Companions are animals that travel with you. Stored in self._companions dict.
+
+Acquisition: Random events (day/night), specific storylines, purchases
+Each companion has: name, type, happiness (0-100), days_owned, fed_today, bonded (bool)
+
+Daily cycle:
+  - Morning: update_companions_daily() — if not fed yesterday: -5 happiness. If happiness ≤10: 33% chance runs away.
+  - Afternoon: "Spend time with companions?" option. Can feed, pet, interact individually or as group.
+  - Night: apply_companion_night_bonuses() — Patches gives sanity at night.
+
+Bonding: happiness ≥80 + owned 7+ days → bonded = True. Unique dialogue.
+
+Companion types defined in lists.py make_companion_types():
+  Squirrelly (Squirrel), Whiskers (Cat), Lucky (Dog), Mr. Pecks (Crow),
+  Patches (Opossum), Rusty (Raccoon), Slick (Snake), Hopper (Rabbit)
+  Plus rare ones found in events: Echo (Dolphin), Kraken, Moonwhisker (Magical Rabbit),
+  Shellbert (Tortoise), Don (Raccoon Boss), Grace (Deer), and others.
+
+Each type has 4 mood categories × 4-6 dialogue lines.
+
+Companion bonuses (daily, chance-based):
+  - Sanity restore: +1 to +10 depending on companion type
+  - Money find: Mr. Pecks (5%, $1-20), Rusty (3%, $2-15)
+  - Luck bonus: Hopper, Squirrelly
+  - Danger warning: Whiskers
+  - Night healing: Patches
+
+Dark path: Sell companions to Grimy Gus at the pawn shop. Selling 3+ triggers dark achievement.
+
+================================================================================
+10. ITEM SYSTEM
+================================================================================
+
+CASINO ITEMS (bought at Marvin's, found in events, 17 upgradeable):
+  Each has a base version and an upgraded version (upgraded at Oswald's after 3+ mechanic visits).
+  Items affect gameplay during blackjack hands and passive daily effects.
+
+  Base → Upgraded:
+  Delight Indicator → Delight Manipulator    (Dealer happiness visibility/control)
+  Health Indicator → Health Manipulator       (Health visibility/control)
+  Dirty Old Hat → Unwashed Hair              (Lowers minimum bets)
+  Golden Watch → Sapphire Watch              (Extra gambling round)
+  Sneaky Peeky Shades → Sneaky Peeky Goggles (Peek at Dealer's hole card)
+  Quiet Sneakers → Quiet Bunny Slippers      (Stealth bonuses)
+  Faulty Insurance → Real Insurance           (Loss protection)
+  Lucky Coin → Lucky Medallion               (Luck boost)
+  Worn Gloves → Velvet Gloves                (Card handling)
+  Tattered Cloak → Invisible Cloak           (Avoidance)
+  Rusty Compass → Golden Compass             (Navigation)
+  Pocket Watch → Grandfather Clock           (Time/extra round, with joke dialogue)
+  Gambler's Chalice → Overflowing Goblet     (Flask capacity)
+  Twin's Locket → Mirror of Duality          (Split bonuses)
+  White Feather → Phoenix Feather            (Survive death once)
+  Dealer's Grudge → Dealer's Mercy           (Dealer interaction modifier)
+  Gambler's Grimoire → Oracle's Tome         (Stat tracking + predictions)
+
+DURABILITY: All items have hidden durability. Each use decrements by 1-5. At 0 the
+item "breaks" (moved to _broken_inventory). Can be repaired at mechanics.
+
+COLLECTIBLES: ~60+ items found in events. Can be sold at Gus's pawn shop. Not
+upgradeable. Examples: Old Coin, Brass Key, Crystal Ball, Ancient Scroll, etc.
+
+FLASKS (bought at Witch Doctor):
+  Flask of No Bust, Flask of Imminent Blackjack, Flask of Dealer's Whispers,
+  Flask of Bonus Fortune, Anti-Venom, Anti-Virus, Flask of Fortunate Day,
+  Flask of Fortunate Night, Flask of Second Chance, Split Serum,
+  Flask of Dealer's Hesitation, Flask of Pocket Aces
+  Each has charges (durability) and activates during blackjack or events.
+
+FOOD (bought at Convenience Store):
+  Candy Bar, Bag of Chips, Turkey Sandwich, Energy Drink, Beef Jerky,
+  Cup Noodles, Granola Bar, Hot Dog, Microwave Burrito
+  Each heals HP, some restore sanity, some reduce fatigue, some can feed companions.
+
+================================================================================
+11. ENDINGS
+================================================================================
+The game has 10+ distinct endings, triggered by different paths:
+
+MILLIONAIRE PATH ($1,000,000+):
+  1. Hit $1M → _is_millionaire = True
+  2. Next morning: Special visitor arrives, tells you to visit a mechanic
+  3. Afternoon: Choose which mechanic to visit (Tom, Frank, or Oswald)
+  4. Each mechanic path branches into sub-endings:
+
+  TOM PATH:
+    - Salvation: Tom tells you to go to church. Religious healing ending.
+    - Resurrection: Tom tells you about the Dealer's dog story. Leave the casino forever.
+  
+  FRANK PATH:
+    - Frank is revealed as a neo-Nazi. You get a choice:
+    - Destruction: Shoot the Dealer with Frank's revolver
+    - Retribution: Shoot Frank, spare the Dealer. Dealer reveals his name is Mortimer, 
+      gives you a jade chip from Vienna 1938.
+  
+  OSWALD PATH:
+    - Transcendence: Accept Oswald's offer to take over the casino. You become the new Dealer.
+    - Eternity: Requires ALL 17 items fully upgraded. You transcend into something beyond human.
+  
+  AIRPORT:
+    - Bliss: Fly away to a tropical island. Simple happy ending.
+    - Sanctuary: Requires 5+ companions + Animal Whistle. Charter flight, live on wildlife reserve.
+
+SANITY ENDINGS:
+  - Madness: Sanity hits 0 (40% chance). Shadow confrontation with 3 philosophical questions.
+    Score 5+/9 to survive. Fail = shadow consumes you.
+  - Broken: Sanity hits 0 (60% chance). Not a true ending — game continues but with permanent
+    hallucinations, unreliable narration, random gameplay effects.
+
+DEATH:
+  - Health reaches 0
+  - Dealer kills you (happiness = 0)
+  - Loan shark sends Tony
+  - Say "no" on Day 1
+  - Various lethal events
+
+DREAM CHAINS (prerequisites for some endings):
+  Tom dreams:    rebecca → nathan → johnathan (at $1k, $10k, $500k)
+  Frank dreams:  dealers_anger → dealers_scar → dealers_revolver → dealer_in_dreams
+  Oswald dreams: casino_bar → casino_table → casino_riches
+  30% chance per night to fire if eligible. Replace day summary with dream narrative.
+
+================================================================================
+12. LOCATION / SHOP SYSTEM
+================================================================================
+Afternoon choices come from Lists.make_shop_list(). Available locations depend
+on NPCs met, items owned, and current state:
+
+  Doctor's Office          — Always available (unless banned). Treats injuries/illness.
+  Witch Doctor's Tower     — After meeting Witch. Sells flasks.
+  Trusty Tom's             — After meeting Tom. Car repairs, upgrades.
+  Filthy Frank's           — After meeting Frank. Car repairs, upgrades.
+  Oswald's Optimal         — After meeting Oswald. Car repairs, item upgrades (3+ visits).
+  Convenience Store        — Always available. Food, common items, gift wrapping.
+  Marvin's Mystical        — After finding Map item. Casino items, rare goods.
+  Grimy Gus's Pawn         — After meeting Gus. Sell items/collectibles, sell companions (dark).
+  Vinnie's Back Alley      — After meeting Vinnie or having debt. Borrow money (fake cash).
+  Make a Phone Call         — After getting any phone number item.
+  Car Workbench            — After getting Tool Kit. DIY car repairs.
+  Airport                  — At $1M+. Fly away (Bliss/Sanctuary endings).
+  Adventure Areas          — Unlocked progressively: Beach, Forest, Mountain, City.
+
+================================================================================
+13. TEXT OUTPUT SYSTEM (typer.py)
+================================================================================
+Type class methods:
+  type.fast(text)        — Medium-speed typewriter. Main narration speed.
+  type.slow(text)        — Slow typewriter. Used for dramatic moments, Dealer speech.
+  type.fast_clean(text)  — Like fast but doesn't pause on colons.
+  type.type(text)        — Standard speed. General text.
+  type.typeover(prompt, text, newline) — Type over previous text (for banners).
+
+Speed control (during any typewriter output):
+  SPACEBAR = skip to end instantly
+  COMMA (,) = Default speed
+  PERIOD (.) = Fast speed
+  SLASH (/) = Fastest speed
+  P = Print mode (instant, no animation)
+
+Ask class methods:
+  ask.yes_or_no(prompt)     — Returns "yes" or "no"
+  ask.press_continue(prompt) — Waits for any key
+  ask.number(prompt, max)   — Returns number 1-max
+
+COLOR FUNCTIONS (defined in EVERY file, duplicated everywhere — this is intentional):
+  red(text)     = Fore.RED      — Dealer speech, danger, damage
+  green(text)   = Fore.GREEN    — Money gains, positive
+  magenta(text) = Fore.MAGENTA  — Base items
+  yellow(text)  = Fore.YELLOW   — Day/rank info, warnings
+  cyan(text)    = Fore.CYAN     — Upgraded items, sanity effects
+  bright(text)  = Style.BRIGHT  — Emphasis
+  italic(text)  = Style.DIM     — Subtle text
+  item(text)    = magenta(bright(text)) — Item display shorthand
+  quote(text)   = wraps in double quotes
+
+NOTE: Every single mixin file re-defines these color helper functions at the top.
+This is a deliberate pattern, not a bug. Don't try to "fix" it by centralizing them.
+
+================================================================================
+14. KEY PATTERNS & CONVENTIONS
+================================================================================
+
+EVENT METHOD NAMING:
+  - Day events: descriptive snake_case (find_20_dollars, creepy_stranger, dog_adoption)
+  - Night events: similar (stargazing, bar_fight, mysterious_letter)
+  - Storyline events: prefixed chain (carnival_stage_1, carnival_stage_2, etc.)
+  - Events are referenced by string name in lists, called via getattr()
+
+STATE CHECKS:
+  self.has_item("Item Name")         — Check inventory
+  self.has_met("NPC Name")           — Check if NPC encountered
+  self.has_danger("Danger Name")     — Check active dangers
+  self.has_travel_restriction("X")   — Check movement blocks
+  self.has_flask_effect("Effect")    — Check active flask effects
+  self.has_status_effect("Effect")   — Check status effects
+
+STATE MUTATIONS:
+  self.add_item("Item Name")         — Add to inventory
+  self.use_item("Item Name")         — Remove from inventory
+  self.meet("NPC Name")              — Mark NPC as met
+  self.add_danger("Danger Name")     — Add danger
+  self.lose_danger("Danger Name")    — Remove danger
+  self.hurt(amount)                  — Reduce health (can trigger death/LifeAlert)
+  self.heal(amount)                  — Increase health (caps at 100)
+  self.change_balance(amount)        — Add/subtract money with formatted display
+  self.change_sanity(amount)         — Adjust sanity
+  self.add_fatigue(amount)           — Increase fatigue
+
+PRINTING PATTERN:
+  type.type("Narrative text here.")
+  print("\n")                        — Blank line between paragraphs
+  type.slow(red("Dealer dialogue.")) — Dealer always in red, always slow
+
+USER INPUT PATTERN:
+  answer = ask.yes_or_no("Question? ")
+  if answer == "yes": ...
+
+MENU PATTERN:
+  type.type("1. Option A")
+  print()
+  type.type("2. Option B")
+  print()
+  type.type("Choose: ")
+  # Then manual input parsing or ask.number()
+
+================================================================================
+15. IMPORTANT GOTCHAS FOR AI AGENTS
+================================================================================
+
+1. DO NOT centralize color functions. They are intentionally duplicated in every file.
+   This is a design choice, not technical debt.
+
+2. The game has NO save system. Each run is a fresh session. All state is in Player.__init__.
+
+3. Events are STRINGS matching METHOD NAMES. If you add an event method, you must also
+   add its string name to the appropriate list in lists.py make_*_events_list().
+
+4. The Blackjack class and Player class are SEPARATE. Blackjack holds card game state.
+   Player holds all RPG state. They communicate via self.__player reference in Blackjack.
+
+5. msvcrt is Windows-only. This game only runs on Windows.
+
+6. type.slow() pauses on periods, commas, exclamation marks. If you put ANSI color codes
+   after punctuation, the pause still triggers on the punctuation character.
+
+7. Items are stored as plain strings in a set. "Lucky Coin" and "Lucky Medallion" are
+   different items. Upgrading removes the base and adds the upgraded version.
+
+8. The game can reach ~$1M naturally through blackjack wins. At that point, the game
+   pivots from roguelike to narrative ending selection.
+
+9. Storylines use escalating probability. A storyline with 10% base and 8% escalation
+   will be at 10%, 18%, 26%, 34%... each day until it fires, then resets for next stage.
+
+10. has_met() is used for EVERYTHING — NPC meetings, milestone tracking, quest flags,
+    one-time event gates. It's basically the global flag system.
+
+11. The Dealer's real name is Mortimer. He's possibly centuries old, survived the
+    Holocaust, has a jade glass eye and a scar from a dog bite. This is revealed
+    only in the Retribution ending.
+
+12. When adding new events: follow the existing pattern. Create a method on the
+    appropriate mixin, add the string name to the lists, use type.type/type.slow
+    for output, use the color functions, end with print("\n").
+
+13. Achievement names are stored as strings in a set. The check_achievements() method
+    in systems.py scans game state and unlocks them. ~240+ achievements exist across
+    categories: gambling, survival, companion, economic, collection, social, secret.
+
+14. The _rank property (0-5) determines which event pool is used. Events get more
+    complex/dangerous/rewarding at higher ranks. Each rank has its own day AND night
+    event pool in lists.py.
+
+15. The game's humor comes from CONTRAST — absurd comedy (grandfather clock in pocket)
+    juxtaposed with genuine emotional weight (Holocaust survivor backstory, addiction
+    storylines). New content should maintain this tonal balance.
+
+================================================================================
+16. QUICK REFERENCE — METHOD LOCATION CHEAT SHEET
+================================================================================
+
+Need to find...                          → Look in...
+─────────────────────────────────────────────────────────────
+Game main loop                           → blackjackMain.py
+Blackjack card game logic                → blackjack.py
+Card/Deck classes                        → deckOfCards.py
+Typewriter text system                   → typer.py
+ALL player state variables               → story/player_core.py __init__
+Player class mixin composition           → story/player_core.py (class definition)
+hurt/heal/kill/status methods            → story/player_core.py
+start_day() and daily effects            → story/game_flow.py
+end_day() and day summary                → story/day_cycle.py
+opening_lines() and night start          → story/day_cycle.py
+Dream chain dispatch                     → story/day_cycle.py _get_pending_dream
+Balance/rank/selling                     → story/economy.py
+day_event()/night_event() dispatch       → story/event_dispatch.py
+ALL day event methods (~300+)            → story/events_day.py
+ALL night event methods                  → story/events_night.py
+Afternoon location choices               → story/locations.py afternoon()
+Doctor/witch doctor                      → story/locations.py + story/medical.py
+Mechanic shops (Tom/Frank/Oswald)        → story/locations.py
+Convenience store                        → story/locations.py
+Pawn shop / Loan shark                   → story/locations.py + story/systems.py
+Adventure areas (Beach/Forest/etc.)      → story/adventures.py
+Car trouble events                       → story/car_events.py
+Injuries/illness/treatment               → story/medical.py
+First mechanic meetings                  → story/mechanics_intro.py
+Companion system                         → story/systems.py (add/feed/pet/update/bonuses)
+Achievement system                       → story/systems.py (check_achievements, unlock)
+Gambling stats / Grimoire                → story/systems.py
+Dealer happiness / Gift system           → story/systems.py
+Loan shark / Pawn shop logic             → story/systems.py
+Item durability                          → story/durability.py
+Storyline system class                   → story/storylines.py (StorylineSystem)
+All storyline event methods              → story/storylines.py
+All ending sequences                     → story/endings.py
+Event pools, shop lists, dialogue data   → lists.py
+Companion type definitions + dialogue    → lists.py (make_companion_types, line ~424)
+Pawn shop prices                         → lists.py
+Convenience store inventory builder      → lists.py (make_convenience_store_inventory)
+Rank-to-event mapping                    → lists.py (get_day_event, get_night_event)
+
+================================================================================
+END OF CONTEXT
+================================================================================

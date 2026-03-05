@@ -11,6 +11,39 @@ class Lists:
         self.__fed_squirrely_list = self.make_fed_squirrely_list()
         self.__hungry_squirrely_list = self.make_hungry_squirrely_list()
         self.__quote_setup_list = self.make_quote_setup_list()
+        # Companion daily dialogue lists
+        self.__whiskers_happy_list = self.make_whiskers_happy_list()
+        self.__whiskers_unhappy_list = self.make_whiskers_unhappy_list()
+        self.__whiskers_weather_list = self.make_whiskers_weather_list()
+        self.__whiskers_morning_list = self.make_whiskers_morning_list()
+        self.__lucky_happy_list = self.make_lucky_happy_list()
+        self.__lucky_unhappy_list = self.make_lucky_unhappy_list()
+        self.__lucky_weather_list = self.make_lucky_weather_list()
+        self.__lucky_morning_list = self.make_lucky_morning_list()
+        self.__pecks_happy_list = self.make_pecks_happy_list()
+        self.__pecks_unhappy_list = self.make_pecks_unhappy_list()
+        self.__pecks_weather_list = self.make_pecks_weather_list()
+        self.__pecks_morning_list = self.make_pecks_morning_list()
+        self.__patches_happy_list = self.make_patches_happy_list()
+        self.__patches_unhappy_list = self.make_patches_unhappy_list()
+        self.__patches_weather_list = self.make_patches_weather_list()
+        self.__patches_morning_list = self.make_patches_morning_list()
+        self.__rusty_happy_list = self.make_rusty_happy_list()
+        self.__rusty_unhappy_list = self.make_rusty_unhappy_list()
+        self.__rusty_weather_list = self.make_rusty_weather_list()
+        self.__rusty_morning_list = self.make_rusty_morning_list()
+        self.__slick_happy_list = self.make_slick_happy_list()
+        self.__slick_unhappy_list = self.make_slick_unhappy_list()
+        self.__slick_weather_list = self.make_slick_weather_list()
+        self.__slick_morning_list = self.make_slick_morning_list()
+        self.__hopper_happy_list = self.make_hopper_happy_list()
+        self.__hopper_unhappy_list = self.make_hopper_unhappy_list()
+        self.__hopper_weather_list = self.make_hopper_weather_list()
+        self.__hopper_morning_list = self.make_hopper_morning_list()
+        self.__squirrelly_comp_happy_list = self.make_squirrelly_comp_happy_list()
+        self.__squirrelly_comp_unhappy_list = self.make_squirrelly_comp_unhappy_list()
+        self.__squirrelly_comp_weather_list = self.make_squirrelly_comp_weather_list()
+        self.__squirrelly_comp_morning_list = self.make_squirrelly_comp_morning_list()
         self.__poor_day_events = self.make_poor_day_events_list()
         self.__cheap_day_events = self.make_cheap_day_events_list()
         self.__modest_day_events = self.make_modest_day_events_list()
@@ -28,6 +61,8 @@ class Lists:
         self.__achievements = self.make_achievements_dict()
         self.__companion_types = self.make_companion_types()
         self.__pawn_shop_prices = self.make_pawn_shop_prices()
+        self.__crafting_recipes = self.make_crafting_recipes()
+        self.__crafted_item_descriptions = self.make_crafted_item_descriptions()
         self.__loan_shark_dialogue = self.make_loan_shark_dialogue()
         self.__dealer_betrayal_list = self.make_dealer_betrayal_dialogue_list()
 
@@ -397,86 +432,302 @@ class Lists:
                 "favorite_food": "Bag of Acorns",
                 "bonuses": {"sanity_restore": 2, "luck_bonus": 1},
                 "dialogue": {
-                    "happy": ["Squirrelly chatters happily on your dashboard.", "Squirrelly does a little dance with an acorn."],
-                    "neutral": ["Squirrelly watches you with curious eyes.", "Squirrelly nibbles on something."],
-                    "sad": ["Squirrelly looks at you with pleading eyes.", "Squirrelly's tail droops sadly."]
+                    "happy": [
+                        "Squirrelly chatters happily on your dashboard.",
+                        "Squirrelly does a little dance with an acorn.",
+                        "Squirrelly buries an acorn in your cup holder. Saving for winter.",
+                        "Squirrelly races up your arm, perches on your head, and chirps triumphantly.",
+                        "Squirrelly presents you with the shiniest acorn you've ever seen. A gift.",
+                        "Squirrelly is vibrating with happiness. Just pure uncontainable squirrel joy."
+                    ],
+                    "neutral": [
+                        "Squirrelly watches you with curious eyes.",
+                        "Squirrelly nibbles on something.",
+                        "Squirrelly sits on the dashboard, tail twitching, judging your life choices.",
+                        "Squirrelly reorganizes the acorn stash in your glove box. Important work.",
+                        "Squirrelly stares at a tree outside with longing, then looks at you. Stays.",
+                        "Squirrelly is doing squirrel math. You don't know what that means but they're focused."
+                    ],
+                    "sad": [
+                        "Squirrelly looks at you with pleading eyes.",
+                        "Squirrelly's tail droops sadly.",
+                        "Squirrelly sits alone in the corner, clutching a single acorn like it's all they have left.",
+                        "Squirrelly won't eat. Won't play. Just sits there, small and still.",
+                        "Squirrelly buries their face in their tail. The world is too big.",
+                        "Squirrelly flinches when you reach for them. That hurts more than you expected."
+                    ],
+                    "bonded": [
+                        "Squirrelly falls asleep in your hand. Total trust. Total peace.",
+                        "Squirrelly brings you an acorn every morning without fail. It's become a ritual between you two.",
+                        "Squirrelly chatters at strangers who get too close to you. Protective little thing.",
+                        "Squirrelly has built a tiny nest in your car. Made of receipts, napkins, and love."
+                    ]
                 }
             },
             "Whiskers": {
                 "type": "Alley Cat",
-                "description": "A scraggly but affectionate stray cat.",
+                "description": "A scraggly but affectionate stray cat who senses danger before it arrives.",
                 "favorite_food": "Cat Food",
                 "bonuses": {"sanity_restore": 3, "danger_warning": True},
                 "dialogue": {
-                    "happy": ["Whiskers purrs loudly in your lap.", "Whiskers kneads your leg with contentment."],
-                    "neutral": ["Whiskers stares out the window.", "Whiskers grooms themselves meticulously."],
-                    "sad": ["Whiskers meows plaintively.", "Whiskers hides under the seat."]
+                    "happy": [
+                        "Whiskers purrs loudly in your lap.",
+                        "Whiskers kneads your leg with contentment.",
+                        "Whiskers headbutts your chin and purrs so hard their whole body vibrates.",
+                        "Whiskers brings you a dead bug. It's a gift. Accept it graciously.",
+                        "Whiskers curls into a perfect circle on your chest. You can feel each purr in your ribs.",
+                        "Whiskers slow-blinks at you. In cat language, that's 'I love you.' You slow-blink back."
+                    ],
+                    "neutral": [
+                        "Whiskers stares out the window.",
+                        "Whiskers grooms themselves meticulously.",
+                        "Whiskers knocks something off your dashboard. On purpose. Maintains eye contact.",
+                        "Whiskers sits in a sunbeam, ignoring your existence with practiced elegance.",
+                        "Whiskers stretches luxuriously. Front paws. Back paws. Full body yawn. It's a whole performance.",
+                        "Whiskers watches a bird outside with the intensity of a trained assassin."
+                    ],
+                    "sad": [
+                        "Whiskers meows plaintively.",
+                        "Whiskers hides under the seat.",
+                        "Whiskers sits with their back to you. The message is clear.",
+                        "Whiskers won't purr. The silence is deafening.",
+                        "Whiskers scratches at the door. They want to leave. That thought terrifies you.",
+                        "Whiskers hisses when you reach out. The betrayal in those eyes cuts deep."
+                    ],
+                    "bonded": [
+                        "Whiskers sleeps ON your face at night. It's inconvenient. It's the best thing ever.",
+                        "Whiskers follows you everywhere now. Into the casino. Into trouble. Into life.",
+                        "Whiskers hisses at anyone who looks at you wrong. Your personal bodyguard in a fur coat.",
+                        "Whiskers brings you gifts every day. Bugs, leaves, once a dollar bill. They're providing for you."
+                    ]
                 }
             },
             "Lucky": {
                 "type": "Three-Legged Dog",
-                "description": "A resilient mutt who lost a leg but not his spirit.",
+                "description": "A resilient mutt who lost a leg but not his spirit. Will die for you.",
                 "favorite_food": "Dog Food",
                 "bonuses": {"sanity_restore": 5, "protection": True},
                 "dialogue": {
-                    "happy": ["Lucky's tail wags so hard his whole body shakes.", "Lucky licks your face enthusiastically."],
-                    "neutral": ["Lucky rests his head on your leg.", "Lucky watches the world go by."],
-                    "sad": ["Lucky whimpers softly.", "Lucky won't meet your eyes."]
+                    "happy": [
+                        "Lucky's tail wags so hard his whole body shakes.",
+                        "Lucky licks your face enthusiastically.",
+                        "Lucky does a three-legged zoomie around the parking lot. Missing a leg never slowed him down.",
+                        "Lucky puts his head in your lap and sighs contentedly. This is his whole world.",
+                        "Lucky brings you a stick. Then another stick. Then a rock. He's generous like that.",
+                        "Lucky howls along with a passing ambulance. His singing voice is... unique."
+                    ],
+                    "neutral": [
+                        "Lucky rests his head on your leg.",
+                        "Lucky watches the world go by.",
+                        "Lucky sniffs everything. Every. Single. Thing. He's conducting an investigation.",
+                        "Lucky lies on his back with his three legs in the air. Living his best life.",
+                        "Lucky tilts his head at you like he's trying to understand human problems.",
+                        "Lucky guards the car while you're nearby. Nothing gets past him."
+                    ],
+                    "sad": [
+                        "Lucky whimpers softly.",
+                        "Lucky won't meet your eyes.",
+                        "Lucky limps to the farthest corner and lies down facing the wall.",
+                        "Lucky doesn't eat his food. Just stares at the bowl. Then at you.",
+                        "Lucky licks his missing leg's stump. Phantom pain. He's hurting.",
+                        "Lucky doesn't wag his tail when you say his name. That's how you know it's bad."
+                    ],
+                    "bonded": [
+                        "Lucky would walk through fire for you. You know this with absolute certainty.",
+                        "Lucky presses his whole body against yours when you're sad. He always knows.",
+                        "Lucky growls at anyone who raises their voice near you. Protective to a fault.",
+                        "Lucky sleeps across the car door like a furry barricade. Nothing gets to you while he's here."
+                    ]
                 }
             },
             "Mr. Pecks": {
                 "type": "Crow",
-                "description": "An intelligent crow who brings you shiny things.",
+                "description": "An intelligent crow who brings you shiny things and remembers every face.",
                 "favorite_food": "Birdseed",
                 "bonuses": {"find_money_chance": 5, "sanity_restore": 1},
                 "dialogue": {
-                    "happy": ["Mr. Pecks caws proudly and drops a shiny coin in your lap.", "Mr. Pecks preens on your shoulder."],
-                    "neutral": ["Mr. Pecks watches you with beady, intelligent eyes.", "Mr. Pecks pecks at the window."],
-                    "sad": ["Mr. Pecks sits silently, feathers ruffled.", "Mr. Pecks won't eat."]
+                    "happy": [
+                        "Mr. Pecks caws proudly and drops a shiny coin in your lap.",
+                        "Mr. Pecks preens on your shoulder.",
+                        "Mr. Pecks does a little hop-dance on your car roof. Tap tap tap.",
+                        "Mr. Pecks brings you a bottle cap, a button, and a paperclip. His treasure trove.",
+                        "Mr. Pecks mimics the sound of your car horn perfectly. Scares the hell out of you.",
+                        "Mr. Pecks gently pulls at your hair. Grooming you. You're part of his flock now."
+                    ],
+                    "neutral": [
+                        "Mr. Pecks watches you with beady, intelligent eyes.",
+                        "Mr. Pecks pecks at the window.",
+                        "Mr. Pecks sits on the rearview mirror, cataloging every passerby. He remembers them all.",
+                        "Mr. Pecks is having a conversation with other crows. About you, probably.",
+                        "Mr. Pecks cocks his head sideways, studying you like a puzzle he hasn't solved yet.",
+                        "Mr. Pecks drops a pebble in your coffee. You think it's an offering. Maybe it's a prank."
+                    ],
+                    "sad": [
+                        "Mr. Pecks sits silently, feathers ruffled.",
+                        "Mr. Pecks won't eat.",
+                        "Mr. Pecks turns his back to you on the rooftop. A crow's cold shoulder.",
+                        "Mr. Pecks hasn't brought you anything shiny in days. The gifts have stopped.",
+                        "Mr. Pecks makes a low, mournful sound you've never heard before. Crow grief.",
+                        "Mr. Pecks flies away and doesn't come back for hours. You worry the whole time."
+                    ],
+                    "bonded": [
+                        "Mr. Pecks has recruited an entire murder of crows. They all know your face. They all watch out for you.",
+                        "Mr. Pecks brings you actual money now. Bills. You don't ask where he gets them.",
+                        "Mr. Pecks dive-bombs people who try to mess with you. Air support.",
+                        "Mr. Pecks perches on your shoulder like you're a pirate. You've never felt cooler."
+                    ]
                 }
             },
             "Patches": {
                 "type": "Opossum",
-                "description": "A nocturnal friend who plays dead when scared.",
+                "description": "A nocturnal friend who plays dead when scared but comes alive at night.",
                 "favorite_food": "Garbage",
                 "bonuses": {"night_bonus": True, "sanity_restore": 2},
                 "dialogue": {
-                    "happy": ["Patches hangs from your rearview mirror by their tail.", "Patches nuzzles your hand."],
-                    "neutral": ["Patches sleeps in a ball under the seat.", "Patches watches you warily."],
-                    "sad": ["Patches plays dead. You're pretty sure they're not actually dead.", "Patches hisses when you get too close."]
+                    "happy": [
+                        "Patches hangs from your rearview mirror by their tail.",
+                        "Patches nuzzles your hand.",
+                        "Patches shows you their babies riding on their back. A whole possum family.",
+                        "Patches waddles over and DOESN'T play dead. The highest form of opossum trust.",
+                        "Patches purrs. Yes, opossums purr. It sounds like a tiny motorboat.",
+                        "Patches opens their mouth in that hissing smile. Terrifying to others. Adorable to you."
+                    ],
+                    "neutral": [
+                        "Patches sleeps in a ball under the seat.",
+                        "Patches watches you warily.",
+                        "Patches hangs upside down from the sun visor. Just vibing.",
+                        "Patches is nocturnal but stays awake to keep you company during the day. Sacrifice.",
+                        "Patches eats a piece of garbage with the delicacy of a sommelier tasting fine wine.",
+                        "Patches makes weird clicking sounds. Opossum communication. You nod like you understand."
+                    ],
+                    "sad": [
+                        "Patches plays dead. You're pretty sure they're not actually dead.",
+                        "Patches hisses when you get too close.",
+                        "Patches curls into a tight ball and won't uncurl. The world is too much.",
+                        "Patches drools more than usual. Stress response. Opossums are sensitive souls.",
+                        "Patches retreats under the seat and won't come out. Not playing dead. Just hiding.",
+                        "Patches bares all 50 teeth at you. More teeth than any other North American mammal. All angry."
+                    ],
+                    "bonded": [
+                        "Patches sleeps in your lap during the day, trusting you completely. For a prey animal, that's everything.",
+                        "Patches stays up all night watching over you while you sleep. Your nocturnal guardian.",
+                        "Patches has stopped playing dead around you entirely. Total trust. Absolute vulnerability.",
+                        "Patches carries their babies everywhere. They've decided you're family. All of you, together."
+                    ]
                 }
             },
             "Rusty": {
                 "type": "Raccoon",
-                "description": "A mischievous raccoon with clever paws.",
+                "description": "A mischievous raccoon with clever paws who steals for you.",
                 "favorite_food": "Anything",
                 "bonuses": {"steal_chance": 3, "sanity_restore": 2},
                 "dialogue": {
-                    "happy": ["Rusty chittered and washed their hands in your coffee cup.", "Rusty brings you something shiny... is that someone's watch?"],
-                    "neutral": ["Rusty rummages through your glove box.", "Rusty watches you with their little bandit mask."],
-                    "sad": ["Rusty sulks in the corner.", "Rusty won't come out of hiding."]
+                    "happy": [
+                        "Rusty chittered and washed their hands in your coffee cup.",
+                        "Rusty brings you something shiny... is that someone's watch?",
+                        "Rusty figured out how to open the glove box. And the center console. And your wallet.",
+                        "Rusty stands on their hind legs and extends their tiny hands toward you. Hug request.",
+                        "Rusty stacks objects into a tower. Knocks it down. Builds it again. Artist at work.",
+                        "Rusty organized all the coins in your car by size. Raccoon OCD is real."
+                    ],
+                    "neutral": [
+                        "Rusty rummages through your glove box.",
+                        "Rusty watches you with their little bandit mask.",
+                        "Rusty is washing something in the puddle outside. It's your phone. RUSTY, NO.",
+                        "Rusty opens a bag of chips with surgical precision. Those dexterous little paws.",
+                        "Rusty examines a coin, turns it over three times, then pockets it. Where? How?",
+                        "Rusty makes eye contact, then deliberately knocks your sunglasses off the dashboard."
+                    ],
+                    "sad": [
+                        "Rusty sulks in the corner.",
+                        "Rusty won't come out of hiding.",
+                        "Rusty stops stealing things. That's when you know something's really wrong.",
+                        "Rusty washes their paws over and over. Stress behavior. They need comfort.",
+                        "Rusty chatters softly in the dark. It sounds almost like crying.",
+                        "Rusty returns everything they stole today. Neatly arranged. A peace offering you didn't need."
+                    ],
+                    "bonded": [
+                        "Rusty has a network of raccoon informants across the city. You don't ask questions.",
+                        "Rusty steals exclusively FOR you now. Wallets, jewelry, once a whole ham. Provider.",
+                        "Rusty taught their babies to steal. You now have a raccoon crime family. Don Rusty.",
+                        "Rusty sleeps in your hoodie pocket. A warm, furry lump of loyalty and larceny."
+                    ]
                 }
             },
             "Slick": {
                 "type": "Rat",
-                "description": "A surprisingly clean and clever rat.",
+                "description": "A surprisingly clean and clever rat who knows every escape route.",
                 "favorite_food": "Cheese",
                 "bonuses": {"danger_warning": True, "sanity_restore": 1},
                 "dialogue": {
-                    "happy": ["Slick runs up your arm and perches on your shoulder.", "Slick squeaks contentedly."],
-                    "neutral": ["Slick watches you from the dashboard.", "Slick grooms their whiskers."],
-                    "sad": ["Slick hides in the glove box.", "Slick won't eat."]
+                    "happy": [
+                        "Slick runs up your arm and perches on your shoulder.",
+                        "Slick squeaks contentedly.",
+                        "Slick does a tiny popcorning hop. Happy rat behavior. It's incredibly cute.",
+                        "Slick grinds their teeth softly. Bruxing. Rat equivalent of purring.",
+                        "Slick brings you a crumb of food. Sharing. From a rat, that means everything.",
+                        "Slick crawls into your sleeve and falls asleep. Warm. Safe. Loved."
+                    ],
+                    "neutral": [
+                        "Slick watches you from the dashboard.",
+                        "Slick grooms their whiskers.",
+                        "Slick explores every crack and crevice of the car. Mapping escape routes. Always.",
+                        "Slick sits up on their haunches and sniffs the air. Something is on their mind.",
+                        "Slick arranges their bedding material precisely. Nesting behavior. Making a home.",
+                        "Slick stares at the wall for 30 seconds then looks at you like they solved the universe."
+                    ],
+                    "sad": [
+                        "Slick hides in the glove box.",
+                        "Slick won't eat.",
+                        "Slick's ears are flat against their head. Fear. Sadness. Both.",
+                        "Slick bites you gently. Not aggression. A cry for help.",
+                        "Slick stays in the darkest corner. Hiding from the world. From you.",
+                        "Slick's whiskers droop. You didn't know rat whiskers could droop. They can."
+                    ],
+                    "bonded": [
+                        "Slick has memorized every exit, every alley, every hiding spot within a mile. Your personal GPS of survival.",
+                        "Slick sleeps in your shirt pocket, right over your heart. You're their whole world.",
+                        "Slick alerts you with specific squeaks for different threats. You've learned their language.",
+                        "Slick has befriended every rat in the area. You have informants everywhere. The rat network."
+                    ]
                 }
             },
             "Hopper": {
                 "type": "Rabbit",
-                "description": "A lucky rabbit who brings good fortune.",
+                "description": "A lucky rabbit who brings good fortune wherever they hop.",
                 "favorite_food": "Carrot",
                 "bonuses": {"luck_bonus": 3, "sanity_restore": 2},
                 "dialogue": {
-                    "happy": ["Hopper does little binkies around the car.", "Hopper snuggles against your leg."],
-                    "neutral": ["Hopper twitches their nose curiously.", "Hopper lounges on the passenger seat."],
-                    "sad": ["Hopper thumps their foot anxiously.", "Hopper won't come out of hiding."]
+                    "happy": [
+                        "Hopper does little binkies around the car.",
+                        "Hopper snuggles against your leg.",
+                        "Hopper flops on their side dramatically. Rabbit body language for 'life is perfect.'",
+                        "Hopper zooms around the car at impossible speed, then stops and looks smug.",
+                        "Hopper lets you rub their belly. Rabbits almost never do this. You've been chosen.",
+                        "Hopper grooms your hand with tiny licks. Cleaning you. You're one of their babies now."
+                    ],
+                    "neutral": [
+                        "Hopper twitches their nose curiously.",
+                        "Hopper lounges on the passenger seat.",
+                        "Hopper rearranges the blankets into a nest. Very specific about comfort.",
+                        "Hopper chinning everything. That's your stuff, that's your stuff, EVERYTHING is their stuff.",
+                        "Hopper sits perfectly still, ears rotating like satellite dishes. Listening.",
+                        "Hopper pushes their food bowl toward you. Then pulls it back. Sharing is complicated."
+                    ],
+                    "sad": [
+                        "Hopper thumps their foot anxiously.",
+                        "Hopper won't come out of hiding.",
+                        "Hopper sits hunched in the corner, ears flat. A rabbit loaf of sadness.",
+                        "Hopper grinds their teeth. Not the happy kind. The stressed kind. Sharp, rapid.",
+                        "Hopper refuses all food. All treats. All comfort. Stubbornly sad.",
+                        "Hopper lunges when you reach in. Scared. Not angry. But scared."
+                    ],
+                    "bonded": [
+                        "Hopper binkies whenever they see you. Pure, stupid, wonderful joy.",
+                        "Hopper has claimed the entire car as their territory. You're allowed to visit.",
+                        "Hopper grooms your face every morning. You wake up to rabbit kisses. Life is good.",
+                        "Hopper brings you luck you can almost feel. Things just... go right when they're nearby."
+                    ]
                 }
             }
         }
@@ -492,6 +743,23 @@ class Lists:
         if companion and "dialogue" in companion:
             return random.choice(companion["dialogue"].get(mood, ["Your companion looks at you."]))
         return "Your companion is with you."
+    
+    def get_companion_bonus(self, name, bonus_name):
+        """Get a specific bonus value for a companion"""
+        companion = self.__companion_types.get(name, None)
+        if companion and "bonuses" in companion:
+            return companion["bonuses"].get(bonus_name, None)
+        return None
+
+    def has_companion_with_bonus(self, player, bonus_name):
+        """Check if any living companion has a specific bonus"""
+        living = player.get_all_companions()
+        for name in living:
+            companion_type = self.__companion_types.get(name, None)
+            if companion_type and "bonuses" in companion_type:
+                if bonus_name in companion_type["bonuses"]:
+                    return name
+        return None
 
     # ==========================================
     # PAWN SHOP PRICE DATA
@@ -565,6 +833,34 @@ class Lists:
             "Birdseed": 3,
             "Cheese": 2,
             "Carrot": 1,
+            
+            # Crafted Items
+            "Shiv": 35,
+            "Slingshot": 20,
+            "Road Flare Torch": 40,
+            "Pepper Spray": 30,
+            "Improvised Trap": 25,
+            "Car Alarm Rigging": 30,
+            "Snare Trap": 20,
+            "Home Remedy": 20,
+            "Wound Salve": 25,
+            "Splint": 15,
+            "Smelling Salts": 18,
+            "Lockpick Set": 30,
+            "Fishing Rod": 25,
+            "Binocular Scope": 45,
+            "Signal Mirror": 15,
+            "Lucky Charm Bracelet": 10,
+            "Dream Catcher": 15,
+            "Worry Stone": 8,
+            "Rain Collector": 10,
+            "Emergency Blanket": 12,
+            "Smoke Signal Kit": 20,
+            "Fire Starter Kit": 15,
+            "Water Purifier": 18,
+            "Companion Bed": 15,
+            "Pet Toy": 8,
+            "Feeding Station": 10,
         }
     
     def get_pawn_price(self, item_name):
@@ -573,6 +869,300 @@ class Lists:
     def get_sellable_items(self):
         """Returns list of items that can be sold at pawn shop"""
         return list(self.__pawn_shop_prices.keys())
+
+    # ==========================================
+    # CRAFTING RECIPE DATA (CAR WORKBENCH)
+    # ==========================================
+
+    def make_crafting_recipes(self):
+        """All recipes craftable at the car workbench.
+        Each recipe: name, ingredients list, description, pawn_value, category.
+        Categories: weapon, trap, remedy, tool, charm, survival, companion"""
+        return {
+            # === WEAPONS ===
+            "Shiv": {
+                "ingredients": ["Duct Tape", "Pocket Knife"],
+                "description": "A pocket knife taped to a stick. Crude, effective, terrifying.",
+                "pawn_value": 35,
+                "category": "weapon",
+                "craft_text": "You wrap duct tape around the handle of your pocket knife until it feels right. It's ugly. It'll work.",
+            },
+            "Slingshot": {
+                "ingredients": ["Rubber Bands", "Bungee Cords"],
+                "description": "A Y-shaped branch with rubber pulled taut. David vs. Goliath energy.",
+                "pawn_value": 20,
+                "category": "weapon",
+                "craft_text": "You find a forked stick outside, stretch the rubber bands between the prongs, and suddenly you're ten years old again. Except now you're armed.",
+            },
+            "Road Flare Torch": {
+                "ingredients": ["Road Flares", "Duct Tape"],
+                "description": "A road flare strapped to a stick. Lights the way and scares off threats.",
+                "pawn_value": 40,
+                "category": "weapon",
+                "craft_text": "You duct-tape a road flare to an old car antenna. It's a torch. It's ridiculous. It's incredibly effective.",
+            },
+            "Pepper Spray": {
+                "ingredients": ["Bug Spray", "Lighter"],
+                "description": "Bug spray + flame = homemade deterrent. Not exactly legal. Very effective.",
+                "pawn_value": 30,
+                "category": "weapon",
+                "craft_text": "You hold the lighter in front of the bug spray can. A quick test spray sends a fireball three feet out. You grin. This'll keep the creeps away.",
+            },
+
+            # === TRAPS ===
+            "Improvised Trap": {
+                "ingredients": ["Fishing Line", "Pocket Knife"],
+                "description": "Trip wire connected to a noise maker. Alerts you to intruders while you sleep.",
+                "pawn_value": 25,
+                "category": "trap",
+                "craft_text": "You string fishing line between the car's side mirrors, attach some cans, and set it at ankle height. Anyone who gets close, you'll hear them.",
+            },
+            "Car Alarm Rigging": {
+                "ingredients": ["Bungee Cords", "Spare Fuses"],
+                "description": "A jury-rigged alarm system for your wagon. Won't stop a thief, but it'll wake you up.",
+                "pawn_value": 30,
+                "category": "trap",
+                "craft_text": "You wire the spare fuses into a loop with the bungee cords on the door handle. Open the door, circuit breaks, horn blasts. Genius or insanity. Same thing.",
+            },
+            "Snare Trap": {
+                "ingredients": ["Rope", "Fishing Line"],
+                "description": "A classic snare loop hidden in the grass. Catches small animals or trips big ones.",
+                "pawn_value": 20,
+                "category": "trap",
+                "craft_text": "You tie a loop in the rope, thread the fishing line through, and set it near a rabbit trail. Primitive. Effective. You feel like a caveman.",
+            },
+
+            # === REMEDIES ===
+            "Home Remedy": {
+                "ingredients": ["First Aid Kit", "Cough Drops"],
+                "description": "A DIY cold cure: crushed cough drops in warm water, bandages for comfort. Actually works.",
+                "pawn_value": 20,
+                "category": "remedy",
+                "craft_text": "You crush the cough drops into a paste, mix them with clean bandage material from the first aid kit, and make a throat poultice. It looks disgusting. It works.",
+            },
+            "Wound Salve": {
+                "ingredients": ["First Aid Kit", "Super Glue"],
+                "description": "Medical-grade wound closure. Super glue was literally invented for this.",
+                "pawn_value": 25,
+                "category": "remedy",
+                "craft_text": "Fun fact: super glue was originally designed for field surgery. You squeeze it along a clean bandage strip. Instant butterfly closure. You feel like a doctor. Sort of.",
+            },
+            "Splint": {
+                "ingredients": ["Duct Tape", "Rope"],
+                "description": "A rigid splint for sprains and fractures. Won't fix it, but it'll hold.",
+                "pawn_value": 15,
+                "category": "remedy",
+                "craft_text": "You wrap rope around two straight sticks, reinforce with duct tape, and create a splint that a field medic would nod approvingly at. Probably.",
+            },
+            "Smelling Salts": {
+                "ingredients": ["Hand Warmers", "Breath Mints"],
+                "description": "Crushed mints in a warm pouch. One whiff clears the fog from your brain.",
+                "pawn_value": 18,
+                "category": "remedy",
+                "craft_text": "You crush the mints to dust, pour them into a hand warmer pouch, and seal it. Crack it open near your nose. WHOOSH. You can see through time. Almost.",
+            },
+
+            # === TOOLS ===
+            "Lockpick Set": {
+                "ingredients": ["Pocket Knife", "Fishing Line"],
+                "description": "A bent knife blade and tension wrench. Opens things that were meant to stay closed.",
+                "pawn_value": 30,
+                "category": "tool",
+                "craft_text": "You heat the tip of the pocket knife blade with a lighter and bend it into a hook. Thread the fishing line through for tension. Your first lockpick set. Criminal? Maybe. Useful? Absolutely.",
+            },
+            "Fishing Rod": {
+                "ingredients": ["Fishing Line", "Rope"],
+                "description": "A proper fishing rig made from a car antenna and braided line. Fresh dinner awaits.",
+                "pawn_value": 25,
+                "category": "tool",
+                "craft_text": "You snap the car antenna off (sorry, wagon), tie the fishing line to the tip, and braid the rope for a handle grip. Cast it into any body of water and hope for the best.",
+            },
+            "Binocular Scope": {
+                "ingredients": ["Binoculars", "Duct Tape"],
+                "description": "Binoculars taped to the car's sun visor. See danger before it sees you.",
+                "pawn_value": 45,
+                "category": "tool",
+                "craft_text": "You duct-tape the binoculars to the sun visor at an angle. Now you can scan the horizon without even holding them. Surveillance state: population you.",
+            },
+            "Signal Mirror": {
+                "ingredients": ["Broken Compass", "Super Glue"],
+                "description": "The compass glass, polished and mounted. Flash it at passing cars, helicopters, or the sun itself.",
+                "pawn_value": 15,
+                "category": "tool",
+                "craft_text": "You crack the compass open, extract the glass face, polish it on your jeans, and glue it to a flat piece of cardboard. It catches the light perfectly. SOS, baby.",
+            },
+
+            # === CHARMS / LUCKY ITEMS ===
+            "Lucky Charm Bracelet": {
+                "ingredients": ["Lucky Penny", "Fishing Line"],
+                "description": "A penny on a string. Stupid, right? Then why does everything go better when you wear it?",
+                "pawn_value": 10,
+                "category": "charm",
+                "craft_text": "You punch a hole in the lucky penny, thread the fishing line through, and tie it around your wrist. It's not magic. But also, it kind of is.",
+            },
+            "Dream Catcher": {
+                "ingredients": ["Fishing Line", "Rubber Bands"],
+                "description": "A web of line and bands stretched in a circle. Hangs from your rearview mirror. Catches bad dreams.",
+                "pawn_value": 15,
+                "category": "charm",
+                "craft_text": "You bend a coat hanger into a circle, weave the fishing line through it, stretch rubber bands across in a web pattern, and hang it from the rearview mirror. It sways gently. Your dreams get softer.",
+            },
+            "Worry Stone": {
+                "ingredients": ["Lucky Penny", "Hand Warmers"],
+                "description": "A warm penny you rub between your fingers when the world gets loud. Anxiety tool. Free therapy.",
+                "pawn_value": 8,
+                "category": "charm",
+                "craft_text": "You press the lucky penny into a hand warmer, let it heat up, and hold it in your palm. Rub it with your thumb. Smooth. Warm. The anxiety doesn't vanish, but it gets quieter.",
+            },
+
+            # === SURVIVAL ===
+            "Rain Collector": {
+                "ingredients": ["Plastic Wrap", "Garbage Bag"],
+                "description": "A funnel system that collects rainwater into a bottle. Hydration on autopilot.",
+                "pawn_value": 10,
+                "category": "survival",
+                "craft_text": "You stretch the plastic wrap over the mouth of a cut garbage bag, creating a funnel. Set it on the roof. When it rains, clean water drips right into your bottle. Survivalist mode: engaged.",
+            },
+            "Emergency Blanket": {
+                "ingredients": ["Garbage Bag", "Duct Tape"],
+                "description": "A garbage bag lined with tape for insulation. Ugly, crinkly, surprisingly warm.",
+                "pawn_value": 12,
+                "category": "survival",
+                "craft_text": "You split the garbage bag open, layer duct tape across the inside for insulation, and fold it into a blanket. It looks like modern art. It keeps you alive.",
+            },
+            "Smoke Signal Kit": {
+                "ingredients": ["Road Flares", "Garbage Bag"],
+                "description": "Black smoke on demand. Signal for help or scare off wildlife. Your choice.",
+                "pawn_value": 20,
+                "category": "survival",
+                "craft_text": "You shred the garbage bag into strips, wrap them around the road flare tip, and test it. Thick black smoke billows up. You could signal a helicopter. Or ruin someone's laundry day.",
+            },
+            "Fire Starter Kit": {
+                "ingredients": ["Lighter", "Hand Warmers"],
+                "description": "A lighter plus tinder in a sealed pouch. Start a campfire anywhere, any weather.",
+                "pawn_value": 15,
+                "category": "survival",
+                "craft_text": "You crack open the hand warmers, pour the iron filings into a zip bag with the lighter, and seal it tight. Instant fire kit. You could survive in the wilderness. Probably. For a day.",
+            },
+            "Water Purifier": {
+                "ingredients": ["Plastic Wrap", "Lighter"],
+                "description": "Solar still in a bag. Put dirty water in, wait, get clean water out. Science is cool.",
+                "pawn_value": 18,
+                "category": "survival",
+                "craft_text": "You set dirty water in a bowl, cover it with plastic wrap, and put a small weight in the center. The sun evaporates the water, condensation runs down the plastic, and drips into your cup. Clean water. You are a genius.",
+            },
+
+            # === COMPANION ITEMS ===
+            "Companion Bed": {
+                "ingredients": ["Blanket", "Duct Tape"],
+                "description": "A cozy padded bed for your animal friend. Duct tape holds the shape, blanket holds the warmth.",
+                "pawn_value": 15,
+                "category": "companion",
+                "craft_text": "You fold the blanket into a donut shape, tape the bottom so it stays put, and set it in the corner of the car. Your companion sniffs it. Circles three times. Lies down. Home.",
+            },
+            "Pet Toy": {
+                "ingredients": ["Rope", "Rubber Bands"],
+                "description": "A braided rope toy with rubber band squeakers. Hours of entertainment. Mostly for you.",
+                "pawn_value": 8,
+                "category": "companion",
+                "craft_text": "You braid the rope into a thick knot, weave rubber bands through it so it makes a satisfying SNAP when squeezed. Your companion goes absolutely feral. Best toy ever.",
+            },
+            "Feeding Station": {
+                "ingredients": ["Plastic Wrap", "Duct Tape"],
+                "description": "A waterproof food bowl that sticks to the car floor. No more spillage. Finally.",
+                "pawn_value": 10,
+                "category": "companion",
+                "craft_text": "You mold the plastic wrap into a bowl shape, reinforce it with duct tape, and stick it to the car floor. It's not pretty. But the food stays in the bowl. Revolutionary.",
+            },
+        }
+
+    def get_crafting_recipes(self):
+        """Returns all crafting recipes"""
+        return self.__crafting_recipes
+
+    def get_available_recipes(self, player):
+        """Returns recipes the player currently has ingredients for"""
+        available = {}
+        for name, recipe in self.__crafting_recipes.items():
+            if not player.has_item(name):  # Can't craft duplicates
+                has_all = True
+                for ingredient in recipe["ingredients"]:
+                    if not player.has_item(ingredient):
+                        has_all = False
+                        break
+                if has_all:
+                    available[name] = recipe
+        return available
+
+    def get_all_recipe_names(self):
+        """Returns list of all craftable item names"""
+        return list(self.__crafting_recipes.keys())
+
+    def get_recipe(self, name):
+        """Returns a specific recipe by name"""
+        return self.__crafting_recipes.get(name, None)
+
+    def get_craftable_categories(self):
+        """Returns list of unique categories"""
+        categories = set()
+        for recipe in self.__crafting_recipes.values():
+            categories.add(recipe["category"])
+        return sorted(list(categories))
+
+    def get_recipes_by_category(self, category):
+        """Returns recipes filtered by category"""
+        return {name: recipe for name, recipe in self.__crafting_recipes.items() 
+                if recipe["category"] == category}
+
+    # ==========================================
+    # CRAFTED ITEM DESCRIPTIONS (for workbench inspection)
+    # ==========================================
+
+    def make_crafted_item_descriptions(self):
+        """Detailed descriptions shown when inspecting a crafted item at the workbench"""
+        return {
+            # Weapons
+            "Shiv": "A crude blade made from a pocket knife and duct tape. Gives you +30% chance to win combat encounters and scares off muggers. Not pretty, but effective.",
+            "Slingshot": "A handmade slingshot. Use it to hunt small game during adventures or pelt annoying NPCs with pebbles. +15% chance to hit targets in ranged encounters.",
+            "Road Flare Torch": "A blazing torch that lights dark areas and terrifies nocturnal threats. Doubles as a weapon. +25% chance to scare off night attackers. Burns out after 3 uses.",
+            "Pepper Spray": "Homemade pepper spray. Guarantees escape from any non-boss combat encounter. Single use, but what a use it is.",
+            # Traps
+            "Improvised Trap": "Trip wire alarm around your car. +40% chance to prevent theft events. Gives you early warning during night encounters.",
+            "Car Alarm Rigging": "Jury-rigged car alarm. Prevents the 'car_break_in' event entirely. Also wakes you up during night attacks, giving you first-strike advantage.",
+            "Snare Trap": "A snare that catches small animals. During adventures, +20% chance to find food. Can also trip pursuers in chase events.",
+            # Remedies
+            "Home Remedy": "Cures a Cold or Sore Throat instantly. One use. Better than suffering for three days.",
+            "Wound Salve": "Closes wounds and prevents infection. Heals 15 HP and removes one injury. One use.",
+            "Splint": "Stabilizes fractures and sprains. Removes the 'Broken Bone' injury. Reusable until your next injury.",
+            "Smelling Salts": "Clears your head. Restores 8 sanity instantly. Single use. Like a slap to the brain, but pleasant.",
+            # Tools
+            "Lockpick Set": "Opens locked containers and doors. During adventures, unlocks alternate paths and hidden loot. Reusable but breaks after 5 uses.",
+            "Fishing Rod": "Cast into any body of water during adventures. Catch fish for free food (heals 12 HP) or rare items. Reusable.",
+            "Binocular Scope": "Mounted on your car visor. Reveals hidden details in events — sometimes exposes traps, shortcuts, or hidden NPCs. Passive effect.",
+            "Signal Mirror": "Flash it during day events for a chance to attract help. +10% chance to receive assistance in dangerous situations. Passive.",
+            # Charms
+            "Lucky Charm Bracelet": "Worn on your wrist. +2% blackjack luck bonus. Small but consistent. Stacks with other luck items.",
+            "Dream Catcher": "Hangs from rearview mirror. Night events have +10% chance to be positive. Bad dreams give less sanity damage.",
+            "Worry Stone": "Carry it always. Passive: lose 1 less sanity from any sanity-draining event. Small comfort in a cruel world.",
+            # Survival
+            "Rain Collector": "Collects water during rain events. Automatically restores 5 HP on rainy days. Passive.",
+            "Emergency Blanket": "Extra warmth at night. Reduces fatigue gained during night events by 15%. Passive.",
+            "Smoke Signal Kit": "Create a smoke signal during adventures. +20% chance to be rescued in dangerous situations. Single use.",
+            "Fire Starter Kit": "Start a fire anywhere. During camping events, restores 5 HP and 3 sanity. During cold events, prevents health damage. 3 uses.",
+            "Water Purifier": "Clean water on demand. Restores 8 HP when used. 5 uses before it needs to be rebuilt.",
+            # Companion
+            "Companion Bed": "Your companion sleeps better. Companion happiness decay reduced by 25%. Passive.",
+            "Pet Toy": "Play with your companion for bonus happiness. When used, restores 15 companion happiness. Reusable.",
+            "Feeding Station": "Food lasts longer. Companion feeding restores +50% more happiness. Passive.",
+        }
+
+    def get_crafted_item_description(self, item_name):
+        """Get the detailed description of a crafted item"""
+        return self.__crafted_item_descriptions.get(item_name, "A mysterious crafted item. You're not sure what it does.")
+
+    def is_crafted_item(self, item_name):
+        """Check if an item is a crafted item"""
+        return item_name in self.__crafting_recipes
 
     # ==========================================
     # LOAN SHARK DIALOGUE
@@ -865,6 +1455,41 @@ class Lists:
         a_list.append("the_cat_knows")
         a_list.append("rain_on_the_roof")
         a_list.append("the_sleeping_stranger")
+        # COMPANION DAY EVENTS
+        a_list.append("lucky_guards_car")
+        a_list.append("mr_pecks_treasure")
+        a_list.append("whiskers_sixth_sense")
+        a_list.append("slick_escape_route")
+        a_list.append("hopper_lucky_day")
+        a_list.append("patches_night_watch")
+        a_list.append("squirrelly_stash")
+        a_list.append("companion_sick_day")
+        a_list.append("companion_hero_moment")
+        a_list.append("companion_nightmare")
+        a_list.append("companion_lost_adventure")
+        a_list.append("companion_food_crisis")
+        # CRAFTED ITEM EVENTS
+        a_list.append("shiv_confrontation")
+        a_list.append("lockpick_opportunity")
+        a_list.append("fishing_day")
+        a_list.append("trap_night_thief")
+        a_list.append("dream_catcher_night")
+        a_list.append("slingshot_bird_hunt")
+        a_list.append("signal_mirror_rescue")
+        a_list.append("rain_collector_bonus")
+        a_list.append("fire_starter_campfire")
+        a_list.append("companion_bed_bonus")
+        a_list.append("worry_stone_moment")
+        a_list.append("snare_trap_catch")
+        a_list.append("binocular_scope_discovery")
+        a_list.append("emergency_blanket_cold_night")
+        a_list.append("lucky_charm_streak")
+        a_list.append("water_purifier_use")
+        a_list.append("pet_toy_playtime")
+        a_list.append("home_remedy_illness")
+        a_list.append("road_flare_torch_encounter")
+        a_list.append("feeding_station_morning")
+        a_list.append("splint_injury_event")
         random.shuffle(a_list)
         return a_list
     
@@ -1034,10 +1659,6 @@ class Lists:
         a_list.append("the_hitchhiker")
         # Conditional
         a_list.append("mayas_luck")
-        # One-Time Conditional (Dreams)
-        a_list.append("remember_rebecca")
-        a_list.append("dealers_anger")
-        a_list.append("casino_bar")
         # Secret Events
         a_list.append("deja_vu")
         a_list.append("exactly_1111")
@@ -1071,6 +1692,45 @@ class Lists:
         a_list.append("insomniac_revelation")
         a_list.append("rain_on_the_roof")
         a_list.append("the_sleeping_stranger")
+        # COMPANION DAY EVENTS
+        a_list.append("lucky_guards_car")
+        a_list.append("mr_pecks_treasure")
+        a_list.append("rusty_midnight_heist")
+        a_list.append("whiskers_sixth_sense")
+        a_list.append("slick_escape_route")
+        a_list.append("hopper_lucky_day")
+        a_list.append("patches_night_watch")
+        a_list.append("squirrelly_stash")
+        a_list.append("companion_sick_day")
+        a_list.append("companion_rivalry")
+        a_list.append("companion_hero_moment")
+        a_list.append("companion_nightmare")
+        a_list.append("companion_lost_adventure")
+        a_list.append("companion_brings_friend")
+        a_list.append("companion_food_crisis")
+        a_list.append("companion_milestone")
+        # CRAFTED ITEM EVENTS
+        a_list.append("shiv_confrontation")
+        a_list.append("lockpick_opportunity")
+        a_list.append("fishing_day")
+        a_list.append("trap_night_thief")
+        a_list.append("dream_catcher_night")
+        a_list.append("slingshot_bird_hunt")
+        a_list.append("signal_mirror_rescue")
+        a_list.append("rain_collector_bonus")
+        a_list.append("fire_starter_campfire")
+        a_list.append("companion_bed_bonus")
+        a_list.append("worry_stone_moment")
+        a_list.append("snare_trap_catch")
+        a_list.append("binocular_scope_discovery")
+        a_list.append("emergency_blanket_cold_night")
+        a_list.append("lucky_charm_streak")
+        a_list.append("water_purifier_use")
+        a_list.append("pet_toy_playtime")
+        a_list.append("home_remedy_illness")
+        a_list.append("road_flare_torch_encounter")
+        a_list.append("feeding_station_morning")
+        a_list.append("splint_injury_event")
         random.shuffle(a_list)
         return a_list
     
@@ -1242,10 +1902,6 @@ class Lists:
         a_list.append("the_food_truck")
         # One-Time Conditional
         a_list.append("further_interrogation")
-        # One-Time Conditional (Dreams)
-        a_list.append("remember_nathan")
-        a_list.append("dealers_scar")
-        a_list.append("casino_table")
         # Secret Events
         a_list.append("exactly_50000")
         # NEW CREATIVE EVENTS - Modest Tier
@@ -1277,6 +1933,48 @@ class Lists:
         a_list.append("insomniac_revelation")
         a_list.append("item_hoarder")
         a_list.append("rain_on_the_roof")
+        # COMPANION DAY EVENTS
+        a_list.append("lucky_guards_car")
+        a_list.append("mr_pecks_treasure")
+        a_list.append("rusty_midnight_heist")
+        a_list.append("whiskers_sixth_sense")
+        a_list.append("slick_escape_route")
+        a_list.append("hopper_lucky_day")
+        a_list.append("patches_night_watch")
+        a_list.append("squirrelly_stash")
+        a_list.append("companion_sick_day")
+        a_list.append("companion_rivalry")
+        a_list.append("companion_hero_moment")
+        a_list.append("companion_death_sacrifice")
+        a_list.append("companion_nightmare")
+        a_list.append("companion_lost_adventure")
+        a_list.append("companion_bonded_moment")
+        a_list.append("companion_learns_trick")
+        a_list.append("companion_brings_friend")
+        a_list.append("companion_food_crisis")
+        a_list.append("companion_milestone")
+        # CRAFTED ITEM EVENTS
+        a_list.append("shiv_confrontation")
+        a_list.append("lockpick_opportunity")
+        a_list.append("fishing_day")
+        a_list.append("trap_night_thief")
+        a_list.append("dream_catcher_night")
+        a_list.append("slingshot_bird_hunt")
+        a_list.append("signal_mirror_rescue")
+        a_list.append("rain_collector_bonus")
+        a_list.append("fire_starter_campfire")
+        a_list.append("companion_bed_bonus")
+        a_list.append("worry_stone_moment")
+        a_list.append("snare_trap_catch")
+        a_list.append("binocular_scope_discovery")
+        a_list.append("emergency_blanket_cold_night")
+        a_list.append("lucky_charm_streak")
+        a_list.append("water_purifier_use")
+        a_list.append("pet_toy_playtime")
+        a_list.append("home_remedy_illness")
+        a_list.append("road_flare_torch_encounter")
+        a_list.append("feeding_station_morning")
+        a_list.append("splint_injury_event")
         random.shuffle(a_list)
         return a_list
     
@@ -1406,7 +2104,48 @@ class Lists:
         a_list.append("starving_cow")
         # Secret Events
         a_list.append("exactly_250000")
-        a_list.append("dealer_in_dreams")
+        # COMPANION DAY EVENTS
+        a_list.append("lucky_guards_car")
+        a_list.append("mr_pecks_treasure")
+        a_list.append("rusty_midnight_heist")
+        a_list.append("whiskers_sixth_sense")
+        a_list.append("slick_escape_route")
+        a_list.append("hopper_lucky_day")
+        a_list.append("patches_night_watch")
+        a_list.append("squirrelly_stash")
+        a_list.append("companion_sick_day")
+        a_list.append("companion_rivalry")
+        a_list.append("companion_hero_moment")
+        a_list.append("companion_death_sacrifice")
+        a_list.append("companion_nightmare")
+        a_list.append("companion_lost_adventure")
+        a_list.append("companion_bonded_moment")
+        a_list.append("companion_learns_trick")
+        a_list.append("companion_brings_friend")
+        a_list.append("companion_food_crisis")
+        a_list.append("companion_milestone")
+        # CRAFTED ITEM EVENTS
+        a_list.append("shiv_confrontation")
+        a_list.append("lockpick_opportunity")
+        a_list.append("fishing_day")
+        a_list.append("trap_night_thief")
+        a_list.append("dream_catcher_night")
+        a_list.append("slingshot_bird_hunt")
+        a_list.append("signal_mirror_rescue")
+        a_list.append("rain_collector_bonus")
+        a_list.append("fire_starter_campfire")
+        a_list.append("companion_bed_bonus")
+        a_list.append("worry_stone_moment")
+        a_list.append("snare_trap_catch")
+        a_list.append("binocular_scope_discovery")
+        a_list.append("emergency_blanket_cold_night")
+        a_list.append("lucky_charm_streak")
+        a_list.append("water_purifier_use")
+        a_list.append("pet_toy_playtime")
+        a_list.append("home_remedy_illness")
+        a_list.append("road_flare_torch_encounter")
+        a_list.append("feeding_station_morning")
+        a_list.append("splint_injury_event")
         random.shuffle(a_list)
         return a_list
     
@@ -1509,10 +2248,6 @@ class Lists:
         a_list.append("the_doppelganger")
         # One-Time Conditional
         a_list.append("even_further_interrogation")
-        # One-Time Conditional (Dreams)
-        a_list.append("remember_johnathan")
-        a_list.append("dealers_revolver")
-        a_list.append("casino_riches")
         # Secret Events
         a_list.append("exactly_777777")
         # NEW CREATIVE EVENTS - Doughman Tier
@@ -1555,6 +2290,48 @@ class Lists:
         a_list.append("the_scar_story")
         a_list.append("the_winning_streak_paranoia")
         a_list.append("old_gambling_buddy")
+        # COMPANION DAY EVENTS
+        a_list.append("lucky_guards_car")
+        a_list.append("mr_pecks_treasure")
+        a_list.append("rusty_midnight_heist")
+        a_list.append("whiskers_sixth_sense")
+        a_list.append("slick_escape_route")
+        a_list.append("hopper_lucky_day")
+        a_list.append("patches_night_watch")
+        a_list.append("squirrelly_stash")
+        a_list.append("companion_sick_day")
+        a_list.append("companion_rivalry")
+        a_list.append("companion_hero_moment")
+        a_list.append("companion_death_sacrifice")
+        a_list.append("companion_nightmare")
+        a_list.append("companion_lost_adventure")
+        a_list.append("companion_bonded_moment")
+        a_list.append("companion_learns_trick")
+        a_list.append("companion_brings_friend")
+        a_list.append("companion_food_crisis")
+        a_list.append("companion_milestone")
+        # CRAFTED ITEM EVENTS
+        a_list.append("shiv_confrontation")
+        a_list.append("lockpick_opportunity")
+        a_list.append("fishing_day")
+        a_list.append("trap_night_thief")
+        a_list.append("dream_catcher_night")
+        a_list.append("slingshot_bird_hunt")
+        a_list.append("signal_mirror_rescue")
+        a_list.append("rain_collector_bonus")
+        a_list.append("fire_starter_campfire")
+        a_list.append("companion_bed_bonus")
+        a_list.append("worry_stone_moment")
+        a_list.append("snare_trap_catch")
+        a_list.append("binocular_scope_discovery")
+        a_list.append("emergency_blanket_cold_night")
+        a_list.append("lucky_charm_streak")
+        a_list.append("water_purifier_use")
+        a_list.append("pet_toy_playtime")
+        a_list.append("home_remedy_illness")
+        a_list.append("road_flare_torch_encounter")
+        a_list.append("feeding_station_morning")
+        a_list.append("splint_injury_event")
         random.shuffle(a_list)
         return a_list
     
@@ -1629,7 +2406,6 @@ class Lists:
         # One-Time
         a_list.append("the_warning")
         a_list.append("the_celebration")
-        a_list.append("final_dream")
         a_list.append("the_offer")
         # One-Time Conditional
         a_list.append("cow_army")
@@ -1675,6 +2451,48 @@ class Lists:
         a_list.append("the_scar_story")
         a_list.append("the_winning_streak_paranoia")
         a_list.append("old_gambling_buddy")
+        # COMPANION DAY EVENTS
+        a_list.append("lucky_guards_car")
+        a_list.append("mr_pecks_treasure")
+        a_list.append("rusty_midnight_heist")
+        a_list.append("whiskers_sixth_sense")
+        a_list.append("slick_escape_route")
+        a_list.append("hopper_lucky_day")
+        a_list.append("patches_night_watch")
+        a_list.append("squirrelly_stash")
+        a_list.append("companion_sick_day")
+        a_list.append("companion_rivalry")
+        a_list.append("companion_hero_moment")
+        a_list.append("companion_death_sacrifice")
+        a_list.append("companion_nightmare")
+        a_list.append("companion_lost_adventure")
+        a_list.append("companion_bonded_moment")
+        a_list.append("companion_learns_trick")
+        a_list.append("companion_brings_friend")
+        a_list.append("companion_food_crisis")
+        a_list.append("companion_milestone")
+        # CRAFTED ITEM EVENTS
+        a_list.append("shiv_confrontation")
+        a_list.append("lockpick_opportunity")
+        a_list.append("fishing_day")
+        a_list.append("trap_night_thief")
+        a_list.append("dream_catcher_night")
+        a_list.append("slingshot_bird_hunt")
+        a_list.append("signal_mirror_rescue")
+        a_list.append("rain_collector_bonus")
+        a_list.append("fire_starter_campfire")
+        a_list.append("companion_bed_bonus")
+        a_list.append("worry_stone_moment")
+        a_list.append("snare_trap_catch")
+        a_list.append("binocular_scope_discovery")
+        a_list.append("emergency_blanket_cold_night")
+        a_list.append("lucky_charm_streak")
+        a_list.append("water_purifier_use")
+        a_list.append("pet_toy_playtime")
+        a_list.append("home_remedy_illness")
+        a_list.append("road_flare_torch_encounter")
+        a_list.append("feeding_station_morning")
+        a_list.append("splint_injury_event")
         random.shuffle(a_list)
         return a_list
     
@@ -1782,6 +2600,9 @@ class Lists:
            self.__player.has_item("Beach Romance Number") or 
            self.__player.has_item("Rich Friend's Number")):
             a_list.append("Make a Phone Call")
+        # Car Workbench - unlocked by owning a Tool Kit
+        if(self.__player.has_item("Tool Kit")):
+            a_list.append("Car Workbench")
         # Airport unlocks when you're a millionaire
         if(self.__player.get_balance() >= 1000000):
             a_list.append("Airport")
@@ -2365,7 +3186,640 @@ class Lists:
         if len(self.__worried_squirrely_list)==0:
             self.__worried_squirrely_list = self.make_worried_squirrely_list()
         return self.__worried_squirrely_list.pop()
-    
+
+
+    # ==========================================
+    # WHISKERS (ALLEY CAT) DAILY DIALOGUE
+    # ==========================================
+
+    def make_whiskers_happy_list(self):
+        a_list = []
+        a_list.append("Whiskers stretches out across the dashboard, soaking up the morning sun like she owns the car. She probably does.")
+        a_list.append("Whiskers brings you a dead moth she found under the seat. She drops it at your feet, looks up at you expectantly. This is love.")
+        a_list.append("Whiskers headbutts your hand over and over until you scratch behind her ears. The purring is thunderous.")
+        a_list.append("Whiskers is in a playful mood, batting at the dangling air freshener like it personally offended her.")
+        a_list.append("Whiskers curls up on the warm spot where you were just sitting. She kneads the seat, purring, and falls asleep in seconds.")
+        a_list.append("Whiskers slow-blinks at you from across the car. You slow-blink back. The ritual is complete.")
+        a_list.append("Whiskers finds a stray shoelace and goes absolutely feral on it. Five minutes of chaos. Then she licks her paw like nothing happened.")
+        a_list.append("Whiskers climbs onto your shoulder and nuzzles your ear. Her whiskers tickle. You don't dare move.")
+        a_list.append("Whiskers catches a fly mid-air. She looks at you like, 'Did you see that?' You did. You're impressed.")
+        a_list.append("Whiskers rolls onto her back, all four paws in the air. A belly trap? Or genuine trust? You risk a pet. She lets you. You've won today.")
+        a_list.append("Whiskers grooms your eyebrows while you're trying to read. Apparently they were a mess.")
+        a_list.append("Whiskers perches on the steering wheel and pretends to drive. She's a terrible driver. But she looks adorable.")
+        random.shuffle(a_list)
+        return a_list
+
+    def get_whiskers_happy_update(self):
+        if len(self.__whiskers_happy_list) == 0:
+            self.__whiskers_happy_list = self.make_whiskers_happy_list()
+        return self.__whiskers_happy_list.pop()
+
+    def make_whiskers_unhappy_list(self):
+        a_list = []
+        a_list.append("Whiskers sits with her back to you. The cold shoulder is real.")
+        a_list.append("Whiskers won't eat. She just stares at the food, then at you, then turns away.")
+        a_list.append("Whiskers hides under the passenger seat and won't come out, no matter how many treats you offer.")
+        a_list.append("Whiskers hisses at you when you reach for her. Okay. Message received.")
+        a_list.append("Whiskers has been scratching the upholstery. Passive-aggressive redecorating.")
+        a_list.append("Whiskers knocks your coffee off the dashboard. On purpose. While maintaining eye contact.")
+        a_list.append("Whiskers sits in the window with her ears pinned back, watching the world like it failed her.")
+        a_list.append("Whiskers is grooming excessively. Stress cleaning. She's not okay.")
+        a_list.append("Whiskers meows at the door. She wants out. The thought of her leaving makes your chest hurt.")
+        a_list.append("Whiskers swipes at your hand when you try to pet her. No claws. But the message is clear.")
+        random.shuffle(a_list)
+        return a_list
+
+    def get_whiskers_unhappy_update(self):
+        if len(self.__whiskers_unhappy_list) == 0:
+            self.__whiskers_unhappy_list = self.make_whiskers_unhappy_list()
+        return self.__whiskers_unhappy_list.pop()
+
+    def make_whiskers_weather_list(self):
+        a_list = []
+        a_list.append("Whiskers presses herself flat against the floorboard. Thunder terrifies her.")
+        a_list.append("Whiskers's ears rotate like radar dishes with every crack of thunder. She's on high alert.")
+        a_list.append("Whiskers hides inside your jacket. You can feel her trembling against your chest.")
+        a_list.append("Whiskers watches the rain hit the windshield, tracking each drop with laser focus. Hunting instinct never sleeps.")
+        a_list.append("Whiskers curls into the tightest ball you've ever seen. The storm will pass. She'll survive it in a sphere.")
+        random.shuffle(a_list)
+        return a_list
+
+    def get_whiskers_weather_update(self):
+        if len(self.__whiskers_weather_list) == 0:
+            self.__whiskers_weather_list = self.make_whiskers_weather_list()
+        return self.__whiskers_weather_list.pop()
+
+    def make_whiskers_morning_list(self):
+        a_list = []
+        a_list.append("Whiskers yawns, showing every single tiny fang. Good morning to you too.")
+        a_list.append("Whiskers stretches — front paws out, butt in the air, back arched. The morning yoga routine.")
+        a_list.append("Whiskers drops a dead bug on your chest to wake you up. Breakfast in bed, cat-style.")
+        a_list.append("Whiskers is already awake, sitting perfectly still on the dashboard, silhouetted against the sunrise. She looks regal.")
+        a_list.append("Whiskers paws at your face until you open your eyes. Then she walks away. She just wanted to know you were alive.")
+        a_list.append("Whiskers demands breakfast by walking across your face. Repeatedly.")
+        a_list.append("Whiskers sits on the hood of the car, watching the birds. Planning.")
+        a_list.append("Whiskers has been grooming herself since before dawn. Looking sharp for another day of doing nothing.")
+        random.shuffle(a_list)
+        return a_list
+
+    def get_whiskers_morning_update(self):
+        if len(self.__whiskers_morning_list) == 0:
+            self.__whiskers_morning_list = self.make_whiskers_morning_list()
+        return self.__whiskers_morning_list.pop()
+
+    # ==========================================
+    # LUCKY (THREE-LEGGED DOG) DAILY DIALOGUE
+    # ==========================================
+
+    def make_lucky_happy_list(self):
+        a_list = []
+        a_list.append("Lucky does a three-legged zoomie around the parking lot. He's missing a leg but not a care in the world.")
+        a_list.append("Lucky brings you a stick he found. Then he brings another. And another. Your car is filling with sticks.")
+        a_list.append("Lucky puts his head in your lap and sighs the most contented sigh you've ever heard. This is his happy place.")
+        a_list.append("Lucky's tail wags so hard it thumps against the car door like a drum. Ba-dum, ba-dum, ba-dum.")
+        a_list.append("Lucky licks your hand for a solid thirty seconds. Then your face. Then your ear. He's thorough.")
+        a_list.append("Lucky sees another dog through the window and loses his entire mind. FRIEND! FRIEND! FRIEND!")
+        a_list.append("Lucky rolls in something questionable outside and comes back grinning. He smells terrible. He's so happy.")
+        a_list.append("Lucky falls asleep mid-tail-wag. The tail just... stops. But his face is pure peace.")
+        a_list.append("Lucky chases his own tail. Well, tries to. Three legs make it more of a spiral. He doesn't care.")
+        a_list.append("Lucky digs a hole in the grass outside, buries absolutely nothing, and pats it down proudly. Job well done.")
+        a_list.append("Lucky steals your sock and parades around with it like he won a trophy.")
+        a_list.append("Lucky tries to fit on your lap. He does not fit. He doesn't care. He's on your lap now.")
+        random.shuffle(a_list)
+        return a_list
+
+    def get_lucky_happy_update(self):
+        if len(self.__lucky_happy_list) == 0:
+            self.__lucky_happy_list = self.make_lucky_happy_list()
+        return self.__lucky_happy_list.pop()
+
+    def make_lucky_unhappy_list(self):
+        a_list = []
+        a_list.append("Lucky whimpers softly, pressing his nose into the corner of the seat.")
+        a_list.append("Lucky won't eat. He just nudges the food bowl with his nose and walks away.")
+        a_list.append("Lucky lies with his chin on his paws, eyes open, staring at nothing. The light in them is dim.")
+        a_list.append("Lucky limps more than usual today. The phantom pain in his missing leg is acting up.")
+        a_list.append("Lucky doesn't wag his tail when you say his name. That's never happened before.")
+        a_list.append("Lucky tried to jump onto the seat and fell. He just lay there for a minute. You both pretended it didn't happen.")
+        a_list.append("Lucky flinches when you raise your hand. Old scars. Old memories. You move slowly, gently.")
+        a_list.append("Lucky looks at the door. Then at you. Then at the door. He's thinking about leaving. It breaks your heart.")
+        a_list.append("Lucky howls softly at night. Not at the moon. At nothing. At everything.")
+        a_list.append("Lucky licks the stump where his leg used to be. Over and over. Some wounds never fully heal.")
+        random.shuffle(a_list)
+        return a_list
+
+    def get_lucky_unhappy_update(self):
+        if len(self.__lucky_unhappy_list) == 0:
+            self.__lucky_unhappy_list = self.make_lucky_unhappy_list()
+        return self.__lucky_unhappy_list.pop()
+
+    def make_lucky_weather_list(self):
+        a_list = []
+        a_list.append("Lucky hates thunder. He crawls under the steering column and won't come out.")
+        a_list.append("Lucky presses his whole body against you during the storm. He's shaking. You hold him tight.")
+        a_list.append("Lucky barks at the lightning. Defending you from the sky itself.")
+        a_list.append("Lucky whines with every thunderclap, shoving his face deeper into your armpit.")
+        a_list.append("Lucky pants heavily in the rain. Not heat — anxiety. You rub his ears and whisper that it's okay.")
+        random.shuffle(a_list)
+        return a_list
+
+    def get_lucky_weather_update(self):
+        if len(self.__lucky_weather_list) == 0:
+            self.__lucky_weather_list = self.make_lucky_weather_list()
+        return self.__lucky_weather_list.pop()
+
+    def make_lucky_morning_list(self):
+        a_list = []
+        a_list.append("Lucky wakes you up by licking your entire face. Every inch. No corner untouched.")
+        a_list.append("Lucky is already sitting by the door when you wake up. Tail wagging. Ready for the day. You're not.")
+        a_list.append("Lucky stretches and yawns, tongue curling out impossibly far. Good morning, buddy.")
+        a_list.append("Lucky nudges your hand with his cold, wet nose. Time to get up. Time to pet him.")
+        a_list.append("Lucky stands guard by the window, watching the sunrise. Protecting you even from the morning.")
+        a_list.append("Lucky wags his tail so hard the whole car rocks. He dreamed of you. You can tell.")
+        a_list.append("Lucky brings you a shoe. Not because he fetched it. Because he wants you to get up and go outside with him.")
+        a_list.append("Lucky makes little wuffing sounds in his sleep. Chasing dream rabbits. Living his best unconscious life.")
+        random.shuffle(a_list)
+        return a_list
+
+    def get_lucky_morning_update(self):
+        if len(self.__lucky_morning_list) == 0:
+            self.__lucky_morning_list = self.make_lucky_morning_list()
+        return self.__lucky_morning_list.pop()
+
+    # ==========================================
+    # MR. PECKS (CROW) DAILY DIALOGUE
+    # ==========================================
+
+    def make_pecks_happy_list(self):
+        a_list = []
+        a_list.append("Mr. Pecks perches on the rearview mirror and caws triumphantly. He found something. It's a button. He's never been more proud.")
+        a_list.append("Mr. Pecks does a little hop-dance on the hood of the car. Left foot, right foot, spin. Encore!")
+        a_list.append("Mr. Pecks drops a shiny bottle cap in your hand, then puffs up his chest. A worthy tribute, apparently.")
+        a_list.append("Mr. Pecks mimics your car alarm perfectly. Scares the hell out of a passerby. He looks pleased.")
+        a_list.append("Mr. Pecks brings you a french fry he stole from someone's plate at the diner. Still warm. Crime pays.")
+        a_list.append("Mr. Pecks gently pulls at your hair. Not yanking. Grooming. You're part of his flock.")
+        a_list.append("Mr. Pecks plays a game where he drops a pebble and catches it before it hits the ground. Over and over. He never misses.")
+        a_list.append("Mr. Pecks sits on your shoulder, fluffs up his feathers, and closes his eyes. You're his favorite perch.")
+        a_list.append("Mr. Pecks caws at other birds until they fly away. This is HIS human. Back off.")
+        a_list.append("Mr. Pecks leaves a line of breadcrumbs leading to a quarter he found. Treasure map. X marks the spot.")
+        a_list.append("Mr. Pecks learned to knock on the window with his beak. Tap-tap-tap. Let me in. It's freezing out here.")
+        a_list.append("Mr. Pecks is having a full conversation with a group of crows outside. They keep looking at you. What are they saying?")
+        random.shuffle(a_list)
+        return a_list
+
+    def get_pecks_happy_update(self):
+        if len(self.__pecks_happy_list) == 0:
+            self.__pecks_happy_list = self.make_pecks_happy_list()
+        return self.__pecks_happy_list.pop()
+
+    def make_pecks_unhappy_list(self):
+        a_list = []
+        a_list.append("Mr. Pecks sits on the roof with his back to you. Hasn't moved in hours.")
+        a_list.append("Mr. Pecks drops a rock next to your head. Not AT you. Near you. A warning.")
+        a_list.append("Mr. Pecks won't take food from your hand anymore. He eats it off the ground instead. The disrespect.")
+        a_list.append("Mr. Pecks makes a low, guttural sound. Crow for 'I'm not happy with how things are going.'")
+        a_list.append("Mr. Pecks flies away for hours. You sit there wondering if he's coming back. He does. Barely.")
+        a_list.append("Mr. Pecks stops bringing you gifts. The shiny things dry up. The relationship is strained.")
+        a_list.append("Mr. Pecks sits on a telephone wire, watching you from a distance. Close enough to see. Far enough to leave.")
+        a_list.append("Mr. Pecks pecks at the window glass aggressively. Tap. Tap. TAP. Something's wrong.")
+        a_list.append("Mr. Pecks caws at you in a tone you haven't heard before. It sounds angry. Disappointed. Both.")
+        a_list.append("Mr. Pecks ruffles his feathers and looks small. He's not puffing up. He's deflating.")
+        random.shuffle(a_list)
+        return a_list
+
+    def get_pecks_unhappy_update(self):
+        if len(self.__pecks_unhappy_list) == 0:
+            self.__pecks_unhappy_list = self.make_pecks_unhappy_list()
+        return self.__pecks_unhappy_list.pop()
+
+    def make_pecks_weather_list(self):
+        a_list = []
+        a_list.append("Mr. Pecks tucks his head under his wing. The rain makes his feathers heavy.")
+        a_list.append("Mr. Pecks presses against the window from inside, watching the storm like it owes him money.")
+        a_list.append("Mr. Pecks paces back and forth on the dashboard during thunder. Agitated. Alert.")
+        a_list.append("Mr. Pecks fluffs up into a round ball of wet feathers. He looks miserable. And spherical.")
+        a_list.append("Mr. Pecks caws at the thunder like he can argue with it. He can't. He tries anyway.")
+        random.shuffle(a_list)
+        return a_list
+
+    def get_pecks_weather_update(self):
+        if len(self.__pecks_weather_list) == 0:
+            self.__pecks_weather_list = self.make_pecks_weather_list()
+        return self.__pecks_weather_list.pop()
+
+    def make_pecks_morning_list(self):
+        a_list = []
+        a_list.append("Mr. Pecks caws at sunrise. Every single morning. Your alarm clock has feathers.")
+        a_list.append("Mr. Pecks is already awake, arranging his collection of shiny objects on the dashboard. Inventory day.")
+        a_list.append("Mr. Pecks taps on the glass with his beak until you wake up. Persistent doesn't begin to describe it.")
+        a_list.append("Mr. Pecks drops a worm on the windshield. Breakfast delivery. He's looking at you expectantly.")
+        a_list.append("Mr. Pecks sits on the antenna, silhouetted against the dawn. He looks majestic. He knows it.")
+        a_list.append("Mr. Pecks is having a morning briefing with two other crows on the fence. They disperse when you wake up. Suspicious.")
+        a_list.append("Mr. Pecks preens his feathers methodically. Left wing. Right wing. Tail. A gentleman prepares for the day.")
+        a_list.append("Mr. Pecks has been awake for hours. Crows don't sleep much. He's been watching over you the whole time.")
+        random.shuffle(a_list)
+        return a_list
+
+    def get_pecks_morning_update(self):
+        if len(self.__pecks_morning_list) == 0:
+            self.__pecks_morning_list = self.make_pecks_morning_list()
+        return self.__pecks_morning_list.pop()
+
+    # ==========================================
+    # PATCHES (OPOSSUM) DAILY DIALOGUE
+    # ==========================================
+
+    def make_patches_happy_list(self):
+        a_list = []
+        a_list.append("Patches waddles over to you with her mouth slightly open. That's an opossum smile. You've learned to love it.")
+        a_list.append("Patches shows you her babies again. They're riding on her back, little pink noses poking out of her fur. A family.")
+        a_list.append("Patches doesn't play dead when you reach for her. That's trust. That's everything.")
+        a_list.append("Patches purrs in your lap. Yes, opossums purr. It sounds like a tiny outboard motor. It's perfect.")
+        a_list.append("Patches hangs from the rearview mirror by her tail, swinging gently. Her version of a hammock.")
+        a_list.append("Patches eats a piece of garbage you gave her like it's filet mignon. Closes her eyes. Savors it. Chef's kiss.")
+        a_list.append("Patches grooms your fingers one by one. Gentle nibbles. She's cleaning you. You're filthy, apparently.")
+        a_list.append("Patches does that thing where she opens her mouth and shows all 50 teeth. Terrifying to strangers. A smile to you.")
+        a_list.append("Patches falls asleep on your chest. Her heartbeat is surprisingly fast. Like a little drum. Alive. Here. Yours.")
+        a_list.append("Patches discovers a rotten banana and reacts like she's found the Holy Grail. Ecstatic. Euphoric. It's a banana.")
+        a_list.append("Patches lets her babies climb on you. Tiny opossum feet on your arms, your shoulders, your head. You are a playground.")
+        a_list.append("Patches sits in your palm and clicks her tongue happily. Opossum for 'I approve of you.'")
+        random.shuffle(a_list)
+        return a_list
+
+    def get_patches_happy_update(self):
+        if len(self.__patches_happy_list) == 0:
+            self.__patches_happy_list = self.make_patches_happy_list()
+        return self.__patches_happy_list.pop()
+
+    def make_patches_unhappy_list(self):
+        a_list = []
+        a_list.append("Patches plays dead again. She hasn't done that around you in weeks. Something's wrong.")
+        a_list.append("Patches drools more than usual. Stress drooling. Opossum anxiety is real.")
+        a_list.append("Patches retreats under the seat, curled into a tight ball. Won't uncurl. Won't eat.")
+        a_list.append("Patches bares all 50 teeth at you. This isn't a smile. You know the difference now.")
+        a_list.append("Patches hisses when you open the car door. She's scared. Of you? Of the world? Both?")
+        a_list.append("Patches hasn't come out since last night. Nocturnal by nature, but this feels different.")
+        a_list.append("Patches's babies are clinging to her tighter than usual. They sense her distress.")
+        a_list.append("Patches eats less than half her food. She pushes the rest away with her nose.")
+        a_list.append("Patches sits in the dark corner, eyes wide and glassy. Playing dead emotionally.")
+        a_list.append("Patches flinches at every sound. Hyper-alert. Her prey instincts are screaming.")
+        random.shuffle(a_list)
+        return a_list
+
+    def get_patches_unhappy_update(self):
+        if len(self.__patches_unhappy_list) == 0:
+            self.__patches_unhappy_list = self.make_patches_unhappy_list()
+        return self.__patches_unhappy_list.pop()
+
+    def make_patches_weather_list(self):
+        a_list = []
+        a_list.append("Patches curls into a ball so tight she's basically a sphere. Rain is not her thing.")
+        a_list.append("Patches sleeps through the entire storm. Nocturnal creatures give zero cares about daytime weather.")
+        a_list.append("Patches's babies huddle closer to her during the thunder. A family staying warm.")
+        a_list.append("Patches watches the rain from inside, nose twitching. She's not going out in THAT.")
+        a_list.append("Patches finds the driest, warmest spot in the entire car and claims it. Under your blanket. Against your side.")
+        random.shuffle(a_list)
+        return a_list
+
+    def get_patches_weather_update(self):
+        if len(self.__patches_weather_list) == 0:
+            self.__patches_weather_list = self.make_patches_weather_list()
+        return self.__patches_weather_list.pop()
+
+    def make_patches_morning_list(self):
+        a_list = []
+        a_list.append("Patches is just going to sleep as you're waking up. Ships passing in the night. Literally.")
+        a_list.append("Patches yawns, showing every single one of those 50 teeth. It never stops being terrifying.")
+        a_list.append("Patches stayed up all night watching over you. She's exhausted. But you're safe.")
+        a_list.append("Patches's babies are already asleep, piled on top of each other like a opossum pancake stack.")
+        a_list.append("Patches reluctantly opens one eye. The sun is her enemy. Mornings are an insult.")
+        a_list.append("Patches has been busy all night. There are tiny footprints on the dashboard. Everywhere.")
+        a_list.append("Patches found a stash of bugs during the night and left them for you. Breakfast. Thanks, Patches.")
+        a_list.append("Patches drags herself to her sleeping spot with the gravity of someone who's worked a double shift. Good night, girl.")
+        random.shuffle(a_list)
+        return a_list
+
+    def get_patches_morning_update(self):
+        if len(self.__patches_morning_list) == 0:
+            self.__patches_morning_list = self.make_patches_morning_list()
+        return self.__patches_morning_list.pop()
+
+    # ==========================================
+    # RUSTY (RACCOON) DAILY DIALOGUE
+    # ==========================================
+
+    def make_rusty_happy_list(self):
+        a_list = []
+        a_list.append("Rusty washes a grape in a puddle before eating it. Hygienic king. He's better than you.")
+        a_list.append("Rusty figured out how to unzip your bag. Again. He's rifling through it with those dexterous little paws.")
+        a_list.append("Rusty stacks coins into a tower, admires it, then knocks it over. Raccoon economics.")
+        a_list.append("Rusty brings you someone's wallet. 'Where did you get this, Rusty?' He says nothing. Because he's a raccoon.")
+        a_list.append("Rusty opens a jar of peanut butter you SWORE was sealed. Twist-off, apparently. For raccoon hands.")
+        a_list.append("Rusty stands on his hind legs and extends his tiny hands toward you. Arms up. Hug request. You oblige.")
+        a_list.append("Rusty organized all the loose change in the cup holder by denomination. You owe him an accounting degree.")
+        a_list.append("Rusty does the raccoon thing where he puts his hands on his face and looks at you through his fingers. Peek-a-boo.")
+        a_list.append("Rusty steals a donut from a stranger's hand through the window. Doesn't even flinch. Professional.")
+        a_list.append("Rusty has built a nest out of stolen napkins, receipts, and one very nice silk scarf. Where did the scarf come from, Rusty?")
+        a_list.append("Rusty tries to wash a sugar cube and looks confused when it dissolves. The betrayal on his face is heartbreaking.")
+        a_list.append("Rusty sits in your lap and holds your thumb with both paws. His hands are weirdly human. This is weirdly nice.")
+        random.shuffle(a_list)
+        return a_list
+
+    def get_rusty_happy_update(self):
+        if len(self.__rusty_happy_list) == 0:
+            self.__rusty_happy_list = self.make_rusty_happy_list()
+        return self.__rusty_happy_list.pop()
+
+    def make_rusty_unhappy_list(self):
+        a_list = []
+        a_list.append("Rusty stops stealing things. That's how you know it's bad. The crimes are on hold.")
+        a_list.append("Rusty chatters angrily and won't let you near his stash. He's hoarding. Stress behavior.")
+        a_list.append("Rusty washes his paws compulsively. Over and over. It's not about being clean anymore.")
+        a_list.append("Rusty knocks everything off every surface. This isn't playful. This is rage.")
+        a_list.append("Rusty bites your finger. Not hard. But enough. A warning.")
+        a_list.append("Rusty hides behind the spare tire with all his stolen goods. Fortress of solitude.")
+        a_list.append("Rusty returns everything he stole today and lines it up neatly. It feels like a goodbye.")
+        a_list.append("Rusty makes a sound you've never heard before. A low whine. Raccoon sadness sounds awful.")
+        a_list.append("Rusty doesn't wash his food. He just eats it dirty. Something is deeply wrong.")
+        a_list.append("Rusty sits in the dark, eyes reflecting like two green marbles. He doesn't blink.")
+        random.shuffle(a_list)
+        return a_list
+
+    def get_rusty_unhappy_update(self):
+        if len(self.__rusty_unhappy_list) == 0:
+            self.__rusty_unhappy_list = self.make_rusty_unhappy_list()
+        return self.__rusty_unhappy_list.pop()
+
+    def make_rusty_weather_list(self):
+        a_list = []
+        a_list.append("Rusty doesn't mind the rain. He stands outside washing things in the puddles. Living his best raccoon life.")
+        a_list.append("Rusty steals a passing stranger's umbrella. Drags it into the car. He's a problem solver.")
+        a_list.append("Rusty chatters at the thunder like he's arguing with it. Spoiler: he's losing.")
+        a_list.append("Rusty wraps himself in your jacket during the storm. The bandit mask pokes out from the collar. Adorable criminal.")
+        a_list.append("Rusty discovered that rain puddles are perfect for washing things. He's been outside for an hour. Come back, Rusty.")
+        random.shuffle(a_list)
+        return a_list
+
+    def get_rusty_weather_update(self):
+        if len(self.__rusty_weather_list) == 0:
+            self.__rusty_weather_list = self.make_rusty_weather_list()
+        return self.__rusty_weather_list.pop()
+
+    def make_rusty_morning_list(self):
+        a_list = []
+        a_list.append("Rusty is sitting on your chest when you wake up, holding a shiny coin an inch from your face. Morning offering.")
+        a_list.append("Rusty was busy all night. Your glove box is open. Your wallet is empty. There's a neat pile of coins on the dashboard.")
+        a_list.append("Rusty opens one eye, realizes it's morning, and goes back to sleep immediately. Raccoons are nocturnal. Respect it.")
+        a_list.append("Rusty has organized the entire car overnight. Everything is in piles. Raccoon piles. You don't understand the system.")
+        a_list.append("Rusty presents you with a breakfast he assembled: two crackers, a gummy bear, and a button. Gourmet.")
+        a_list.append("Rusty yawns, and his little bandit face scrunches up. Even his yawns look sneaky.")
+        a_list.append("Rusty already stole three things before you opened your eyes. His morning commute.")
+        a_list.append("Rusty is washing a blueberry in the cupholder water. Breakfast prep. He takes nutrition seriously.")
+        random.shuffle(a_list)
+        return a_list
+
+    def get_rusty_morning_update(self):
+        if len(self.__rusty_morning_list) == 0:
+            self.__rusty_morning_list = self.make_rusty_morning_list()
+        return self.__rusty_morning_list.pop()
+
+    # ==========================================
+    # SLICK (RAT) DAILY DIALOGUE
+    # ==========================================
+
+    def make_slick_happy_list(self):
+        a_list = []
+        a_list.append("Slick does a tiny popcorning hop across the dashboard. Hop. Hop. Hop. Pure rat joy.")
+        a_list.append("Slick bruxes so loud you can hear his teeth grinding from across the car. Happy rat purring.")
+        a_list.append("Slick runs up your arm, across your shoulders, down the other arm, and back again. Rat highway.")
+        a_list.append("Slick brings you a crumb. It's tiny. It's all he has. He's sharing it with you.")
+        a_list.append("Slick crawls into your sleeve and falls asleep against your forearm. Warm. Safe. Home.")
+        a_list.append("Slick boggling — his eyes are bulging in and out of his skull. It looks horrifying. It means he's ecstatic.")
+        a_list.append("Slick grooms your thumbnail with his tiny pink tongue. You are clean now. You're welcome.")
+        a_list.append("Slick plays with a ball of paper, tossing it in the air and catching it. Athlete of the year.")
+        a_list.append("Slick makes a nest out of shredded receipts and curls up in it. Interior designer. Minimalist.")
+        a_list.append("Slick sits on your shoulder and squeaks softly in your ear. He's telling you a secret. You'll never know what it is.")
+        a_list.append("Slick hangs upside down from your finger by his tail, looking at the world from a new angle.")
+        a_list.append("Slick learned to come when you whistle. He pokes his head out, whiskers twitching, then sprints to you.")
+        random.shuffle(a_list)
+        return a_list
+
+    def get_slick_happy_update(self):
+        if len(self.__slick_happy_list) == 0:
+            self.__slick_happy_list = self.make_slick_happy_list()
+        return self.__slick_happy_list.pop()
+
+    def make_slick_unhappy_list(self):
+        a_list = []
+        a_list.append("Slick hides in the glove box and won't come out. You can hear him breathing fast.")
+        a_list.append("Slick's ears are flat against his head. He's scared. Or sad. Probably both.")
+        a_list.append("Slick won't eat his food. Pushes the crumbs away. Turns his back.")
+        a_list.append("Slick bites you. Not hard. But he's never done that before. Something's wrong.")
+        a_list.append("Slick stays in the darkest corner of the car. Won't come into the light.")
+        a_list.append("Slick puffs up his fur. Making himself look bigger. But really he's just scared.")
+        a_list.append("Slick chatters his teeth — not the happy kind. The anxious kind. Rapid. Clicking.")
+        a_list.append("Slick grooms himself excessively. A bald spot is forming. Stress.")
+        a_list.append("Slick freezes when you reach for him. Completely still. Survival instinct. He doesn't trust right now.")
+        a_list.append("Slick squeaks in his sleep. Rat nightmares. You wish you could help.")
+        random.shuffle(a_list)
+        return a_list
+
+    def get_slick_unhappy_update(self):
+        if len(self.__slick_unhappy_list) == 0:
+            self.__slick_unhappy_list = self.make_slick_unhappy_list()
+        return self.__slick_unhappy_list.pop()
+
+    def make_slick_weather_list(self):
+        a_list = []
+        a_list.append("Slick doesn't mind rain. He's a rat. Rats are built for weather. He sleeps through it.")
+        a_list.append("Slick burrows deeper into his nest during the thunder. Not scared. Just... cautious.")
+        a_list.append("Slick presses against your neck during the storm. His little heart is hammering.")
+        a_list.append("Slick watches the rain from the window, nose twitching. Calculating the best routes through it.")
+        a_list.append("Slick squeaks every time thunder cracks. A protest. He's filing a formal complaint with the sky.")
+        random.shuffle(a_list)
+        return a_list
+
+    def get_slick_weather_update(self):
+        if len(self.__slick_weather_list) == 0:
+            self.__slick_weather_list = self.make_slick_weather_list()
+        return self.__slick_weather_list.pop()
+
+    def make_slick_morning_list(self):
+        a_list = []
+        a_list.append("Slick is nocturnal, but he adjusted his schedule for you. He's sitting on the dashboard, yawning. Morning, buddy.")
+        a_list.append("Slick pokes his head out of your pocket. Pink nose twitching. Eyes barely open. Not a morning rat.")
+        a_list.append("Slick already mapped three new escape routes while you were sleeping. Morning briefing accomplished.")
+        a_list.append("Slick brings you a seed he's been saving. It's his breakfast. He wants you to have it.")
+        a_list.append("Slick runs a perimeter check around the car. Checks every crack. Every hole. All clear, boss.")
+        a_list.append("Slick stretches his whole body out flat, then curls back up. Rat version of hitting snooze.")
+        a_list.append("Slick sits on the rearview mirror, cleaning his whiskers. Looking sharp for the day ahead.")
+        a_list.append("Slick squeaks once when you wake up. Just once. Good morning. Efficient communication.")
+        random.shuffle(a_list)
+        return a_list
+
+    def get_slick_morning_update(self):
+        if len(self.__slick_morning_list) == 0:
+            self.__slick_morning_list = self.make_slick_morning_list()
+        return self.__slick_morning_list.pop()
+
+    # ==========================================
+    # HOPPER (RABBIT) DAILY DIALOGUE
+    # ==========================================
+
+    def make_hopper_happy_list(self):
+        a_list = []
+        a_list.append("Hopper does a binky — a full-body twist in mid-air. Rabbit for 'LIFE IS INCREDIBLE.'")
+        a_list.append("Hopper flops on her side so dramatically you think she's dead. She's not. She's just... extremely content.")
+        a_list.append("Hopper zooms around the car at top speed, bouncing off the seats. Bunny NASCAR. She's winning.")
+        a_list.append("Hopper licks your hand over and over. Tiny sandpaper tongue. She's grooming you. You're her baby now.")
+        a_list.append("Hopper lets you rub her belly. Rabbits NEVER do this. You are chosen. You are blessed.")
+        a_list.append("Hopper nudges your hand with her nose until you pet her. Then she purrs. Yes, rabbits purr. Tooth purring.")
+        a_list.append("Hopper leaves little poops everywhere. Territorial marking. Every surface is hers. Including you.")
+        a_list.append("Hopper chinning your shoes, your bag, your jacket. Rubbing her scent on everything. You belong to Hopper.")
+        a_list.append("Hopper discovered a patch of clover outside and lost her entire mind. CLOVER! THE BEST DAY!")
+        a_list.append("Hopper sits in your lap, ears up, nose going a million miles an hour. Processing. Computing. Being rabbit.")
+        a_list.append("Hopper stacks her food pellets into a little pyramid. Then eats the pyramid. Architecture and lunch.")
+        a_list.append("Hopper binkies so hard she hits the ceiling. Not hurt. Just embarrassed. She looks at you. Say nothing.")
+        random.shuffle(a_list)
+        return a_list
+
+    def get_hopper_happy_update(self):
+        if len(self.__hopper_happy_list) == 0:
+            self.__hopper_happy_list = self.make_hopper_happy_list()
+        return self.__hopper_happy_list.pop()
+
+    def make_hopper_unhappy_list(self):
+        a_list = []
+        a_list.append("Hopper thumps her back foot hard. Once. Twice. Danger signal. She's warning the warren. There is no warren. Just you.")
+        a_list.append("Hopper won't eat. Not even the good pellets. Not even treats. She sits hunched, ears flat.")
+        a_list.append("Hopper grinds her teeth — the bad kind. The stressed kind. It sounds like gravel crunching.")
+        a_list.append("Hopper lunges when you reach into her space. Not trying to bite. Just scared. Back off.")
+        a_list.append("Hopper hides behind the spare tire. You can only see her nose twitching in the dark.")
+        a_list.append("Hopper digs at the car floor compulsively. Trying to burrow. Trying to escape. Trying to be anywhere but here.")
+        a_list.append("Hopper sits perfectly still, eyes wide, ears back. Frozen. The prey response. The world is too dangerous.")
+        a_list.append("Hopper stops binkying. No more flops. No more zooms. Just a still, small rabbit.")
+        a_list.append("Hopper pushes her food bowl away. Flips it over. Statement made.")
+        a_list.append("Hopper won't let you touch her. She flinches. You pull your hand back slowly. It hurts.")
+        random.shuffle(a_list)
+        return a_list
+
+    def get_hopper_unhappy_update(self):
+        if len(self.__hopper_unhappy_list) == 0:
+            self.__hopper_unhappy_list = self.make_hopper_unhappy_list()
+        return self.__hopper_unhappy_list.pop()
+
+    def make_hopper_weather_list(self):
+        a_list = []
+        a_list.append("Hopper thumps at every thunderclap. Warning you. DANGER! IT'S DANGER! She's not wrong, technically.")
+        a_list.append("Hopper burrows into your blanket so deep you can't find her. She'll come out when the sun does.")
+        a_list.append("Hopper presses against your side, ears flat. Rabbits are prey animals. Storms feel like predators.")
+        a_list.append("Hopper freezes completely during lightning. Statue mode. Even her nose stops twitching. That's serious.")
+        a_list.append("Hopper digs at the car floor frantically. She wants underground. She wants a burrow. You are the burrow.")
+        random.shuffle(a_list)
+        return a_list
+
+    def get_hopper_weather_update(self):
+        if len(self.__hopper_weather_list) == 0:
+            self.__hopper_weather_list = self.make_hopper_weather_list()
+        return self.__hopper_weather_list.pop()
+
+    def make_hopper_morning_list(self):
+        a_list = []
+        a_list.append("Hopper is already awake, nose twitching at 200 BPM. Rabbits are crepuscular. Dawn is her time.")
+        a_list.append("Hopper binkies as the first light hits the car. Morning celebration. A new day! More clover!")
+        a_list.append("Hopper nudges your face with her cold, wet nose until you wake up. Boop. Boop. BOOP.")
+        a_list.append("Hopper rearranged her bedding during the night into the perfect nest. Martha Stewart of rabbits.")
+        a_list.append("Hopper sits in the driver's seat watching the sunrise. Philosophical rabbit. Deep in thought. About carrots, probably.")
+        a_list.append("Hopper leaves a trail of little poops from her bed to your face. Morning breadcrumbs. Thanks, Hopper.")
+        a_list.append("Hopper tooth-purrs as you wake up. Rabbit for 'I'm happy you're still here.'")
+        a_list.append("Hopper does three binkies before you even sit up. Morning energy levels: maximum.")
+        random.shuffle(a_list)
+        return a_list
+
+    def get_hopper_morning_update(self):
+        if len(self.__hopper_morning_list) == 0:
+            self.__hopper_morning_list = self.make_hopper_morning_list()
+        return self.__hopper_morning_list.pop()
+
+    # ==========================================
+    # SQUIRRELLY (COMPANION SYSTEM) DAILY DIALOGUE
+    # ==========================================
+
+    def make_squirrelly_comp_happy_list(self):
+        a_list = []
+        a_list.append("Squirrelly is vibrating on the dashboard. Not sitting. Vibrating. The acorn energy is overwhelming.")
+        a_list.append("Squirrelly races around the car at impossible speed, leaping from seat to headrest to your shoulder to the mirror.")
+        a_list.append("Squirrelly buried sixteen acorns in your car this morning. SIXTEEN. You found two of them.")
+        a_list.append("Squirrelly presents you with the absolute perfect acorn. She inspected forty. This one made the cut.")
+        a_list.append("Squirrelly does the happy chatter — that rapid-fire clicking sound that means all is right in squirrel world.")
+        a_list.append("Squirrelly rides on your head while you walk. She likes the view from up there. You are a tree now.")
+        a_list.append("Squirrelly finds a sunbeam on the dashboard and melts into a flat pancake of warm squirrel happiness.")
+        a_list.append("Squirrelly climbs the outside of the car and sits on the roof. Queen of the world. King of the junkyard.")
+        a_list.append("Squirrelly plays with a bottle cap, spinning it with her paws. Simple pleasures. Best pleasures.")
+        a_list.append("Squirrelly stuffs her cheeks so full of seeds she can barely close her mouth. Storage capacity: maximum.")
+        a_list.append("Squirrelly grooms your eyebrows. They needed work, apparently. Squirrel salon, open for business.")
+        a_list.append("Squirrelly chirps at birds outside, and they chirp back. She's networking. Building connections.")
+        random.shuffle(a_list)
+        return a_list
+
+    def get_squirrelly_comp_happy_update(self):
+        if len(self.__squirrelly_comp_happy_list) == 0:
+            self.__squirrelly_comp_happy_list = self.make_squirrelly_comp_happy_list()
+        return self.__squirrelly_comp_happy_list.pop()
+
+    def make_squirrelly_comp_unhappy_list(self):
+        a_list = []
+        a_list.append("Squirrelly sits alone in the cup holder, clutching one acorn. She won't eat it. Won't share it. Just holds it.")
+        a_list.append("Squirrelly won't chatter. Won't chirp. Just sits there, tail limp, eyes empty.")
+        a_list.append("Squirrelly digs frantically at the floor. Trying to bury something. There's nothing to bury. The instinct is all she has left.")
+        a_list.append("Squirrelly flinches when you reach for her. Not because you hurt her. Because the world did.")
+        a_list.append("Squirrelly stares at the trees outside for hours. You wonder if she'd be happier out there. The thought is a knife.")
+        a_list.append("Squirrelly bites the inside of the glove box. Stress. Gnawing. Something's eating her and she's eating back.")
+        a_list.append("Squirrelly pushed all her acorns into a pile and hasn't touched them. The stash means nothing right now.")
+        a_list.append("Squirrelly's tail is puffed up. Not cute puffed. Scared puffed. Danger-alert puffed.")
+        a_list.append("Squirrelly hides in your shoe and won't come out. The shoe is safety. You are not. That hurts.")
+        a_list.append("Squirrelly makes a soft, sad squeak you've never heard before. It sounds like crying. Squirrels don't cry. Do they?")
+        random.shuffle(a_list)
+        return a_list
+
+    def get_squirrelly_comp_unhappy_update(self):
+        if len(self.__squirrelly_comp_unhappy_list) == 0:
+            self.__squirrelly_comp_unhappy_list = self.make_squirrelly_comp_unhappy_list()
+        return self.__squirrelly_comp_unhappy_list.pop()
+
+    def make_squirrelly_comp_weather_list(self):
+        a_list = []
+        a_list.append("Squirrelly does NOT like storms. She's in your shirt. Against your chest. Shaking.")
+        a_list.append("Squirrelly chatters angrily at the thunder. HOW DARE YOU. HOW DARE YOU RAIN ON MY ACORNS.")
+        a_list.append("Squirrelly hides in the glove box and builds a barricade of acorns. Fort Squirrelly. No entry.")
+        a_list.append("Squirrelly presses her whole body against the heater vent. Warmth is survival. Warmth is life.")
+        a_list.append("Squirrelly buries herself in your blanket with just her nose poking out. Only her nose braves the storm.")
+        random.shuffle(a_list)
+        return a_list
+
+    def get_squirrelly_comp_weather_update(self):
+        if len(self.__squirrelly_comp_weather_list) == 0:
+            self.__squirrelly_comp_weather_list = self.make_squirrelly_comp_weather_list()
+        return self.__squirrelly_comp_weather_list.pop()
+
+    def make_squirrelly_comp_morning_list(self):
+        a_list = []
+        a_list.append("Squirrelly drops an acorn on your face to wake you up. BONK. Good morning. Get up. It's acorn time.")
+        a_list.append("Squirrelly is already racing around the car at 5 AM. Squirrels don't do slow mornings.")
+        a_list.append("Squirrelly presents you with a perfectly arranged line of acorns. Your morning report. All acorns accounted for.")
+        a_list.append("Squirrelly sits on the steering wheel, chattering at the sunrise. Morning prayers. To the acorn gods.")
+        a_list.append("Squirrelly is reorganizing her stash. The acorn inventory must be updated daily. She takes this seriously.")
+        a_list.append("Squirrelly chirps exactly twice. Her way of saying 'we made it through another night.' You chirp back.")
+        a_list.append("Squirrelly is hanging upside down from the rearview mirror, eating a nut. Just absolutely living her best life.")
+        a_list.append("Squirrelly scurries up your arm the second you move. She was waiting. She's always waiting for you.")
+        random.shuffle(a_list)
+        return a_list
+
+    def get_squirrelly_comp_morning_update(self):
+        if len(self.__squirrelly_comp_morning_list) == 0:
+            self.__squirrelly_comp_morning_list = self.make_squirrelly_comp_morning_list()
+        return self.__squirrelly_comp_morning_list.pop()
+
 
     def make_sickness_list(self):
         a_list = []
@@ -2589,6 +4043,196 @@ class Lists:
     
     def get_rank_comment(self, rank):
         return random.choice(self.make_rank_comment_list(rank))
+
+    # ==========================================
+    # SLEEP FLAVOR TEXT SYSTEM
+    # ==========================================
+
+    def get_sleep_text(self, quality):
+        """Returns a random sleep flavor text based on sleep quality tier."""
+        texts = {
+            "refreshed": [
+                "You slept like a baby. A big, grown baby in a car, but a baby nonetheless.",
+                "That might have been the best sleep of your life. You feel incredible.",
+                "You wake up feeling like a million bucks. Well, maybe a few thousand bucks. But still great.",
+                "Your eyes pop open and you're ready to go. Did someone slip you a good dream? Because that was chef's kiss.",
+                "You stretch out and feel every vertebra in your spine crack in the most satisfying way. Today is going to be good.",
+                "You actually feel rested. Like, genuinely rested. This is what sleeping is supposed to feel like?",
+                "The sun hits your face through the windshield and you don't even mind. That's how good you feel.",
+                "You wake up smiling. When's the last time that happened? You can't remember, but it happened today.",
+                "That was some quality sleep. Five stars. Would sleep again.",
+                "You had a dream about winning at Blackjack. Then you woke up. But you still feel great.",
+                "Your body feels like it got a factory reset overnight. Joints? Smooth. Back? Fine. Mood? Immaculate.",
+                "You wake up and actually want to get out of the car. This is a historic moment.",
+                "Best night's sleep in a long time. You even folded your blanket. Who are you?",
+                "You slept so hard you forgot where you were for a second. That's the good kind of confusion.",
+                "You yawn, stretch, and feel genuinely alive. Not just surviving. Actually alive.",
+                "A bird is singing outside your car. You don't want to punch it. Progress.",
+                "You wake up with energy. Like, real energy. Not 'I didn't die in my sleep' energy.",
+                "Your neck doesn't hurt. Your back doesn't hurt. Nothing hurts. Is this a trap?",
+                "You slept so well that you're suspicious. Something this good can't be free.",
+                "You wake up refreshed and optimistic. The optimism will probably wear off by noon, but for now, you bask in it.",
+            ],
+            "well_rested": [
+                "Not bad. You slept pretty well, all things considered.",
+                "You wake up feeling fine. Not amazing, not terrible. Just... fine. And fine is fine.",
+                "A solid night's rest. Your body thanks you by not hurting for once.",
+                "You slept well enough to face whatever today throws at you. Probably.",
+                "You open your eyes and think, 'Alright, I can do this.' That's more enthusiasm than usual.",
+                "Decent sleep. You had one weird dream about a talking fish, but other than that, pretty standard.",
+                "You wake up without any new aches or pains. You'll take that as a win.",
+                "Your sleep was good. Not award-winning, but definitely a solid B+.",
+                "The morning light doesn't feel aggressive today. That's always a good sign.",
+                "You actually feel somewhat ready for the day. Miracles do happen.",
+                "You slept through the whole night. No weird noises, no nightmares. Just sleep. Wonderful, boring sleep.",
+                "You stretch and only one thing pops. That's a good ratio.",
+                "Woke up on the right side of the car seat. It's going to be a decent day.",
+                "Your dreams were forgettable, which is the best kind of dream when you live in a car.",
+                "You feel alright. 'Alright' is severely underrated.",
+                "Good enough sleep to not hate everything. That's the bar, and you cleared it.",
+                "You slept like someone who's getting used to sleeping in a car. Which you are.",
+                "Morning comes and you greet it without groaning. Small victories.",
+                "You wake up feeling functional. Not inspired. Functional. That's plenty.",
+                "Solid rest. You even had a pleasant dream, though you can't quite remember what it was about.",
+            ],
+            "decent": [
+                "You wake up. That's about all there is to report.",
+                "Sleep happened. You're alive. Moving on.",
+                "Your sleep was exactly average. Not worth mentioning, really. And yet, here we are.",
+                "You slept okay. Not great. Just okay. The most 'okay' sleep possible.",
+                "You wake up feeling the same as you did yesterday. Consistency, baby.",
+                "Another night in the car, another morning of existing. The cycle continues.",
+                "You didn't sleep great, but you didn't sleep terribly. The Switzerland of sleep.",
+                "Your body feels like it slept for exactly the amount it needed. Not a minute more.",
+                "You wake up and stare at the ceiling of your car for a moment before deciding to exist.",
+                "The sleep was there. It did its job. Barely.",
+                "You had a dream but forgot it immediately. Your subconscious is on a need-to-know basis.",
+                "You slept. That's the whole story. No drama. No excitement. Just sleep.",
+                "Your neck has a slight crick in it, but nothing a few shoulder rolls can't sort out.",
+                "An unremarkable night of sleep. You're becoming an expert at those.",
+                "You wake up with a neutral expression and a neutral mood. Neutral is your whole thing right now.",
+                "Sleep: completed. Enthusiasm: pending.",
+                "You open your eyes and feel nothing in particular. Peak Wednesday energy.",
+                "Your sleep was a solid C. Passing grade. Nothing to write home about.",
+                "You wake up and your first thought is 'meh.' Which is, honestly, better than most days.",
+                "The night passes without incident. You're alive and moderately functional. Good enough.",
+            ],
+            "restless": [
+                "You tossed and turned all night. The car seat has a permanent imprint of your frustration.",
+                "Sleep came in pieces. You'd doze off, wake up, doze off, wake up. Rinse and repeat.",
+                "You woke up three times during the night. Once because of a noise. Twice because your brain hates you.",
+                "Your sleep was choppy at best. You feel like you got about half the rest you needed.",
+                "You wake up already tired. That shouldn't be possible, and yet.",
+                "The night felt longer than it should have. Every hour crawled by like it had somewhere else to be.",
+                "You didn't sleep so much as you laid there with your eyes closed, pretending to sleep.",
+                "Your dreams kept waking you up. Rude of them, honestly.",
+                "You wake up with the distinct feeling that you just fought something in your sleep.",
+                "Sleep was... present? Technically? But not quality sleep. Dollar store sleep.",
+                "You feel groggy. Not dangerously groggy. Just enough to make everything slightly annoying.",
+                "Your pillow — well, your rolled-up jacket — did nothing for you last night.",
+                "You keep yawning as you get up. Your body is making a statement.",
+                "Last night's sleep was like a buffet where everything was slightly stale. Edible, but disappointing.",
+                "You wake up and immediately want to go back to sleep. But the sun has other plans.",
+                "Your eyes feel heavy. Your limbs feel heavier. Your motivation feels heaviest.",
+                "You spent half the night staring at the roof of your car. You've memorized every scratch.",
+                "Restless night. You're running on maybe 60% battery. That'll have to do.",
+                "You feel like you slept, but your body feels like you didn't. Your body might be lying.",
+                "The morning hits different when you're already exhausted. It hits worse.",
+            ],
+            "poor": [
+                "You barely slept. Your eyes feel like they've been replaced with sandpaper.",
+                "What even was last night? You're not sure you actually slept at all.",
+                "You wake up more tired than when you went to sleep. That's a talent.",
+                "Your body aches in places you didn't know could ache. The car seat is winning the war.",
+                "Sleep? What sleep? You laid there for eight hours and got maybe two hours of actual rest.",
+                "The bags under your eyes have bags. You look like a raccoon, and not the cute kind.",
+                "You wake up with a headache that seems personally offended by the morning light.",
+                "Last night was rough. Real rough. You feel like you got run over by a very slow, very persistent truck.",
+                "You're exhausted. The kind of exhausted where blinking feels like a workout.",
+                "Your brain is running on fumes. Coherent thought is a luxury you can't afford today.",
+                "Every muscle in your body is filing a formal complaint about last night.",
+                "You wake up and seriously consider whether 'just sleeping all day' is a viable life strategy.",
+                "The sun is too bright. The birds are too loud. Everything is too much. You're too tired.",
+                "You got up on the wrong side of the car. Both sides are wrong when you sleep this badly.",
+                "Your spine is staging a revolution. Your neck is the ringleader.",
+                "You feel like a phone at 8% battery. Functional, but don't push it.",
+                "Sleep deprivation is a hell of a drug. You're currently overdosing on it.",
+                "You stagger out of the car like a zombie. A zombie with joint pain. A geriatric zombie.",
+                "Last night was a war between you and sleep. Sleep won. You lost. Everyone lost.",
+                "You're so tired that you put your shirt on backwards and didn't notice until now.",
+            ],
+            "terrible": [
+                "You didn't sleep. You just... existed horizontally for a while.",
+                "Your body has entered survival mode. Sleep is a distant memory.",
+                "You wake up — wait, were you even asleep? The line between conscious and unconscious has blurred.",
+                "The sunrise is an insult. It's mocking you. 'Oh, you're still awake? Cool, here's MORE light.'",
+                "You've been awake so long that your thoughts are starting to echo.",
+                "Your eyes are open but nobody's home. The lights are on but the electricity bill hasn't been paid.",
+                "You feel like a wrung-out dishrag. The world's most exhausted, car-dwelling dishrag.",
+                "Getting up takes three attempts. The first two times, gravity wins.",
+                "You're running on spite and whatever's left of yesterday's willpower. It's not much.",
+                "Everything hurts. Not in a dramatic way. In a 'my entire body is begging for sleep' way.",
+                "Your brain is buffering. Please wait. Please wait. Please wait.",
+                "You look at yourself in the rearview mirror and genuinely don't recognize the person staring back.",
+                "Sleep didn't happen. What happened was a prolonged argument with your own consciousness.",
+                "You're so tired that the idea of standing up sounds like an extreme sport.",
+                "Your hands are shaking slightly. Not from fear. From pure, unadulterated exhaustion.",
+                "The car seat has betrayed you. The blanket has betrayed you. Your own eyelids have betrayed you.",
+                "You're functioning on zero sleep and maximum stubbornness. Stubbornness is all you have left.",
+                "You stare at the steering wheel for a full minute before remembering what it does.",
+                "Is this what being a ghost feels like? Just floating through existence? Because that's where you're at.",
+                "You're so exhausted that even your exhaustion is tired.",
+            ],
+            "wrecked": [
+                "You're not even sure you're awake right now. This could be a dream. A terrible, terrible dream.",
+                "Your body has gone on strike. Your brain is the lone scab crossing the picket line.",
+                "You haven't slept in what feels like years. Time has lost all meaning.",
+                "You see the sun rise and feel nothing. You are beyond feelings. You are a husk.",
+                "Your thoughts come in fragments. Disconnected. Random. Was that a squirrel? Focus. Focus.",
+                "You try to stand and your knees buckle. Not because they're weak. Because they've forgotten how.",
+                "The world looks fuzzy. Not in a cute way. In a 'your brain is shutting down' way.",
+                "You're running on negative sleep. You owe the universe hours of rest and it's collecting interest.",
+                "You hear a ringing in your ears. It's either exhaustion or you're dying. Could be both.",
+                "Your vision blurs and for a second, you think you see two suns. There's only one. Probably.",
+                "You haven't blinked in six minutes. You know this because you've been counting. Why are you counting?",
+                "Is the car moving? No. Is the ground moving? Also no. Then why is everything swaying?",
+                "You open the car door and forget what you were going to do. This happens four more times.",
+                "Sleep deprivation fact: after enough hours awake, your brain starts making stuff up. You're there.",
+                "You try to remember your name and it takes way longer than it should.",
+                "You're so tired that you hallucinated a bed. It was the car seat. It's always the car seat.",
+                "Your body is a machine that hasn't been serviced in years. Everything squeaks. Everything groans.",
+                "You contemplate whether it's possible to die of tiredness. The answer is yes, but you're too tired to die.",
+                "The sunrise looks like it's pulsing. It isn't. Your eyes are just giving up.",
+                "If exhaustion was currency, you'd be a millionaire. Unfortunately, it's not. You're still broke and tired.",
+            ],
+        }
+        return random.choice(texts.get(quality, texts["decent"]))
+
+    def get_fatigue_blocked_text(self):
+        """Returns flavor text when fatigue prevents the player from experiencing a day event."""
+        texts = [
+            "You're too exhausted to do much of anything this morning. You just sit in your car and zone out.",
+            "Your body refuses to cooperate. Whatever was about to happen, you're too tired for it.",
+            "An opportunity passes you by while you're half-asleep in your car. Oh well.",
+            "You see something interesting in the distance, but your legs refuse to carry you there.",
+            "You try to get up and do something, but exhaustion pins you to the seat like a paperweight.",
+            "Something happens nearby. You're too tired to even turn your head to look.",
+            "The universe tries to throw you a bone. You're too exhausted to catch it.",
+            "You spend the morning in a fog. Things happen around you. You are not part of them.",
+            "Your eyelids are so heavy that the entire morning passes in a blur of half-consciousness.",
+            "You had plans. Big plans. But exhaustion had bigger plans. Exhaustion won.",
+            "A stranger waves at you from the road. By the time you process what's happening, they're gone.",
+            "You miss something. You're not sure what, but you feel like you missed something.",
+            "You wake up, blink, and suddenly it's afternoon. Did you sleep through the whole morning?",
+            "Your brain is on power-saving mode. Only essential functions are available. Nothing is essential.",
+            "You try to participate in the day, but your body vetoes the motion. Motion denied.",
+            "The morning plays out like a movie you're watching through frosted glass. You're there, but you're not.",
+            "You open the car door, stare at the outside world for thirty seconds, and close it again. Not today.",
+            "Your body has entered 'do not disturb' mode. Nobody consulted you about this.",
+            "The day is happening whether you're ready or not. Spoiler: you're not.",
+            "You attempt consciousness. Consciousness politely declines.",
+        ]
+        return random.choice(texts)
     
     # ==========================================
     # DEALER GIFT REACTION SYSTEM
