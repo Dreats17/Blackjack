@@ -883,7 +883,6 @@ class AdventuresMixin:
             self.change_balance(pot)
         print("\n")
 
-
     # Nearly There Nights (900,000+)
     def woodlands_adventure(self):
         self.meet("Woodlands Adventure Event")
@@ -1283,8 +1282,6 @@ class AdventuresMixin:
             type.type("You rest beneath an ancient oak, listening to the wind in the leaves. Sometimes the greatest adventure is simply being still.")
             self.heal(random.randint(15, 30))
             print("\n")
-
-
 
     def swamp_adventure(self):
         self.meet("Swamp Adventure Event")
@@ -1855,8 +1852,6 @@ class AdventuresMixin:
             type.type("The dreams that come are strange and wild, but not unpleasant.")
             self.heal(random.randint(15, 30))
             print("\n")
-
-
 
     def beach_adventure(self):
         self.meet("Beach Adventure Event")

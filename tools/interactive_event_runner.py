@@ -64,31 +64,6 @@ def get_min_balance_for_rank(rank_name):
         "Nearly There": 900000
     }[rank_name]
 
-def set_conditions_for_event(player, event):
-    # Set up known conditions for specific events so they always play
-    # Add more as needed for your game logic
-    # Example: sore_throat requires not already having status
-    if event == "sore_throat":
-        if player.has_status("Sore Throat"):
-            player.remove_status("Sore Throat")
-    if event == "spider_bite":
-        if not player.has_danger("Spider"):
-            player.add_danger("Spider")
-        if player.has_status("Spider Bite"):
-            player.remove_status("Spider Bite")
-    if event == "ant_bite":
-        if not player.has_danger("Ant"):
-            player.add_danger("Ant")
-    if event == "got_a_cold":
-        if player.has_status("Cold"):
-            player.remove_status("Cold")
-    if event == "cold_gets_worse":
-        if not player.has_status("Cold"):
-            player.add_status("Cold")
-    if event == "hungry_cockroach":
-        if not player.has_danger("Cockroach"):
-            player.add_danger("Cockroach")
-    # Add more event-specific setup as needed
 
 def main():
     print("Blackjack Story Event Runner (Manual, Sorted, Direct)\n")
@@ -107,8 +82,6 @@ def main():
         player.set_balance(min_balance)
     elif hasattr(player, "_Player__balance"):
         setattr(player, "_Player__balance", min_balance)
-
-    set_conditions_for_event(player, event)
 
     print(f"\nRunning event: {event}\n")
     if hasattr(player, event):

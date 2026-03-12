@@ -757,6 +757,9 @@ class SystemsMixin:
         self._met.add(person)
         self._statistics["people_met"] += 1
 
+    def mark_met(self, person):
+        self._met.add(person)
+
     def has_met(self, person):
         return person in self._met
 
@@ -1104,8 +1107,16 @@ class SystemsMixin:
     # COMPANION SYSTEM
     # ==========================================
     
-    def add_companion(self, name, companion_type):
+    def add_companion(self, name, companion_type=None):
         """Add a new companion"""
+        default_types = {
+            "Patches": "Opossum",
+            "Rusty": "Raccoon",
+            "Slick": "Rat",
+            "Hopper": "Rabbit",
+        }
+        if companion_type is None:
+            companion_type = default_types.get(name, "Unknown")
         if name not in self._companions:
             self._companions[name] = {
                 "type": companion_type,

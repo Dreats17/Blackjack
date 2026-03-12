@@ -1,0 +1,351 @@
+========================================================================================
+Cycle 01 | Day 2
+State   $ 50 -> 45 (-$5) | HP 100 -> 100 (+0) | SAN 100 -> 100 (+0) | Rank 0 -> 0 | Car N
+Events  storyline:jameson:stage0, met:Cowboy, night:chase_the_rabbit
+Polarity neutral
+Changes +items=['Carrot'] | +story=['jameson']
+Stats   days_survived +1, people_met +1
+Gamble  total_hands +3, wins +1, losses +2, total_won +$4, total_lost +$9
+========================================================================================
+Cycle 02 | Day 3
+State   $ 45 -> 41 (-$4) | HP 100 -> 95 (-5) | SAN 100 -> 97 (-3) | Rank 0 -> 0 | Car N
+Events  storyline:stray_cat:stage0, night:insomnia_night
+Polarity negative
+Changes +story=['stray_cat']
+Stats   days_survived +1
+Gamble  total_hands +3, wins +1, losses +2, busts +1, total_won +$4, total_lost +$8
+========================================================================================
+Cycle 03 | Day 4
+State   $ 41 -> 141 (+$100) | HP 95 -> 98 (+3) | SAN 97 -> 97 (+0) | Rank 0 -> 0 | Car N
+Events  day:the_glitch, day:the_empty_room, day:rock_bottom, day:walking_stick_hike, day:rain_on_the_roof, night:woodlands_path, met:Woodlands Path Event, night:ditched_wallet
+Polarity positive
+Changes none
+Stats   days_survived +1, people_met +1
+Gamble  total_hands +3, wins +1, losses +1, ties +1, blackjacks +1, total_won +$6, total_lost +$4
+========================================================================================
+Cycle 04 | Day 5
+State   $ 141 -> 100 (-$41) | HP 98 -> 100 (+2) | SAN 97 -> 85 (-12) | Rank 0 -> 0 | Car N
+Events  storyline:martinez:stage0, met:Martinez
+Polarity negative
+Changes +travel=['Wasted Afternoon'] | +story=['martinez']
+Stats   days_survived +1, people_met +1
+Gamble  total_hands +3, wins +1, losses +2, total_won +$41, total_lost +$82
+========================================================================================
+Cycle 05 | Day 6
+State   $ 100 -> 55 (-$45) | HP 100 -> 100 (+0) | SAN 85 -> 81 (-4) | Rank 0 -> 0 | Car N
+Events  storyline:kyle:stage0, met:Kyle
+Polarity negative
+Changes -travel=['Wasted Afternoon'] | +story=['kyle']
+Stats   days_survived +1, people_met +1
+Gamble  total_hands +3, wins +1, losses +2, total_won +$10, total_lost +$55
+========================================================================================
+Cycle 06 | Day 7
+State   $ 55 -> 57 (+$2) | HP 100 -> 100 (+0) | SAN 81 -> 83 (+2) | Rank 0 -> 0 | Car N
+Events  storyline:phil:stage0, met:Interrogator, night:stargazing
+Polarity positive
+Changes +story=['phil']
+Stats   days_survived +1, people_met +1
+Gamble  total_hands +3, wins +2, losses +1, total_won +$8, total_lost +$6
+========================================================================================
+Cycle 07 | Day 8
+State   $ 57 -> 55 (-$2) | HP 100 -> 100 (+0) | SAN 83 -> 65 (-18) | Rank 0 -> 0 | Car N
+Events  storyline:gas_station_hero:stage0, night:nightmare_of_losing
+Polarity negative
+Changes +story=['gas_station_hero']
+Stats   days_survived +1
+Gamble  total_hands +3, wins +2, losses +1, busts +1, total_won +$12, total_lost +$14
+========================================================================================
+Cycle 08 | Day 9
+State   $ 55 -> 34 (-$21) | HP 100 -> 60 (-40) | SAN 65 -> 41 (-24) | Rank 0 -> 0 | Car N
+Events  storyline:carnival:stage0, met:Carnival, night:drowning_dream
+Polarity negative
+Changes +story=['carnival']
+Stats   days_survived +1, people_met +1
+Gamble  total_hands +3, wins +1, losses +2, busts +1, total_won +$5, total_lost +$11
+========================================================================================
+Cycle 09 | Day 10
+State   $ 34 -> 31 (-$3) | HP 60 -> 51 (-9) | SAN 41 -> 41 (+0) | Rank 0 -> 0 | Car N
+Events  storyline:kyle:stage1, night:went_jogging
+Polarity negative
+Changes +injuries=['Scraped Knee']
+Stats   days_survived +1
+Gamble  total_hands +3, losses +2, ties +1, busts +1, total_lost +$6
+========================================================================================
+Cycle 10 | Day 11
+State   $ 31 -> 34 (+$3) | HP 51 -> 53 (+2) | SAN 41 -> 40 (-1) | Rank 0 -> 0 | Car N
+Events  storyline:martinez:stage1, night:raccoon_invasion
+Polarity positive
+Changes none
+Stats   days_survived +1
+Gamble  total_hands +3, wins +1, losses +2, blackjacks +1, busts +1, total_won +$6, total_lost +$4
+========================================================================================
+Cycle 11 | Day 12
+State   $ 34 -> 45 (+$11) | HP 53 -> 70 (+17) | SAN 40 -> 48 (+8) | Rank 0 -> 0 | Car N
+Events  storyline:carnival:stage1, met:Fortune Told, night:peaceful_night
+Polarity positive
+Changes +items=['Carnival Token']
+Stats   days_survived +1, people_met +1
+Gamble  total_hands +3, wins +2, losses +1, blackjacks +1, busts +1, total_won +$18, total_lost +$7
+========================================================================================
+Cycle 12 | Day 13
+State   $ 45 -> 93 (+$48) | HP 70 -> 74 (+4) | SAN 48 -> 53 (+5) | Rank 0 -> 0 | Car N
+Events  storyline:mime:stage0, met:Mime, night:midnight_walk
+Polarity positive
+Changes +story=['mime']
+Stats   days_survived +1, people_met +1
+Gamble  total_hands +3, wins +2, losses +1, busts +1, total_won +$58, total_lost +$10
+========================================================================================
+Cycle 13 | Day 14
+State   $ 93 -> 12 (-$81) | HP 74 -> 79 (+5) | SAN 53 -> 47 (-6) | Rank 0 -> 0 | Car N
+Events  storyline:carnival:stage2, night:nice_dream
+Polarity neutral
+Changes -items=['Carnival Token']
+Stats   days_survived +1
+Gamble  total_hands +3, losses +3, busts +2, total_lost +$81
+========================================================================================
+Cycle 14 | Day 15
+State   $ 12 -> 12 (+$0) | HP 79 -> 76 (-3) | SAN 47 -> 31 (-16) | Rank 0 -> 0 | Car N
+Events  storyline:sleep_paralysis:stage0, met:Sleep Paralysis, night:stray_cat_returns, night:nightmare
+Polarity negative
+Changes +story=['sleep_paralysis']
+Stats   days_survived +1, people_met +1
+Gamble  total_hands +3, wins +1, losses +1, ties +1, blackjacks +1, total_won +$6, total_lost +$6
+========================================================================================
+Cycle 15 | Day 16
+State   $ 12 -> 9 (-$3) | HP 76 -> 80 (+4) | SAN 31 -> 34 (+3) | Rank 0 -> 0 | Car N
+Events  storyline:dealer_past:stage0, met:Dealer Photo, night:dream_of_winning
+Polarity positive
+Changes +story=['dealer_past']
+Stats   days_survived +1, people_met +1
+Gamble  total_hands +3, wins +1, losses +2, busts +2, total_won +$6, total_lost +$10
+========================================================================================
+Cycle 16 | Day 17
+State   $ 9 -> 2 (-$7) | HP 80 -> 82 (+2) | SAN 34 -> 15 (-19) | Rank 0 -> 0 | Car N
+Events  storyline:jameson:stage1, night:stray_cat_dies, day:mirror_stranger
+Polarity negative
+Changes none
+Stats   days_survived +1
+Gamble  total_hands +3, losses +3, total_lost +$7
+========================================================================================
+Cycle 17 | Day 18
+State   $ 2 -> 1 (-$1) | HP 82 -> 84 (+2) | SAN 15 -> 13 (-2) | Rank 0 -> 0 | Car N
+Events  storyline:kyle:stage2, night:nice_dream
+Polarity positive
+Changes none
+Stats   days_survived +1
+Gamble  total_hands +3, wins +1, losses +2, total_won +$1, total_lost +$2
+========================================================================================
+Cycle 18 | Day 19
+State   $ 1 -> 0 (-$1) | HP 84 -> 99 (+15) | SAN 13 -> 46 (+33) | Rank 0 -> 0 | Car N
+Events  storyline:bridge_angel:stage0, night:peaceful_night
+Polarity positive
+Changes none
+Stats   days_survived +1
+Gamble  total_hands +3, wins +1, losses +1, ties +1, blackjacks +1, total_lost +$1
+Result  player hit $0 during cycle 18
+
+########################################################################################
+Run Summary | cycles_requested=60 | seed=6
+Final    Day 19 | $ 0 | HP 99 | SAN 46 | Rank 0 | Alive=True
+Peak     $ 141 | Rank 0
+Peak days    4
+Inventory   ['Carrot']
+Has car            False
+Ever had car       False
+Has map            False
+Has worn map       False
+Has marvin access  False
+Millionaire reached False
+Millionaire visited False
+Death cause        None
+Injuries    ['Scraped Knee']
+Status      []
+Pawned items []
+Pawned count 0
+Companions  []
+Travel restrictions  []
+Broken items        []
+Repairing items     []
+Storylines active     ['carnival', 'dealer_past', 'gas_station_hero', 'jameson', 'kyle', 'martinez', 'mime', 'phil', 'sleep_paralysis', 'stray_cat']
+Storylines completed  []
+Storylines failed     []
+Mechanic intro decisions
+  none
+
+Fallback decisions
+  none
+
+Event polarity
+  positive 26
+  negative 20
+  neutral 5
+
+Item impact
+  Carnival Token hits=2 pos=1 neg=0 neu=1 cash=-70 hp=+22 san=+2
+  Carrot hits=1 pos=0 neg=0 neu=1 cash=-5 hp=+0 san=+0
+
+Marvin provenance
+  none
+
+Planner traces
+  goals acquire_car=122
+  cycle=17 day=17 goal=acquire_car action=1 confidence=0.88 reason=goal=acquire_car blackjack_bet phase=car_rush survival=True edge=0
+  cycle=17 day=17 goal=acquire_car action=stand confidence=0.92 reason=goal=acquire_car blackjack_action=stand total=14 soft=0 dealer=2
+  cycle=17 day=18 goal=acquire_car action=no confidence=0.88 reason=threat_context_refusal
+  cycle=18 day=18 goal=acquire_car action=1 confidence=0.88 reason=goal=acquire_car blackjack_bet phase=car_rush survival=True edge=0
+  cycle=18 day=18 goal=acquire_car action=stand confidence=0.92 reason=goal=acquire_car blackjack_action=stand total=19 soft=0 dealer=10
+  cycle=18 day=18 goal=acquire_car action=stand confidence=0.92 reason=goal=acquire_car blackjack_action=stand total=17 soft=0 dealer=7
+  cycle=18 day=18 goal=acquire_car action=0 confidence=0.95 reason=goal=acquire_car blackjack_bet_empty_bankroll
+  cycle=18 day=? goal=acquire_car action=call for help confidence=0.80 reason=call_for_help
+
+Route visibility
+  none
+
+Event Distribution | day
+    1  mirror_stranger
+    1  rain_on_the_roof
+    1  rock_bottom
+    1  the_empty_room
+    1  the_glitch
+    1  walking_stick_hike
+
+Event Distribution | night
+    2  nice_dream
+    2  peaceful_night
+    1  chase_the_rabbit
+    1  ditched_wallet
+    1  dream_of_winning
+    1  drowning_dream
+    1  insomnia_night
+    1  midnight_walk
+    1  nightmare
+    1  nightmare_of_losing
+    1  raccoon_invasion
+    1  stargazing
+    1  stray_cat_dies
+    1  stray_cat_returns
+    1  went_jogging
+    1  woodlands_path
+
+Event Distribution | storyline
+    1  bridge_angel:stage0
+    1  carnival:stage0
+    1  carnival:stage1
+    1  carnival:stage2
+    1  dealer_past:stage0
+    1  gas_station_hero:stage0
+    1  jameson:stage0
+    1  jameson:stage1
+    1  kyle:stage0
+    1  kyle:stage1
+    1  kyle:stage2
+    1  martinez:stage0
+    1  martinez:stage1
+    1  mime:stage0
+    1  phil:stage0
+    1  sleep_paralysis:stage0
+    1  stray_cat:stage0
+
+Event Distribution | met
+    1  Carnival
+    1  Cowboy
+    1  Dealer Photo
+    1  Fortune Told
+    1  Interrogator
+    1  Kyle
+    1  Martinez
+    1  Mime
+    1  Sleep Paralysis
+    1  Woodlands Path Event
+
+Event Distribution | location
+  none
+
+Event Distribution | all
+    2  night:nice_dream
+    2  night:peaceful_night
+    1  day:mirror_stranger
+    1  day:rain_on_the_roof
+    1  day:rock_bottom
+    1  day:the_empty_room
+    1  day:the_glitch
+    1  day:walking_stick_hike
+    1  met:Carnival
+    1  met:Cowboy
+    1  met:Dealer Photo
+    1  met:Fortune Told
+    1  met:Interrogator
+    1  met:Kyle
+    1  met:Martinez
+    1  met:Mime
+    1  met:Sleep Paralysis
+    1  met:Woodlands Path Event
+    1  night:chase_the_rabbit
+    1  night:ditched_wallet
+    1  night:dream_of_winning
+    1  night:drowning_dream
+    1  night:insomnia_night
+    1  night:midnight_walk
+    1  night:nightmare
+    1  night:nightmare_of_losing
+    1  night:raccoon_invasion
+    1  night:stargazing
+    1  night:stray_cat_dies
+    1  night:stray_cat_returns
+    1  night:went_jogging
+    1  night:woodlands_path
+    1  storyline:bridge_angel:stage0
+    1  storyline:carnival:stage0
+    1  storyline:carnival:stage1
+    1  storyline:carnival:stage2
+    1  storyline:dealer_past:stage0
+    1  storyline:gas_station_hero:stage0
+    1  storyline:jameson:stage0
+    1  storyline:jameson:stage1
+
+Final Statistics
+  days_survived          18
+  total_money_earned     0
+  total_money_spent      0
+  items_collected        0
+  items_sold             0
+  events_experienced     0
+  people_met             10
+  injuries_sustained     0
+  illnesses_contracted   0
+  near_death_experiences 0
+  companions_befriended  0
+  loans_taken            0
+  loans_repaid           0
+  times_robbed           0
+  times_hospitalized     0
+  mechanic_visits        0
+  doctor_visits          0
+  witch_doctor_visits    0
+  casino_visits          0
+  pawn_shop_visits       0
+  marvin_visits          0
+  loan_shark_visits      0
+
+Final Gambling Statistics
+  total_hands            54
+  wins                   19
+  losses                 31
+  blackjacks             5
+  busts                  11
+  ties                   4
+  biggest_win            41
+  biggest_loss           50
+  current_streak         1
+  best_win_streak        4
+  worst_loss_streak      5
+  total_won              185
+  total_lost             323
+  double_downs_won       0
+  splits_won             0
+  surrenders_used        0
+  insurance_collected    0
+
+NO ERRORS
+
+NO WARNINGS

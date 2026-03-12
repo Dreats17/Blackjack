@@ -89,6 +89,15 @@ class Deck:
                 self.__deck.append(ace)
                 return True
         return False
+
+    def find_and_move_value_to_top(self, values):
+        target_values = set(values)
+        for i, card in enumerate(self.__deck):
+            if card.value() in target_values:
+                chosen_card = self.__deck.pop(i)
+                self.__deck.append(chosen_card)
+                return True
+        return False
     
 class Card:
     __slots__ = ["__name", "__suit", "__value"]

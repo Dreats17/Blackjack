@@ -613,6 +613,8 @@ class NightEventsMixin:
             type.type("Do you approach the witch's shack?")
             choice = ask.yes_or_no()
             if choice == "yes":
+                if not self.has_met("Witch"):
+                    self.meet("Witch")
                 type.type("You climb the rickety ladder. The witch is ancient, her skin like dried leather, but her eyes are sharp and knowing. ")
                 type.type("She's stirring a pot that smells like... chicken soup?")
                 print("\n")
@@ -792,6 +794,8 @@ class NightEventsMixin:
             type.type("Do you ask her for help, ask her what she's selling, or swim away?")
             choice = input("(help/buy/swim): ").strip().lower()
             if choice == "help":
+                if not self.has_met("Witch"):
+                    self.meet("Witch")
                 type.type(quote("Help don't come free in these waters. But I like your face. Grab on."))
                 print("\n")
                 type.type("She pulls you into her boat and poles you to shore. As you climb out, she hands you something - a small bundle of herbs tied with red string.")
@@ -800,6 +804,8 @@ class NightEventsMixin:
                 self.add_item("Witch's Ward")
                 print("\n")
             elif choice == "buy":
+                if not self.has_met("Witch"):
+                    self.meet("Witch")
                 type.type("She grins, revealing teeth filed to points.")
                 print("\n")
                 type.type(quote("I sell charms. Luck, love, revenge. What's your poison?"))

@@ -1,0 +1,474 @@
+import random
+import time
+import sys
+import typer
+import msvcrt
+from colorama import Fore, Back, Style, init
+init(convert=True)
+
+PAR = "\n\n"
+
+type = typer.Type()
+ask = typer.Ask()
+
+# all the pretty colors
+def red(text):
+    return (Fore.RED + text + Fore.WHITE)
+
+def green(text):
+    return (Fore.GREEN + text + Fore.WHITE)
+            
+def magenta(text):
+    return (Fore.MAGENTA + text + Fore.WHITE)
+
+def yellow(text):
+    return (Fore.YELLOW + text + Fore.WHITE)
+
+def cyan(text):
+    return (Fore.CYAN + text + Fore.WHITE)
+            
+def bright(text):
+    return (Style.BRIGHT + text + Style.NORMAL)
+
+def italic(text):
+    return (Style.DIM + text + Style.NORMAL)
+
+def item(text):
+    return magenta(bright(text))
+
+def open_quote(text):
+    return ("\"" + text)
+
+def close_quote(text):
+    return (text + "\"")
+
+def quote(text):
+    return ("\"" + text + "\"")
+
+def space_quote(text):
+    return ("\"" + text + "\" ")
+
+class DaySurrealMixin:
+    """Surreal events: meta, absurd, and fourth-wall-breaking moments"""
+
+    def sock_puppet_therapist(self):
+        # EVENT: Man with sock puppet "Dr. Socksworth" offers therapy (low sanity only)
+        # CONDITION: Sanity < 60
+        # EFFECTS: Accept = pour heart out, +15 sanity; Refuse = -2 sanity from judgment
+        if self.get_sanity() >= 60:
+            self.day_event()
+            return
+        type.type("You step out of your car and a man sits down next to you on the curb. He has a sock puppet on his hand. It's wearing tiny glasses.")
+        print("\n")
+        type.type("The puppet turns to you. " + quote("You look troubled. Want to talk about it?"))
+        print("\n")
+        type.type("You're about to walk away when the man speaks: " + quote("Dr. Socksworth is a licensed therapist. Technically."))
+        print("\n")
+        answer = ask.yes_or_no("Talk to... Dr. Socksworth? ")
+        if answer == "yes":
+            type.type("You pour your heart out to a sock puppet. This is your life now.")
+            print("\n")
+            type.type("Dr. Socksworth listens attentively. " + quote("Mm-hmm. Yes. I see. And how does that make you feel?"))
+            print("\n")
+            type.type("Somehow, against all odds, you feel BETTER.")
+            print("\n")
+            type.type("The sock puppet gives you a tiny pamphlet: 'COPING MECHANISMS FOR GAMBLERS: A SOCK'S GUIDE'")
+            print("\n")
+            type.type("You keep it. It's strangely helpful.")
+            self.restore_sanity(15)
+        else:
+            type.type("You walk away. Dr. Socksworth calls after you:")
+            print("\n")
+            type.type(quote("RUNNING FROM YOUR PROBLEMS WON'T SOLVE ANYTHING!"))
+            print("\n")
+            type.type("A sock has never made you feel so judged.")
+            self.lose_sanity(2)
+        print("\n")
+
+    # WEIRD EVENTS
+
+    def time_loop(self):
+        # EVENT: Experience the same morning 3 times, must break the loop
+        # EFFECTS: Save bird = +$50, meet "Time Bird"; Ignore phone = +5 sanity; Scream = -5 sanity
+        type.type("The clock on your car dashboard says 8:47 AM.")
+        print("\n")
+        type.type("You go to brush your teeth. A bird hits the window. Your phone buzzes.")
+        print("\n")
+        type.type("You wake up. The clock says 8:47 AM.")
+        print("\n")
+        type.type("Wait. What?")
+        print("\n")
+        type.type("You go to brush your teeth. You KNOW a bird is about to hit the window. It does. Your phone buzzes.")
+        print("\n")
+        type.type("You wake up. The clock says 8:47 AM.")
+        print("\n")
+        type.type("This is the third time. You're sure of it now.")
+        print("\n")
+        answer = ask.option("What do you do differently? ", ["save the bird", "ignore your phone", "scream"])
+        if answer == "save the bird":
+            type.type("You stand at the window, waiting. The bird approaches. You OPEN the window!")
+            print("\n")
+            type.type("The bird flies through, circles your head, and drops something shiny before flying away.")
+            print("\n")
+            type.type("A golden coin. Worth " + green(bright("$50")) + ". The loop breaks.")
+            self.change_balance(50)
+            self.meet("Time Bird")
+        elif answer == "ignore your phone":
+            type.type("You don't check your phone. The buzzing stops. The loop... freezes.")
+            print("\n")
+            type.type("For a moment, time itself seems to hold its breath.")
+            print("\n")
+            type.type("Then everything resumes. Normal. But you remember all three loops.")
+            self.restore_sanity(5)
+        else:
+            type.type("You SCREAM at 8:47 AM. The neighbors probably hate you.")
+            print("\n")
+            type.type("But it works! The loop shatters. You stumble forward, free.")
+            print("\n")
+            type.type("You've lost 3 hours somewhere. Or gained them? Time is weird now.")
+            self.lose_sanity(5)
+        print("\n")
+
+    def mirror_stranger(self):
+        # EVENT: Your reflection acts independently and holds up a sign saying "SOON"
+        # EFFECTS: 30% find encouraging note from reflection (+5 sanity); 70% avoid mirrors all day (-8 sanity)
+        type.type("You catch your reflection in the car mirror. It smiles.")
+        print("\n")
+        type.type("You're not smiling.")
+        print("\n")
+        type.type("The reflection waves. You don't move your hand.")
+        print("\n")
+        type.type("It holds up a sign. Written in what might be blood: 'SOON.'")
+        print("\n")
+        type.type("You blink. The reflection is normal again. Just you, looking terrified.")
+        print("\n")
+        if random.random() < 0.3:
+            type.type("In the back seat, you notice something that wasn't there before.")
+            type.type(" A note, in your own handwriting: 'You're doing fine. Keep going.'")
+            print("\n")
+            type.type("Did the reflection... leave it?")
+            self.restore_sanity(5)
+        else:
+            type.type("You avoid mirrors for the rest of the day. Just to be safe.")
+            self.lose_sanity(8)
+        print("\n")
+
+    def the_glitch(self):
+        # EVENT: Reality glitches around you (low sanity only)
+        # CONDITION: Sanity < 50
+        # EFFECTS: Random - money change (-$100 to +$200), health (-15 to +25), time skip, or identity confusion (-10 sanity)
+        if self.get_sanity() >= 50:
+            self.day_event()
+            return
+        type.type("Sitting in your car, reality... stutters.")
+        print("\n")
+        type.type("The colors around you shift. Blue becomes green. Green becomes screaming.")
+        print("\n")
+        type.type("Wait, that's not right.")
+        print("\n")
+        type.type("You look at your hands. You have seven fingers. No, six. No, the normal amount. Maybe.")
+        print("\n")
+        glitch = random.choice(["money", "health", "time", "identity"])
+        if glitch == "money":
+            change = random.randint(-100, 200)
+            if change >= 0:
+                type.type("Your wallet glitches. Suddenly, there's more money in it. " + green(bright("+$" + str(change))))
+                self.change_balance(change)
+            else:
+                type.type("Your wallet glitches. Some of your money is gone. " + red(str(change)))
+                self.change_balance(change)
+        elif glitch == "health":
+            change = random.randint(-15, 25)
+            if change >= 0:
+                type.type("Your body glitches. You feel BETTER than before. " + green(bright("+" + str(change) + " HP")))
+                self.heal(change)
+            else:
+                type.type("Your body glitches. Something hurts now. " + red(str(change) + " HP"))
+                self.hurt(abs(change))
+        elif glitch == "time":
+            type.type("You blink and it's suddenly six hours later. What happened?")
+            type.type(" You don't know. You'll never know.")
+        else:
+            type.type("For a moment, you forget who you are. Then it comes back, but... different.")
+            type.type(" Were you always left-handed? You don't remember.")
+            self.lose_sanity(10)
+        print("\n")
+        type.type("Reality snaps back. Everything is normal. Everything is fine.")
+        print("\n")
+        type.type("Is it?")
+        print("\n")
+
+    def wrong_universe(self):
+        # EVENT: Slip into alternate dimension with purple sky and floating cars
+        # EFFECTS: Meet alternate rich self, get Dimensional Coin item (50%) or $100-300 (50%), -10 sanity
+        type.type("You step out of your car and around a corner. The world changes.")
+        print("\n")
+        type.type("The sky is purple. The buildings are organic, pulsing like living things.")
+        type.type(" Cars float. People have too many eyes. A dog speaks fluent French.")
+        print("\n")
+        type.type("This is not your world.")
+        print("\n")
+        type.type("A version of yourself approaches. They're taller, more confident. Richer, clearly.")
+        print("\n")
+        type.type(quote("Ah, another me. Let me guess - you're from a world where you're still struggling?"))
+        print("\n")
+        type.type("You nod, dumbstruck.")
+        print("\n")
+        type.type(quote("Pathetic. Well, take this. It won't help much, but it's something."))
+        print("\n")
+        if random.random() < 0.5:
+            type.type("They hand you a strange coin. It hums with otherworldly energy.")
+            self.add_item("Dimensional Coin")
+            type.type(" You got a " + magenta(bright("Dimensional Coin")) + "!")
+        else:
+            amount = random.randint(100, 300)
+            type.type("They hand you a wad of bills. The denominations don't exist in your world, but...")
+            type.type(" Somehow they translate to " + green(bright("$" + str(amount))) + "!")
+            self.change_balance(amount)
+        print("\n")
+        type.type("The world flickers. Shifts. You're back in the normal universe.")
+        print("\n")
+        type.type("Was any of that real?")
+        self.lose_sanity(10)
+        print("\n")
+
+    def fourth_wall_break(self):
+        # EVENT: A stranger becomes aware they're in a game, breaks the fourth wall
+        # EFFECTS: -15 sanity from existential dread
+        type.type("A stranger approaches your car. They look... worried.")
+        print("\n")
+        type.type(quote("Hey. You. Can you keep a secret?"))
+        print("\n")
+        type.type("Before you can answer, they lean in close.")
+        print("\n")
+        type.type(quote("I think... I think none of this is real. I think we're in some kind of... game. Or story."))
+        print("\n")
+        type.type("You laugh nervously. " + quote("That's crazy talk."))
+        print("\n")
+        type.type(quote("Is it? Think about it. The same things happen over and over. There's a PATTERN. And you..."))
+        print("\n")
+        type.type(quote("You're the main character, aren't you? Everyone else is just... background."))
+        print("\n")
+        type.type("The stranger starts crying.")
+        print("\n")
+        type.type(quote("Am I even real? Do I exist when you're not looking at me?"))
+        print("\n")
+        type.type("They walk away, still crying. You stand there, deeply unsettled.")
+        print("\n")
+        type.type("...")
+        print("\n")
+        type.type("You glance at the 'player.' The one reading this. Just for a second.")
+        print("\n")
+        self.lose_sanity(15)
+        print("\n")
+
+    # DARK EVENTS
+
+    def the_collector(self):
+        # EVENT: Man in black suit collects debts, favors, and "souls"
+        # EFFECTS: Meet "The Collector", various sanity loss based on choice
+        type.type("You look up from your car. A man in a black suit steps out of the shadows. His smile doesn't reach his eyes.")
+        print("\n")
+        type.type(quote("You've been making moves. Big moves. People notice."))
+        print("\n")
+        type.type("He produces a small notebook and flips through it.")
+        print("\n")
+        type.type(quote("According to my records, you owe... well, you don't owe ME anything. Yet."))
+        print("\n")
+        type.type(quote("But I'm here to offer a service. I collect things. Debts. Favors. Souls, sometimes."))
+        print("\n")
+        type.type("He chuckles. It's not a friendly sound.")
+        print("\n")
+        answer = ask.option("What do you say? ", ["not interested", "what are you offering", "souls?"])
+        if answer == "not interested":
+            type.type("He shrugs. " + quote("Everyone says that at first. I'll be around."))
+            print("\n")
+            type.type("He vanishes into the shadows. You didn't see him go. He was just... gone.")
+            self.meet("The Collector")
+        elif answer == "what are you offering":
+            type.type(quote("Information. Protection. Future knowledge. Whatever you need, I can provide."))
+            print("\n")
+            type.type(quote("My price is... flexible. Sometimes money. Sometimes favors. Sometimes..."))
+            print("\n")
+            type.type("He leans in close. " + quote("...years."))
+            print("\n")
+            type.type("You step back. He laughs.")
+            print("\n")
+            type.type(quote("Not ready yet. That's fine. When you are, I'll know."))
+            self.meet("The Collector")
+            self.lose_sanity(10)
+        else:
+            type.type(quote("Souls? Oh, that's mostly a metaphor. Mostly."))
+            print("\n")
+            type.type("His smile widens just a bit too far.")
+            print("\n")
+            type.type(quote("Don't worry about souls. You've still got yours. For now."))
+            self.meet("The Collector")
+            self.lose_sanity(15)
+        print("\n")
+
+    def the_empty_room(self):
+        # EVENT: Find a door that shouldn't exist, leads to infinite white void with creature
+        # CONDITION: Sanity < 40
+        # EFFECTS: -20 sanity, gain "Glimpsed the Void" status
+        if self.get_sanity() >= 40:
+            self.day_event()
+            return
+        type.type("You step out of your car and notice a door you've never seen before. It's in a wall that shouldn't have a door.")
+        print("\n")
+        type.type("Something tells you not to open it. Something screams at you to run.")
+        print("\n")
+        type.type("You open it anyway. Of course you do.")
+        print("\n")
+        type.type("Inside is... empty. Completely, perfectly empty. No floor, no walls, no ceiling.")
+        type.type(" Just white. Endless white in every direction.")
+        print("\n")
+        type.type("You step inside. Your footsteps make no sound. You are nowhere.")
+        print("\n")
+        type.type("And then you see it.")
+        print("\n")
+        type.type("In the distance. Getting closer. Something that has too many limbs and not enough face.")
+        print("\n")
+        type.type("You run. Back through the door. SLAM it shut.")
+        print("\n")
+        type.type("When you turn around, the door is gone. The wall is smooth. Like the door never existed.")
+        print("\n")
+        type.type("But you can still hear scratching from inside the wall.")
+        self.lose_sanity(20)
+        self.add_status("Glimpsed the Void")
+        print("\n")
+
+    def blood_moon_bargain(self):
+        # EVENT: On a blood red moon, dark forces offer one night of perfect luck for one year of life
+        # EFFECTS: Accept = "Blood Moon Luck" + "Year Shorter" status, -20 sanity; Reject = +5 sanity
+        type.type("Through your windshield, the sky is wrong. The light filtering in is red. Blood red. The color of things that shouldn't be.")
+        print("\n")
+        type.type("You hear a voice inside your car. It comes from nowhere and everywhere.")
+        print("\n")
+        type.type(cyan(quote("GAMBLER. WE HAVE WATCHED YOU.")))
+        print("\n")
+        type.type("You look around. There's no one there. Just shadows that move wrong.")
+        print("\n")
+        type.type(cyan(quote("WE OFFER A BARGAIN. ONE NIGHT OF PERFECT LUCK. EVERY HAND A WINNER.")))
+        print("\n")
+        type.type(cyan(quote("IN EXCHANGE... ONE YEAR OF YOUR LIFE. BURNED FROM THE END. GONE FOREVER.")))
+        print("\n")
+        answer = ask.yes_or_no("Accept the blood moon bargain? ")
+        if answer == "yes":
+            type.type("You speak into the darkness. " + quote("I accept."))
+            print("\n")
+            type.type("The shadows LAUGH. A contract burns itself into your arm. It's painless, somehow worse than pain.")
+            print("\n")
+            type.type(cyan(quote("DONE. TONIGHT, YOU CANNOT LOSE. BUT TOMORROW, YOU WILL FEEL IT. THE MISSING TIME.")))
+            print("\n")
+            type.type("The red moon seems to glow brighter. You feel different. Powerful. Cursed.")
+            self.add_status("Blood Moon Luck")
+            self.add_status("Year Shorter")
+            self.lose_sanity(20)
+        else:
+            type.type("You shake your head. " + quote("No. I'll take my chances the normal way."))
+            print("\n")
+            type.type("The shadows hiss in displeasure.")
+            print("\n")
+            type.type(cyan(quote("FOOLISH. BUT BRAVE. WE WILL WATCH. WE ARE ALWAYS WATCHING.")))
+            print("\n")
+            type.type("The red moon fades to normal. You've made an enemy tonight. Or escaped one.")
+            self.restore_sanity(5)
+            self.meet("Rejected the Shadows")
+        print("\n")
+
+    # GOOFY EVENTS
+
+    def alien_abduction(self):
+        # EVENT: Briefly abducted by aliens at 2 AM, returned with missing time
+        # EFFECTS: Random - money (+$50-200), health (+30 HP, +10 sanity), Alien Crystal item, or nothing (-10 sanity)
+        type.type("A bright light floods your car. You float up. Through the roof. This shouldn't be possible.")
+        print("\n")
+        type.type("Everything goes white.")
+        print("\n")
+        type.type("...")
+        print("\n")
+        type.type("You wake up three hours later in your car. You don't remember anything.")
+        print("\n")
+        type.type("But there's a new mark on your arm: a tiny UFO tattoo that wasn't there before.")
+        print("\n")
+        effect = random.choice(["money", "health", "item", "nothing"])
+        if effect == "money":
+            amount = random.randint(50, 200)
+            type.type("Your wallet is heavier. You have " + green(bright("$" + str(amount))) + " more than before.")
+            type.type(" Alien money? Space bribe?")
+            self.change_balance(amount)
+        elif effect == "health":
+            type.type("You feel... better? Healthier? Did they FIX something?")
+            self.heal(30)
+            self.restore_sanity(10)
+        elif effect == "item":
+            type.type("There's a glowing crystal in your pocket. You don't know what it does.")
+            self.add_item("Alien Crystal")
+            type.type(" You got an " + magenta(bright("Alien Crystal")) + "!")
+        else:
+            type.type("Nothing seems different. But you can't shake the feeling you've been... studied.")
+            self.lose_sanity(10)
+        print("\n")
+
+    def dance_battle(self):
+        # EVENT: Street gang challenges you to a dance-off
+        # EFFECTS: Win (score >= 2) = +$25-75, +5 sanity; Tie = pass with respect; Lose = -$15, -3 sanity
+        type.type("You step out of your car and a group of teenagers blocks your path. Their leader steps forward.")
+        print("\n")
+        type.type(quote("Yo! This is our turf. You wanna pass? You gotta DANCE."))
+        print("\n")
+        type.type("A boombox appears. Music starts playing. The crowd forms a circle.")
+        print("\n")
+        type.type("It's dance battle time. What's your move?")
+        print("\n")
+        moves = ["worm", "robot", "spin move", "moonwalk", "interpretive dance"]
+        move = ask.option("Your opening move: ", moves)
+        score = 0
+        if move == "worm":
+            if random.random() < 0.6:
+                type.type("You hit the floor and worm like your life depends on it! The crowd goes WILD!")
+                score += 2
+            else:
+                type.type("You hit the floor and... just kind of wiggle sadly. Like a dying fish.")
+                score -= 1
+        elif move == "robot":
+            type.type("You bust out crisp, mechanical movements. " + quote("BEEP BOOP!"))
+            score += 1
+        elif move == "spin move":
+            if random.random() < 0.5:
+                type.type("You spin so fast you become a BLUR! The crowd screams!")
+                score += 3
+            else:
+                type.type("You spin... and fall over. Dizzy and embarrassed.")
+                score -= 2
+        elif move == "moonwalk":
+            type.type("You glide backwards like you're on ice. Smooth. Real smooth.")
+            score += 2
+        else:
+            type.type("You... interpret. Dance? The crowd is confused but intrigued.")
+            score += random.choice([-1, 0, 1, 2, 3])
+        print("\n")
+        if score >= 2:
+            type.type("You WIN the dance battle! The gang cheers!")
+            print("\n")
+            reward = random.randint(25, 75)
+            type.type("They shower you with singles. You collect " + green(bright("$" + str(reward))) + "!")
+            self.change_balance(reward)
+            self.restore_sanity(5)
+        elif score >= 0:
+            type.type("It's a TIE! The gang respects your effort.")
+            print("\n")
+            type.type(quote("You got moves, old timer. You can pass."))
+        else:
+            type.type("You LOSE. The gang boos you mercilessly.")
+            print("\n")
+            type.type("They take your lunch money. Literally. " + red("(-$15)"))
+            self.change_balance(-15)
+            self.lose_sanity(3)
+        print("\n")
+
+    # ==========================================
+    # NEW SECRET EVENTS - HIDDEN TRIGGERS
+    # ==========================================
+

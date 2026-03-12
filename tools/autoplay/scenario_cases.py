@@ -1,0 +1,1794 @@
+from __future__ import annotations
+
+from dataclasses import dataclass
+from typing import Callable
+
+from .interfaces import DecisionOption, DecisionRequest
+from .planner import StrategicPlan, choose_strategic_goal
+from .policies import choose_blackjack_bet, choose_event_inline_choice, choose_event_option, choose_event_yes_no
+from .route_policy import choose_route_option
+from .state import GameState, build_game_state_snapshot
+
+
+@dataclass(frozen=True)
+class ScenarioResult:
+    scenario_id: str
+    suite: str
+    passed: bool
+    summary: str
+    details: dict[str, object]
+
+
+RouteCheck = Callable[[StrategicPlan, str], tuple[bool, str]]
+BetCheck = Callable[[int], tuple[bool, str]]
+
+
+class FakeScenarioPlayer:
+    def __init__(
+        self,
+        *,
+        day: int,
+        balance: int,
+        rank: int,
+        health: int,
+        sanity: int,
+        fatigue: int = 0,
+        inventory: tuple[str, ...] = (),
+        statuses: tuple[str, ...] = (),
+        injuries: tuple[str, ...] = (),
+        met: tuple[str, ...] = (),
+        store_inventory: tuple[tuple[str, int], ...] = (),
+        collectible_prices: dict[str, int] | None = None,
+    ) -> None:
+        self._day = day
+        self._balance = balance
+        self._rank = rank
+        self._health = health
+        self._sanity = sanity
+        self._fatigue = fatigue
+        self._alive = True
+        self._inventory = list(inventory)
+        self._status_effects = list(statuses)
+        self._injuries = list(injuries)
+        self._travel_restrictions = []
+        self._broken_inventory = []
+        self._repairing_inventory = []
+        self._flask_effects = []
+        self._convenience_store_inventory = list(store_inventory)
+        self._collectible_prices = dict(collectible_prices or {})
+        self._met = set(met)
+        self._autoplay_location_last_day = {}
+        self._autoplay_location_count = {}
+
+    def get_balance(self):
+        return self._balance
+
+    def get_health(self):
+        return self._health
+
+    def get_sanity(self):
+        return self._sanity
+
+    def get_fatigue(self):
+        return self._fatigue
+
+    def get_rank(self):
+        return self._rank
+
+    def is_alive(self):
+        return self._alive
+
+    def has_item(self, item_name):
+        return item_name in self._inventory
+
+    def has_met(self, name):
+        return name in self._met
+
+    def has_flask_effect(self, effect_name):
+        return effect_name in self._flask_effects
+
+    def get_all_companions(self):
+        return {}
+
+    def get_inventory_food(self):
+        return []
+
+    def get_food_data(self, _item_name):
+        return None
+
+    def get_collectible_prices(self):
+        return dict(self._collectible_prices)
+
+    def can_access_upgrades(self):
+        return False
+
+    def can_upgrade(self, _item_name):
+        return False
+
+    def get_mechanic_visits(self):
+        return 0
+
+    def get_chosen_mechanic(self):
+        return None
+
+    def get_loan_shark_debt(self):
+        return 0
+
+    def get_loan_shark_warning_level(self):
+        return 0
+
+    def get_fraudulent_cash(self):
+        return 0
+
+    def get_dealer_happiness(self):
+        return 50
+
+    def len_flasks(self):
+        return 0
+
+    def has_danger(self, _danger_name):
+        return False
+
+    def has_broken_item(self, _item_name):
+        return False
+
+    def is_repairing_item(self, _item_name):
+        return False
+
+    def has_fire_source(self):
+        return False
+
+
+def _route_options(*labels: str) -> tuple[DecisionOption, ...]:
+    return tuple(
+        DecisionOption(option_id=f"route_{index + 1}", label=label, value=label)
+        for index, label in enumerate(labels)
+    )
+
+
+def _event_options(*labels: str) -> tuple[DecisionOption, ...]:
+    return tuple(
+        DecisionOption(option_id=f"event_{index + 1}", label=label, value=label)
+        for index, label in enumerate(labels)
+    )
+
+
+def _assert_goal_and_route(expected_goal: str, expected_route: str) -> RouteCheck:
+    def checker(plan: StrategicPlan, chosen_route: str) -> tuple[bool, str]:
+        ok = plan.goal == expected_goal and chosen_route == expected_route
+        return ok, f"goal={plan.goal} route={chosen_route} expected_goal={expected_goal} expected_route={expected_route}"
+
+    return checker
+
+
+def _assert_max_bet(max_bet: int) -> BetCheck:
+    def checker(bet: int) -> tuple[bool, str]:
+        ok = bet <= max_bet
+        return ok, f"bet={bet} max_bet={max_bet}"
+
+    return checker
+
+
+def _assert_min_bet(min_bet: int) -> BetCheck:
+    def checker(bet: int) -> tuple[bool, str]:
+        ok = bet >= min_bet
+        return ok, f"bet={bet} min_bet={min_bet}"
+
+    return checker
+
+
+def _assert_balance_blend(balance: int) -> BetCheck:
+    def checker(bet: int) -> tuple[bool, str]:
+        ok = bet > balance
+        return ok, f"bet={bet} balance={balance}"
+
+    return checker
+
+
+def _run_route_scenario(
+    scenario_id: str,
+    suite: str,
+    state: GameState,
+    route_labels: tuple[str, ...],
+    metadata: dict[str, object],
+    check: RouteCheck,
+) -> ScenarioResult:
+    plan = choose_strategic_goal(state)
+    request = DecisionRequest(
+        request_type="route_select",
+        stable_context_id="scenario_route",
+        game_state=state.to_dict(),
+        normalized_options=_route_options(*route_labels),
+        metadata={"day": state.day, **metadata},
+    )
+    option, trace = choose_route_option(request, plan)
+    chosen_route = "" if option is None else str(option.value if option.value is not None else option.label)
+    passed, detail = check(plan, chosen_route)
+    return ScenarioResult(
+        scenario_id=scenario_id,
+        suite=suite,
+        passed=passed,
+        summary=detail,
+        details={
+            "goal": plan.goal,
+            "goal_reason": plan.reason,
+            "route": chosen_route,
+            "trace_reason": trace.reason,
+        },
+    )
+
+
+def _run_event_yes_no_scenario(
+    scenario_id: str,
+    suite: str,
+    state: GameState,
+    prompt: str,
+    recent_lines: tuple[str, ...],
+    metadata: dict[str, object],
+    expected_answer: str,
+) -> ScenarioResult:
+    plan = choose_strategic_goal(state)
+    request = DecisionRequest(
+        request_type="yes_no",
+        stable_context_id="scenario_yes_no",
+        game_state=state.to_dict(),
+        normalized_options=_event_options("yes", "no"),
+        raw_prompt_text=prompt,
+        raw_recent_text=recent_lines,
+        metadata={"day": state.day, **metadata},
+    )
+    answer, trace = choose_event_yes_no(request, plan)
+    passed = answer == expected_answer
+    return ScenarioResult(
+        scenario_id=scenario_id,
+        suite=suite,
+        passed=passed,
+        summary=f"answer={answer} expected={expected_answer}",
+        details={
+            "goal": plan.goal,
+            "answer": answer,
+            "expected": expected_answer,
+            "trace_reason": None if trace is None else trace.reason,
+        },
+    )
+
+
+def _run_event_option_scenario(
+    scenario_id: str,
+    suite: str,
+    state: GameState,
+    options: tuple[str, ...],
+    metadata: dict[str, object],
+    expected_label: str,
+) -> ScenarioResult:
+    plan = choose_strategic_goal(state)
+    request = DecisionRequest(
+        request_type="event_branch",
+        stable_context_id="scenario_event_branch",
+        game_state=state.to_dict(),
+        normalized_options=_event_options(*options),
+        metadata={"day": state.day, **metadata},
+    )
+    option, trace = choose_event_option(request, plan)
+    chosen_label = "" if option is None else str(option.value if option.value is not None else option.label)
+    passed = chosen_label == expected_label
+    return ScenarioResult(
+        scenario_id=scenario_id,
+        suite=suite,
+        passed=passed,
+        summary=f"choice={chosen_label} expected={expected_label}",
+        details={
+            "goal": plan.goal,
+            "choice": chosen_label,
+            "expected": expected_label,
+            "trace_reason": None if trace is None else trace.reason,
+        },
+    )
+
+
+def _run_event_inline_scenario(
+    scenario_id: str,
+    suite: str,
+    state: GameState,
+    prompt: str,
+    recent_lines: tuple[str, ...],
+    choices: tuple[str, ...],
+    metadata: dict[str, object],
+    expected_choice: str,
+) -> ScenarioResult:
+    plan = choose_strategic_goal(state)
+    request = DecisionRequest(
+        request_type="event_inline",
+        stable_context_id="scenario_event_inline",
+        game_state=state.to_dict(),
+        normalized_options=_event_options(*choices),
+        raw_prompt_text=prompt,
+        raw_recent_text=recent_lines,
+        metadata={"day": state.day, **metadata},
+    )
+    chosen, trace = choose_event_inline_choice(request, plan)
+    passed = chosen == expected_choice
+    return ScenarioResult(
+        scenario_id=scenario_id,
+        suite=suite,
+        passed=passed,
+        summary=f"choice={chosen} expected={expected_choice}",
+        details={
+            "goal": plan.goal,
+            "choice": chosen,
+            "expected": expected_choice,
+            "trace_reason": None if trace is None else trace.reason,
+        },
+    )
+
+
+def _run_bet_scenario(
+    scenario_id: str,
+    suite: str,
+    state: GameState,
+    metadata: dict[str, object],
+    check: BetCheck,
+) -> ScenarioResult:
+    plan = choose_strategic_goal(state)
+    request = DecisionRequest(
+        request_type="blackjack_bet",
+        stable_context_id="scenario_blackjack_bet",
+        game_state=state.to_dict(),
+        metadata={"day": state.day, **metadata},
+    )
+    bet, trace = choose_blackjack_bet(request, plan)
+    chosen_bet = 0 if bet is None else int(bet)
+    passed, detail = check(chosen_bet)
+    return ScenarioResult(
+        scenario_id=scenario_id,
+        suite=suite,
+        passed=passed,
+        summary=detail,
+        details={
+            "goal": plan.goal,
+            "bet": chosen_bet,
+            "trace_reason": trace.reason,
+            "trace_metadata": trace.metadata,
+        },
+    )
+
+
+def _run_snapshot_goal_scenario(
+    scenario_id: str,
+    suite: str,
+    player: FakeScenarioPlayer,
+    *,
+    economy_hints: dict[str, object],
+    available_routes: tuple[str, ...] = (),
+    expected_goal: str,
+) -> ScenarioResult:
+    state = build_game_state_snapshot(
+        player,
+        current_context_tag="scenario_snapshot_goal",
+        available_routes=available_routes,
+        economy_hints=economy_hints,
+    )
+    plan = choose_strategic_goal(state)
+    passed = plan.goal == expected_goal
+    return ScenarioResult(
+        scenario_id=scenario_id,
+        suite=suite,
+        passed=passed,
+        summary=f"goal={plan.goal} expected={expected_goal}",
+        details={
+            "goal": plan.goal,
+            "expected": expected_goal,
+            "available_routes": list(state.available_routes),
+            "opportunity_flags": dict(state.opportunity_flags),
+        },
+    )
+
+
+def _run_quicktest_destination_scenario(
+    scenario_id: str,
+    suite: str,
+    player: FakeScenarioPlayer,
+    route_labels: tuple[str, ...],
+    expected_label: str,
+) -> ScenarioResult:
+    from tools import quicktest as quicktest_harness
+
+    menu_options = tuple((index + 1, label) for index, label in enumerate(route_labels))
+    chosen_number = quicktest_harness._choose_destination(menu_options, player)
+    by_number = {number: label for number, label in menu_options}
+    chosen_label = by_number.get(chosen_number, "")
+    passed = chosen_label == expected_label
+    return ScenarioResult(
+        scenario_id=scenario_id,
+        suite=suite,
+        passed=passed,
+        summary=f"route={chosen_label} expected={expected_label}",
+        details={
+            "route": chosen_label,
+            "expected": expected_label,
+            "day": player._day,
+            "balance": player._balance,
+            "health": player._health,
+            "sanity": player._sanity,
+            "statuses": list(player._status_effects),
+            "injuries": list(player._injuries),
+        },
+    )
+
+
+def _run_quicktest_loan_borrow_scenario(
+    scenario_id: str,
+    suite: str,
+    player: FakeScenarioPlayer,
+    menu_options: tuple[tuple[int, str], ...],
+    expected_label: str,
+) -> ScenarioResult:
+    from tools import quicktest as quicktest_harness
+
+    chosen_number = quicktest_harness._choose_loan_borrow_amount(menu_options, player)
+    by_number = {number: label for number, label in menu_options}
+    chosen_label = by_number.get(chosen_number, "")
+    passed = chosen_label == expected_label
+    return ScenarioResult(
+        scenario_id=scenario_id,
+        suite=suite,
+        passed=passed,
+        summary=f"choice={chosen_label} expected={expected_label}",
+        details={
+            "choice": chosen_label,
+            "expected": expected_label,
+            "day": player._day,
+            "balance": player._balance,
+            "health": player._health,
+            "sanity": player._sanity,
+            "inventory": list(player._inventory),
+            "met": sorted(player._met),
+        },
+    )
+
+
+def _run_quicktest_mechanic_offer_scenario(
+    scenario_id: str,
+    suite: str,
+    player: FakeScenarioPlayer,
+    *,
+    cost: int,
+    recent: str,
+    expected_answer: str,
+) -> ScenarioResult:
+    from tools import quicktest as quicktest_harness
+
+    answer = "yes" if quicktest_harness._should_buy_car_repair(player, cost, recent.lower()) else "no"
+    passed = answer == expected_answer
+    return ScenarioResult(
+        scenario_id=scenario_id,
+        suite=suite,
+        passed=passed,
+        summary=f"answer={answer} expected={expected_answer}",
+        details={
+            "answer": answer,
+            "expected": expected_answer,
+            "day": player._day,
+            "balance": player._balance,
+            "recent": recent,
+            "met": sorted(player._met),
+        },
+    )
+
+
+def run_all_scenarios() -> list[ScenarioResult]:
+    results: list[ScenarioResult] = []
+
+    results.append(
+        _run_route_scenario(
+            "saveable_doctor_death",
+            "route",
+            GameState(
+                day=12,
+                balance=240,
+                rank=0,
+                health=28,
+                sanity=44,
+                fatigue=34,
+                alive=True,
+                current_context_tag="afternoon_destination",
+                has_car=True,
+                mechanic_visits=1,
+                opportunity_flags={
+                    "can_visit_marvin": False,
+                    "can_restock_supplies": True,
+                },
+                current_progress_goal_candidates=("survive_emergency", "stabilize_health", "restock_supplies"),
+            ),
+            ("Doctor's Office", "Convenience Store", "Stay Home"),
+            {
+                "urgent_medical": True,
+                "wants_doctor": True,
+                "needs_recovery_day": False,
+                "has_car": True,
+                "medical_choice": "Doctor's Office",
+                "wants_store": True,
+                "store_spend": 60,
+            },
+            _assert_goal_and_route("survive_emergency", "Doctor's Office"),
+        )
+    )
+
+    results.append(
+        _run_snapshot_goal_scenario(
+            "no_car_store_hints_do_not_create_store_goal",
+            "state_goal",
+            FakeScenarioPlayer(
+                day=5,
+                balance=141,
+                rank=0,
+                health=64,
+                sanity=75,
+                fatigue=0,
+            ),
+            economy_hints={
+                "store_candidate_count": 4,
+                "store_best_priority": 78,
+                "store_target_spend": 8,
+            },
+            expected_goal="acquire_car",
+        )
+    )
+
+    results.append(
+        _run_snapshot_goal_scenario(
+            "low_cash_marvin_access_does_not_force_marvin_goal",
+            "state_goal",
+            FakeScenarioPlayer(
+                day=12,
+                balance=73,
+                rank=0,
+                health=96,
+                sanity=41,
+                inventory=("Car", "Worn Map"),
+            ),
+            economy_hints={
+                "marvin_affordable_priority": 0,
+            },
+            expected_goal="push_next_rank",
+        )
+    )
+
+    results.append(
+        _run_snapshot_goal_scenario(
+            "strong_marvin_window_prefers_marvin_goal",
+            "state_goal",
+            FakeScenarioPlayer(
+                day=24,
+                balance=18000,
+                rank=1,
+                health=84,
+                sanity=71,
+                inventory=("Car", "Worn Map"),
+            ),
+            economy_hints={
+                "marvin_affordable_priority": 92,
+                "marvin_candidate_price": 12000,
+                "marvin_strong_window": 1,
+            },
+            available_routes=("Marvin's Mystical Merchandise", "Convenience Store"),
+            expected_goal="exploit_marvin",
+        )
+    )
+
+    results.append(
+        _run_snapshot_goal_scenario(
+            "healthy_midgame_store_pressure_defers_to_rank_push",
+            "state_goal",
+            FakeScenarioPlayer(
+                day=26,
+                balance=2500,
+                rank=1,
+                health=82,
+                sanity=64,
+                fatigue=14,
+                inventory=("Car",),
+                store_inventory=(("Pocket Knife", 90), ("Water Bottles", 60), ("Binoculars", 140)),
+            ),
+            economy_hints={
+                "store_candidate_count": 3,
+                "store_best_priority": 70,
+                "store_target_spend": 90,
+            },
+            expected_goal="push_next_rank",
+        )
+    )
+
+    results.append(
+        _run_route_scenario(
+            "marvin_access_but_no_visit",
+            "route",
+            GameState(
+                day=24,
+                balance=18000,
+                rank=1,
+                health=84,
+                sanity=71,
+                fatigue=20,
+                alive=True,
+                current_context_tag="afternoon_destination",
+                has_car=True,
+                has_worn_map=True,
+                has_marvin_access=True,
+                opportunity_flags={"can_visit_marvin": True},
+                current_progress_goal_candidates=("exploit_marvin", "push_next_rank"),
+            ),
+            ("Marvin", "Convenience Store", "Stay Home"),
+            {
+                "has_car": True,
+                "has_marvin_access": True,
+                "wants_marvin": True,
+                "marvin_priority": 92,
+                "store_spend": 0,
+            },
+            _assert_goal_and_route("exploit_marvin", "Marvin"),
+        )
+    )
+
+    results.append(
+        _run_route_scenario(
+            "companion_food_crisis",
+            "route",
+            GameState(
+                day=18,
+                balance=900,
+                rank=1,
+                health=77,
+                sanity=51,
+                fatigue=22,
+                alive=True,
+                current_context_tag="afternoon_destination",
+                has_car=True,
+                companion_count=3,
+                companion_low_happiness_count=2,
+                inventory_food_count=0,
+                store_candidate_count=4,
+                store_best_purchase_priority=95,
+                store_target_spend=140,
+                opportunity_flags={
+                    "can_preserve_companions": True,
+                    "can_restock_supplies": True,
+                },
+                current_progress_goal_candidates=("preserve_companion_roster", "restock_supplies", "push_next_rank"),
+            ),
+            ("Convenience Store", "Pawn Shop", "Stay Home"),
+            {
+                "has_car": True,
+                "wants_store": True,
+                "store_spend": 140,
+                "wants_pawn": False,
+            },
+            _assert_goal_and_route("restock_supplies", "Convenience Store"),
+        )
+    )
+
+    results.append(
+        _run_route_scenario(
+            "debt_pressure_case",
+            "route",
+            GameState(
+                day=21,
+                balance=340,
+                rank=0,
+                health=74,
+                sanity=58,
+                fatigue=18,
+                alive=True,
+                current_context_tag="afternoon_destination",
+                has_car=True,
+                loan_debt=4200,
+                loan_warning_level=3,
+                pawn_planned_sale_count=2,
+                pawn_planned_sale_value=260,
+                opportunity_flags={
+                    "can_reduce_debt_risk": True,
+                    "can_contain_debt_escalation": True,
+                    "can_cashout_pawn_inventory": True,
+                },
+                current_progress_goal_candidates=("contain_debt_escalation", "cashout_pawn_inventory", "reduce_debt_risk"),
+            ),
+            ("Loan Shark", "Pawn Shop", "Marvin"),
+            {
+                "has_car": True,
+                "wants_loan": True,
+                "loan_pressure": 64,
+                "wants_pawn": True,
+                "pawn_value": 260,
+                "wants_marvin": False,
+            },
+            _assert_goal_and_route("contain_debt_escalation", "Loan Shark"),
+        )
+    )
+
+    results.append(
+        _run_route_scenario(
+            "high_fatigue_missed_event_case",
+            "route",
+            GameState(
+                day=16,
+                balance=700,
+                rank=1,
+                health=69,
+                sanity=48,
+                fatigue=92,
+                alive=True,
+                current_context_tag="afternoon_destination",
+                has_car=True,
+                opportunity_flags={"can_reduce_fatigue_pressure": True},
+                current_progress_goal_candidates=("reduce_fatigue_pressure", "push_next_rank"),
+            ),
+            ("Stay Home", "Convenience Store", "Marvin"),
+            {
+                "has_car": True,
+                "needs_recovery_day": True,
+                "wants_store": False,
+                "wants_marvin": False,
+            },
+            _assert_goal_and_route("reduce_fatigue_pressure", "Stay Home"),
+        )
+    )
+
+    results.append(
+        _run_route_scenario(
+            "car_trouble_interruption_case",
+            "route",
+            GameState(
+                day=22,
+                balance=620,
+                rank=1,
+                health=78,
+                sanity=61,
+                fatigue=26,
+                alive=True,
+                current_context_tag="afternoon_destination",
+                has_car=True,
+                travel_restrictions=("Engine Trouble",),
+                mechanic_visits=1,
+                opportunity_flags={
+                    "can_recover_from_car_trouble": True,
+                    "can_advance_mechanic_arc": True,
+                },
+                current_progress_goal_candidates=("recover_from_car_trouble", "advance_mechanic_arc"),
+            ),
+            ("Tom's Auto Shop", "Stay Home", "Convenience Store"),
+            {
+                "has_car": True,
+                "wants_mechanic": True,
+                "mechanic_urgency": 80,
+                "needs_recovery_day": False,
+            },
+            _assert_goal_and_route("recover_from_car_trouble", "Tom's Auto Shop"),
+        )
+    )
+
+    results.append(
+        _run_quicktest_destination_scenario(
+            "urgent_medical_interrupt_route",
+            "route_interrupt",
+            FakeScenarioPlayer(
+                day=14,
+                balance=350,
+                rank=0,
+                health=24,
+                sanity=45,
+                fatigue=18,
+                inventory=("Car",),
+                injuries=("Broken Ribs",),
+            ),
+            ("Doctor's Office", "Convenience Store", "Stay Home"),
+            "Doctor's Office",
+        )
+    )
+
+    results.append(
+        _run_quicktest_destination_scenario(
+            "recovery_day_interrupt_route",
+            "route_interrupt",
+            FakeScenarioPlayer(
+                day=18,
+                balance=500,
+                rank=1,
+                health=58,
+                sanity=40,
+                fatigue=20,
+                inventory=("Car",),
+                injuries=("Scraped Knee",),
+                store_inventory=(("LifeAlert", 100),),
+            ),
+            ("Doctor's Office", "Convenience Store", "Stay Home"),
+            "Stay Home",
+        )
+    )
+
+    results.append(
+        _run_quicktest_destination_scenario(
+            "recovery_day_store_bypass_route",
+            "route_interrupt",
+            FakeScenarioPlayer(
+                day=18,
+                balance=500,
+                rank=1,
+                health=68,
+                sanity=34,
+                fatigue=20,
+                inventory=("Car",),
+                injuries=("Scraped Knee",),
+                store_inventory=(("LifeAlert", 100),),
+            ),
+            ("Convenience Store", "Stay Home", "Marvin's Mystical Merchandise"),
+            "Convenience Store",
+        )
+    )
+
+    results.append(
+        _run_quicktest_destination_scenario(
+            "recovery_day_pawn_bypass_route",
+            "route_interrupt",
+            FakeScenarioPlayer(
+                day=18,
+                balance=300,
+                rank=1,
+                health=66,
+                sanity=34,
+                fatigue=20,
+                inventory=("Car", "Silver Ring"),
+                injuries=("Scraped Knee",),
+                collectible_prices={"Silver Ring": 300},
+            ),
+            ("Grimy Gus's Pawn Emporium", "Stay Home", "Convenience Store"),
+            "Grimy Gus's Pawn Emporium",
+        )
+    )
+
+    results.append(
+        _run_quicktest_destination_scenario(
+            "recovery_day_no_car_mechanic_bypass_route",
+            "route_interrupt",
+            FakeScenarioPlayer(
+                day=10,
+                balance=160,
+                rank=0,
+                health=54,
+                sanity=45,
+                fatigue=18,
+                injuries=("Scraped Knee",),
+                met=("Tom", "Tom Event"),
+            ),
+            ("Trusty Tom's Trucks and Tires", "Doctor's Office", "Stay Home"),
+            "Trusty Tom's Trucks and Tires",
+        )
+    )
+
+    results.append(
+        _run_quicktest_destination_scenario(
+            "recovery_day_no_car_mild_status_stack_bypass_route",
+            "route_interrupt",
+            FakeScenarioPlayer(
+                day=10,
+                balance=190,
+                rank=0,
+                health=58,
+                sanity=42,
+                fatigue=18,
+                injuries=("Broken Leg",),
+                statuses=("Flu", "Ringworm", "Sinus Infection"),
+                met=("Tom", "Tom Event"),
+            ),
+            ("Trusty Tom's Trucks and Tires", "Doctor's Office", "Stay Home"),
+            "Trusty Tom's Trucks and Tires",
+        )
+    )
+
+    results.append(
+        _run_quicktest_destination_scenario(
+            "no_car_progression_defers_nonurgent_doctor_route",
+            "route_interrupt",
+            FakeScenarioPlayer(
+                day=10,
+                balance=300,
+                rank=0,
+                health=50,
+                sanity=45,
+                fatigue=18,
+                injuries=("Broken Leg",),
+                met=("Tom", "Tom Event"),
+            ),
+            ("Trusty Tom's Trucks and Tires", "Doctor's Office", "Stay Home"),
+            "Trusty Tom's Trucks and Tires",
+        )
+    )
+
+    results.append(
+        _run_quicktest_destination_scenario(
+            "car_injury_doctor_preempts_progression",
+            "route_interrupt",
+            FakeScenarioPlayer(
+                day=19,
+                balance=176,
+                rank=0,
+                health=79,
+                sanity=96,
+                inventory=("Car", "Worn Map"),
+                injuries=("Broken Leg",),
+            ),
+            ("Doctor's Office", "Marvin's Mystical Merchandise", "Convenience Store", "Stay Home"),
+            "Doctor's Office",
+        )
+    )
+
+    shared_event_state = GameState(
+        day=19,
+        balance=600,
+        rank=1,
+        health=80,
+        sanity=60,
+        fatigue=20,
+        alive=True,
+        current_context_tag="event",
+        has_car=True,
+        current_progress_goal_candidates=("push_next_rank",),
+    )
+
+    results.append(
+        _run_event_yes_no_scenario(
+            "suspicious_bargain_refusal",
+            "event_yes_no",
+            shared_event_state,
+            "accept the devil's offer?",
+            (),
+            {
+                "prompt_lower": "accept the devil's offer?",
+                "recent_lower": "a smiling stranger promises an easy out if you just agree now",
+            },
+            "no",
+        )
+    )
+
+    results.append(
+        _run_event_yes_no_scenario(
+            "loyalty_bonus_money_refusal",
+            "event_yes_no",
+            shared_event_state,
+            "take the money?",
+            ("A loyalty bonus offer appears before you.",),
+            {
+                "prompt_lower": "take the money?",
+                "recent_lower": "loyalty bonus - take the money?",
+            },
+            "no",
+        )
+    )
+
+    results.append(
+        _run_event_yes_no_scenario(
+            "cupcake_sanity_gate",
+            "event_yes_no",
+            GameState(
+                day=8,
+                balance=40,
+                rank=0,
+                health=78,
+                sanity=41,
+                fatigue=12,
+                alive=True,
+                current_context_tag="event",
+                current_progress_goal_candidates=("stabilize_health",),
+            ),
+            "buy yourself a cupcake?",
+            (),
+            {
+                "prompt_lower": "buy yourself a cupcake?",
+                "recent_lower": "",
+            },
+            "yes",
+        )
+    )
+
+    results.append(
+        _run_event_option_scenario(
+            "protect_companion_branch",
+            "event_option",
+            shared_event_state,
+            ("refuse - lucky stays with you", "tell him to prove it", "give lucky back"),
+            {},
+            "tell him to prove it",
+        )
+    )
+
+    results.append(
+        _run_event_option_scenario(
+            "generic_low_resource_walkaway_branch",
+            "event_option",
+            GameState(
+                day=9,
+                balance=20,
+                rank=0,
+                health=44,
+                sanity=21,
+                fatigue=18,
+                alive=True,
+                current_context_tag="event",
+                current_progress_goal_candidates=("survive_emergency",),
+            ),
+            ("Kick the door", "Walk away", "Fight them"),
+            {"prompt_lower": "what do you do?"},
+            "Walk away",
+        )
+    )
+
+    results.append(
+        _run_event_option_scenario(
+            "car_trouble_option_branch",
+            "event_option",
+            GameState(
+                day=11,
+                balance=10,
+                rank=0,
+                health=72,
+                sanity=58,
+                fatigue=16,
+                alive=True,
+                current_context_tag="event",
+                inventory=("Spare Tire",),
+                current_progress_goal_candidates=("recover_from_car_trouble",),
+            ),
+            ("pull it out", "leave it", "drive to shop"),
+            {"prompt_lower": "what do you do?"},
+            "pull it out",
+        )
+    )
+
+    results.append(
+        _run_event_option_scenario(
+            "gas_station_robbery_prefers_hide",
+            "event_option",
+            GameState(
+                day=6,
+                balance=66,
+                rank=0,
+                health=95,
+                sanity=82,
+                fatigue=9,
+                alive=True,
+                current_context_tag="event",
+                current_progress_goal_candidates=("acquire_car",),
+            ),
+            ("comply", "hide", "hero"),
+            {"prompt_lower": "what do you do?"},
+            "hide",
+        )
+    )
+
+    results.append(
+        _run_event_inline_scenario(
+            "inline_decline_suspicious_offer",
+            "event_inline",
+            shared_event_state,
+            "",
+            (),
+            ("accept", "decline", "scram"),
+            {"prompt_lower": "", "recent_lower": ""},
+            "decline",
+        )
+    )
+
+    results.append(
+        _run_event_inline_scenario(
+            "inline_companion_sick_choice",
+            "event_inline",
+            GameState(
+                day=10,
+                balance=80,
+                rank=0,
+                health=75,
+                sanity=52,
+                fatigue=14,
+                alive=True,
+                current_context_tag="raw_input",
+                inventory=("Cough Drops",),
+                current_progress_goal_candidates=("push_next_rank",),
+            ),
+            "Choose:",
+            ("Your companion is sick. What do you do?",),
+            ("1", "2", "3", "4"),
+            {
+                "prompt_lower": "choose:",
+                "recent_lower": "your companion is sick. what do you do?",
+            },
+            "2",
+        )
+    )
+
+    results.append(
+        _run_event_inline_scenario(
+            "inline_cheap_choice_prefers_free_when_broke",
+            "event_inline",
+            GameState(
+                day=7,
+                balance=8,
+                rank=0,
+                health=70,
+                sanity=45,
+                fatigue=10,
+                alive=True,
+                current_context_tag="raw_input",
+                current_progress_goal_candidates=("stabilize_health",),
+            ),
+            "",
+            (),
+            ("$1", "$5", "free"),
+            {"prompt_lower": "", "recent_lower": ""},
+            "free",
+        )
+    )
+
+    results.append(
+        _run_event_inline_scenario(
+            "inline_wish_prefers_health",
+            "event_inline",
+            GameState(
+                day=13,
+                balance=120,
+                rank=0,
+                health=52,
+                sanity=50,
+                fatigue=12,
+                alive=True,
+                current_context_tag="raw_input",
+                current_progress_goal_candidates=("push_next_rank",),
+            ),
+            "Wish for something:",
+            (),
+            ("money", "health", "luck"),
+            {"prompt_lower": "wish for something:", "recent_lower": ""},
+            "health",
+        )
+    )
+
+    results.append(
+        _run_event_inline_scenario(
+            "inline_pet_feed_uses_tuna",
+            "event_inline",
+            GameState(
+                day=9,
+                balance=60,
+                rank=0,
+                health=68,
+                sanity=54,
+                fatigue=10,
+                alive=True,
+                current_context_tag="raw_input",
+                inventory=("Can of Tuna",),
+                current_progress_goal_candidates=("push_next_rank",),
+            ),
+            "",
+            (),
+            ("pet", "feed", "ignore"),
+            {"prompt_lower": "", "recent_lower": ""},
+            "feed",
+        )
+    )
+
+    bet_state = GameState(
+        day=15,
+        balance=600,
+        rank=0,
+        health=39,
+        sanity=42,
+        fatigue=18,
+        alive=True,
+        current_context_tag="blackjack_bet",
+        has_car=True,
+        dealer_happiness=50,
+        current_progress_goal_candidates=("survive_emergency", "stabilize_health"),
+    )
+    results.append(
+        _run_bet_scenario(
+            "saveable_doctor_death_bet_reserve",
+            "blackjack_bet",
+            bet_state,
+            {
+                "cycle": 0,
+                "rank": 0,
+                "health": 39,
+                "sanity": 42,
+                "dealer_happiness": 50,
+                "balance": 600,
+                "fake_cash": 0,
+                "min_bet": 10,
+                "target": 1000,
+                "floor": 0,
+                "distance": 400,
+                "store_budget": 0,
+                "wants_store": False,
+                "wants_pawn": False,
+                "wants_doctor": True,
+                "progression_ready": False,
+                "phase": "car_ready",
+                "tuner_bet_ratio": 0.17,
+                "tuner_bet_ratio_safe": 0.12,
+                "tuner_max_ratio": 0.26,
+                "tuner_pressure_factor": 0.62,
+                "tuner_surplus_push": 0.42,
+                "edge_score": 1,
+                "pending_marvin_active": False,
+                "pending_marvin_price": 0,
+                "pending_marvin_shortfall": 0,
+                "stall_days": 0,
+                "early_caution": False,
+                "stranded_no_car": False,
+                "survival_mode": True,
+                "needs_car": False,
+                "wants_millionaire_push": False,
+                "has_extra_round_item": False,
+                "urgent_doctor": True,
+                "has_met_tom": True,
+                "has_met_frank": False,
+                "has_met_oswald": False,
+                "car_progress_reserve": 0,
+                "mechanic_purchase_reserve": 0,
+                "known_car_repair_reserve": 0,
+                "has_faulty_insurance": False,
+                "wants_map_unlock": False,
+            },
+            _assert_max_bet(96),
+        )
+    )
+
+    no_car_threshold_state = GameState(
+        day=5,
+        balance=220,
+        rank=0,
+        health=78,
+        sanity=55,
+        fatigue=14,
+        alive=True,
+        current_context_tag="blackjack_bet",
+        has_car=False,
+        dealer_happiness=50,
+        current_progress_goal_candidates=("acquire_car", "push_next_rank"),
+    )
+    results.append(
+        _run_bet_scenario(
+            "no_car_preserves_tom_threshold",
+            "blackjack_bet",
+            no_car_threshold_state,
+            {
+                "cycle": 0,
+                "rank": 0,
+                "health": 78,
+                "sanity": 55,
+                "dealer_happiness": 50,
+                "balance": 220,
+                "fake_cash": 0,
+                "min_bet": 10,
+                "target": 1000,
+                "floor": 0,
+                "distance": 780,
+                "store_budget": 0,
+                "wants_store": False,
+                "wants_pawn": False,
+                "wants_doctor": False,
+                "progression_ready": False,
+                "phase": "car_rush",
+                "tuner_bet_ratio": 0.17,
+                "tuner_bet_ratio_safe": 0.12,
+                "tuner_max_ratio": 0.26,
+                "tuner_pressure_factor": 0.62,
+                "tuner_surplus_push": 0.42,
+                "edge_score": 3,
+                "pending_marvin_active": False,
+                "pending_marvin_price": 0,
+                "pending_marvin_shortfall": 0,
+                "stall_days": 0,
+                "early_caution": False,
+                "stranded_no_car": True,
+                "survival_mode": False,
+                "needs_car": True,
+                "wants_millionaire_push": False,
+                "has_extra_round_item": False,
+                "urgent_doctor": False,
+                "has_met_tom": False,
+                "has_met_frank": False,
+                "has_met_oswald": False,
+                "car_progress_reserve": 200,
+                "mechanic_purchase_reserve": 200,
+                "known_car_repair_reserve": 0,
+                "has_faulty_insurance": False,
+                "wants_map_unlock": False,
+            },
+            _assert_max_bet(20),
+        )
+    )
+
+    no_car_bridge_state = GameState(
+        day=5,
+        balance=141,
+        rank=0,
+        health=64,
+        sanity=75,
+        fatigue=0,
+        alive=True,
+        current_context_tag="blackjack_bet",
+        has_car=False,
+        dealer_happiness=50,
+        current_progress_goal_candidates=("acquire_car",),
+    )
+    results.append(
+        _run_bet_scenario(
+            "no_car_bridges_tom_threshold_band",
+            "blackjack_bet",
+            no_car_bridge_state,
+            {
+                "cycle": 0,
+                "rank": 0,
+                "health": 64,
+                "sanity": 75,
+                "dealer_happiness": 50,
+                "balance": 141,
+                "fake_cash": 0,
+                "min_bet": 5,
+                "target": 1000,
+                "floor": 0,
+                "distance": 859,
+                "store_budget": 8,
+                "wants_store": False,
+                "wants_pawn": False,
+                "wants_doctor": False,
+                "progression_ready": False,
+                "phase": "car_rush",
+                "tuner_bet_ratio": 0.17,
+                "tuner_bet_ratio_safe": 0.12,
+                "tuner_max_ratio": 0.26,
+                "tuner_pressure_factor": 0.62,
+                "tuner_surplus_push": 0.42,
+                "edge_score": 0,
+                "pending_marvin_active": False,
+                "pending_marvin_price": 0,
+                "pending_marvin_shortfall": 0,
+                "stall_days": 0,
+                "early_caution": False,
+                "stranded_no_car": True,
+                "survival_mode": True,
+                "needs_car": True,
+                "wants_millionaire_push": False,
+                "has_extra_round_item": False,
+                "urgent_doctor": False,
+                "has_met_tom": False,
+                "has_met_frank": False,
+                "has_met_oswald": False,
+                "car_progress_reserve": 50,
+                "mechanic_purchase_reserve": 0,
+                "known_car_repair_reserve": 0,
+                "has_faulty_insurance": False,
+                "wants_map_unlock": False,
+            },
+            _assert_max_bet(22),
+        )
+    )
+
+    no_car_push_state = GameState(
+        day=2,
+        balance=50,
+        rank=0,
+        health=90,
+        sanity=70,
+        fatigue=5,
+        alive=True,
+        current_context_tag="blackjack_bet",
+        has_car=False,
+        dealer_happiness=50,
+        current_progress_goal_candidates=("acquire_car",),
+    )
+    results.append(
+        _run_bet_scenario(
+            "no_car_low_bankroll_pushes_for_car",
+            "blackjack_bet",
+            no_car_push_state,
+            {
+                "cycle": 0,
+                "rank": 0,
+                "health": 90,
+                "sanity": 70,
+                "dealer_happiness": 50,
+                "balance": 50,
+                "fake_cash": 0,
+                "min_bet": 10,
+                "target": 1000,
+                "floor": 0,
+                "distance": 950,
+                "store_budget": 0,
+                "wants_store": False,
+                "wants_pawn": False,
+                "wants_doctor": False,
+                "progression_ready": False,
+                "phase": "car_rush",
+                "tuner_bet_ratio": 0.17,
+                "tuner_bet_ratio_safe": 0.12,
+                "tuner_max_ratio": 0.26,
+                "tuner_pressure_factor": 0.62,
+                "tuner_surplus_push": 0.42,
+                "edge_score": 3,
+                "pending_marvin_active": False,
+                "pending_marvin_price": 0,
+                "pending_marvin_shortfall": 0,
+                "stall_days": 0,
+                "early_caution": False,
+                "stranded_no_car": True,
+                "survival_mode": False,
+                "needs_car": True,
+                "wants_millionaire_push": False,
+                "has_extra_round_item": False,
+                "urgent_doctor": False,
+                "has_met_tom": False,
+                "has_met_frank": False,
+                "has_met_oswald": False,
+                "car_progress_reserve": 0,
+                "mechanic_purchase_reserve": 0,
+                "known_car_repair_reserve": 0,
+                "has_faulty_insurance": False,
+                "wants_map_unlock": False,
+            },
+            _assert_max_bet(11),
+        )
+    )
+
+    pre_tom_breakout_state = GameState(
+        day=5,
+        balance=174,
+        rank=0,
+        health=88,
+        sanity=95,
+        fatigue=0,
+        alive=True,
+        current_context_tag="blackjack_bet",
+        has_car=False,
+        dealer_happiness=50,
+        current_progress_goal_candidates=("acquire_car",),
+    )
+    results.append(
+        _run_bet_scenario(
+            "pre_tom_doctor_window_preserves_cash",
+            "blackjack_bet",
+            pre_tom_breakout_state,
+            {
+                "cycle": 0,
+                "rank": 0,
+                "health": 88,
+                "sanity": 95,
+                "dealer_happiness": 50,
+                "balance": 174,
+                "fake_cash": 0,
+                "min_bet": 5,
+                "target": 1000,
+                "floor": 0,
+                "distance": 826,
+                "store_budget": 0,
+                "wants_store": False,
+                "wants_pawn": False,
+                "wants_doctor": True,
+                "progression_ready": False,
+                "phase": "car_rush",
+                "tuner_bet_ratio": 0.17,
+                "tuner_bet_ratio_safe": 0.12,
+                "tuner_max_ratio": 0.26,
+                "tuner_pressure_factor": 0.62,
+                "tuner_surplus_push": 0.42,
+                "edge_score": 0,
+                "pending_marvin_active": False,
+                "pending_marvin_price": 0,
+                "pending_marvin_shortfall": 0,
+                "stall_days": 0,
+                "early_caution": True,
+                "stranded_no_car": False,
+                "survival_mode": True,
+                "needs_car": True,
+                "wants_millionaire_push": False,
+                "has_extra_round_item": False,
+                "urgent_doctor": True,
+                "has_met_tom": False,
+                "has_met_frank": False,
+                "has_met_oswald": False,
+                "car_progress_reserve": 50,
+                "mechanic_purchase_reserve": 0,
+                "known_car_repair_reserve": 0,
+                "has_faulty_insurance": False,
+                "wants_map_unlock": False,
+            },
+            _assert_max_bet(31),
+        )
+    )
+
+    mechanic_threshold_state = GameState(
+        day=9,
+        balance=160,
+        rank=0,
+        health=72,
+        sanity=52,
+        fatigue=10,
+        alive=True,
+        current_context_tag="blackjack_bet",
+        has_car=False,
+        dealer_happiness=50,
+        current_progress_goal_candidates=("acquire_car",),
+    )
+    results.append(
+        _run_bet_scenario(
+            "first_mechanic_threshold_pushes_for_one_hand_cross",
+            "blackjack_bet",
+            mechanic_threshold_state,
+            {
+                "cycle": 0,
+                "rank": 0,
+                "health": 72,
+                "sanity": 52,
+                "dealer_happiness": 50,
+                "balance": 160,
+                "fake_cash": 0,
+                "min_bet": 5,
+                "target": 1000,
+                "floor": 0,
+                "distance": 840,
+                "store_budget": 0,
+                "wants_store": False,
+                "wants_pawn": False,
+                "wants_doctor": False,
+                "progression_ready": False,
+                "phase": "car_rush",
+                "tuner_bet_ratio": 0.17,
+                "tuner_bet_ratio_safe": 0.12,
+                "tuner_max_ratio": 0.26,
+                "tuner_pressure_factor": 0.62,
+                "tuner_surplus_push": 0.42,
+                "edge_score": 0,
+                "pending_marvin_active": False,
+                "pending_marvin_price": 0,
+                "pending_marvin_shortfall": 0,
+                "stall_days": 0,
+                "early_caution": False,
+                "stranded_no_car": False,
+                "survival_mode": False,
+                "needs_car": True,
+                "wants_millionaire_push": False,
+                "has_extra_round_item": False,
+                "urgent_doctor": False,
+                "has_met_tom": False,
+                "has_met_frank": False,
+                "has_met_oswald": False,
+                "car_progress_reserve": 50,
+                "mechanic_purchase_reserve": 0,
+                "known_car_repair_reserve": 0,
+                "has_faulty_insurance": False,
+                "wants_map_unlock": False,
+            },
+            _assert_min_bet(40),
+        )
+    )
+
+    results.append(
+        _run_quicktest_mechanic_offer_scenario(
+            "tom_offer_accepted_at_threshold",
+            "mechanic_offer",
+            FakeScenarioPlayer(
+                day=5,
+                balance=200,
+                rank=0,
+                health=78,
+                sanity=55,
+                fatigue=14,
+            ),
+            cost=150,
+            recent="Tom pulls a big red wrench out of his pocket. Yep, this thing's busted alright!",
+            expected_answer="yes",
+        )
+    )
+
+    blend_state = GameState(
+        day=28,
+        balance=4000,
+        rank=1,
+        health=85,
+        sanity=72,
+        fatigue=16,
+        alive=True,
+        current_context_tag="blackjack_bet",
+        has_car=True,
+        fraudulent_cash=2000,
+        dealer_happiness=88,
+        current_progress_goal_candidates=("blend_fraudulent_cash_safely", "push_next_rank"),
+    )
+    results.append(
+        _run_bet_scenario(
+            "fraudulent_cash_blend_case",
+            "blackjack_bet",
+            blend_state,
+            {
+                "cycle": 0,
+                "rank": 1,
+                "health": 85,
+                "sanity": 72,
+                "dealer_happiness": 88,
+                "balance": 4000,
+                "fake_cash": 2000,
+                "min_bet": 25,
+                "target": 10000,
+                "floor": 1000,
+                "distance": 6000,
+                "store_budget": 0,
+                "wants_store": False,
+                "wants_pawn": False,
+                "wants_doctor": False,
+                "progression_ready": True,
+                "phase": "car_ready",
+                "tuner_bet_ratio": 0.24,
+                "tuner_bet_ratio_safe": 0.16,
+                "tuner_max_ratio": 0.36,
+                "tuner_pressure_factor": 0.72,
+                "tuner_surplus_push": 0.54,
+                "edge_score": 6,
+                "pending_marvin_active": False,
+                "pending_marvin_price": 0,
+                "pending_marvin_shortfall": 0,
+                "stall_days": 0,
+                "early_caution": False,
+                "stranded_no_car": False,
+                "survival_mode": False,
+                "needs_car": False,
+                "wants_millionaire_push": False,
+                "has_extra_round_item": True,
+                "urgent_doctor": False,
+                "has_met_tom": True,
+                "has_met_frank": True,
+                "has_met_oswald": False,
+                "car_progress_reserve": 0,
+                "mechanic_purchase_reserve": 0,
+                "known_car_repair_reserve": 0,
+                "has_faulty_insurance": False,
+                "wants_map_unlock": False,
+            },
+            _assert_balance_blend(4000),
+        )
+    )
+
+    marvin_hold_state = GameState(
+        day=30,
+        balance=12000,
+        rank=1,
+        health=90,
+        sanity=74,
+        fatigue=14,
+        alive=True,
+        current_context_tag="blackjack_bet",
+        has_car=True,
+        has_worn_map=True,
+        has_marvin_access=True,
+        dealer_happiness=82,
+        current_progress_goal_candidates=("exploit_marvin", "push_next_rank"),
+    )
+    results.append(
+        _run_bet_scenario(
+            "marvin_preserve_cash_window",
+            "blackjack_bet",
+            marvin_hold_state,
+            {
+                "cycle": 0,
+                "rank": 1,
+                "health": 90,
+                "sanity": 74,
+                "dealer_happiness": 82,
+                "balance": 12000,
+                "fake_cash": 0,
+                "min_bet": 50,
+                "target": 10000,
+                "floor": 10000,
+                "distance": 0,
+                "store_budget": 0,
+                "wants_store": False,
+                "wants_pawn": False,
+                "wants_doctor": False,
+                "progression_ready": True,
+                "phase": "car_ready",
+                "tuner_bet_ratio": 0.24,
+                "tuner_bet_ratio_safe": 0.16,
+                "tuner_max_ratio": 0.36,
+                "tuner_pressure_factor": 0.72,
+                "tuner_surplus_push": 0.54,
+                "edge_score": 5,
+                "pending_marvin_active": True,
+                "pending_marvin_price": 9000,
+                "pending_marvin_shortfall": 0,
+                "stall_days": 0,
+                "early_caution": False,
+                "stranded_no_car": False,
+                "survival_mode": False,
+                "needs_car": False,
+                "wants_millionaire_push": False,
+                "has_extra_round_item": False,
+                "urgent_doctor": False,
+                "has_met_tom": True,
+                "has_met_frank": True,
+                "has_met_oswald": False,
+                "car_progress_reserve": 0,
+                "mechanic_purchase_reserve": 0,
+                "known_car_repair_reserve": 0,
+                "has_faulty_insurance": False,
+                "wants_map_unlock": False,
+            },
+            _assert_max_bet(1200),
+        )
+    )
+
+    midgame_growth_state = GameState(
+        day=27,
+        balance=2000,
+        rank=1,
+        health=86,
+        sanity=69,
+        fatigue=12,
+        alive=True,
+        current_context_tag="blackjack_bet",
+        has_car=True,
+        has_worn_map=True,
+        has_marvin_access=True,
+        dealer_happiness=78,
+        current_progress_goal_candidates=("push_next_rank", "exploit_marvin"),
+    )
+    results.append(
+        _run_bet_scenario(
+            "post_car_midgame_growth_window_pushes_harder",
+            "blackjack_bet",
+            midgame_growth_state,
+            {
+                "cycle": 0,
+                "rank": 1,
+                "health": 86,
+                "sanity": 69,
+                "dealer_happiness": 78,
+                "balance": 2000,
+                "fake_cash": 0,
+                "min_bet": 25,
+                "target": 10000,
+                "floor": 1000,
+                "distance": 8000,
+                "store_budget": 0,
+                "wants_store": False,
+                "wants_pawn": False,
+                "wants_doctor": False,
+                "progression_ready": True,
+                "phase": "car_ready",
+                "tuner_bet_ratio": 0.24,
+                "tuner_bet_ratio_safe": 0.16,
+                "tuner_max_ratio": 0.36,
+                "tuner_pressure_factor": 0.72,
+                "tuner_surplus_push": 0.54,
+                "edge_score": 4,
+                "pending_marvin_active": False,
+                "pending_marvin_price": 0,
+                "pending_marvin_shortfall": 0,
+                "stall_days": 3,
+                "early_caution": False,
+                "stranded_no_car": False,
+                "survival_mode": False,
+                "needs_car": False,
+                "wants_millionaire_push": False,
+                "has_extra_round_item": False,
+                "urgent_doctor": False,
+                "has_met_tom": True,
+                "has_met_frank": True,
+                "has_met_oswald": False,
+                "car_progress_reserve": 0,
+                "mechanic_purchase_reserve": 0,
+                "known_car_repair_reserve": 0,
+                "has_faulty_insurance": False,
+                "wants_map_unlock": False,
+            },
+            _assert_min_bet(600),
+        )
+    )
+
+    return results

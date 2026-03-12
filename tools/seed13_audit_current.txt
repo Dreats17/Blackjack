@@ -1,0 +1,225 @@
+========================================================================================
+Cycle 01 | Day 2
+State   $ 50 -> 37 (-$13) | HP 100 -> 68 (-32) | SAN 100 -> 82 (-18) | Rank 0 -> 0 | Car N
+Events  day:damaged_exhaust_again, day:rock_bottom, day:bar_fight_aftermath, night:insomnia_night
+Polarity negative
+Changes +injuries=['Broken Hand', 'Broken Nose']
+Stats   days_survived +1
+Gamble  total_hands +3, losses +3, busts +1, total_lost +$13
+========================================================================================
+Cycle 02 | Day 3
+State   $ 37 -> 39 (+$2) | HP 68 -> 71 (+3) | SAN 82 -> 74 (-8) | Rank 0 -> 0 | Car N
+Events  day:the_mime, met:Mime, night:nightmare
+Polarity negative
+Changes none
+Stats   days_survived +1, people_met +1
+Gamble  total_hands +3, wins +2, losses +1, total_won +$6, total_lost +$4
+========================================================================================
+Cycle 03 | Day 4
+State   $ 39 -> 42 (+$3) | HP 71 -> 62 (-9) | SAN 74 -> 75 (+1) | Rank 0 -> 0 | Car N
+Events  day:slick_escape_route, day:damaged_exhaust_fixed, day:estranged_dog, night:stray_cat_dies, day:kitchen_accident
+Polarity negative
+Changes +injuries=['Deep Laceration'] | +story=['mime']
+Stats   days_survived +1
+Gamble  total_hands +3, wins +2, losses +1, total_won +$6, total_lost +$3
+========================================================================================
+Cycle 04 | Day 5
+State   $ 42 -> 141 (+$99) | HP 62 -> 64 (+2) | SAN 75 -> 75 (+0) | Rank 0 -> 0 | Car N
+Events  storyline:dr_feelgood:stage0, met:Dr. Feelgood, night:ditched_wallet
+Polarity positive
+Changes +story=['dr_feelgood']
+Stats   days_survived +1, people_met +1
+Gamble  total_hands +3, wins +3, total_won +$13
+========================================================================================
+Cycle 05 | Day 6
+State   $ 141 -> 120 (-$21) | HP 64 -> 62 (-2) | SAN 75 -> 70 (-5) | Rank 0 -> 0 | Car N
+Events  storyline:kyle:stage0, met:Kyle, night:nightmare_of_losing
+Polarity negative
+Changes +story=['kyle']
+Stats   days_survived +1, people_met +1
+Gamble  total_hands +3, wins +1, losses +2, blackjacks +1, busts +1, total_won +$20, total_lost +$41
+========================================================================================
+Cycle 06 | Day 7
+State   $ 120 -> 96 (-$24) | HP 62 -> 32 (-30) | SAN 70 -> 39 (-31) | Rank 0 -> 0 | Car N
+Events  storyline:gas_station_hero:stage0, night:drowning_dream, met:Drowning Dream
+Polarity negative
+Changes +story=['gas_station_hero']
+Stats   days_survived +1, people_met +1
+Gamble  total_hands +3, wins +1, losses +2, busts +1, total_won +$5, total_lost +$29
+========================================================================================
+Cycle 07 | Day 8
+State   $ 96 -> 68 (-$28) | HP 32 -> 100 (+68) | SAN 39 -> 40 (+1) | Rank 0 -> 0 | Car N
+Events  storyline:betsy:stage0, met:Betsy, location:doctor, met:Doctor's Office
+Polarity positive
+Changes +injuries=['Broken Leg'] | +story=['betsy']
+Stats   days_survived +1, people_met +2, doctor_visits +1
+Gamble  total_hands +3, wins +2, losses +1, blackjacks +1, total_won +$50, total_lost +$23
+Result  player died during cycle 7 | cause: You have succumbed to your wounds
+
+########################################################################################
+Run Summary | cycles_requested=60 | seed=13
+Final    Day 8 | $ 68 | HP 100 | SAN 40 | Rank 0 | Alive=False
+Peak     $ 141 | Rank 0
+Peak days    5
+Inventory   []
+Has car            False
+Ever had car       False
+Has map            False
+Has worn map       False
+Has marvin access  False
+Millionaire reached False
+Millionaire visited False
+Death cause        You have succumbed to your wounds
+Injuries    ['Broken Hand', 'Broken Leg', 'Broken Nose', 'Deep Laceration']
+Status      []
+Pawned items []
+Pawned count 0
+Companions  []
+Travel restrictions  []
+Broken items        []
+Repairing items     []
+Storylines active     ['betsy', 'dr_feelgood', 'gas_station_hero', 'kyle', 'mime']
+Storylines completed  []
+Storylines failed     []
+Mechanic intro decisions
+  none
+
+Fallback decisions
+  none
+
+Event polarity
+  positive 7
+  negative 18
+  neutral 0
+
+Item impact
+  none
+
+Marvin provenance
+  none
+
+Planner traces
+  goals acquire_car=43 | survive_emergency=9 | stabilize_health=6
+  cycle=7 day=7 goal=survive_emergency action=20 confidence=0.88 reason=goal=survive_emergency blackjack_bet phase=car_rush survival=True edge=0
+  cycle=7 day=7 goal=survive_emergency action=stand confidence=0.92 reason=goal=survive_emergency blackjack_action=stand total=15 soft=0 dealer=6
+  cycle=7 day=7 goal=survive_emergency action=23 confidence=0.88 reason=goal=survive_emergency blackjack_bet phase=car_rush survival=True edge=0
+  cycle=7 day=7 goal=survive_emergency action=hit confidence=0.92 reason=goal=survive_emergency blackjack_action=hit total=13 soft=0 dealer=10
+  cycle=7 day=7 goal=survive_emergency action=hit confidence=0.92 reason=goal=survive_emergency blackjack_action=hit total=14 soft=0 dealer=10
+  cycle=7 day=7 goal=survive_emergency action=stand confidence=0.92 reason=goal=survive_emergency blackjack_action=stand total=17 soft=0 dealer=10
+  cycle=7 day=8 goal=survive_emergency action=no confidence=0.88 reason=threat_context_refusal
+  cycle=7 day=8 goal=survive_emergency action=1 confidence=1.00 reason=urgent medical override -> Doctor's Office
+
+Route visibility
+  outcomes interrupt=7
+  interrupts recovery_day=6 | urgent_medical=1
+  blocked_goals stabilize_health=7 | acquire_car=7 | push_next_rank=7 | bootstrap_blackjack_edge=5 | survive_emergency=2
+  interrupted_top_goals acquire_car=5 | survive_emergency=1 | run_ended=1
+
+Event Distribution | day
+    1  bar_fight_aftermath
+    1  damaged_exhaust_again
+    1  damaged_exhaust_fixed
+    1  estranged_dog
+    1  kitchen_accident
+    1  rock_bottom
+    1  slick_escape_route
+    1  the_mime
+
+Event Distribution | night
+    1  ditched_wallet
+    1  drowning_dream
+    1  insomnia_night
+    1  nightmare
+    1  nightmare_of_losing
+    1  stray_cat_dies
+
+Event Distribution | storyline
+    1  betsy:stage0
+    1  dr_feelgood:stage0
+    1  gas_station_hero:stage0
+    1  kyle:stage0
+
+Event Distribution | met
+    1  Betsy
+    1  Doctor's Office
+    1  Dr. Feelgood
+    1  Drowning Dream
+    1  Kyle
+    1  Mime
+
+Event Distribution | location
+    1  doctor
+
+Event Distribution | all
+    1  day:bar_fight_aftermath
+    1  day:damaged_exhaust_again
+    1  day:damaged_exhaust_fixed
+    1  day:estranged_dog
+    1  day:kitchen_accident
+    1  day:rock_bottom
+    1  day:slick_escape_route
+    1  day:the_mime
+    1  location:doctor
+    1  met:Betsy
+    1  met:Doctor's Office
+    1  met:Dr. Feelgood
+    1  met:Drowning Dream
+    1  met:Kyle
+    1  met:Mime
+    1  night:ditched_wallet
+    1  night:drowning_dream
+    1  night:insomnia_night
+    1  night:nightmare
+    1  night:nightmare_of_losing
+    1  night:stray_cat_dies
+    1  storyline:betsy:stage0
+    1  storyline:dr_feelgood:stage0
+    1  storyline:gas_station_hero:stage0
+    1  storyline:kyle:stage0
+
+Final Statistics
+  days_survived          7
+  total_money_earned     0
+  total_money_spent      0
+  items_collected        0
+  items_sold             0
+  events_experienced     0
+  people_met             6
+  injuries_sustained     0
+  illnesses_contracted   0
+  near_death_experiences 0
+  companions_befriended  0
+  loans_taken            0
+  loans_repaid           0
+  times_robbed           0
+  times_hospitalized     0
+  mechanic_visits        0
+  doctor_visits          1
+  witch_doctor_visits    0
+  casino_visits          0
+  pawn_shop_visits       0
+  marvin_visits          0
+  loan_shark_visits      0
+
+Final Gambling Statistics
+  total_hands            21
+  wins                   11
+  losses                 10
+  blackjacks             2
+  busts                  3
+  ties                   0
+  biggest_win            30
+  biggest_loss           23
+  current_streak         -1
+  best_win_streak        5
+  worst_loss_streak      3
+  total_won              100
+  total_lost             113
+  double_downs_won       0
+  splits_won             0
+  surrenders_used        0
+  insurance_collected    0
+
+NO ERRORS
+
+NO WARNINGS

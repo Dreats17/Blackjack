@@ -242,10 +242,63 @@ class LocationsMixin:
             else: self.night_event()
             
         else:
-            self.night_event()
+            shops = self._lists.make_shop_list(on_foot=True)
+
+            if len(shops) == 0:
+                self.night_event()
+                return
+
+            type.type("Your wagon isn't road-ready, but there are still places you can reach before sundown.")
+            print()
+            type.type("Would you like to spend your day driving somewhere? ")
+            print()
+
+            for i in range(len(shops)):
+                type.type(str(i+1) + ". " + shops[i])
+                time.sleep(0.5)
+                print()
+
+            stay_home_num = len(shops) + 1
+            type.type(str(stay_home_num) + ". Stay Home")
+            time.sleep(0.5)
+            print()
+
+            type.type("Choose a number: ")
+
+            choice = None
+            while True:
+                while choice is None:
+                    try:
+                        choice = int(input())
+                    except ValueError:
+                        type.type("Choose a number: ")
+                if 1 <= choice <= len(shops):
+                    shop = shops[choice-1]
+                    break
+                if choice == stay_home_num:
+                    shop = "Home"
+                    break
+                choice = None
+                type.type("That number's not a choice!")
+                print()
+                type.type("Choose a number: ")
+            print()
+
+            if shop == "Doctor's Office": self.visit_doctor()
+            elif shop == "Witch Doctor's Tower": self.visit_witch_doctor()
+            elif shop == "Trusty Tom's Trucks and Tires": self.visit_tom()
+            elif shop == "Filthy Frank's Flawless Fixtures": self.visit_frank()
+            elif shop == "Oswald's Optimal Outoparts": self.visit_oswald()
+            elif shop == "Convenience Store": self.visit_convenience_store()
+            elif shop == "Marvin's Mystical Merchandise": self.visit_marvin()
+            elif shop == "Grimy Gus's Pawn Emporium": self.visit_pawn_shop()
+            elif shop == "Vinnie's Back Alley Loans": self.visit_loan_shark()
+            elif shop == "Make a Phone Call": self.visit_phone_call()
+            else: self.night_event()
 
     #Doctor's Office Interaction    
     def visit_doctor(self):
+        self.increment_statistic("doctor_visits")
         type.type("You get in your car and drive to the Doctor's Office. ")
         if not self.has_met("Doctor's Office"):
             self.meet("Doctor's Office")
@@ -488,7 +541,7 @@ class LocationsMixin:
         self.restore_sanity(random.choice([1, 2, 3]))  # Restores sanity
         type.type("You walk back to the front desk to checkout.")
         print("\n")
-        cost = int((random.randint(65, 90)/100)*self._balance)
+        cost = int((random.randint(35, 60)/100)*self._balance)
         type.type("That will be " + bright(green("${:,}".format(cost))))
         if self.has_item("Real Insurance"):
             print("\n")
@@ -532,6 +585,7 @@ class LocationsMixin:
 
     # Witch Doctor's shop and interactions
     def visit_witch_doctor(self):
+        self.increment_statistic("witch_doctor_visits")
         potions = self._lists.make_witch_inventory()
         type.type("You get in your car and drive to the Witch Doctor's Tower. ")
         print("\n")
@@ -653,6 +707,7 @@ class LocationsMixin:
                 type.type("I SEE, so YOU WANT the Flask of Imminent Blackjack?")
                 if imminent_blackjack_price == 0:
                     imminent_blackjack_price = random.choice([40000, 45000, 50000])
+                price = imminent_blackjack_price
             elif potion == "Dealer's Whispers":
                 type.type("HAHAHA, so YOU WANT the Flask of Dealer's Whispers?")
                 if dealers_whispers_price == 0:
@@ -844,6 +899,7 @@ class LocationsMixin:
             type.type(quote("I ain't one to pry, but... whoever's callin', they sound real worried. Real sad. Maybe you should think about pickin' up."))
 
     def visit_tom(self):
+        self.increment_statistic("mechanic_visits")
         days_elapsed = self.get_days_elapsed("Mechanic")
         self.mark_day("Mechanic")
         type.type("You get in your car and drive to Tom's Trusty Trucks and Tires. ")
@@ -1296,6 +1352,7 @@ class LocationsMixin:
             type.type(quote("Think about it."))
 
     def visit_frank(self):
+        self.increment_statistic("mechanic_visits")
         days_elapsed = self.get_days_elapsed("Mechanic")
         self.mark_day("Mechanic")
         type.type("You get in your car and drive to Filthy Frank's Flawless Fixtures. ")
@@ -1730,6 +1787,7 @@ class LocationsMixin:
             type.type("Stuart looks up from his work. For just a moment, you could swear you see something mechanical glinting beneath his sleeve.")
 
     def visit_oswald(self):
+        self.increment_statistic("mechanic_visits")
         type.type("You get in your car and drive to Oswald's Optimal Outoparts. ")
         print("\n")
         self.oswald_dialogue()
@@ -3295,6 +3353,7 @@ class LocationsMixin:
 
     # Marvin's Shop and interactions
     def visit_marvin(self):
+        self.increment_statistic("marvin_visits")
         type.type("You get in your car and drive to Marvin's Mystical Merchandise. ")
         print("\n")
         inventory = self._lists.make_marvin_inventory()
@@ -3435,8 +3494,413 @@ class LocationsMixin:
         type.type("That's all I've got to sell you tonight. Maybe try coming back another day. ")
         self.start_night()
 
+    # Loan Shark Interaction
+    def visit_loan_shark(self):
+        self.increment_statistic("loan_shark_visits")
+        type.type("You drive to the seediest part of town, down a narrow alley behind a row of shuttered businesses. ")
+        print("\n")
+        
+        if not self.has_met("Vinnie"):
+            self.meet("Vinnie")
+            type.type("At the end of the alley, a black sedan idles with its headlights off. ")
+            type.type("Leaning against it is a man in a dark leather jacket, gold chain glinting around his neck. ")
+            type.type("He's got slicked-back hair and the kind of smile that never reaches his eyes.")
+            print("\n")
+            type.type("As you approach, he straightens up and looks you over like a butcher sizing up a cut of meat.")
+            print("\n")
+            type.type(quote("Fresh face. I like fresh faces. Name's Vinnie. And you look like someone who could use some... financial assistance."))
+            print("\n")
+            type.type("He gestures to the trunk of his car, which is suspiciously open just enough to reveal stacks of cash.")
+            print("\n")
+            type.type(quote("Simple terms. I give you money. You pay me back. Plus interest. 20% a week. Compound. Miss a payment... well."))
+            print("\n")
+            type.type("He cracks his knuckles meaningfully.")
+            print("\n")
+            type.type(quote("Let's just say my associate Tony handles the collections. You don't want to meet Tony."))
+            print("\n")
+        else:
+            # Get greeting based on warning level
+            warning_level = self.get_loan_shark_warning_level()
+            debt = self.get_loan_shark_debt()
+            
+            if debt > 0:
+                if warning_level >= 4:
+                    dialogue = self._lists.get_loan_shark_dialogue("collecting")
+                elif warning_level >= 3:
+                    dialogue = self._lists.get_loan_shark_dialogue("violence")
+                elif warning_level >= 2:
+                    dialogue = self._lists.get_loan_shark_dialogue("threat")
+                elif warning_level >= 1:
+                    dialogue = self._lists.get_loan_shark_dialogue("warning_2")
+                else:
+                    dialogue = self._lists.get_loan_shark_dialogue("warning_1")
+                type.type(dialogue)
+                print("\n")
+            else:
+                type.type(self._lists.get_loan_shark_dialogue("greeting"))
+                print("\n")
+        
+        self.visit_loan_shark_menu()
+    
+    def visit_loan_shark_menu(self):
+        debt = self.get_loan_shark_debt()
+        warning_level = self.get_loan_shark_warning_level()
+        balance = self.get_balance()
+        
+        # Show current debt status
+        if debt > 0:
+            type.type("Current debt: " + red(bright("${:,}".format(debt))))
+            print()
+            if warning_level > 0:
+                status_colors = [yellow, yellow, red, red]
+                status_names = ["Overdue", "Very Overdue", "DANGER", "CRITICAL"]
+                type.type("Status: " + status_colors[min(warning_level-1, 3)](bright(status_names[min(warning_level-1, 3)])))
+                print()
+            print()
+        
+        # Menu options
+        type.type("What would you like to do?")
+        print()
+        if debt == 0 or warning_level < 3:  # Can only borrow if not in too much trouble
+            type.type("1. Borrow money")
+            print()
+        if debt > 0:
+            type.type("2. Repay debt")
+            print()
+        type.type("3. Leave")
+        print()
+        
+        choice = input("Choose: ").strip()
+        
+        if choice == "1" and (debt == 0 or warning_level < 3):
+            self.visit_loan_shark_borrow()
+        elif choice == "2" and debt > 0:
+            self.visit_loan_shark_repay()
+        else:
+            if debt > 0 and warning_level >= 2:
+                type.type(quote("Running away won't save you. I know where you sleep."))
+            else:
+                type.type(quote("Don't be a stranger. Money's always available for friends."))
+            print("\n")
+            self.start_night()
+    
+    def visit_loan_shark_borrow(self):
+        warning_level = self.get_loan_shark_warning_level()
+        current_debt = self.get_loan_shark_debt()
+        
+        # Determine max loan based on reputation and current debt
+        if current_debt > 0:
+            max_loan = 5000 - current_debt  # Can't owe more than $5000 total
+            if max_loan <= 0:
+                type.type(quote("You're already in deep enough. Pay off what you owe first."))
+                print("\n")
+                self.visit_loan_shark_menu()
+                return
+        else:
+            # First-timers or clean records get more options
+            max_loan = 5000
+        
+        type.type(self._lists.get_loan_shark_dialogue("offer"))
+        print("\n")
+        
+        # Loan options
+        loan_options = []
+        if max_loan >= 100:
+            loan_options.append(100)
+        if max_loan >= 500:
+            loan_options.append(500)
+        if max_loan >= 1000:
+            loan_options.append(1000)
+        if max_loan >= 2500:
+            loan_options.append(2500)
+        if max_loan >= 5000 and current_debt == 0:
+            loan_options.append(5000)
+        
+        for i, amount in enumerate(loan_options, 1):
+            type.type(str(i) + ". Borrow " + green("${:,}".format(amount)))
+            print()
+        type.type(str(len(loan_options) + 1) + ". Never mind")
+        print()
+        
+        try:
+            choice = int(input("Choose: ").strip())
+            if 1 <= choice <= len(loan_options):
+                amount = loan_options[choice - 1]
+                type.type(quote("Smart move. Or stupid. We'll see which."))
+                print("\n")
+                self.take_loan(amount)
+                self.increment_statistic("loans_taken")
+                self.increment_statistic("total_borrowed", amount)
+                print("\n")
+                type.type(quote("Remember. 20% interest. Every. Single. Week."))
+                print("\n")
+                type.type(quote("And if you can't pay... Tony will explain the alternatives."))
+                print("\n")
+            else:
+                type.type(quote("Cold feet? That's probably smart."))
+                print("\n")
+        except ValueError:
+            type.type(quote("What was that? Speak up."))
+            print("\n")
+        
+        self.visit_loan_shark_menu()
+    
+    def visit_loan_shark_repay(self):
+        debt = self.get_loan_shark_debt()
+        balance = self.get_balance()
+        
+        type.type(quote("Finally doing the right thing, huh? You owe me ") + red(bright("${:,}".format(debt))) + quote("."))
+        print("\n")
+        
+        if balance <= 0:
+            type.type(quote("But you're broke. Why are you wasting my time?"))
+            print("\n")
+            self.visit_loan_shark_menu()
+            return
+        
+        # Repayment options
+        type.type("How much do you want to pay?")
+        print()
+        repay_options = []
+        
+        if balance >= debt:
+            repay_options.append(("Pay in full", debt))
+        if balance >= debt // 2 and debt // 2 > 0:
+            repay_options.append(("Pay half", debt // 2))
+        if balance >= 100:
+            repay_options.append(("Pay $100", 100))
+        if balance >= 500 and balance < debt:
+            repay_options.append(("Pay $500", 500))
+        if balance >= 1000 and balance < debt:
+            repay_options.append(("Pay $1,000", 1000))
+        
+        for i, (name, amount) in enumerate(repay_options, 1):
+            type.type(str(i) + ". " + name + " (" + green("${:,}".format(amount)) + ")")
+            print()
+        type.type(str(len(repay_options) + 1) + ". Never mind")
+        print()
+        
+        try:
+            choice = int(input("Choose: ").strip())
+            if 1 <= choice <= len(repay_options):
+                name, amount = repay_options[choice - 1]
+                self.repay_loan(amount)
+                self.increment_statistic("total_repaid", amount)
+            else:
+                if self.get_loan_shark_warning_level() >= 2:
+                    type.type(quote("You come here, waste my time, and don't pay? Bold."))
+                else:
+                    type.type(quote("Make up your mind."))
+                print("\n")
+        except ValueError:
+            type.type(quote("Numbers. I'm looking for numbers."))
+            print("\n")
+        
+        self.visit_loan_shark_menu()
+
+    def loan_shark_encounter(self):
+        """Random encounter when loan shark debt is high - DANGEROUS"""
+        warning_level = self.get_loan_shark_warning_level()
+        debt = self.get_loan_shark_debt()
+        
+        print("\n")
+        type.slow(red(bright("═══════════════════════════════════════")))
+        print()
+        type.slow(red(bright("         VINNIE WANTS HIS MONEY        ")))
+        print()
+        type.slow(red(bright("═══════════════════════════════════════")))
+        print("\n")
+        
+        if warning_level >= 4:
+            # DEATH TERRITORY
+            type.type("You're getting into your car when a van screeches up behind you.")
+            print("\n")
+            type.type("Men in dark suits pile out. You recognize Tony—Vinnie's enforcer.")
+            print("\n")
+            type.type("He's carrying a baseball bat. The others have worse.")
+            print("\n")
+            type.type(quote("Vinnie's done waiting. You owe him ") + red(bright("${:,}".format(debt))) + quote(". Today."))
+            print("\n")
+            
+            if self.get_balance() >= debt:
+                answer = ask.option("What do you do? ", ["pay everything", "fight", "beg"])
+                if answer == "pay everything":
+                    type.type("You hand over every last dollar you owe. Tony counts it, nods.")
+                    print("\n")
+                    type.type(quote("Smart choice. Vinnie says you're clear. For now."))
+                    self.repay_loan(debt)
+                    print("\n")
+                elif answer == "fight":
+                    self.loan_shark_fight()
+                else:
+                    type.type("You drop to your knees. Tears streaming. Begging for your life.")
+                    print("\n")
+                    if random.randrange(4) == 0:
+                        type.type("Tony hesitates. Something flickers in his eyes.")
+                        print("\n")
+                        type.type(quote("...One more week. But the interest doubles. And next time, I won't be so nice."))
+                        self._loan_shark_debt = int(self._loan_shark_debt * 1.5)
+                        self._loan_shark_days_overdue = 14  # Reset to threat level
+                        self.lose_sanity(20)
+                    else:
+                        type.type("Tony shrugs. " + quote("Nothing personal."))
+                        self.loan_shark_violence()
+            else:
+                answer = ask.option("You don't have enough. What do you do? ", ["pay what you have", "fight", "beg"])
+                if answer == "pay what you have":
+                    balance = self.get_balance()
+                    type.type("You empty your pockets. " + green("${:,}".format(balance)) + ". It's not enough.")
+                    print("\n")
+                    self.repay_loan(balance)
+                    type.type(quote("This covers the interest. But you still owe us. We'll be back."))
+                    self.hurt(30)  # They rough you up anyway
+                    self.lose_sanity(15)
+                    print("\n")
+                elif answer == "fight":
+                    self.loan_shark_fight()
+                else:
+                    type.type(quote("Begging? Really?"))
+                    self.loan_shark_violence()
+            print("\n")
+            
+        elif warning_level >= 3:
+            # VIOLENCE TERRITORY
+            type.type("You're walking to the casino when a black sedan pulls up beside you.")
+            print("\n")
+            type.type("The window rolls down. Tony's face appears. He's not smiling.")
+            print("\n")
+            type.type(quote("Boss says you've been avoiding him. That's not smart."))
+            print("\n")
+            type.type("Before you can respond, he's out of the car. His fist connects with your stomach.")
+            print("\n")
+            type.type("You double over. He hits you again. And again.")
+            print("\n")
+            type.type(quote("That's a reminder. Next time, we take something you can't grow back."))
+            print("\n")
+            self.hurt(35)
+            self.lose_sanity(15)
+            print("\n")
+            
+        elif warning_level >= 2:
+            # THREAT TERRITORY
+            type.type("There's a note tucked under your windshield wiper.")
+            print("\n")
+            type.type("It reads: " + red(quote("WE KNOW WHERE YOU SLEEP.")))
+            print("\n")
+            type.type("Below it, a photo. You, in your car. Last night. Taken from outside.")
+            print("\n")
+            type.type("Someone was watching you. Someone is always watching you.")
+            print("\n")
+            self.lose_sanity(12)
+            print("\n")
+            
+        else:
+            # WARNING TERRITORY
+            type.type("Your phone buzzes. Unknown number.")
+            print("\n")
+            type.type(quote("Don't forget. You owe Vinnie. He doesn't like to wait."))
+            print("\n")
+            type.type("The line goes dead before you can respond.")
+            self.lose_sanity(5)
+            print("\n")
+    
+    def loan_shark_fight(self):
+        """Fight Tony and the goons - VERY DANGEROUS"""
+        type.type("You throw a punch at Tony. It connects. He staggers back, surprised.")
+        print("\n")
+        type.type("Then the other two are on you. Fists. Boots. Something metal.")
+        print("\n")
+        
+        chance = random.randrange(10)
+        if chance < 2:
+            # You somehow win
+            type.type("Adrenaline surges through you. You fight like a cornered animal.")
+            print("\n")
+            type.type("Somehow—SOMEHOW—you take them down. All three. You're covered in blood.")
+            print("\n")
+            type.type("Tony is unconscious. You grab his wallet. " + green(bright("$500")) + " and a gun.")
+            print("\n")
+            type.type("You've made a terrible enemy. But you're alive.")
+            self.change_balance(500)
+            self.add_item("Tony's Gun")
+            self.add_danger("Vinnie's Enemy")
+            self.hurt(40)
+            self.lose_sanity(20)
+            self._loan_shark_debt = 0  # Debt cleared through violence
+            self._loan_shark_warning_level = 0
+        elif chance < 5:
+            # You escape
+            type.type("You manage to break free. Run. Don't stop running.")
+            print("\n")
+            type.type("They're shouting behind you. Something about finding you. About your kneecaps.")
+            print("\n")
+            type.type("You hide for hours. Shaking. Waiting for them to find you.")
+            self.hurt(25)
+            self.lose_sanity(20)
+        else:
+            # You lose badly
+            self.loan_shark_violence()
+    
+    def loan_shark_violence(self):
+        """Tony and the goons beat you - GRAPHIC"""
+        type.type("They don't hold back.")
+        print("\n")
+        type.type("The first blow breaks something. You hear it crack.")
+        print("\n")
+        type.type("You're on the ground. Curled up. Trying to protect your head.")
+        print("\n")
+        type.type("Boots. Over and over. Your ribs. Your back. Your face.")
+        print("\n")
+        time.sleep(1)
+        type.type("...")
+        print("\n")
+        time.sleep(1)
+        
+        chance = random.randrange(10)
+        if chance < 3:
+            # You survive, barely
+            type.type("You wake up in an alley. Sun is coming up.")
+            print("\n")
+            type.type("Everything hurts. You can barely move. But you're alive.")
+            print("\n")
+            type.type("They left a message carved into your arm: " + red(quote("PAY")))
+            print("\n")
+            self.hurt(60)
+            self.lose_sanity(30)
+            self.add_status("Broken Ribs")
+            self.add_status("Concussion")
+            self.add_danger("Scarred")
+        elif chance < 7:
+            # You survive, they take something
+            type.type("Tony leans down. His face is inches from yours.")
+            print("\n")
+            type.type(quote("Consider this a payment plan."))
+            print("\n")
+            type.type("He pulls out a knife. Grabs your left hand.")
+            print("\n")
+            type.slow(red("..."))
+            print("\n")
+            type.type("You wake up in a hospital. Missing a finger. They found you in a dumpster.")
+            print("\n")
+            type.type("The debt is halved. The message is clear.")
+            self._loan_shark_debt = self._loan_shark_debt // 2
+            self.hurt(50)
+            self.lose_sanity(40)
+            self.add_danger("Missing Finger")
+            self.add_status("Severe Trauma")
+        else:
+            # You don't survive
+            type.type("Tony's boot comes down one final time.")
+            print("\n")
+            type.type("You don't feel it.")
+            print("\n")
+            type.type("You don't feel anything anymore.")
+            print("\n")
+            self.kill("beaten to death by loan sharks")
+
     # Pawn Shop Interaction
     def visit_pawn_shop(self):
+        self.increment_statistic("pawn_shop_visits")
         type.type("You get in your car and drive down a winding backstreet to Grimy Gus's Pawn Emporium. ")
         print("\n")
         if not self.has_met("Pawn Shop"):
@@ -3692,6 +4156,7 @@ class LocationsMixin:
             if answer == "yes":
                 self.lose_item(item)
                 self.change_balance(price)
+                self.increment_statistic("items_sold")
                 sold_something = True
                 
                 # Track if this is a new unique item sold
@@ -4190,406 +4655,3 @@ class LocationsMixin:
         print("\n")
         type.slow("Thank you for playing.")
         quit()
-
-    # Loan Shark Interaction
-    def visit_loan_shark(self):
-        type.type("You drive to the seediest part of town, down a narrow alley behind a row of shuttered businesses. ")
-        print("\n")
-        
-        if not self.has_met("Vinnie"):
-            self.meet("Vinnie")
-            type.type("At the end of the alley, a black sedan idles with its headlights off. ")
-            type.type("Leaning against it is a man in a dark leather jacket, gold chain glinting around his neck. ")
-            type.type("He's got slicked-back hair and the kind of smile that never reaches his eyes.")
-            print("\n")
-            type.type("As you approach, he straightens up and looks you over like a butcher sizing up a cut of meat.")
-            print("\n")
-            type.type(quote("Fresh face. I like fresh faces. Name's Vinnie. And you look like someone who could use some... financial assistance."))
-            print("\n")
-            type.type("He gestures to the trunk of his car, which is suspiciously open just enough to reveal stacks of cash.")
-            print("\n")
-            type.type(quote("Simple terms. I give you money. You pay me back. Plus interest. 20% a week. Compound. Miss a payment... well."))
-            print("\n")
-            type.type("He cracks his knuckles meaningfully.")
-            print("\n")
-            type.type(quote("Let's just say my associate Tony handles the collections. You don't want to meet Tony."))
-            print("\n")
-        else:
-            # Get greeting based on warning level
-            warning_level = self.get_loan_shark_warning_level()
-            debt = self.get_loan_shark_debt()
-            
-            if debt > 0:
-                if warning_level >= 4:
-                    dialogue = self._lists.get_loan_shark_dialogue("collecting")
-                elif warning_level >= 3:
-                    dialogue = self._lists.get_loan_shark_dialogue("violence")
-                elif warning_level >= 2:
-                    dialogue = self._lists.get_loan_shark_dialogue("threat")
-                elif warning_level >= 1:
-                    dialogue = self._lists.get_loan_shark_dialogue("warning_2")
-                else:
-                    dialogue = self._lists.get_loan_shark_dialogue("warning_1")
-                type.type(dialogue)
-                print("\n")
-            else:
-                type.type(self._lists.get_loan_shark_dialogue("greeting"))
-                print("\n")
-        
-        self.visit_loan_shark_menu()
-    
-    def visit_loan_shark_menu(self):
-        debt = self.get_loan_shark_debt()
-        warning_level = self.get_loan_shark_warning_level()
-        balance = self.get_balance()
-        
-        # Show current debt status
-        if debt > 0:
-            type.type("Current debt: " + red(bright("${:,}".format(debt))))
-            print()
-            if warning_level > 0:
-                status_colors = [yellow, yellow, red, red]
-                status_names = ["Overdue", "Very Overdue", "DANGER", "CRITICAL"]
-                type.type("Status: " + status_colors[min(warning_level-1, 3)](bright(status_names[min(warning_level-1, 3)])))
-                print()
-            print()
-        
-        # Menu options
-        type.type("What would you like to do?")
-        print()
-        if debt == 0 or warning_level < 3:  # Can only borrow if not in too much trouble
-            type.type("1. Borrow money")
-            print()
-        if debt > 0:
-            type.type("2. Repay debt")
-            print()
-        type.type("3. Leave")
-        print()
-        
-        choice = input("Choose: ").strip()
-        
-        if choice == "1" and (debt == 0 or warning_level < 3):
-            self.visit_loan_shark_borrow()
-        elif choice == "2" and debt > 0:
-            self.visit_loan_shark_repay()
-        else:
-            if debt > 0 and warning_level >= 2:
-                type.type(quote("Running away won't save you. I know where you sleep."))
-            else:
-                type.type(quote("Don't be a stranger. Money's always available for friends."))
-            print("\n")
-            self.start_night()
-    
-    def visit_loan_shark_borrow(self):
-        warning_level = self.get_loan_shark_warning_level()
-        current_debt = self.get_loan_shark_debt()
-        
-        # Determine max loan based on reputation and current debt
-        if current_debt > 0:
-            max_loan = 5000 - current_debt  # Can't owe more than $5000 total
-            if max_loan <= 0:
-                type.type(quote("You're already in deep enough. Pay off what you owe first."))
-                print("\n")
-                self.visit_loan_shark_menu()
-                return
-        else:
-            # First-timers or clean records get more options
-            max_loan = 5000
-        
-        type.type(self._lists.get_loan_shark_dialogue("offer"))
-        print("\n")
-        
-        # Loan options
-        loan_options = []
-        if max_loan >= 100:
-            loan_options.append(100)
-        if max_loan >= 500:
-            loan_options.append(500)
-        if max_loan >= 1000:
-            loan_options.append(1000)
-        if max_loan >= 2500:
-            loan_options.append(2500)
-        if max_loan >= 5000 and current_debt == 0:
-            loan_options.append(5000)
-        
-        for i, amount in enumerate(loan_options, 1):
-            type.type(str(i) + ". Borrow " + green("${:,}".format(amount)))
-            print()
-        type.type(str(len(loan_options) + 1) + ". Never mind")
-        print()
-        
-        try:
-            choice = int(input("Choose: ").strip())
-            if 1 <= choice <= len(loan_options):
-                amount = loan_options[choice - 1]
-                type.type(quote("Smart move. Or stupid. We'll see which."))
-                print("\n")
-                self.take_loan(amount)
-                self.increment_statistic("loans_taken")
-                self.increment_statistic("total_borrowed", amount)
-                print("\n")
-                type.type(quote("Remember. 20% interest. Every. Single. Week."))
-                print("\n")
-                type.type(quote("And if you can't pay... Tony will explain the alternatives."))
-                print("\n")
-            else:
-                type.type(quote("Cold feet? That's probably smart."))
-                print("\n")
-        except ValueError:
-            type.type(quote("What was that? Speak up."))
-            print("\n")
-        
-        self.visit_loan_shark_menu()
-    
-    def visit_loan_shark_repay(self):
-        debt = self.get_loan_shark_debt()
-        balance = self.get_balance()
-        
-        type.type(quote("Finally doing the right thing, huh? You owe me ") + red(bright("${:,}".format(debt))) + quote("."))
-        print("\n")
-        
-        if balance <= 0:
-            type.type(quote("But you're broke. Why are you wasting my time?"))
-            print("\n")
-            self.visit_loan_shark_menu()
-            return
-        
-        # Repayment options
-        type.type("How much do you want to pay?")
-        print()
-        repay_options = []
-        
-        if balance >= debt:
-            repay_options.append(("Pay in full", debt))
-        if balance >= debt // 2 and debt // 2 > 0:
-            repay_options.append(("Pay half", debt // 2))
-        if balance >= 100:
-            repay_options.append(("Pay $100", 100))
-        if balance >= 500 and balance < debt:
-            repay_options.append(("Pay $500", 500))
-        if balance >= 1000 and balance < debt:
-            repay_options.append(("Pay $1,000", 1000))
-        
-        for i, (name, amount) in enumerate(repay_options, 1):
-            type.type(str(i) + ". " + name + " (" + green("${:,}".format(amount)) + ")")
-            print()
-        type.type(str(len(repay_options) + 1) + ". Never mind")
-        print()
-        
-        try:
-            choice = int(input("Choose: ").strip())
-            if 1 <= choice <= len(repay_options):
-                name, amount = repay_options[choice - 1]
-                self.repay_loan(amount)
-                self.increment_statistic("total_repaid", amount)
-            else:
-                if self.get_loan_shark_warning_level() >= 2:
-                    type.type(quote("You come here, waste my time, and don't pay? Bold."))
-                else:
-                    type.type(quote("Make up your mind."))
-                print("\n")
-        except ValueError:
-            type.type(quote("Numbers. I'm looking for numbers."))
-            print("\n")
-        
-        self.visit_loan_shark_menu()
-
-    def loan_shark_encounter(self):
-        """Random encounter when loan shark debt is high - DANGEROUS"""
-        warning_level = self.get_loan_shark_warning_level()
-        debt = self.get_loan_shark_debt()
-        
-        print("\n")
-        type.slow(red(bright("═══════════════════════════════════════")))
-        print()
-        type.slow(red(bright("         VINNIE WANTS HIS MONEY        ")))
-        print()
-        type.slow(red(bright("═══════════════════════════════════════")))
-        print("\n")
-        
-        if warning_level >= 4:
-            # DEATH TERRITORY
-            type.type("You're getting into your car when a van screeches up behind you.")
-            print("\n")
-            type.type("Men in dark suits pile out. You recognize Tony—Vinnie's enforcer.")
-            print("\n")
-            type.type("He's carrying a baseball bat. The others have worse.")
-            print("\n")
-            type.type(quote("Vinnie's done waiting. You owe him ") + red(bright("${:,}".format(debt))) + quote(". Today."))
-            print("\n")
-            
-            if self.get_balance() >= debt:
-                answer = ask.option("What do you do? ", ["pay everything", "fight", "beg"])
-                if answer == "pay everything":
-                    type.type("You hand over every last dollar you owe. Tony counts it, nods.")
-                    print("\n")
-                    type.type(quote("Smart choice. Vinnie says you're clear. For now."))
-                    self.repay_loan(debt)
-                    print("\n")
-                elif answer == "fight":
-                    self.loan_shark_fight()
-                else:
-                    type.type("You drop to your knees. Tears streaming. Begging for your life.")
-                    print("\n")
-                    if random.randrange(4) == 0:
-                        type.type("Tony hesitates. Something flickers in his eyes.")
-                        print("\n")
-                        type.type(quote("...One more week. But the interest doubles. And next time, I won't be so nice."))
-                        self._loan_shark_debt = int(self._loan_shark_debt * 1.5)
-                        self._loan_shark_days_overdue = 14  # Reset to threat level
-                        self.lose_sanity(20)
-                    else:
-                        type.type("Tony shrugs. " + quote("Nothing personal."))
-                        self.loan_shark_violence()
-            else:
-                answer = ask.option("You don't have enough. What do you do? ", ["pay what you have", "fight", "beg"])
-                if answer == "pay what you have":
-                    balance = self.get_balance()
-                    type.type("You empty your pockets. " + green("${:,}".format(balance)) + ". It's not enough.")
-                    print("\n")
-                    self.repay_loan(balance)
-                    type.type(quote("This covers the interest. But you still owe us. We'll be back."))
-                    self.hurt(30)  # They rough you up anyway
-                    self.lose_sanity(15)
-                    print("\n")
-                elif answer == "fight":
-                    self.loan_shark_fight()
-                else:
-                    type.type(quote("Begging? Really?"))
-                    self.loan_shark_violence()
-            print("\n")
-            
-        elif warning_level >= 3:
-            # VIOLENCE TERRITORY
-            type.type("You're walking to the casino when a black sedan pulls up beside you.")
-            print("\n")
-            type.type("The window rolls down. Tony's face appears. He's not smiling.")
-            print("\n")
-            type.type(quote("Boss says you've been avoiding him. That's not smart."))
-            print("\n")
-            type.type("Before you can respond, he's out of the car. His fist connects with your stomach.")
-            print("\n")
-            type.type("You double over. He hits you again. And again.")
-            print("\n")
-            type.type(quote("That's a reminder. Next time, we take something you can't grow back."))
-            print("\n")
-            self.hurt(35)
-            self.lose_sanity(15)
-            print("\n")
-            
-        elif warning_level >= 2:
-            # THREAT TERRITORY
-            type.type("There's a note tucked under your windshield wiper.")
-            print("\n")
-            type.type("It reads: " + red(quote("WE KNOW WHERE YOU SLEEP.")))
-            print("\n")
-            type.type("Below it, a photo. You, in your car. Last night. Taken from outside.")
-            print("\n")
-            type.type("Someone was watching you. Someone is always watching you.")
-            print("\n")
-            self.lose_sanity(12)
-            print("\n")
-            
-        else:
-            # WARNING TERRITORY
-            type.type("Your phone buzzes. Unknown number.")
-            print("\n")
-            type.type(quote("Don't forget. You owe Vinnie. He doesn't like to wait."))
-            print("\n")
-            type.type("The line goes dead before you can respond.")
-            self.lose_sanity(5)
-            print("\n")
-    
-    def loan_shark_fight(self):
-        """Fight Tony and the goons - VERY DANGEROUS"""
-        type.type("You throw a punch at Tony. It connects. He staggers back, surprised.")
-        print("\n")
-        type.type("Then the other two are on you. Fists. Boots. Something metal.")
-        print("\n")
-        
-        chance = random.randrange(10)
-        if chance < 2:
-            # You somehow win
-            type.type("Adrenaline surges through you. You fight like a cornered animal.")
-            print("\n")
-            type.type("Somehow—SOMEHOW—you take them down. All three. You're covered in blood.")
-            print("\n")
-            type.type("Tony is unconscious. You grab his wallet. " + green(bright("$500")) + " and a gun.")
-            print("\n")
-            type.type("You've made a terrible enemy. But you're alive.")
-            self.change_balance(500)
-            self.add_item("Tony's Gun")
-            self.add_danger("Vinnie's Enemy")
-            self.hurt(40)
-            self.lose_sanity(20)
-            self._loan_shark_debt = 0  # Debt cleared through violence
-            self._loan_shark_warning_level = 0
-        elif chance < 5:
-            # You escape
-            type.type("You manage to break free. Run. Don't stop running.")
-            print("\n")
-            type.type("They're shouting behind you. Something about finding you. About your kneecaps.")
-            print("\n")
-            type.type("You hide for hours. Shaking. Waiting for them to find you.")
-            self.hurt(25)
-            self.lose_sanity(20)
-        else:
-            # You lose badly
-            self.loan_shark_violence()
-    
-    def loan_shark_violence(self):
-        """Tony and the goons beat you - GRAPHIC"""
-        type.type("They don't hold back.")
-        print("\n")
-        type.type("The first blow breaks something. You hear it crack.")
-        print("\n")
-        type.type("You're on the ground. Curled up. Trying to protect your head.")
-        print("\n")
-        type.type("Boots. Over and over. Your ribs. Your back. Your face.")
-        print("\n")
-        time.sleep(1)
-        type.type("...")
-        print("\n")
-        time.sleep(1)
-        
-        chance = random.randrange(10)
-        if chance < 3:
-            # You survive, barely
-            type.type("You wake up in an alley. Sun is coming up.")
-            print("\n")
-            type.type("Everything hurts. You can barely move. But you're alive.")
-            print("\n")
-            type.type("They left a message carved into your arm: " + red(quote("PAY")))
-            print("\n")
-            self.hurt(60)
-            self.lose_sanity(30)
-            self.add_status("Broken Ribs")
-            self.add_status("Concussion")
-            self.add_danger("Scarred")
-        elif chance < 7:
-            # You survive, they take something
-            type.type("Tony leans down. His face is inches from yours.")
-            print("\n")
-            type.type(quote("Consider this a payment plan."))
-            print("\n")
-            type.type("He pulls out a knife. Grabs your left hand.")
-            print("\n")
-            type.slow(red("..."))
-            print("\n")
-            type.type("You wake up in a hospital. Missing a finger. They found you in a dumpster.")
-            print("\n")
-            type.type("The debt is halved. The message is clear.")
-            self._loan_shark_debt = self._loan_shark_debt // 2
-            self.hurt(50)
-            self.lose_sanity(40)
-            self.add_danger("Missing Finger")
-            self.add_status("Severe Trauma")
-        else:
-            # You don't survive
-            type.type("Tony's boot comes down one final time.")
-            print("\n")
-            type.type("You don't feel it.")
-            print("\n")
-            type.type("You don't feel anything anymore.")
-            print("\n")
-            self.die("beaten to death by loan sharks")

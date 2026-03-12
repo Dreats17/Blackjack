@@ -74,7 +74,20 @@ FOOD_DATA = {
 from story.systems import SystemsMixin
 from story.economy import EconomyMixin
 from story.day_cycle import DayCycleMixin
-from story.events_day import DayEventsMixin
+from story.events_day_survival import DaySurvivalMixin
+from story.events_day_people import DayPeopleMixin
+from story.events_day_animals import DayAnimalsMixin
+from story.mechanics_intro import MechanicsStorylineMixin
+from story.events_day_casino import DayCasinoMixin
+from story.events_day_wealth import DayWealthMixin
+from story.events_day_dark import DayDarkMixin
+from story.events_day_companions import DayCompanionsMixin
+from story.events_day_items import DayItemsMixin
+from story.events_day_surreal import DaySurrealMixin
+from story.events_day_numbers import DayNumbersMixin
+from story.events_day_storylines import DayStorylinesMixin
+from story.events_illness import IllnessMixin
+from story.events_car import CarEventsMixin
 from story.events_night import NightEventsMixin
 from story.adventures import AdventuresMixin
 from story.game_flow import GameFlowMixin
@@ -87,7 +100,20 @@ class Player(
     SystemsMixin,
     EconomyMixin,
     DayCycleMixin,
-    DayEventsMixin,
+    DaySurvivalMixin,
+    DayPeopleMixin,
+    DayAnimalsMixin,
+    MechanicsStorylineMixin,
+    DayCasinoMixin,
+    DayWealthMixin,
+    DayDarkMixin,
+    DayCompanionsMixin,
+    DayItemsMixin,
+    DaySurrealMixin,
+    DayNumbersMixin,
+    DayStorylinesMixin,
+    IllnessMixin,
+    CarEventsMixin,
     NightEventsMixin,
     AdventuresMixin,
     GameFlowMixin,
@@ -119,7 +145,7 @@ class Player(
         self._previous_balance = 50
         self._rank = 0
         self._day = 1
-        self._counting_days = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+        self._counting_days = [0] * 13
         self._item_durability = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] # [delight_indicator, health_indicator, dirty_old_hat, golden_watch, enchanting_silver_bar, sneaky_peeky_shades, quiet_sneakers, faulty_insurance, lucky_coin, worn_gloves, tattered_cloak, rusty_compass, pocket_watch, gamblers_chalice, twins_locket, white_feather, dealers_grudge, gamblers_grimoire]
         self._flask_durability = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] # [no_bust, imminent_blackjack, dealers_whispers, bonus_fortune, anti_venom, anti_virus, fortunate_day, fortunate_night, second_chance, split_serum, dealers_hesitation, pocket_aces]
         self._round_count = 3
@@ -187,8 +213,11 @@ class Player(
             "times_hospitalized": 0,
             "mechanic_visits": 0,
             "doctor_visits": 0,
+            "witch_doctor_visits": 0,
             "casino_visits": 0,
             "pawn_shop_visits": 0,
+            "marvin_visits": 0,
+            "loan_shark_visits": 0,
         }
         
         # COMPANION SYSTEM - Tracks active companions and their states
@@ -419,7 +448,13 @@ class Player(
         self._broken_inventory.add(item)
     
     def use_item(self, item):
-        self._inventory.remove(item)
+        self._inventory.discard(item)
+
+    def remove_item(self, item):
+        self._inventory.discard(item)
+
+    def lose_item(self, item):
+        self.remove_item(item)
 
     def break_item(self, item):
         self._broken_inventory.add(item)
@@ -555,7 +590,10 @@ class Player(
         return danger in self._dangers
     
     def lose_danger(self, danger):
-        self._dangers.remove(danger)
+        self._dangers.discard(danger)
+
+    def remove_danger(self, danger):
+        self._dangers.discard(danger)
 
     # Dream sequence tracking
     def get_tom_dreams(self):

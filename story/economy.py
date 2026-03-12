@@ -68,16 +68,19 @@ class EconomyMixin:
         return self._balance
 
     def set_balance(self, value):
-        self._balance = value
+        self._balance = int(value)
 
     def change_balance(self, value):
         print("\n")
         if (self._balance + value) <= 0:
             self._balance = 0
             type.type("Your new balance is " + red(bright("$0")))
+            print("\n")
+            self.status()
+            return
         else:
             previous_balance = self._balance
-            self._balance += value
+            self._balance = int(self._balance + value)
             if value > 0:
                 type.type("Your new balance is " + green(bright("${:,}".format(previous_balance) + " + ${:,}".format(value)) + bright(green(" = " + "${:,}".format(self._balance)))))
             elif value < 0:

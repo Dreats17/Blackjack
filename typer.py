@@ -270,6 +270,21 @@ class Type:
 
             self.check_for_skip()
 
+    def typeover(self, prompt, text, newline=False):
+        """Print prompt, wait for any keypress, then overwrite the line with text."""
+        sys.stdout.write(prompt)
+        sys.stdout.flush()
+        # Clear keyboard buffer, then block until a key is pressed
+        while msvcrt.kbhit():
+            msvcrt.getch()
+        msvcrt.getch()
+        # Overwrite the prompt line with spaces, then carriage-return to start
+        sys.stdout.write('\r' + ' ' * len(prompt) + '\r')
+        sys.stdout.flush()
+        self.fast(text)
+        if newline:
+            print()
+
     def cleanup(self):
         while msvcrt.kbhit():
             byte = msvcrt.getch()
