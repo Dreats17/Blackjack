@@ -1489,23 +1489,25 @@ def _rank_tuner(player):
 
 
 def _rank_protection_floor(player):
-    """Minimum balance to keep so a single purchase can't drop the player more than 1 rank.
+    """Minimum balance to keep so a single purchase can't drop the player out of their rank.
 
-    At ranks > 0 there should be strict rules about catastrophic spending.  The floor
-    is the balance threshold of one rank BELOW the current rank — e.g. a rank-2 player
-    ($10k–$99k) should not spend down below $1,000 (rank-1 threshold) in one shot.
+    At ranks > 1 there should be strict rules about catastrophic spending.  The floor
+    is the balance threshold of the CURRENT rank — a rank-2 player ($10k–$99k) should
+    not spend down below $10,000 (the rank-2 entry threshold) in one shot.
 
-    Returns 0 at rank 0/1 because those ranks have no meaningful downside to a 1-rank
-    drop (rank 0 IS the baseline).
+    This prevents the bot from wiping out its rank cushion with a single low-priority
+    purchase.  High-priority items (≥88) already have their own push-window override.
+
+    Returns 0 at rank 0/1 because those ranks have minimal consequence.
     """
     if player is None:
         return 0
     rank = int(player.get_rank())
-    # Rank thresholds: 0→$1, 1→$1k, 2→$10k, 3→$100k, 4→$500k, 5→$900k
+    # Rank thresholds: 0→$0, 1→$1k, 2→$10k, 3→$100k, 4→$500k, 5→$900k
     thresholds = [0, 1000, 10000, 100000, 500000, 900000]
     if rank <= 1:
         return 0
-    return thresholds[rank - 1]
+    return thresholds[rank]
 
 
 def _in_rank_push_window(player):
@@ -4262,6 +4264,13 @@ def _decide_yes_no(prompt=""):
             priority = _marvin_item_priority(current_offer, player)
             if priority <= 0:
                 return finalize("no", f"marvin_offer_priority_zero:{current_offer}")
+            # At rank 2+, skip low-value items — spending on them wipes out the rank cushion
+            # and leaves the bot vulnerable to gambling variance.  Items like Dirty Old Hat
+            # (priority 62) are not worth the balance dip; only items that meaningfully improve
+            # the edge (priority ≥ 70 base, or high-priority after rank/health adjustments) qualify.
+            rank = int(player.get_rank()) if hasattr(player, "get_rank") else 0
+            if rank >= 2 and priority < 70:
+                return finalize("no", f"marvin_offer_rank2_low_priority:{current_offer}")
             if _can_afford_optional_purchase(player, cost, priority):
                 return finalize("yes", f"marvin_offer_affordable:{current_offer}", 0.8)
             # High-priority Marvin items are justified exceptions to rank-drop protection
