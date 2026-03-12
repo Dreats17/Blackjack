@@ -1092,6 +1092,8 @@ def _needs_doctor(player):
         or (player.has_item("Car") and len(injuries) >= 1 and 60 <= player._health < 85)
         or (player._health < 55 and len(injuries) >= 1)
         or (player._health < 60 and len(statuses) >= 1)
+        # Visit when 3+ total conditions are present — compound accumulation is dangerous.
+        or (len(injuries) + len(statuses) >= 3)
         or len(injuries) >= 2
         or (player._health < 50 and len(statuses) >= 2)
         or (player._sanity < 24 and len(statuses) >= 2)
@@ -1112,11 +1114,12 @@ def _doctor_visit_is_urgent(player):
     urgent_injuries = {"ruptured spleen", "concussion", "broken ribs", "punctured lung"}
     injuries = _injury_names(player)
     return (
-        player._health < 30
+        player._health < 35
         or player._sanity < 12
         or any(status in urgent_statuses for status in statuses)
         or any(injury in urgent_injuries for injury in injuries)
         or (player._health < 42 and len(statuses) >= 2)
+        or (player._health < 48 and len(statuses) + len(injuries) >= 3)
     )
 
 
@@ -1399,7 +1402,10 @@ def _should_visit_doctor(player):
                 return True
         if len(statuses) >= 2 and remaining_balance >= 90 and player.get_health() < 80:
             return True
-    if remaining_balance < 120:
+        # 3+ combined injuries+statuses: treat as compound accumulation regardless of HP.
+        if len(injuries) + len(statuses) >= 3 and remaining_balance >= 120:
+            return True
+    if remaining_balance < 100:
         return False
     if player.get_health() < 62 and remaining_balance >= 120:
         return True
@@ -4187,7 +4193,11 @@ def _decide_yes_no(prompt=""):
         return finalize(event_override, "adapter_budget_gate")
 
     if "spend time with your companions" in prompt_lower:
-        answer = "yes" if player is not None and (_companion_count(player) >= 3 or player.get_sanity() < 55 or player.get_health() < 70) else "no"
+        # Never skip a needed doctor visit to socialise — medical need takes priority.
+        if player is not None and (_doctor_visit_is_urgent(player) or _wants_doctor_visit(player)):
+            answer = "no"
+        else:
+            answer = "yes" if player is not None and (_companion_count(player) >= 3 or player.get_sanity() < 55 or player.get_health() < 72) else "no"
         return finalize(answer, "companion_recovery_gate")
     if any(
         re.search(rf"\b{re.escape(phrase)}\b", recent)

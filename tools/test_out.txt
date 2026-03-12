@@ -1,691 +1,667 @@
 ========================================================================================
 Cycle 01 | Day 2
-State   $ 50 -> 59 (+$9) | HP 100 -> 100 (+0) | SAN 100 -> 100 (+0) | Rank 0 -> 0 | Car N
-Events  storyline:stray_cat:stage0, met:Stray Cat Friend, night:midnight_walk
-Polarity neutral
+State   $ 50 -> 58 (+$8) | HP 100 -> 100 (+0) | SAN 100 -> 95 (-5) | Rank 0 -> 0 | Car N
+Events  storyline:stray_cat:stage0, met:Stray Cat Friend, night:nightmare_of_losing
+Polarity negative
 Changes +companions=['Whiskers'] | +story=['stray_cat']
 Stats   days_survived +1, people_met +1, companions_befriended +2
-Gamble  total_hands +3, wins +2, losses +1, blackjacks +1, total_won +$15, total_lost +$6
+Gamble  total_hands +3, wins +2, losses +1, blackjacks +1, total_won +$13, total_lost +$5
 ========================================================================================
 Cycle 02 | Day 3
-State   $ 59 -> 82 (+$23) | HP 100 -> 100 (+0) | SAN 100 -> 98 (-2) | Rank 0 -> 0 | Car N
-Events  day:opossum_in_trash, night:raccoon_invasion
-Polarity negative
-Changes +companions=['Patches']
-Stats   days_survived +1, companions_befriended +2
-Gamble  total_hands +3, wins +2, ties +1, blackjacks +1, total_won +$23
-========================================================================================
-Cycle 03 | Day 4
-State   $ 82 -> 81 (-$1) | HP 100 -> 100 (+0) | SAN 98 -> 100 (+2) | Rank 0 -> 0 | Car N
-Events  storyline:jameson:stage0, met:Cowboy, night:ditched_wallet
+State   $ 58 -> 94 (+$36) | HP 100 -> 100 (+0) | SAN 95 -> 100 (+5) | Rank 0 -> 0 | Car N
+Events  storyline:jameson:stage0, met:Cowboy, night:midnight_walk
 Polarity positive
 Changes +items=['Carrot'] | +story=['jameson']
 Stats   days_survived +1, people_met +1
-Gamble  total_hands +3, wins +1, losses +2, total_won +$13, total_lost +$28
+Gamble  total_hands +3, wins +2, ties +1, blackjacks +2, total_won +$36
 ========================================================================================
-Cycle 04 | Day 5
-State   $ 81 -> 60 (-$21) | HP 100 -> 75 (-25) | SAN 100 -> 80 (-20) | Rank 0 -> 0 | Car N
-Events  storyline:gas_station_hero:stage0, night:nightmare_of_losing
-Polarity negative
-Changes +story=['gas_station_hero']
-Stats   days_survived +1
-Gamble  total_hands +3, wins +1, losses +2, busts +1, total_won +$5, total_lost +$26
-========================================================================================
-Cycle 05 | Day 6
-State   $ 60 -> 53 (-$7) | HP 75 -> 78 (+3) | SAN 80 -> 80 (+0) | Rank 0 -> 0 | Car N
-Events  storyline:kyle:stage0, met:Kyle, met:Kyle Asked, night:woodlands_path, met:Woodlands Path Event
-Polarity positive
-Changes +story=['kyle']
-Stats   days_survived +1, people_met +3
-Gamble  total_hands +3, wins +1, losses +2, total_won +$4, total_lost +$11
-========================================================================================
-Cycle 06 | Day 7
-State   $ 53 -> 45 (-$8) | HP 78 -> 83 (+5) | SAN 80 -> 81 (+1) | Rank 0 -> 0 | Car N
-Events  day:water_purifier_use, night:nice_dream
-Polarity positive
-Changes none
-Stats   days_survived +1
-Gamble  total_hands +3, wins +1, losses +2, total_won +$4, total_lost +$9
-========================================================================================
-Cycle 07 | Day 8
-State   $ 45 -> 58 (+$13) | HP 83 -> 89 (+6) | SAN 81 -> 83 (+2) | Rank 0 -> 0 | Car N
-Events  storyline:martinez:stage0, met:Martinez, met:Martinez Honest, night:went_jogging
-Polarity positive
-Changes +story=['martinez']
-Stats   days_survived +1, people_met +2
-Gamble  total_hands +3, wins +3, total_won +$13
-========================================================================================
-Cycle 08 | Day 9
-State   $ 58 -> 48 (-$10) | HP 89 -> 94 (+5) | SAN 83 -> 61 (-22) | Rank 0 -> 0 | Car N
-Events  storyline:phil:stage0, met:Interrogator, night:stargazing
-Polarity negative
-Changes +story=['phil']
-Stats   days_survived +1, people_met +1
-Gamble  total_hands +3, losses +2, ties +1, total_lost +$10
-========================================================================================
-Cycle 09 | Day 10
-State   $ 48 -> 44 (-$4) | HP 94 -> 97 (+3) | SAN 61 -> 65 (+4) | Rank 0 -> 0 | Car N
-Events  day:trap_night_thief, night:dream_of_winning
-Polarity positive
-Changes none
-Stats   days_survived +1
-Gamble  total_hands +3, wins +1, losses +2, total_won +$4, total_lost +$8
-========================================================================================
-Cycle 10 | Day 11
-State   $ 44 -> 44 (+$0) | HP 97 -> 90 (-7) | SAN 65 -> 35 (-30) | Rank 0 -> 0 | Car N
-Events  storyline:sleep_paralysis:stage0, met:Sleep Paralysis, night:drowning_dream, met:Drowning Dream
-Polarity negative
-Changes +story=['sleep_paralysis']
-Stats   days_survived +1, people_met +2
-Gamble  total_hands +3, wins +1, losses +1, ties +1, busts +1, total_won +$4, total_lost +$4
-========================================================================================
-Cycle 11 | Day 12
-State   $ 44 -> 47 (+$3) | HP 90 -> 100 (+10) | SAN 35 -> 45 (+10) | Rank 0 -> 0 | Car N
-Events  storyline:jameson:stage1, night:peaceful_night
-Polarity positive
-Changes none
-Stats   days_survived +1
-Gamble  total_hands +3, wins +1, losses +1, ties +1, busts +1, total_won +$3, total_lost +$3
-========================================================================================
-Cycle 12 | Day 13
-State   $ 47 -> 37 (-$10) | HP 100 -> 100 (+0) | SAN 45 -> 34 (-11) | Rank 0 -> 0 | Car N
-Events  storyline:graveyard:stage0, met:Graveyard, met:Walked Graveyard, night:nightmare
-Polarity negative
-Changes +story=['graveyard']
-Stats   days_survived +1, people_met +2
-Gamble  total_hands +3, losses +3, busts +1, total_lost +$15
-========================================================================================
-Cycle 13 | Day 14
-State   $ 37 -> 31 (-$6) | HP 100 -> 100 (+0) | SAN 34 -> 43 (+9) | Rank 0 -> 0 | Car N
-Events  storyline:martinez:stage1, met:Martinez Coffee, night:stray_cat_returns
-Polarity positive
-Changes none
-Stats   days_survived +1, people_met +1
-Gamble  total_hands +3, wins +1, losses +2, total_won +$2, total_lost +$11
-========================================================================================
-Cycle 14 | Day 15
-State   $ 31 -> 21 (-$10) | HP 100 -> 95 (-5) | SAN 43 -> 41 (-2) | Rank 0 -> 0 | Car N
-Events  storyline:dealer_past:stage0, met:Dealer Photo, met:Asked About Photo, night:insomnia_night
-Polarity negative
-Changes +story=['dealer_past']
-Stats   days_survived +1, people_met +2
-Gamble  total_hands +3, wins +1, losses +2, busts +1, total_won +$1, total_lost +$11
-========================================================================================
-Cycle 15 | Day 16
-State   $ 21 -> 20 (-$1) | HP 95 -> 96 (+1) | SAN 41 -> 16 (-25) | Rank 0 -> 0 | Car N
-Events  storyline:kyle:stage1, met:Kyle Confided, night:stray_cat_dies, met:Cat Died
-Polarity negative
-Changes none
-Stats   days_survived +1, people_met +2
-Gamble  total_hands +3, wins +1, losses +1, ties +1, total_won +$3, total_lost +$4
-========================================================================================
-Cycle 16 | Day 17
-State   $ 20 -> 27 (+$7) | HP 96 -> 97 (+1) | SAN 16 -> 15 (-1) | Rank 0 -> 0 | Car N
-Events  storyline:phil:stage1, night:chase_the_rabbit
+Cycle 03 | Day 4
+State   $ 94 -> 113 (+$19) | HP 100 -> 100 (+0) | SAN 100 -> 100 (+0) | Rank 0 -> 0 | Car N
+Events  day:lucky_penny, night:went_jogging
 Polarity neutral
 Changes none
 Stats   days_survived +1
-Gamble  total_hands +3, wins +2, losses +1, blackjacks +1, total_won +$14, total_lost +$7
+Gamble  total_hands +3, wins +2, losses +1, total_won +$34, total_lost +$16
+========================================================================================
+Cycle 04 | Day 5
+State   $ 113 -> 146 (+$33) | HP 100 -> 70 (-30) | SAN 100 -> 82 (-18) | Rank 0 -> 0 | Car N
+Events  storyline:gas_station_hero:stage0, night:insomnia_night
+Polarity negative
+Changes +story=['gas_station_hero']
+Stats   days_survived +1
+Gamble  total_hands +3, wins +2, ties +1, total_won +$33
+========================================================================================
+Cycle 05 | Day 6
+State   $ 146 -> 138 (-$8) | HP 70 -> 75 (+5) | SAN 82 -> 80 (-2) | Rank 0 -> 0 | Car N
+Events  storyline:kyle:stage0, met:Kyle, met:Kyle Asked, night:raccoon_invasion
+Polarity positive
+Changes +story=['kyle']
+Stats   days_survived +1, people_met +2
+Gamble  total_hands +3, wins +1, losses +1, ties +1, total_won +$23, total_lost +$31
+========================================================================================
+Cycle 06 | Day 7
+State   $ 138 -> 110 (-$28) | HP 75 -> 76 (+1) | SAN 80 -> 72 (-8) | Rank 0 -> 0 | Car N
+Events  day:feeding_station_morning, night:nightmare
+Polarity negative
+Changes none
+Stats   days_survived +1
+Gamble  total_hands +3, wins +1, losses +2, total_won +$10, total_lost +$38
+========================================================================================
+Cycle 07 | Day 8
+State   $ 110 -> 263 (+$153) | HP 76 -> 78 (+2) | SAN 72 -> 70 (-2) | Rank 0 -> 0 | Car N
+Events  day:seagull_attack, night:woodlands_path, met:Woodlands Path Event
+Polarity positive
+Changes none
+Stats   days_survived +1, people_met +1
+Gamble  total_hands +3, wins +2, ties +1, total_won +$30
+========================================================================================
+Cycle 08 | Day 9
+State   $ 263 -> 240 (-$23) | HP 78 -> 81 (+3) | SAN 70 -> 44 (-26) | Rank 0 -> 0 | Car N
+Events  storyline:mechanics:stage0, met:Frank Event, night:stray_cat_dies, met:Cat Died
+Polarity negative
+Changes +story=['mechanics']
+Stats   days_survived +1, people_met +2
+Gamble  total_hands +3, wins +1, losses +2, blackjacks +1, total_won +$34, total_lost +$66
+========================================================================================
+Cycle 09 | Day 10
+State   $ 240 -> 376 (+$136) | HP 81 -> 77 (-4) | SAN 44 -> 39 (-5) | Rank 0 -> 0 | Car N
+Events  storyline:sleep_paralysis:stage0, met:Sleep Paralysis, night:ditched_wallet
+Polarity negative
+Changes +story=['sleep_paralysis']
+Stats   days_survived +1, people_met +1
+Gamble  total_hands +3, wins +1, losses +1, ties +1, total_won +$40, total_lost +$13
+========================================================================================
+Cycle 10 | Day 11
+State   $ 376 -> 163 (-$213) | HP 77 -> 82 (+5) | SAN 39 -> 45 (+6) | Rank 0 -> 0 | Car Y
+Events  storyline:mechanics:stage1, met:Tom Event, met:Tom, night:dream_of_winning
+Polarity positive
+Changes +items=['Car']
+Stats   days_survived +1, people_met +2
+Gamble  total_hands +3, wins +1, losses +2, busts +1, total_won +$74, total_lost +$63
+========================================================================================
+Cycle 11 | Day 12
+State   $ 163 -> 201 (+$38) | HP 82 -> 87 (+5) | SAN 45 -> 46 (+1) | Rank 0 -> 0 | Car Y
+Events  storyline:marvin:stage0, met:Windblown Worn Map
+Polarity positive
+Changes +items=['Worn Map'] | +story_completed=['marvin']
+Stats   days_survived +1, people_met +1
+Gamble  total_hands +3, wins +2, losses +1, busts +1, total_won +$38, total_lost +$14
+========================================================================================
+Cycle 12 | Day 13
+State   $ 201 -> 109 (-$92) | HP 87 -> 100 (+13) | SAN 46 -> 37 (-9) | Rank 0 -> 0 | Car Y
+Events  storyline:witch:stage0, met:Roadside Bone Chimes, met:Witch, location:doctor, met:Doctor's Office
+Polarity positive
+Changes +items=["Granny's Swamp Nectar"] | +story_completed=['witch']
+Stats   days_survived +1, people_met +3, doctor_visits +1
+Gamble  total_hands +3, wins +1, losses +2, busts +1, total_won +$24, total_lost +$45
+========================================================================================
+Cycle 13 | Day 14
+State   $ 109 -> 109 (+$0) | HP 100 -> 100 (+0) | SAN 37 -> 36 (-1) | Rank 0 -> 0 | Car Y
+Events  storyline:grimy_gus:stage0, met:Grimy Gus, location:shop:pawn_shop, met:Pawn Shop
+Polarity negative
+Changes +story_completed=['grimy_gus']
+Stats   days_survived +1, people_met +2, pawn_shop_visits +1
+Gamble  total_hands +3, losses +2, ties +1, busts +1, total_lost +$18
+========================================================================================
+Cycle 14 | Day 15
+State   $ 109 -> 106 (-$3) | HP 100 -> 100 (+0) | SAN 36 -> 36 (+0) | Rank 0 -> 0 | Car Y
+Events  storyline:vinnie:stage0, met:Vinnie, location:shop:pawn_shop
+Polarity neutral
+Changes +story_completed=['vinnie']
+Stats   days_survived +1, people_met +1, pawn_shop_visits +1
+Gamble  total_hands +3, wins +1, losses +1, ties +1, busts +1, total_won +$15, total_lost +$18
+========================================================================================
+Cycle 15 | Day 16
+State   $ 106 -> 83 (-$23) | HP 100 -> 100 (+0) | SAN 36 -> 36 (+0) | Rank 0 -> 0 | Car Y
+Events  storyline:dealer_past:stage0, met:Dealer Photo, met:Asked About Photo, location:shop:pawn_shop
+Polarity neutral
+Changes +story=['dealer_past']
+Stats   days_survived +1, people_met +2, pawn_shop_visits +1
+Gamble  total_hands +3, wins +1, losses +2, total_won +$6, total_lost +$29
+========================================================================================
+Cycle 16 | Day 17
+State   $ 83 -> 69 (-$14) | HP 100 -> 95 (-5) | SAN 36 -> 28 (-8) | Rank 0 -> 0 | Car Y
+Events  storyline:sleep_paralysis:stage1, met:Shadow Spoke, location:shop:pawn_shop
+Polarity negative
+Changes none
+Stats   days_survived +1, people_met +1, pawn_shop_visits +1
+Gamble  total_hands +3, losses +3, busts +1, total_lost +$25
 ========================================================================================
 Cycle 17 | Day 18
-State   $ 27 -> 32 (+$5) | HP 97 -> 100 (+3) | SAN 15 -> 50 (+35) | Rank 0 -> 0 | Car N
+State   $ 69 -> 67 (-$2) | HP 95 -> 96 (+1) | SAN 28 -> 29 (+1) | Rank 0 -> 0 | Car Y
+Events  storyline:jameson:stage1, met:Jameson Tom Help, location:shop:pawn_shop
+Polarity positive
+Changes none
+Stats   days_survived +1, people_met +1, pawn_shop_visits +1
+Gamble  total_hands +3, wins +1, losses +2, total_won +$11, total_lost +$19
+========================================================================================
+Cycle 18 | Day 19
+State   $ 67 -> 87 (+$20) | HP 96 -> 100 (+4) | SAN 29 -> 30 (+1) | Rank 0 -> 0 | Car Y
+Events  storyline:kyle:stage1, met:Kyle Confided, location:shop:pawn_shop
+Polarity positive
+Changes none
+Stats   days_survived +1, people_met +1, pawn_shop_visits +1
+Gamble  total_hands +3, wins +2, losses +1, blackjacks +1, busts +1, total_won +$37, total_lost +$17
+========================================================================================
+Cycle 19 | Day 20
+State   $ 87 -> 61 (-$26) | HP 100 -> 100 (+0) | SAN 30 -> 54 (+24) | Rank 0 -> 0 | Car Y
+Events  storyline:bridge_angel:stage0, location:shop:pawn_shop
+Polarity positive
+Changes none
+Stats   days_survived +1, pawn_shop_visits +1
+Gamble  total_hands +3, losses +3, total_lost +$32
+========================================================================================
+Cycle 20 | Day 21
+State   $ 61 -> 43 (-$18) | HP 100 -> 100 (+0) | SAN 54 -> 46 (-8) | Rank 0 -> 0 | Car Y
+Events  storyline:mime:stage0, met:Mime, location:shop:pawn_shop
+Polarity negative
+Changes +story=['mime']
+Stats   days_survived +1, people_met +1, pawn_shop_visits +1
+Gamble  total_hands +3, losses +2, ties +1, busts +1, total_lost +$18
+========================================================================================
+Cycle 21 | Day 22
+State   $ 43 -> 15 (-$28) | HP 100 -> 100 (+0) | SAN 46 -> 46 (+0) | Rank 0 -> 0 | Car Y
+Events  day:bad_tattoo_infection, location:doctor
+Polarity neutral
+Changes +status=['Staph Infection']
+Stats   days_survived +1, doctor_visits +1
+Gamble  total_hands +3, losses +3, total_lost +$13
+========================================================================================
+Cycle 22 | Day 23
+State   $ 15 -> 8 (-$7) | HP 100 -> 100 (+0) | SAN 46 -> 48 (+2) | Rank 0 -> 0 | Car Y
+Events  storyline:martinez:stage0, met:Martinez, met:Martinez Honest, location:doctor
+Polarity positive
+Changes +story=['martinez']
+Stats   days_survived +1, people_met +2, doctor_visits +1
+Gamble  total_hands +3, wins +1, losses +2, busts +1, total_won +$1, total_lost +$2
+========================================================================================
+Cycle 23 | Day 24
+State   $ 8 -> 7 (-$1) | HP 100 -> 60 (-40) | SAN 48 -> 18 (-30) | Rank 0 -> 0 | Car N
+Events  storyline:sleep_paralysis:stage2, met:Refused Shadow, night:drowning_dream, met:Drowning Dream
+Polarity negative
+Changes -items=['Car']
+Stats   days_survived +1, people_met +2
+Gamble  total_hands +3, wins +2, ties +1, total_won +$2
+========================================================================================
+Cycle 24 | Day 25
+State   $ 7 -> 8 (+$1) | HP 60 -> 76 (+16) | SAN 18 -> 52 (+34) | Rank 0 -> 0 | Car N
 Events  storyline:bridge_angel:stage0, night:peaceful_night
 Polarity positive
 Changes none
 Stats   days_survived +1
-Gamble  total_hands +3, wins +1, losses +2, total_won +$5, total_lost +$3
-========================================================================================
-Cycle 18 | Day 19
-State   $ 32 -> 35 (+$3) | HP 100 -> 100 (+0) | SAN 50 -> 49 (-1) | Rank 0 -> 0 | Car N
-Events  day:lost_wallet, day:trash_treasure, night:went_jogging
-Polarity negative
-Changes none
-Stats   days_survived +1
-Gamble  total_hands +3, wins +1, losses +1, ties +1, blackjacks +1, total_won +$10, total_lost +$7
-========================================================================================
-Cycle 19 | Day 20
-State   $ 35 -> 35 (+$0) | HP 100 -> 100 (+0) | SAN 49 -> 48 (-1) | Rank 0 -> 0 | Car N
-Events  storyline:graveyard:stage1, met:Talked To Edgar, night:stray_cat_dies, day:lost_dog_investigation, day:car_battery_dead
-Polarity negative
-Changes none
-Stats   days_survived +1, people_met +1
-Gamble  total_hands +3, losses +2, ties +1, busts +1, total_lost +$4
-========================================================================================
-Cycle 20 | Day 21
-State   $ 35 -> 138 (+$103) | HP 100 -> 94 (-6) | SAN 48 -> 47 (-1) | Rank 0 -> 0 | Car N
-Events  day:contract_sinus_infection, night:ditched_wallet
-Polarity negative
-Changes +status=['Sinus Infection']
-Stats   days_survived +1
-Gamble  total_hands +3, wins +1, losses +2, total_won +$6, total_lost +$10
-========================================================================================
-Cycle 21 | Day 22
-State   $ 138 -> 135 (-$3) | HP 94 -> 92 (-2) | SAN 47 -> 44 (-3) | Rank 0 -> 0 | Car N
-Events  storyline:kyle:stage2, night:chase_the_rabbit, night:insomnia_night
-Polarity negative
-Changes none
-Stats   days_survived +1
-Gamble  total_hands +3, wins +1, losses +2, blackjacks +1, busts +1, total_won +$44, total_lost +$47
-========================================================================================
-Cycle 22 | Day 23
-State   $ 135 -> 142 (+$7) | HP 92 -> 90 (-2) | SAN 44 -> 45 (+1) | Rank 0 -> 0 | Car N
-Events  storyline:sleep_paralysis:stage1, met:Shadow Spoke, night:stray_cat_returns
-Polarity negative
-Changes none
-Stats   days_survived +1, people_met +1
-Gamble  total_hands +3, wins +2, losses +1, total_won +$28, total_lost +$21
-========================================================================================
-Cycle 23 | Day 24
-State   $ 142 -> 143 (+$1) | HP 90 -> 95 (+5) | SAN 45 -> 40 (-5) | Rank 0 -> 0 | Car N
-Events  storyline:martinez:stage2, met:Martinez Favor, night:nightmare_of_losing
-Polarity positive
-Changes +items=["Martinez's Card"]
-Stats   days_survived +1, people_met +1
-Gamble  total_hands +3, wins +1, losses +2, blackjacks +1, total_won +$38, total_lost +$37
-========================================================================================
-Cycle 24 | Day 25
-State   $ 143 -> 92 (-$51) | HP 95 -> 98 (+3) | SAN 40 -> 38 (-2) | Rank 0 -> 0 | Car N
-Events  storyline:dealer_past:stage1, met:Read Journal, night:woodlands_path, met:Woodlands Path Event
-Polarity positive
-Changes none
-Stats   days_survived +1, people_met +2
-Gamble  total_hands +3, losses +3, total_lost +$51
+Gamble  total_hands +3, wins +1, losses +2, blackjacks +1, busts +1, total_won +$2, total_lost +$2
 ========================================================================================
 Cycle 25 | Day 26
-State   $ 92 -> 92 (+$0) | HP 98 -> 100 (+2) | SAN 38 -> 43 (+5) | Rank 0 -> 0 | Car N
-Events  storyline:mime:stage0, met:Mime, night:dream_of_winning
+State   $ 8 -> 9 (+$1) | HP 76 -> 77 (+1) | SAN 52 -> 61 (+9) | Rank 0 -> 0 | Car N
+Events  storyline:kyle:stage2, night:stray_cat_returns
 Polarity positive
-Changes +story=['mime']
-Stats   days_survived +1, people_met +1
-Gamble  total_hands +3, wins +1, losses +1, ties +1, total_won +$16, total_lost +$16
+Changes none
+Stats   days_survived +1
+Gamble  total_hands +3, wins +2, losses +1, total_won +$2, total_lost +$1
 ========================================================================================
 Cycle 26 | Day 27
-State   $ 92 -> 74 (-$18) | HP 100 -> 100 (+0) | SAN 43 -> 44 (+1) | Rank 0 -> 0 | Car N
-Events  storyline:phil:stage2, night:midnight_walk
+State   $ 9 -> 10 (+$1) | HP 77 -> 80 (+3) | SAN 61 -> 64 (+3) | Rank 0 -> 0 | Car N
+Events  storyline:graveyard:stage0, met:Graveyard, met:Walked Graveyard, night:stargazing
 Polarity positive
-Changes none
-Stats   days_survived +1
-Gamble  total_hands +3, wins +1, losses +2, busts +1, total_won +$8, total_lost +$26
+Changes +story=['graveyard']
+Stats   days_survived +1, people_met +2
+Gamble  total_hands +3, wins +1, ties +2, total_won +$1
 ========================================================================================
 Cycle 27 | Day 28
-State   $ 74 -> 550 (+$476) | HP 100 -> 100 (+0) | SAN 44 -> 44 (+0) | Rank 0 -> 0 | Car N
-Events  storyline:martinez:stage3, night:raccoon_invasion
+State   $ 10 -> 14 (+$4) | HP 80 -> 83 (+3) | SAN 64 -> 63 (-1) | Rank 0 -> 0 | Car N
+Events  storyline:dealer_past:stage1, met:Read Journal, night:chase_the_rabbit
 Polarity positive
-Changes -story=['martinez'] | +story_completed=['martinez']
-Stats   days_survived +1
-Gamble  total_hands +3, wins +1, losses +2, total_won +$6, total_lost +$30
+Changes none
+Stats   days_survived +1, people_met +1
+Gamble  total_hands +3, wins +3, blackjacks +1, total_won +$4
 ========================================================================================
 Cycle 28 | Day 29
-State   $ 550 -> 222 (-$328) | HP 100 -> 100 (+0) | SAN 44 -> 46 (+2) | Rank 0 -> 0 | Car Y
-Events  storyline:mechanics:stage0, met:Tom Event, met:Tom, night:nice_dream
-Polarity neutral
-Changes +items=['Car'] | +story=['mechanics']
-Stats   days_survived +1, people_met +2
-Gamble  total_hands +3, wins +1, losses +2, total_won +$47, total_lost +$175
+State   $ 14 -> 16 (+$2) | HP 83 -> 84 (+1) | SAN 63 -> 68 (+5) | Rank 0 -> 0 | Car N
+Events  day:prime_day, night:nice_dream
+Polarity positive
+Changes none
+Stats   days_survived +1
+Gamble  total_hands +3, wins +2, ties +1, total_won +$2
 ========================================================================================
 Cycle 29 | Day 30
-State   $ 222 -> 153 (-$69) | HP 100 -> 100 (+0) | SAN 46 -> 46 (+0) | Rank 0 -> 0 | Car Y
-Events  storyline:marvin:stage0, met:Flea Market Route Map, location:shop:convenience_store, met:Convenience Store
-Polarity neutral
-Changes +items=['Worn Map'] | +story_completed=['marvin']
-Stats   days_survived +1, people_met +2
-Gamble  total_hands +3, losses +3, total_lost +$69
+State   $ 16 -> 16 (+$0) | HP 84 -> 85 (+1) | SAN 68 -> 83 (+15) | Rank 0 -> 0 | Car N
+Events  storyline:sleep_paralysis:stage3, night:went_jogging
+Polarity positive
+Changes +injuries=['Scraped Knee'] | -story=['sleep_paralysis'] | +story_completed=['sleep_paralysis']
+Stats   days_survived +1
+Gamble  total_hands +3, wins +1, losses +2, total_won +$1, total_lost +$2
 ========================================================================================
 Cycle 30 | Day 31
-State   $ 153 -> 127 (-$26) | HP 100 -> 100 (+0) | SAN 46 -> 47 (+1) | Rank 0 -> 0 | Car Y
-Events  storyline:witch:stage0, met:Witch Doctor Matchbook, met:Witch, location:shop:convenience_store
+State   $ 16 -> 32 (+$16) | HP 85 -> 87 (+2) | SAN 83 -> 89 (+6) | Rank 0 -> 0 | Car N
+Events  storyline:mime:stage1, night:midnight_walk
 Polarity positive
-Changes +story_completed=['witch']
-Stats   days_survived +1, people_met +2
-Gamble  total_hands +3, losses +3, busts +1, total_lost +$49
+Changes none
+Stats   days_survived +1
+Gamble  total_hands +3, wins +2, losses +1, total_won +$2, total_lost +$1
 ========================================================================================
 Cycle 31 | Day 32
-State   $ 127 -> 148 (+$21) | HP 100 -> 100 (+0) | SAN 47 -> 47 (+0) | Rank 0 -> 0 | Car Y
-Events  storyline:grimy_gus:stage0, met:Grimy Gus, location:shop:convenience_store
-Polarity neutral
-Changes +story_completed=['grimy_gus']
+State   $ 32 -> 29 (-$3) | HP 87 -> 94 (+7) | SAN 89 -> 89 (+0) | Rank 0 -> 0 | Car N
+Events  storyline:martinez:stage1, met:Martinez Coffee, night:raccoon_invasion
+Polarity positive
+Changes none
 Stats   days_survived +1, people_met +1
-Gamble  total_hands +3, wins +1, losses +2, total_won +$21, total_lost +$21
+Gamble  total_hands +3, wins +1, losses +2, busts +1, total_won +$3, total_lost +$6
 ========================================================================================
 Cycle 32 | Day 33
-State   $ 148 -> 119 (-$29) | HP 100 -> 100 (+0) | SAN 47 -> 47 (+0) | Rank 0 -> 0 | Car Y
-Events  storyline:vinnie:stage0, met:Vinnie, location:shop:convenience_store
-Polarity neutral
-Changes +story_completed=['vinnie']
-Stats   days_survived +1, people_met +1
-Gamble  total_hands +3, wins +1, losses +2, blackjacks +1, total_won +$16, total_lost +$45
+State   $ 29 -> 31 (+$2) | HP 94 -> 98 (+4) | SAN 89 -> 92 (+3) | Rank 0 -> 0 | Car N
+Events  storyline:kyle:stage3, night:stargazing
+Polarity positive
+Changes none
+Stats   days_survived +1
+Gamble  total_hands +3, wins +1, losses +2, busts +2, total_won +$2, total_lost +$3
 ========================================================================================
 Cycle 33 | Day 34
-State   $ 119 -> 131 (+$12) | HP 100 -> 100 (+0) | SAN 47 -> 47 (+0) | Rank 0 -> 0 | Car Y
-Events  storyline:mime:stage1, location:shop:convenience_store
-Polarity neutral
+State   $ 31 -> 34 (+$3) | HP 98 -> 99 (+1) | SAN 92 -> 95 (+3) | Rank 0 -> 0 | Car N
+Events  storyline:dealer_past:stage2, met:Dealer Asked, night:nice_dream
+Polarity positive
 Changes none
-Stats   days_survived +1
-Gamble  total_hands +3, wins +2, losses +1, total_won +$19, total_lost +$22
+Stats   days_survived +1, people_met +1
+Gamble  total_hands +3, wins +2, losses +1, total_won +$6, total_lost +$3
 ========================================================================================
 Cycle 34 | Day 35
-State   $ 131 -> 91 (-$40) | HP 100 -> 100 (+0) | SAN 47 -> 50 (+3) | Rank 0 -> 0 | Car Y
-Events  storyline:graveyard:stage2, location:shop:convenience_store
+State   $ 34 -> 35 (+$1) | HP 99 -> 100 (+1) | SAN 95 -> 100 (+5) | Rank 0 -> 0 | Car N
+Events  day:conspiracy_theorist, night:peaceful_night
 Polarity positive
 Changes none
 Stats   days_survived +1
-Gamble  total_hands +3, losses +3, busts +1, total_lost +$52
+Gamble  total_hands +3, wins +1, losses +1, ties +1, total_won +$1, total_lost +$1
 ========================================================================================
 Cycle 35 | Day 36
-State   $ 91 -> 74 (-$17) | HP 100 -> 100 (+0) | SAN 50 -> 50 (+0) | Rank 0 -> 0 | Car Y
-Events  storyline:kyle:stage3, location:mechanic:tom
-Polarity neutral
-Changes none
-Stats   days_survived +1, mechanic_visits +1
-Gamble  total_hands +3, wins +1, losses +2, busts +1, total_won +$15, total_lost +$32
-========================================================================================
-Cycle 36 | Day 37
-State   $ 74 -> 83 (+$9) | HP 100 -> 100 (+0) | SAN 50 -> 50 (+0) | Rank 0 -> 0 | Car Y
-Events  storyline:lockbox:stage0, met:Lockbox, location:shop:convenience_store
-Polarity neutral
-Changes +items=['Lockbox'] | +story=['lockbox']
-Stats   days_survived +1, people_met +1
-Gamble  total_hands +3, wins +2, losses +1, total_won +$19, total_lost +$10
-========================================================================================
-Cycle 37 | Day 38
-State   $ 83 -> 88 (+$5) | HP 100 -> 100 (+0) | SAN 50 -> 50 (+0) | Rank 0 -> 0 | Car Y
-Events  storyline:phil:stage3, location:shop:convenience_store
-Polarity neutral
-Changes none
-Stats   days_survived +1
-Gamble  total_hands +3, wins +2, losses +1, total_won +$20, total_lost +$15
-========================================================================================
-Cycle 38 | Day 39
-State   $ 88 -> 139 (+$51) | HP 100 -> 100 (+0) | SAN 50 -> 38 (-12) | Rank 0 -> 0 | Car Y
-Events  storyline:sleep_paralysis:stage2, met:Refused Shadow, night:nightmare
+State   $ 35 -> 131 (+$96) | HP 100 -> 99 (-1) | SAN 100 -> 100 (+0) | Rank 0 -> 0 | Car N
+Events  storyline:carnival:stage0, met:Carnival, met:Entered Carnival, night:ditched_wallet
 Polarity negative
-Changes -story=['phil'] | +story_completed=['phil']
-Stats   days_survived +1, people_met +1
-Gamble  total_hands +3, wins +3, total_won +$51
-========================================================================================
-Cycle 39 | Day 40
-State   $ 139 -> 213 (+$74) | HP 100 -> 100 (+0) | SAN 38 -> 38 (+0) | Rank 0 -> 0 | Car Y
-Events  storyline:dealer_past:stage2, met:Dealer Asked, location:shop:convenience_store
-Polarity neutral
-Changes none
-Stats   days_survived +1, people_met +1
-Gamble  total_hands +3, wins +3, blackjacks +1, total_won +$74
-========================================================================================
-Cycle 40 | Day 41
-State   $ 213 -> 242 (+$29) | HP 100 -> 55 (-45) | SAN 38 -> 13 (-25) | Rank 0 -> 0 | Car Y
-Events  storyline:bridge_angel:stage0, day:damaged_exhaust_again, day:carbon_monoxide, location:doctor:witch
-Polarity negative
-Changes none
-Stats   days_survived +1, witch_doctor_visits +1
-Gamble  total_hands +3, wins +2, losses +1, total_won +$65, total_lost +$36
-========================================================================================
-Cycle 41 | Day 42
-State   $ 242 -> 298 (+$56) | HP 55 -> 61 (+6) | SAN 13 -> 25 (+12) | Rank 0 -> 0 | Car Y
-Events  storyline:graveyard:stage3, night:stargazing
-Polarity positive
-Changes +items=["Edgar's Letter", "Edgar's List"] | -story=['graveyard'] | +story_completed=['graveyard']
-Stats   days_survived +1
-Gamble  total_hands +3, wins +2, ties +1, total_won +$56
-========================================================================================
-Cycle 42 | Day 43
-State   $ 298 -> 259 (-$39) | HP 61 -> 64 (+3) | SAN 25 -> 23 (-2) | Rank 0 -> 0 | Car Y
-Events  storyline:mime:stage2, met:Gerald, night:woodlands_path, met:Woodlands Path Event
-Polarity positive
-Changes none
-Stats   days_survived +1, people_met +2
-Gamble  total_hands +3, wins +1, losses +2, busts +1, total_won +$27, total_lost +$66
-========================================================================================
-Cycle 43 | Day 44
-State   $ 259 -> 358 (+$99) | HP 64 -> 84 (+20) | SAN 23 -> 21 (-2) | Rank 0 -> 0 | Car Y
-Events  storyline:kyle:stage4, night:went_jogging
-Polarity positive
-Changes -story=['kyle'] | +story_completed=['kyle']
-Stats   days_survived +1
-Gamble  total_hands +3, wins +2, ties +1, blackjacks +1, total_won +$99
-========================================================================================
-Cycle 44 | Day 45
-State   $ 358 -> 312 (-$46) | HP 84 -> 89 (+5) | SAN 21 -> 46 (+25) | Rank 0 -> 0 | Car Y
-Events  storyline:bridge_angel:stage0, location:shop:convenience_store
-Polarity positive
-Changes none
-Stats   days_survived +1
-Gamble  total_hands +3, wins +1, losses +2, busts +1, total_won +$33, total_lost +$79
-========================================================================================
-Cycle 45 | Day 46
-State   $ 312 -> 371 (+$59) | HP 89 -> 94 (+5) | SAN 46 -> 44 (-2) | Rank 0 -> 0 | Car Y
-Events  day:the_empty_room, day:lockpick_opportunity, location:shop:convenience_store
-Polarity positive
-Changes none
-Stats   days_survived +1
-Gamble  total_hands +3, wins +2, losses +1, blackjacks +1, total_won +$127, total_lost +$68
-========================================================================================
-Cycle 46 | Day 47
-State   $ 371 -> 290 (-$81) | HP 94 -> 95 (+1) | SAN 44 -> 39 (-5) | Rank 0 -> 0 | Car Y
-Events  storyline:lockbox:stage1, location:shop:convenience_store
-Polarity negative
-Changes none
-Stats   days_survived +1
-Gamble  total_hands +3, losses +2, ties +1, total_lost +$110
-========================================================================================
-Cycle 47 | Day 48
-State   $ 290 -> 239 (-$51) | HP 95 -> 100 (+5) | SAN 39 -> 39 (+0) | Rank 0 -> 0 | Car Y
-Events  storyline:carnival:stage0, met:Carnival, met:Entered Carnival, location:shop:convenience_store
-Polarity positive
 Changes +story=['carnival']
 Stats   days_survived +1, people_met +2
-Gamble  total_hands +3, wins +1, losses +2, total_won +$31, total_lost +$82
+Gamble  total_hands +3, wins +1, losses +2, busts +1, total_won +$1, total_lost +$6
 ========================================================================================
-Cycle 48 | Day 49
-State   $ 239 -> 154 (-$85) | HP 100 -> 100 (+0) | SAN 39 -> 38 (-1) | Rank 0 -> 0 | Car Y
-Events  storyline:mime:stage3, location:shop:convenience_store
-Polarity negative
-Changes none
-Stats   days_survived +1
-Gamble  total_hands +3, losses +3, busts +2, total_lost +$85
-========================================================================================
-Cycle 49 | Day 50
-State   $ 154 -> 169 (+$15) | HP 100 -> 90 (-10) | SAN 38 -> 38 (+0) | Rank 0 -> 0 | Car Y
-Events  storyline:bridge_angel:stage0, day:contract_strep_throat, location:shop:convenience_store
-Polarity negative
-Changes +status=['Strep Throat']
-Stats   days_survived +1
-Gamble  total_hands +3, wins +1, losses +2, blackjacks +1, total_won +$36, total_lost +$36
-========================================================================================
-Cycle 50 | Day 51
-State   $ 169 -> 259 (+$90) | HP 90 -> 100 (+10) | SAN 38 -> 53 (+15) | Rank 0 -> 0 | Car Y
-Events  storyline:sleep_paralysis:stage3, location:shop:convenience_store
-Polarity positive
-Changes -story=['sleep_paralysis'] | +story_completed=['sleep_paralysis']
-Stats   days_survived +1
-Gamble  total_hands +3, wins +3, blackjacks +1, total_won +$90
-========================================================================================
-Cycle 51 | Day 52
-State   $ 259 -> 246 (-$13) | HP 100 -> 100 (+0) | SAN 53 -> 57 (+4) | Rank 0 -> 0 | Car Y
-Events  storyline:dealer_past:stage3, met:Dealer Opened Up, location:shop:convenience_store
-Polarity positive
-Changes none
-Stats   days_survived +1, people_met +1
-Gamble  total_hands +3, wins +1, losses +1, ties +1, busts +1, total_won +$56, total_lost +$69
-========================================================================================
-Cycle 52 | Day 53
-State   $ 246 -> 2,210 (+$1,964) | HP 100 -> 100 (+0) | SAN 57 -> 81 (+24) | Rank 0 -> 1 | Car Y
-Events  storyline:lockbox:stage2, met:Has Apartment, location:shop:convenience_store
-Polarity positive
-Changes +items=['Apartment Key'] | -items=['Lockbox'] | -story=['lockbox'] | +story_completed=['lockbox']
-Stats   days_survived +1, people_met +1
-Gamble  total_hands +3, wins +1, losses +2, total_won +$22, total_lost +$73
-========================================================================================
-Cycle 53 | Day 54
-State   $ 2,210 -> 2,312 (+$102) | HP 100 -> 100 (+0) | SAN 81 -> 79 (-2) | Rank 1 -> 1 | Car Y
-Events  storyline:mechanics:stage1, met:Oswald Event, night:nice_dream
+Cycle 36 | Day 37
+State   $ 131 -> 158 (+$27) | HP 99 -> 94 (-5) | SAN 100 -> 97 (-3) | Rank 0 -> 0 | Car N
+Events  storyline:graveyard:stage1, met:Talked To Edgar, night:insomnia_night
 Polarity negative
 Changes none
 Stats   days_survived +1, people_met +1
-Gamble  total_hands +3, wins +2, losses +1, blackjacks +1, busts +1, total_won +$1,015, total_lost +$913
+Gamble  total_hands +3, wins +2, losses +1, total_won +$27, total_lost +$8
 ========================================================================================
-Cycle 54 | Day 55
-State   $ 2,312 -> 3,063 (+$751) | HP 100 -> 100 (+0) | SAN 79 -> 82 (+3) | Rank 1 -> 1 | Car Y
-Events  storyline:carnival:stage1, met:Fortune Told, location:shop:convenience_store
+Cycle 37 | Day 38
+State   $ 158 -> 180 (+$22) | HP 94 -> 94 (+0) | SAN 97 -> 87 (-10) | Rank 0 -> 0 | Car N
+Events  storyline:kyle:stage4, night:nightmare
+Polarity negative
+Changes -story=['kyle'] | +story_completed=['kyle']
+Stats   days_survived +1
+Gamble  total_hands +3, wins +2, losses +1, blackjacks +1, total_won +$48, total_lost +$26
+========================================================================================
+Cycle 38 | Day 39
+State   $ 180 -> 132 (-$48) | HP 94 -> 98 (+4) | SAN 87 -> 96 (+9) | Rank 0 -> 0 | Car N
+Events  storyline:carnival:stage1, met:Fortune Told, night:dream_of_winning
 Polarity positive
 Changes +items=['Carnival Token']
 Stats   days_survived +1, people_met +1
-Gamble  total_hands +3, wins +2, losses +1, blackjacks +1, busts +1, total_won +$1,942, total_lost +$1,191
+Gamble  total_hands +3, losses +3, total_lost +$48
+========================================================================================
+Cycle 39 | Day 40
+State   $ 132 -> 143 (+$11) | HP 98 -> 83 (-15) | SAN 96 -> 86 (-10) | Rank 0 -> 0 | Car N
+Events  storyline:martinez:stage2, met:Martinez Favor
+Polarity negative
+Changes +items=["Martinez's Card"] | +travel=['Wasted Afternoon']
+Stats   days_survived +1, people_met +1
+Gamble  total_hands +3, wins +1, losses +2, blackjacks +1, busts +1, total_won +$26, total_lost +$22
+========================================================================================
+Cycle 40 | Day 41
+State   $ 143 -> 128 (-$15) | HP 83 -> 83 (+0) | SAN 86 -> 83 (-3) | Rank 0 -> 0 | Car N
+Events  storyline:mime:stage2, met:Gerald
+Polarity negative
+Changes -travel=['Wasted Afternoon']
+Stats   days_survived +1, people_met +1
+Gamble  total_hands +3, wins +1, losses +2, busts +1, total_won +$14, total_lost +$29
+========================================================================================
+Cycle 41 | Day 42
+State   $ 128 -> 95 (-$33) | HP 83 -> 83 (+0) | SAN 83 -> 90 (+7) | Rank 0 -> 0 | Car N
+Events  storyline:carnival:stage2, night:stray_cat_returns
+Polarity positive
+Changes +items=['Professor Bear'] | -items=['Carnival Token']
+Stats   days_survived +1
+Gamble  total_hands +3, losses +3, total_lost +$33
+========================================================================================
+Cycle 42 | Day 43
+State   $ 95 -> 229 (+$134) | HP 83 -> 85 (+2) | SAN 90 -> 89 (-1) | Rank 0 -> 0 | Car N
+Events  storyline:lockbox:stage0, met:Lockbox, night:woodlands_path, met:Woodlands Path Event
+Polarity positive
+Changes +items=['Lockbox'] | +story=['lockbox']
+Stats   days_survived +1, people_met +2
+Gamble  total_hands +3, wins +1, losses +2, total_won +$8, total_lost +$18
+========================================================================================
+Cycle 43 | Day 44
+State   $ 229 -> 220 (-$9) | HP 85 -> 85 (+0) | SAN 89 -> 88 (-1) | Rank 0 -> 0 | Car N
+Events  storyline:carnival:stage3, night:nightmare_of_losing
+Polarity negative
+Changes -story=['carnival'] | +story_completed=['carnival']
+Stats   days_survived +1
+Gamble  total_hands +3, wins +1, losses +1, ties +1, total_won +$39, total_lost +$48
+========================================================================================
+Cycle 44 | Day 45
+State   $ 220 -> 180 (-$40) | HP 85 -> 89 (+4) | SAN 88 -> 92 (+4) | Rank 0 -> 0 | Car N
+Events  storyline:graveyard:stage2, night:stray_cat_dies, day:hermit_trail_discovery, met:Hermit Trail Found
+Polarity positive
+Changes +items=["Hermit's Journal"]
+Stats   days_survived +1, people_met +1
+Gamble  total_hands +3, wins +1, losses +2, total_won +$13, total_lost +$53
+========================================================================================
+Cycle 45 | Day 46
+State   $ 180 -> 160 (-$20) | HP 89 -> 91 (+2) | SAN 92 -> 92 (+0) | Rank 0 -> 0 | Car N
+Events  storyline:dealer_past:stage3, met:Dealer Opened Up, night:chase_the_rabbit, night:nightmare_of_losing
+Polarity positive
+Changes none
+Stats   days_survived +1, people_met +1
+Gamble  total_hands +3, wins +1, losses +2, busts +2, total_won +$15, total_lost +$35
+========================================================================================
+Cycle 46 | Day 47
+State   $ 160 -> 643 (+$483) | HP 91 -> 99 (+8) | SAN 92 -> 100 (+8) | Rank 0 -> 0 | Car N
+Events  storyline:martinez:stage3, night:stray_cat_returns
+Polarity positive
+Changes -story=['martinez'] | +story_completed=['martinez']
+Stats   days_survived +1
+Gamble  total_hands +3, wins +1, losses +2, busts +1, total_won +$14, total_lost +$31
+========================================================================================
+Cycle 47 | Day 48
+State   $ 643 -> 522 (-$121) | HP 99 -> 99 (+0) | SAN 100 -> 100 (+0) | Rank 0 -> 0 | Car Y
+Events  storyline:mechanics:stage2, met:Oswald Event, met:Oswald, night:ditched_wallet
+Polarity negative
+Changes +items=['Car']
+Stats   days_survived +1, people_met +2
+Gamble  total_hands +3, wins +3, blackjacks +2, total_won +$537
+========================================================================================
+Cycle 48 | Day 49
+State   $ 522 -> 248 (-$274) | HP 99 -> 100 (+1) | SAN 100 -> 100 (+0) | Rank 0 -> 0 | Car Y
+Events  storyline:mime:stage3, location:doctor
+Polarity neutral
+Changes none
+Stats   days_survived +1, doctor_visits +1
+Gamble  total_hands +3, losses +3, busts +2, total_lost +$141
+========================================================================================
+Cycle 49 | Day 50
+State   $ 248 -> 103 (-$145) | HP 100 -> 100 (+0) | SAN 100 -> 100 (+0) | Rank 0 -> 0 | Car Y
+Events  storyline:stuart:stage0, met:Stuart, location:doctor
+Polarity negative
+Changes +story=['stuart'] | -story=['mechanics'] | +story_completed=['mechanics']
+Stats   days_survived +1, people_met +1, doctor_visits +1
+Gamble  total_hands +3, wins +1, losses +2, total_won +$21, total_lost +$55
+========================================================================================
+Cycle 50 | Day 51
+State   $ 103 -> 71 (-$32) | HP 100 -> 100 (+0) | SAN 100 -> 100 (+0) | Rank 0 -> 0 | Car Y
+Events  storyline:dealer_past:stage4, location:doctor
+Polarity neutral
+Changes +items=["Dealer's Coin"] | -story=['dealer_past'] | +story_completed=['dealer_past']
+Stats   days_survived +1, doctor_visits +1
+Gamble  total_hands +3, wins +3, total_won +$40
+========================================================================================
+Cycle 51 | Day 52
+State   $ 71 -> 41 (-$30) | HP 100 -> 100 (+0) | SAN 100 -> 100 (+0) | Rank 0 -> 0 | Car Y
+Events  storyline:mechanic_dreams:stage0, location:doctor
+Polarity neutral
+Changes +story=['mechanic_dreams']
+Stats   days_survived +1, doctor_visits +1
+Gamble  total_hands +3, wins +1, losses +2, blackjacks +1, busts +1, total_won +$14, total_lost +$13
+========================================================================================
+Cycle 52 | Day 53
+State   $ 41 -> 23 (-$18) | HP 100 -> 100 (+0) | SAN 100 -> 98 (-2) | Rank 0 -> 0 | Car Y
+Events  storyline:lockbox:stage1, location:doctor
+Polarity negative
+Changes none
+Stats   days_survived +1, doctor_visits +1
+Gamble  total_hands +3, wins +1, losses +1, ties +1, blackjacks +1, busts +1, total_won +$8, total_lost +$5
+========================================================================================
+Cycle 53 | Day 54
+State   $ 23 -> 13 (-$10) | HP 100 -> 100 (+0) | SAN 98 -> 99 (+1) | Rank 0 -> 0 | Car Y
+Events  day:public_pool_infection, location:doctor
+Polarity positive
+Changes +status=['Ear Infection', 'Pink Eye']
+Stats   days_survived +1, doctor_visits +1
+Gamble  total_hands +3, wins +2, ties +1, total_won +$5
+========================================================================================
+Cycle 54 | Day 55
+State   $ 13 -> 15 (+$2) | HP 100 -> 94 (-6) | SAN 99 -> 97 (-2) | Rank 0 -> 0 | Car Y
+Events  storyline:graveyard:stage3, night:insomnia_night
+Polarity negative
+Changes +items=["Edgar's Letter", "Edgar's List"] | -story=['graveyard'] | +story_completed=['graveyard']
+Stats   days_survived +1
+Gamble  total_hands +3, wins +2, losses +1, blackjacks +1, total_won +$3, total_lost +$1
 ========================================================================================
 Cycle 55 | Day 56
-State   $ 3,063 -> 2,974 (-$89) | HP 100 -> 92 (-8) | SAN 82 -> 79 (-3) | Rank 1 -> 1 | Car Y
-Events  day:contract_uti, location:shop:convenience_store
+State   $ 15 -> 18 (+$3) | HP 94 -> 94 (+0) | SAN 97 -> 89 (-8) | Rank 0 -> 0 | Car Y
+Events  storyline:stuart:stage1, night:chase_the_rabbit, night:nightmare
 Polarity negative
-Changes +status=['UTI']
+Changes none
 Stats   days_survived +1
-Gamble  total_hands +3, wins +1, losses +1, ties +1, blackjacks +1, busts +1, total_won +$2,228, total_lost +$2,317
+Gamble  total_hands +3, wins +2, losses +1, blackjacks +1, total_won +$3, total_lost +$1
 ========================================================================================
 Cycle 56 | Day 57
-State   $ 2,974 -> 3,088 (+$114) | HP 92 -> 100 (+8) | SAN 79 -> 80 (+1) | Rank 1 -> 1 | Car Y
-Events  storyline:mime:stage4, location:shop:convenience_store
+State   $ 18 -> 19 (+$1) | HP 94 -> 98 (+4) | SAN 89 -> 90 (+1) | Rank 0 -> 0 | Car Y
+Events  day:car_battery_dead, night:nice_dream
+Polarity positive
+Changes none
+Stats   days_survived +1
+Gamble  total_hands +3, wins +2, losses +1, total_won +$3, total_lost +$2
+========================================================================================
+Cycle 57 | Day 58
+State   $ 19 -> 15 (-$4) | HP 98 -> 99 (+1) | SAN 90 -> 94 (+4) | Rank 0 -> 0 | Car Y
+Events  storyline:phil:stage0, met:Interrogator, night:midnight_walk
+Polarity positive
+Changes +story=['phil']
+Stats   days_survived +1, people_met +1
+Gamble  total_hands +3, losses +3, busts +1, total_lost +$5
+========================================================================================
+Cycle 58 | Day 59
+State   $ 15 -> 16 (+$1) | HP 99 -> 100 (+1) | SAN 94 -> 91 (-3) | Rank 0 -> 0 | Car Y
+Events  day:ant_bite, day:bad_hair_day, night:stray_cat_dies, day:trash_treasure
+Polarity negative
+Changes none
+Stats   days_survived +1
+Gamble  total_hands +3, wins +2, losses +1, blackjacks +1, total_won +$3, total_lost +$2
+========================================================================================
+Cycle 59 | Day 60
+State   $ 16 -> 321 (+$305) | HP 100 -> 100 (+0) | SAN 91 -> 97 (+6) | Rank 0 -> 0 | Car Y
+Events  storyline:mime:stage4, night:went_jogging
 Polarity positive
 Changes +items=['Fake Flower'] | -story=['mime'] | +story_completed=['mime']
 Stats   days_survived +1
-Gamble  total_hands +3, wins +2, losses +1, blackjacks +1, total_won +$1,912, total_lost +$2,098
-========================================================================================
-Cycle 57 | Day 58
-State   $ 3,088 -> 1,750 (-$1,338) | HP 100 -> 100 (+0) | SAN 80 -> 75 (-5) | Rank 1 -> 1 | Car Y
-Events  storyline:carnival:stage2, met:Carnival Won Big, location:shop:convenience_store
-Polarity negative
-Changes -items=['Carnival Token']
-Stats   days_survived +1, people_met +1
-Gamble  total_hands +3, losses +3, total_lost +$2,088
-========================================================================================
-Cycle 58 | Day 59
-State   $ 1,750 -> 757 (-$993) | HP 100 -> 100 (+0) | SAN 75 -> 73 (-2) | Rank 1 -> 1 | Car Y
-Events  day:cold_gets_worse, day:the_crow_council, day:mayas_luck, day:broken_ankle, location:doctor, met:Doctor's Office
-Polarity negative
-Changes +injuries=['Broken Ankle']
-Stats   days_survived +1, people_met +1, doctor_visits +1
-Gamble  total_hands +3, wins +1, losses +2, total_won +$240, total_lost +$750
-========================================================================================
-Cycle 59 | Day 60
-State   $ 757 -> 650 (-$107) | HP 100 -> 100 (+0) | SAN 73 -> 86 (+13) | Rank 1 -> 0 | Car Y
-Events  storyline:carnival:stage3, night:peaceful_night
-Polarity positive
-Changes -story=['carnival'] | +story_completed=['carnival']
-Stats   days_survived +1
-Gamble  total_hands +3, wins +1, losses +1, ties +1, total_won +$43, total_lost +$150
+Gamble  total_hands +3, wins +3, blackjacks +1, total_won +$5
 ========================================================================================
 Cycle 60 | Day 61
-State   $ 650 -> 1,052 (+$402) | HP 100 -> 99 (-1) | SAN 86 -> 78 (-8) | Rank 0 -> 1 | Car Y
-Events  day:dead_battery_afternoon
-Polarity negative
-Changes none
-Stats   days_survived +1
-Gamble  total_hands +3, wins +2, losses +1, blackjacks +1, total_won +$402, total_lost +$38
+State   $ 321 -> 1,974 (+$1,653) | HP 100 -> 99 (-1) | SAN 97 -> 100 (+3) | Rank 0 -> 1 | Car Y
+Events  storyline:lockbox:stage2, met:Has Apartment
+Polarity positive
+Changes +items=['Apartment Key'] | -items=['Lockbox'] | +travel=['Wasted Afternoon'] | -story=['lockbox'] | +story_completed=['lockbox']
+Stats   days_survived +1, people_met +1
+Gamble  total_hands +3, wins +1, losses +2, busts +1, total_won +$28, total_lost +$75
 ========================================================================================
 Cycle 61 | Day 62
-State   $ 1,052 -> 1,602 (+$550) | HP 99 -> 99 (+0) | SAN 78 -> 61 (-17) | Rank 1 -> 1 | Car Y
-Events  day:fourth_wall_break, night:raccoon_invasion
-Polarity negative
-Changes none
+State   $ 1,974 -> 1,923 (-$51) | HP 99 -> 99 (+0) | SAN 100 -> 100 (+0) | Rank 1 -> 1 | Car Y
+Events  storyline:stuart:stage2
+Polarity neutral
+Changes -travel=['Wasted Afternoon']
 Stats   days_survived +1
-Gamble  total_hands +3, wins +2, ties +1, blackjacks +2, total_won +$550
+Gamble  total_hands +3, wins +1, losses +1, ties +1, total_won +$315, total_lost +$366
 ========================================================================================
 Cycle 62 | Day 63
-State   $ 1,602 -> 550 (-$1,052) | HP 99 -> 100 (+1) | SAN 61 -> 72 (+11) | Rank 1 -> 1 | Car Y
-Events  storyline:dealer_past:stage4, location:doctor
+State   $ 1,923 -> 2,506 (+$583) | HP 99 -> 99 (+0) | SAN 100 -> 100 (+0) | Rank 1 -> 1 | Car Y
+Events  storyline:mechanic_dreams:stage1, night:stray_cat_dies, day:lost_tourist, met:Lost Tourist
 Polarity positive
-Changes +items=["Dealer's Coin"] | -story=['dealer_past'] | +story_completed=['dealer_past']
-Stats   days_survived +1, doctor_visits +1
-Gamble  total_hands +3, losses +3, total_lost +$602
+Changes none
+Stats   days_survived +1, people_met +1
+Gamble  total_hands +3, wins +2, losses +1, blackjacks +1, total_won +$1,019, total_lost +$470
 ========================================================================================
 Cycle 63 | Day 64
-State   $ 550 -> 426 (-$124) | HP 100 -> 99 (-1) | SAN 72 -> 74 (+2) | Rank 1 -> 0 | Car Y
-Events  day:feeding_station_morning, night:nice_dream
-Polarity neutral
-Changes none
+State   $ 2,506 -> 2,047 (-$459) | HP 99 -> 74 (-25) | SAN 100 -> 99 (-1) | Rank 1 -> 1 | Car Y
+Events  day:second_degree_burns, night:midnight_snack_run
+Polarity negative
+Changes +status=['Second Degree Burns']
 Stats   days_survived +1
-Gamble  total_hands +3, losses +3, busts +1, total_lost +$168
+Gamble  total_hands +3, wins +1, losses +2, busts +2, total_won +$336, total_lost +$790
 ========================================================================================
 Cycle 64 | Day 65
-State   $ 426 -> 461 (+$35) | HP 99 -> 99 (+0) | SAN 74 -> 73 (-1) | Rank 0 -> 0 | Car Y
-Events  day:gut_wound_complications, day:freight_truck, night:raccoon_invasion
+State   $ 2,047 -> 3,633 (+$1,586) | HP 74 -> 61 (-13) | SAN 99 -> 93 (-6) | Rank 1 -> 1 | Car Y
+Events  day:tooth_abscess, night:police_checkpoint
 Polarity negative
-Changes none
+Changes +status=['Tooth Abscess']
 Stats   days_survived +1
-Gamble  total_hands +3, wins +2, losses +1, total_won +$86, total_lost +$51
+Gamble  total_hands +3, wins +3, blackjacks +1, total_won +$1,586
 ========================================================================================
 Cycle 65 | Day 66
-State   $ 461 -> 497 (+$36) | HP 99 -> 72 (-27) | SAN 73 -> 70 (-3) | Rank 0 -> 0 | Car Y
-Events  day:slip_in_shower, night:ditched_wallet
-Polarity negative
-Changes +injuries=['Concussion', 'Deep Laceration']
-Stats   days_survived +1
-Gamble  total_hands +3, wins +1, losses +2, total_won +$55, total_lost +$105
+State   $ 3,633 -> 2,974 (-$659) | HP 61 -> 65 (+4) | SAN 93 -> 95 (+2) | Rank 1 -> 1 | Car Y
+Events  day:turn_to_god, met:Ezekiel, night:nice_dream
+Polarity positive
+Changes none
+Stats   days_survived +1, people_met +1
+Gamble  total_hands +3, wins +1, losses +2, busts +1, total_won +$581, total_lost +$1,240
 ========================================================================================
 Cycle 66 | Day 67
-State   $ 497 -> 432 (-$65) | HP 72 -> 67 (-5) | SAN 70 -> 63 (-7) | Rank 0 -> 0 | Car Y
-Events  storyline:dr_feelgood:stage0, met:Dr. Feelgood, night:insomnia_night
-Polarity negative
-Changes +story=['dr_feelgood']
-Stats   days_survived +1, people_met +1
-Gamble  total_hands +3, wins +1, losses +2, busts +1, total_won +$46, total_lost +$111
-========================================================================================
-Cycle 67 | Day 68
-State   $ 432 -> 477 (+$45) | HP 67 -> 41 (-26) | SAN 63 -> 68 (+5) | Rank 0 -> 0 | Car Y
-Events  day:dog_attack_severe, night:stray_cat_returns
-Polarity negative
-Changes +status=['Possible Rabies']
-Stats   days_survived +1
-Gamble  total_hands +3, wins +2, losses +1, busts +1, total_won +$96, total_lost +$51
-========================================================================================
-Cycle 68 | Day 69
-State   $ 477 -> 794 (+$317) | HP 41 -> 43 (+2) | SAN 68 -> 65 (-3) | Rank 0 -> 0 | Car Y
-Events  day:hail_damage, night:stargazing
+State   $ 2,974 -> 2,967 (-$7) | HP 65 -> 67 (+2) | SAN 95 -> 100 (+5) | Rank 1 -> 1 | Car Y
+Events  storyline:radio_signal:stage0, met:Radio Signal, met:Wrote Numbers, night:stray_cat_returns
 Polarity positive
-Changes none
-Stats   days_survived +1
-Gamble  total_hands +3, wins +3, blackjacks +1, total_won +$317
-========================================================================================
-Cycle 69 | Day 70
-State   $ 794 -> 1,185 (+$391) | HP 43 -> 41 (-2) | SAN 65 -> 66 (+1) | Rank 0 -> 1 | Car Y
-Events  day:nail_in_tire
-Polarity positive
-Changes none
-Stats   days_survived +1
-Gamble  total_hands +3, wins +3, blackjacks +1, total_won +$416
-========================================================================================
-Cycle 70 | Day 71
-State   $ 1,185 -> 994 (-$191) | HP 41 -> 43 (+2) | SAN 66 -> 61 (-5) | Rank 1 -> 0 | Car Y
-Events  storyline:dr_feelgood:stage1, night:nightmare_of_losing
-Polarity negative
-Changes none
-Stats   days_survived +1
-Gamble  total_hands +3, wins +1, losses +2, total_won +$87, total_lost +$278
-========================================================================================
-Cycle 71 | Day 72
-State   $ 994 -> 1,332 (+$338) | HP 43 -> 50 (+7) | SAN 61 -> 61 (+0) | Rank 0 -> 1 | Car Y
-Events  day:oil_leak_spotted, night:midnight_snack_run
-Polarity positive
-Changes none
-Stats   days_survived +1
-Gamble  total_hands +3, wins +2, losses +1, blackjacks +1, busts +1, total_won +$345, total_lost +$122
-========================================================================================
-Cycle 72 | Day 73
-State   $ 1,332 -> 995 (-$337) | HP 50 -> 48 (-2) | SAN 61 -> 67 (+6) | Rank 1 -> 0 | Car Y
-Events  day:rusty_midnight_heist, day:lottery_scratch, night:midnight_walk
-Polarity positive
-Changes none
-Stats   days_survived +1
-Gamble  total_hands +3, losses +2, ties +1, total_lost +$332
-========================================================================================
-Cycle 73 | Day 74
-State   $ 995 -> 1,086 (+$91) | HP 48 -> 48 (+0) | SAN 67 -> 61 (-6) | Rank 0 -> 1 | Car Y
-Events  storyline:dr_feelgood:stage2, night:police_checkpoint
-Polarity negative
-Changes none
-Stats   days_survived +1
-Gamble  total_hands +3, wins +1, losses +1, ties +1, blackjacks +1, busts +1, total_won +$210, total_lost +$119
-========================================================================================
-Cycle 74 | Day 75
-State   $ 1,086 -> 1,020 (-$66) | HP 48 -> 46 (-2) | SAN 61 -> 58 (-3) | Rank 1 -> 1 | Car Y
-Events  day:social_encounter, night:chase_the_second_rabbit
-Polarity negative
-Changes none
-Stats   days_survived +1
-Gamble  total_hands +3, wins +1, losses +1, ties +1, total_won +$100, total_lost +$166
-========================================================================================
-Cycle 75 | Day 76
-State   $ 1,020 -> 792 (-$228) | HP 46 -> 44 (-2) | SAN 58 -> 50 (-8) | Rank 1 -> 0 | Car Y
-Events  storyline:dr_feelgood:stage3, met:Cold Turkey, night:nightmare
-Polarity negative
-Changes none
-Stats   days_survived +1, people_met +1
-Gamble  total_hands +3, losses +3, busts +1, total_lost +$296
-========================================================================================
-Cycle 76 | Day 77
-State   $ 792 -> 728 (-$64) | HP 44 -> 44 (+0) | SAN 50 -> 38 (-12) | Rank 0 -> 0 | Car Y
-Events  storyline:radio_signal:stage0, met:Radio Signal, met:Wrote Numbers, night:stray_cat_dies, day:wrong_universe
-Polarity negative
 Changes +items=['Radio Numbers'] | +story=['radio_signal']
 Stats   days_survived +1, people_met +2
-Gamble  total_hands +3, losses +3, busts +2, total_lost +$297
+Gamble  total_hands +3, wins +1, losses +2, blackjacks +1, busts +2, total_won +$558, total_lost +$923
 ========================================================================================
-Cycle 77 | Day 78
-State   $ 728 -> 617 (-$111) | HP 44 -> 27 (-17) | SAN 38 -> 43 (+5) | Rank 0 -> 0 | Car Y
-Events  storyline:bridge_angel:stage0, day:midnight_visitor, day:sunburn, night:dream_of_winning
+Cycle 67 | Day 68
+State   $ 2,967 -> 2,765 (-$202) | HP 67 -> 69 (+2) | SAN 100 -> 95 (-5) | Rank 1 -> 1 | Car Y
+Events  storyline:phil:stage1, night:swamp_stroll, met:Swamp Stroll Event
 Polarity negative
 Changes none
-Stats   days_survived +1
-Gamble  total_hands +3, wins +1, losses +2, blackjacks +1, busts +1, total_won +$106, total_lost +$217
+Stats   days_survived +1, people_met +1
+Gamble  total_hands +3, wins +1, losses +2, blackjacks +1, busts +1, total_won +$670, total_lost +$872
 ========================================================================================
-Cycle 78 | Day 79
-State   $ 617 -> 457 (-$160) | HP 27 -> 29 (+2) | SAN 43 -> 35 (-8) | Rank 0 -> 0 | Car Y
-Events  day:prayer_ignored, night:chase_the_rabbit, night:nice_dream
-Polarity negative
-Changes none
-Stats   days_survived +1
-Gamble  total_hands +3, losses +3, busts +2, total_lost +$189
-========================================================================================
-Cycle 79 | Day 80
-State   $ 457 -> 355 (-$102) | HP 29 -> 27 (-2) | SAN 35 -> 40 (+5) | Rank 0 -> 0 | Car Y
-Events  storyline:bridge_angel:stage0, day:empty_event, night:stray_cat_returns
+Cycle 68 | Day 69
+State   $ 2,765 -> 2,460 (-$305) | HP 69 -> 73 (+4) | SAN 95 -> 95 (+0) | Rank 1 -> 1 | Car Y
+Events  storyline:mechanic_dreams:stage2, night:woodlands_river, met:Woodlands River Event
 Polarity positive
 Changes none
-Stats   days_survived +1
-Gamble  total_hands +3, losses +3, total_lost +$124
+Stats   days_survived +1, people_met +1
+Gamble  total_hands +3, wins +1, losses +2, busts +2, total_won +$163, total_lost +$722
 ========================================================================================
-Cycle 80 | Day 81
-State   $ 355 -> 557 (+$202) | HP 27 -> 25 (-2) | SAN 40 -> 41 (+1) | Rank 0 -> 0 | Car Y
-Events  storyline:bridge_angel:stage0, day:thermostat_stuck
+Cycle 69 | Day 70
+State   $ 2,460 -> 2,780 (+$320) | HP 73 -> 77 (+4) | SAN 95 -> 88 (-7) | Rank 1 -> 1 | Car Y
+Events  day:feeding_station_morning, night:nightmare
 Polarity neutral
 Changes none
 Stats   days_survived +1
-Gamble  total_hands +3, wins +3, blackjacks +2, total_won +$252
+Gamble  total_hands +3, wins +2, losses +1, total_won +$849, total_lost +$529
+========================================================================================
+Cycle 70 | Day 71
+State   $ 2,780 -> 2,871 (+$91) | HP 77 -> 79 (+2) | SAN 88 -> 86 (-2) | Rank 1 -> 1 | Car Y
+Events  day:dream_catcher_night, night:woodlands_field, met:Woodlands Field Event
+Polarity positive
+Changes none
+Stats   days_survived +1, people_met +1
+Gamble  total_hands +3, wins +2, losses +1, total_won +$637, total_lost +$546
+========================================================================================
+Cycle 71 | Day 72
+State   $ 2,871 -> 2,205 (-$666) | HP 79 -> 83 (+4) | SAN 86 -> 90 (+4) | Rank 1 -> 1 | Car Y
+Events  storyline:stuart:stage3, night:midnight_walk
+Polarity positive
+Changes -story=['stuart'] | +story_completed=['stuart']
+Stats   days_survived +1
+Gamble  total_hands +3, wins +1, losses +2, busts +1, total_won +$254, total_lost +$920
+========================================================================================
+Cycle 72 | Day 73
+State   $ 2,205 -> 3,440 (+$1,235) | HP 83 -> 100 (+17) | SAN 90 -> 100 (+10) | Rank 1 -> 1 | Car Y
+Events  day:empty_event, night:peaceful_night
+Polarity positive
+Changes none
+Stats   days_survived +1
+Gamble  total_hands +3, wins +3, total_won +$1,235
+========================================================================================
+Cycle 73 | Day 74
+State   $ 3,440 -> 2,816 (-$624) | HP 100 -> 80 (-20) | SAN 100 -> 100 (+0) | Rank 1 -> 1 | Car Y
+Events  day:weight_dropping, night:stargazing
+Polarity negative
+Changes +injuries=['Broken Hand']
+Stats   days_survived +1
+Gamble  total_hands +3, wins +1, losses +2, busts +1, total_won +$388, total_lost +$1,012
+========================================================================================
+Cycle 74 | Day 75
+State   $ 2,816 -> 2,971 (+$155) | HP 80 -> 83 (+3) | SAN 100 -> 100 (+0) | Rank 1 -> 1 | Car Y
+Events  storyline:mechanic_dreams:stage3, night:satellite_falling
+Polarity positive
+Changes none
+Stats   days_survived +1
+Gamble  total_hands +3, wins +2, losses +1, busts +1, total_won +$605, total_lost +$450
+========================================================================================
+Cycle 75 | Day 76
+State   $ 2,971 -> 4,548 (+$1,577) | HP 83 -> 82 (-1) | SAN 100 -> 95 (-5) | Rank 1 -> 1 | Car Y
+Events  storyline:radio_signal:stage1, met:Found Frequency, night:chase_the_second_rabbit
+Polarity positive
+Changes none
+Stats   days_survived +1, people_met +1
+Gamble  total_hands +3, wins +2, losses +1, blackjacks +1, total_won +$1,577, total_lost +$330
+========================================================================================
+Cycle 76 | Day 77
+State   $ 4,548 -> 3,723 (-$825) | HP 82 -> 78 (-4) | SAN 95 -> 92 (-3) | Rank 1 -> 1 | Car Y
+Events  storyline:phil:stage2, night:insomnia_night
+Polarity negative
+Changes none
+Stats   days_survived +1
+Gamble  total_hands +3, wins +1, losses +2, busts +1, total_won +$611, total_lost +$1,436
+========================================================================================
+Cycle 77 | Day 78
+State   $ 3,723 -> 3,707 (-$16) | HP 78 -> 32 (-46) | SAN 92 -> 65 (-27) | Rank 1 -> 1 | Car Y
+Events  day:street_musician, night:carbon_monoxide
+Polarity negative
+Changes none
+Stats   days_survived +1
+Gamble  total_hands +3, wins +2, losses +1, total_won +$1,285, total_lost +$801
+========================================================================================
+Cycle 78 | Day 79
+State   $ 3,707 -> 4,189 (+$482) | HP 32 -> 23 (-9) | SAN 65 -> 65 (+0) | Rank 1 -> 1 | Car Y
+Events  storyline:mechanic_dreams:stage4, night:whats_my_favorite_color, night:stray_cat_has_kittens, day:companion_brings_friend, day:mosquito_bite_infection
+Polarity negative
+Changes none
+Stats   days_survived +1
+Gamble  total_hands +3, wins +2, losses +1, total_won +$1,075, total_lost +$593
+========================================================================================
+Cycle 79 | Day 80
+State   $ 4,189 -> 5,636 (+$1,447) | HP 23 -> 22 (-1) | SAN 65 -> 58 (-7) | Rank 1 -> 1 | Car Y
+Events  storyline:radio_signal:stage2, met:Found Tower, met:Took Logbook, night:raccoon_invasion
+Polarity positive
+Changes +items=['Radio Logbook']
+Stats   days_survived +1, people_met +2
+Gamble  total_hands +3, wins +2, losses +1, busts +1, total_won +$1,447, total_lost +$295
+========================================================================================
+Cycle 80 | Day 81
+State   $ 5,636 -> 9,982 (+$4,346) | HP 22 -> 25 (+3) | SAN 58 -> 58 (+0) | Rank 1 -> 1 | Car Y
+Events  storyline:bridge_angel:stage0, day:companion_nightmare, day:signal_mirror_rescue, night:satellite_falling
+Polarity positive
+Changes none
+Stats   days_survived +1
+Gamble  total_hands +3, wins +3, blackjacks +1, total_won +$4,371
 ========================================================================================
 Cycle 81 | Day 82
-State   $ 557 -> 468 (-$89) | HP 25 -> 28 (+3) | SAN 41 -> 51 (+10) | Rank 0 -> 0 | Car Y
-Events  storyline:dr_feelgood:stage4, night:chase_the_rabbit, night:woodlands_path, met:Woodlands Path Event
-Polarity positive
-Changes -story=['dr_feelgood'] | +story_completed=['dr_feelgood']
+State   $ 9,982 -> 7,549 (-$2,433) | HP 25 -> 9 (-16) | SAN 58 -> 58 (+0) | Rank 1 -> 1 | Car Y
+Events  storyline:bridge_angel:stage0, day:slick_escape_route, day:mayas_luck, day:back_pain, night:chase_the_second_rabbit, night:whats_my_favorite_color, night:woodlands_field, met:Woodlands Field Event
+Polarity negative
+Changes none
 Stats   days_survived +1, people_met +1
-Gamble  total_hands +3, losses +2, ties +1, busts +1, total_lost +$121
+Gamble  total_hands +3, wins +1, losses +2, total_won +$505, total_lost +$2,938
 ========================================================================================
 Cycle 82 | Day 83
-State   $ 468 -> 376 (-$92) | HP 28 -> 5 (-23) | SAN 51 -> 46 (-5) | Rank 0 -> 0 | Car Y
-Events  day:shiv_confrontation, night:stray_cat_dies, day:back_pain
+State   $ 7,549 -> 7,890 (+$341) | HP 9 -> 0 (-9) | SAN 58 -> 38 (-20) | Rank 1 -> 1 | Car Y
+Events  storyline:bridge_angel:stage0, day:morning_fog, night:carbon_monoxide
 Polarity negative
 Changes none
 Stats   days_survived +1
-Gamble  total_hands +3, losses +2, ties +1, busts +2, total_lost +$94
-========================================================================================
-Cycle 83 | Day 84
-State   $ 376 -> 499 (+$123) | HP 5 -> 5 (+0) | SAN 46 -> 46 (+0) | Rank 0 -> 0 | Car Y
-Events  storyline:bridge_angel:stage0, day:windshield_cracked, night:dream_of_winning
-Polarity positive
-Changes none
-Stats   days_survived +1
-Gamble  total_hands +3, wins +3, total_won +$123
-========================================================================================
-Cycle 84 | Day 85
-State   $ 499 -> 750 (+$251) | HP 5 -> 3 (-2) | SAN 46 -> 36 (-10) | Rank 0 -> 0 | Car Y
-Events  storyline:bridge_angel:stage0, day:bald_tires_noticed, night:nightmare_of_losing
-Polarity negative
-Changes none
-Stats   days_survived +1
-Gamble  total_hands +3, wins +3, total_won +$251
-========================================================================================
-Cycle 85 | Day 86
-State   $ 750 -> 846 (+$96) | HP 3 -> 0 (-3) | SAN 36 -> 25 (-11) | Rank 0 -> 0 | Car Y
-Events  storyline:bridge_angel:stage0, day:food_truck_nightmare, night:nightmare
-Polarity negative
-Changes +status=['Severe Dehydration', 'Stomach Flu']
-Stats   days_survived +1
-Gamble  total_hands +3, wins +2, losses +1, total_won +$216, total_lost +$120
-Result  player died during cycle 85 | cause: You have succumbed to your wounds
+Gamble  total_hands +3, wins +2, losses +1, total_won +$1,548, total_lost +$1,207
+Result  player died during cycle 82 | cause: You have succumbed to your wounds
 
 ########################################################################################
-Run Summary | cycles_requested=100 | seed=12
-Final    Day 86 | $ 846 | HP 0 | SAN 25 | Rank 0 | Alive=False
-Peak     $ 3,088 | Rank 1
-Peak days    57
-Inventory   ['Apartment Key', 'Car', 'Carrot', "Dealer's Coin", "Edgar's Letter", "Edgar's List", 'Fake Flower', "Martinez's Card", 'Radio Numbers', 'Worn Map']
+Run Summary | cycles_requested=100 | seed=21
+Final    Day 83 | $ 7,890 | HP 0 | SAN 38 | Rank 1 | Alive=False
+Peak     $ 9,982 | Rank 1
+Peak days    81
+Inventory   ['Apartment Key', 'Car', 'Carrot', "Dealer's Coin", "Edgar's Letter", "Edgar's List", 'Fake Flower', "Granny's Swamp Nectar", "Hermit's Journal", "Martinez's Card", 'Professor Bear', 'Radio Logbook', 'Radio Numbers', 'Worn Map']
 Has car            True
 Ever had car       True
 Has map            False
@@ -694,146 +670,135 @@ Has marvin access  True
 Millionaire reached False
 Millionaire visited False
 Death cause        You have succumbed to your wounds
-Injuries    ['Broken Ankle', 'Concussion', 'Deep Laceration']
-Status      ['Possible Rabies', 'Severe Dehydration', 'Sinus Infection', 'Stomach Flu', 'Strep Throat', 'UTI']
+Injuries    ['Broken Hand', 'Scraped Knee']
+Status      ['Ear Infection', 'Pink Eye', 'Second Degree Burns', 'Staph Infection', 'Tooth Abscess']
 Pawned items []
 Pawned count 0
-Companions  ['Patches', 'Whiskers']
+Companions  ['Whiskers']
 Travel restrictions  []
 Broken items        []
 Repairing items     []
-Storylines active     ['gas_station_hero', 'jameson', 'mechanics', 'radio_signal', 'stray_cat']
-Storylines completed  ['carnival', 'dealer_past', 'dr_feelgood', 'graveyard', 'grimy_gus', 'kyle', 'lockbox', 'martinez', 'marvin', 'mime', 'phil', 'sleep_paralysis', 'vinnie', 'witch']
+Storylines active     ['gas_station_hero', 'jameson', 'mechanic_dreams', 'phil', 'radio_signal', 'stray_cat']
+Storylines completed  ['carnival', 'dealer_past', 'graveyard', 'grimy_gus', 'kyle', 'lockbox', 'martinez', 'marvin', 'mechanics', 'mime', 'sleep_paralysis', 'stuart', 'vinnie', 'witch']
 Storylines failed     []
 Mechanic intro decisions
-  day=29 mechanic=Tom cost=$200 balance=$422 answer=yes source=blank
-  day=29 mechanic=Tom cost=$200 balance=$222 answer=no source=blank
-  day=29 mechanic=Tom cost=$200 balance=$222 answer=no source=blank
-  day=29 mechanic=Tom cost=$200 balance=$222 answer=no source=blank
-  day=29 mechanic=Tom cost=$200 balance=$222 answer=no source=blank
-  day=29 mechanic=Tom cost=$200 balance=$222 answer=no source=blank
-  day=29 mechanic=Tom cost=$200 balance=$222 answer=no source=blank
-  day=29 mechanic=Tom cost=$200 balance=$222 answer=no source=blank
-  day=29 mechanic=Tom cost=$222 balance=$222 answer=no source=blank
-  day=39 mechanic=Unknown cost=? balance=$139 answer=no source=yesno
-  day=54 mechanic=Oswald cost=$800 balance=$2,312 answer=no source=blank
-  day=54 mechanic=Oswald cost=$800 balance=$2,312 answer=no source=blank
-  day=54 mechanic=Oswald cost=$800 balance=$2,312 answer=no source=blank
-  day=54 mechanic=Oswald cost=$800 balance=$2,312 answer=no source=blank
-  day=54 mechanic=Oswald cost=$800 balance=$2,312 answer=no source=blank
-  day=54 mechanic=Oswald cost=$800 balance=$2,312 answer=no source=blank
-  day=54 mechanic=Oswald cost=$800 balance=$2,312 answer=no source=blank
+  day=9 mechanic=Frank cost=$75 balance=$240 answer=no source=blank
+  day=11 mechanic=Tom cost=$250 balance=$413 answer=yes source=blank
+  day=11 mechanic=Tom cost=$250 balance=$163 answer=no source=yesno
+  day=11 mechanic=Tom cost=$250 balance=$163 answer=no source=blank
+  day=11 mechanic=Tom cost=$250 balance=$163 answer=no source=blank
+  day=11 mechanic=Tom cost=$250 balance=$163 answer=no source=blank
+  day=11 mechanic=Tom cost=$250 balance=$163 answer=no source=blank
+  day=11 mechanic=Tom cost=$163 balance=$163 answer=no source=blank
+  day=24 mechanic=Tom cost=? balance=$10 answer=no source=yesno
+  day=48 mechanic=Oswald cost=$800 balance=$1,180 answer=yes source=blank
 
 Fallback decisions
   none
 
 Event polarity
-  positive 95
-  negative 110
-  neutral 35
+  positive 124
+  negative 90
+  neutral 20
 
 Item impact
-  Lockbox hits=2 pos=1 neg=0 neu=1 cash=+1973 hp=+0 san=+24
-  Apartment Key hits=1 pos=1 neg=0 neu=0 cash=+1964 hp=+0 san=+24
-  Fake Flower hits=1 pos=1 neg=0 neu=0 cash=+114 hp=+8 san=+1
-  Edgar's List hits=1 pos=1 neg=0 neu=0 cash=+56 hp=+6 san=+12
-  Edgar's Letter hits=1 pos=1 neg=0 neu=0 cash=+56 hp=+6 san=+12
-  Martinez's Card hits=1 pos=1 neg=0 neu=0 cash=+1 hp=+5 san=-5
-  Carrot hits=1 pos=1 neg=0 neu=0 cash=-1 hp=+0 san=+2
-  Dealer's Coin hits=1 pos=1 neg=0 neu=0 cash=-1052 hp=+1 san=+11
-  Carnival Token hits=2 pos=1 neg=1 neu=0 cash=-587 hp=+0 san=-2
-  Worn Map hits=1 pos=0 neg=0 neu=1 cash=-69 hp=+0 san=+0
-  Radio Numbers hits=1 pos=0 neg=1 neu=0 cash=-64 hp=+0 san=-12
+  Lockbox hits=2 pos=2 neg=0 neu=0 cash=+1787 hp=+1 san=+2
+  Carnival Token hits=2 pos=2 neg=0 neu=0 cash=-81 hp=+4 san=+16
+  Apartment Key hits=1 pos=1 neg=0 neu=0 cash=+1653 hp=-1 san=+3
+  Radio Logbook hits=1 pos=1 neg=0 neu=0 cash=+1447 hp=-1 san=-7
+  Fake Flower hits=1 pos=1 neg=0 neu=0 cash=+305 hp=+0 san=+6
+  Worn Map hits=1 pos=1 neg=0 neu=0 cash=+38 hp=+5 san=+1
+  Carrot hits=1 pos=1 neg=0 neu=0 cash=+36 hp=+0 san=+5
+  Radio Numbers hits=1 pos=1 neg=0 neu=0 cash=-7 hp=+2 san=+5
+  Professor Bear hits=1 pos=1 neg=0 neu=0 cash=-33 hp=+0 san=+7
+  Hermit's Journal hits=1 pos=1 neg=0 neu=0 cash=-40 hp=+4 san=+4
+  Granny's Swamp Nectar hits=1 pos=1 neg=0 neu=0 cash=-92 hp=+13 san=-9
+  Dealer's Coin hits=1 pos=0 neg=0 neu=1 cash=-32 hp=+0 san=+0
+  Martinez's Card hits=1 pos=0 neg=1 neu=0 cash=+11 hp=-15 san=-10
+  Edgar's List hits=1 pos=0 neg=1 neu=0 cash=+2 hp=-6 san=-2
+  Edgar's Letter hits=1 pos=0 neg=1 neu=0 cash=+2 hp=-6 san=-2
 
 Marvin provenance
   none
 
 Planner traces
-  goals push_next_rank=218 | acquire_car=198 | restock_supplies=165 | survive_emergency=68 | stabilize_sanity=36 | stabilize_health=27 | advance_mechanic_arc=3
-  cycle=84 day=84 goal=survive_emergency action=103 confidence=0.88 reason=goal=survive_emergency blackjack_bet phase=rank_one_rush survival=True edge=0
-  cycle=84 day=84 goal=survive_emergency action=stand confidence=0.92 reason=goal=survive_emergency blackjack_action=stand total=20 soft=0 dealer=3
-  cycle=85 day=85 goal=survive_emergency action=120 confidence=0.88 reason=goal=survive_emergency blackjack_bet phase=rank_one_rush survival=True edge=0
-  cycle=85 day=85 goal=survive_emergency action=100 confidence=0.88 reason=goal=survive_emergency blackjack_bet phase=rank_one_rush survival=True edge=0
-  cycle=85 day=85 goal=survive_emergency action=stand confidence=0.92 reason=goal=survive_emergency blackjack_action=stand total=19 soft=0 dealer=4
-  cycle=85 day=85 goal=survive_emergency action=116 confidence=0.88 reason=goal=survive_emergency blackjack_bet phase=rank_one_rush survival=True edge=0
-  cycle=85 day=85 goal=survive_emergency action=hit confidence=0.92 reason=goal=survive_emergency blackjack_action=hit total=13 soft=0 dealer=11
-  cycle=85 day=85 goal=survive_emergency action=stand confidence=0.92 reason=goal=survive_emergency blackjack_action=stand total=18 soft=0 dealer=11
+  goals acquire_car=240 | cashout_pawn_inventory=156 | push_next_rank=99 | restock_supplies=69 | survive_emergency=47 | stabilize_health=21 | stabilize_sanity=19 | preserve_companion_roster=11
+  cycle=82 day=82 goal=survive_emergency action=hit confidence=0.92 reason=goal=survive_emergency blackjack_action=hit total=7 soft=0 dealer=7
+  cycle=82 day=82 goal=survive_emergency action=hit confidence=0.92 reason=goal=survive_emergency blackjack_action=hit total=9 soft=0 dealer=7
+  cycle=82 day=82 goal=survive_emergency action=stand confidence=0.92 reason=goal=survive_emergency blackjack_action=stand total=17 soft=0 dealer=7
+  cycle=82 day=82 goal=survive_emergency action=stand confidence=0.92 reason=goal=survive_emergency blackjack_action=stand total=17 soft=0 dealer=6
+  cycle=82 day=82 goal=survive_emergency action=1088 confidence=0.88 reason=goal=survive_emergency blackjack_bet phase=rank_two_rush survival=True edge=0
+  cycle=82 day=82 goal=survive_emergency action=hit confidence=0.92 reason=goal=survive_emergency blackjack_action=hit total=15 soft=15 dealer=10
+  cycle=82 day=82 goal=survive_emergency action=hit confidence=0.92 reason=goal=survive_emergency blackjack_action=hit total=15 soft=0 dealer=10
+  cycle=82 day=82 goal=survive_emergency action=stand confidence=0.92 reason=goal=survive_emergency blackjack_action=stand total=19 soft=0 dealer=10
 
 Route visibility
-  outcomes applied=23 | suppressed=22 | interrupt=10
-  interrupts recovery_day=7 | medical_stabilization=3
-  blocked_goals restock_supplies=10 | advance_mechanic_arc=10 | reach_adventure_threshold=10 | push_next_rank=10 | stabilize_health=9 | stabilize_sanity=4 | survive_emergency=1
-  interrupted_top_goals restock_supplies=10
-  applied_goals restock_supplies=22 | advance_mechanic_arc=1
-  suppressed_goals push_next_rank=22
+  outcomes applied=8 | interrupt=8
+  interrupts urgent_medical=8
+  blocked_goals cashout_pawn_inventory=8 | advance_mechanic_arc=8 | reach_adventure_threshold=8 | push_next_rank=8 | restock_supplies=4 | stabilize_health=1
+  interrupted_top_goals cashout_pawn_inventory=8
+  applied_goals cashout_pawn_inventory=8
 
 Event Distribution | day
+    2  feeding_station_morning
+    1  ant_bite
     1  back_pain
-    1  bald_tires_noticed
-    1  broken_ankle
+    1  bad_hair_day
+    1  bad_tattoo_infection
     1  car_battery_dead
-    1  carbon_monoxide
-    1  cold_gets_worse
-    1  contract_sinus_infection
-    1  contract_strep_throat
-    1  contract_uti
-    1  damaged_exhaust_again
-    1  dead_battery_afternoon
-    1  dog_attack_severe
+    1  companion_brings_friend
+    1  companion_nightmare
+    1  conspiracy_theorist
+    1  dream_catcher_night
     1  empty_event
-    1  feeding_station_morning
-    1  food_truck_nightmare
-    1  fourth_wall_break
-    1  freight_truck
-    1  gut_wound_complications
-    1  hail_damage
-    1  lockpick_opportunity
-    1  lost_dog_investigation
-    1  lost_wallet
-    1  lottery_scratch
+    1  hermit_trail_discovery
+    1  lost_tourist
+    1  lucky_penny
     1  mayas_luck
-    1  midnight_visitor
-    1  nail_in_tire
-    1  oil_leak_spotted
-    1  opossum_in_trash
-    1  prayer_ignored
-    1  rusty_midnight_heist
-    1  shiv_confrontation
-    1  slip_in_shower
-    1  social_encounter
-    1  sunburn
-    1  the_crow_council
-    1  the_empty_room
-    1  thermostat_stuck
-    1  trap_night_thief
+    1  morning_fog
+    1  mosquito_bite_infection
+    1  prime_day
+    1  public_pool_infection
+    1  seagull_attack
+    1  second_degree_burns
+    1  signal_mirror_rescue
+    1  slick_escape_route
+    1  street_musician
+    1  tooth_abscess
     1  trash_treasure
-    1  water_purifier_use
-    1  windshield_cracked
-    1  wrong_universe
+    1  turn_to_god
+    1  weight_dropping
 
 Event Distribution | night
-    5  nice_dream
-    4  chase_the_rabbit
-    4  dream_of_winning
+    4  insomnia_night
+    4  midnight_walk
+    4  nice_dream
     4  nightmare
-    4  nightmare_of_losing
-    4  raccoon_invasion
     4  stray_cat_dies
     4  stray_cat_returns
-    4  woodlands_path
+    3  chase_the_rabbit
     3  ditched_wallet
-    3  insomnia_night
-    3  midnight_walk
+    3  nightmare_of_losing
     3  peaceful_night
+    3  raccoon_invasion
     3  stargazing
     3  went_jogging
-    1  chase_the_second_rabbit
+    2  carbon_monoxide
+    2  chase_the_second_rabbit
+    2  dream_of_winning
+    2  satellite_falling
+    2  whats_my_favorite_color
+    2  woodlands_field
+    2  woodlands_path
     1  drowning_dream
     1  midnight_snack_run
     1  police_checkpoint
+    1  stray_cat_has_kittens
+    1  swamp_stroll
+    1  woodlands_river
 
 Event Distribution | storyline
-   10  bridge_angel:stage0
+    5  bridge_angel:stage0
     1  carnival:stage0
     1  carnival:stage1
     1  carnival:stage2
@@ -843,11 +808,6 @@ Event Distribution | storyline
     1  dealer_past:stage2
     1  dealer_past:stage3
     1  dealer_past:stage4
-    1  dr_feelgood:stage0
-    1  dr_feelgood:stage1
-    1  dr_feelgood:stage2
-    1  dr_feelgood:stage3
-    1  dr_feelgood:stage4
     1  gas_station_hero:stage0
     1  graveyard:stage0
     1  graveyard:stage1
@@ -869,8 +829,14 @@ Event Distribution | storyline
     1  martinez:stage2
     1  martinez:stage3
     1  marvin:stage0
+    1  mechanic_dreams:stage0
+    1  mechanic_dreams:stage1
+    1  mechanic_dreams:stage2
+    1  mechanic_dreams:stage3
+    1  mechanic_dreams:stage4
     1  mechanics:stage0
     1  mechanics:stage1
+    1  mechanics:stage2
     1  mime:stage0
     1  mime:stage1
     1  mime:stage2
@@ -879,129 +845,132 @@ Event Distribution | storyline
     1  phil:stage0
     1  phil:stage1
     1  phil:stage2
-    1  phil:stage3
     1  radio_signal:stage0
+    1  radio_signal:stage1
+    1  radio_signal:stage2
     1  sleep_paralysis:stage0
     1  sleep_paralysis:stage1
     1  sleep_paralysis:stage2
     1  sleep_paralysis:stage3
     1  stray_cat:stage0
+    1  stuart:stage0
+    1  stuart:stage1
+    1  stuart:stage2
+    1  stuart:stage3
     1  vinnie:stage0
     1  witch:stage0
 
 Event Distribution | met
-    4  Woodlands Path Event
+    2  Woodlands Field Event
+    2  Woodlands Path Event
     1  Asked About Photo
     1  Carnival
-    1  Carnival Won Big
     1  Cat Died
-    1  Cold Turkey
-    1  Convenience Store
     1  Cowboy
     1  Dealer Asked
     1  Dealer Opened Up
     1  Dealer Photo
     1  Doctor's Office
-    1  Dr. Feelgood
     1  Drowning Dream
     1  Entered Carnival
-    1  Flea Market Route Map
+    1  Ezekiel
     1  Fortune Told
+    1  Found Frequency
+    1  Found Tower
+    1  Frank Event
     1  Gerald
     1  Graveyard
     1  Grimy Gus
     1  Has Apartment
+    1  Hermit Trail Found
     1  Interrogator
+    1  Jameson Tom Help
     1  Kyle
-    1  Kyle Asked
-    1  Kyle Confided
 
 Event Distribution | location
-   22  shop:convenience_store
-    2  doctor
-    1  doctor:witch
-    1  mechanic:tom
+    9  doctor
+    8  shop:pawn_shop
 
 Event Distribution | all
-   22  location:shop:convenience_store
-   10  storyline:bridge_angel:stage0
-    5  night:nice_dream
-    4  met:Woodlands Path Event
-    4  night:chase_the_rabbit
-    4  night:dream_of_winning
+    9  location:doctor
+    8  location:shop:pawn_shop
+    5  storyline:bridge_angel:stage0
+    4  night:insomnia_night
+    4  night:midnight_walk
+    4  night:nice_dream
     4  night:nightmare
-    4  night:nightmare_of_losing
-    4  night:raccoon_invasion
     4  night:stray_cat_dies
     4  night:stray_cat_returns
-    4  night:woodlands_path
+    3  night:chase_the_rabbit
     3  night:ditched_wallet
-    3  night:insomnia_night
-    3  night:midnight_walk
+    3  night:nightmare_of_losing
     3  night:peaceful_night
+    3  night:raccoon_invasion
     3  night:stargazing
     3  night:went_jogging
-    2  location:doctor
+    2  day:feeding_station_morning
+    2  met:Woodlands Field Event
+    2  met:Woodlands Path Event
+    2  night:carbon_monoxide
+    2  night:chase_the_second_rabbit
+    2  night:dream_of_winning
+    2  night:satellite_falling
+    2  night:whats_my_favorite_color
+    2  night:woodlands_field
+    2  night:woodlands_path
+    1  day:ant_bite
     1  day:back_pain
-    1  day:bald_tires_noticed
-    1  day:broken_ankle
+    1  day:bad_hair_day
+    1  day:bad_tattoo_infection
     1  day:car_battery_dead
-    1  day:carbon_monoxide
-    1  day:cold_gets_worse
-    1  day:contract_sinus_infection
-    1  day:contract_strep_throat
-    1  day:contract_uti
-    1  day:damaged_exhaust_again
-    1  day:dead_battery_afternoon
-    1  day:dog_attack_severe
+    1  day:companion_brings_friend
+    1  day:companion_nightmare
+    1  day:conspiracy_theorist
+    1  day:dream_catcher_night
     1  day:empty_event
-    1  day:feeding_station_morning
-    1  day:food_truck_nightmare
-    1  day:fourth_wall_break
-    1  day:freight_truck
-    1  day:gut_wound_complications
-    1  day:hail_damage
-    1  day:lockpick_opportunity
-    1  day:lost_dog_investigation
+    1  day:hermit_trail_discovery
+    1  day:lost_tourist
+    1  day:lucky_penny
+    1  day:mayas_luck
 
 Final Statistics
-  days_survived          85
+  days_survived          82
   total_money_earned     0
   total_money_spent      0
   items_collected        0
   items_sold             0
   events_experienced     0
-  people_met             49
+  people_met             58
   injuries_sustained     0
   illnesses_contracted   0
   near_death_experiences 0
-  companions_befriended  4
+  companions_befriended  2
   loans_taken            0
   loans_repaid           0
   times_robbed           0
   times_hospitalized     0
-  mechanic_visits        1
-  doctor_visits          2
-  witch_doctor_visits    1
+  mechanic_visits        0
+  doctor_visits          9
+  witch_doctor_visits    0
   casino_visits          0
-  pawn_shop_visits       0
+  pawn_shop_visits       8
   marvin_visits          0
   loan_shark_visits      0
 
 Final Gambling Statistics
-  total_hands            255
-  wins                   104
-  losses                 131
-  blackjacks             26
-  busts                  33
-  ties                   20
-  biggest_win            2228
-  biggest_loss           2317
+  total_hands            246
+  wins                   115
+  losses                 114
+  blackjacks             23
+  busts                  38
+  ties                   17
+  biggest_win            2090
+  biggest_loss           1597
   current_streak         2
-  best_win_streak        9
-  worst_loss_streak      10
-  total_won              12231
-  total_lost             14707
+  best_win_streak        6
+  worst_loss_streak      6
+  total_won              22977
+  total_lost             17598
   double_downs_won       0
   splits_won             0
   surrenders_used        0
