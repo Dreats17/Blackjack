@@ -8,12 +8,20 @@ import random
 import re
 import sys
 import traceback
+import types
 import warnings
 from collections import Counter, defaultdict
 from unittest.mock import patch
 
 # Patch msvcrt before anything else imports it.
-import msvcrt
+# msvcrt is Windows-only; install a stub for other platforms.
+if "msvcrt" not in sys.modules:
+    _stub = types.ModuleType("msvcrt")
+    _stub.kbhit = lambda: False  # type: ignore[attr-defined]
+    _stub.getch = lambda: b""  # type: ignore[attr-defined]
+    sys.modules["msvcrt"] = _stub
+
+import msvcrt  # noqa: E402  (now always available)
 
 msvcrt.kbhit = lambda: False
 msvcrt.getch = lambda: b""
