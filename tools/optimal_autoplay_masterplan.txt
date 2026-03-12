@@ -54,8 +54,9 @@ MARVIN AVAILABILITY (verified from lists.py make_shop_list)
   There is NO rank gate in make_shop_list — only the map requirement.
   The docs say Rank 3+ but the code has no rank check here.
 - Marvin's item prices are RANDOM per visit (not fixed):
-  e.g. Health Indicator $4,000–$5,500, Golden Watch $15,000–$17,500,
-  Rusty Compass $4,000–$6,000.  All items use random.choice([low, mid, high]).
+  e.g. Health Indicator $8,000–$9,500, Golden Watch $29,000–$35,000,
+  Faulty Insurance $10,000–$12,000.  Cheapest item starts at $8,000.
+  All items use random.choice([low, mid, high]).
 
 ROADSIDE MECHANIC VISIT (newly implemented — not in docs, added for longevity)
 - Fires at 45 % probability when car trouble adds "Wasted Afternoon".
