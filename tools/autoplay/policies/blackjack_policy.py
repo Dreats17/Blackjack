@@ -396,6 +396,10 @@ def choose_blackjack_bet(request: DecisionRequest, plan: StrategicPlan) -> tuple
             ratio = max(ratio, 0.28)
     if balance >= 25000 and edge_score >= 6:
         ratio = min(ratio, 0.30 if balance < 100000 else 0.18)
+    # Rank 2 cushion: when balance is within 2.5x the rank floor ($25k), be conservative
+    # to avoid a bad streak dropping the bot below the $10k threshold.
+    if rank == 2 and balance < 25000:
+        ratio = min(ratio, 0.16)
     if stalled_run and not survival_mode:
         if phase == "car_rush":
             ratio = max(ratio, 0.26 if balance < 350 else 0.18)
@@ -530,6 +534,10 @@ def choose_blackjack_bet(request: DecisionRequest, plan: StrategicPlan) -> tuple
             max_ratio = max(max_ratio, 0.40)
     if balance >= 25000 and edge_score >= 6:
         max_ratio = min(max_ratio, 0.38 if balance < 100000 else 0.24)
+    # Rank 2 cushion: when balance is within 2.5x the rank floor ($25k), cap max bet
+    # to avoid dropping below the $10k threshold from a single bad session.
+    if rank == 2 and balance < 25000:
+        max_ratio = min(max_ratio, 0.24)
     if stalled_run and not survival_mode:
         if phase == "car_rush":
             max_ratio = max(max_ratio, 0.36 if balance < 350 else 0.24)

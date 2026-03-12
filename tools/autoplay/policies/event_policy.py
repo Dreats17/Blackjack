@@ -462,7 +462,9 @@ def choose_event_option(request: DecisionRequest, plan: StrategicPlan) -> tuple[
     elif normalized == ["wrong person", "play along", "run"]:
         chosen_index, reason = 0, "wrong_person"
     elif normalized == ["step back", "stay", "call for help"]:
-        chosen_index, reason = 2, "call_for_help"
+        # "stay" meets Bridge Angel (+20 sanity) and unlocks bridge_angel_returns (+15)
+        # and call_bridge_angel (+30) — 65 total vs 25 from "call for help" alone.
+        chosen_index, reason = 1, "stay_meets_bridge_angel"
     elif normalized == ["bail out", "investigate", "ignore it"]:
         chosen_index, reason = 0, "bail_out"
     elif normalized == ["try it", "sell it", "throw it away"]:

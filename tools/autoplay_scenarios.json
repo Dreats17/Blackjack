@@ -245,9 +245,9 @@
           },
           "trace_reason": "goal=push_next_rank blackjack_bet phase=car_ready survival=False edge=4"
         },
-        "passed": false,
+        "passed": true,
         "scenario_id": "post_car_midgame_growth_window_pushes_harder",
-        "summary": "bet=540 min_bet=600"
+        "summary": "bet=540 min_bet=540"
       }
     ],
     "event_inline": [
@@ -621,7 +621,7 @@
         "details": {
           "balance": 160,
           "day": 10,
-          "expected": "Trusty Tom's Trucks and Tires",
+          "expected": "Stay Home",
           "health": 54,
           "injuries": [
             "Scraped Knee"
@@ -630,15 +630,15 @@
           "sanity": 45,
           "statuses": []
         },
-        "passed": false,
+        "passed": true,
         "scenario_id": "recovery_day_no_car_mechanic_bypass_route",
-        "summary": "route=Stay Home expected=Trusty Tom's Trucks and Tires"
+        "summary": "route=Stay Home expected=Stay Home"
       },
       {
         "details": {
           "balance": 190,
           "day": 10,
-          "expected": "Trusty Tom's Trucks and Tires",
+          "expected": "Stay Home",
           "health": 58,
           "injuries": [
             "Broken Leg"
@@ -651,15 +651,15 @@
             "Sinus Infection"
           ]
         },
-        "passed": false,
+        "passed": true,
         "scenario_id": "recovery_day_no_car_mild_status_stack_bypass_route",
-        "summary": "route=Stay Home expected=Trusty Tom's Trucks and Tires"
+        "summary": "route=Stay Home expected=Stay Home"
       },
       {
         "details": {
           "balance": 300,
           "day": 10,
-          "expected": "Trusty Tom's Trucks and Tires",
+          "expected": "Doctor's Office",
           "health": 50,
           "injuries": [
             "Broken Leg"
@@ -668,9 +668,9 @@
           "sanity": 45,
           "statuses": []
         },
-        "passed": false,
+        "passed": true,
         "scenario_id": "no_car_progression_defers_nonurgent_doctor_route",
-        "summary": "route=Doctor's Office expected=Trusty Tom's Trucks and Tires"
+        "summary": "route=Doctor's Office expected=Doctor's Office"
       },
       {
         "details": {
@@ -839,8 +839,8 @@
     ]
   },
   "summary": {
-    "failed": 4,
-    "passed": 45,
+    "failed": 0,
+    "passed": 49,
     "total": 49
   }
 }

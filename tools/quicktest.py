@@ -1127,6 +1127,10 @@ def _doctor_visit_is_urgent(player):
         or any(injury in urgent_injuries for injury in injuries)
         or (player._health < 42 and len(statuses) >= 2)
         or (player._health < 48 and len(statuses) + len(injuries) >= 3)
+        # Compound accumulation: treat as urgent when overwhelming conditions exist
+        or len(injuries) >= 3
+        or len(statuses) >= 5
+        or (len(injuries) >= 2 and len(statuses) >= 3)
     )
 
 

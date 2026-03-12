@@ -2300,6 +2300,7 @@ class DayDarkMixin:
         type.type("You put it in your pocket. It feels like it weighs a hundred pounds.")
         self.add_item("Angel's Number")
         self.restore_sanity(15)
+        self._storyline_system.advance("bridge_angel")
         print("\n")
 
     def call_bridge_angel(self):
@@ -2318,6 +2319,7 @@ class DayDarkMixin:
         print("\n")
         type.type(quote("You're stronger than you think. I believe in you."))
         self.restore_sanity(30)
+        self._storyline_system.complete("bridge_angel")
         print("\n")
 
     # === GAS STATION HERO CHAIN ===

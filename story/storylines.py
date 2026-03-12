@@ -414,6 +414,7 @@ class StorylineSystem:
         _POOL_ARCS = frozenset({
             "stray_cat", "jameson", "phil", "mime", "betsy",
             "gas_station_hero", "collector", "victoria", "grimy_gus", "vinnie", "marvin", "witch",
+            "bridge_angel",
         })
         _SINGLE_SHOT_ARCS = frozenset({"collector", "grimy_gus", "vinnie", "marvin", "witch"})
 
@@ -710,7 +711,7 @@ class StorylineSystem:
             
             case "bridge_angel":
                 if stage == 1:
-                    return p.has_met("Bridge Angel Saved")
+                    return p.has_met("Bridge Angel")
                 return True
             
             case "gas_station_hero":
@@ -846,9 +847,9 @@ class StorylineSystem:
                     return getattr(p, events[stage])
 
             case "bridge_angel":
-                # Stage 0: Despair brings you to the bridge (low health or sanity)
+                # Stage 0: Despair brings you to the bridge (sanity <= 30 trigger, matches event guard)
                 if stage == 0:
-                    if day < 7 or (p.get_health() >= 30 and p.get_sanity() >= 40):
+                    if day < 7 or p.get_sanity() > 30:
                         return None
                 events = ["bridge_contemplation", "bridge_angel_returns", "call_bridge_angel"]
                 if stage < len(events):

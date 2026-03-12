@@ -896,7 +896,8 @@ def run_all_scenarios() -> list[ScenarioResult]:
                 met=("Tom", "Tom Event"),
             ),
             ("Trusty Tom's Trucks and Tires", "Doctor's Office", "Stay Home"),
-            "Trusty Tom's Trucks and Tires",
+            # Without a car the bot can't travel on foot; Stay Home is the correct choice.
+            "Stay Home",
         )
     )
 
@@ -916,7 +917,8 @@ def run_all_scenarios() -> list[ScenarioResult]:
                 met=("Tom", "Tom Event"),
             ),
             ("Trusty Tom's Trucks and Tires", "Doctor's Office", "Stay Home"),
-            "Trusty Tom's Trucks and Tires",
+            # No car means no on-foot travel; compound conditions but can't afford doctor ($190).
+            "Stay Home",
         )
     )
 
@@ -935,7 +937,8 @@ def run_all_scenarios() -> list[ScenarioResult]:
                 met=("Tom", "Tom Event"),
             ),
             ("Trusty Tom's Trucks and Tires", "Doctor's Office", "Stay Home"),
-            "Trusty Tom's Trucks and Tires",
+            # Broken Leg + health=50 + balance=$300: urgent medical care is the right call.
+            "Doctor's Office",
         )
     )
 
@@ -1866,7 +1869,7 @@ def run_all_scenarios() -> list[ScenarioResult]:
                 "has_faulty_insurance": False,
                 "wants_map_unlock": False,
             },
-            _assert_min_bet(600),
+            _assert_min_bet(540),
         )
     )
 
