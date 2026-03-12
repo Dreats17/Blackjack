@@ -24,3 +24,6 @@ dist/
 # OS
 Thumbs.db
 .DS_Store
+tools/test_out.txt
+tools/test_out.json
+tools/cumulative_test_out.txt

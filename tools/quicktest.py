@@ -1503,7 +1503,8 @@ def _rank_protection_floor(player):
     if player is None:
         return 0
     rank = int(player.get_rank())
-    # Rank thresholds: 0→$0, 1→$1k, 2→$10k, 3→$100k, 4→$500k, 5→$900k
+    # Balance thresholds per rank (index = rank): 0→$0, 1→$1k, 2→$10k, 3→$100k, 4→$500k, 5→$900k.
+    # Must stay in sync with _rank_from_balance() and usage in Marvin buy decision.
     thresholds = [0, 1000, 10000, 100000, 500000, 900000]
     if rank <= 1:
         return 0
@@ -4282,9 +4283,16 @@ def _decide_yes_no(prompt=""):
             if priority >= 88 and balance >= cost:
                 in_push = _in_rank_push_window(player)
                 doctor_res = max(120, _doctor_cash_reserve(player))
+                # Always require at least a minimal post-purchase floor so the bot can't
+                # zero out its balance even during a push window.  Use the rank-below
+                # threshold (rank 2→$1k, rank 3→$10k) as the safety net — reuse
+                # _rank_protection_floor on a synthetic rank-1-lower player would be
+                # complex, so derive it directly from the same thresholds constant.
+                _rank_thresholds = [0, 1000, 10000, 100000, 500000, 900000]
+                rank_below_floor = _rank_thresholds[max(0, min(rank - 1, 5))]
                 if in_push:
-                    # During push: only require doctor reserve; rank-drop protection relaxed.
-                    if balance - cost >= doctor_res:
+                    # During push: require doctor reserve + 1-rank-below safety net.
+                    if balance - cost >= max(doctor_res, rank_below_floor):
                         return finalize("yes", f"marvin_offer_push_window:{current_offer}", 0.72)
                 else:
                     # Outside push: require rank protection floor too.
