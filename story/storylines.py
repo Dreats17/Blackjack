@@ -787,11 +787,13 @@ class StorylineSystem:
 
             case "betsy":
                 # Stage 0: A stray cow wanders into your life.
-                # hungry_cow is a cheap-tier (rank 1+) pool event; starving_cow is modest (rank 2+).
-                # Firing at rank 0 deals unblockable 40-80 HP to players with no car and no
-                # Doctor access — a lethal spiral that is inconsistent with the pool tier.
+                # hungry_cow ($100/round) = rank-1 affordable; but starving_cow ($10k/round) fires
+                # as stage-1 and can hit a player who is still at rank 1.  Raising to rank >= 2
+                # keeps the $10k demand inside the tier where it is actually affordable, and is
+                # still consistent with the pool-event placement (hungry_cow appears in cheap-tier
+                # but starving_cow appears in modest-tier / rank 2+).
                 if stage == 0:
-                    if p.has_met("Betsy") or day < 5 or p.get_rank() < 1 or random.random() > 0.10:
+                    if p.has_met("Betsy") or day < 5 or p.get_rank() < 2 or random.random() > 0.10:
                         return None
                 events = ["hungry_cow", "starving_cow", "cow_army"]
                 if stage < len(events):

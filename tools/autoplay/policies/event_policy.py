@@ -271,6 +271,12 @@ def choose_event_yes_no(request: DecisionRequest, plan: StrategicPlan) -> tuple[
         "listen to him?",
         "do the interview?",
         "do you promise?",
+        # Phil's final interrogation: "Will you leave?" → answer "yes" = 25% death,
+        # "no" = 33% death. Always say yes for the better odds (bot normally hits
+        # threat_context_refusal and says no, which is the worse choice).
+        '"answer me. "',
+        '"answer me."',
+        "answer me.",
     }
     always_no = {
         "take the pill?",
