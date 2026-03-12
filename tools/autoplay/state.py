@@ -172,6 +172,21 @@ def _opportunity_flags(
         and "pawn" in route_tokens
         and _economy_hint_value(economy_hints, "pawn_planned_sale_value") > 0
         and not marvin_ready_window,
+        # Proactive borrowing: Vinnie met, no current debt, balance low enough that a loan is
+        # worth the 20%/week interest cost (rank-based thresholds verified from systems.py).
+        "can_borrow_to_bootstrap": (
+            has_car
+            and "loan" in route_tokens
+            and debt == 0
+            and _economy_hint_value(economy_hints, "fake_cash") == 0
+            and bool(player and player.has_met("Vinnie"))
+            and health >= 48
+            and sanity >= 26
+            and (
+                (int(_safe_call(player, "get_rank", 0) or 0) == 0 and balance < 900)
+                or (int(_safe_call(player, "get_rank", 0) or 0) == 1 and not has_map and balance < 3000)
+            )
+        ),
     }
 
 
@@ -214,6 +229,12 @@ def _goal_candidates(
         candidates.append("cashout_pawn_inventory")
     if fake_cash > 0:
         candidates.append("blend_fraudulent_cash_safely")
+    # Proactive borrowing: when Vinnie is accessible and balance is low, borrowing is one
+    # of the best moves in the game.  Include push_next_rank/bootstrap as goals so the
+    # route policy's loan alignment (+30 / +22) can beat the convenience store score.
+    if flags.get("can_borrow_to_bootstrap"):
+        if not any(g in candidates for g in ("bootstrap_blackjack_edge", "push_next_rank")):
+            candidates.append("push_next_rank")
     if flags["can_visit_marvin"]:
         candidates.append("exploit_marvin")
     elif bool(player and player.has_item("Car")) and not (bool(player and player.has_item("Map")) or bool(player and player.has_item("Worn Map"))):

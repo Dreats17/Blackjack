@@ -729,6 +729,7 @@
           "opportunity_flags": {
             "can_advance_mechanic_arc": false,
             "can_adventure_safely": false,
+            "can_borrow_to_bootstrap": false,
             "can_cashout_pawn_inventory": false,
             "can_contain_debt_escalation": false,
             "can_convert_millionaire_to_ending": false,
@@ -756,6 +757,7 @@
           "opportunity_flags": {
             "can_advance_mechanic_arc": false,
             "can_adventure_safely": false,
+            "can_borrow_to_bootstrap": false,
             "can_cashout_pawn_inventory": false,
             "can_contain_debt_escalation": false,
             "can_convert_millionaire_to_ending": false,
@@ -786,6 +788,7 @@
           "opportunity_flags": {
             "can_advance_mechanic_arc": false,
             "can_adventure_safely": false,
+            "can_borrow_to_bootstrap": false,
             "can_cashout_pawn_inventory": false,
             "can_contain_debt_escalation": false,
             "can_convert_millionaire_to_ending": false,
@@ -813,6 +816,7 @@
           "opportunity_flags": {
             "can_advance_mechanic_arc": false,
             "can_adventure_safely": false,
+            "can_borrow_to_bootstrap": false,
             "can_cashout_pawn_inventory": false,
             "can_contain_debt_escalation": false,
             "can_convert_millionaire_to_ending": false,

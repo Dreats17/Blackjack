@@ -782,6 +782,7 @@ def _structured_economy_hints(player):
         "marvin_affordable_priority": int(marvin_affordable_priority),
         "marvin_candidate_price": marvin_candidate_price,
         "marvin_strong_window": int(marvin_strong_window),
+        "fake_cash": int(player.get_fraudulent_cash()) if hasattr(player, "get_fraudulent_cash") else 0,
     }
 
 
@@ -3241,7 +3242,13 @@ def _poverty_escape_loan_mode(player):
 
     if player.get_health() < 48 or player.get_sanity() < 26:
         return False
-    if edge_score < 2:
+    # Require at least one edge item even at very low balance.
+    # Borrowing with edge_score=0 (no useful items) means gambling with borrowed money
+    # at a raw house edge — the 20%/week interest will compound faster than the expected
+    # win rate.  At rank 0 edge_score>=1 is a reasonable floor; edge_score>=2 for rank 1+.
+    if rank == 0 and edge_score < 1:
+        return False
+    if rank >= 1 and edge_score < 2:
         return False
 
     if rank == 0:
@@ -3288,12 +3295,18 @@ def _wants_loan_shark_run(player):
     if fake_cash > 0:
         return False
 
+    edge_score = _blackjack_edge_score(player)
+    # Require at least 1 edge item before proactive borrowing: without any edge advantage
+    # the bot is gambling at the raw house edge, and 20%/wk interest compounds faster
+    # than the expected win rate.  (Exception: repaying existing debt is always allowed.)
+    if edge_score < 1:
+        return False
+
     if balance < 500:
         return True
     if player.get_rank() <= 0 and balance < 900 and player.get_health() >= 48 and player.get_sanity() >= 24:
         return True
 
-    edge_score = _blackjack_edge_score(player)
     if player.get_health() < 42 or player.get_sanity() < 22:
         return False
     if wants_doctor:
@@ -3314,11 +3327,6 @@ def _wants_loan_shark_run(player):
     if _has_marvin_access(player) and _best_marvin_affordable_priority(player) < 84 and balance < 6000 and edge_score >= 3:
         return True
     if player.get_rank() == 0:
-        # At rank 0, use the loan shark aggressively to bootstrap progression.
-        # Even with no edge items (edge_score=0), a small loan is worth it when
-        # the bot has a car but is cash-poor.
-        if balance < 150:
-            return True
         if balance < 325:
             return True
         if balance < 900:
@@ -3349,12 +3357,26 @@ def _has_adventure_utility(player):
 def _wants_adventure_run(player):
     if not _adventure_ready(player):
         return False
-    if _wants_doctor_visit(player) or _wants_store_run(player):
+
+    # Doctor visits always block adventures (health/safety first).
+    if _wants_doctor_visit(player):
         return False
+    # Store blocks adventures at rank 0-1: gathering edge items is more important than
+    # spending the afternoon on a low-yield adventure.  At rank 2+ the player has already
+    # made it past the critical progression bottleneck, so only truly urgent supply runs
+    # (Tool Kit, Spare Tire, Road Flares, First Aid Kit — all priority >= 90) block adventures.
+    rank_val = int(player.get_rank())
+    if _wants_store_run(player):
+        if rank_val < 2:
+            return False
+        # At rank 2+ only block if the store trip is truly urgent.
+        store_cands = _store_purchase_candidates(player)
+        if store_cands and store_cands[0][0] >= 90:
+            return False
 
     balance = player.get_balance()
     floor = _rank_floor(balance)
-    rank = int(player.get_rank())
+    rank = rank_val
 
     if rank <= 0:
         return False
@@ -3384,7 +3406,9 @@ def _wants_adventure_run(player):
     if rank == 2:
         if utility_push:
             return balance >= max(600, floor - 650) and player.get_health() >= 58 and player.get_sanity() >= 26
-        return balance >= floor and player.get_health() >= 65 and player.get_sanity() >= 32
+        # No utility items at rank 2: The Road is open — go if we can afford it and have a
+        # comfortable buffer.  floor at $10k → need balance >= $10k (i.e., just above floor).
+        return balance >= max(floor, 8000) and player.get_health() >= 65 and player.get_sanity() >= 32
     return balance >= floor + 1000 and player.get_health() >= 68 and player.get_sanity() >= 36
 
 
@@ -3446,15 +3470,19 @@ def _choose_progression_destination(labels, options, player):
         if mechanic_bootstrap:
             ordered = [mechanic_progression_choice, marvin_choice, upgrade_choice, loan_choice, adventure_choice, workbench_craft_choice, store_choice, doctor_choice]
         else:
+            # Rotate through three orderings so adventures get their slot regularly.
+            # Rotation 0 (most days): marvin → mechanic → upgrade → adventure → loan
+            # Rotation 1: mechanic → adventure → marvin → upgrade → loan
+            # Rotation 2: adventure → marvin → mechanic → upgrade → loan
             rotation = day % 3
             if rotation == 1:
-                ordered = [mechanic_progression_choice, marvin_choice, upgrade_choice, loan_choice, adventure_choice, workbench_craft_choice, store_choice, doctor_choice]
+                ordered = [mechanic_progression_choice, adventure_choice, marvin_choice, upgrade_choice, loan_choice, workbench_craft_choice, store_choice, doctor_choice]
             elif rotation == 2:
-                ordered = [marvin_choice, mechanic_progression_choice, upgrade_choice, loan_choice, adventure_choice, workbench_craft_choice, store_choice, doctor_choice]
+                ordered = [adventure_choice, marvin_choice, mechanic_progression_choice, upgrade_choice, loan_choice, workbench_craft_choice, store_choice, doctor_choice]
             else:
-                ordered = [upgrade_choice, mechanic_progression_choice, marvin_choice, loan_choice, adventure_choice, workbench_craft_choice, store_choice, doctor_choice]
+                ordered = [marvin_choice, mechanic_progression_choice, upgrade_choice, adventure_choice, loan_choice, workbench_craft_choice, store_choice, doctor_choice]
             if adventure_push:
-                ordered = [marvin_choice, adventure_choice, mechanic_progression_choice, upgrade_choice, loan_choice, workbench_craft_choice, store_choice, doctor_choice]
+                ordered = [adventure_choice, marvin_choice, mechanic_progression_choice, upgrade_choice, loan_choice, workbench_craft_choice, store_choice, doctor_choice]
     else:
         if mechanic_bootstrap:
             if marvin_priority_push:
@@ -3734,6 +3762,17 @@ def _choose_destination(options, player):
     if allow_recovery_override and _needs_recovery_day(player) and "Stay Home" in labels:
         _record_route_interrupt_trace(player, labels["Stay Home"], "recovery-day override -> Stay Home", "stabilize_health", "recovery_day")
         return labels["Stay Home"]
+
+    # Loan shark bootstrap interrupt: when Vinnie is met, no debt, and the player is
+    # cash-poor (rank 0 < $900, rank 1 no-map < $3k), borrowing from Vinnie is almost
+    # always the best available move.  Without this interrupt the route scorer ranks the
+    # convenience store above the loan shark because push_next_rank's store bonus slightly
+    # exceeds the loan bonus in edge cases (store_spend high, loan_pressure=0 first visit).
+    # This mirrors the medical/flask interrupts — it fires after all safety checks so it
+    # never overrides doctor, recovery day, or urgent cases.
+    if "Vinnie's Back Alley Loans" in labels and _poverty_escape_loan_mode(player):
+        _record_route_interrupt_trace(player, labels["Vinnie's Back Alley Loans"], "poverty-escape loan bootstrap", "push_next_rank", "poverty_loan_bootstrap")
+        return labels["Vinnie's Back Alley Loans"]
 
     # Flask-only witch visit: inserted before the planner so it isn't buried
     # by the planner's store bias.  It's deliberately after medical/recovery

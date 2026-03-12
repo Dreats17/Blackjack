@@ -144,8 +144,16 @@ def choose_strategic_goal(game_state: GameState) -> StrategicPlan:
     if game_state.opportunity_flags.get("can_adventure_safely"):
         if game_state.rank >= 2:
             score("exploit_adventure", 18.0)
+            # At rank 2+ with adventure safe, also boost push_next_rank so the planner
+            # considers adventure as a valid push-forward action.
+            score("push_next_rank", 8.0)
         else:
             score("reach_adventure_threshold", 16.0)
+
+    # Proactive borrowing: when Vinnie is available and balance is low, score
+    # push_next_rank higher so the loan route beats the convenience store.
+    if game_state.opportunity_flags.get("can_borrow_to_bootstrap"):
+        score("push_next_rank", 14.0)
 
     if game_state.opportunity_flags.get("can_convert_millionaire_to_ending"):
         score("convert_millionaire_to_ending", 200.0)

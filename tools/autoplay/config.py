@@ -358,6 +358,12 @@ CRAFTING_RECIPE_PRIORITIES: dict[str, int] = {
 # which may push them above this threshold even if their base priority is below it.
 CRAFTING_MIN_PRIORITY: int = 60
 
+# At rank 2+, store visits only block adventure when the best store candidate has at
+# least this priority — i.e., truly urgent items like Tool Kit (93), Spare Tire (100),
+# Road Flares (96), or First Aid Kit (100).  Lower-priority items (Duct Tape ~62,
+# crafting ingredients 54-72) should NOT cancel a valid adventure run.
+CRITICAL_STORE_PRIORITY_THRESHOLD: int = 90
+
 # Gift wrapping: dealer_happiness threshold below which gift-wrapping is worth doing
 GIFT_WRAP_HAPPINESS_THRESHOLD: int = 78
 
