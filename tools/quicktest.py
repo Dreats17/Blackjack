@@ -1160,6 +1160,28 @@ def _doctor_heal_cost_estimate(player):
     return max(0, int(balance * 0.48))
 
 
+def _doctor_cash_reserve(player):
+    """Cash to hold back for a doctor/witch visit that is currently needed.
+
+    Returns 0 when the player is healthy — there is no reason to reserve funds for
+    a hypothetical future visit.  Only reserves when a visit is actually warranted.
+    """
+    if player is None:
+        return 0
+    if _doctor_visit_is_urgent(player):
+        if _wants_witch_heal(player):
+            return _witch_heal_cost_estimate(player)
+        return _doctor_heal_cost_estimate(player)
+    if _needs_doctor(player):
+        estimate = _witch_heal_cost_estimate(player) if player.has_met("Witch") else _doctor_heal_cost_estimate(player)
+        return min(max(60, int(estimate * 0.75)), max(0, int(player.get_balance())))
+    if _wants_witch_heal(player):
+        return _witch_heal_cost_estimate(player)
+    if _wants_doctor_visit(player):
+        return _doctor_heal_cost_estimate(player)
+    return 0
+
+
 def _flask_count(player):
     if player is None or not hasattr(player, "len_flasks"):
         return 0
@@ -1466,21 +1488,73 @@ def _rank_tuner(player):
     return get_rank_tuner(rank)
 
 
-def _doctor_cash_reserve(player):
+def _rank_protection_floor(player):
+    """Minimum balance to keep so a single purchase can't drop the player more than 1 rank.
+
+    At ranks > 0 there should be strict rules about catastrophic spending.  The floor
+    is the balance threshold of one rank BELOW the current rank — e.g. a rank-2 player
+    ($10k–$99k) should not spend down below $1,000 (rank-1 threshold) in one shot.
+
+    Returns 0 at rank 0/1 because those ranks have no meaningful downside to a 1-rank
+    drop (rank 0 IS the baseline).
+    """
     if player is None:
         return 0
-    if _doctor_visit_is_urgent(player):
-        if _wants_witch_heal(player):
-            return _witch_heal_cost_estimate(player)
-        return _doctor_heal_cost_estimate(player)
-    if _needs_doctor(player):
-        estimate = _witch_heal_cost_estimate(player) if player.has_met("Witch") else _doctor_heal_cost_estimate(player)
-        return min(max(60, int(estimate * 0.75)), max(0, int(player.get_balance())))
-    if _wants_witch_heal(player):
-        return _witch_heal_cost_estimate(player)
-    if _wants_doctor_visit(player):
-        return _doctor_heal_cost_estimate(player)
-    return 0
+    rank = int(player.get_rank())
+    # Rank thresholds: 0→$1, 1→$1k, 2→$10k, 3→$100k, 4→$500k, 5→$900k
+    thresholds = [0, 1000, 10000, 100000, 500000, 900000]
+    if rank <= 1:
+        return 0
+    return thresholds[rank - 1]
+
+
+def _in_rank_push_window(player):
+    """True when the bot is actively pushing toward the next rank or a win milestone.
+
+    Used to unlock more aggressive spend/loan decisions — e.g. borrowing right before
+    a Marvin purchase so the post-purchase balance stays healthy, or allowing a deeper
+    balance dip when buying a high-priority edge item.  The gate prevents these more
+    aggressive strategies from firing during ordinary grinding when any downside is
+    hard to recover from.
+    """
+    if player is None or not player.has_item("Car"):
+        return False
+    if _wants_doctor_visit(player) or _doctor_visit_is_urgent(player):
+        return False
+    if player.get_health() < 50 or player.get_sanity() < 24:
+        return False
+
+    balance = player.get_balance()
+    rank = int(player.get_rank())
+    target = _rank_target(balance)   # next rank threshold
+    floor = _rank_floor(balance)     # current rank floor
+
+    # Don't push if we're stalled for too long — suggests a structural problem, not
+    # just a temporary gap before a good purchase.
+    if _progress_stall_days(player) > 12:
+        return False
+
+    # "Pushing for a rank up": within the top half of the current rank bracket,
+    # OR in the lower half but with a clear Marvin target identified.
+    # e.g. rank 1 ($1k–$10k): pushing when balance >= $4.6k (= 1k + 40%*9k).
+    # e.g. rank 2 ($10k–$100k): pushing when balance >= $28k (= 10k + 20%*90k).
+    # We use a low 20% threshold for rank 2+ because rank brackets are wide and
+    # the loan-before-Marvin strategy is most valuable early in the bracket.
+    push_pct = 0.20 if rank >= 2 else 0.40
+    rank_span = max(1, target - floor)
+    push_threshold = floor + int(rank_span * push_pct)
+
+    # "Pushing for a win": at rank 2+ with strong edge, healthy state — not
+    # necessarily near the rank ceiling but positioned to sustain aggressive play.
+    pushing_for_win = (
+        rank >= 2
+        and _blackjack_edge_score(player) >= 4
+        and player.get_health() >= 65
+        and player.get_sanity() >= 32
+        and balance >= floor + int(rank_span * 0.10)
+    )
+
+    return balance >= push_threshold or pushing_for_win
 
 
 def _needs_recovery_day(player):
@@ -1559,6 +1633,15 @@ def _cash_safety_reserve(player, priority=0):
             reserve = max(reserve, int(floor * tuner["floor_keep_mid"]))
         else:
             reserve = max(reserve, int(floor * tuner["floor_keep_base"]))
+
+    # Rank protection: at ranks > 1, do not let optional spending drop the player
+    # more than one full rank.  This is a hard lower bound — the tuner coefficients
+    # above already keep the balance near the CURRENT rank floor, but if the current
+    # balance is far above that floor (e.g. $50k at rank 2) the protection floor
+    # matters for ensuring a single large purchase cannot drop two ranks at once.
+    protection_floor = _rank_protection_floor(player)
+    if protection_floor > 0:
+        reserve = max(reserve, protection_floor)
 
     return min(balance, reserve)
 
@@ -1833,6 +1916,19 @@ def _best_marvin_candidate(player, budget):
 
 
 def _marvin_loan_plan(player):
+    """Return a loan plan to fund a Marvin purchase, or None if not applicable.
+
+    Two modes:
+    1. Buy-enable  – the target item is unaffordable outright; borrow the shortfall.
+    2. Buffer-preserve – the item IS affordable but buying it leaves the player nearly
+       broke (dropping 2 ranks or below the post-purchase safety floor); borrow enough
+       so the post-purchase balance stays comfortable.
+
+    Mode 2 only activates during a rank-push or win-push window — i.e. when the player
+    is actively pushing toward the next rank / a win milestone and has the health/edge
+    to sustain aggressive play.  This mirrors the user intent of "loans right before a
+    purchase, when pushing for a rank up or a win."
+    """
     if player is None or not player.has_item("Car") or not _has_marvin_access(player):
         return None
     if not player.has_met("Vinnie") or int(player.get_loan_shark_debt()) > 0:
@@ -1843,33 +1939,71 @@ def _marvin_loan_plan(player):
         return None
 
     balance = player.get_balance()
-    if balance < 2000 or balance >= 26000:
-        return None
-
-    current = _best_marvin_candidate(player, balance)
-    if current is not None and current[0] >= 84:
-        return None
-
+    rank = int(player.get_rank())
     doctor_reserve = max(80, _doctor_cash_reserve(player))
     if balance <= doctor_reserve:
         return None
+
+    # Upper balance cap: no need to borrow when already flush.
+    # Expanded from old $26k cap to allow buffer-preserve loans at higher ranks.
+    max_balance_for_plan = {0: 10000, 1: 20000, 2: 60000, 3: 200000}.get(rank, 60000)
+    if balance >= max_balance_for_plan:
+        return None
+
+    in_push = _in_rank_push_window(player)
+
+    # Post-purchase safety floor: minimum balance to retain after buying.
+    # During a push window we allow a deeper dip (protection_floor // 2 at minimum),
+    # because the improved edge score will repay the short-term pain faster.
+    protection_floor = _rank_protection_floor(player)
+    if in_push:
+        post_purchase_min = max(doctor_reserve, protection_floor // 2)
+    else:
+        post_purchase_min = max(doctor_reserve, protection_floor)
+
+    # Check whether the current best affordable item already qualifies — if so, skip
+    # borrowing; we'll just buy it.
+    current = _best_marvin_candidate(player, balance)
+    current_ok = current is not None and current[0] >= 84
 
     for loan_amount in (500, 1000, 2500, 5000):
         candidate = _best_marvin_candidate(player, balance + loan_amount)
         if candidate is None:
             continue
         priority, price, item_name = candidate
+
         shortfall = max(0, price - balance)
-        if shortfall == 0 or shortfall > loan_amount:
+
+        # Mode 1: buy-enable — need the loan just to afford the item.
+        if shortfall > 0:
+            if shortfall > loan_amount:
+                continue
+            if balance + loan_amount - price < doctor_reserve:
+                continue
+            if item_name == "Faulty Insurance" and priority >= 84:
+                return {"borrow": loan_amount, "price": price, "priority": priority, "item": item_name, "mode": "buy_enable"}
+            if priority >= 88 and shortfall <= loan_amount:
+                return {"borrow": loan_amount, "price": price, "priority": priority, "item": item_name, "mode": "buy_enable"}
+            if priority >= 84 and shortfall <= 2500:
+                return {"borrow": loan_amount, "price": price, "priority": priority, "item": item_name, "mode": "buy_enable"}
             continue
-        if balance + loan_amount - price < doctor_reserve:
+
+        # Mode 2: buffer-preserve — can afford the item but post-purchase balance is
+        # dangerously low.  Only during a push window, and only for high-priority items.
+        if not in_push:
             continue
-        if item_name == "Faulty Insurance" and priority >= 88 and shortfall <= loan_amount:
-            return {"borrow": loan_amount, "price": price, "priority": priority, "item": item_name}
-        if priority >= 92 and shortfall <= 2500:
-            return {"borrow": loan_amount, "price": price, "priority": priority, "item": item_name}
-        if priority >= 84 and shortfall <= 1500:
-            return {"borrow": loan_amount, "price": price, "priority": priority, "item": item_name}
+        if current_ok:
+            continue  # can already afford a great item without a loan
+        post_purchase = balance - price
+        if post_purchase >= post_purchase_min + loan_amount:
+            continue  # buffer is already fine even without borrowing
+        needed_buffer = post_purchase_min - post_purchase
+        if needed_buffer <= 0 or needed_buffer > loan_amount:
+            continue
+        if priority < 80:
+            continue
+        return {"borrow": loan_amount, "price": price, "priority": priority, "item": item_name, "mode": "buffer_preserve"}
+
     return None
 
 
@@ -4102,7 +4236,8 @@ def _decide_yes_no(prompt=""):
             return finalize("no", "witch_potion_without_player")
         if _flask_count(player) >= 2:
             return finalize("no", "witch_potion_capacity_block")
-        answer = "yes" if player.get_balance() >= 12000 else "no"
+        # With new Fortunate Day/Night prices starting at $8k, allow entry at $8k.
+        answer = "yes" if player.get_balance() >= 8000 else "no"
         return finalize(answer, "witch_potion_budget_gate")
     if _should_buy_car_repair(player, cost, recent):
         return finalize("yes", "car_repair_required", 0.82)
@@ -4129,8 +4264,24 @@ def _decide_yes_no(prompt=""):
                 return finalize("no", f"marvin_offer_priority_zero:{current_offer}")
             if _can_afford_optional_purchase(player, cost, priority):
                 return finalize("yes", f"marvin_offer_affordable:{current_offer}", 0.8)
-            if priority >= 90 and player.get_balance() >= cost and player.get_balance() - cost >= max(120, _doctor_cash_reserve(player)):
-                return finalize("yes", f"marvin_offer_high_priority:{current_offer}", 0.72)
+            # High-priority Marvin items are justified exceptions to rank-drop protection
+            # when the bot is actively pushing for a rank-up or win.  The improved edge
+            # score from the item will repay the short-term balance dip much faster than
+            # ordinary grinding would.  Outside a push window we still require the normal
+            # reserve (rank-protection floor) to be satisfied.
+            balance = player.get_balance()
+            if priority >= 88 and balance >= cost:
+                in_push = _in_rank_push_window(player)
+                doctor_res = max(120, _doctor_cash_reserve(player))
+                if in_push:
+                    # During push: only require doctor reserve; rank-drop protection relaxed.
+                    if balance - cost >= doctor_res:
+                        return finalize("yes", f"marvin_offer_push_window:{current_offer}", 0.72)
+                else:
+                    # Outside push: require rank protection floor too.
+                    prot = _rank_protection_floor(player)
+                    if balance - cost >= max(doctor_res, prot):
+                        return finalize("yes", f"marvin_offer_high_priority:{current_offer}", 0.68)
             return finalize("no", f"marvin_offer_budget_block:{current_offer}")
         must_have = any(name in recent for name in [
             "faulty insurance", "health indicator", "delight indicator", "rusty compass",

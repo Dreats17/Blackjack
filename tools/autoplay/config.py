@@ -91,25 +91,27 @@ MARVIN_ITEM_PRIORITIES: dict[str, int] = {
 }
 
 MARVIN_PRICE_ESTIMATES: dict[str, int] = {
-    "Delight Indicator": 8500,
-    "Health Indicator": 8000,
-    "Dirty Old Hat": 25000,
-    "Golden Watch": 29000,
-    "Faulty Insurance": 10000,
-    "Enchanting Silver Bar": 10000,
-    "Sneaky Peeky Shades": 35000,
-    "Quiet Sneakers": 15000,
-    "Lucky Coin": 12000,
-    "Worn Gloves": 18000,
-    "Tattered Cloak": 22000,
-    "Rusty Compass": 8000,
-    "Pocket Watch": 20000,
-    "Gambler's Chalice": 28000,
-    "Twin's Locket": 35000,
-    "White Feather": 15000,
-    "Dealer's Grudge": 22000,
-    "Gambler's Grimoire": 8000,
-    "Animal Whistle": 50000,
+    # Mid-point estimates based on new price ranges in locations.py (reduced ~25% from original).
+    # Using roughly the low-to-mid value so the bot attempts visits it can likely afford.
+    "Delight Indicator": 7000,         # range [6500, 7500, 8500]
+    "Health Indicator": 6500,          # range [6000, 7000, 8000]
+    "Dirty Old Hat": 20000,            # range [18000, 22000, 26000]
+    "Golden Watch": 24000,             # range [22000, 26000, 30000]
+    "Faulty Insurance": 8000,          # range [7500, 8500, 9500]
+    "Enchanting Silver Bar": 7500,     # fixed 7500
+    "Sneaky Peeky Shades": 28000,      # range [26000, 30000, 34000]
+    "Quiet Sneakers": 12000,           # range [11000, 14000, 17000]
+    "Lucky Coin": 10000,               # range [9000, 11000, 13000]
+    "Worn Gloves": 15000,              # range [14000, 16000, 19000]
+    "Tattered Cloak": 18000,           # range [16000, 20000, 24000]
+    "Rusty Compass": 7000,             # range [6000, 7500, 9000]
+    "Pocket Watch": 17000,             # range [15000, 19000, 22000]
+    "Gambler's Chalice": 23000,        # range [21000, 25000, 29000]
+    "Twin's Locket": 30000,            # range [26000, 32000, 38000]
+    "White Feather": 12000,            # range [11000, 14000, 17000]
+    "Dealer's Grudge": 18000,          # range [16000, 20000, 24000]
+    "Gambler's Grimoire": 7000,        # range [6000, 7500, 9000]
+    "Animal Whistle": 40000,           # fixed 40000
 }
 
 MARVIN_ITEM_ORDER: tuple[str, ...] = (
@@ -193,18 +195,19 @@ WITCH_FLASK_PRIORITIES: dict[str, int] = {
 # Using minimums means the bot will attempt a visit when it CAN afford the cheapest
 # roll; if the actual roll is higher the bot will decline, but healing may still apply.
 WITCH_FLASK_PRICE_ESTIMATES: dict[str, int] = {
-    "No Bust": 25000,             # code: random.choice([25000, 27000, 30000])
-    "Imminent Blackjack": 40000,  # code: random.choice([40000, 45000, 50000])
-    "Dealer's Whispers": 23000,   # code: random.choice([23000, 27000, 32000])
-    "Bonus Fortune": 35000,       # code: random.choice([35000, 42000, 45000])
-    "Anti-Venom": 25000,          # code: random.choice([25000, 26000, 27000])
-    "Anti-Virus": 26000,          # code: random.choice([26000, 27000, 28000])
-    "Fortunate Day": 12000,       # code: random.choice([12000, 13000, 18000]) — was 18000 (max)
-    "Fortunate Night": 12000,     # code: random.choice([12000, 15000, 20000]) — was 20000 (max)
-    "Second Chance": 28000,       # code: random.choice([28000, 32000, 36000])
-    "Split Serum": 30000,         # code: random.choice([30000, 35000, 40000])
-    "Dealer's Hesitation": 20000, # code: random.choice([20000, 24000, 28000])
-    "Pocket Aces": 45000,         # code: random.choice([45000, 50000, 55000])
+    # Mid-point estimates based on new price ranges in locations.py (reduced ~25% from original).
+    "No Bust": 19000,             # range [18000, 22000, 25000]
+    "Imminent Blackjack": 32000,  # range [30000, 35000, 42000]
+    "Dealer's Whispers": 19000,   # range [17000, 21000, 25000]
+    "Bonus Fortune": 29000,       # range [26000, 32000, 36000]
+    "Anti-Venom": 19000,          # range [18000, 20000, 23000]
+    "Anti-Virus": 20000,          # range [19000, 21000, 24000]
+    "Fortunate Day": 8000,        # range [8000, 9500, 12000] — use minimum for accessibility
+    "Fortunate Night": 8000,      # range [8000, 10000, 14000] — use minimum for accessibility
+    "Second Chance": 22000,       # range [21000, 25000, 28000]
+    "Split Serum": 24000,         # range [22000, 27000, 32000]
+    "Dealer's Hesitation": 16000, # range [15000, 18000, 22000]
+    "Pocket Aces": 36000,         # range [34000, 38000, 44000]
 }
 
 
