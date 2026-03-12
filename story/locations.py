@@ -701,62 +701,62 @@ class LocationsMixin:
             if potion == "No Bust":
                 type.type("AHHH, so YOU WANT the Flask of No Bust?")
                 if no_bust_price == 0:
-                    no_bust_price = random.choice([25000, 27000, 30000])
+                    no_bust_price = random.choice([18000, 22000, 25000])
                 price = no_bust_price
             elif potion == "Imminent Blackjack":
                 type.type("I SEE, so YOU WANT the Flask of Imminent Blackjack?")
                 if imminent_blackjack_price == 0:
-                    imminent_blackjack_price = random.choice([40000, 45000, 50000])
+                    imminent_blackjack_price = random.choice([30000, 35000, 42000])
                 price = imminent_blackjack_price
             elif potion == "Dealer's Whispers":
                 type.type("HAHAHA, so YOU WANT the Flask of Dealer's Whispers?")
                 if dealers_whispers_price == 0:
-                    dealers_whispers_price = random.choice([23000, 27000, 32000])
+                    dealers_whispers_price = random.choice([17000, 21000, 25000])
                 price = dealers_whispers_price
             elif potion == "Bonus Fortune":
                 type.type("OOOOOOOOHHH, so YOU WANT the Flask of Bonus Fortune?")
                 if bonus_fortune_price == 0:
-                    bonus_fortune_price = random.choice([35000, 42000, 45000])
+                    bonus_fortune_price = random.choice([26000, 32000, 36000])
                 price = bonus_fortune_price
             elif potion == "Anti-Venom":
                 type.type("OF COURSEEEE, YOU WANT the Flask of Anti-Venom?")
                 if antivenom_price == 0:
-                    antivenom_price = random.choice([25000, 26000, 27000])
+                    antivenom_price = random.choice([18000, 20000, 23000])
                 price = antivenom_price
             elif potion == "Anti-Virus":
                 type.type("AH-HA, YOU WANT the Flask of Anti-Virus?")
                 if antivirus_price == 0:
-                    antivirus_price = random.choice([26000, 27000, 28000])
+                    antivirus_price = random.choice([19000, 21000, 24000])
                 price = antivirus_price
             elif potion == "Fortunate Day":
                 type.type("HEHEHAHAIHEHIA, so YOU WANT the Flask of Fortunate Day?")
                 if fortunate_day_price == 0:
-                    fortunate_day_price = random.choice([12000, 13000, 18000])
+                    fortunate_day_price = random.choice([8000, 9500, 12000])
                 price = fortunate_day_price
             elif potion == "Fortunate Night":
                 type.type("MUAHAHAHAHA, so YOU WANT the Flask of Fortunate Night?")
                 if fortunate_night_price == 0:
-                    fortunate_night_price = random.choice([12000, 15000, 20000])
+                    fortunate_night_price = random.choice([8000, 10000, 14000])
                 price = fortunate_night_price
             elif potion == "Second Chance":
                 type.type("OHOHOHOHO, so YOU WANT the Flask of Second Chance?")
                 if second_chance_price == 0:
-                    second_chance_price = random.choice([28000, 32000, 36000])
+                    second_chance_price = random.choice([21000, 25000, 28000])
                 price = second_chance_price
             elif potion == "Split Serum":
                 type.type("YESYESYES, so YOU WANT the Flask of Split Serum?")
                 if split_serum_price == 0:
-                    split_serum_price = random.choice([30000, 35000, 40000])
+                    split_serum_price = random.choice([22000, 27000, 32000])
                 price = split_serum_price
             elif potion == "Dealer's Hesitation":
                 type.type("MUEHEHEHE, so YOU WANT the Flask of Dealer's Hesitation?")
                 if dealers_hesitation_price == 0:
-                    dealers_hesitation_price = random.choice([20000, 24000, 28000])
+                    dealers_hesitation_price = random.choice([15000, 18000, 22000])
                 price = dealers_hesitation_price
             elif potion == "Pocket Aces":
                 type.type("OOOOOH LALA, so YOU WANT the Flask of Pocket Aces?")
                 if pocket_aces_price == 0:
-                    pocket_aces_price = random.choice([45000, 50000, 55000])
+                    pocket_aces_price = random.choice([34000, 38000, 44000])
                 price = pocket_aces_price
             else: 
                 type.type("Then OUR BUSINESS has been SETTLED. Be GONE. GOODBYE! COME AGAIN!")
@@ -3381,74 +3381,74 @@ class LocationsMixin:
 
             if item == "Delight Indicator":
                 type.type("With this little device, you can read how happy anyone is, just by pointing it at them! Could get you out of a lot of trouble.")
-                price = random.choice([8500, 9500, 10000])
+                price = random.choice([6500, 7500, 8500])
             elif item == "Health Indicator":
                 type.type("This gadget lets you see how healthy you are at any given moment. It's great for knowing how imminent a trip to the ER is.")
-                price = random.choice([8000, 8500, 9500])
+                price = random.choice([6000, 7000, 8000])
             elif item == "Dirty Old Hat":
                 type.type("By wearing this, you're telling the whole world \"I'm poor and I'm not afraid to show it!\" It's a foolproof way for people to take pity on you.")
-                price = random.choice([25000, 28000, 30000])
+                price = random.choice([18000, 22000, 26000])
             elif item == "Golden Watch":
                 type.type("This watch was my grandfathers at one point. It's a beauty. If you're a gambling man, anyone in their right mind would wanna see you betting on their table.")
-                price = random.choice([29000, 32000, 35000])
+                price = random.choice([22000, 26000, 30000])
             elif item == "Faulty Insurance":
                 type.type("I got this thing forged by a buddy of mine. It's a fake insurance card. I've used it to get out of so many hospital bills, and you could too!")
-                price = random.choice([10000, 11000, 12000])
+                price = random.choice([7500, 8500, 9500])
             elif item == "Enchanting Silver Bar":
                 type.type("Listen, I know this silver bar looks a bit useless, but I swear, it's awesome. ")
                 type.type("Look at the stock market, this thing is only gonna get more and more expensive. ")
                 type.type("And if I sell it to you, you can sell it off later and make some money.")
-                price = 10000
+                price = 7500
             elif item == "Sneaky Peeky Shades":
                 type.type("These aren't your ordinary pair of glasses. Put them on, and you'll catch glimpses that others can't see. ")
                 type.type("But use them wisely; you only get one peek per night.")
-                price = random.choice([35000, 38000, 40000])
+                price = random.choice([26000, 30000, 34000])
             elif item == "Quiet Sneakers":
                 type.type("Sometimes, the best move is to walk away. Use this when you feel trouble brewing, and avoid the day's misfortunes.")
-                price = random.choice([15000, 18000, 20000])
+                price = random.choice([11000, 14000, 17000])
             elif item == "Lucky Coin":
                 type.type("This here's an old coin with a four-leaf clover on it. ")
                 type.type("My grandma used to say it could turn bad luck into no luck at all. ")
                 type.type("Lost a hand? Flip this, and maybe you'll get your bet back.")
-                price = random.choice([12000, 14000, 16000])
+                price = random.choice([9000, 11000, 13000])
             elif item == "Worn Gloves":
                 type.type("These gloves are pretty beat up, but trust me, they've got some magic left in 'em. ")
                 type.type("Wear these when you play, and you'll feel the cards better. Might just get luckier draws.")
-                price = random.choice([18000, 20000, 22000])
+                price = random.choice([14000, 16000, 19000])
             elif item == "Tattered Cloak":
                 type.type("Don't let the moth holes fool ya. This cloak's got some sneaky enchantment. Dealers sometimes just... forget to collect when you lose. Weird, right?")
-                price = random.choice([22000, 25000, 28000])
+                price = random.choice([16000, 20000, 24000])
             elif item == "Rusty Compass":
                 type.type("The glass is cracked and it's missing a few screws, but this compass still points to opportunity. ")
                 type.type("Carry it around, and you might stumble upon something unexpected.")
-                price = random.choice([8000, 10000, 12000])
+                price = random.choice([6000, 7500, 9000])
             elif item == "Pocket Watch":
                 type.type("This brass beauty is always running a bit slow, but hey, that works in your favor. Flash it at the table, and you might squeeze in an extra round.")
-                price = random.choice([20000, 23000, 26000])
+                price = random.choice([15000, 19000, 22000])
             # New mystical gambling items
             elif item == "Gambler's Chalice":
                 type.type("Ah, the Chalice! Legend says a desperate gambler drank from this cup and doubled his fortune in one night. ")
                 type.type("The catch? You can only use its power once per visit. Raise your bet, draw one more card, and pray.")
-                price = random.choice([28000, 32000, 35000])
+                price = random.choice([21000, 25000, 29000])
             elif item == "Twin's Locket":
                 type.type("This locket contains portraits of twins who could never agree on anything—except cards. ")
                 type.type("When you're dealt a pair, this little beauty lets you split 'em and play two hands. Double the risk, double the reward.")
-                price = random.choice([35000, 40000, 45000])
+                price = random.choice([26000, 32000, 38000])
             elif item == "White Feather":
                 type.type("Plucked from a chicken that ran from every fight—but lived to tell the tale. ")
                 type.type("When a hand looks hopeless, wave this feather and surrender with dignity. ")
                 type.type("You'll lose half your bet, but keep your pride. Sort of.")
-                price = random.choice([15000, 18000, 20000])
+                price = random.choice([11000, 14000, 17000])
             elif item == "Dealer's Grudge":
                 type.type("The Dealer dropped this jade pendant years ago. It still pulses with his essence. ")
                 type.type("When he shows an Ace, you can invoke the Grudge—take a side bet against his Blackjack. ")
                 type.type("If he gets it, you get paid. If not... well, you lose the side bet.")
-                price = random.choice([22000, 25000, 28000])
+                price = random.choice([16000, 20000, 24000])
             elif item == "Gambler's Grimoire":
                 type.type("This tattered book has a mind of its own. ")
                 type.type("It watches every hand you play, tracking your wins, losses, streaks, and failures. ")
                 type.type("When you break a record—good or bad—it'll let you know. Sarcastically. Very sarcastically.")
-                price = random.choice([8000, 10000, 12000])
+                price = random.choice([6000, 7500, 9000])
             elif item == "Animal Whistle":
                 type.type("Marvin lowers his voice, glancing around conspiratorially.")
                 print("\n")
@@ -3461,7 +3461,7 @@ class LocationsMixin:
                 print("\n")
                 type.type(quote("But here's the secret—if you gather enough of them... if you truly become their shepherd... "))
                 type.type(quote("Something magical happens. I've heard stories of people who left this place with an ark of their own."))
-                price = 50000
+                price = 40000
 
             print()
 
