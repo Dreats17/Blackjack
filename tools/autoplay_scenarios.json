@@ -167,7 +167,7 @@
       },
       {
         "details": {
-          "bet": 5500,
+          "bet": 5000,
           "goal": "blend_fraudulent_cash_safely",
           "trace_metadata": {
             "max_ratio": 0.36,
@@ -191,7 +191,7 @@
         },
         "passed": true,
         "scenario_id": "fraudulent_cash_blend_case",
-        "summary": "bet=5500 balance=4000"
+        "summary": "bet=5000 balance=4000"
       },
       {
         "details": {

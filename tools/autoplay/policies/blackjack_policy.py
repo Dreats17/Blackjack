@@ -334,6 +334,24 @@ def choose_blackjack_bet(request: DecisionRequest, plan: StrategicPlan) -> tuple
         and sanity >= 34
         and 1200 <= balance < 8000
     )
+    # Rank 2 → 3 push window: the bot has a car, good health, and enough balance to
+    # aggressively push toward rank 3 ($100k).  Floor protection already ensures the
+    # bot can't lose below $10k in one hand; this window boosts the bet ratio so the
+    # bot grows fast enough to reach rank 3 within the run time limit.
+    rank_three_growth_window = (
+        has_car
+        and rank == 2
+        and progression_ready
+        and phase == "million_rush"
+        and not wants_store
+        and not wants_doctor
+        and not urgent_doctor
+        and not survival_mode
+        and not pending_marvin_active
+        and health >= 58
+        and sanity >= 30
+        and 15000 <= balance < 100000
+    )
 
     if total_available <= 0:
         trace = DecisionTrace(
@@ -390,6 +408,10 @@ def choose_blackjack_bet(request: DecisionRequest, plan: StrategicPlan) -> tuple
             ratio = max(ratio, 0.30 if edge_score >= 4 else 0.26)
         else:
             ratio = max(ratio, 0.24)
+    if rank_three_growth_window:
+        # Boost ratio in the rank-2→3 push; floor protection caps actual bet at
+        # balance - $10k so the bot can't lose below rank 2 floor regardless.
+        ratio = max(ratio, 0.34 if edge_score >= 5 else 0.30)
     if pending_marvin_active and not survival_mode:
         if pending_marvin_shortfall > 0:
             ratio = min(ratio, 0.12 if edge_score >= 5 else 0.10)
@@ -520,6 +542,9 @@ def choose_blackjack_bet(request: DecisionRequest, plan: StrategicPlan) -> tuple
             max_ratio = max(max_ratio, 0.70 if edge_score >= 4 else 0.62)
         else:
             max_ratio = max(max_ratio, 0.58)
+    if rank_three_growth_window:
+        # Allow betting up to 55% of balance; floor protection will cap to surplus anyway.
+        max_ratio = max(max_ratio, 0.55 if edge_score >= 5 else 0.48)
     if pending_marvin_active and not survival_mode:
         if pending_marvin_shortfall > 0:
             max_ratio = min(max_ratio, 0.18 if edge_score >= 5 else 0.15)
@@ -818,6 +843,13 @@ def choose_blackjack_bet(request: DecisionRequest, plan: StrategicPlan) -> tuple
                 blend_slice = min(fake_cash, max(200, int(fake_cash * 0.30)))
             if blend_slice > 0:
                 bet = max(bet, min(total_available, max(min_bet, balance + blend_slice)))
+                # The blend can push the bet above what the rank-protection floor computed
+                # earlier.  Re-apply: losing the bet must not drop real balance below floor.
+                # (balance - floor) is the real surplus we can risk; adding fake_cash gives
+                # the maximum bet that still lands at floor on a full loss.
+                if floor and balance > floor:
+                    blend_floor_cap = max(min_bet, (balance - floor) + fake_cash)
+                    bet = min(bet, blend_floor_cap)
 
     if bet > total_available:
         bet = int(total_available)
