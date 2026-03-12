@@ -555,6 +555,7 @@ class StorylineSystem:
         p = self.player
         single_shot_arcs = {"collector", "grimy_gus", "vinnie", "marvin", "witch"}
         self._sync_phil_storyline_state()
+        self._sync_betsy_storyline_state()
         syncs = [
             ("stray_cat",        lambda: p.has_met("Stray Cat Fed")),
             ("jameson",          lambda: p.has_met("Cowboy")),
@@ -575,6 +576,35 @@ class StorylineSystem:
                 sl["day_started"] = p.get_day()
                 if name in single_shot_arcs:
                     sl["completed"] = True
+
+    def _sync_betsy_storyline_state(self):
+        """
+        Advance the betsy arc past stages whose gate-danger has been consumed.
+
+        Neither hungry_cow nor starving_cow call sl.advance() themselves, so the
+        stage stays at 1 forever once starving_cow fires (removing "Betsy Tractor").
+        Calling this each day auto-advances based on which Betsy danger is active:
+
+          stage 1 → 2  : starving_cow has already fired (Betsy Tractor gone, Betsy Army set)
+          stage 2 → 3+ : cow_army has already fired    (Betsy Army gone)
+        """
+        p = self.player
+        sl = self.storylines.get("betsy")
+        if sl is None or sl["completed"] or sl["failed"]:
+            return
+        if not p.has_met("Betsy"):
+            return
+
+        day = p.get_day()
+        if sl["stage"] == 1 and not p.has_danger("Betsy Tractor"):
+            # starving_cow has fired (it removes "Betsy Tractor" at the top of the event).
+            # Advance to stage 2 so cow_army can fire when "Betsy Army" danger is present.
+            sl["stage"] = 2
+            sl["day_started"] = day
+        elif sl["stage"] == 2 and not p.has_danger("Betsy Army"):
+            # cow_army has fired (it removes "Betsy Army" at the top of the event).
+            # Betsy arc is complete — all three stages done.
+            sl["completed"] = True
 
     def _sync_phil_storyline_state(self):
         p = self.player
@@ -664,6 +694,12 @@ class StorylineSystem:
                 return True
             
             case "betsy":
+                # Gate each stage on the presence of the danger set by the previous event.
+                # This prevents re-triggering after the danger has been consumed.
+                if stage == 1:
+                    return p.has_danger("Betsy Tractor")  # hungry_cow sets this
+                if stage == 2:
+                    return p.has_danger("Betsy Army")     # starving_cow sets this
                 return True
             
             case "stray_cat":

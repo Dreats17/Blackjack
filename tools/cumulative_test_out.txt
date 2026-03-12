@@ -1,35 +1,35 @@
-=== AUTOTEST RUN 2026-03-12 06:39:12 ===
-AUTOTEST cycles=60 seeds=1-20 total=20
-Longevity alive=14/20 died=6/20 broke=4/20 timeouts=0 doctor_missed=1
-Progress car=14/20 ever_car=14/20 location=14/20 rank1+=10/20 clean=20/20
-Unlocks map=1/20 worn_map=13/20 marvin_access=14/20 witch=14/20 gus=14/20 vinnie=14/20 million=0/20
-Visits doctor=9/20 witch_doctor=2/20 store=9/20 pawn=5/20 loan=0/20 marvin=2/20 tom=3/20 frank=0/20 oswald=2/20 upgrade=2/20 crafting=0/20 companion=0/20 adventure=0/20 airport=0/20 mechanic_end=0/20 wins=0/20
+=== AUTOTEST RUN 2026-03-12 06:46:43 ===
+AUTOTEST cycles=120 seeds=1-20 total=20
+Longevity alive=10/20 died=10/20 broke=10/20 timeouts=0 doctor_missed=1
+Progress car=14/20 ever_car=14/20 location=14/20 rank1+=13/20 clean=20/20
+Unlocks map=2/20 worn_map=13/20 marvin_access=14/20 witch=14/20 gus=14/20 vinnie=14/20 million=0/20
+Visits doctor=12/20 witch_doctor=2/20 store=10/20 pawn=6/20 loan=0/20 marvin=2/20 tom=4/20 frank=1/20 oswald=2/20 upgrade=2/20 crafting=0/20 companion=0/20 adventure=0/20 airport=0/20 mechanic_end=0/20 wins=0/20
 
-Decision Coverage requests=7147 traces=7224
-Requests blackjack_action=3415 blackjack_bet=2020 yes_no=1248 route_select=315 menu_select=92 event_branch=56 event_inline=1
-Traces   blackjack_action=3415 blackjack_bet=2020 yes_no=1248 route_select=392 menu_select=92 event_branch=56 event_inline=1
-Contexts blackjack_action=3415 blackjack_bet=2020 yes_no_prompt=1248 afternoon_destination=315 pawn_menu=92 option_prompt=56 raw_input_prompt=1
-Goals    acquire_car=3066 push_next_rank=1899 cashout_pawn_inventory=738 restock_supplies=591 stabilize_sanity=210 advance_mechanic_arc=170 exploit_marvin=156 recover_from_car_trouble=135
-Route outcomes applied=216 suppressed=99 interrupt=77
-Route interrupts urgent_medical=41 medical_stabilization=21 recovery_day=15
-Blocked goals advance_mechanic_arc=77 push_next_rank=77 reach_adventure_threshold=77 stabilize_health=70 restock_supplies=59 recover_from_car_trouble=29 stabilize_sanity=13 cashout_pawn_inventory=13
-Interrupted top goals restock_supplies=40 recover_from_car_trouble=13 advance_mechanic_arc=11 cashout_pawn_inventory=11 exploit_marvin=1 run_ended=1
-Applied routes restock_supplies=99 cashout_pawn_inventory=92 advance_mechanic_arc=16 exploit_marvin=8 run_ended=1
-Suppressed routes push_next_rank=90 preserve_companion_roster=5 stabilize_sanity=4
+Decision Coverage requests=9618 traces=9772
+Requests blackjack_action=4810 blackjack_bet=2786 yes_no=1460 route_select=371 menu_select=118 event_branch=71 event_inline=2
+Traces   blackjack_action=4810 blackjack_bet=2786 yes_no=1460 route_select=525 menu_select=118 event_branch=71 event_inline=2
+Contexts blackjack_action=4810 blackjack_bet=2786 yes_no_prompt=1460 afternoon_destination=371 pawn_menu=114 option_prompt=71 companion_menu=4 raw_input_prompt=2
+Goals    acquire_car=3066 push_next_rank=2671 cashout_pawn_inventory=1168 restock_supplies=951 survive_emergency=550 stabilize_health=394 advance_mechanic_arc=286 stabilize_sanity=230
+Route outcomes applied=256 interrupt=154 suppressed=115
+Route interrupts urgent_medical=98 medical_stabilization=38 recovery_day=18
+Blocked goals advance_mechanic_arc=154 push_next_rank=154 reach_adventure_threshold=153 stabilize_health=147 restock_supplies=95 recover_from_car_trouble=53 cashout_pawn_inventory=29 preserve_companion_roster=17
+Interrupted top goals restock_supplies=60 advance_mechanic_arc=29 recover_from_car_trouble=26 cashout_pawn_inventory=26 stabilize_health=9 stabilize_sanity=1 survive_emergency=1 push_next_rank=1
+Applied routes restock_supplies=114 cashout_pawn_inventory=114 advance_mechanic_arc=18 exploit_marvin=9 run_ended=1
+Suppressed routes push_next_rank=105 preserve_companion_roster=5 stabilize_sanity=4 exploit_marvin=1
 
 Shop Summary
 shop              unlocked-runs visited-runs total-visits
 ----------------- ------------- ------------ ------------
-Doctor                       14/20            9/20           60
+Doctor                       14/20           12/20          136
 Witch Doctor                 14/20            2/20            2
-Convenience Store            14/20            9/20           99
-Pawn Shop                    14/20            5/20           92
+Convenience Store            14/20           10/20          114
+Pawn Shop                    14/20            6/20          114
 Loan Shark                   14/20            0/20            0
-Marvin                       14/20            2/20            8
-Tom                           9/20            3/20            6
-Frank                         2/20            0/20            0
+Marvin                       14/20            2/20            9
+Tom                           9/20            4/20            8
+Frank                         2/20            1/20            1
 Oswald                        4/20            2/20           11
-Car Access                   14/20            9/20           99
+Car Access                   14/20           10/20          114
 Car Workbench                 2/20            0/20            0
 Crafting                      0/20            0/20            0
 Companion                     0/20            0/20            0
@@ -42,86 +42,87 @@ early route pressure interrupt-runs=0/6 medical-interrupt-runs=0/6 suppressed-ru
 peak-balance buckets peak<100=2 peak100-199=1 peak200-349=3 peak350-799=0 peak800+=0
 mechanic outcomes no mechanic offer=3 | Tom path no car=2 | Frank accepted no car=1
 
-Stagnation Audit stalled-runs=6/20
+Stagnation Audit stalled-runs=3/20
 day-bucket runs avg-peak$ no-car marvin-access marvin-visit doctor loan top-deaths        
 ---------- ---- --------- ------ ------------- ------------ ------ ---- ------------------
 20-39      3/20       288      3             0            0      0    0 untreated-wounds=1
-40-69      3/20       796      0             3            0      1    0 none              
 
 Distributions
 Peak balance
 peak<100      2/20  ##......................
 100-199       1/20  #.......................
 200-349       4/20  #####...................
-350-799       1/20  #.......................
-800-1,999     3/20  ####....................
-2k-4,999      7/20  ########................
-5k+           2/20  ##......................
+350-799       0/20  ........................
+800-1,999     0/20  ........................
+2k-4,999      9/20  ###########.............
+5k+           4/20  #####...................
 
 Run length
 day<=10       2/20  ##......................
 11-30         4/20  #####...................
 31-60         4/20  #####...................
-61-90        10/20  ############............
-91+           0/20  ........................
+61-90         5/20  ######..................
+91+           5/20  ######..................
 
 Medical Cohorts
 cohort      runs alive avg-peak$ 2k+ avg-end$ avg-day missed
 ---------- ----- ----- --------- --- -------- ------- ------
-doctor-any  9/20     7    19,068   7      884      58      0
+doctor-any 12/20     6    16,286  12      937      86      0
 witch-only  0/20     0         0   0        0       0      0
-no-medical 11/20     7       973   2      222      31      1
+no-medical  8/20     4       556   1      160      20      1
 
 Event Economy
-cash gains   storyline:collector:stage0 total=+19489 avg=+19489.0 hits=1 | storyline:victoria:stage0 total=+10171 avg=+10171.2 hits=1 | night:beach_dive total=+10171 avg=+10171.2 hits=1 | storyline:mechanic_dreams:stage1 total=+8992 avg=+1498.8 hits=6
-cash losses  storyline:betsy:stage1 total=-21410 avg=-5352.6 hits=4 | night:midnight_snack_run total=-17841 avg=-8920.5 hits=2 | night:nightmare total=-17616 avg=-550.5 hits=32 | storyline:dealer_past:stage3 total=-16174 avg=-1470.4 hits=11
-health losses night:insomnia_night total=-64 avg=-2.1 hits=30 | night:drowning_dream total=-48 avg=-2.6 hits=18 | storyline:gas_station_hero:stage0 total=-45 avg=-2.4 hits=19 | night:stray_cat_dies total=-37 avg=-1.1 hits=33
-sanity losses storyline:gas_station_hero:stage0 total=-164 avg=-8.6 hits=19 | night:nightmare total=-128 avg=-4.0 hits=32 | night:stray_cat_dies total=-116 avg=-3.5 hits=33 | night:drowning_dream total=-94 avg=-5.2 hits=18
+cash gains   storyline:collector:stage0 total=+19489 avg=+19489.0 hits=1 | storyline:victoria:stage0 total=+10171 avg=+10171.2 hits=1 | night:beach_dive total=+10171 avg=+10171.2 hits=1 | storyline:mechanic_dreams:stage1 total=+8851 avg=+983.4 hits=9
+cash losses  storyline:betsy:stage1 total=-19000 avg=-19000.0 hits=1 | night:midnight_snack_run total=-17553 avg=-2925.5 hits=6 | night:nightmare total=-17442 avg=-371.1 hits=47 | storyline:dealer_past:stage3 total=-16174 avg=-1470.4 hits=11
+health losses night:insomnia_night total=-98 avg=-2.5 hits=39 | night:carbon_monoxide total=-61 avg=-15.3 hits=4 | night:stray_cat_dies total=-50 avg=-1.1 hits=44 | night:drowning_dream total=-48 avg=-2.6 hits=18
+sanity losses night:nightmare total=-181 avg=-3.9 hits=47 | storyline:gas_station_hero:stage0 total=-164 avg=-8.6 hits=19 | night:stray_cat_dies total=-129 avg=-2.9 hits=44 | night:nightmare_of_losing total=-96 avg=-2.5 hits=38
 
 Storyline Audit
-completed  grimy_gus=14 | marvin=14 | vinnie=14 | witch=14 | kyle=13 | sleep_paralysis=12
+completed  grimy_gus=14 | marvin=14 | vinnie=14 | witch=14 | kyle=13 | lockbox=12
 failed     none
-active-end gas_station_hero=19 | jameson=17 | stray_cat=17 | dealer_past=13 | mime=10 | mechanic_dreams=8
+active-end gas_station_hero=19 | jameson=17 | stray_cat=17 | mechanic_dreams=10 | phil=7 | mechanics=7
 
 Death Stage Audit
-day-bucket deaths avg-day avg-peak$ top-tags                                  common-conditions                                
----------- ------ ------- --------- ----------------------------------------- -------------------------------------------------
-day<=10         1       7        65 nightmare-drowning=1                      Broken Wrist=1                                   
-11-30           2      17       177 nightmare-drowning=1 | untreated-wounds=1 Scabies=1 | Scraped Knee=1 | Hepatitis=1         
-31-60           3      48     3,009 gun-violence=3                            Possible Rabies=1 | Scabies=1 | Sinus Infection=1
+day-bucket deaths avg-day avg-peak$ top-tags                                             common-conditions                                     
+---------- ------ ------- --------- ---------------------------------------------------- ------------------------------------------------------
+day<=10         1       7        65 nightmare-drowning=1                                 Broken Wrist=1                                        
+11-30           2      17       177 nightmare-drowning=1 | untreated-wounds=1            Scabies=1 | Scraped Knee=1 | Hepatitis=1              
+31-60           3      48     3,009 gun-violence=3                                       Possible Rabies=1 | Scabies=1 | Sinus Infection=1     
+61-90           2      88     4,388 compound-trauma-collapse=1 | wounds-plus-infection=1 Sinus Infection=2 | Broken Ankle=2 | Deep Laceration=2
+91+             2     116     6,718 wounds-plus-infection=2                              Broken Ribs=2 | Anaphylaxis=1 | Anxiety Disorder=1    
 
 Death Rank Audit
-end-rank deaths avg-day avg-peak$ top-tags                                                   top-causes                                                                                                                                                                                                                                           
--------- ------ ------- --------- ---------------------------------------------------------- -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-       0      5      27     1,147 nightmare-drowning=2 | gun-violence=2 | untreated-wounds=1 Drowned in your car. Some nightmares are real.=2 | Before you get the chance to grab it, the man steps back, unholsters the pistol, then fires three shots into your chest. The glass behind you shatters, and you fall to your knees in the street=2
-       1      1      47     3,710 gun-violence=1                                             Before you get the chance to grab it, the man steps back, unholsters the pistol, then fires three shots into your chest. The glass behind you shatters, and you fall to your knees in the street=1                                                   
+end-rank deaths avg-day avg-peak$ top-tags                                                              top-causes                                                                                                                                                                                                                              
+-------- ------ ------- --------- --------------------------------------------------------------------- ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+       0      7      48     2,493 nightmare-drowning=2 | gun-violence=2 | wounds-plus-infection=2       You have succumbed to your wounds=3 | Drowned in your car. Some nightmares are real.=2                                                                                                                                                  
+       1      3      85     4,737 compound-trauma-collapse=1 | wounds-plus-infection=1 | gun-violence=1 You have succumbed to your wounds=2 | Before you get the chance to grab it, the man steps back, unholsters the pistol, then fires three shots into your chest. The glass behind you shatters, and you fall to your knees in the street=1
 
 Fallback Review runs=0/20
 none
 
-Event Polarity total=2380
-positive=1042 (43.8%)
-negative=1082 (45.5%)
-neutral=256 (10.8%)
+Event Polarity total=3213
+positive=1413 (44.0%)
+negative=1501 (46.7%)
+neutral=299 (9.3%)
 
 Item Impact
 item                  hits pos neg neu   cash  hp san
 --------------------- ---- --- --- --- ------ --- ---
-Lockbox                 21  16   2   3 16,752  16 219
-Apartment Key            9   9   0   0 16,169  14 196
+Lockbox                 28  21   4   3 22,784  14 276
+Apartment Key           12  12   0   0 22,735  27 249
+Fake Flower             12  10   1   1  3,486  22  38
+Dealer's Coin           10   9   1   0 -7,141  15 103
+Carnival Token          22  14   8   0  1,230  24  -8
 Worn Map                13   8   2   3 -1,840  22  20
-Carnival Token          19  12   7   0 -1,052  24   3
-Fake Flower              6   4   1   1    904  17   9
-Dealer's Coin            3   3   0   0    -92  10  32
+Edgar's List             8   6   2   0  3,130  12  49
+Edgar's Letter           8   6   2   0  3,130  12  49
 Granny's Swamp Nectar    6   2   1   3 11,412   5  15
 Professor Bear           3   2   1   0    716   1  -9
-Edgar's List             3   2   1   0   -508  12  17
-Edgar's Letter           3   2   1   0   -508  12  17
-Radio Numbers            5   1   1   3    852   2  -9
+Hermit's Journal         1   1   0   0    -46   2   7
+Veteran's Lucky Chip     1   1   0   0   -400   1  18
 Gas Can                  2   1   1   0  2,603 -10  -5
 Enchanting Silver Bar    1   0   0   1    880   0  -6
-Martinez's Card         11   3   4   4     79   8 -44
-Carrot                  17   6   9   2    -66  -1 -79
+Martinez's Card         13   4   5   4    219   9 -58
 
 Marvin Provenance
 item                  bought-runs used-runs broken-runs fixed-runs avg-buy-day avg-use-day use-sources
@@ -130,57 +131,80 @@ Enchanting Silver Bar        1/20      0/20        0/20       0/20          49  
 
 seed outcome car rank   peak$ peak-days end-day  end$  hp san top-route             
 ---- ------- --- ---- ------- --------- ------- ----- --- --- ----------------------
-   1 ok       Y     1   1,188        61      61 1,188 100 100 doctor                
+   1 died     Y     1   5,689        89      89 5,689  15  42 doctor                
    2 died     N     0      65         3       7    48  88  78 none                  
-   3 ok       Y     0   2,291        47      61    24 100  70 doctor                
+   3 broke    Y     0   2,291        47      68     0 100  76 doctor                
    4 died     N     0     112         3      12     7  89  91 none                  
    5 died     Y     0   2,180        18      45   427  64  82 doctor                
-   6 ok       Y     0   3,077        43      61   528  98  68 shop:convenience_store
+   6 broke    Y     0   3,077        43     120     0  75  66 doctor                
    7 broke    N     0     320        20      23     0 100  35 none                  
-   8 ok       Y     0     842        39      61   230 100  65 shop:pawn_shop        
+   8 died     Y     1   4,811        79     119 1,151   0  95 shop:pawn_shop        
    9 died     Y     0   3,136        47      51   992 100  60 shop:pawn_shop        
-  10 ok       Y     0  14,547        55      61   353 100  74 shop:pawn_shop        
-  11 ok       Y     0     546        19      61    89  99  47 shop:pawn_shop        
-  12 ok       Y     1   3,088        57      61 1,052  99  78 shop:convenience_store
+  10 broke    Y     0  14,547        55      86     0 100  88 doctor                
+  11 broke    Y     0   2,015        81     101     0   7  62 shop:pawn_shop        
+  12 died     Y     0   3,088        57      86   846   0  25 shop:convenience_store
   13 died     N     0     242        17      22   231   0  15 none                  
-  14 ok       Y     0     999        60      61   867 100  42 mechanic:oswald       
+  14 died     Y     0   8,626        83     113   281   0  96 mechanic:oswald       
   15 broke    Y     0     220         8      13     0 100  32 mechanic:tom          
-  16 ok       Y     1 140,685        46      61 1,301 100  49 shop:convenience_store
+  16 broke    Y     1 140,685        46      65     0 100  60 shop:convenience_store
   17 broke    N     0      50         1       2     0  95  85 none                  
   18 died     Y     1   3,710        46      47 2,850  96  89 shop:convenience_store
   19 broke    N     0     303        11      33     0  81  35 none                  
-  20 ok       Y     0   4,715        52      61   205 100  61 shop:convenience_store
+  20 broke    Y     0   4,715        52      94     0  88  75 shop:convenience_store
 
-Deaths gun violence=3 nightmare accident=2 illness injury=1
+Deaths illness injury=5 gun violence=3 nightmare accident=2
 
 Deaths By Run Length
-day peak$ seed rank tag                cause                                     
---- ----- ---- ---- ------------------ ------------------------------------------
-  7    65    2    0 nightmare-drowning Drowned in your car. Some nightmares ar...
- 12   112    4    0 nightmare-drowning Drowned in your car. Some nightmares ar...
- 22   242   13    0 untreated-wounds   You have succumbed to your wounds         
- 45 2,180    5    0 gun-violence       Before you get the chance to grab it, t...
- 47 3,710   18    1 gun-violence       Before you get the chance to grab it, t...
- 51 3,136    9    0 gun-violence       Before you get the chance to grab it, t...
+day peak$ seed rank tag                      cause                                     
+--- ----- ---- ---- ------------------------ ------------------------------------------
+  7    65    2    0 nightmare-drowning       Drowned in your car. Some nightmares ar...
+ 12   112    4    0 nightmare-drowning       Drowned in your car. Some nightmares ar...
+ 22   242   13    0 untreated-wounds         You have succumbed to your wounds         
+ 45 2,180    5    0 gun-violence             Before you get the chance to grab it, t...
+ 47 3,710   18    1 gun-violence             Before you get the chance to grab it, t...
+ 51 3,136    9    0 gun-violence             Before you get the chance to grab it, t...
+ 86 3,088   12    0 wounds-plus-infection    You have succumbed to your wounds         
+ 89 5,689    1    1 compound-trauma-collapse You have succumbed to your wounds         
+113 8,626   14    0 wounds-plus-infection    You have succumbed to your wounds         
+119 4,811    8    1 wounds-plus-infection    You have succumbed to your wounds         
 
 Deaths By Peak Balance
-peak$ day seed rank tag                cause                                     
------ --- ---- ---- ------------------ ------------------------------------------
-3,710  47   18    1 gun-violence       Before you get the chance to grab it, t...
-3,136  51    9    0 gun-violence       Before you get the chance to grab it, t...
-2,180  45    5    0 gun-violence       Before you get the chance to grab it, t...
-  242  22   13    0 untreated-wounds   You have succumbed to your wounds         
-  112  12    4    0 nightmare-drowning Drowned in your car. Some nightmares ar...
-   65   7    2    0 nightmare-drowning Drowned in your car. Some nightmares ar...
+peak$ day seed rank tag                      cause                                     
+----- --- ---- ---- ------------------------ ------------------------------------------
+8,626 113   14    0 wounds-plus-infection    You have succumbed to your wounds         
+5,689  89    1    1 compound-trauma-collapse You have succumbed to your wounds         
+4,811 119    8    1 wounds-plus-infection    You have succumbed to your wounds         
+3,710  47   18    1 gun-violence             Before you get the chance to grab it, t...
+3,136  51    9    0 gun-violence             Before you get the chance to grab it, t...
+3,088  86   12    0 wounds-plus-infection    You have succumbed to your wounds         
+2,180  45    5    0 gun-violence             Before you get the chance to grab it, t...
+  242  22   13    0 untreated-wounds         You have succumbed to your wounds         
+  112  12    4    0 nightmare-drowning       Drowned in your car. Some nightmares ar...
+   65   7    2    0 nightmare-drowning       Drowned in your car. Some nightmares ar...
 
 Fatal Pressure
-recent-damage-events night:insomnia_night=3 | location:shop:convenience_store=3 | storyline:phil:stage3=2 | day:broken_wrist=1 | night:stargazing=1 | storyline:gas_station_hero:stage0=1
-health-damage-events night:insomnia_night=33.4 | storyline:sleep_paralysis:stage2=15.3 | met:Refused Shadow=15.3 | night:midnight_walk=15.2 | night:carbon_monoxide=15 | night:drowning_dream=14
-sanity-damage-events storyline:gas_station_hero:stage0=45 | night:nightmare=28.3 | night:insomnia_night=24.3 | night:drowning_dream=22.1 | met:Drowning Dream=22.1 | night:stray_cat_dies=22
-injuries Scraped Knee=2 | Deep Laceration=2 | Broken Wrist=1 | Broken Hand=1 | Broken Nose=1 | Whiplash=1
-statuses Scabies=2 | Possible Rabies=1 | Sinus Infection=1 | Waterborne Illness=1 | Strep Throat=1 | Hepatitis=1
+recent-damage-events storyline:bridge_angel:stage0=7 | night:insomnia_night=3 | night:raccoon_invasion=3 | location:shop:convenience_store=3 | night:police_checkpoint=2 | night:peaceful_night=2
+health-damage-events night:insomnia_night=64.7 | night:carbon_monoxide=61.3 | night:stray_cat_dies=34.6 | storyline:bridge_angel:stage0=31.5 | night:woodlands_river=29.6 | met:Woodlands River Event=29.6
+sanity-damage-events night:nightmare=105 | storyline:gas_station_hero:stage0=83 | night:stray_cat_dies=64.5 | night:drowning_dream=50.5 | met:Drowning Dream=50.5 | night:insomnia_night=50.3
+injuries Deep Laceration=4 | Scraped Knee=4 | Broken Ankle=2 | Broken Wrist=2 | Broken Ribs=2 | Severed Skin=1
+statuses Sinus Infection=4 | Scabies=3 | Strep Throat=3 | Second Degree Burns=2 | Shellfish Poisoning=2 | Possible Rabies=2
 
 Fatal Context Samples
+seed=14 day=113 rank=0 peak=8,626 tag=wounds-plus-infection cause=You have succumbed to your wounds
+  recent=d113 hp-11 san+4 ev=storyline:bridge_angel:stage0/day:reunion_photo_comfort +status=Ear Infection,Pink Eye || d112 hp-17 san-5 ev=storyline:bridge_angel:stage0/day:interrogation || d111 hp-2 san+1 ev=storyline:mechanic_dreams:stage10/night:nice_dream
+  top-hp=night:carbon_monoxide=-15.0 | storyline:mechanic_dreams:stage4=-15.0 | night:insomnia_night=-14.7
+  top-san=night:nightmare=-19.2 | storyline:mime:stage1=-17.0 | night:insomnia_night=-13.5
+  injuries=Broken Collarbone, Broken Ribs, Scraped Knee | statuses=Chronic Insomnia, Ear Infection, Pink Eye, Second Degree Burns, Shellfish Poisoning, Strep Throat, UTI, Waterborne Illness
+seed=1 day=89 rank=1 peak=5,689 tag=compound-trauma-collapse cause=You have succumbed to your wounds
+  recent=d89 hp+9 san+11 ev=storyline:bridge_angel:stage0/day:second_degree_burns +status=Second Degree Burns || d88 hp+1 san-8 ev=storyline:radio_signal:stage2/met:Found Tower || d87 hp-4 san-15 ev=storyline:bridge_angel:stage0/day:someone_stole_your_stuff
+  top-hp=night:nightmare=-14.5 | day:hiking_disaster=-10.3 | met:Stuart=-10.3
+  top-san=night:nightmare=-33.7 | day:car_alarm_malfunction=-20.0 | storyline:gas_station_hero:stage0=-13.0
+  injuries=Broken Ankle, Broken Wrist, Deep Laceration, Scraped Knee | statuses=Lead Poisoning, Ringworm, Scabies, Second Degree Burns, Severe Asthma, Shellfish Poisoning, Sinus Infection
+seed=8 day=119 rank=1 peak=4,811 tag=wounds-plus-infection cause=You have succumbed to your wounds
+  recent=d119 hp-58 san+0 ev=storyline:mechanic_dreams:stage12/night:woodlands_river +inj=Severed Skin || d118 hp+2 san-2 ev=day:car_wont_start/night:raccoon_invasion || d117 hp+2 san-1 ev=day:water_purifier_use/night:nice_dream
+  top-hp=night:carbon_monoxide=-21.0 | storyline:mechanic_dreams:stage9=-21.0 | met:Woodlands River Event=-19.3
+  top-san=night:carbon_monoxide=-12.5 | storyline:mechanic_dreams:stage9=-12.5 | night:stray_cat_dies=-11.8
+  injuries=Broken Ribs, Severed Skin | statuses=Anaphylaxis, Anxiety Disorder, Mold Toxicity, Sinus Infection
 seed=18 day=47 rank=1 peak=3,710 tag=gun-violence cause=Before you get the chance to grab it, the man steps back, unholsters the pistol, then fires three shots into your chest. The glass behind you shatters, and you fall to your knees in the street
   recent=d47 hp-1 san-3 ev=storyline:phil:stage3/night:police_checkpoint || d46 hp-1 san-2 ev=storyline:radio_signal:stage0/met:Radio Signal || d45 hp-2 san-2 ev=storyline:kyle:stage4/location:shop:convenience_store
   top-hp=day:whiplash_injury=-4.3 | met:Woodlands Path Event=-4.3 | night:woodlands_path=-4.3
@@ -191,6 +215,11 @@ seed=9 day=51 rank=0 peak=3,136 tag=gun-violence cause=Before you get the chance
   top-hp=night:insomnia_night=-5.0 | day:companion_lost_adventure=-3.8 | day:contract_strep_throat=-3.8
   top-san=night:nightmare_of_losing=-12.5 | night:stray_cat_dies=-11.0 | storyline:gas_station_hero:stage0=-9.5
   injuries=none | statuses=Strep Throat
+seed=12 day=86 rank=0 peak=3,088 tag=wounds-plus-infection cause=You have succumbed to your wounds
+  recent=d86 hp-3 san-11 ev=storyline:bridge_angel:stage0/day:food_truck_nightmare +status=Severe Dehydration,Stomach Flu || d85 hp-2 san-10 ev=storyline:bridge_angel:stage0/day:bald_tires_noticed || d83 hp-23 san-5 ev=day:shiv_confrontation/night:stray_cat_dies
+  top-hp=storyline:bridge_angel:stage0=-18.2 | night:ditched_wallet=-16.5 | night:stray_cat_returns=-14.3
+  top-san=night:nightmare_of_losing=-17.5 | night:nightmare=-13.1 | night:stray_cat_dies=-10.5
+  injuries=Broken Ankle, Concussion, Deep Laceration | statuses=Possible Rabies, Severe Dehydration, Sinus Infection, Stomach Flu, Strep Throat, UTI
 seed=5 day=45 rank=0 peak=2,180 tag=gun-violence cause=Before you get the chance to grab it, the man steps back, unholsters the pistol, then fires three shots into your chest. The glass behind you shatters, and you fall to your knees in the street
   recent=d45 hp+4 san-1 ev=storyline:phil:stage3 || d39 hp-45 san-31 ev=storyline:sleep_paralysis:stage2/met:Refused Shadow || d37 hp+0 san-24 ev=storyline:dealer_past:stage2/met:Dealer Asked
   top-hp=met:Refused Shadow=-15.0 | night:carbon_monoxide=-15.0 | storyline:sleep_paralysis:stage2=-15.0
@@ -217,5 +246,5 @@ seed cause-group        hp san statuses injuries cause
 ---- ------------------ -- --- -------- -------- ------------------------------------------
   13 illness injury      0  15        1        3 You have succumbed to your wounds
 
-Best peak    seed=16 peak=140685 peak_days=46 rank=3 final_day=61 final_balance=1301
-Longest run  seed=16 day=61 balance=1301 peak=140685 peak_days=46 rank=3
+Best peak    seed=16 peak=140685 peak_days=46 rank=3 final_day=65 final_balance=0
+Longest run  seed=6 day=120 balance=0 peak=3077 peak_days=43 rank=1
