@@ -596,8 +596,9 @@ class StorylineSystem:
             return
 
         day = p.get_day()
-        if sl["stage"] == 1 and not p.has_danger("Betsy Tractor"):
-            # starving_cow has fired (it removes "Betsy Tractor" at the top of the event).
+        if sl["stage"] == 1 and not p.has_danger("Betsy Tractor") and p.has_danger("Betsy Army"):
+            # starving_cow has fired (it removes "Betsy Tractor" AND adds "Betsy Army").
+            # Both conditions confirm starving_cow completed, not just that the danger vanished.
             # Advance to stage 2 so cow_army can fire when "Betsy Army" danger is present.
             sl["stage"] = 2
             sl["day_started"] = day
