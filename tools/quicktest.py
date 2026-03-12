@@ -96,6 +96,8 @@ MECHANIC_DECISIONS = []
 EARLY_MECHANIC_DAY_LIMIT = 10
 EARLY_MECHANIC_THRESHOLD = 200
 FALLBACK_DECISIONS = Counter()
+FLASK_PURCHASES = Counter()  # tracks which witch flasks are bought during the run
+ITEMS_EVER_BROKEN = Counter()  # accumulates all items that break across cycles
 EVER_HAD_CAR = False
 DECISION_REQUESTS = []
 DECISION_TRACES = []
@@ -176,6 +178,11 @@ def _render_item_history(entries):
 
 def _capture_type(self, *args, **kwargs):
     _remember_text(*args)
+    text = " ".join(str(part) for part in args if part is not None)
+    text = ANSI_RE.sub("", text)
+    if text:
+        _story_file.write(text)
+        _story_file.flush()
 
 
 def _get_recent_menu_options(limit=40):
@@ -2566,6 +2573,7 @@ def _choose_witch_flask(options, player):
     if policy_choice is not None:
         return policy_choice
     if best_choice is not None:
+        FLASK_PURCHASES[best_choice[2]] += 1
         return _record_numeric_menu_trace(
             player,
             request_type="purchase_select",
@@ -4925,6 +4933,7 @@ CYCLES = int(sys.argv[1]) if len(sys.argv) > 1 else 300
 SEED = int(sys.argv[2]) if len(sys.argv) > 2 else 42
 LOG = os.path.join(os.path.dirname(os.path.abspath(__file__)), "test_out.txt")
 JSON_LOG = os.path.join(os.path.dirname(os.path.abspath(__file__)), "test_out.json")
+STORY_LOG = os.path.join(os.path.dirname(os.path.abspath(__file__)), "story_out.txt")
 
 CURRENT_CYCLE = None
 CURRENT_EVENTS = []
@@ -4945,6 +4954,8 @@ TRACKED_STATS = [
     "companions_befriended",
     "loans_taken",
     "loans_repaid",
+    "total_borrowed",
+    "total_repaid",
     "times_robbed",
     "times_hospitalized",
     "mechanic_visits",
@@ -4974,15 +4985,25 @@ TRACKED_GAMBLING_STATS = [
 
 def fake_input(_prompt=""):
     _remember_text(_prompt)
-    return _decide_raw_input(_prompt)
+    response = _decide_raw_input(_prompt)
+    # Mirror the prompt + player response into the story log
+    prompt_clean = ANSI_RE.sub("", str(_prompt)).strip()
+    if prompt_clean:
+        _story_file.write(prompt_clean + " ")
+    _story_file.write(f"[{response}]\n")
+    _story_file.flush()
+    return response
 
 
 _log_file = open(LOG, "w", encoding="utf-8")
+_story_file = open(STORY_LOG, "w", encoding="utf-8")
 
 
 def _close_log_file():
     if not _log_file.closed:
         _log_file.close()
+    if not _story_file.closed:
+        _story_file.close()
 
 
 atexit.register(_close_log_file)
@@ -5332,7 +5353,20 @@ install_tracking_hooks()
 import builtins as _builtins
 
 _real_print = _builtins.print
-_builtins.print = lambda *args, **kwargs: None
+
+
+def _story_print(*args, **kwargs):
+    """Capture game print() calls as paragraph breaks in the story log."""
+    text = kwargs.get("sep", " ").join(str(a) for a in args)
+    text = ANSI_RE.sub("", text)
+    # Treat any print() call as a paragraph separator — output its actual content
+    # (which is often "\n" or empty) to keep the story readable.
+    end = kwargs.get("end", "\n")
+    _story_file.write(text + end)
+    _story_file.flush()
+
+
+_builtins.print = _story_print
 _builtins.quit = lambda *args, **kwargs: None
 _builtins.exit = lambda *args, **kwargs: None
 
@@ -5402,6 +5436,8 @@ with patch("builtins.input", fake_input):
         travel_added, travel_removed = set_diff(before["travel_restrictions"], after["travel_restrictions"])
         broken_added, broken_removed = set_diff(before["broken_items"], after["broken_items"])
         repairing_added, repairing_removed = set_diff(before["repairing_items"], after["repairing_items"])
+        for item_name in broken_added:
+            ITEMS_EVER_BROKEN[item_name] += 1
 
         stat_changes = stat_deltas(before["statistics"], after["statistics"], TRACKED_STATS)
         gambling_changes = stat_deltas(before["gambling"], after["gambling"], TRACKED_GAMBLING_STATS)
@@ -5703,6 +5739,8 @@ json_payload = {
     "early_mechanic_funnel": dict(early_mechanic_funnel),
     "mechanic_decisions": list(MECHANIC_DECISIONS),
     "fallback_decisions": dict(FALLBACK_DECISIONS),
+    "flask_purchases": dict(FLASK_PURCHASES),
+    "items_ever_broken": dict(ITEMS_EVER_BROKEN),
     "event_polarity": dict(event_polarity_counts),
     "item_impacts": dict(item_impacts),
     "marvin_provenance": {
@@ -5746,6 +5784,9 @@ json_payload = {
 with open(JSON_LOG, "w", encoding="utf-8") as json_handle:
     json.dump(json_payload, json_handle, indent=2, sort_keys=True)
 
+# Restore real print before closing so final messages are visible
+_builtins.print = _real_print
 _close_log_file()
 print(f"Results -> {LOG}")
+print(f"Story   -> {STORY_LOG}")
 print(f"Errors: {len(errs)}")

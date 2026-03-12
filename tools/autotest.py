@@ -29,6 +29,7 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 QUICKTEST = os.path.join(ROOT, "tools", "quicktest.py")
 REPORT = os.path.join(ROOT, "tools", "test_out.txt")
 REPORT_JSON = os.path.join(ROOT, "tools", "test_out.json")
+STORY_OUT = os.path.join(ROOT, "tools", "story_out.txt")
 CUMULATIVE_REPORT = os.path.join(ROOT, "tools", "cumulative_test_out.txt")
 
 
@@ -115,6 +116,14 @@ class RunResult:
     early_medical_interrupt_count: int = 0
     early_route_applied_count: int = 0
     early_route_suppressed_count: int = 0
+    # Rich statistics surfaces
+    game_statistics: dict[str, int] = field(default_factory=dict)
+    gambling_statistics: dict[str, int] = field(default_factory=dict)
+    companions_list: list[str] = field(default_factory=list)
+    broken_items_list: list[str] = field(default_factory=list)
+    repairing_items_list: list[str] = field(default_factory=list)
+    flask_purchases: dict[str, int] = field(default_factory=dict)
+    items_ever_broken: dict[str, int] = field(default_factory=dict)
 
     @property
     def reached_location(self) -> bool:
@@ -676,6 +685,24 @@ def _apply_json_report(result: RunResult, payload: dict[str, object]) -> None:
         result.error_count = len(payload["errors"])
     if isinstance(payload.get("warnings"), list):
         result.warning_count = len(payload["warnings"])
+
+    if isinstance(payload.get("final_state"), dict):
+        fs = payload["final_state"]
+        if isinstance(fs.get("statistics"), dict):
+            result.game_statistics = {str(k): int(v) for k, v in fs["statistics"].items()}
+        if isinstance(fs.get("gambling"), dict):
+            result.gambling_statistics = {str(k): int(v) for k, v in fs["gambling"].items()}
+        if isinstance(fs.get("companions"), list):
+            result.companions_list = [str(c) for c in fs["companions"]]
+        if isinstance(fs.get("broken_items"), list):
+            result.broken_items_list = [str(i) for i in fs["broken_items"]]
+        if isinstance(fs.get("repairing_items"), list):
+            result.repairing_items_list = [str(i) for i in fs["repairing_items"]]
+
+    if isinstance(payload.get("flask_purchases"), dict):
+        result.flask_purchases = {str(k): int(v) for k, v in payload["flask_purchases"].items()}
+    if isinstance(payload.get("items_ever_broken"), dict):
+        result.items_ever_broken = {str(k): int(v) for k, v in payload["items_ever_broken"].items()}
 
 
 def _record_cycle_event_effects(result: RunResult, lines: list[str]) -> None:
@@ -1956,6 +1983,373 @@ def _fatal_context_lines(results: list[RunResult]) -> list[str]:
     return lines
 
 
+def _game_statistics_lines(results: list[RunResult]) -> list[str]:
+    """Show distributions of key game-wide statistics across seeds."""
+    if not results:
+        return []
+
+    def _stat(result: RunResult, key: str) -> int:
+        return result.game_statistics.get(key, 0)
+
+    stat_keys = [
+        ("injuries_sustained", "injuries-sustained"),
+        ("illnesses_contracted", "illnesses-contracted"),
+        ("loans_taken", "loans-taken"),
+        ("loans_repaid", "loans-repaid"),
+        ("total_borrowed", "total-borrowed"),
+        ("companions_befriended", "companions-befriended"),
+        ("near_death_experiences", "near-deaths"),
+        ("times_robbed", "times-robbed"),
+        ("times_hospitalized", "times-hospitalized"),
+        ("mechanic_visits", "mechanic-visits"),
+        ("doctor_visits", "doctor-visits"),
+        ("witch_doctor_visits", "witch-dr-visits"),
+    ]
+
+    def avg(vals: list[int]) -> str:
+        return f"{sum(vals)/max(1, len(vals)):.1f}"
+
+    total = len(results)
+    lines = ["Game Statistics"]
+    header = f"{'stat':<22} {'avg':>5} {'max':>5} {'min':>5} {'nonzero':>8} {'sum':>9}"
+    lines.append(header)
+    lines.append("-" * len(header))
+    for key, label in stat_keys:
+        vals = [_stat(r, key) for r in results]
+        nonzero = sum(1 for v in vals if v > 0)
+        money = "borrowed" in label or "total" in label
+        total_val = sum(vals)
+        fmt_sum = f"${total_val:,}" if money else str(total_val)
+        fmt_max = f"${max(vals):,}" if money else str(max(vals))
+        fmt_min = f"${min(vals):,}" if money else str(min(vals))
+        fmt_avg = f"${sum(vals)/max(1,len(vals)):,.0f}" if money else avg(vals)
+        lines.append(
+            f"{label:<22} {fmt_avg:>5} {fmt_max:>5} {fmt_min:>5} {nonzero:>4}/{total:<2} {fmt_sum:>9}"
+        )
+    lines.append("")
+    return lines
+
+
+def _injury_illness_distribution_lines(results: list[RunResult]) -> list[str]:
+    """Per-seed distribution of injuries and statuses at end-of-run, split by outcome."""
+    if not results:
+        return []
+
+    def _stat(result: RunResult, key: str) -> int:
+        return result.game_statistics.get(key, 0)
+
+    alive_results = [r for r in results if r.alive]
+    dead_results = [r for r in results if r.outcome == "died"]
+    broke_results = [r for r in results if r.outcome == "broke"]
+
+    def cohort_row(label: str, cohort: list[RunResult]) -> dict[str, str]:
+        if not cohort:
+            return {"cohort": label, "n": "0", "avg_inj_sus": "-", "avg_ill_sus": "-",
+                    "avg_inj_end": "-", "avg_ill_end": "-", "max_inj": "-", "max_ill": "-"}
+        inj_sus = [_stat(r, "injuries_sustained") for r in cohort]
+        ill_sus = [_stat(r, "illnesses_contracted") for r in cohort]
+        inj_end = [len(r.injuries) for r in cohort]
+        ill_end = [len(r.statuses) for r in cohort]
+        def av(lst: list[int]) -> str:
+            return f"{sum(lst)/len(lst):.1f}"
+        return {
+            "cohort": label,
+            "n": str(len(cohort)),
+            "avg_inj_sus": av(inj_sus),
+            "avg_ill_sus": av(ill_sus),
+            "avg_inj_end": av(inj_end),
+            "avg_ill_end": av(ill_end),
+            "max_inj": str(max(inj_end)),
+            "max_ill": str(max(ill_end)),
+        }
+
+    rows = [
+        cohort_row("all", results),
+        cohort_row("alive", alive_results),
+        cohort_row("died", dead_results),
+        cohort_row("broke", broke_results),
+    ]
+
+    lines = ["Injury & Illness Distribution"]
+    lines.extend(_build_text_table(
+        [
+            ("cohort", "cohort"),
+            ("n", "n"),
+            ("avg_inj_sus", "avg-inj-total"),
+            ("avg_ill_sus", "avg-ill-total"),
+            ("avg_inj_end", "avg-inj-end"),
+            ("avg_ill_end", "avg-ill-end"),
+            ("max_inj", "max-inj-end"),
+            ("max_ill", "max-ill-end"),
+        ],
+        rows,
+        {"n": "right", "avg_inj_sus": "right", "avg_ill_sus": "right",
+         "avg_inj_end": "right", "avg_ill_end": "right", "max_inj": "right", "max_ill": "right"},
+    ))
+
+    # Seed-level breakdown: seeds with most injuries/illnesses
+    sorted_by_inj = sorted(results, key=lambda r: _stat(r, "injuries_sustained"), reverse=True)[:6]
+    sorted_by_ill = sorted(results, key=lambda r: _stat(r, "illnesses_contracted"), reverse=True)[:6]
+    lines.append("most injuries: " + " | ".join(
+        f"s{r.seed}={_stat(r,'injuries_sustained')}(end:{len(r.injuries)})" for r in sorted_by_inj
+    ))
+    lines.append("most illnesses: " + " | ".join(
+        f"s{r.seed}={_stat(r,'illnesses_contracted')}(end:{len(r.statuses)})" for r in sorted_by_ill
+    ))
+    # Least non-zero
+    nonzero_inj = [r for r in results if _stat(r, "injuries_sustained") > 0]
+    nonzero_ill = [r for r in results if _stat(r, "illnesses_contracted") > 0]
+    if nonzero_inj:
+        least_inj = sorted(nonzero_inj, key=lambda r: _stat(r, "injuries_sustained"))[:4]
+        lines.append("least injuries (excl 0): " + " | ".join(
+            f"s{r.seed}={_stat(r,'injuries_sustained')}" for r in least_inj
+        ))
+    if nonzero_ill:
+        least_ill = sorted(nonzero_ill, key=lambda r: _stat(r, "illnesses_contracted"))[:4]
+        lines.append("least illnesses (excl 0): " + " | ".join(
+            f"s{r.seed}={_stat(r,'illnesses_contracted')}" for r in least_ill
+        ))
+    lines.append("")
+    return lines
+
+
+def _companion_roster_lines(results: list[RunResult]) -> list[str]:
+    """Show companion acquisition across seeds."""
+    if not results:
+        return []
+
+    total = len(results)
+    all_companions: Counter[str] = Counter()
+    for result in results:
+        for companion in result.companions_list:
+            all_companions[companion] += 1
+
+    runs_with_companions = sum(1 for r in results if r.companions_list)
+    avg_companions = sum(len(r.companions_list) for r in results) / max(1, total)
+    max_companions = max((len(r.companions_list) for r in results), default=0)
+    max_seed = next(
+        (r.seed for r in results if len(r.companions_list) == max_companions), None
+    )
+
+    lines = [
+        f"Companion Roster runs-with-companions={runs_with_companions}/{total} "
+        f"avg-per-run={avg_companions:.1f} max={max_companions}(seed={max_seed})"
+    ]
+    if all_companions:
+        lines.append("companion         acquired  (seeds)")
+        lines.append("----------------  --------  ------")
+        for companion, count in all_companions.most_common():
+            seeds_with = [str(r.seed) for r in results if companion in r.companions_list]
+            seed_str = ",".join(seeds_with[:8]) + ("..." if len(seeds_with) > 8 else "")
+            lines.append(f"{companion:<18}{count:>5}/{total:<2}  s={seed_str}")
+    else:
+        lines.append("no companions acquired")
+
+    # Also list companions_befriended stat (includes all time, even if later lost)
+    stat_totals = Counter()
+    for r in results:
+        stat_totals["befriended"] += r.game_statistics.get("companions_befriended", 0)
+    if stat_totals["befriended"] > 0:
+        lines.append(f"total companions-befriended stat across all seeds: {stat_totals['befriended']}")
+    lines.append("")
+    return lines
+
+
+def _loan_distribution_lines(results: list[RunResult]) -> list[str]:
+    """Show loan-taking behaviour and amounts."""
+    if not results:
+        return []
+
+    total = len(results)
+    loan_runs = sum(1 for r in results if r.game_statistics.get("loans_taken", 0) > 0)
+    total_loans = sum(r.game_statistics.get("loans_taken", 0) for r in results)
+    total_repaid = sum(r.game_statistics.get("loans_repaid", 0) for r in results)
+    total_borrowed_amt = sum(r.game_statistics.get("total_borrowed", 0) for r in results)
+    total_repaid_amt = sum(r.game_statistics.get("total_repaid", 0) for r in results)
+
+    lines = [
+        f"Loan Distribution runs-with-loans={loan_runs}/{total} "
+        f"total-loans={total_loans} total-repaid={total_repaid} "
+        f"total-borrowed=${total_borrowed_amt:,} total-repaid-amt=${total_repaid_amt:,}"
+    ]
+
+    # Per-seed breakdown for seeds that took loans
+    loan_seeds = sorted(
+        [r for r in results if r.game_statistics.get("loans_taken", 0) > 0],
+        key=lambda r: r.game_statistics.get("loans_taken", 0),
+        reverse=True,
+    )
+    if loan_seeds:
+        lines.append("seed  loans  repaid  borrowed    repaid-amt  outcome   peak")
+        lines.append("----  -----  ------  ----------  ----------  --------  --------")
+        for r in loan_seeds[:12]:
+            n = r.game_statistics.get("loans_taken", 0)
+            rep = r.game_statistics.get("loans_repaid", 0)
+            bor = r.game_statistics.get("total_borrowed", 0)
+            rep_amt = r.game_statistics.get("total_repaid", 0)
+            lines.append(
+                f"{r.seed:>4}  {n:>5}  {rep:>6}  ${bor:>9,}  ${rep_amt:>9,}  "
+                f"{r.outcome:<8}  ${r.peak_balance or r.balance or 0:>7,}"
+            )
+    lines.append("")
+    return lines
+
+
+def _gambling_performance_lines(results: list[RunResult]) -> list[str]:
+    """Show gambling win-rates and blackjack performance across seeds."""
+    if not results:
+        return []
+
+    def _gstat(result: RunResult, key: str) -> int:
+        return result.gambling_statistics.get(key, 0)
+
+    total = len(results)
+    all_hands = sum(_gstat(r, "total_hands") for r in results)
+    all_wins = sum(_gstat(r, "wins") for r in results)
+    all_losses = sum(_gstat(r, "losses") for r in results)
+    all_ties = sum(_gstat(r, "ties") for r in results)
+    all_bjs = sum(_gstat(r, "blackjacks") for r in results)
+    all_busts = sum(_gstat(r, "busts") for r in results)
+    all_won = sum(_gstat(r, "total_won") for r in results)
+    all_lost = sum(_gstat(r, "total_lost") for r in results)
+    all_dd_won = sum(_gstat(r, "double_downs_won") for r in results)
+    all_splits_won = sum(_gstat(r, "splits_won") for r in results)
+    all_surrenders = sum(_gstat(r, "surrenders_used") for r in results)
+
+    win_rate = (all_wins / max(1, all_hands)) * 100
+    bj_rate = (all_bjs / max(1, all_hands)) * 100
+    bust_rate = (all_busts / max(1, all_hands)) * 100
+    tie_rate = (all_ties / max(1, all_hands)) * 100
+    net = all_won - all_lost
+
+    lines = [
+        f"Gambling Performance seeds={total} total-hands={all_hands:,}",
+        f"win-rate={win_rate:.1f}%  bj-rate={bj_rate:.1f}%  bust-rate={bust_rate:.1f}%  tie-rate={tie_rate:.1f}%",
+        f"total-won=${all_won:,}  total-lost=${all_lost:,}  net=${net:,}",
+        f"double-downs-won={all_dd_won:,}  splits-won={all_splits_won:,}  surrenders={all_surrenders:,}",
+    ]
+
+    # Top and bottom seeds by win rate
+    def seed_win_rate(r: RunResult) -> float:
+        h = _gstat(r, "total_hands")
+        return _gstat(r, "wins") / max(1, h) if h > 0 else 0.0
+
+    sorted_by_wr = sorted([r for r in results if _gstat(r, "total_hands") > 20], key=seed_win_rate)
+    if sorted_by_wr:
+        worst = sorted_by_wr[:3]
+        best = sorted_by_wr[-3:]
+        lines.append(
+            "best-wr: " + " | ".join(
+                f"s{r.seed}={seed_win_rate(r)*100:.1f}%({_gstat(r,'total_hands')}h)" for r in reversed(best)
+            )
+        )
+        lines.append(
+            "worst-wr: " + " | ".join(
+                f"s{r.seed}={seed_win_rate(r)*100:.1f}%({_gstat(r,'total_hands')}h)" for r in worst
+            )
+        )
+    lines.append("")
+    return lines
+
+
+def _flask_and_item_breakage_lines(results: list[RunResult]) -> list[str]:
+    """Witch flask purchases and item breakage summary."""
+    lines: list[str] = []
+
+    # Flask purchases
+    flask_total: Counter[str] = Counter()
+    flask_runs: Counter[str] = Counter()
+    for r in results:
+        for flask_name, count in r.flask_purchases.items():
+            flask_total[flask_name] += count
+            flask_runs[flask_name] += 1
+
+    total = len(results)
+    total_flasks = sum(flask_total.values())
+    runs_bought = sum(1 for r in results if r.flask_purchases)
+    lines.append(
+        f"Flask Purchases runs-bought={runs_bought}/{total} total-purchased={total_flasks}"
+    )
+    if flask_total:
+        lines.append("flask                  times-bought  runs")
+        lines.append("---------------------  ------------  ----")
+        for flask_name, count in flask_total.most_common():
+            lines.append(f"{flask_name:<23}{count:>8}  {flask_runs[flask_name]:>4}/{total}")
+    else:
+        lines.append("no flasks purchased")
+    lines.append("")
+
+    # Item breakages
+    item_break_total: Counter[str] = Counter()
+    item_break_runs: Counter[str] = Counter()
+    for r in results:
+        for item_name, count in r.items_ever_broken.items():
+            item_break_total[item_name] += count
+            item_break_runs[item_name] += 1
+
+    total_breaks = sum(item_break_total.values())
+    runs_with_breaks = sum(1 for r in results if r.items_ever_broken)
+    lines.append(
+        f"Item Breakage runs-with-breaks={runs_with_breaks}/{total} total-breaks={total_breaks}"
+    )
+    if item_break_total:
+        lines.append("item                   total-breaks  runs")
+        lines.append("---------------------  ------------  ----")
+        for item_name, count in item_break_total.most_common():
+            lines.append(f"{item_name:<23}{count:>8}  {item_break_runs[item_name]:>4}/{total}")
+    else:
+        lines.append("no item breakages recorded")
+    lines.append("")
+
+    # Items currently broken or in repair at end of run
+    broken_end: Counter[str] = Counter()
+    repairing_end: Counter[str] = Counter()
+    for r in results:
+        for item in r.broken_items_list:
+            broken_end[item] += 1
+        for item in r.repairing_items_list:
+            repairing_end[item] += 1
+    if broken_end or repairing_end:
+        lines.append("Items broken at run-end: " + _summarize_counter(broken_end, 6))
+        lines.append("Items in repair at run-end: " + _summarize_counter(repairing_end, 6))
+        lines.append("")
+
+    return lines
+
+
+def _mechanic_repair_lines(results: list[RunResult]) -> list[str]:
+    """Which items were fixed at mechanics and how often mechanics visited."""
+    if not results:
+        return []
+
+    total = len(results)
+    mechanic_visits_total = sum(r.game_statistics.get("mechanic_visits", 0) for r in results)
+    runs_with_mechanic = sum(1 for r in results if r.game_statistics.get("mechanic_visits", 0) > 0)
+
+    # From marvin_provenance, collect items that were fixed
+    fixed_items: Counter[str] = Counter()
+    fixed_runs: Counter[str] = Counter()
+    for r in results:
+        for item_name, history in r.marvin_item_provenance.items():
+            fixed = history.get("fixed", [])
+            if fixed:
+                fixed_items[item_name] += len(fixed)
+                fixed_runs[item_name] += 1
+
+    lines = [
+        f"Mechanic Repair runs-visited={runs_with_mechanic}/{total} "
+        f"total-mechanic-visits={mechanic_visits_total}"
+    ]
+    if fixed_items:
+        lines.append("items fixed at mechanic:")
+        for item_name, count in fixed_items.most_common(8):
+            lines.append(f"  {item_name}: fixed {count}x in {fixed_runs[item_name]} runs")
+    else:
+        lines.append("no items fixed at mechanic recorded")
+    lines.append("")
+    return lines
+
+
 def _render_summary_lines(results: list[RunResult], cycles: int, seed_label: str) -> list[str]:
     metrics = _collect_summary(results)
     total = metrics["total"]
@@ -2075,6 +2469,14 @@ def _render_summary_lines(results: list[RunResult], cycles: int, seed_label: str
     lines.extend(_event_polarity_lines(results))
     lines.extend(_item_impact_lines(results))
     lines.extend(_marvin_provenance_lines(results))
+    # New rich statistics sections
+    lines.extend(_game_statistics_lines(results))
+    lines.extend(_injury_illness_distribution_lines(results))
+    lines.extend(_companion_roster_lines(results))
+    lines.extend(_loan_distribution_lines(results))
+    lines.extend(_gambling_performance_lines(results))
+    lines.extend(_flask_and_item_breakage_lines(results))
+    lines.extend(_mechanic_repair_lines(results))
     row_data = []
     for result in results:
         if result.timed_out:
@@ -2213,6 +2615,13 @@ def main() -> int:
         print(_progress_line(index, total, result, batch_started_at), flush=True)
 
     render_summary(results, cycles, seed_label)
+
+    # Remind where the story log lives (contains the last seed's in-game text)
+    if os.path.isfile(STORY_OUT):
+        if total == 1:
+            print(f"Story log -> {STORY_OUT}  (seed={seeds[0]} in-game narrative)", flush=True)
+        else:
+            print(f"Story log -> {STORY_OUT}  (last seed={seeds[-1]} in-game narrative; re-run quicktest.py for any specific seed)", flush=True)
     return 0
 
 

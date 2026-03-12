@@ -209,6 +209,8 @@ class Player(
             "companions_befriended": 0,
             "loans_taken": 0,
             "loans_repaid": 0,
+            "total_borrowed": 0,
+            "total_repaid": 0,
             "times_robbed": 0,
             "times_hospitalized": 0,
             "mechanic_visits": 0,
@@ -401,6 +403,8 @@ class Player(
         return len(self._flask_effects)
 
     def add_status(self, status):
+        if status not in self._status_effects:
+            self.increment_statistic("illnesses_contracted")
         self._status_effects.add(status)
 
     def has_status(self, status):
@@ -410,6 +414,8 @@ class Player(
         self._status_effects.remove(status)
 
     def add_injury(self, injury):
+        if injury not in self._injuries:
+            self.increment_statistic("injuries_sustained")
         self._injuries.add(injury)
 
     def has_injury(self, injury):
