@@ -264,7 +264,7 @@ RANK_TUNER_PROFILES: dict[int, dict[str, float | int]] = {
         "store_health_gate": 58,
         "store_sanity_gate": 26,
         "marvin_min_balance": 9500,
-        "marvin_floor_buffer": 1500,
+        "marvin_floor_buffer": 5000,
         "upgrade_floor_buffer": 140000,
     },
     3: {

@@ -3143,8 +3143,9 @@ def _adapter_yes_no_fallback(prompt_lower, player, cost=None):
     if prompt_lower == "take the cat to a vet? ($200)":
         if player is None or cost is None:
             return "no"
-        return "yes" if _can_afford_optional_purchase(player, cost, 88) else "no"
-
+        # Saving the cat: +15 sanity now, prevents -25 sanity from stray_cat_dies later.
+        # Net +40 sanity vs not paying — always save if balance allows any flexibility.
+        return "yes" if (player.get_balance() >= cost + 40) else "no"
     if prompt_lower == "buy it for $50?":
         if player is None or cost is None:
             return "no"
@@ -4294,6 +4295,14 @@ def _decide_yes_no(prompt=""):
             rank = int(player.get_rank()) if hasattr(player, "get_rank") else 0
             if rank >= 2 and priority < 70:
                 return finalize("no", f"marvin_offer_rank2_low_priority:{current_offer}")
+            # At rank 2+, require a bigger post-purchase buffer than just the $10k rank floor
+            # to avoid gambling variance immediately dropping us back to rank 1.  We enforce
+            # an extra $5k cushion: post-purchase balance must stay ≥ $15k.
+            if rank >= 2:
+                balance = player.get_balance()
+                rank2_post_purchase_floor = 15000
+                if balance - cost < rank2_post_purchase_floor and priority < 88:
+                    return finalize("no", f"marvin_offer_rank2_post_purchase_floor:{current_offer}")
             if _can_afford_optional_purchase(player, cost, priority):
                 return finalize("yes", f"marvin_offer_affordable:{current_offer}", 0.8)
             # High-priority Marvin items are justified exceptions to rank-drop protection

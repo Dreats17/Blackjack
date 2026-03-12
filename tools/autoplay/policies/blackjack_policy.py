@@ -396,10 +396,19 @@ def choose_blackjack_bet(request: DecisionRequest, plan: StrategicPlan) -> tuple
             ratio = max(ratio, 0.28)
     if balance >= 25000 and edge_score >= 6:
         ratio = min(ratio, 0.30 if balance < 100000 else 0.18)
-    # Rank 2 cushion: when balance is within 2.5x the rank floor ($25k), be conservative
-    # to avoid a bad streak dropping the bot below the $10k threshold.
-    if rank == 2 and balance < 25000:
+    # Rank 2 cushion: cap ratio by balance tier to prevent rank regression.
+    # At $10k-$13k (very close to floor): ultra-conservative.
+    # At $13k-$25k (still in danger zone): moderately conservative.
+    # At $25k-$50k (growth zone): still needs protection vs bad streaks.
+    if rank == 2 and balance < 13000:
+        ratio = min(ratio, 0.08)
+    elif rank == 2 and balance < 25000:
         ratio = min(ratio, 0.16)
+    elif rank == 2 and balance < 50000:
+        ratio = min(ratio, 0.24)
+    # Rank 3 cushion: cap ratio when balance is within 1.3x of the $100k floor.
+    if rank == 3 and balance < 130000:
+        ratio = min(ratio, 0.14)
     if stalled_run and not survival_mode:
         if phase == "car_rush":
             ratio = max(ratio, 0.26 if balance < 350 else 0.18)
@@ -415,7 +424,15 @@ def choose_blackjack_bet(request: DecisionRequest, plan: StrategicPlan) -> tuple
     if rank_three_growth_window:
         # Boost ratio in the rank-2→3 push; floor protection caps actual bet at
         # balance - $10k so the bot can't lose below rank 2 floor regardless.
+        # Cushion guards above further restrict this boost when near the $10k/$25k/$50k bands.
         ratio = max(ratio, 0.34 if edge_score >= 5 else 0.30)
+    # Re-apply rank cushions after any growth-window boosts so they remain hard upper bounds.
+    if rank == 2 and balance < 13000:
+        ratio = min(ratio, 0.08)
+    elif rank == 2 and balance < 25000:
+        ratio = min(ratio, 0.16)
+    elif rank == 2 and balance < 50000:
+        ratio = min(ratio, 0.24)
     if pending_marvin_active and not survival_mode:
         if pending_marvin_shortfall > 0:
             ratio = min(ratio, 0.12 if edge_score >= 5 else 0.10)
@@ -534,10 +551,16 @@ def choose_blackjack_bet(request: DecisionRequest, plan: StrategicPlan) -> tuple
             max_ratio = max(max_ratio, 0.40)
     if balance >= 25000 and edge_score >= 6:
         max_ratio = min(max_ratio, 0.38 if balance < 100000 else 0.24)
-    # Rank 2 cushion: when balance is within 2.5x the rank floor ($25k), cap max bet
-    # to avoid dropping below the $10k threshold from a single bad session.
-    if rank == 2 and balance < 25000:
+    # Rank 2 cushion: cap max_ratio by balance tier (mirrors ratio guards above).
+    if rank == 2 and balance < 13000:
+        max_ratio = min(max_ratio, 0.12)
+    elif rank == 2 and balance < 25000:
         max_ratio = min(max_ratio, 0.24)
+    elif rank == 2 and balance < 50000:
+        max_ratio = min(max_ratio, 0.34)
+    # Rank 3 cushion: cap max_ratio when balance is within 1.3x of the $100k floor.
+    if rank == 3 and balance < 130000:
+        max_ratio = min(max_ratio, 0.18)
     if stalled_run and not survival_mode:
         if phase == "car_rush":
             max_ratio = max(max_ratio, 0.36 if balance < 350 else 0.24)
@@ -552,7 +575,15 @@ def choose_blackjack_bet(request: DecisionRequest, plan: StrategicPlan) -> tuple
             max_ratio = max(max_ratio, 0.58)
     if rank_three_growth_window:
         # Allow betting up to 55% of balance; floor protection will cap to surplus anyway.
+        # Cushion guards from above further restrict at $10k-$50k balance bands.
         max_ratio = max(max_ratio, 0.55 if edge_score >= 5 else 0.48)
+    # Re-apply rank cushions after any growth-window boosts so they remain hard upper bounds.
+    if rank == 2 and balance < 13000:
+        max_ratio = min(max_ratio, 0.12)
+    elif rank == 2 and balance < 25000:
+        max_ratio = min(max_ratio, 0.24)
+    elif rank == 2 and balance < 50000:
+        max_ratio = min(max_ratio, 0.34)
     if pending_marvin_active and not survival_mode:
         if pending_marvin_shortfall > 0:
             max_ratio = min(max_ratio, 0.18 if edge_score >= 5 else 0.15)
