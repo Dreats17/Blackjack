@@ -832,6 +832,7 @@ class Lists:
             "Birdseed": 1,
             "Fish": 5,
             "Bread": 1,
+            "Sandwich": 2,
             "Cheese": 1,
             "Baking Soda": 1,
             "Battery Terminal Cleaner": 3,
@@ -3455,7 +3456,7 @@ class Lists:
             ("Candy Bar", 5), ("Bag of Chips", 8), ("Turkey Sandwich", 15),
             ("Energy Drink", 12), ("Beef Jerky", 10), ("Cup Noodles", 7),
             ("Granola Bar", 6), ("Hot Dog", 8), ("Microwave Burrito", 9),
-            ("Cheese", 4), ("Bread", 3),
+            ("Cheese", 4), ("Bread", 3), ("Sandwich", 8),
         ]
         random.shuffle(food_items)
         for i in range(min(3, len(food_items))):  # 3 random food items

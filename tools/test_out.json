@@ -5835,7 +5835,7 @@
           "Scabies"
         ],
         "store_best_purchase_priority": 34,
-        "store_candidate_count": 2,
+        "store_candidate_count": 3,
         "store_target_spend": 7,
         "travel_restrictions": []
       },
@@ -5986,7 +5986,7 @@
           "Scabies"
         ],
         "store_best_purchase_priority": 34,
-        "store_candidate_count": 2,
+        "store_candidate_count": 3,
         "store_target_spend": 7,
         "travel_restrictions": []
       },
@@ -6126,7 +6126,7 @@
           "Scabies"
         ],
         "store_best_purchase_priority": 34,
-        "store_candidate_count": 2,
+        "store_candidate_count": 3,
         "store_target_spend": 7,
         "travel_restrictions": []
       },
@@ -6277,7 +6277,7 @@
           "Scabies"
         ],
         "store_best_purchase_priority": 34,
-        "store_candidate_count": 2,
+        "store_candidate_count": 3,
         "store_target_spend": 7,
         "travel_restrictions": []
       },
@@ -6417,7 +6417,7 @@
           "Scabies"
         ],
         "store_best_purchase_priority": 34,
-        "store_candidate_count": 2,
+        "store_candidate_count": 3,
         "store_target_spend": 7,
         "travel_restrictions": []
       },
@@ -6568,7 +6568,7 @@
           "Scabies"
         ],
         "store_best_purchase_priority": 34,
-        "store_candidate_count": 2,
+        "store_candidate_count": 3,
         "store_target_spend": 7,
         "travel_restrictions": []
       },
@@ -6708,7 +6708,7 @@
           "Scabies"
         ],
         "store_best_purchase_priority": 34,
-        "store_candidate_count": 2,
+        "store_candidate_count": 3,
         "store_target_spend": 7,
         "travel_restrictions": []
       },
@@ -11194,7 +11194,7 @@
           "Scabies"
         ],
         "store_best_purchase_priority": 34,
-        "store_candidate_count": 2,
+        "store_candidate_count": 3,
         "store_target_spend": 7,
         "travel_restrictions": []
       },
@@ -11305,7 +11305,7 @@
           "Scabies"
         ],
         "store_best_purchase_priority": 34,
-        "store_candidate_count": 2,
+        "store_candidate_count": 3,
         "store_target_spend": 7,
         "travel_restrictions": []
       },
@@ -11414,7 +11414,7 @@
           "Scabies"
         ],
         "store_best_purchase_priority": 34,
-        "store_candidate_count": 2,
+        "store_candidate_count": 3,
         "store_target_spend": 7,
         "travel_restrictions": []
       },
@@ -11525,7 +11525,7 @@
           "Scabies"
         ],
         "store_best_purchase_priority": 34,
-        "store_candidate_count": 2,
+        "store_candidate_count": 3,
         "store_target_spend": 7,
         "travel_restrictions": []
       },
@@ -11634,7 +11634,7 @@
           "Scabies"
         ],
         "store_best_purchase_priority": 34,
-        "store_candidate_count": 2,
+        "store_candidate_count": 3,
         "store_target_spend": 7,
         "travel_restrictions": []
       },
@@ -11745,7 +11745,7 @@
           "Scabies"
         ],
         "store_best_purchase_priority": 34,
-        "store_candidate_count": 2,
+        "store_candidate_count": 3,
         "store_target_spend": 7,
         "travel_restrictions": []
       },
@@ -11854,7 +11854,7 @@
           "Scabies"
         ],
         "store_best_purchase_priority": 34,
-        "store_candidate_count": 2,
+        "store_candidate_count": 3,
         "store_target_spend": 7,
         "travel_restrictions": []
       },
@@ -12064,5 +12064,7 @@
     "sanity": 43
   },
   "seed": 42,
-  "warnings": []
+  "warnings": [
+    "/home/runner/work/Blackjack/Blackjack/story/endings.py:1080: SyntaxWarning: invalid escape sequence '\\R'\n  type.slow(\"\\Rot in hell, you fucking bastard.\\\"\")"
+  ]
 }
