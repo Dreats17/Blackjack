@@ -1,7 +1,7 @@
-=== AUTOTEST RUN 2026-03-12 06:51:52 ===
+=== AUTOTEST RUN 2026-03-12 06:59:41 ===
 AUTOTEST cycles=60 seeds=1-20 total=20
 Longevity alive=15/20 died=5/20 broke=4/20 timeouts=0 doctor_missed=0
-Progress car=15/20 ever_car=15/20 location=15/20 rank1+=9/20 clean=20/20
+Progress car=15/20 ever_car=15/20 location=15/20 rank1+=9/20 clean=19/20
 Unlocks map=1/20 worn_map=14/20 marvin_access=15/20 witch=15/20 gus=15/20 vinnie=15/20 million=0/20
 Visits doctor=9/20 witch_doctor=2/20 store=9/20 pawn=6/20 loan=0/20 marvin=2/20 tom=3/20 frank=1/20 oswald=2/20 upgrade=2/20 crafting=0/20 companion=0/20 adventure=0/20 airport=0/20 mechanic_end=0/20 wins=0/20
 
