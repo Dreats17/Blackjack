@@ -12,19 +12,21 @@ How to read this file
 - `[ ]` means not meaningfully covered yet.
 - "Distance to win" means distance to deliberate, repeatable millionaire-capable play, not lucky outlier wins.
 
-Current benchmark checkpoint
-- Scenario suite: 47/47 passed (+7 new scenarios)
-- Fixed slice: autotest.py 60 1 20 -> alive 15/20, died 5/20, broke 9/20, car 11/20, rank1+ 7/20, doctor_missed 0/20
-- Current known blocker: bankroll growth from post-car midgame into the 8k to 10k Marvin band
-- Current late-game gap: marvin 0/20, adventure 0/20, airport 0/20, wins 0/20 on the fixed slice
+Current benchmark checkpoint (Batch 3 — 2026-03-12)
+- Scenario suite: 47/47 passed (unchanged — no new scenarios yet in this batch)
+- Fixed slice BEFORE batch 3: autotest.py 60 1 20 -> alive 15/20, car 15/20, rank1+ 9/20,
+  marvin 2/20, crafting 0/20, loan 0/20, witch_doctor 2/20, adventure 0/20
+- Best peak before: $140,685 seed 16 rank 3
+- Current known blocker: crafting ingredient acquisition + workbench routing missing entirely;
+  flask-only witch visits never triggered; Marvin Health/Delight Indicator never bought
 
 Milestone ladder
 - [~] Milestone 1: reliable no-car survival and car acquisition
-  Status: partly achieved
-  Evidence: car 11/20, ever_car 11/20 on the fixed slice; early avoidable-death handling improved
+  Status: significantly improved this session
+  Evidence: car 15/20 (was 11/20); early death reduction and no-car recovery progress
 - [~] Milestone 2: reliable post-car stabilization and rank-1 conversion
   Status: partly achieved
-  Evidence: rank1+ 7/20; doctor_missed 0/20; post-car fairness cleanup landed
+  Evidence: rank1+ 9/20 (was 7/20); doctor_missed 0/20 maintained
 - [ ] Milestone 3: reliable 10k funnel
   Status: not achieved
   Evidence: strong runs still stall below the real Marvin-buy band too often
@@ -35,15 +37,28 @@ Milestone ladder
 - [ ] Milestone 6: full-benchmark balance audit at millionaire-capable strength
   Status: not achieved
 
-Game ecosystem coverage
+Game ecosystem coverage — CODE-VERIFIED FACTS
 - [x] Early no-car betting safety and car-threshold preservation
 - [x] Doctor urgency and obvious emergency handling
 - [x] Route interruptions and recovery-day bypass behavior
 - [x] Mechanic threshold handling for early car access
 - [x] Carbon monoxide fairness fix and follow-up exhaust danger chain
 - [x] Gift wrap timing: wrap when dealer_happiness < 78 and not in emergency (policy + 3 scenarios)
-- [x] Workbench crafting engagement: bot now engages crafting when ingredients are available
+- [x] Workbench crafting engagement: _choose_workbench_menu/_choose_workbench_craft in quicktest.py
 - [x] Workbench craft confirmation: always confirms yes when autoplay chose to craft (policy + scenario)
+- [x] Workbench ROUTING: _wants_workbench_craft_run() added and wired into _choose_progression_destination
+      Triggered when: has_item("Tool Kit") AND craftable recipe with priority >= 60 AND gap > 2 days.
+      (Previously: Car Workbench was NEVER selected for crafting — zero routing existed.)
+- [x] Crafting ingredient store priorities: Garbage Bag(58), Plastic Wrap(54), Fishing Line(60),
+      Rubber Bands(28), Breath Mints(28) — all were priority 0 before (never bought).
+- [x] Marvin Health Indicator priority: 0 → 64 (cheapest at $8k, useful HP readout)
+- [x] Marvin Delight Indicator priority: 0 → 68 (cheapest at $8.5k, feeds gift-wrap gate)
+- [x] WITCH_FLASK_PRICE_ESTIMATES corrected to minimum prices from code (Fortunate Day $18k→$12k,
+      Fortunate Night $20k→$12k). Enables flask visit check to trigger earlier.
+- [x] Witch flask Fortunate Day priority: 44 → 58 (entry-level flask at rank 2+)
+- [x] Witch flask Fortunate Night priority: 28 → 44 (entry-level flask at rank 2+)
+- [x] Witch flask-only visits: _wants_witch_flask_only_run() added — bot can now visit Witch
+      for a flask without needing healing. Says NO to heal prompt to preserve cash for flask.
 - [x] Millionaire afternoon routing: prefers mechanic ending then airport (policy + 2 scenarios)
 - [x] Companion hungry/runaway prevention: urgent companion feed when runaway_risk > 0 (scenario)
 - [~] Pawn-shop behavior and pawn-cashout pressure
@@ -51,68 +66,89 @@ Game ecosystem coverage
 - [~] Marvin access recognition and preservation behavior
 - [~] Convenience-store pressure and low-impact store suppression in growth windows
 - [~] Companion acquisition, feeding, happiness: routing and food purchasing partially covered
+- [~] Adventure unlock: _wants_adventure_run correctly requires rank 2+ for The Road.
+      The Road needs no prerequisite events. Rank 1 needs utility item (Rusty Compass $8k from Marvin).
+      Adventure routing exists; blocker is reaching rank 2 reliably (balance $10k+).
+- [~] Witch-doctor economy: heal+flask combined visits covered; flask-only path now added.
+      Price ranges verified from code. Fortunate Day/Night are entry-level flasks at rank 2.
 - [ ] Dealer happiness thresholds affecting gifts or other systems in real runs (beyond wrap gate)
 - [ ] Crafted-item downstream event value
 - [ ] Loan shark full strategic loop: borrow, warning escalation, repayment, forced-encounter handling
-- [ ] Witch-doctor economy and flask exploitation depth
-- [ ] Adventure unlock to visit to value funnel
+      Verified from code: max loan $5k, 20% interest per week, warning levels at 3/7/14/21 days overdue.
 - [ ] Airport route usage and full ending conversion path
 
 Fairness and bug-audit coverage
 - [x] Harness is being used to detect unfair repeatable spikes
 - [x] Human-readable fairness changelog exists at docs/10_GAMEPLAY_FAIRNESS_CHANGELOG.md
-- [x] Mechanic-presence reporting: coverage_flags now includes K=crafting, Q=companion, E=mechanic_end, $=airport_win
-- [x] Metrics reporting: autotest.py now reports crafting, companion, mechanic_end in Visit summary line
+- [x] Mechanic-presence reporting: coverage_flags includes K=crafting, Q=companion, E=mechanic_end, $=airport_win
+- [x] Metrics reporting: autotest.py reports crafting, companion, mechanic_end in Visit summary line
+- [x] Masterplan CORE GAME MECHANIC TRUTHS updated with code-verified facts for Marvin, Witch Doctor,
+      Convenience Store, Car Workbench/Crafting, Adventure system, and Loan Shark.
 - [~] Harness-to-core-game cross-check workflow exists informally through audit work
 - [ ] Expected-but-missing mechanic report
 - [ ] Core-game bug suspect report from harness evidence
 
 AI decision tracking (items to manually review)
-The following decisions were changed or added in this batch. Each can be reverted by inspecting
+The following decisions were changed or added in batch 3. Each can be reverted by inspecting
 the trace reason fields in autoplay_scenarios.json or the DECISION_TRACES output from quicktest.
 
-1. Gift wrap gate: threshold changed from dealer_happiness < 90 to dealer_happiness < 78
-   (reason: "gift_wrap_happiness_gate" in event_policy.yes_no)
-   Also: emergency check added - now declines wrap when health < 45, sanity < 20, or no car
+Batch 3 changes:
+1. Crafting ingredient priorities: added Garbage Bag(58), Plastic Wrap(54), Fishing Line(60),
+   Rubber Bands(28), Breath Mints(28) to STORE_PROGRESSION_PRIORITIES in config.py.
+   Old behavior: all these items had priority 0 — never purchased.
+   Revert: remove entries from STORE_PROGRESSION_PRIORITIES in config.py.
+
+2. Car Workbench routing: added _wants_workbench_craft_run() to quicktest.py and wired into
+   _choose_progression_destination as workbench_craft_choice (placed after Marvin/adventure/upgrade).
+   Old behavior: Car Workbench was never selected as a destination — crafting was unreachable.
+   Revert: remove _wants_workbench_craft_run() and workbench_craft_choice from all orderings.
+
+3. Marvin Health Indicator priority: 0 → 64 in config.py MARVIN_ITEM_PRIORITIES.
+   Marvin Delight Indicator priority: 0 → 68 in config.py MARVIN_ITEM_PRIORITIES.
+   Old behavior: both items had priority 0 — bot never bought them despite $8-10k min price.
+   Revert: set both back to 0 in MARVIN_ITEM_PRIORITIES.
+
+4. Witch flask price estimates corrected to minimum prices (Fortunate Day 18000→12000,
+   Fortunate Night 20000→12000) and priorities raised (Fortunate Day 44→58, Night 28→44).
+   Old behavior: bot treated cheapest flasks as ~$18-20k — never visited for them until very late.
+   Revert: restore 18000/20000 prices and 44/28 priorities in config.py WITCH_FLASK_PRICE_ESTIMATES
+   and WITCH_FLASK_PRIORITIES.
+
+5. Witch flask-only visits: added _wants_witch_flask_only_run() to quicktest.py; updated
+   _medical_destination_label to return "Witch Doctor's Tower" for flask-only case;
+   updated legacy and planner destination check; updated heal prompt handler to say NO
+   to healing on flask-only visits (trace reason: "witch_flask_only_skip_heal").
+   Old behavior: witch was only visited when _needs_doctor() was True — flask-only visits impossible.
+   Revert: remove _wants_witch_flask_only_run(), restore original _medical_destination_label early return,
+   restore original heal prompt handler.
+
+Previous batch decisions (batch 1-2):
+6. Gift wrap gate: threshold changed from dealer_happiness < 90 to dealer_happiness < 78
    Old behavior: gift_wrap_for_dealer_happiness (if balance >= 20 and happiness < 90)
    Revert: restore in quicktest.py _decide_yes_no and event_policy.py choose_event_yes_no
 
-2. Workbench crafting: bot now engages crafting at workbench when useful recipes are available
-   Old behavior: always returned "5" (Pack Up) - never crafted anything
-   New behavior: _choose_workbench_menu selects "1" (Craft Something) when best recipe priority >= 60
-   Priority list is in config.py CRAFTING_RECIPE_PRIORITIES
-   Revert: restore "return '5'" in quicktest.py _decide_raw_input workbench block
-
-3. Millionaire afternoon: explicit routing to mechanic ending or airport
-   Old behavior: only matched "drive to the airport" text in a very specific condition
-   New behavior: _choose_millionaire_afternoon prefers chosen mechanic, then airport, then fallback
-   Trace reason: "millionaire_mechanic_ending:{mechanic}" or "millionaire_airport_ending"
-   Revert: restore original text-match logic in quicktest.py _decide_raw_input
-
-4. Companion hungry gate: now uses companion_runaway_risk_count from game state
+7. Companion hungry gate: now uses companion_runaway_risk_count from game state
    Old behavior: chose "3" (buy food) if balance >= 20 else "4" (skip)
-   New behavior: also chose "3" when companion_runaway_risk_count > 0 or companion_low_happiness_count > 0
-   Trace reason: "hungry_companions_gate" in event_policy.py
    Revert: restore simple balance check in event_policy.py choose_event_inline_choice
 
 Current deliberate next targets
-- [~] Investigate the best post-car seeds that peak below 10k and identify the most common stall cause
-- [ ] Expand adventure unlock path coverage: when bot has rank >= 2 and high health/sanity, adventure push
-- [ ] Add focused scenario cases for loan shark warning escalation and repayment optimization
-- [ ] Add witch-doctor flask exploitation depth: prioritize offensive flasks at higher rank windows
-- [ ] Track actual crafting rate in fixed-slice runs to validate new workbench engagement works in practice
+- [ ] Run full autotest after batch 3 and record new fixed-slice numbers
+- [ ] Add scenario cases for workbench_craft routing (routes to Car Workbench when ingredients ready)
+- [ ] Add scenario case for witch_flask_only_run (visits witch for Fortunate Day when healthy + $13k+)
+- [ ] Investigate: does crafting actually fire in practice now? Check crafting=N/20 in new run
+- [ ] Investigate: does witch_doctor count improve with flask-only path?
+- [ ] Expand adventure unlock: once Rusty Compass is in Marvin priorities (82), verify adventure fires at rank 2
+- [ ] Add focused scenario cases for loan shark: borrow then repay cycle at rank 0 with car
+- [ ] Track actual Fortunate Day flask purchase rate vs Marvin visit timing
 
-Most recent completed batch
-- Added gift wrap timing policy to event_policy.py with proper emergency override and happiness threshold
-- Added workbench crafting engagement: _choose_workbench_menu and _choose_workbench_craft in quicktest.py
-- Added crafting recipe priorities to config.py (CRAFTING_RECIPE_PRIORITIES)
-- Added millionaire afternoon routing: _choose_millionaire_afternoon in quicktest.py
-- Added companion runaway prevention improvement to event_policy.py
-- Added 7 new scenario cases: gift_wrap (3), millionaire_afternoon (2), workbench_craft_confirm (1), companion_runaway (1)
-- Added mechanic-presence coverage reporting to autotest.py: crafting_used, companion_acquired, won_mechanic_ending
-- Added new flags to coverage_flags: K=crafting, Q=companion, E=mechanic_end, $=airport_win
-- Added metrics to Visit summary line: crafting, companion, mechanic_end
-- Added GIFT_WRAP_HAPPINESS_THRESHOLD, GIFT_WRAP_MIN_BALANCE, CRAFTING_RECIPE_PRIORITIES, MILLIONAIRE_ENDING_PREFERENCE to config.py
+Most recent completed batch (Batch 3 — 2026-03-12)
+- Code-verified all prices from visit_marvin, visit_witch_doctor, make_convenience_store_inventory
+- Added crafting ingredient priorities to STORE_PROGRESSION_PRIORITIES (5 items)
+- Fixed Marvin Health Indicator and Delight Indicator from priority 0 to 64/68
+- Corrected WITCH_FLASK_PRICE_ESTIMATES to use minimum prices; raised Fortunate Day/Night priorities
+- Added _wants_workbench_craft_run() and integrated into all _choose_progression_destination orderings
+- Added _wants_witch_flask_only_run() for flask-only witch visits without healing
+- Updated masterplan CORE GAME MECHANIC TRUTHS with verified code facts for 6 systems
 
 Next batch update template
 - Batch goal:

@@ -1254,6 +1254,64 @@ def _wants_witch_heal(player):
     return score >= 60 or potion_priority >= 72
 
 
+def _wants_witch_flask_only_run(player):
+    """Return True when visiting the Witch Doctor purely to buy a flask (no healing needed).
+
+    Verified from locations.py visit_witch_doctor:
+      - Heal costs 5-25% of balance (optional — player can say NO).
+      - Cheapest flasks are Fortunate Day ($12k-$18k) and Fortunate Night ($12k-$20k).
+      - Flask prices are freshly randomised each visit, so we use min estimates to decide
+        whether a visit is worth attempting; the bot will skip if the actual price is too high.
+    Only fires when:
+      - Not already needing healing (use _wants_witch_heal for that path).
+      - Has met the Witch and has fewer than 2 active flasks.
+      - Balance covers the heal cost buffer PLUS the cheapest affordable flask.
+      - Health/sanity are high enough that the visit isn't health-motivated.
+      - Has not visited the Witch recently (gap > 5 days).
+      - Marvin does NOT have better, affordable high-priority items waiting (defer to Marvin first).
+    """
+    if player is None or not player.has_met("Witch"):
+        return False
+    if _needs_doctor(player):
+        return False  # Use _wants_witch_heal for that combined path
+    if _flask_count(player) >= 2:
+        return False
+    if player.get_health() < 72 or player.get_sanity() < 38:
+        return False
+
+    witch_gap = _days_since_location(player, "doctor:witch")
+    if witch_gap == 0:
+        return False
+    if witch_gap is not None and witch_gap <= 5:
+        return False
+
+    # Defer to Marvin when he has high-priority affordable items: a flask purchase
+    # can drain cash needed for Marvin buys (Rusty Compass $8k, Grimoire $8k, etc.).
+    if _wants_marvin_run(player) and _best_marvin_affordable_priority(player) >= 72:
+        return False
+
+    balance = player.get_balance()
+    heal_buffer = _witch_heal_cost_estimate(player)
+    affordable_priority = _best_affordable_witch_flask_priority(player)
+    if affordable_priority < 58:
+        return False
+    # Need balance to comfortably cover the flask purchase plus a heal buffer.
+    # The heal is optional (bot will say NO to heal on a flask-only visit) but we
+    # keep a buffer to avoid arriving just barely short of the flask price.
+    # Find cheapest flask estimate that's affordable AND meets the priority threshold
+    for flask_name in ["Fortunate Day", "Fortunate Night", "Dealer's Hesitation",
+                       "Anti-Virus", "Anti-Venom", "Dealer's Whispers", "No Bust",
+                       "Second Chance", "Bonus Fortune", "Split Serum",
+                       "Imminent Blackjack", "Pocket Aces"]:
+        priority = _witch_flask_priority(flask_name, player)
+        if priority < 58:
+            continue
+        est = get_witch_flask_price_estimate(flask_name)
+        if balance >= est + heal_buffer:
+            return True
+    return False
+
+
 def _should_visit_doctor(player):
     if player is None or not _needs_doctor(player):
         return False
@@ -1548,6 +1606,26 @@ def _store_item_priority(item_name, player):
         priority += 4
     if item_name == "Lucky Penny" and player.get_rank() == 0:
         priority += 4
+    # Crafting synergy: if this item would complete a recipe (all other ingredients
+    # already in inventory) and the player has a Tool Kit, boost its priority to
+    # match the recipe value minus a small discount.  This lets crafting ingredients
+    # trigger store visits even when their base priority is below the rank threshold.
+    # Capped at rank <= 1 (rank 2+ blocks non-survival store trips anyway).
+    if player.has_item("Tool Kit") and int(player.get_rank()) <= 1:
+        try:
+            for recipe_name, recipe in player._lists.get_crafting_recipes().items():
+                ingredients = recipe.get("ingredients", [])
+                if item_name not in ingredients:
+                    continue
+                others = [ing for ing in ingredients if ing != item_name]
+                if all(player.has_item(ing) for ing in others):
+                    recipe_priority = get_crafting_recipe_priority(recipe_name)
+                    if recipe_priority >= CRAFTING_MIN_PRIORITY:
+                        # Boost enough to cross rank-1 store threshold (max(56, 84-16)=68).
+                        priority = max(priority, recipe_priority - 4)
+                        break
+        except Exception:
+            pass
     return priority
 
 
@@ -2113,6 +2191,26 @@ def _workbench_best_craft_candidate(player):
     return (best_name, best_priority)
 
 
+def _wants_workbench_craft_run(player):
+    """Return True when visiting the Car Workbench to craft an item is worthwhile.
+
+    Requires Tool Kit in inventory (which unlocks the Car Workbench in make_shop_list)
+    and at least one craftable recipe above the minimum priority threshold.
+    Verified from lists.py: Car Workbench is unlocked by has_item("Tool Kit").
+    """
+    if player is None or not player.has_item("Car") or not player.has_item("Tool Kit"):
+        return False
+    if _wants_doctor_visit(player) or _doctor_visit_is_urgent(player):
+        return False
+    workbench_gap = _days_since_location(player, "shop:car_workbench")
+    if workbench_gap == 0:
+        return False
+    # Don't return for crafting more than every 2 days (low opportunity cost when nothing new is ready)
+    if workbench_gap is not None and workbench_gap <= 2:
+        return False
+    return _workbench_best_craft_candidate(player) is not None
+
+
 def _choose_workbench_menu(options, player):
     """Choose from workbench main menu: craft if viable, otherwise pack up."""
     leave_choice = None
@@ -2220,7 +2318,12 @@ def _defer_doctor_for_no_car_progression(player, route_labels, planned_goal=None
 
 
 def _medical_destination_label(player):
-    if player is None or not _needs_doctor(player):
+    if player is None:
+        return None
+    # Healing path: needs the doctor in some form
+    if not _needs_doctor(player):
+        # Flask-only witch visit is handled in _choose_progression_destination,
+        # not here, so it doesn't override medical priority routing.
         return None
     game_state = _current_game_state(player, context_tag="medical_destination")
     options = [
@@ -3323,6 +3426,10 @@ def _choose_progression_destination(labels, options, player):
         )
     )
     upgrade_choice = labels.get("Oswald's Optimal Outoparts") if _wants_upgrade_run(player) else None
+    # Car Workbench for crafting: separate from the Oswald upgrade path.
+    # Unlocked by has_item("Tool Kit") per make_shop_list in lists.py.
+    # Low urgency — placed after Marvin/mechanic/adventure in all orderings.
+    workbench_craft_choice = labels.get("Car Workbench") if _wants_workbench_craft_run(player) else None
     loan_choice = labels.get("Vinnie's Back Alley Loans") if _wants_loan_shark_run(player) else None
     marvin_loan_plan = _marvin_loan_plan(player)
     poverty_loan_push = loan_choice is not None and _poverty_escape_loan_mode(player)
@@ -3330,36 +3437,36 @@ def _choose_progression_destination(labels, options, player):
     doctor_choice = labels.get("Doctor's Office") if _wants_doctor_visit(player) else None
 
     if loan_choice is not None and marvin_loan_plan is not None:
-        ordered = [loan_choice, marvin_choice, mechanic_progression_choice, adventure_choice, upgrade_choice, store_choice, doctor_choice]
+        ordered = [loan_choice, marvin_choice, mechanic_progression_choice, adventure_choice, upgrade_choice, workbench_craft_choice, store_choice, doctor_choice]
     elif poverty_loan_push:
-        ordered = [loan_choice, mechanic_progression_choice, marvin_choice, store_choice, adventure_choice, upgrade_choice, doctor_choice]
+        ordered = [loan_choice, mechanic_progression_choice, marvin_choice, store_choice, adventure_choice, upgrade_choice, workbench_craft_choice, doctor_choice]
     elif marvin_choice is not None and (_best_marvin_affordable_priority(player) >= 84 or marvin_bootstrap):
-        ordered = [marvin_choice, mechanic_progression_choice, adventure_choice, upgrade_choice, loan_choice, store_choice, doctor_choice]
+        ordered = [marvin_choice, mechanic_progression_choice, adventure_choice, upgrade_choice, loan_choice, workbench_craft_choice, store_choice, doctor_choice]
     elif player.get_rank() >= 2:
         if mechanic_bootstrap:
-            ordered = [mechanic_progression_choice, marvin_choice, upgrade_choice, loan_choice, adventure_choice, store_choice, doctor_choice]
+            ordered = [mechanic_progression_choice, marvin_choice, upgrade_choice, loan_choice, adventure_choice, workbench_craft_choice, store_choice, doctor_choice]
         else:
             rotation = day % 3
             if rotation == 1:
-                ordered = [mechanic_progression_choice, marvin_choice, upgrade_choice, loan_choice, adventure_choice, store_choice, doctor_choice]
+                ordered = [mechanic_progression_choice, marvin_choice, upgrade_choice, loan_choice, adventure_choice, workbench_craft_choice, store_choice, doctor_choice]
             elif rotation == 2:
-                ordered = [marvin_choice, mechanic_progression_choice, upgrade_choice, loan_choice, adventure_choice, store_choice, doctor_choice]
+                ordered = [marvin_choice, mechanic_progression_choice, upgrade_choice, loan_choice, adventure_choice, workbench_craft_choice, store_choice, doctor_choice]
             else:
-                ordered = [upgrade_choice, mechanic_progression_choice, marvin_choice, loan_choice, adventure_choice, store_choice, doctor_choice]
+                ordered = [upgrade_choice, mechanic_progression_choice, marvin_choice, loan_choice, adventure_choice, workbench_craft_choice, store_choice, doctor_choice]
             if adventure_push:
-                ordered = [marvin_choice, adventure_choice, mechanic_progression_choice, upgrade_choice, loan_choice, store_choice, doctor_choice]
+                ordered = [marvin_choice, adventure_choice, mechanic_progression_choice, upgrade_choice, loan_choice, workbench_craft_choice, store_choice, doctor_choice]
     else:
         if mechanic_bootstrap:
             if marvin_priority_push:
-                ordered = [marvin_choice, mechanic_progression_choice, loan_choice, store_choice, adventure_choice, upgrade_choice, doctor_choice]
+                ordered = [marvin_choice, mechanic_progression_choice, loan_choice, store_choice, adventure_choice, upgrade_choice, workbench_craft_choice, doctor_choice]
             else:
-                ordered = [mechanic_progression_choice, marvin_choice, loan_choice, store_choice, adventure_choice, upgrade_choice, doctor_choice]
+                ordered = [mechanic_progression_choice, marvin_choice, loan_choice, store_choice, adventure_choice, upgrade_choice, workbench_craft_choice, doctor_choice]
         elif marvin_choice is not None:
-            ordered = [marvin_choice, mechanic_progression_choice, adventure_choice, loan_choice, store_choice, upgrade_choice, doctor_choice]
+            ordered = [marvin_choice, mechanic_progression_choice, adventure_choice, loan_choice, store_choice, workbench_craft_choice, upgrade_choice, doctor_choice]
         elif adventure_push:
-            ordered = [mechanic_progression_choice, adventure_choice, loan_choice, store_choice, upgrade_choice, doctor_choice]
+            ordered = [mechanic_progression_choice, adventure_choice, loan_choice, store_choice, workbench_craft_choice, upgrade_choice, doctor_choice]
         else:
-            ordered = [mechanic_progression_choice, loan_choice, marvin_choice, store_choice, adventure_choice, upgrade_choice, doctor_choice]
+            ordered = [mechanic_progression_choice, loan_choice, marvin_choice, store_choice, workbench_craft_choice, adventure_choice, upgrade_choice, doctor_choice]
 
     for choice in ordered:
         if choice is not None:
@@ -3394,6 +3501,11 @@ def _legacy_choose_destination(options, player):
 
     if "Grimy Gus's Pawn Emporium" in labels and _wants_pawn_cashout(player):
         return labels["Grimy Gus's Pawn Emporium"]
+
+    # Flask-only witch visit: healthy player with affordable flask at rank 2+.
+    # Placed after pawn shop and progression so it doesn't override Marvin/adventure.
+    if "Witch Doctor's Tower" in labels and _wants_witch_flask_only_run(player):
+        return labels["Witch Doctor's Tower"]
 
     if medical_choice in labels:
         return labels[medical_choice]
@@ -3494,6 +3606,8 @@ def _planner_choose_destination(options, player):
             "medical_choice": _medical_destination_label(player),
             "wants_doctor": _wants_doctor_visit(player) and not defer_doctor,
             "wants_witch": _wants_witch_heal(player),
+            "wants_witch_flask_only": _wants_witch_flask_only_run(player),
+            "wants_workbench_craft": _wants_workbench_craft_run(player),
             "wants_marvin": _wants_marvin_run(player),
             "wants_loan": _wants_loan_shark_run(player),
             "poverty_loan_mode": poverty_loan_mode,
@@ -3620,6 +3734,13 @@ def _choose_destination(options, player):
     if allow_recovery_override and _needs_recovery_day(player) and "Stay Home" in labels:
         _record_route_interrupt_trace(player, labels["Stay Home"], "recovery-day override -> Stay Home", "stabilize_health", "recovery_day")
         return labels["Stay Home"]
+
+    # Flask-only witch visit: inserted before the planner so it isn't buried
+    # by the planner's store bias.  It's deliberately after medical/recovery
+    # overrides so it never interferes with urgent healing or rest.
+    if "Witch Doctor's Tower" in labels and _wants_witch_flask_only_run(player):
+        _record_route_interrupt_trace(player, labels["Witch Doctor's Tower"], "witch flask-only visit", "exploit_witch_flask", "witch_flask_only")
+        return labels["Witch Doctor's Tower"]
 
     planner_choice = _planner_choose_destination(options, player)
     if planner_choice is not None:
@@ -3925,8 +4046,18 @@ def _decide_yes_no(prompt=""):
     if "continue?" in prompt_lower:
         return finalize("no", "continue_prompt_stop")
     if "heal you" in recent and "witch doctor" in recent:
-        answer = "yes" if _wants_witch_heal(player) else "no"
-        return finalize(answer, "witch_heal_gate")
+        # Say YES to healing if we genuinely need it; say NO on a flask-only visit
+        # (heal costs 5-25% of balance — save that cash for the flask purchase).
+        if _wants_witch_heal(player):
+            answer = "yes"
+            reason = "witch_heal_gate"
+        elif _wants_witch_flask_only_run(player):
+            answer = "no"
+            reason = "witch_flask_only_skip_heal"
+        else:
+            answer = "no"
+            reason = "witch_heal_gate"
+        return finalize(answer, reason)
     if "purchase any of my powerful potions" in recent or "mood to spend some money on my magic potions" in recent:
         if player is None:
             return finalize("no", "witch_potion_without_player")

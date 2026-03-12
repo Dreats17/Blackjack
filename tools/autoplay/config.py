@@ -40,6 +40,15 @@ STORE_PROGRESSION_PRIORITIES: dict[str, int] = {
     "Antique Pocket Watch": 20,
     "Lottery Ticket": 14,
     "Lucky Penny": 12,
+    # Crafting ingredients (Car Workbench recipes) — verified from lists.py make_crafting_recipes
+    # These items have priority 0 elsewhere and are therefore NEVER bought without this table.
+    # Priorities must exceed max(56, rank_store_priority_min - 16) = 68 at rank 1 to trigger store
+    # visits when the item is the best available (rank tuner store_priority_min=84 at rank 1).
+    "Garbage Bag": 72,    # Emergency Blanket (74), Rain Collector (58), Smoke Signal Kit (60); all ranks
+    "Plastic Wrap": 70,   # Feeding Station (78), Water Purifier (64), Rain Collector (58); all ranks
+    "Fishing Line": 72,   # Lockpick Set (72), Improvised Trap (62), Fishing Rod (54); rank 2 store
+    "Rubber Bands": 30,   # Dream Catcher (50), Slingshot (46); rank 0 store only
+    "Breath Mints": 30,   # Smelling Salts (66) needs Hand Warmers + Breath Mints; rank 0 store only
 }
 
 STORE_MUST_HAVE_ITEMS: frozenset[str] = frozenset(
@@ -63,8 +72,11 @@ MARVIN_ITEM_PRIORITIES: dict[str, int] = {
     "Faulty Insurance": 90,
     "Dirty Old Hat": 72,
     "Golden Watch": 80,
-    "Health Indicator": 0,
-    "Delight Indicator": 0,
+    # Health Indicator ($8k-$9.5k): shows real-time HP — useful for planning doctor visits.
+    # Delight Indicator ($8.5k-$10k): shows dealer/NPC happiness — feeds gift-wrap gate logic.
+    # Both are the cheapest Marvin items alongside Rusty Compass and Gambler's Grimoire.
+    "Health Indicator": 64,
+    "Delight Indicator": 68,
     "Worn Gloves": 90,
     "Tattered Cloak": 86,
     "Gambler's Chalice": 84,
@@ -171,23 +183,28 @@ WITCH_FLASK_PRIORITIES: dict[str, int] = {
     "Imminent Blackjack": 66,
     "Anti-Virus": 58,
     "Anti-Venom": 54,
-    "Fortunate Day": 44,
-    "Fortunate Night": 28,
+    # Fortunate Day/Night are the cheapest flasks (min $12k each from code).
+    # Raising their priorities enables the flask-only visit path at rank 2 ($10k+).
+    "Fortunate Day": 58,    # was 44; gives all day events a positive tilt
+    "Fortunate Night": 44,  # was 28; gives all night events a positive tilt
 }
 
+# Price estimates use minimum values from visit_witch_doctor random.choice() ranges.
+# Using minimums means the bot will attempt a visit when it CAN afford the cheapest
+# roll; if the actual roll is higher the bot will decline, but healing may still apply.
 WITCH_FLASK_PRICE_ESTIMATES: dict[str, int] = {
-    "No Bust": 30000,
-    "Imminent Blackjack": 50000,
-    "Dealer's Whispers": 32000,
-    "Bonus Fortune": 45000,
-    "Anti-Venom": 27000,
-    "Anti-Virus": 28000,
-    "Fortunate Day": 18000,
-    "Fortunate Night": 20000,
-    "Second Chance": 36000,
-    "Split Serum": 40000,
-    "Dealer's Hesitation": 28000,
-    "Pocket Aces": 55000,
+    "No Bust": 25000,             # code: random.choice([25000, 27000, 30000])
+    "Imminent Blackjack": 40000,  # code: random.choice([40000, 45000, 50000])
+    "Dealer's Whispers": 23000,   # code: random.choice([23000, 27000, 32000])
+    "Bonus Fortune": 35000,       # code: random.choice([35000, 42000, 45000])
+    "Anti-Venom": 25000,          # code: random.choice([25000, 26000, 27000])
+    "Anti-Virus": 26000,          # code: random.choice([26000, 27000, 28000])
+    "Fortunate Day": 12000,       # code: random.choice([12000, 13000, 18000]) — was 18000 (max)
+    "Fortunate Night": 12000,     # code: random.choice([12000, 15000, 20000]) — was 20000 (max)
+    "Second Chance": 28000,       # code: random.choice([28000, 32000, 36000])
+    "Split Serum": 30000,         # code: random.choice([30000, 35000, 40000])
+    "Dealer's Hesitation": 20000, # code: random.choice([20000, 24000, 28000])
+    "Pocket Aces": 45000,         # code: random.choice([45000, 50000, 55000])
 }
 
 

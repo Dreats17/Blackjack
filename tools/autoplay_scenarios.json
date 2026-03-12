@@ -170,7 +170,7 @@
           "bet": 5500,
           "goal": "blend_fraudulent_cash_safely",
           "trace_metadata": {
-            "max_ratio": 0.7,
+            "max_ratio": 0.36,
             "mechanic_gap": 0,
             "mechanic_threshold_push_window": false,
             "pending_marvin_active": false,
@@ -184,7 +184,7 @@
               }
             },
             "pressure_bet": 0,
-            "ratio": 0.3,
+            "ratio": 0.24,
             "store_budget": 0
           },
           "trace_reason": "goal=blend_fraudulent_cash_safely blackjack_bet phase=car_ready survival=False edge=6"
@@ -223,10 +223,10 @@
       },
       {
         "details": {
-          "bet": 680,
+          "bet": 540,
           "goal": "push_next_rank",
           "trace_metadata": {
-            "max_ratio": 0.78,
+            "max_ratio": 0.36,
             "mechanic_gap": 0,
             "mechanic_threshold_push_window": false,
             "pending_marvin_active": false,
@@ -240,14 +240,14 @@
               }
             },
             "pressure_bet": 0,
-            "ratio": 0.34,
+            "ratio": 0.24,
             "store_budget": 0
           },
           "trace_reason": "goal=push_next_rank blackjack_bet phase=car_ready survival=False edge=4"
         },
-        "passed": true,
+        "passed": false,
         "scenario_id": "post_car_midgame_growth_window_pushes_harder",
-        "summary": "bet=680 min_bet=600"
+        "summary": "bet=540 min_bet=600"
       }
     ],
     "event_inline": [
@@ -626,13 +626,13 @@
           "injuries": [
             "Scraped Knee"
           ],
-          "route": "Trusty Tom's Trucks and Tires",
+          "route": "Stay Home",
           "sanity": 45,
           "statuses": []
         },
-        "passed": true,
+        "passed": false,
         "scenario_id": "recovery_day_no_car_mechanic_bypass_route",
-        "summary": "route=Trusty Tom's Trucks and Tires expected=Trusty Tom's Trucks and Tires"
+        "summary": "route=Stay Home expected=Trusty Tom's Trucks and Tires"
       },
       {
         "details": {
@@ -643,7 +643,7 @@
           "injuries": [
             "Broken Leg"
           ],
-          "route": "Trusty Tom's Trucks and Tires",
+          "route": "Stay Home",
           "sanity": 42,
           "statuses": [
             "Flu",
@@ -651,9 +651,9 @@
             "Sinus Infection"
           ]
         },
-        "passed": true,
+        "passed": false,
         "scenario_id": "recovery_day_no_car_mild_status_stack_bypass_route",
-        "summary": "route=Trusty Tom's Trucks and Tires expected=Trusty Tom's Trucks and Tires"
+        "summary": "route=Stay Home expected=Trusty Tom's Trucks and Tires"
       },
       {
         "details": {
@@ -664,13 +664,13 @@
           "injuries": [
             "Broken Leg"
           ],
-          "route": "Trusty Tom's Trucks and Tires",
+          "route": "Doctor's Office",
           "sanity": 45,
           "statuses": []
         },
-        "passed": true,
+        "passed": false,
         "scenario_id": "no_car_progression_defers_nonurgent_doctor_route",
-        "summary": "route=Trusty Tom's Trucks and Tires expected=Trusty Tom's Trucks and Tires"
+        "summary": "route=Doctor's Office expected=Trusty Tom's Trucks and Tires"
       },
       {
         "details": {
@@ -688,6 +688,36 @@
         "passed": true,
         "scenario_id": "car_injury_doctor_preempts_progression",
         "summary": "route=Doctor's Office expected=Doctor's Office"
+      },
+      {
+        "details": {
+          "balance": 1800,
+          "day": 22,
+          "expected": "Car Workbench",
+          "health": 80,
+          "injuries": [],
+          "route": "Car Workbench",
+          "sanity": 55,
+          "statuses": []
+        },
+        "passed": true,
+        "scenario_id": "workbench_craft_route_fires_when_ingredients_ready",
+        "summary": "route=Car Workbench expected=Car Workbench"
+      },
+      {
+        "details": {
+          "balance": 15000,
+          "day": 25,
+          "expected": "Witch Doctor's Tower",
+          "health": 80,
+          "injuries": [],
+          "route": "Witch Doctor's Tower",
+          "sanity": 55,
+          "statuses": []
+        },
+        "passed": true,
+        "scenario_id": "witch_flask_only_run_fires_when_healthy_and_affordable",
+        "summary": "route=Witch Doctor's Tower expected=Witch Doctor's Tower"
       }
     ],
     "state_goal": [
@@ -805,8 +835,8 @@
     ]
   },
   "summary": {
-    "failed": 0,
-    "passed": 47,
-    "total": 47
+    "failed": 4,
+    "passed": 45,
+    "total": 49
   }
 }

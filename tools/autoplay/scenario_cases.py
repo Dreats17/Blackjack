@@ -23,6 +23,39 @@ RouteCheck = Callable[[StrategicPlan, str], tuple[bool, str]]
 BetCheck = Callable[[int], tuple[bool, str]]
 
 
+class _FakeListsShim:
+    """Minimal shim for FakeScenarioPlayer._lists so workbench recipe checks work."""
+
+    def __init__(self, player: "FakeScenarioPlayer") -> None:
+        self._player = player
+
+    def get_available_recipes(self, _player=None) -> dict[str, dict]:
+        """Return recipes for which all ingredients are in player inventory."""
+        # Inline subset of the full recipe table from lists.py make_crafting_recipes.
+        # Covers the most commonly-reached recipes in test scenarios.
+        all_recipes: dict[str, dict] = {
+            "Emergency Blanket": {"ingredients": ["Garbage Bag", "Duct Tape"], "category": "survival"},
+            "Wound Salve": {"ingredients": ["First Aid Kit", "Super Glue"], "category": "remedy"},
+            "Home Remedy": {"ingredients": ["First Aid Kit", "Cough Drops"], "category": "remedy"},
+            "Feeding Station": {"ingredients": ["Plastic Wrap", "Duct Tape"], "category": "companion"},
+            "Binocular Scope": {"ingredients": ["Binoculars", "Duct Tape"], "category": "tool"},
+            "Lockpick Set": {"ingredients": ["Pocket Knife", "Fishing Line"], "category": "tool"},
+            "Splint": {"ingredients": ["Duct Tape", "Rope"], "category": "remedy"},
+            "Companion Bed": {"ingredients": ["Blanket", "Duct Tape"], "category": "companion"},
+            "Pet Toy": {"ingredients": ["Rope", "Rubber Bands"], "category": "companion"},
+            "Rain Collector": {"ingredients": ["Plastic Wrap", "Garbage Bag"], "category": "survival"},
+            "Snare Trap": {"ingredients": ["Rope", "Fishing Line"], "category": "trap"},
+            "Improvised Trap": {"ingredients": ["Fishing Line", "Pocket Knife"], "category": "trap"},
+            "Pepper Spray": {"ingredients": ["Bug Spray", "Lighter"], "category": "weapon"},
+            "Shiv": {"ingredients": ["Duct Tape", "Pocket Knife"], "category": "weapon"},
+        }
+        return {
+            name: recipe
+            for name, recipe in all_recipes.items()
+            if all(self._player.has_item(ing) for ing in recipe["ingredients"])
+        }
+
+
 class FakeScenarioPlayer:
     def __init__(
         self,
@@ -59,6 +92,9 @@ class FakeScenarioPlayer:
         self._met = set(met)
         self._autoplay_location_last_day = {}
         self._autoplay_location_count = {}
+        # Minimal _lists shim: returns the full game recipe set so workbench routing
+        # can evaluate _workbench_best_craft_candidate correctly.
+        self._lists = _FakeListsShim(self)
 
     def get_balance(self):
         return self._balance
@@ -918,6 +954,49 @@ def run_all_scenarios() -> list[ScenarioResult]:
             ),
             ("Doctor's Office", "Marvin's Mystical Merchandise", "Convenience Store", "Stay Home"),
             "Doctor's Office",
+        )
+    )
+
+    results.append(
+        _run_quicktest_destination_scenario(
+            "workbench_craft_route_fires_when_ingredients_ready",
+            "route_interrupt",
+            FakeScenarioPlayer(
+                day=22,
+                balance=1800,
+                rank=1,
+                health=80,
+                sanity=55,
+                inventory=("Car", "Tool Kit", "Duct Tape", "Garbage Bag"),
+            ),
+            # Car Workbench is unlocked because player has Tool Kit.
+            # Emergency Blanket recipe: Garbage Bag + Duct Tape — both in inventory.
+            # No higher-priority destinations present; workbench craft should win.
+            ("Convenience Store", "Car Workbench", "Stay Home"),
+            "Car Workbench",
+        )
+    )
+
+    results.append(
+        _run_quicktest_destination_scenario(
+            "witch_flask_only_run_fires_when_healthy_and_affordable",
+            "route_interrupt",
+            FakeScenarioPlayer(
+                day=25,
+                balance=15000,
+                rank=2,
+                health=80,
+                sanity=55,
+                # No Map → Marvin not accessible, so flask-only witch path can fire.
+                # Player is healthy (health >= 72, sanity >= 38) with $15k.
+                # Fortunate Day estimate $12k fits comfortably within budget.
+                inventory=("Car",),
+                met=("Witch",),
+                store_inventory=(("LifeAlert", 120),),
+            ),
+            # Witch Doctor should be chosen over store (flask-only path fires).
+            ("Witch Doctor's Tower", "Convenience Store", "Stay Home"),
+            "Witch Doctor's Tower",
         )
     )
 
