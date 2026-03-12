@@ -13,7 +13,7 @@ How to read this file
 - "Distance to win" means distance to deliberate, repeatable millionaire-capable play, not lucky outlier wins.
 
 Current benchmark checkpoint
-- Scenario suite: 40/40 passed
+- Scenario suite: 47/47 passed (+7 new scenarios)
 - Fixed slice: autotest.py 60 1 20 -> alive 15/20, died 5/20, broke 9/20, car 11/20, rank1+ 7/20, doctor_missed 0/20
 - Current known blocker: bankroll growth from post-car midgame into the 8k to 10k Marvin band
 - Current late-game gap: marvin 0/20, adventure 0/20, airport 0/20, wins 0/20 on the fixed slice
@@ -41,38 +41,78 @@ Game ecosystem coverage
 - [x] Route interruptions and recovery-day bypass behavior
 - [x] Mechanic threshold handling for early car access
 - [x] Carbon monoxide fairness fix and follow-up exhaust danger chain
+- [x] Gift wrap timing: wrap when dealer_happiness < 78 and not in emergency (policy + 3 scenarios)
+- [x] Workbench crafting engagement: bot now engages crafting when ingredients are available
+- [x] Workbench craft confirmation: always confirms yes when autoplay chose to craft (policy + scenario)
+- [x] Millionaire afternoon routing: prefers mechanic ending then airport (policy + 2 scenarios)
+- [x] Companion hungry/runaway prevention: urgent companion feed when runaway_risk > 0 (scenario)
 - [~] Pawn-shop behavior and pawn-cashout pressure
 - [~] Post-car rank pushing and midgame bankroll growth
 - [~] Marvin access recognition and preservation behavior
 - [~] Convenience-store pressure and low-impact store suppression in growth windows
-- [ ] Gifts and gift-wrapping timing
-- [ ] Dealer happiness thresholds affecting gifts or other systems in real runs
-- [ ] Companion acquisition, feeding, happiness, runaway prevention, and companion-positive routing
-- [ ] Crafting loops and workbench outputs
+- [~] Companion acquisition, feeding, happiness: routing and food purchasing partially covered
+- [ ] Dealer happiness thresholds affecting gifts or other systems in real runs (beyond wrap gate)
 - [ ] Crafted-item downstream event value
 - [ ] Loan shark full strategic loop: borrow, warning escalation, repayment, forced-encounter handling
 - [ ] Witch-doctor economy and flask exploitation depth
 - [ ] Adventure unlock to visit to value funnel
-- [ ] Millionaire branch menus and ending conversion
-- [ ] Airport route usage and ending conversion
+- [ ] Airport route usage and full ending conversion path
 
 Fairness and bug-audit coverage
 - [x] Harness is being used to detect unfair repeatable spikes
 - [x] Human-readable fairness changelog exists at docs/10_GAMEPLAY_FAIRNESS_CHANGELOG.md
+- [x] Mechanic-presence reporting: coverage_flags now includes K=crafting, Q=companion, E=mechanic_end, $=airport_win
+- [x] Metrics reporting: autotest.py now reports crafting, companion, mechanic_end in Visit summary line
 - [~] Harness-to-core-game cross-check workflow exists informally through audit work
-- [ ] Explicit mechanic-presence reporting for systems that should appear in gameplay
 - [ ] Expected-but-missing mechanic report
 - [ ] Core-game bug suspect report from harness evidence
 
+AI decision tracking (items to manually review)
+The following decisions were changed or added in this batch. Each can be reverted by inspecting
+the trace reason fields in autoplay_scenarios.json or the DECISION_TRACES output from quicktest.
+
+1. Gift wrap gate: threshold changed from dealer_happiness < 90 to dealer_happiness < 78
+   (reason: "gift_wrap_happiness_gate" in event_policy.yes_no)
+   Also: emergency check added - now declines wrap when health < 45, sanity < 20, or no car
+   Old behavior: gift_wrap_for_dealer_happiness (if balance >= 20 and happiness < 90)
+   Revert: restore in quicktest.py _decide_yes_no and event_policy.py choose_event_yes_no
+
+2. Workbench crafting: bot now engages crafting at workbench when useful recipes are available
+   Old behavior: always returned "5" (Pack Up) - never crafted anything
+   New behavior: _choose_workbench_menu selects "1" (Craft Something) when best recipe priority >= 60
+   Priority list is in config.py CRAFTING_RECIPE_PRIORITIES
+   Revert: restore "return '5'" in quicktest.py _decide_raw_input workbench block
+
+3. Millionaire afternoon: explicit routing to mechanic ending or airport
+   Old behavior: only matched "drive to the airport" text in a very specific condition
+   New behavior: _choose_millionaire_afternoon prefers chosen mechanic, then airport, then fallback
+   Trace reason: "millionaire_mechanic_ending:{mechanic}" or "millionaire_airport_ending"
+   Revert: restore original text-match logic in quicktest.py _decide_raw_input
+
+4. Companion hungry gate: now uses companion_runaway_risk_count from game state
+   Old behavior: chose "3" (buy food) if balance >= 20 else "4" (skip)
+   New behavior: also chose "3" when companion_runaway_risk_count > 0 or companion_low_happiness_count > 0
+   Trace reason: "hungry_companions_gate" in event_policy.py
+   Revert: restore simple balance check in event_policy.py choose_event_inline_choice
+
 Current deliberate next targets
 - [~] Investigate the best post-car seeds that peak below 10k and identify the most common stall cause
-- [ ] Add mechanic-presence reporting for gifts, companions, workbench, crafting outputs, millionaire branches, and gift-effect thresholds
-- [ ] Add focused scenario cases for gifts, dealer happiness effects, companions, and workbench or crafting loops
+- [ ] Expand adventure unlock path coverage: when bot has rank >= 2 and high health/sanity, adventure push
+- [ ] Add focused scenario cases for loan shark warning escalation and repayment optimization
+- [ ] Add witch-doctor flask exploitation depth: prioritize offensive flasks at higher rank windows
+- [ ] Track actual crafting rate in fixed-slice runs to validate new workbench engagement works in practice
 
 Most recent completed batch
-- Reframed the master plan around benchmark play, exhaustive case coverage, gameplay audit use, and fairness detection
-- Added a human-readable fairness changelog
-- Added a visible-mechanics checklist, milestone ladder, and deliberate multi-process iteration plan toward 1 million dollars
+- Added gift wrap timing policy to event_policy.py with proper emergency override and happiness threshold
+- Added workbench crafting engagement: _choose_workbench_menu and _choose_workbench_craft in quicktest.py
+- Added crafting recipe priorities to config.py (CRAFTING_RECIPE_PRIORITIES)
+- Added millionaire afternoon routing: _choose_millionaire_afternoon in quicktest.py
+- Added companion runaway prevention improvement to event_policy.py
+- Added 7 new scenario cases: gift_wrap (3), millionaire_afternoon (2), workbench_craft_confirm (1), companion_runaway (1)
+- Added mechanic-presence coverage reporting to autotest.py: crafting_used, companion_acquired, won_mechanic_ending
+- Added new flags to coverage_flags: K=crafting, Q=companion, E=mechanic_end, $=airport_win
+- Added metrics to Visit summary line: crafting, companion, mechanic_end
+- Added GIFT_WRAP_HAPPINESS_THRESHOLD, GIFT_WRAP_MIN_BALANCE, CRAFTING_RECIPE_PRIORITIES, MILLIONAIRE_ENDING_PREFERENCE to config.py
 
 Next batch update template
 - Batch goal:

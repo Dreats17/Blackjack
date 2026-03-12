@@ -305,6 +305,17 @@
         "passed": true,
         "scenario_id": "inline_pet_feed_uses_tuna",
         "summary": "choice=feed expected=feed"
+      },
+      {
+        "details": {
+          "choice": "3",
+          "expected": "3",
+          "goal": "preserve_companion_roster",
+          "trace_reason": "hungry_companions_gate"
+        },
+        "passed": true,
+        "scenario_id": "companion_hungry_runaway_risk_buys_food",
+        "summary": "choice=3 expected=3"
       }
     ],
     "event_option": [
@@ -351,6 +362,28 @@
         "passed": true,
         "scenario_id": "gas_station_robbery_prefers_hide",
         "summary": "choice=hide expected=hide"
+      },
+      {
+        "details": {
+          "choice": "Visit Tom's Trusty Trucks and Tires",
+          "expected": "Visit Tom's Trusty Trucks and Tires",
+          "goal": "convert_millionaire_to_ending",
+          "trace_reason": "millionaire_mechanic_ending:Tom"
+        },
+        "passed": true,
+        "scenario_id": "millionaire_afternoon_prefers_mechanic_ending",
+        "summary": "choice=Visit Tom's Trusty Trucks and Tires expected=Visit Tom's Trusty Trucks and Tires"
+      },
+      {
+        "details": {
+          "choice": "Drive to the Airport",
+          "expected": "Drive to the Airport",
+          "goal": "convert_millionaire_to_ending",
+          "trace_reason": "generic_non_risky_choice"
+        },
+        "passed": true,
+        "scenario_id": "millionaire_afternoon_airport_when_no_mechanic",
+        "summary": "choice=Drive to the Airport expected=Drive to the Airport"
       }
     ],
     "event_yes_no": [
@@ -385,6 +418,50 @@
         },
         "passed": true,
         "scenario_id": "cupcake_sanity_gate",
+        "summary": "answer=yes expected=yes"
+      },
+      {
+        "details": {
+          "answer": "yes",
+          "expected": "yes",
+          "goal": "push_next_rank",
+          "trace_reason": "gift_wrap_happiness_gate"
+        },
+        "passed": true,
+        "scenario_id": "gift_wrap_accepted_when_dealer_sad",
+        "summary": "answer=yes expected=yes"
+      },
+      {
+        "details": {
+          "answer": "no",
+          "expected": "no",
+          "goal": "push_next_rank",
+          "trace_reason": "gift_wrap_happiness_gate"
+        },
+        "passed": true,
+        "scenario_id": "gift_wrap_declined_when_dealer_happy",
+        "summary": "answer=no expected=no"
+      },
+      {
+        "details": {
+          "answer": "no",
+          "expected": "no",
+          "goal": "survive_emergency",
+          "trace_reason": "gift_wrap_happiness_gate"
+        },
+        "passed": true,
+        "scenario_id": "gift_wrap_declined_in_emergency",
+        "summary": "answer=no expected=no"
+      },
+      {
+        "details": {
+          "answer": "yes",
+          "expected": "yes",
+          "goal": "push_next_rank",
+          "trace_reason": "workbench_craft_confirm"
+        },
+        "passed": true,
+        "scenario_id": "workbench_craft_confirm_says_yes",
         "summary": "answer=yes expected=yes"
       }
     ],
@@ -729,7 +806,7 @@
   },
   "summary": {
     "failed": 0,
-    "passed": 40,
-    "total": 40
+    "passed": 47,
+    "total": 47
   }
 }

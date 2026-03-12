@@ -1,5 +1,10 @@
 from __future__ import annotations
 
+from ..config import (
+    GIFT_WRAP_HAPPINESS_THRESHOLD,
+    GIFT_WRAP_MIN_BALANCE,
+    MILLIONAIRE_ENDING_PREFERENCE,
+)
 from ..interfaces import DecisionOption, DecisionRequest
 from ..planner import StrategicPlan
 from ..trace import DecisionTrace
@@ -342,6 +347,28 @@ def choose_event_yes_no(request: DecisionRequest, plan: StrategicPlan) -> tuple[
         answer = "yes" if balance - int(cost or 800) >= 700 else "no"
         return answer, _yes_no_trace(request, plan, answer, "car_recovery_gate", 0.74)
 
+    # Gift wrap decision: wrap an item when dealer happiness is below the useful threshold
+    # and we have enough balance and aren't in an emergency.
+    if "gift wrap" in prompt_lower:
+        dealer_happiness = int(request.game_state.get("dealer_happiness", 50) or 50)
+        in_emergency = plan.goal in {"survive_emergency", "acquire_car", "contain_debt_escalation"}
+        answer = (
+            "yes"
+            if (
+                balance >= GIFT_WRAP_MIN_BALANCE
+                and dealer_happiness < GIFT_WRAP_HAPPINESS_THRESHOLD
+                and not in_emergency
+            )
+            else "no"
+        )
+        return answer, _yes_no_trace(request, plan, answer, "gift_wrap_happiness_gate", 0.8)
+
+    # Confirm crafting at workbench: always accept when the autoplay chose to craft
+    if "(yes/no):" in prompt_lower and "crafted" not in recent and (
+        "combine" in recent or "what do you want to craft" in recent
+    ):
+        return "yes", _yes_no_trace(request, plan, "yes", "workbench_craft_confirm", 0.9)
+
     if not prompt_lower:
         if any(
             phrase in recent
@@ -431,6 +458,45 @@ def choose_event_option(request: DecisionRequest, plan: StrategicPlan) -> tuple[
     elif normalized == ["worm", "robot", "spin move", "moonwalk", "interpretive dance"]:
         chosen_index, reason = 3, "moonwalk"
 
+    # Millionaire afternoon menu: choose between mechanic ending and airport.
+    # Options like "Visit Tom's...", "Drive to the Airport", "Continue gambling".
+    if chosen_index is None:
+        millionaire_labels = {
+            opt.label.lower(): idx
+            for idx, opt in enumerate(options)
+        }
+        is_millionaire_menu = (
+            any("drive to the airport" in lbl for lbl in millionaire_labels)
+            and any(
+                keyword in lbl
+                for keyword in ("tom", "frank", "oswald", "mechanic")
+                for lbl in millionaire_labels
+            )
+        )
+        if is_millionaire_menu:
+            chosen_mechanic = str(request.game_state.get("chosen_mechanic") or "")
+            for pref in MILLIONAIRE_ENDING_PREFERENCE:
+                if pref == "mechanic" and chosen_mechanic:
+                    for lbl, idx in millionaire_labels.items():
+                        if chosen_mechanic.lower() in lbl:
+                            chosen_index = idx
+                            reason = f"millionaire_mechanic_ending:{chosen_mechanic}"
+                            break
+                elif pref == "mechanic":
+                    for lbl, idx in millionaire_labels.items():
+                        if any(name in lbl for name in ("tom", "frank", "oswald")):
+                            chosen_index = idx
+                            reason = "millionaire_mechanic_ending_any"
+                            break
+                elif pref == "airport":
+                    for lbl, idx in millionaire_labels.items():
+                        if "airport" in lbl:
+                            chosen_index = idx
+                            reason = "millionaire_airport_ending"
+                            break
+                if chosen_index is not None:
+                    break
+
     if chosen_index is None:
         chosen_index, reason, confidence = _choose_generic_option(options, request)
         if chosen_index is None:
@@ -500,7 +566,11 @@ def choose_event_inline_choice(request: DecisionRequest, plan: StrategicPlan) ->
         if "what do you do?\n1. break it up carefully" in recent or "break it up carefully" in recent:
             return "1", _inline_trace(request, plan, "1", "break_it_up_carefully", 0.82)
         if "morning. your companions are hungry." in recent:
-            chosen = "3" if balance >= 20 else "4"
+            # If companion runaway risk is high, prefer buying food (option 3) over skipping (option 4)
+            companion_runaway_risk = int(request.game_state.get("companion_runaway_risk_count", 0) or 0)
+            low_happiness = int(request.game_state.get("companion_low_happiness_count", 0) or 0)
+            urgent_companion_need = companion_runaway_risk > 0 or low_happiness > 0
+            chosen = "3" if (balance >= 20 or urgent_companion_need) else "4"
             return chosen, _inline_trace(request, plan, chosen, "hungry_companions_gate", 0.82)
         if "something's wrong." in recent and "is gone." in recent and "search the immediate area" in recent:
             return "1", _inline_trace(request, plan, "1", "search_immediate_area", 0.8)

@@ -217,6 +217,37 @@ class RunResult:
         return any(name.startswith("adventure:") for name in self.location_hits)
 
     @property
+    def companion_acquired(self) -> bool:
+        """True if any companion was befriended during this run."""
+        befriended = self.item_impacts.get("companions_befriended", {}).get("count", 0)
+        if befriended > 0:
+            return True
+        # Also check the final companions list and statistics parsed from the run
+        return False
+
+    @property
+    def crafting_used(self) -> bool:
+        """True if the player crafted at least one item at the workbench."""
+        _known_crafted = {
+            "Shiv", "Slingshot", "Road Flare Torch", "Pepper Spray",
+            "Improvised Trap", "Car Alarm Rigging", "Snare Trap",
+            "Home Remedy", "Wound Salve", "Splint", "Smelling Salts",
+            "Lockpick Set", "Fishing Rod", "Binocular Scope", "Signal Mirror",
+            "Lucky Charm Bracelet", "Dream Catcher", "Worry Stone",
+            "Rain Collector", "Emergency Blanket", "Smoke Signal Kit",
+            "Fire Starter Kit", "Water Purifier",
+            "Companion Bed", "Pet Toy", "Feeding Station",
+        }
+        return bool(_known_crafted.intersection(self.inventory))
+
+    @property
+    def won_mechanic_ending(self) -> bool:
+        """True if the player reached the millionaire state and visited their mechanic."""
+        if not self.millionaire_reached:
+            return False
+        return self.visited_tom or self.visited_frank or self.visited_oswald
+
+    @property
     def doctor_likely_saveable(self) -> bool:
         if self.outcome != "died":
             return False
@@ -283,6 +314,14 @@ class RunResult:
             flags.append("U")
         if self.visited_adventure:
             flags.append("A")
+        if self.crafting_used:
+            flags.append("K")
+        if self.companion_acquired:
+            flags.append("Q")
+        if self.won_mechanic_ending:
+            flags.append("E")
+        if self.won_millionaire_ending:
+            flags.append("$")
         return "".join(flags) if flags else "-"
 
     @property
@@ -456,6 +495,8 @@ SHOP_ROWS = [
     ("Oswald", lambda result: result.met_oswald or result.visited_oswald, "mechanic:oswald"),
     ("Car Access", lambda result: result.ever_had_car, "shop:convenience_store"),
     ("Car Workbench", lambda result: result.has_tool_kit or result.visited_upgrade, "shop:car_workbench"),
+    ("Crafting", lambda result: result.crafting_used, "shop:car_workbench"),
+    ("Companion", lambda result: result.companion_acquired, "companion"),
     ("Airport", lambda result: result.millionaire_reached or result.visited_airport, "shop:airport"),
 ]
 
@@ -1041,12 +1082,15 @@ def _collect_summary(results: list[RunResult]) -> dict[str, int]:
         "loan": sum(1 for result in results if result.visited_loan_shark),
         "million": sum(1 for result in results if result.millionaire_reached),
         "wins": sum(1 for result in results if result.won_millionaire_ending),
+        "mechanic_end": sum(1 for result in results if result.won_mechanic_ending),
         "airport": sum(1 for result in results if result.visited_airport),
         "marvin": sum(1 for result in results if result.visited_marvin),
         "tom": sum(1 for result in results if result.visited_tom),
         "frank": sum(1 for result in results if result.visited_frank),
         "oswald": sum(1 for result in results if result.visited_oswald),
         "upgrade": sum(1 for result in results if result.visited_upgrade),
+        "crafting": sum(1 for result in results if result.crafting_used),
+        "companion": sum(1 for result in results if result.companion_acquired),
         "adventure": sum(1 for result in results if result.visited_adventure),
         "alive": sum(1 for result in results if result.alive),
         "doctor_missed": sum(1 for result in results if result.doctor_likely_saveable and not result.visited_doctor),
@@ -1956,8 +2000,11 @@ def _render_summary_lines(results: list[RunResult], cycles: int, seed_label: str
             f"frank={metrics['frank']}/{total} "
             f"oswald={metrics['oswald']}/{total} "
             f"upgrade={metrics['upgrade']}/{total} "
+            f"crafting={metrics['crafting']}/{total} "
+            f"companion={metrics['companion']}/{total} "
             f"adventure={metrics['adventure']}/{total} "
             f"airport={metrics['airport']}/{total} "
+            f"mechanic_end={metrics['mechanic_end']}/{total} "
             f"wins={metrics['wins']}/{total}"
         ),
         "",

@@ -297,6 +297,69 @@ RANK_TUNER_PROFILES: dict[int, dict[str, float | int]] = {
 }
 
 
+# Crafting recipe strategic priorities (higher = more worth crafting)
+# Categories: companion items > remedies > survival > tools > traps > weapons > charms
+CRAFTING_RECIPE_PRIORITIES: dict[str, int] = {
+    # Companion items - high value when companions present
+    "Companion Bed": 88,
+    "Pet Toy": 72,
+    "Feeding Station": 78,
+    # Remedies - good when injured or sick
+    "Home Remedy": 82,
+    "Wound Salve": 84,
+    "Splint": 70,
+    "Smelling Salts": 66,
+    # Survival - broad utility
+    "Emergency Blanket": 74,
+    "Fire Starter Kit": 68,
+    "Water Purifier": 64,
+    "Rain Collector": 58,
+    "Smoke Signal Kit": 60,
+    # Tools - utility
+    "Binocular Scope": 76,
+    "Lockpick Set": 72,
+    "Fishing Rod": 54,
+    "Signal Mirror": 48,
+    # Traps - situational
+    "Improvised Trap": 62,
+    "Car Alarm Rigging": 66,
+    "Snare Trap": 52,
+    # Weapons - defensive
+    "Road Flare Torch": 70,
+    "Pepper Spray": 68,
+    "Shiv": 56,
+    "Slingshot": 46,
+    # Charms - low direct utility
+    "Lucky Charm Bracelet": 44,
+    "Dream Catcher": 50,
+    "Worry Stone": 40,
+}
+
+# Minimum strategic priority to bother crafting (at threshold, skip companion items unless companions present)
+CRAFTING_MIN_PRIORITY: int = 60
+
+# Gift wrapping: dealer_happiness threshold below which gift-wrapping is worth doing
+GIFT_WRAP_HAPPINESS_THRESHOLD: int = 78
+
+# Gift wrapping: minimum balance to spend on wrapping (wrapping costs a small amount)
+GIFT_WRAP_MIN_BALANCE: int = 30
+
+# Items worth gifting to the dealer (sorted by value to the gift system)
+GIFT_WORTHY_ITEMS: tuple[str, ...] = (
+    "Vintage Wine",
+    "Fancy Pen",
+    "Leather Gloves",
+    "Lucky Rabbit Foot",
+    "Antique Pocket Watch",
+    "Silver Flask",
+)
+
+# Millionaire ending preference order by strategic weight (mechanic ending > airport by default)
+# "mechanic" means visit chosen mechanic for the special ending
+# "airport" means drive to the airport
+MILLIONAIRE_ENDING_PREFERENCE: tuple[str, ...] = ("mechanic", "airport")
+
+
 def get_rank_tuner(rank: int) -> dict[str, float | int]:
     normalized_rank = max(0, min(int(rank), max(RANK_TUNER_PROFILES)))
     return dict(RANK_TUNER_PROFILES[normalized_rank])
@@ -328,6 +391,10 @@ def get_upgrade_price_estimate(item_name: str) -> int:
 
 def get_witch_flask_base_priority(flask_name: str) -> int:
     return WITCH_FLASK_PRIORITIES.get(flask_name, 0)
+
+
+def get_crafting_recipe_priority(recipe_name: str) -> int:
+    return CRAFTING_RECIPE_PRIORITIES.get(recipe_name, 0)
 
 
 def get_witch_flask_price_estimate(flask_name: str) -> int:

@@ -56,9 +56,12 @@ import story
 import typer as _typer
 from tools.autoplay import DecisionOption, DecisionRequest, DecisionTrace, build_game_state_snapshot, choose_route_option, choose_strategic_goal
 from tools.autoplay.config import (
+    GIFT_WRAP_HAPPINESS_THRESHOLD,
+    GIFT_WRAP_MIN_BALANCE,
     MARVIN_ITEM_ORDER,
     STORE_CAR_SURVIVAL_PRIORITIES,
     STORE_MUST_HAVE_ITEMS,
+    get_crafting_recipe_priority,
     get_rank_tuner,
     get_marvin_base_priority,
     get_marvin_price_estimate,
@@ -2065,6 +2068,135 @@ def _wants_upgrade_run(player):
     return _best_upgrade_candidate(player) is not None
 
 
+def _workbench_best_craft_candidate(player):
+    """Returns (recipe_name, priority) for the best craftable item, or None.
+
+    Uses player._lists.get_available_recipes to find what can be crafted,
+    then ranks them by get_crafting_recipe_priority.  Companion items get a
+    bonus when companions are present so the bot prefers them.
+    """
+    if player is None or not hasattr(player, "_lists"):
+        return None
+    try:
+        available = player._lists.get_available_recipes(player)
+    except Exception:
+        return None
+    if not available:
+        return None
+    companion_count = _companion_count(player)
+    best_name = None
+    best_priority = -1
+    for name in available:
+        priority = get_crafting_recipe_priority(name)
+        recipe = available[name]
+        if recipe.get("category") == "companion" and companion_count > 0:
+            priority += 18
+        if priority > best_priority:
+            best_name = name
+            best_priority = priority
+    if best_name is None or best_priority < 60:
+        return None
+    return (best_name, best_priority)
+
+
+def _choose_workbench_menu(options, player):
+    """Choose from workbench main menu: craft if viable, otherwise pack up."""
+    leave_choice = None
+    craft_choice = None
+    for number, label in options:
+        lowered = label.lower()
+        if "pack up" in lowered or "leave" in lowered:
+            leave_choice = number
+        elif "craft something" in lowered or lowered.startswith("1.") or number == 1:
+            craft_choice = number
+
+    candidate = _workbench_best_craft_candidate(player)
+    if candidate is not None and craft_choice is not None:
+        name, priority = candidate
+        return _record_numeric_menu_trace(
+            player,
+            request_type="menu_select",
+            stable_context_id="workbench_menu",
+            menu_options=options,
+            chosen_number=craft_choice,
+            reason=f"workbench_craft_viable:{name}",
+            confidence=0.78,
+        )
+    # No viable recipe: pack up
+    target = leave_choice if leave_choice is not None else (options[-1][0] if options else 1)
+    return _record_numeric_menu_trace(
+        player,
+        request_type="menu_select",
+        stable_context_id="workbench_menu",
+        menu_options=options,
+        chosen_number=target,
+        reason="workbench_pack_up_no_recipes",
+        confidence=0.88,
+    )
+
+
+def _choose_workbench_craft(options, player):
+    """Pick the best recipe from the workbench craft sub-menu."""
+    if not options:
+        return options[-1][0] if options else 1
+    cancel_choice = None
+    companion_count = _companion_count(player)
+    best_number = None
+    best_priority = -1
+    for number, label in options:
+        lowered = label.lower()
+        if "never mind" in lowered or "cancel" in lowered:
+            cancel_choice = number
+            continue
+        # Match recipe name from the label (number. Name <- ingredients)
+        label_stripped = label.split("←")[0].strip()
+        label_stripped = label_stripped.lstrip("0123456789. ").strip()
+        priority = get_crafting_recipe_priority(label_stripped)
+        if priority <= 0:
+            # Try matching known recipe names inside the label
+            for known_name in ("Companion Bed", "Pet Toy", "Feeding Station",
+                               "Home Remedy", "Wound Salve", "Splint",
+                               "Binocular Scope", "Road Flare Torch",
+                               "Pepper Spray", "Dream Catcher", "Emergency Blanket"):
+                if known_name.lower() in lowered:
+                    priority = get_crafting_recipe_priority(known_name)
+                    break
+        if priority <= 0:
+            continue
+        recipe_cat = ""
+        for r_name in ("Companion Bed", "Pet Toy", "Feeding Station"):
+            if r_name.lower() in lowered:
+                recipe_cat = "companion"
+                break
+        if recipe_cat == "companion" and companion_count > 0:
+            priority += 18
+        if priority > best_priority:
+            best_priority = priority
+            best_number = number
+
+    if best_number is not None:
+        return _record_numeric_menu_trace(
+            player,
+            request_type="menu_select",
+            stable_context_id="workbench_craft_menu",
+            menu_options=options,
+            chosen_number=best_number,
+            reason="workbench_recipe_selected",
+            confidence=0.82,
+        )
+    # No good recipe found: cancel
+    target = cancel_choice if cancel_choice is not None else (options[-1][0] if options else 1)
+    return _record_numeric_menu_trace(
+        player,
+        request_type="menu_select",
+        stable_context_id="workbench_craft_menu",
+        menu_options=options,
+        chosen_number=target,
+        reason="workbench_no_viable_recipe_cancel",
+        confidence=0.8,
+    )
+
+
 def _wants_doctor_visit(player):
     return player is not None and _should_visit_doctor(player)
 
@@ -2258,6 +2390,50 @@ def _wants_millionaire_push(player):
         return False
     balance = player.get_balance()
     return balance >= 100000 and balance < 1000000 and player.get_health() >= 65 and player.get_sanity() >= 40
+
+
+def _choose_millionaire_afternoon(options, player):
+    """Choose from millionaire afternoon menu.
+
+    Preference order: chosen mechanic ending > any mechanic ending > airport ending.
+    The "continue gambling" option is also available but we prefer ending.
+    Traces the decision for post-run review.
+    """
+    if not options:
+        return 1
+    mechanic_choice = None
+    airport_choice = None
+    chosen_mechanic = _chosen_mechanic_name(player)
+    for number, label in options:
+        lowered = label.lower()
+        if "airport" in lowered:
+            airport_choice = number
+            continue
+        # Check for mechanic visit option
+        if any(name in lowered for name in ("tom", "frank", "oswald")):
+            if chosen_mechanic and chosen_mechanic.lower() in lowered:
+                mechanic_choice = number  # prefer the chosen mechanic
+            elif mechanic_choice is None:
+                mechanic_choice = number  # fallback to any mechanic
+
+    # Prefer mechanic ending; fall back to airport; fall back to last option
+    target = mechanic_choice if mechanic_choice is not None else (airport_choice or options[-1][0])
+    reason = (
+        f"millionaire_mechanic_ending:{chosen_mechanic}"
+        if target == mechanic_choice and mechanic_choice is not None
+        else "millionaire_airport_ending"
+        if target == airport_choice
+        else "millionaire_afternoon_fallback"
+    )
+    return _record_numeric_menu_trace(
+        player,
+        request_type="menu_select",
+        stable_context_id="millionaire_afternoon",
+        menu_options=options,
+        chosen_number=target,
+        reason=reason,
+        confidence=0.85,
+    )
 
 
 def _repair_item_priorities(player):
@@ -3749,7 +3925,12 @@ def _decide_yes_no(prompt=""):
         if player is None:
             return finalize("no", "gift_wrap_without_player")
         dealer_happiness = _dealer_happiness(player)
-        if player.get_balance() >= 20 and dealer_happiness < 90:
+        in_emergency = player.get_health() < 45 or player.get_sanity() < 20 or not player.has_item("Car")
+        if (
+            player.get_balance() >= GIFT_WRAP_MIN_BALANCE
+            and dealer_happiness < GIFT_WRAP_HAPPINESS_THRESHOLD
+            and not in_emergency
+        ):
             return finalize("yes", "gift_wrap_for_dealer_happiness")
         return finalize("no", "gift_wrap_not_worth_it")
     if prompt_lower.startswith("sell ") or prompt_lower.startswith("sell the "):
@@ -3974,13 +4155,13 @@ def _decide_raw_input(prompt=""):
         return _choose_inline_choice(inline_choices, player, prompt)
     if "who do you want to sell" in prompt_lower:
         return str(_choose_pawn_sale_item(options, player))
-    if (
+    # Millionaire afternoon menu: mechanic ending vs airport vs continue
+    millionaire_afternoon = (
         "choose a number" in prompt_lower
         or "choose a number" in "\n".join(RECENT_TEXT[-5:]).lower()
-    ) and "drive to the airport" in recent and "continue playing" in recent:
-        for number, label in options:
-            if "drive to the airport" in label.lower():
-                return str(number)
+    ) and "drive to the airport" in recent
+    if millionaire_afternoon:
+        return str(_choose_millionaire_afternoon(options, player))
     if "choose:" in prompt_lower and _looks_like_pawn_menu(options):
         return str(_choose_pawn_menu(options, player))
     if "choose:" in prompt_lower and _looks_like_loan_borrow_menu(options):
@@ -3990,7 +4171,14 @@ def _decide_raw_input(prompt=""):
     if "choose:" in prompt_lower and _looks_like_loan_menu(options):
         return str(_choose_loan_menu(options, player))
     if "choose:" in prompt_lower and "car workbench" in recent:
-        return "5"
+        # Workbench main menu (Pack Up is option 5, Craft Something is option 1)
+        if "pack up" in recent.lower():
+            return str(_choose_workbench_menu(options, player))
+        # Workbench craft sub-menu (recipe list with numbered items)
+        if "what do you want to craft" in recent.lower():
+            return str(_choose_workbench_craft(options, player))
+        # Fallback: pack up
+        return str(options[-1][0] if options else 1)
     if (
         "choose:" in prompt_lower
         and "what would you like to do?" in recent
@@ -4020,7 +4208,10 @@ def _decide_raw_input(prompt=""):
         if "which item would you like stuart to upgrade" in recent:
             return str(_choose_upgrade_item(options, player))
         if "car workbench" in recent:
-            return str(options[-1][0] if options else 1)
+            # Craft sub-menu reached via "choose a number" path
+            if "what do you want to craft" in recent.lower():
+                return str(_choose_workbench_craft(options, player))
+            return str(_choose_workbench_menu(options, player))
         return str(options[-1][0] if options else 1)
     if "choose: " in prompt_lower and "who do you want to sell" not in prompt_lower:
         return str(options[-1][0] if options else 1)

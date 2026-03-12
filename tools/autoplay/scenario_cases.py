@@ -1791,4 +1791,220 @@ def run_all_scenarios() -> list[ScenarioResult]:
         )
     )
 
+    # ===== GIFT WRAP SCENARIOS =====
+
+    # Gift wrap: should accept when dealer happiness is low and not in emergency
+    results.append(
+        _run_event_yes_no_scenario(
+            "gift_wrap_accepted_when_dealer_sad",
+            "event_yes_no",
+            GameState(
+                day=10,
+                balance=350,
+                rank=1,
+                health=72,
+                sanity=55,
+                fatigue=20,
+                alive=True,
+                current_context_tag="yes_no_prompt",
+                has_car=True,
+                dealer_happiness=55,
+                current_progress_goal_candidates=("push_next_rank",),
+            ),
+            "Gift wrap?",
+            (),
+            {
+                "prompt_lower": "gift wrap?",
+                "recent_lower": "would you like to gift wrap an item for the dealer?",
+            },
+            "yes",
+        )
+    )
+
+    # Gift wrap: should decline when dealer happiness is already high
+    results.append(
+        _run_event_yes_no_scenario(
+            "gift_wrap_declined_when_dealer_happy",
+            "event_yes_no",
+            GameState(
+                day=10,
+                balance=350,
+                rank=1,
+                health=72,
+                sanity=55,
+                fatigue=20,
+                alive=True,
+                current_context_tag="yes_no_prompt",
+                has_car=True,
+                dealer_happiness=92,
+                current_progress_goal_candidates=("push_next_rank",),
+            ),
+            "Gift wrap?",
+            (),
+            {
+                "prompt_lower": "gift wrap?",
+                "recent_lower": "would you like to gift wrap an item for the dealer?",
+            },
+            "no",
+        )
+    )
+
+    # Gift wrap: should decline when in emergency (survive_emergency goal)
+    results.append(
+        _run_event_yes_no_scenario(
+            "gift_wrap_declined_in_emergency",
+            "event_yes_no",
+            GameState(
+                day=10,
+                balance=350,
+                rank=0,
+                health=32,
+                sanity=18,
+                fatigue=20,
+                alive=True,
+                current_context_tag="yes_no_prompt",
+                has_car=True,
+                dealer_happiness=55,
+                current_progress_goal_candidates=("survive_emergency",),
+            ),
+            "Gift wrap?",
+            (),
+            {
+                "prompt_lower": "gift wrap?",
+                "recent_lower": "would you like to gift wrap an item for the dealer?",
+            },
+            "no",
+        )
+    )
+
+    # ===== MILLIONAIRE AFTERNOON SCENARIOS =====
+
+    # Millionaire afternoon: should choose chosen mechanic ending
+    results.append(
+        _run_event_option_scenario(
+            "millionaire_afternoon_prefers_mechanic_ending",
+            "event_option",
+            GameState(
+                day=45,
+                balance=1_200_000,
+                rank=3,
+                health=85,
+                sanity=72,
+                fatigue=10,
+                alive=True,
+                current_context_tag="option_prompt",
+                has_car=True,
+                chosen_mechanic="Tom",
+                current_progress_goal_candidates=("convert_millionaire_to_ending",),
+                opportunity_flags={"can_convert_millionaire_to_ending": True},
+            ),
+            (
+                "Visit Tom's Trusty Trucks and Tires",
+                "Drive to the Airport",
+                "Continue gambling",
+            ),
+            {
+                "prompt_lower": "choose a number",
+                "recent_lower": "you wake up as a millionaire. what do you do?",
+            },
+            "Visit Tom's Trusty Trucks and Tires",
+        )
+    )
+
+    # Millionaire afternoon: airport when no mechanic chosen
+    results.append(
+        _run_event_option_scenario(
+            "millionaire_afternoon_airport_when_no_mechanic",
+            "event_option",
+            GameState(
+                day=45,
+                balance=1_200_000,
+                rank=3,
+                health=85,
+                sanity=72,
+                fatigue=10,
+                alive=True,
+                current_context_tag="option_prompt",
+                has_car=True,
+                chosen_mechanic=None,
+                current_progress_goal_candidates=("convert_millionaire_to_ending",),
+                opportunity_flags={"can_convert_millionaire_to_ending": True},
+            ),
+            (
+                "Drive to the Airport",
+                "Continue gambling",
+            ),
+            {
+                "prompt_lower": "choose a number",
+                "recent_lower": "you wake up as a millionaire. what do you do? drive to the airport",
+            },
+            "Drive to the Airport",
+        )
+    )
+
+    # ===== WORKBENCH CONFIRM SCENARIOS =====
+
+    # Workbench craft confirm: should say yes when combining items
+    results.append(
+        _run_event_yes_no_scenario(
+            "workbench_craft_confirm_says_yes",
+            "event_yes_no",
+            GameState(
+                day=12,
+                balance=600,
+                rank=1,
+                health=75,
+                sanity=60,
+                fatigue=15,
+                alive=True,
+                current_context_tag="yes_no_prompt",
+                has_car=True,
+                current_progress_goal_candidates=("push_next_rank",),
+            ),
+            "(yes/no): ",
+            (
+                "Car Workbench",
+                "Combine First Aid Kit and Cough Drops into a Home Remedy?",
+            ),
+            {
+                "prompt_lower": "(yes/no):",
+                "recent_lower": "car workbench combine first aid kit and cough drops into a home remedy?",
+            },
+            "yes",
+        )
+    )
+
+    # ===== COMPANION RUNAWAY PREVENTION SCENARIOS =====
+
+    # Companion hungry with runaway risk: should buy food (option 3) even with limited balance
+    results.append(
+        _run_event_inline_scenario(
+            "companion_hungry_runaway_risk_buys_food",
+            "event_inline",
+            GameState(
+                day=14,
+                balance=35,
+                rank=0,
+                health=68,
+                sanity=45,
+                fatigue=22,
+                alive=True,
+                current_context_tag="inline_choice_prompt",
+                has_car=True,
+                companion_count=2,
+                companion_runaway_risk_count=1,
+                companion_low_happiness_count=2,
+                current_progress_goal_candidates=("preserve_companion_roster",),
+            ),
+            "Choose:",
+            ("morning. your companions are hungry.",),
+            ("1", "2", "3", "4"),
+            {
+                "prompt_lower": "choose:",
+                "recent_lower": "morning. your companions are hungry.",
+            },
+            "3",
+        )
+    )
+
     return results
