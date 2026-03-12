@@ -815,6 +815,19 @@ class Lists:
             "Energy Drink": 3,
             "Coffee Thermos": 10,
             "Road Map": 3,
+            # Convenience store items previously unsellable
+            "Duct Tape": 4,
+            "Water Bottles": 3,
+            "Road Flares": 8,
+            "Bug Spray": 5,
+            "Binoculars": 20,
+            "Garbage Bag": 1,
+            "Plastic Wrap": 2,
+            "Fishing Line": 6,
+            "Super Glue": 4,
+            "Hand Warmers": 3,
+            "Rubber Bands": 1,
+            "Breath Mints": 1,
             
             # Car Items
             "Jumper Cables": 20,
