@@ -56,6 +56,8 @@ import story
 import typer as _typer
 from tools.autoplay import DecisionOption, DecisionRequest, DecisionTrace, build_game_state_snapshot, choose_route_option, choose_strategic_goal
 from tools.autoplay.config import (
+    CRAFTING_MIN_PRIORITY,
+    CRAFTING_RECIPE_PRIORITIES,
     GIFT_WRAP_HAPPINESS_THRESHOLD,
     GIFT_WRAP_MIN_BALANCE,
     MARVIN_ITEM_ORDER,
@@ -2094,7 +2096,7 @@ def _workbench_best_craft_candidate(player):
         if priority > best_priority:
             best_name = name
             best_priority = priority
-    if best_name is None or best_priority < 60:
+    if best_name is None or best_priority < CRAFTING_MIN_PRIORITY:
         return None
     return (best_name, best_priority)
 
@@ -2143,6 +2145,10 @@ def _choose_workbench_craft(options, player):
     companion_count = _companion_count(player)
     best_number = None
     best_priority = -1
+    companion_recipes = frozenset(
+        name for name, recipe in CRAFTING_RECIPE_PRIORITIES.items()
+        if name in ("Companion Bed", "Pet Toy", "Feeding Station")
+    )
     for number, label in options:
         lowered = label.lower()
         if "never mind" in lowered or "cancel" in lowered:
@@ -2153,22 +2159,15 @@ def _choose_workbench_craft(options, player):
         label_stripped = label_stripped.lstrip("0123456789. ").strip()
         priority = get_crafting_recipe_priority(label_stripped)
         if priority <= 0:
-            # Try matching known recipe names inside the label
-            for known_name in ("Companion Bed", "Pet Toy", "Feeding Station",
-                               "Home Remedy", "Wound Salve", "Splint",
-                               "Binocular Scope", "Road Flare Torch",
-                               "Pepper Spray", "Dream Catcher", "Emergency Blanket"):
+            # Try matching any known recipe name inside the label
+            for known_name in CRAFTING_RECIPE_PRIORITIES:
                 if known_name.lower() in lowered:
                     priority = get_crafting_recipe_priority(known_name)
+                    label_stripped = known_name
                     break
         if priority <= 0:
             continue
-        recipe_cat = ""
-        for r_name in ("Companion Bed", "Pet Toy", "Feeding Station"):
-            if r_name.lower() in lowered:
-                recipe_cat = "companion"
-                break
-        if recipe_cat == "companion" and companion_count > 0:
+        if label_stripped in companion_recipes and companion_count > 0:
             priority += 18
         if priority > best_priority:
             best_priority = priority

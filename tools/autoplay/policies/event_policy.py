@@ -351,7 +351,10 @@ def choose_event_yes_no(request: DecisionRequest, plan: StrategicPlan) -> tuple[
     # and we have enough balance and aren't in an emergency.
     if "gift wrap" in prompt_lower:
         dealer_happiness = int(request.game_state.get("dealer_happiness", 50) or 50)
-        in_emergency = plan.goal in {"survive_emergency", "acquire_car", "contain_debt_escalation"}
+        # Emergency check: goal-based and stats-based for belt-and-suspenders safety
+        in_emergency_goal = plan.goal in {"survive_emergency", "acquire_car", "contain_debt_escalation"}
+        in_emergency_stats = health < 45 or sanity < 20 or not request.game_state.get("has_car", True)
+        in_emergency = in_emergency_goal or in_emergency_stats
         answer = (
             "yes"
             if (
@@ -363,8 +366,9 @@ def choose_event_yes_no(request: DecisionRequest, plan: StrategicPlan) -> tuple[
         )
         return answer, _yes_no_trace(request, plan, answer, "gift_wrap_happiness_gate", 0.8)
 
-    # Confirm crafting at workbench: always accept when the autoplay chose to craft
-    if "(yes/no):" in prompt_lower and "crafted" not in recent and (
+    # Confirm crafting at workbench: always accept when the autoplay chose to craft.
+    # Require "car workbench" in recent to avoid false positives from other yes/no contexts.
+    if "(yes/no):" in prompt_lower and "car workbench" in recent and "crafted" not in recent and (
         "combine" in recent or "what do you want to craft" in recent
     ):
         return "yes", _yes_no_trace(request, plan, "yes", "workbench_craft_confirm", 0.9)

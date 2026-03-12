@@ -335,7 +335,10 @@ CRAFTING_RECIPE_PRIORITIES: dict[str, int] = {
     "Worry Stone": 40,
 }
 
-# Minimum strategic priority to bother crafting (at threshold, skip companion items unless companions present)
+# Minimum strategic priority to bother crafting.
+# Recipes with priority >= this threshold are considered worth crafting.
+# Companion items receive a +18 bonus in quicktest.py when companions are present,
+# which may push them above this threshold even if their base priority is below it.
 CRAFTING_MIN_PRIORITY: int = 60
 
 # Gift wrapping: dealer_happiness threshold below which gift-wrapping is worth doing
