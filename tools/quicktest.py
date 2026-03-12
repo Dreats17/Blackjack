@@ -4169,6 +4169,21 @@ def _looks_like_pawn_menu(options):
     )
 
 
+def _looks_like_store_menu(options):
+    """Return True when options look like the Kyle convenience-store item menu.
+
+    The store always appends "I'm not buying anything" as the last option.
+    We rely on this structural feature rather than scanning recent text because
+    the item list can easily exceed the 120-char recent window, causing the old
+    ``"what do you want?" in recent`` check to miss the store entirely and fall
+    through to the generic last-option fallback ("I'm not buying anything").
+    Item price labels use ANSI color codes (e.g. green/bright "$3"), so checking
+    for a literal " - $" pattern is unreliable; the exit-option text is plain.
+    """
+    labels = [label.lower() for _number, label in options]
+    return any("i'm not buying anything" in label for label in labels)
+
+
 def _decide_yes_no(prompt=""):
     player = CURRENT_PLAYER
     prompt_lower = (prompt or "").lower().strip()
@@ -4555,6 +4570,14 @@ def _decide_raw_input(prompt=""):
             return str(_choose_pawn_menu(options, player))
         if "who do you want to interact with" in prompt_lower or "after noon with your companions" in recent or "afternoon with your companions" in recent:
             return str(_choose_companion_interaction(options, player))
+        # Store menu must be detected before the route check: the route-menu text
+        # ("Would you like to spend your day driving somewhere?") stays in the
+        # 120-line recent window well into the store visit, causing the route
+        # handler to mis-dispatch store item menus as destination choices.
+        # Checking option structure (has "I'm not buying anything") is reliable
+        # and specific — no other menu uses that exit label.
+        if _looks_like_store_menu(options):
+            return str(_choose_store_item(options, player))
         if "would you like to spend your day driving somewhere" in recent:
             return str(_choose_destination(options, player))
         if _looks_like_loan_borrow_menu(options):
