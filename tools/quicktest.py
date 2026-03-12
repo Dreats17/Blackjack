@@ -1298,6 +1298,18 @@ def _should_visit_doctor(player):
 
     if urgent:
         return balance >= estimated_cost
+
+    # Critical compound illness: visit even at very low balance to break the
+    # illness-spiral before it becomes fatal.  4+ statuses or 3+ injuries signals
+    # that treatment is overdue regardless of remaining cash.
+    if balance >= estimated_cost and balance > 30:
+        if len(statuses) >= 4:
+            return True
+        if len(injuries) >= 3:
+            return True
+        if len(statuses) >= 2 and len(injuries) >= 2:
+            return True
+
     if player.has_item("Car"):
         if len(injuries) >= 2 and remaining_balance >= 70:
             return True
