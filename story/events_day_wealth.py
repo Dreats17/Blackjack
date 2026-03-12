@@ -1653,10 +1653,18 @@ class DayWealthMixin:
     # === WEAKENED IMMUNE SYSTEM CHAIN ===
 
     def high_roller_room_visit(self):
-        if not self.has_item("High Roller Keycard"):
+        has_access = (self.has_item("High Roller Keycard") or
+                      self.has_item("VIP Invitation") or
+                      self.has_item("Casino VIP Card"))
+        if not has_access:
             self.day_event()
             return
-        type.type("You leave your car and head to the casino. You use your High Roller Keycard. The doors slide open.")
+        if self.has_item("VIP Invitation"):
+            type.type("You pull out your " + magenta(bright("VIP Invitation")) + " at the door. The bouncer looks it over, nods, and waves you through.")
+        elif self.has_item("Casino VIP Card"):
+            type.type("You flash your " + magenta(bright("Casino VIP Card")) + " at the entrance. The red rope parts like the Red Sea.")
+        else:
+            type.type("You leave your car and head to the casino. You use your High Roller Keycard. The doors slide open.")
         print("\n")
         type.type("It's another world in here. Velvet ropes. Crystal chandeliers. Free champagne.")
         print("\n")
@@ -1668,7 +1676,10 @@ class DayWealthMixin:
         print("\n")
 
     def high_roller_whale(self):
-        if not self.has_item("High Roller Keycard"):
+        has_access = (self.has_item("High Roller Keycard") or
+                      self.has_item("VIP Invitation") or
+                      self.has_item("Casino VIP Card"))
+        if not has_access:
             self.day_event()
             return
         if self.has_met("Met the Whale"):

@@ -3313,9 +3313,12 @@ class AdventuresMixin:
                 print("\n")
             
             elif action == "share_food":
-                if self.has_item("Food"):
+                food_items = ["Turkey Sandwich", "Beef Jerky", "Granola Bar", "Hot Dog",
+                              "Candy Bar", "Bread", "Cheese", "Cup Noodles", "Microwave Burrito"]
+                shared_food = next((f for f in food_items if self.has_item(f)), None)
+                if shared_food:
                     type.type("You share what you have. It's not much, but their gratitude is real.")
-                    self.use_item("Food")
+                    self.use_item(shared_food)
                 else:
                     type.type("You don't have any food. But you sit with them while they eat what they have.")
                 print("\n")

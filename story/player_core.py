@@ -694,7 +694,9 @@ class Player(
             "Mysterious Lockbox", "Mysterious Key", "Mysterious Code",
             "Fountain Water", "Treasure Map", "Joe's Treasure Map",
             # Secret Items (2 items)
-            "Dealer's Joker", "Ace of Spades"
+            "Dealer's Joker", "Ace of Spades",
+            # Sentimental Items
+            "Filled Locket"
         ]
     
     def get_collectible_prices(self):
@@ -769,6 +771,8 @@ class Player(
             # Secret Items
             "Dealer's Joker": 50000,
             "Ace of Spades": 1000,
+            # Sentimental Items
+            "Filled Locket": 500,
         }
     
     def get_gus_total_collectibles(self):

@@ -181,8 +181,8 @@ class DayItemsMixin:
             if catch == 0:
                 type.type("A tug! You reel it in — a decent-sized bass. Not bad!")
                 print("\n")
-                type.type("You cook it over a small fire. Fresh fish. Tastes like victory.")
-                self.heal(12)
+                type.type("You wrap it up and put it on ice in the cooler. Fresh fish — good for eating or bartering.")
+                self.add_item("Fish")  # Used in adventures.py for Deathclaw race and Kraken encounter
                 print("\n")
             elif catch == 1:
                 type.type("You reel in... an old boot. Classic. At least the casting was relaxing.")
@@ -355,6 +355,17 @@ class DayItemsMixin:
             type.type("The firefighters look annoyed when they realize you're not actually on fire. ")
             type.type("But they call you a tow truck. The " + cyan(bright("Smoke Signal Kit")) + " is spent.")
             self.use_item("Smoke Signal Kit")
+            self.restore_sanity(2)
+            print("\n")
+        elif self.has_item("Broken Compass"):
+            type.type("You dig through your bag. No signal mirror, but you do have a " + cyan(bright("Broken Compass")) + ".")
+            print("\n")
+            type.type("The glass face is still intact. You crack it open, polish the glass on your jeans, and hold it up.")
+            print("\n")
+            type.type("It's not a great mirror, but it catches the light well enough.")
+            print("\n")
+            type.type("A passing truck slows. They drive you to the nearest town.")
+            type.type(" Next time, you think, you'll craft a proper Signal Mirror from this.")
             self.restore_sanity(2)
             print("\n")
         else:
@@ -853,5 +864,832 @@ class DayItemsMixin:
         self.add_item("Scrap Armor")
         self.meet("Scrap Armor Made")
         self.restore_sanity(5)
+        print("\n")
+
+
+    # ============================================================
+    # ITEM USE EVENTS - events that activate specific held items
+    # ============================================================
+
+    def mystery_potion_effect(self):
+        """Mystery Potion has a random effect when the player thinks about drinking it"""
+        if not self.has_item("Mystery Potion"):
+            self.day_event()
+            return
+        type.type("You dig through your bag and find the " + cyan(bright("Mystery Potion")) + " you've been carrying around.")
+        print("\n")
+        type.type("It's been staring at you for days. Glowing faintly. Smelling of something you can't identify.")
+        print("\n")
+        type.type("You decide: today's the day. You open it and drink.")
+        print("\n")
+        self.use_item("Mystery Potion")
+        effect = random.randrange(6)
+        if effect == 0:
+            type.type("It tastes like childhood. Like the smell of rain on concrete. Like a memory you forgot you had.")
+            print("\n")
+            type.type("You feel... good. Really good. Restored.")
+            self.heal(random.randint(20, 40))
+            self.restore_sanity(15)
+        elif effect == 1:
+            type.type("It tastes like battery acid and regret. Your whole body shudders.")
+            print("\n")
+            type.type("Then, after five horrible seconds, you feel absolutely fine. Better than fine.")
+            self.heal(random.randint(10, 25))
+        elif effect == 2:
+            amount = random.randint(50, 300)
+            type.type("It tastes like money. Like ambition. Like a promise.")
+            print("\n")
+            type.type("You find " + green("${:,}".format(amount)) + " in your pocket that wasn't there a minute ago. You don't question it.")
+            self.change_balance(amount)
+            self.restore_sanity(5)
+        elif effect == 3:
+            type.type("It tastes... completely normal. Like water. Like literally nothing.")
+            print("\n")
+            type.type("Maybe it was just water. Maybe that's fine. You're hydrated.")
+            self.heal(5)
+        elif effect == 4:
+            type.type("It tastes incredible. Like the best meal you've ever had, compressed into a single swallow.")
+            print("\n")
+            type.type("Your fatigue vanishes. Your aches vanish. Whatever was in that bottle, it WORKED.")
+            self.heal(random.randint(15, 30))
+            self.reduce_fatigue(random.randint(15, 30))
+        else:
+            type.type("It tastes like nothing. Then it hits you. Your vision blurs. The world tilts.")
+            print("\n")
+            type.type("You wake up an hour later, $" + str(random.randint(20, 80)) + " richer and with no memory of what happened.")
+            type.type(" The potion works in mysterious ways.")
+            self.change_balance(random.randint(20, 80))
+            self.restore_sanity(3)
+        print("\n")
+
+    def love_potion_use(self):
+        """Love Potion creates a positive NPC encounter"""
+        if not self.has_item("Love Potion"):
+            self.day_event()
+            return
+        type.type("You've been carrying the " + cyan(bright("Love Potion")) + " long enough. Today feels like the day.")
+        print("\n")
+        type.type("You find a coffee shop. You order two coffees. You add a single drop to one.")
+        print("\n")
+        self.use_item("Love Potion")
+        outcome = random.randrange(4)
+        if outcome == 0:
+            type.type("The barista tries your coffee by accident. They look at you with sudden warmth.")
+            print("\n")
+            type.type(quote("This is on the house. And hey — come back anytime."))
+            print("\n")
+            type.type("Free coffee. A new friend, maybe. The swamp witch knows her stuff.")
+            self.restore_sanity(10)
+            self.change_balance(random.randint(50, 150))
+        elif outcome == 1:
+            type.type("You meet someone at the counter. Eyes meet. A conversation starts that shouldn't end.")
+            print("\n")
+            type.type("You talk for three hours. You miss two events you were planning. Worth it.")
+            self.restore_sanity(20)
+        elif outcome == 2:
+            type.type("Nothing happens. The potion might have been a placebo. Or maybe the magic needs more faith.")
+            print("\n")
+            type.type("You get a normal coffee. A normal day. Sometimes normal is what you needed.")
+            self.restore_sanity(5)
+        else:
+            type.type("Someone spills their coffee on you. They apologize profusely, buy you a replacement, and then invite you to dinner to make up for it.")
+            print("\n")
+            type.type("The love potion, it turns out, works best through chaos.")
+            self.restore_sanity(15)
+            self.change_balance(random.randint(20, 80))
+        print("\n")
+
+    def feelgood_bottle_moment(self):
+        """Feelgood Bottle restores sanity and gives a mood boost"""
+        if not self.has_item("Feelgood Bottle"):
+            self.day_event()
+            return
+        type.type("You reach for the " + cyan(bright("Feelgood Bottle")) + " in your glove compartment.")
+        print("\n")
+        type.type("The label says nothing. The liquid inside looks like afternoon light through amber glass.")
+        print("\n")
+        type.type("You take a sip. It tastes like the last day of summer. Like a song you loved at seventeen.")
+        print("\n")
+        self.use_item("Feelgood Bottle")
+        self.restore_sanity(random.randint(15, 25))
+        self.heal(random.randint(5, 15))
+        self.reduce_fatigue(10)
+        type.type("Whatever was in that bottle — it was exactly what you needed. Everything feels lighter.")
+        print("\n")
+        type.type("Not solved. Not fixed. Just... lighter.")
+        print("\n")
+
+    def persistent_bottle_refill(self):
+        """Persistent Bottle provides clean water repeatedly"""
+        if not self.has_item("Persistent Bottle"):
+            self.day_event()
+            return
+        type.type("You're thirsty. Parched. You reach into the backseat for the " + cyan(bright("Persistent Bottle")) + ".")
+        print("\n")
+        type.type("You remember finding this at the bottom of the fountain. It was bone-dry then.")
+        print("\n")
+        type.type("It's full now. It's always full. You've stopped questioning it.")
+        print("\n")
+        type.type("You drink deeply. Cool, clean water. Perfect.")
+        self.heal(5)
+        self.restore_sanity(3)
+        self.reduce_fatigue(5)
+        print("\n")
+
+    def silver_horseshoe_luck(self):
+        """Silver Horseshoe gives a lucky break"""
+        if not self.has_item("Silver Horseshoe"):
+            self.day_event()
+            return
+        type.type("You glance at the " + cyan(bright("Silver Horseshoe")) + " hanging from your rearview mirror.")
+        print("\n")
+        type.type("It catches the light. Old. Worn. Heavy with years.")
+        print("\n")
+        type.type(quote("Luckier than anything you'll find in a casino.") + " That's what Jameson said.")
+        print("\n")
+        outcome = random.randrange(4)
+        if outcome == 0:
+            amount = random.randint(50, 200)
+            type.type("You glance down and see a folded bill on the sidewalk. Then another. Then another.")
+            print("\n")
+            type.type("You count " + green("${:,}".format(amount)) + " total. Today, the horseshoe delivers.")
+            self.change_balance(amount)
+        elif outcome == 1:
+            type.type("Your car starts first try. The traffic parts ahead of you. Every light is green.")
+            print("\n")
+            type.type("Nothing remarkable. Nothing terrible. Just a perfect, frictionless day. The horseshoe at work.")
+            self.restore_sanity(8)
+        elif outcome == 2:
+            type.type("You're about to pull into a parking spot when a car cuts you off. You honk.")
+            print("\n")
+            type.type("Then you notice: the spot they took has a citation on the meter. Your luck held.")
+            self.restore_sanity(5)
+            self.change_balance(random.randint(10, 40))
+        else:
+            type.type("You find a scratch-off on the ground. Win it all back and then some: " + green("${:,}".format(random.randint(20, 100))) + ".")
+            self.change_balance(random.randint(20, 100))
+        print("\n")
+
+    def road_talisman_protection(self):
+        """Road Talisman keeps you safe on the road"""
+        if not self.has_item("Road Talisman"):
+            self.day_event()
+            return
+        type.type("Something feels wrong today. You can't name it. A weight. A tremor in the air.")
+        print("\n")
+        type.type("Your hand moves to the " + cyan(bright("Road Talisman")) + " hanging from the mirror. Warm to the touch.")
+        print("\n")
+        outcome = random.randrange(3)
+        if outcome == 0:
+            type.type("A truck runs a red light right where you would have been. But you'd stopped to adjust the talisman.")
+            print("\n")
+            type.type("The truck blows past at sixty miles an hour. Three feet in front of you.")
+            print("\n")
+            type.type("You sit there, shaking. The talisman is cool now.")
+            self.restore_sanity(5)
+        elif outcome == 1:
+            type.type("You get a flat tire. Annoying. But you'd packed your kit this morning, guided by some instinct.")
+            print("\n")
+            type.type("Twenty minutes later, you're rolling again. The talisman glows, faintly, in approval.")
+            self.restore_sanity(3)
+        else:
+            type.type("Nothing bad happens today. Nothing at all.")
+            print("\n")
+            type.type("You drive for hours without incident. Clean roads. Good weather. A kind stranger waves you into traffic.")
+            print("\n")
+            type.type("Maybe the talisman works by preventing the invisible troubles. The ones you never see coming.")
+            self.restore_sanity(8)
+            self.heal(5)
+        print("\n")
+
+    def ritual_token_ceremony(self):
+        """Ritual Token provides a mystical benefit"""
+        if not self.has_item("Ritual Token"):
+            self.day_event()
+            return
+        if self.has_met("Ritual Token Used"):
+            self.day_event()
+            return
+        self.meet("Ritual Token Used")
+        type.type("You've been carrying the " + cyan(bright("Ritual Token")) + " for a while. Small. Carved wood.")
+        print("\n")
+        type.type("The shaman who gave it to you said: " + quote("Use it when the need is greatest. Only once."))
+        print("\n")
+        type.type("You're not sure this is the greatest need. But then again — when would be?")
+        print("\n")
+        answer = ask.yes_or_no("Use the Ritual Token? ")
+        if answer == "yes":
+            self.use_item("Ritual Token")
+            type.type("You hold the token and close your eyes. You think about where you've been.")
+            print("\n")
+            type.type("You think about where you're going.")
+            print("\n")
+            type.slow("...")
+            print("\n")
+            ritual_gift = random.randrange(4)
+            if ritual_gift == 0:
+                amount = random.randint(200, 800)
+                type.type("When you open your eyes, there's an envelope under your wiper blade. Cash inside: " + green("${:,}".format(amount)) + ".")
+                print("\n")
+                type.type("No explanation. The shaman said 'the need.' The road provides.")
+                self.change_balance(amount)
+            elif ritual_gift == 1:
+                type.type("The world feels clear. Sharp. Like a fog has lifted.")
+                print("\n")
+                type.type("Your body aches less. Your mind races less. Everything is quiet.")
+                self.heal(30)
+                self.restore_sanity(20)
+            elif ritual_gift == 2:
+                type.type("A warmth spreads from your chest outward. You feel protected. Guided.")
+                print("\n")
+                type.type("For the next few days, nothing bad will find you. The shaman's word.")
+                self.add_status("Ritual Protection")
+            else:
+                type.type("You feel... connected. To the road. To everyone on it.")
+                print("\n")
+                type.type("The token crumbles to dust in your hand. But something remains in your chest.")
+                self.restore_sanity(25)
+                self.heal(20)
+                self.change_balance(random.randint(100, 400))
+            print("\n")
+        else:
+            type.type("Not yet. You put the token back. The road will tell you when.")
+            print("\n")
+
+    def council_feather_blessing(self):
+        """Council Feather brings a mystical blessing"""
+        if not self.has_item("Council Feather"):
+            self.day_event()
+            return
+        if self.has_met("Council Feather Blessed"):
+            self.day_event()
+            return
+        self.meet("Council Feather Blessed")
+        type.type("The " + cyan(bright("Council Feather")) + " in your rearview mirror sways though the windows are closed.")
+        print("\n")
+        type.type("It's jet-black with an oily sheen. A crow gave it to you. Not many people get crow gifts.")
+        print("\n")
+        type.type("You feel a presence at the edge of things. Watching. Not threatening. Curious.")
+        print("\n")
+        type.type("The day unfolds differently. Like something cleared a path for you.")
+        self.restore_sanity(12)
+        self.heal(10)
+        amount = random.randint(50, 250)
+        type.type("You find " + green("${:,}".format(amount)) + " in a parking lot. The crow was right: you're favored today.")
+        self.change_balance(amount)
+        print("\n")
+
+    def cowboy_jacket_encounter(self):
+        """Cowboy Jacket makes NPCs more respectful"""
+        if not self.has_item("Cowboy Jacket"):
+            self.day_event()
+            return
+        type.type("You pull on the " + cyan(bright("Cowboy Jacket")) + " before heading out today. Old leather. Horse smell. Character.")
+        print("\n")
+        type.type("People look at you differently. Not rich-differently. Not dangerous-differently.")
+        print("\n")
+        type.type("Dependable-differently. Like you're someone who keeps their word.")
+        print("\n")
+        outcome = random.randrange(3)
+        if outcome == 0:
+            type.type("A man at the diner insists on buying your coffee.")
+            print("\n")
+            type.type(quote("My grandfather had a jacket like that. Good man. Figured you might be too."))
+            self.restore_sanity(8)
+            self.change_balance(random.randint(5, 20))
+        elif outcome == 1:
+            type.type("You get waved to the front of a long line at the car wash.")
+            print("\n")
+            type.type(quote("Nice jacket. Go ahead, friend."))
+            print("\n")
+            type.type("A small kindness. The jacket earns it.")
+            self.restore_sanity(5)
+        else:
+            type.type("A mechanic charges you half price on an oil check, talking the whole time about his ranch days.")
+            print("\n")
+            type.type("The jacket speaks before you do. It says: " + quote("This one's good people."))
+            self.change_balance(random.randint(30, 80))
+            self.restore_sanity(5)
+        print("\n")
+
+    def found_phone_call(self):
+        """Found Phone lets you make an anonymous call"""
+        if not self.has_item("Found Phone"):
+            self.day_event()
+            return
+        if self.has_met("Found Phone Used"):
+            self.day_event()
+            return
+        self.meet("Found Phone Used")
+        type.type("You still have the " + cyan(bright("Found Phone")) + " you picked up. Battery's dying.")
+        print("\n")
+        type.type("There are unread messages. Family stuff. People who love whoever had this phone.")
+        print("\n")
+        type.type("You scroll to the emergency contact. A name: 'Mom'.")
+        print("\n")
+        answer = ask.yes_or_no("Call them? Tell them you found the phone? ")
+        if answer == "yes":
+            type.type("The phone rings. A woman answers, voice tight with worry.")
+            print("\n")
+            type.type(quote("Hello? Who is this? Do you have—"))
+            print("\n")
+            type.type("You explain. The relief in her voice is immediate. Overwhelming.")
+            print("\n")
+            type.type(quote("Oh thank God. THANK GOD. He's been missing for two days. Where did you find it?"))
+            print("\n")
+            type.type("You tell her. She cries. You almost cry. It's a lot.")
+            print("\n")
+            type.type("She offers to mail you a reward. You give her a P.O. box. Two weeks later, an envelope appears.")
+            self.change_balance(random.randint(100, 500))
+            self.restore_sanity(20)
+            self.use_item("Found Phone")
+        else:
+            type.type("You can't bring yourself to do it. You put the phone back.")
+            print("\n")
+            type.type("Maybe tomorrow. Maybe when you find the right words.")
+        print("\n")
+
+    def alien_crystal_event(self):
+        """Alien Crystal has a surreal effect"""
+        if not self.has_item("Alien Crystal"):
+            self.day_event()
+            return
+        type.type("The " + cyan(bright("Alien Crystal")) + " is glowing. It wasn't glowing yesterday.")
+        print("\n")
+        type.type("It pulses softly — blue-white, like a star seen through water.")
+        print("\n")
+        outcome = random.randrange(4)
+        if outcome == 0:
+            type.type("You hold it up to the light. The world inverts. For one second, everything is the negative image of itself.")
+            print("\n")
+            type.type("When it snaps back, there's a " + green("${:,}".format(random.randint(100, 500))) + " on the seat beside you.")
+            print("\n")
+            type.type("You stare at it for a long time. Then you pocket it.")
+            self.change_balance(random.randint(100, 500))
+            self.restore_sanity(5)
+        elif outcome == 1:
+            type.type("The crystal vibrates in your hand. A sound — not a sound, more like a feeling of sound — fills the car.")
+            print("\n")
+            type.type("You wake up. Your body feels fixed. Like it was taken apart and reassembled correctly, finally.")
+            self.heal(30)
+            self.restore_sanity(10)
+        elif outcome == 2:
+            type.type("You dream of a vast emptiness, and a voice in it that says: " + quote("You are doing fine."))
+            print("\n")
+            type.type("It doesn't feel like a dream. It feels like information.")
+            self.restore_sanity(20)
+            self.reduce_fatigue(20)
+        else:
+            type.type("The crystal goes dark. Then it shatters silently, leaving no shards. Just gone.")
+            print("\n")
+            type.type("In your pocket: a folded note. " + quote("You have been acknowledged. Continue."))
+            print("\n")
+            type.type("You don't know what it means. But it makes you feel less alone.")
+            self.use_item("Alien Crystal")
+            self.restore_sanity(15)
+            self.heal(15)
+        print("\n")
+
+    def dimensional_coin_flip(self):
+        """Dimensional Coin has unusual flip outcomes"""
+        if not self.has_item("Dimensional Coin"):
+            self.day_event()
+            return
+        type.type("You're at a crossroads — literal and figurative. You pull out the " + cyan(bright("Dimensional Coin")) + ".")
+        print("\n")
+        type.type("This coin doesn't have heads or tails. Both sides are identical. Featureless silver.")
+        print("\n")
+        type.type("You flip it anyway.")
+        print("\n")
+        result = random.randrange(3)
+        if result == 0:
+            type.type("It lands standing on its edge. Perfectly. Impossibly.")
+            print("\n")
+            type.type("You choose neither path. You find a third option you hadn't considered.")
+            print("\n")
+            type.type("The third option leads to " + green("${:,}".format(random.randint(200, 800))) + ".")
+            self.change_balance(random.randint(200, 800))
+            self.restore_sanity(10)
+        elif result == 1:
+            type.type("The coin lands heads. Or tails. You can't tell the difference, which somehow helps you make the decision.")
+            print("\n")
+            type.type("The right one. You knew it all along. The coin just confirmed it.")
+            self.restore_sanity(12)
+            self.heal(8)
+        else:
+            type.type("The coin vanishes mid-flip. Just gone.")
+            print("\n")
+            type.type("You search everywhere. Nothing. But you feel lucky, inexplicably, for the rest of the day.")
+            self.use_item("Dimensional Coin")
+            self.restore_sanity(8)
+            self.change_balance(random.randint(50, 200))
+        print("\n")
+
+    def radio_numbers_broadcast(self):
+        """Radio Numbers leads to a mysterious find"""
+        if not self.has_item("Radio Numbers"):
+            self.day_event()
+            return
+        if self.has_met("Radio Numbers Decoded"):
+            self.day_event()
+            return
+        self.meet("Radio Numbers Decoded")
+        type.type("You've been carrying the " + cyan(bright("Radio Numbers")) + " for days. Numbers. Coordinates. Something.")
+        print("\n")
+        if self.has_item("Radio Logbook"):
+            type.type("You cross-reference with the " + cyan(bright("Radio Logbook")) + " you recovered. The patterns match.")
+            print("\n")
+            type.type("This isn't random. These numbers are a cipher for GPS coordinates.")
+            print("\n")
+        else:
+            type.type("Today, on a whim, you punch the numbers into your phone as GPS coordinates.")
+            print("\n")
+        type.type("It takes you to an empty field thirty minutes away.")
+        print("\n")
+        type.type("You almost leave. Then you notice: a rusted box half-buried at the coordinates.")
+        print("\n")
+        found = random.randrange(3)
+        # Having the logbook gives a cash bonus
+        logbook_bonus = 500 if self.has_item("Radio Logbook") else 0
+        if found == 0:
+            amount = random.randint(500, 2000) + logbook_bonus
+            type.type("Inside the box: cash. Old bills, rubber-banded in stacks. " + green("${:,}".format(amount)) + " total.")
+            print("\n")
+            type.type("Someone buried this and never came back. Their loss. Your gain.")
+            self.change_balance(amount)
+        elif found == 1:
+            type.type("Inside: a journal. Someone else's story. Someone who also wandered, also searched, also sat in parking lots eating gas station food.")
+            print("\n")
+            type.type("Reading their words, you feel less alone in the universe.")
+            self.restore_sanity(25)
+            if logbook_bonus:
+                type.type("The logbook fills in gaps in their story. A fuller picture. A completed life.")
+                self.restore_sanity(10)
+            print("\n")
+        else:
+            type.type("Inside: a map. More numbers. Another coordinate. You pocket it.")
+            print("\n")
+            type.type("Maybe this goes somewhere better. Maybe it's a game. Maybe it's a life.")
+            self.add_item("Vision Map")
+            self.restore_sanity(10)
+            if logbook_bonus:
+                self.change_balance(logbook_bonus)
+        print("\n")
+
+    def mysterious_envelope_reveal(self):
+        """Mysterious Envelope reveals its contents"""
+        if not self.has_item("Mysterious Envelope"):
+            self.day_event()
+            return
+        if self.has_met("Envelope Opened"):
+            self.day_event()
+            return
+        self.meet("Envelope Opened")
+        type.type("The " + cyan(bright("Mysterious Envelope")) + " has been unopened in your glovebox for days.")
+        print("\n")
+        type.type("You've been afraid to open it. Or maybe just saving it. Today: you open it.")
+        print("\n")
+        contents = random.randrange(4)
+        self.use_item("Mysterious Envelope")
+        if contents == 0:
+            amount = random.randint(200, 1000)
+            type.type("Inside: a cashier's check made out to " + quote("Bearer") + " for " + green("${:,}".format(amount)) + ".")
+            print("\n")
+            type.type("You stare at it. Valid. Signed. Yours.")
+            self.change_balance(amount)
+            self.restore_sanity(10)
+        elif contents == 1:
+            type.type("Inside: a note. In handwriting you don't recognize.")
+            print("\n")
+            type.type(quote("You've been chosen. Not randomly. For reasons that will become clear. Keep going."))
+            print("\n")
+            type.type("That's all. No signature. No return address.")
+            self.restore_sanity(15)
+        elif contents == 2:
+            type.type("Inside: a photograph. A picture of your car. From above. From today.")
+            print("\n")
+            type.type("You look at the sky. Nothing there. Nothing you can see, anyway.")
+            self.restore_sanity(5)
+            self.add_status("Being Watched")
+        else:
+            type.type("Inside: a key. Small, brass, old. And a note: " + quote("Safety deposit box. Bank of the Endless Highway. Ask for Pete."))
+            print("\n")
+            type.type("You've never heard of that bank. But the key goes in your pocket anyway.")
+            self.change_balance(random.randint(50, 300))
+            self.restore_sanity(8)
+        print("\n")
+
+    def lockbox_contents(self):
+        """Lockbox can be opened for its contents"""
+        if not self.has_item("Lockbox"):
+            self.day_event()
+            return
+        if self.has_met("Lockbox Opened"):
+            self.day_event()
+            return
+        self.meet("Lockbox Opened")
+        type.type("The " + cyan(bright("Lockbox")) + " is still locked. It's been locked since you got it.")
+        print("\n")
+        if self.has_item("Lockpick Set"):
+            type.type("You take out your " + cyan(bright("Lockpick Set")) + ". This is what it was made for.")
+            print("\n")
+            type.type("Five minutes of careful work. A click. The lid opens.")
+            print("\n")
+        elif self.has_item("Pocket Knife"):
+            type.type("You wedge your " + cyan(bright("Pocket Knife")) + " into the seam and work it until the lock gives.")
+            print("\n")
+        else:
+            type.type("You try every key you have. Nothing. You drive it to a locksmith.")
+            print("\n")
+            type.type("Twenty dollars and five minutes later, it opens.")
+            self.change_balance(-20)
+        amount = random.randint(100, 600)
+        self.use_item("Lockbox")
+        type.type("Inside: " + green("${:,}".format(amount)) + " in cash and a note: " + quote("Good luck, stranger."))
+        self.change_balance(amount)
+        self.restore_sanity(8)
+        print("\n")
+
+    def hollow_tree_stash_find(self):
+        """Open the Hollow Tree Stash"""
+        if not self.has_item("Hollow Tree Stash"):
+            self.day_event()
+            return
+        if self.has_met("Hollow Tree Opened"):
+            self.day_event()
+            return
+        self.meet("Hollow Tree Opened")
+        type.type("You pull over near the woods and dig out the " + cyan(bright("Hollow Tree Stash")) + " you collected.")
+        print("\n")
+        type.type("A sealed container, hidden in a rotted tree trunk. Someone's cache.")
+        print("\n")
+        type.type("Emergency supplies. Food, tools, some cash.")
+        self.use_item("Hollow Tree Stash")
+        amount = random.randint(50, 300)
+        self.change_balance(amount)
+        self.heal(10)
+        type.type("You find " + green("${:,}".format(amount)) + " in small bills, some preserved food, and a matchbook.")
+        print("\n")
+        type.type("Whoever stashed this never came back. You leave the matchbook out of respect.")
+        self.restore_sanity(5)
+        print("\n")
+
+    def vision_map_navigate(self):
+        """Vision Map leads to a hidden location or shortcut"""
+        if not self.has_item("Vision Map"):
+            self.day_event()
+            return
+        if self.has_met("Vision Map Used"):
+            self.day_event()
+            return
+        self.meet("Vision Map Used")
+        type.type("You spread the " + cyan(bright("Vision Map")) + " on your steering wheel. It shows roads that aren't on any GPS.")
+        print("\n")
+        type.type("You follow one. It winds through emptiness, past forgotten places.")
+        print("\n")
+        type.type("Then it opens into something you didn't expect.")
+        print("\n")
+        destination = random.randrange(3)
+        if destination == 0:
+            amount = random.randint(200, 800)
+            type.type("An abandoned gas station. Inside, behind the counter: a floor safe. Open. Cash inside.")
+            print("\n")
+            type.type("The map knew. " + green("${:,}".format(amount)) + " for following the strange road.")
+            self.change_balance(amount)
+            self.restore_sanity(10)
+        elif destination == 1:
+            type.type("A clearing with a perfect view of the valley. You didn't know this place existed.")
+            print("\n")
+            type.type("You sit here for an hour. No noise. No stress. Just the view.")
+            self.restore_sanity(20)
+            self.heal(15)
+            self.reduce_fatigue(20)
+        else:
+            type.type("A small community of people, off-grid. They're surprised to see you.")
+            print("\n")
+            type.type("You share a meal. Share stories. Share the road.")
+            self.restore_sanity(15)
+            self.heal(10)
+            self.change_balance(random.randint(50, 200))
+        print("\n")
+
+    def secret_route_shortcut(self):
+        """Secret Route Map provides a road benefit"""
+        if not self.has_item("Secret Route Map"):
+            self.day_event()
+            return
+        if self.has_met("Secret Route Used"):
+            self.day_event()
+            return
+        self.meet("Secret Route Used")
+        type.type("You unfold the " + cyan(bright("Secret Route Map")) + " the trucker sold you. Back roads. Shortcuts.")
+        print("\n")
+        type.type("You follow it. It bypasses three construction zones, two traffic jams, and a weigh station.")
+        print("\n")
+        type.type("You save two hours. Maybe three. And you find a roadside diner on the route that's not in any app.")
+        print("\n")
+        type.type("Best pie you've ever had. And the owner tips you off to something worth knowing.")
+        amount = random.randint(50, 300)
+        type.type("He points you toward an opportunity: " + green("${:,}".format(amount)) + " in it for you.")
+        self.change_balance(amount)
+        self.restore_sanity(10)
+        print("\n")
+
+    def street_cat_ally_benefit(self):
+        """Street Cat Ally watches your back"""
+        if not self.has_item("Street Cat Ally"):
+            self.day_event()
+            return
+        type.type("The cat from last night is still with you. You've been calling it " + cyan(bright("The Ally")) + ".")
+        print("\n")
+        type.type("It sits on your dashboard like a hood ornament with opinions.")
+        print("\n")
+        outcome = random.randrange(3)
+        if outcome == 0:
+            type.type("It hisses before you open the car door. You pause. A man was lurking nearby, waiting.")
+            print("\n")
+            type.type("The hiss. The pause. The man moves on. The cat saved you from something.")
+            self.restore_sanity(10)
+        elif outcome == 1:
+            type.type("The cat finds something in the seat cushion you didn't know was there.")
+            amount = random.randint(10, 60)
+            type.type("Coins. And a crumpled bill. " + green("${:,}".format(amount)) + " total.")
+            self.change_balance(amount)
+            self.restore_sanity(5)
+        else:
+            type.type("It curls up on your lap while you drive. Purring.")
+            print("\n")
+            type.type("You're not a cat person. You're a car person. But this cat understands something about living on the road.")
+            self.restore_sanity(12)
+        print("\n")
+
+    def old_photograph_memory(self):
+        """Old Photograph triggers a memory and sanity effect"""
+        if not self.has_item("Old Photograph"):
+            self.day_event()
+            return
+        if self.has_met("Old Photo Remembered"):
+            self.day_event()
+            return
+        self.meet("Old Photo Remembered")
+        type.type("The " + cyan(bright("Old Photograph")) + " falls out of your glovebox. You must have forgotten it was there.")
+        print("\n")
+        type.type("Two people in it. Happy. Somewhere warm.")
+        print("\n")
+        type.type("You don't know who they are. But they look like the kind of happy you're working toward.")
+        print("\n")
+        outcome = random.randrange(2)
+        if outcome == 0:
+            type.type("You tuck it into the visor. Something to look at on the bad days.")
+            print("\n")
+            type.type("Today, inexplicably, is a good day.")
+            self.restore_sanity(15)
+        else:
+            type.type("You flip it over. On the back, in faded pencil: " + quote("Don't stop."))
+            print("\n")
+            type.type("You aren't going to.")
+            self.restore_sanity(20)
+            self.heal(10)
+        print("\n")
+
+    def beach_romance_call(self):
+        """Beach Romance Number can be called"""
+        if not self.has_item("Beach Romance Number"):
+            self.day_event()
+            return
+        if self.has_met("Beach Romance Called"):
+            self.day_event()
+            return
+        self.meet("Beach Romance Called")
+        type.type("The " + cyan(bright("Beach Romance Number")) + " has been sitting in your pocket.")
+        print("\n")
+        type.type("You've almost called it twelve times. Today, you actually dial.")
+        print("\n")
+        result = random.randrange(3)
+        if result == 0:
+            type.type("They pick up on the second ring. Remember you immediately.")
+            print("\n")
+            type.type(quote("I was wondering if you'd ever call."))
+            print("\n")
+            type.type("You talk for an hour. Maybe two. You feel like a person again. A whole one.")
+            self.restore_sanity(25)
+            self.change_balance(random.randint(50, 200))
+        elif result == 1:
+            type.type("Voicemail. A warm voice. You leave a message.")
+            print("\n")
+            type.type("They never call back. But the message — the act of leaving it — feels right.")
+            self.restore_sanity(10)
+        else:
+            type.type("Number disconnected. You stare at your phone.")
+            print("\n")
+            type.type("Some things from the beach stay on the beach. You let it go.")
+            self.restore_sanity(5)
+        self.use_item("Beach Romance Number")
+        print("\n")
+
+    def apartment_key_visit(self):
+        """Apartment Key can be used to visit/rest"""
+        if not self.has_item("Apartment Key"):
+            self.day_event()
+            return
+        if self.has_met("Apartment Visited"):
+            self.day_event()
+            return
+        self.meet("Apartment Visited")
+        type.type("You've been driving past this building every day with the " + cyan(bright("Apartment Key")) + " in your pocket.")
+        print("\n")
+        type.type("Today you stop. You go up. You try the key.")
+        print("\n")
+        type.type("It works.")
+        print("\n")
+        type.type("Empty apartment. Clean. Someone left the essentials.")
+        print("\n")
+        type.type("A shower. A bed. A night off from the car.")
+        print("\n")
+        type.type("You sleep for twelve hours. You dream of something other than the road.")
+        self.heal(25)
+        self.restore_sanity(20)
+        self.reduce_fatigue(40)
+        print("\n")
+
+    def fake_flower_gift(self):
+        """Fake Flower can be gifted to cheer someone up"""
+        if not self.has_item("Fake Flower"):
+            self.day_event()
+            return
+        if self.has_met("Fake Flower Given"):
+            self.day_event()
+            return
+        self.meet("Fake Flower Given")
+        type.type("You're carrying a " + cyan(bright("Fake Flower")) + " that someone made for you. Cloth petals. Wire stem. Perfectly imperfect.")
+        print("\n")
+        type.type("You see a kid crying on the sidewalk. Lost. Upset. Waiting for someone who's late.")
+        print("\n")
+        answer = ask.yes_or_no("Give them the flower? ")
+        if answer == "yes":
+            type.type("You hand it over. The kid stops crying to look at it.")
+            print("\n")
+            type.type("Then smiles. A real one. The kind that breaks your chest open a little.")
+            print("\n")
+            type.type("Their parent arrives. Sees you. Mouths: " + quote("thank you."))
+            print("\n")
+            type.type("You didn't do much. But you did something. That's worth more than you know.")
+            self.use_item("Fake Flower")
+            self.restore_sanity(20)
+        else:
+            type.type("You can't give up the only flower you have. You drive on, trying not to think about the crying kid.")
+            self.lose_sanity(5)
+        print("\n")
+
+    def empty_locket_memory(self):
+        """Empty Locket holds a meaningful memory when combined with Old Photograph"""
+        if not self.has_item("Empty Locket"):
+            self.day_event()
+            return
+        if self.has_met("Locket Filled"):
+            self.day_event()
+            return
+        if self.has_item("Old Photograph"):
+            self.meet("Locket Filled")
+            type.type("You hold the " + cyan(bright("Empty Locket")) + " and the " + cyan(bright("Old Photograph")) + " together.")
+            print("\n")
+            type.type("The photo fits. Perfectly. Like it was always meant to go there.")
+            print("\n")
+            type.type("You hang the locket from your rearview mirror. Those two strangers, watching over you now.")
+            self.use_item("Old Photograph")
+            self.use_item("Empty Locket")
+            self.add_item("Filled Locket")
+            self.restore_sanity(15)
+            print("\n")
+        else:
+            type.type("The " + cyan(bright("Empty Locket")) + " sits in your hand. Small. Waiting.")
+            print("\n")
+            type.type("It needs something to hold. A picture. A memory. Something to protect.")
+            print("\n")
+            type.type("You don't have anything to put in it. Not yet. But you will.")
+            self.restore_sanity(3)
+            print("\n")
+
+    def stack_of_flyers_opportunity(self):
+        """Stack of Flyers leads to a money-making opportunity"""
+        if not self.has_item("Stack of Flyers"):
+            self.day_event()
+            return
+        if self.has_met("Flyers Distributed"):
+            self.day_event()
+            return
+        self.meet("Flyers Distributed")
+        type.type("You have a " + cyan(bright("Stack of Flyers")) + " you picked up. Could use these for something.")
+        print("\n")
+        type.type("You spend the morning putting them up around town: telephone poles, laundromats, coffee shops.")
+        print("\n")
+        type.type("By afternoon, your phone has three calls. Two spam. One legitimate.")
+        print("\n")
+        type.type("A local business wants exactly the kind of help you can offer.")
+        self.use_item("Stack of Flyers")
+        amount = random.randint(100, 400)
+        type.type("Two hours of work. " + green("${:,}".format(amount)) + " in your pocket.")
+        self.change_balance(amount)
+        self.restore_sanity(8)
         print("\n")
 

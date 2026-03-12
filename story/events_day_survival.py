@@ -1199,6 +1199,13 @@ class DaySurvivalMixin:
             self.hurt(3)
             print("\n")
             return
+        if self.has_item("Sunglasses"):
+            type.type("You fell asleep with the window cracked, but at least you'd had your " + magenta(bright("Sunglasses")) + " on.")
+            print("\n")
+            type.type("Your arms got scorched, but your eyes are fine. Small mercy. You look vaguely cool while suffering.")
+            self.hurt(8)
+            print("\n")
+            return
         if self.has_item("Umbrella"):
             type.type("You fell asleep with the window cracked, but your " + magenta(bright("Umbrella")) + " was propped against the window.")
             print("\n")
