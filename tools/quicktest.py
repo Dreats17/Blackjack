@@ -3829,7 +3829,7 @@ def _looks_like_pawn_menu(options):
 
 def _decide_yes_no(prompt=""):
     player = CURRENT_PLAYER
-    prompt_lower = (prompt or "").lower()
+    prompt_lower = (prompt or "").lower().strip()
     recent = _recent_lower(80)
     recent_mechanic = _recent_lower(20)
     cost = _extract_cash_amount(prompt, recent)

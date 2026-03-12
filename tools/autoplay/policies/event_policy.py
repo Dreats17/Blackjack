@@ -207,7 +207,7 @@ def _inline_trace(request: DecisionRequest, plan: StrategicPlan, chosen: str, re
 
 
 def choose_event_yes_no(request: DecisionRequest, plan: StrategicPlan) -> tuple[str | None, DecisionTrace | None]:
-    prompt_lower = str(request.metadata.get("prompt_lower", "") or "")
+    prompt_lower = str(request.metadata.get("prompt_lower", "") or "").strip()
     recent = str(request.metadata.get("recent_lower", "") or "")
     cost = request.metadata.get("cost")
     balance = int(request.game_state.get("balance", 0) or 0)
@@ -216,7 +216,6 @@ def choose_event_yes_no(request: DecisionRequest, plan: StrategicPlan) -> tuple[
     rank = int(request.game_state.get("rank", 0) or 0)
 
     always_yes = {
-        "moo?",
         "do you ask if he's okay?",
         "do you listen?",
         "stand up for kyle?",
@@ -302,6 +301,27 @@ def choose_event_yes_no(request: DecisionRequest, plan: StrategicPlan) -> tuple[
         return "yes", _yes_no_trace(request, plan, "yes", f"event_yes:{prompt_lower}", 0.82)
     if prompt_lower in always_no:
         return "no", _yes_no_trace(request, plan, "no", f"event_no:{prompt_lower}", 0.82)
+
+    # Betsy the cow: "Moo? " prompt. Two different events with very different costs.
+    # hungry_cow  (stage 0): $100 per feeding — affordable, pay unless it would block car acquisition.
+    # starving_cow (stage 1): $10,000 per feeding — only pay if we genuinely have it.
+    # cow_army    (stage 2): $100,000 per feeding — refuse unless Doughman/nearly rich.
+    # Differentiator: "tractor" in recent → stage 1 ($10k); "army" in recent → stage 2 ($100k).
+    if prompt_lower == "moo?":
+        rank = int(request.game_state.get("rank", 0) or 0)
+        needs_car = not bool(request.game_state.get("has_car", False))
+        if "army" in recent or "hundred thousand" in recent or "100,000" in recent:
+            # cow_army: $100k per round — only pay if Doughman (rank 4+)
+            answer = "yes" if rank >= 4 and balance >= 100000 else "no"
+            return answer, _yes_no_trace(request, plan, answer, "betsy_army_budget_gate", 0.85)
+        if "tractor" in recent:
+            # starving_cow: $10,000 per round — only pay if we can afford it
+            answer = "yes" if balance >= 10000 else "no"
+            return answer, _yes_no_trace(request, plan, answer, "betsy_tractor_budget_gate", 0.85)
+        # hungry_cow: $100 per round. Pay unless it would block car acquisition.
+        car_reserve = 250 if needs_car else 0
+        answer = "yes" if balance >= 100 + car_reserve else "no"
+        return answer, _yes_no_trace(request, plan, answer, "betsy_hungry_budget_gate", 0.82)
 
     if prompt_lower == "take the money?" and "loyalty bonus" in recent:
         return "no", _yes_no_trace(request, plan, "no", "loyalty_bonus_money_refusal", 0.8)
