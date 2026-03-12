@@ -42,11 +42,15 @@ STORE_PROGRESSION_PRIORITIES: dict[str, int] = {
     "Lucky Penny": 12,
     # Crafting ingredients (Car Workbench recipes) — verified from lists.py make_crafting_recipes
     # These items have priority 0 elsewhere and are therefore NEVER bought without this table.
-    # Priorities must exceed max(56, rank_store_priority_min - 16) = 68 at rank 1 to trigger store
-    # visits when the item is the best available (rank tuner store_priority_min=84 at rank 1).
+    # With the crafting synergy boost in _store_item_priority, the effective priority
+    # becomes recipe_priority + 4 (starting boost) or + 12 (completing boost), so an
+    # ingredient for Emergency Blanket (74) reaches 78 or 86 respectively.
+    # Base priorities here ensure items are considered even before the synergy fires.
     "Garbage Bag": 72,    # Emergency Blanket (74), Rain Collector (58), Smoke Signal Kit (60); all ranks
     "Plastic Wrap": 70,   # Feeding Station (78), Water Purifier (64), Rain Collector (58); all ranks
     "Fishing Line": 72,   # Lockpick Set (72), Improvised Trap (62), Fishing Rod (54); rank 2 store
+    "Rope": 64,           # Fishing Rod (54), Splint (70), Snare Trap (52); all ranks car-maintenance store
+    "Bungee Cords": 56,   # Car Alarm Rigging (66), Slingshot (46); all ranks car-maintenance store
     "Rubber Bands": 30,   # Dream Catcher (50), Slingshot (46); rank 0 store only
     "Breath Mints": 30,   # Smelling Salts (66) needs Hand Warmers + Breath Mints; rank 0 store only
 }
@@ -91,29 +95,37 @@ MARVIN_ITEM_PRIORITIES: dict[str, int] = {
 }
 
 MARVIN_PRICE_ESTIMATES: dict[str, int] = {
-    # Conservative estimates — deliberately set near the UPPER END of each item's
-    # actual price range so the bot only visits Marvin when it can absorb any roll.
-    # The actual game prices in locations.py were reduced ~25%, so this creates a
-    # "pleasant discount" effect: the bot budgets for the high end and usually pays less.
-    "Delight Indicator": 8500,
-    "Health Indicator": 8000,
-    "Dirty Old Hat": 25000,
-    "Golden Watch": 29000,
-    "Faulty Insurance": 10000,
-    "Enchanting Silver Bar": 10000,
-    "Sneaky Peeky Shades": 35000,
-    "Quiet Sneakers": 15000,
-    "Lucky Coin": 12000,
-    "Worn Gloves": 18000,
-    "Tattered Cloak": 22000,
-    "Rusty Compass": 8000,
-    "Pocket Watch": 20000,
-    "Gambler's Chalice": 28000,
-    "Twin's Locket": 35000,
-    "White Feather": 15000,
-    "Dealer's Grudge": 22000,
-    "Gambler's Grimoire": 8000,
-    "Animal Whistle": 50000,
+    # Mid-range estimates based on code-verified price ranges from locations.py.
+    # Previously these were set at the upper end ($8k+) which prevented the bot
+    # from recognising affordable items at $3k-$6k balance.  Updated to use the
+    # midpoint of each item's actual random.choice range so the bot visits Marvin
+    # once it can realistically afford something.
+    # Actual price ranges (from locations.py, rank-1 tier):
+    #   Rusty Compass:   random.choice([3000, 3500, 4000, 5000, 6000, 7500])  → median ~4500
+    #   Health Indicator:random.choice([3000, 3200, 4000, 4500, 5500, 7000])  → median ~4500
+    #   Delight Indicator:random.choice([4000, 4250, 4500, 5500, 6000, 9000]) → median ~5500
+    #   Faulty Insurance:random.choice([3500, 4000, 5000, 5500, 6000, 7000])  → median ~5000
+    #   Lucky Coin:      random.choice([5000, 5500, 6000, 7000, 8000, 10000]) → median ~6500
+    #   Gambler's Grimoire: random.choice([6000, 7500, 9000])                 → median ~7500
+    "Delight Indicator": 5500,
+    "Health Indicator": 5000,
+    "Dirty Old Hat": 22000,
+    "Golden Watch": 26000,
+    "Faulty Insurance": 5000,
+    "Enchanting Silver Bar": 9000,
+    "Sneaky Peeky Shades": 19000,
+    "Quiet Sneakers": 9000,
+    "Lucky Coin": 6500,
+    "Worn Gloves": 16000,
+    "Tattered Cloak": 12000,
+    "Rusty Compass": 5000,
+    "Pocket Watch": 18000,
+    "Gambler's Chalice": 26000,
+    "Twin's Locket": 32000,
+    "White Feather": 13000,
+    "Dealer's Grudge": 20000,
+    "Gambler's Grimoire": 7500,
+    "Animal Whistle": 48000,
 }
 
 MARVIN_ITEM_ORDER: tuple[str, ...] = (
@@ -229,7 +241,7 @@ RANK_TUNER_PROFILES: dict[int, dict[str, float | int]] = {
         "store_balance_gate": 250,
         "store_health_gate": 60,
         "store_sanity_gate": 30,
-        "marvin_min_balance": 9000,
+        "marvin_min_balance": 5000,
         "marvin_floor_buffer": 3000,
         "upgrade_floor_buffer": 150000,
     },
@@ -246,7 +258,7 @@ RANK_TUNER_PROFILES: dict[int, dict[str, float | int]] = {
         "store_balance_gate": 600,
         "store_health_gate": 60,
         "store_sanity_gate": 28,
-        "marvin_min_balance": 9500,
+        "marvin_min_balance": 5500,
         "marvin_floor_buffer": 3000,
         "upgrade_floor_buffer": 180000,
     },

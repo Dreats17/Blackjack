@@ -1710,24 +1710,38 @@ def _store_item_priority(item_name, player):
         priority += 4
     if item_name == "Lucky Penny" and player.get_rank() == 0:
         priority += 4
-    # Crafting synergy: if this item would complete a recipe (all other ingredients
-    # already in inventory) and the player has a Tool Kit, boost its priority to
-    # match the recipe value minus a small discount.  This lets crafting ingredients
-    # trigger store visits even when their base priority is below the rank threshold.
+    # Crafting synergy: if this item is an ingredient in a high-priority recipe and
+    # the player has a Tool Kit, boost the priority so that crafting ingredients
+    # trigger store visits even before the other ingredients are in inventory.
+    # This breaks the chicken-and-egg deadlock where neither ingredient of a two-
+    # ingredient recipe would ever be bought because the other wasn't present first.
+    # Two tiers:
+    #   - "completing" boost: all other ingredients present → recipe_priority + 16
+    #     (+16 brings Emergency Blanket from 74 → 90, crossing the midgame-growth-
+    #     window gate of >=90 that otherwise suppresses cheap low-impact store items)
+    #   - "starting" boost:   no other ingredients yet       → recipe_priority + 6
+    #     (+6 brings Emergency Blanket from 74 → 80, which crosses the rank-0 threshold
+    #     of 80 so the first ingredient gets bought at rank 0 too)
     # Capped at rank <= 1 (rank 2+ blocks non-survival store trips anyway).
     if player.has_item("Tool Kit") and int(player.get_rank()) <= 1:
         try:
             for recipe_name, recipe in player._lists.get_crafting_recipes().items():
+                if player.has_item(recipe_name):
+                    continue  # already crafted this recipe
                 ingredients = recipe.get("ingredients", [])
                 if item_name not in ingredients:
                     continue
+                recipe_priority = get_crafting_recipe_priority(recipe_name)
+                if recipe_priority < CRAFTING_MIN_PRIORITY:
+                    continue
                 others = [ing for ing in ingredients if ing != item_name]
                 if all(player.has_item(ing) for ing in others):
-                    recipe_priority = get_crafting_recipe_priority(recipe_name)
-                    if recipe_priority >= CRAFTING_MIN_PRIORITY:
-                        # Boost enough to cross rank-1 store threshold (max(56, 84-16)=68).
-                        priority = max(priority, recipe_priority - 4)
-                        break
+                    # Completing boost: buying this finishes the recipe (crosses 90 gate)
+                    priority = max(priority, recipe_priority + 16)
+                else:
+                    # Starting boost: buying this makes progress toward the recipe
+                    priority = max(priority, recipe_priority + 6)
+                break
         except Exception:
             pass
     return priority

@@ -980,6 +980,47 @@ def run_all_scenarios() -> list[ScenarioResult]:
         )
     )
 
+    # Crafting synergy: completing boost — player has Duct Tape + Tool Kit;
+    # Garbage Bag in store completes Emergency Blanket → priority >= 86, store fires.
+    results.append(
+        _run_quicktest_destination_scenario(
+            "crafting_ingredient_completing_boost_triggers_store",
+            "route_interrupt",
+            FakeScenarioPlayer(
+                day=15,
+                balance=700,
+                rank=1,
+                health=82,
+                sanity=60,
+                inventory=("Car", "Tool Kit", "Duct Tape"),
+                store_inventory=(("Garbage Bag", 3),),
+            ),
+            ("Convenience Store", "Stay Home"),
+            "Convenience Store",
+        )
+    )
+
+    # Crafting synergy: starting boost — player has Tool Kit but no other ingredient;
+    # Garbage Bag alone gets a starting boost to 78, which crosses the rank-1 secondary
+    # store gate (>= 68) with balance >= 600.
+    results.append(
+        _run_quicktest_destination_scenario(
+            "crafting_ingredient_starting_boost_triggers_store",
+            "route_interrupt",
+            FakeScenarioPlayer(
+                day=15,
+                balance=700,
+                rank=1,
+                health=82,
+                sanity=60,
+                inventory=("Car", "Tool Kit"),
+                store_inventory=(("Garbage Bag", 3),),
+            ),
+            ("Convenience Store", "Stay Home"),
+            "Convenience Store",
+        )
+    )
+
     results.append(
         _run_quicktest_destination_scenario(
             "witch_flask_only_run_fires_when_healthy_and_affordable",

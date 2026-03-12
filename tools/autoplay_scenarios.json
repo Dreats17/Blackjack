@@ -706,6 +706,36 @@
       },
       {
         "details": {
+          "balance": 700,
+          "day": 15,
+          "expected": "Convenience Store",
+          "health": 82,
+          "injuries": [],
+          "route": "Convenience Store",
+          "sanity": 60,
+          "statuses": []
+        },
+        "passed": true,
+        "scenario_id": "crafting_ingredient_completing_boost_triggers_store",
+        "summary": "route=Convenience Store expected=Convenience Store"
+      },
+      {
+        "details": {
+          "balance": 700,
+          "day": 15,
+          "expected": "Convenience Store",
+          "health": 82,
+          "injuries": [],
+          "route": "Convenience Store",
+          "sanity": 60,
+          "statuses": []
+        },
+        "passed": true,
+        "scenario_id": "crafting_ingredient_starting_boost_triggers_store",
+        "summary": "route=Convenience Store expected=Convenience Store"
+      },
+      {
+        "details": {
           "balance": 15000,
           "day": 25,
           "expected": "Witch Doctor's Tower",
@@ -840,7 +870,7 @@
   },
   "summary": {
     "failed": 0,
-    "passed": 49,
-    "total": 49
+    "passed": 51,
+    "total": 51
   }
 }
