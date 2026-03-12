@@ -15,6 +15,85 @@ What this document contains
 - Maintenance guidance so the system stays useful as the game evolves.
 - A practical checklist for expanding coverage until the harness can engage every meaningful winning path and expose fairness problems or broken systems when it cannot.
 
+======================================================================
+CORE GAME MECHANIC TRUTHS (verified — do not work against these)
+======================================================================
+
+NO ON-FOOT TRAVEL
+- Without a car there is NO afternoon activity whatsoever.
+- make_shop_list(on_foot=True) always returns an empty list and the game
+  immediately calls night_event().  The Doctor, Convenience Store, Pawn Shop,
+  Marvin, Loan Shark — none are reachable on foot.
+- Any routing logic conditioned on "no car AND in the afternoon menu" is dead
+  code.  Mechanics reach the player as random day events; the player cannot
+  seek them out on foot.
+
+MECHANIC SHOPS UNLOCK ONLY VIA SUCCESSFUL CAR PURCHASE
+- Meeting Tom / Frank / Oswald during their roadside intro event does NOT
+  unlock their shop.  Only paying for and receiving the car from that mechanic
+  unlocks their afternoon shop listing.
+
+MECHANIC INTRO SYMPATHY MECHANICS (verified from mechanics_intro.py)
+- Tom  (price $150-$350): say YES even when broke → 50 % chance Tom offers a
+  $50 discount.  No money is taken if still unaffordable.  Always say yes.
+- Frank (price $50-$100): say YES when broke → adds a "Frank" Danger.  BAD.
+  Always say NO to Frank when balance < quoted price.  40 % success rate even
+  when paid (Frank is unreliable).
+- Oswald (price $800-$900): say YES when CAN afford → tip $50-100 AND car
+  fixed.  Say YES when broke → tip $50-100, no fix.  Say NO → no tip, just
+  leaves.  Always say yes to Oswald (tip even if broke).
+
+DOCTOR PRICING (verified from locations.py visit_doctor)
+- No insurance:     35–60 % of current balance
+- Faulty Insurance: 10–35 % of current balance (10 % ban risk)
+- Real Insurance:   FREE
+  (The docs say 65–90 % — the code is the ground truth: 35–60 %.)
+
+MARVIN AVAILABILITY (verified from lists.py make_shop_list)
+- Marvin appears in the shop list whenever the player has a Map or Worn Map.
+  There is NO rank gate in make_shop_list — only the map requirement.
+  The docs say Rank 3+ but the code has no rank check here.
+- Marvin's item prices are RANDOM per visit (not fixed):
+  e.g. Health Indicator $4,000–$5,500, Golden Watch $15,000–$17,500,
+  Rusty Compass $4,000–$6,000.  All items use random.choice([low, mid, high]).
+
+ROADSIDE MECHANIC VISIT (newly implemented — not in docs, added for longevity)
+- Fires at 45 % probability when car trouble adds "Wasted Afternoon".
+- Only available once the player has bought a car from that mechanic
+  (has_met("Tom"), has_met("Frank"), or has_met("Oswald")).
+- Randomly picks from all eligible mechanics the player knows.
+- Prices: Tom $100–$200, Frank $75–$150, Oswald $150–$250.
+- Tom roadside: same sympathy as intro (50 % discount offer if broke).
+- Frank roadside: 40 % success rate; adds Frank Danger if YES + broke.
+- Oswald roadside: tip $50–$100 on YES (both afford and broke); no tip on NO.
+
+MECHANIC INTRO FIRING ORDER (all are random DAY EVENTS, not menu choices)
+- All three mechanics have EQUAL probability of appearing — the order is
+  random, not fixed.  Each is picked from a pool of eligible, not-yet-met
+  mechanics at the moment the storyline event fires.
+- Tom  eligible when: balance >= 200, Tom Event not yet met (no car check).
+- Frank eligible when: NO CAR ONLY, balance >= 200, Frank Event not yet met.
+- Oswald eligible when: balance >= 850, Oswald Event not yet met (no car check —
+  Oswald can visit the player both early and late in the run).
+- If you truly lose your car (no item in inventory), you cannot get it back.
+  The mechanic intro events only *give* a car — they do not recover a lost one.
+
+MARVIN PRICING (random ranges, set fresh each visit)
+- Cheapest items start at $8,000.  Visit ONLY when marvin_affordable_priority
+  > 0 (bot can afford at least one item at its minimum price estimate).
+  Scouting visits when nothing is affordable waste an afternoon with no gain.
+
+WITCH DOCTOR PRICING
+- Healing costs 5–25 % of current balance (random).
+- Potions are randomly priced per visit from fixed ranges (e.g. No Bust
+  $25k–$30k, Fortunate Day $12k–$18k).
+  Only visit when balance can absorb both the heal cost and a target potion.
+
+LOAN SHARK (VINNIE)
+- Vinnie is first met via the "vinnie_referral_card" day event, which fires
+  only when the player already has a car.  The menu entry does not exist
+  until after that event.
+
 Autoplay philosophy
 - Autoplay is not only a bot-quality project. It is also a gameplay audit instrument.
 - The benchmark player should try to engage every mechanic that can reasonably improve a run: car progression, doctor care, witch doctor, Marvin, pawn shop, loan shark, companions, gifts, convenience-store synergies, crafting, workbench loops, and endings.

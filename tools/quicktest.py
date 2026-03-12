@@ -2201,46 +2201,10 @@ def _wants_doctor_visit(player):
 
 
 def _defer_doctor_for_no_car_progression(player, route_labels, planned_goal=None):
-    if player is None or player.has_item("Car") or _doctor_visit_is_urgent(player):
-        return False
-
-    if planned_goal is None:
-        planned_goal = choose_strategic_goal(
-            _current_game_state(player, context_tag="no_car_doctor_deferral")
-        ).goal
-
-    if planned_goal != "acquire_car":
-        return False
-
-    injuries = _injury_names(player)
-    statuses = _status_names(player)
-    severe_injuries = {"ruptured spleen", "concussion", "broken ribs", "punctured lung"}
-    severe_statuses = {
-        "appendicitis", "anaphylaxis", "blood pressure crisis", "dvt", "gangrene", "heat stroke",
-        "hypothermia", "kidney stones", "needle exposure", "pancreatitis", "pneumonia",
-        "possible rabies", "seizure disorder", "sepsis", "severe asthma", "severe dehydration",
-        "staph infection", "tetanus", "uncontrolled diabetes", "waterborne illness",
-    }
-    progression_routes = {
-        "Trusty Tom's Trucks and Tires",
-        "Filthy Frank's Flawless Fixtures",
-        "Oswald's Optimal Outoparts",
-        "Grimy Gus's Pawn Emporium",
-        "Vinnie's Back Alley Loans",
-    }
-
-    if not any(label in route_labels for label in progression_routes):
-        return False
-
-    return (
-        player.get_health() >= 50
-        and player.get_sanity() >= 28
-        and len(injuries) <= 1
-        and len(statuses) <= 2
-        and not any(injury in severe_injuries for injury in injuries)
-        and not any(status in severe_statuses for status in statuses)
-        and _doctor_need_score(player) < 92
-    )
+    # Since there is no on-foot travel, the Doctor is never in the route menu when
+    # the player has no car.  This function is kept as a no-op to avoid breaking
+    # call-sites while the dead-code is cleaned up gradually.
+    return False
 
 
 def _medical_destination_label(player):
@@ -2966,13 +2930,19 @@ def _should_buy_car_repair(player, cost, recent):
         return _can_afford_optional_purchase(player, target_cost, priority)
 
     if "frank" in recent:
+        # Frank's sympathy: saying yes when broke adds a "Frank" Danger to the player.
+        # Decline Frank when we cannot afford his quote to avoid that danger.
         if not player.has_met("Tom Event"):
             return False
         target_cost = cost if cost is not None else 100
+        if cost is not None and balance < cost:
+            return False
         if target_cost <= 100 and balance >= target_cost:
             return True
         return can_pay(target_cost, 92)
     if "tom" in recent:
+        # Tom's sympathy: saying yes when broke triggers a 50% chance of a $50 discount.
+        # No money is lost on failure, so always say yes to Tom even when broke.
         target_cost = cost if cost is not None else 250
         if target_cost <= balance and balance >= 200:
             return True
@@ -2982,6 +2952,8 @@ def _should_buy_car_repair(player, cost, recent):
             return True
         return balance >= 200
     if "stuart" in recent or "oswald" in recent:
+        # Oswald's sympathy: saying yes when broke gives a free $50-100 tip regardless.
+        # Always say yes to Oswald — even without a car fix, we receive free cash.
         target_cost = cost if cost is not None else 900
         if target_cost <= balance and balance >= 850:
             return True
@@ -2989,11 +2961,15 @@ def _should_buy_car_repair(player, cost, recent):
             return True
         return can_pay(target_cost, 75)
     if "i can fix this up for like" in recent:
+        # Frank's offer phrase. Decline when broke (same as the "frank" branch above).
         target_cost = cost if cost is not None else 100
+        if cost is not None and balance < cost:
+            return False
         if target_cost <= 100 and balance >= target_cost:
             return True
         return can_pay(target_cost, 92)
     if "this thing's busted alright" in recent or "could ya do" in recent:
+        # Tom's intro / discount prompt. Apply the Tom sympathy logic.
         target_cost = cost if cost is not None else 250
         if target_cost <= balance and balance >= 200:
             return True
@@ -3003,6 +2979,7 @@ def _should_buy_car_repair(player, cost, recent):
             return True
         return balance >= 200
     if "get you back on the road" in recent or "fix your limousine" in recent:
+        # Oswald's intro phrases. Apply the Oswald sympathy logic (free tip).
         target_cost = cost if cost is not None else 900
         if target_cost <= balance and balance >= 850:
             return True
@@ -3222,17 +3199,18 @@ def _wants_loan_shark_run(player):
     if _has_marvin_access(player) and _best_marvin_affordable_priority(player) < 84 and balance < 6000 and edge_score >= 3:
         return True
     if player.get_rank() == 0:
-        if edge_score < 2:
-            return False
+        # At rank 0, use the loan shark aggressively to bootstrap progression.
+        # Even with no edge items (edge_score=0), a small loan is worth it when
+        # the bot has a car but is cash-poor.
         if balance < 150:
             return True
         if balance < 325:
             return True
         if balance < 900:
             return True
-        if balance < 1800 and edge_score >= 3:
+        if balance < 1800 and edge_score >= 2:
             return True
-        return balance < 1400 and edge_score >= 4
+        return balance < 1400 and edge_score >= 3
     if player.get_rank() == 1 and not player.has_item("Map"):
         return balance < 3600 and edge_score >= 3 and player.get_sanity() >= 30
     return balance < max(3600, _rank_floor(balance)) and edge_score >= 3
@@ -3396,6 +3374,9 @@ def _legacy_choose_destination(options, player):
         if (
             "Marvin's Mystical Merchandise" == progression_label
             or progression_label.startswith("Drive to ")
+            # Loan shark bootstrapping is just as time-sensitive as Marvin — give it the
+            # same priority bypass so it isn't blocked by the pawn/store guards below.
+            or ("Vinnie's Back Alley Loans" == progression_label and _poverty_escape_loan_mode(player))
         ):
             return progression_choice
 
@@ -3432,6 +3413,14 @@ def _planner_choose_destination(options, player):
     loan_pressure = max(
         int(player.get_loan_shark_debt()) if hasattr(player, "get_loan_shark_debt") else 0,
         (int(player.get_loan_shark_warning_level()) if hasattr(player, "get_loan_shark_warning_level") else 0) * 200,
+    )
+    # Poverty escape: flag when the bot has a car, no debt, and not enough cash to
+    # pay even the cheapest mechanic quote ($150 at Tom). Visiting Vinnie first for a
+    # loan breaks the "visit Tom but can't pay" loop.
+    poverty_loan_mode = bool(
+        _poverty_escape_loan_mode(player)
+        and game_state.balance < 150
+        and _wants_loan_shark_run(player)
     )
     mechanic_urgency = 0
     if _wants_mechanic_progression_run(player):
@@ -3495,6 +3484,7 @@ def _planner_choose_destination(options, player):
             "wants_witch": _wants_witch_heal(player),
             "wants_marvin": _wants_marvin_run(player),
             "wants_loan": _wants_loan_shark_run(player),
+            "poverty_loan_mode": poverty_loan_mode,
             "wants_store": wants_store,
             "wants_adventure": _wants_adventure_run(player),
             "wants_upgrade": _wants_upgrade_run(player),
@@ -3592,47 +3582,27 @@ def _choose_destination(options, player):
             and player.get_health() >= 50
             and player.get_sanity() >= 30
         )
-        mechanic_window_open = (
-            recovery_plan.goal == "acquire_car"
-            and any(
-                label in labels
-                for label in (
-                    "Trusty Tom's Trucks and Tires",
-                    "Filthy Frank's Flawless Fixtures",
-                    "Oswald's Optimal Outoparts",
-                )
-            )
-        )
-        mild_no_car_medical_clutter = (
-            player.get_health() >= 56
-            and player.get_sanity() >= 34
+        # Loan shark visits are an economic activity with no physical risk; allow them
+        # through recovery pressure when mild conditions are met.
+        loan_recovery_bypass = (
+            "Vinnie's Back Alley Loans" in labels
+            and _wants_loan_shark_run(player)
+            and player.get_health() >= 55
+            and player.get_sanity() >= 32
             and len(recovery_injuries) <= 1
-            and len(recovery_statuses) <= 3
             and not any(injury in severe_recovery_injuries for injury in recovery_injuries)
             and not any(status in severe_recovery_statuses for status in recovery_statuses)
-            and _doctor_need_score(player) < 72
         )
-        no_car_recovery_push = (
-            recovery_plan.goal == "acquire_car"
-            and _needs_car(player)
-            and not _stranded_no_car_mode(player)
-            and (
-                (
-                    player.get_health() >= 50
-                    and player.get_sanity() >= 28
-                    and len(recovery_injuries) <= 1
-                    and len(recovery_statuses) <= 2
-                    and not any(injury in severe_recovery_injuries for injury in recovery_injuries)
-                    and not any(status in severe_recovery_statuses for status in recovery_statuses)
-                    and _doctor_need_score(player) < 96
-                )
-                or mild_no_car_medical_clutter
-            )
-            and (mechanic_window_open or store_window_open or pawn_window_open or loan_window_open)
-        )
+        # NOTE: mechanic_window_open, mild_no_car_medical_clutter, and
+        # no_car_recovery_push have been removed.  There is no on-foot travel
+        # in this game, so the afternoon route menu is never shown without a
+        # car.  Mechanics drive to the player via random day events; their
+        # shops only appear in the menu AFTER the player has bought a car
+        # from them.  Any route logic conditioned on "no car AND in the menu"
+        # is dead code.
         if mild_recovery_pressure and (store_window_open or pawn_window_open or marvin_window_open):
             allow_recovery_override = False
-        if no_car_recovery_push:
+        if mild_recovery_pressure and loan_recovery_bypass:
             allow_recovery_override = False
 
     if allow_recovery_override and _needs_recovery_day(player) and "Stay Home" in labels:

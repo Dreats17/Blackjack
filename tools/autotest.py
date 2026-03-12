@@ -1274,7 +1274,7 @@ def _shop_summary_lines(results: list[RunResult]) -> list[str]:
         lines.append(
             f"{shop_name:<17} {unlocked_runs:>13}/{total:<2} {visited_runs:>12}/{total:<2} {total_visits:>12}"
         )
-    lines.append("note: Doctor/Store use car-access; Car Workbench uses Tool Kit access.")
+    lines.append("note: ALL locations (including Doctor) require a car. Car Workbench additionally requires a Tool Kit.")
     lines.append("")
     return lines
 

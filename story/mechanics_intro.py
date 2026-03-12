@@ -553,6 +553,184 @@ class MechanicsStorylineMixin:
         print("\n")
 
     # ════════════════════════════════════════════════════════════════════
+    # ROADSIDE MECHANIC VISIT — late-game car-trouble intervention
+    # ════════════════════════════════════════════════════════════════════
+
+    def roadside_mechanic_visit(self):
+        """
+        After car trouble strands the player, the mechanic who sold them their
+        car has a chance to drive by and offer a discounted roadside repair.
+
+        Returns True if the mechanic visited (afternoon partially recovered).
+        Returns False if no mechanic was available or the roll missed.
+        """
+        # Only fires when the player actually has a car and has met at least one mechanic
+        if not self.has_item("Car"):
+            return False
+
+        # 45 % chance per eligible trouble event — likely enough to matter for longevity
+        if random.randrange(100) >= 45:
+            return False
+
+        # Build the pool of mechanics the player has actually done business with
+        eligible = []
+        if self.has_met("Tom"):
+            eligible.append("tom")
+        if self.has_met("Frank"):
+            eligible.append("frank")
+        if self.has_met("Oswald"):
+            eligible.append("oswald")
+
+        if not eligible:
+            return False
+
+        mechanic = random.choice(eligible)
+
+        if mechanic == "tom":
+            self._roadside_visit_tom()
+        elif mechanic == "frank":
+            self._roadside_visit_frank()
+        else:
+            self._roadside_visit_oswald()
+
+        return True
+
+    def _roadside_visit_tom(self):
+        repair_cost = random.choice([100, 150, 200])
+        type.type("A familiar gold truck rolls up and parks behind you. Tom jumps out, wiping his hands on a rag.")
+        print("\n")
+        type.type(quote("Well I'll be. Didn't I just sell you this thing? What'd you do to it?"))
+        print("\n")
+        type.type("He circles the car, muttering to himself, then crouches down and peers underneath.")
+        print("\n")
+        type.type(quote("I can patch this up right here. Won't take long. Call it ") + green(bright("${:,}".format(repair_cost))) + quote(" for the trouble."))
+        print("\n")
+        type.type("Repair for " + green(bright("${:,}".format(repair_cost))) + "? ")
+        yes_or_no = ask.yes_or_no("")
+        print()
+        if yes_or_no == "yes":
+            if self._balance >= repair_cost:
+                self.change_balance(-repair_cost)
+                self.remove_travel_restriction("Wasted Afternoon")
+                type.type(quote("Good as new. Almost. Don't push it so hard next time."))
+                print("\n")
+                type.type("Tom tosses his rag back in the truck and drives off. Your afternoon is yours again.")
+                print("\n")
+            else:
+                random_chance = random.randrange(2)
+                if random_chance == 0:
+                    discounted = repair_cost - 50
+                    type.type(quote("Yunno, I can see you're in a bad way. Tell ya what — ") + green(bright("${:,}".format(discounted))) + quote("?"))
+                    print("\n")
+                    yes_or_no_2 = ask.yes_or_no("")
+                    print()
+                    if yes_or_no_2 == "yes" and self._balance >= discounted:
+                        self.change_balance(-discounted)
+                        self.remove_travel_restriction("Wasted Afternoon")
+                        type.type(quote("Alright! Good as new. Be seein' ya around, ya know?"))
+                        print("\n")
+                    else:
+                        type.type(quote("I really wish there was something more I could do. Best of luck, my friend."))
+                        print("\n")
+                        type.type("Tom gives a sad wave and drives away.")
+                        print("\n")
+                else:
+                    type.type(quote("I really wish there was something I could do. Best of luck my friend."))
+                    print("\n")
+                    type.type("Tom gives a sad wave and drives away.")
+                    print("\n")
+        else:
+            type.type(quote("Suit yourself. Just don't let it get worse."))
+            print("\n")
+            type.type("Tom shrugs, hops back in the truck, and rolls away.")
+            print("\n")
+
+    def _roadside_visit_frank(self):
+        repair_cost = random.choice([75, 100, 150])
+        type.type("A rusty van with a hand-painted \'Frank's\' on the door rattles to a stop beside you.")
+        print("\n")
+        type.type("Frank leans out the window, goggles pushed up on his forehead.")
+        print("\n")
+        type.type(quote("Yo, is that MY car? I mean — the one I fixed? Dude. What happened?"))
+        print("\n")
+        type.type("He hops out and starts poking at things without asking.")
+        print("\n")
+        type.type(quote("Okay okay okay — I can do this. ") + green(bright("${:,}".format(repair_cost))) + quote(". Parts are cheap, labour is love."))
+        print("\n")
+        type.type("Let Frank fix it for " + green(bright("${:,}".format(repair_cost))) + "? ")
+        yes_or_no = ask.yes_or_no("")
+        print()
+        if yes_or_no == "yes":
+            if self._balance >= repair_cost:
+                self.change_balance(-repair_cost)
+                success_chance = random.randrange(5)
+                if success_chance < 2:
+                    self.remove_travel_restriction("Wasted Afternoon")
+                    type.type(quote("NAILED IT. Bam. Done. You're welcome, universe."))
+                    print("\n")
+                    type.type("Frank does a little bow, trips over his own toolbox, and drives off. Car's running.")
+                    print("\n")
+                else:
+                    type.type(quote("Okay so it's... slightly different than before. But it WORKS. Probably."))
+                    print("\n")
+                    type.type("You're not sure what he changed, but the car starts. The afternoon is still gone, though.")
+                    print("\n")
+            else:
+                # Frank adds danger when you say yes but can't pay — consistent with intro
+                self.add_danger("Frank")
+                type.type(quote("Are you KIDDING me? You can't afford that? That's like the cheapest I go! I'll remember this."))
+                print("\n")
+                type.type("Frank kicks your bumper and speeds away.")
+                print("\n")
+        else:
+            type.type(quote("Your loss, man. Literally."))
+            print("\n")
+            type.type("Frank shakes his head and drives off.")
+            print("\n")
+
+    def _roadside_visit_oswald(self):
+        repair_cost = random.choice([150, 200, 250])
+        type.type("A sleek black limousine glides to a stop. The door opens vertically. Oswald steps out.")
+        print("\n")
+        type.type(quote("My goodness. I was simply passing through when I recognized my handiwork. What a small world."))
+        print("\n")
+        type.type("He produces a leather-bound toolkit from inside the limo and gets straight to work.")
+        print("\n")
+        type.type(quote("A professional rate for a repeat customer — ") + green(bright("${:,}".format(repair_cost))) + quote(". Shall we?"))
+        print("\n")
+        type.type("Accept Oswald's roadside repair for " + green(bright("${:,}".format(repair_cost))) + "? ")
+        yes_or_no = ask.yes_or_no("")
+        print()
+        if yes_or_no == "yes":
+            if self._balance >= repair_cost:
+                self.change_balance(-repair_cost)
+                self.remove_travel_restriction("Wasted Afternoon")
+                tip = random.choice([50, 100])
+                type.type(quote("Splendid. Good as new. I do insist on quality. And do allow me —"))
+                print("\n")
+                self.change_balance(tip)
+                type.type("Oswald presses " + green(bright("${:,}".format(tip))) + " into your hand.")
+                print("\n")
+                type.type("He packs his kit, adjusts his bowtie, and the limo glides away. Afternoon saved.")
+                print("\n")
+            else:
+                type.type(quote("Your funds are insufficient. However — "))
+                print("\n")
+                tip = random.choice([50, 100])
+                type.type("Oswald reaches into his breast pocket and produces a crisp bill.")
+                print("\n")
+                type.type(quote("Consider this a gesture of goodwill. Do get that seen to properly."))
+                print("\n")
+                self.change_balance(tip)
+                type.type("You received " + green(bright("${:,}".format(tip))) + " from Oswald.")
+                print("\n")
+        else:
+            type.type(quote("Very well. Safe travels."))
+            print("\n")
+            type.type("Oswald tips his hat and the limo glides away.")
+            print("\n")
+
+    # ════════════════════════════════════════════════════════════════════
 
     def update_story_event_prereqs(self):
         if(self._balance>=200):

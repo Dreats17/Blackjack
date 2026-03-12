@@ -913,13 +913,21 @@ class StorylineSystem:
                 balance = p.get_balance()
                 if balance < 200:
                     return None
+                # Build a pool of eligible mechanics that haven't been introduced yet.
+                # All eligible candidates get equal probability — the order is random,
+                # not fixed (Tom → Frank → Oswald).
+                available = []
                 if not p.has_met("Tom Event"):
-                    return _wrap(storyline_mechanics_intro_tom)
+                    available.append(_wrap(storyline_mechanics_intro_tom))
+                # Frank only drives out when the player has no car yet
                 if not p.has_item("Car") and not p.has_met("Frank Event"):
-                    return _wrap(storyline_mechanics_intro_frank)
-                if not p.has_met("Oswald Event"):
-                    return _wrap(storyline_mechanics_intro_oswald) if balance >= 850 else None
-                return None
+                    available.append(_wrap(storyline_mechanics_intro_frank))
+                # Oswald has no car requirement — he can visit even after the car is bought
+                if not p.has_met("Oswald Event") and balance >= 850:
+                    available.append(_wrap(storyline_mechanics_intro_oswald))
+                if not available:
+                    return None
+                return random.choice(available)
 
             # ── Suzy arc ──────────────────────────────────────────────────────
 

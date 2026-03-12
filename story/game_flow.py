@@ -257,7 +257,13 @@ class GameFlowMixin:
         type.type(yellow("=== CAR TROUBLE ==="))
         print("\n")
         event()
-        
+
+        # If the event left the player stranded for the afternoon, give their
+        # mechanic a chance to drive by and help — the roadside visit system.
+        # The visit may remove "Wasted Afternoon" so the player can still go out.
+        if self.has_travel_restriction("Wasted Afternoon"):
+            self.roadside_mechanic_visit()
+
         return self.has_travel_restriction("Wasted Afternoon")
 
     def get_mark_index(self, mark):

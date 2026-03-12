@@ -3234,6 +3234,10 @@ class Lists:
 
     def make_shop_list(self, on_foot=False):
         a_list = []
+        # There is no on-foot travel in this game.
+        # Without a car the afternoon is skipped entirely (game calls night_event directly).
+        if on_foot:
+            return a_list
         if(not self.__player.has_danger("Doctor Ban")):
             a_list.append("Doctor's Office")
         if((not on_foot) and self.__player.has_met("Witch")):

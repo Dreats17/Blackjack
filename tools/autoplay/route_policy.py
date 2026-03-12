@@ -77,6 +77,13 @@ def _score_route_opportunity(tags: set[str], metadata: dict[str, object]) -> flo
     loan_pressure = float(metadata.get("loan_pressure", 0) or 0)
     if "loan" in tags and metadata.get("wants_loan"):
         total += 52.0 + min(32.0, loan_pressure / 4.0)
+    # In poverty-escape mode the bot can't afford any mechanic quote; boosting the
+    # loan shark ensures it visits Vinnie first to raise capital, breaking the
+    # "try Tom → can't pay → try again" loop.
+    if "loan" in tags and metadata.get("poverty_loan_mode"):
+        total += 100.0
+    if "mechanic" in tags and metadata.get("poverty_loan_mode"):
+        total -= 80.0
 
     marvin_priority = float(metadata.get("marvin_priority", 0) or 0)
     if "marvin" in tags and metadata.get("wants_marvin"):
