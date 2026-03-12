@@ -323,7 +323,7 @@ def choose_blackjack_bet(request: DecisionRequest, plan: StrategicPlan) -> tuple
         has_car
         and rank <= 1
         and progression_ready
-        and phase == "car_ready"
+        and phase in ("rank_one_rush", "rank_two_rush")
         and not wants_store
         and not wants_pawn
         and not wants_doctor
@@ -332,7 +332,6 @@ def choose_blackjack_bet(request: DecisionRequest, plan: StrategicPlan) -> tuple
         and not pending_marvin_active
         and health >= 62
         and sanity >= 34
-        and edge_score >= 2
         and 1200 <= balance < 8000
     )
 
