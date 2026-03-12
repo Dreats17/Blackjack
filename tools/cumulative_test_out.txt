@@ -1,0 +1,105 @@
+=== AUTOTEST RUN 2026-03-12 04:37:21 ===
+AUTOTEST cycles=60 seeds=1-1 total=1
+Longevity alive=1/1 died=0/1 broke=1/1 timeouts=0 doctor_missed=0
+Progress car=0/1 ever_car=0/1 location=1/1 rank1+=0/1 clean=1/1
+Unlocks map=0/1 worn_map=0/1 marvin_access=0/1 witch=0/1 gus=0/1 vinnie=0/1 million=0/1
+Visits doctor=1/1 witch_doctor=0/1 store=0/1 pawn=0/1 loan=0/1 marvin=0/1 tom=0/1 frank=0/1 oswald=0/1 upgrade=0/1 adventure=0/1 airport=0/1 wins=0/1
+
+Decision Coverage requests=414 traces=439
+Requests blackjack_action=205 blackjack_bet=120 yes_no=62 route_select=23 event_branch=4
+Traces   blackjack_action=205 blackjack_bet=120 yes_no=62 route_select=48 event_branch=4
+Contexts blackjack_action=205 blackjack_bet=120 yes_no_prompt=62 afternoon_destination=23 option_prompt=4
+Goals    acquire_car=414 survive_emergency=16 stabilize_health=9
+Route outcomes interrupt=25 suppressed=23
+Route interrupts urgent_medical=16 recovery_day=9
+Blocked goals acquire_car=25 push_next_rank=25 stabilize_health=25 bootstrap_blackjack_edge=20 survive_emergency=2 stabilize_sanity=1
+Interrupted top goals acquire_car=23 survive_emergency=2
+Suppressed routes acquire_car=23
+
+Shop Summary
+shop              unlocked-runs visited-runs total-visits
+----------------- ------------- ------------ ------------
+Doctor                        1/1             1/1            16
+Witch Doctor                  0/1             0/1             0
+Convenience Store             0/1             0/1             0
+Pawn Shop                     0/1             0/1             0
+Loan Shark                    0/1             0/1             0
+Marvin                        0/1             0/1             0
+Tom                           0/1             0/1             0
+Frank                         0/1             0/1             0
+Oswald                        0/1             0/1             0
+Car Access                    0/1             0/1             0
+Car Workbench                 0/1             0/1             0
+Airport                       0/1             0/1             0
+note: Doctor/Store use car-access; Car Workbench uses Tool Kit access.
+
+No-Car Review runs=1/1 early(day<=10)=0 mid(11-30)=0 late(31+)=1 ever-had-then-lost=0 all-three-seen-no-car=0
+early funnel d<=10 threshold=200 reached=0/1 offer-runs=0/1 affordable-offer-runs=0/1 accept-runs=0/1 avg_peak=87
+early route pressure interrupt-runs=0/1 medical-interrupt-runs=0/1 suppressed-runs=1/1 applied-runs=0/1 peak<100=1 peak100-199=0 peak200+=0
+peak-balance buckets peak<100=0 peak100-199=1 peak200-349=0 peak350-799=0 peak800+=0
+mechanic outcomes never had enough for offer=1
+
+Stagnation Audit stalled-runs=1/1
+day-bucket runs avg-peak$ no-car marvin-access marvin-visit doctor loan top-deaths
+---------- ---- --------- ------ ------------- ------------ ------ ---- ----------
+40-69       1/1       179      1             0            0      1    0 none      
+
+Distributions
+Peak balance
+peak<100      0/1   ........................
+100-199       1/1   ########################
+200-349       0/1   ........................
+350-799       0/1   ........................
+800-1,999     0/1   ........................
+2k-4,999      0/1   ........................
+5k+           0/1   ........................
+
+Run length
+day<=10       0/1   ........................
+11-30         0/1   ........................
+31-60         1/1   ########################
+61-90         0/1   ........................
+91+           0/1   ........................
+
+Medical Cohorts
+cohort     runs alive avg-peak$ 2k+ avg-end$ avg-day missed
+---------- ---- ----- --------- --- -------- ------- ------
+doctor-any  1/1     1       179   0        0      50      0
+witch-only  0/1     0         0   0        0       0      0
+no-medical  0/1     0         0   0        0       0      0
+
+Event Economy
+cash gains   night:nightmare total=+33 avg=+10.9 hits=3 | night:ditched_wallet total=+27 avg=+8.9 hits=3 | storyline:mime:stage2 total=+20 avg=+20.3 hits=1 | storyline:sleep_paralysis:stage1 total=+15 avg=+15.0 hits=1
+cash losses  night:went_jogging total=-26 avg=-12.8 hits=2 | storyline:bridge_angel:stage0 total=-25 avg=-12.6 hits=2 | day:flat_tire_again total=-25 avg=-25.0 hits=1 | storyline:kyle:stage4 total=-24 avg=-23.5 hits=1
+health losses night:went_jogging total=-16 avg=-7.8 hits=2 | storyline:gas_station_hero:stage0 total=-12 avg=-12.5 hits=1 | night:stargazing total=-12 avg=-6.0 hits=2 | storyline:betsy:stage0 total=-11 avg=-10.7 hits=1
+sanity losses night:nightmare total=-13 avg=-4.2 hits=3 | storyline:kyle:stage1 total=-5 avg=-5.3 hits=1 | night:drowning_dream total=-5 avg=-5.3 hits=1 | storyline:sleep_paralysis:stage1 total=-5 avg=-5.3 hits=1
+
+Storyline Audit
+completed  kyle=1 | sleep_paralysis=1
+failed     none
+active-end betsy=1 | dealer_past=1 | dr_feelgood=1 | gas_station_hero=1 | jameson=1 | lockbox=1
+
+Fallback Review runs=1/1
+yesno: "What was that?" [low-resource-default] total=1
+
+Event Polarity total=137
+positive=54 (39.4%)
+negative=72 (52.6%)
+neutral=11 (8.0%)
+
+Item Impact
+item            hits pos neg neu cash hp san
+--------------- ---- --- --- --- ---- -- ---
+Carrot             1   1   0   0    4  0   5
+Lockbox            1   1   0   0  -29  3   2
+Martinez's Card    1   0   1   0   13 -4  -3
+
+Marvin Provenance
+none
+
+seed outcome car rank peak$ peak-days end-day end$  hp san top-route
+---- ------- --- ---- ----- --------- ------- ---- --- --- ---------
+   1 broke    N     0   179        34      50    0 100  59 doctor   
+
+Best peak    seed=1 peak=179 peak_days=34 rank=0 final_day=50 final_balance=0
+Longest run  seed=1 day=50 balance=0 peak=179 peak_days=34 rank=0

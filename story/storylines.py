@@ -53,9 +53,9 @@ def quote(text):
     return ("\"" + text + "\"")
 def space_quote(text):
     return ("\"" + text + "\" ")
-def open_quote(text):
+def open_quote(text=""):
     return ("\"" + text)
-def close_quote(text):
+def close_quote(text=""):
     return (text + "\"")
 
 
@@ -106,7 +106,6 @@ class StorylineSystem:
                 "min_gap": 4,
                 "base_chance": 0.12,
                 "escalation": 0.08,
-                "force_start_day": 8,  # Phil shows up to interrogate by day 8
             },
             
             "victoria": {
@@ -117,7 +116,6 @@ class StorylineSystem:
                 "min_gap": 5,
                 "base_chance": 0.15,
                 "escalation": 0.10,
-                "force_start_day": 20,  # Victoria confronts you by day 20 (if balance qualifies)
             },
             
             "betsy": {
@@ -128,7 +126,6 @@ class StorylineSystem:
                 "min_gap": 5,
                 "base_chance": 0.10,
                 "escalation": 0.08,
-                "force_start_day": 15,  # The cow finds you by day 15
             },
             
             "stray_cat": {
@@ -139,7 +136,6 @@ class StorylineSystem:
                 "min_gap": 3,
                 "base_chance": 0.15,
                 "escalation": 0.10,
-                "force_start_day": 8,  # The stray cat shows up by day 8
             },
             
             "bridge_angel": {
@@ -160,7 +156,6 @@ class StorylineSystem:
                 "min_gap": 3,
                 "base_chance": 0.15,
                 "escalation": 0.10,
-                "force_start_day": 15,  # The robbery happens by day 15
             },
             
             "painkiller": {
@@ -181,7 +176,6 @@ class StorylineSystem:
                 "min_gap": 5,
                 "base_chance": 0.10,
                 "escalation": 0.08,
-                "force_start_day": 20,  # The Collector finds you by day 20 (if balance qualifies)
             },
             
             "mechanic_dreams": {
@@ -206,7 +200,40 @@ class StorylineSystem:
                 "min_gap": 0,
                 "base_chance": 0.15,
                 "escalation": 0.10,
-                "force_start_day": 15,  # Grimy Gus is discovered by day 15 (if rank qualifies)
+                "force_start_day": 9,  # Gus should surface in the early car-and-collectible game
+            },
+
+            "vinnie": {
+                "stage": 0,  # 0=not met, 1=discovered (done)
+                "day_started": 0,
+                "completed": False,
+                "failed": False,
+                "min_gap": 0,
+                "base_chance": 0.15,
+                "escalation": 0.10,
+                "force_start_day": 8,  # Vinnie should show up before low-bankroll car runs stall out
+            },
+
+            "marvin": {
+                "stage": 0,  # 0=not unlocked, 1=map acquired (done)
+                "day_started": 0,
+                "completed": False,
+                "failed": False,
+                "min_gap": 0,
+                "base_chance": 0.15,
+                "escalation": 0.10,
+                "force_start_day": 7,  # Marvin should become reachable before rank-2 runs flatten out
+            },
+
+            "witch": {
+                "stage": 0,  # 0=not met, 1=introduced (done)
+                "day_started": 0,
+                "completed": False,
+                "failed": False,
+                "min_gap": 0,
+                "base_chance": 0.12,
+                "escalation": 0.08,
+                "force_start_day": 10,  # The Witch should surface once the run has started taking damage
             },
             
             "mechanics": {
@@ -217,7 +244,7 @@ class StorylineSystem:
                 "min_gap": 2,
                 "base_chance": 0.40,
                 "escalation": 0.15,
-                "force_start_day": 5,  # First mechanic shows up by day 5 (if balance >= 200)
+                "force_start_day": 5,  # First mechanic shows up by day 5
             },
             
             # ==========================================
@@ -386,8 +413,54 @@ class StorylineSystem:
         # Must be auto-advanced to stage 1 after firing so follow-up stages can unlock.
         _POOL_ARCS = frozenset({
             "stray_cat", "jameson", "phil", "mime", "betsy",
-            "gas_station_hero", "collector", "victoria", "grimy_gus",
+            "gas_station_hero", "collector", "victoria", "grimy_gus", "vinnie", "marvin", "witch",
         })
+        _SINGLE_SHOT_ARCS = frozenset({"collector", "grimy_gus", "vinnie", "marvin", "witch"})
+
+        def _mark_started(name):
+            sl = self.storylines[name]
+            sl["stage"] = 1
+            sl["day_started"] = day
+
+        def _unlock_priority(name):
+            p = self.player
+            priorities = [
+                ("mechanics", not p.has_item("Car")),
+                ("marvin", not (p.has_item("Map") or p.has_item("Worn Map"))),
+                ("witch", not p.has_met("Witch")),
+                ("grimy_gus", not p.has_met("Grimy Gus")),
+                ("vinnie", not p.has_met("Vinnie") and p.get_loan_shark_debt() <= 0),
+            ]
+            for index, (priority_name, needed) in enumerate(priorities):
+                if name == priority_name and needed:
+                    return index
+            return None
+
+        def _finalize_event(name, event):
+            if name not in _SINGLE_SHOT_ARCS:
+                return event
+
+            def _run_once():
+                event()
+                sl = self.storylines[name]
+                sl["stage"] = max(sl["stage"], 1)
+                sl["day_started"] = self.player.get_day()
+                if name == "collector" and self.player.has_met("The Collector"):
+                    sl["completed"] = True
+                elif name == "grimy_gus" and self.player.has_met("Grimy Gus"):
+                    sl["completed"] = True
+                elif name == "vinnie" and (
+                    self.player.has_met("Vinnie") or self.player.get_loan_shark_debt() > 0
+                ):
+                    sl["completed"] = True
+                elif name == "marvin" and (
+                    self.player.has_item("Map") or self.player.has_item("Worn Map")
+                ):
+                    sl["completed"] = True
+                elif name == "witch" and self.player.has_met("Witch"):
+                    sl["completed"] = True
+
+            return _run_once
 
         # Sync arcs whose stage-0 events may have fired via the random pool
         self._sync_pool_triggered_arcs()
@@ -406,13 +479,30 @@ class StorylineSystem:
                     forced[name] = event
 
         if forced:
-            chosen = random.choice(list(forced.keys()))
+            unlock_forced = [(priority, name) for name in forced if (priority := _unlock_priority(name)) is not None]
+            if unlock_forced:
+                chosen = min(unlock_forced)[1]
+            else:
+                chosen = random.choice(list(forced.keys()))
             event = forced[chosen]
-            sl = self.storylines[chosen]
             if chosen in _POOL_ARCS:
-                sl["stage"] = 1
-                sl["day_started"] = day
-            return event
+                _mark_started(chosen)
+            return _finalize_event(chosen, event)
+
+        # Keep car progression moving once the mechanics arc has started.
+        mechanics = self.storylines.get("mechanics")
+        if (
+            mechanics is not None
+            and not self.player.has_item("Car")
+            and not mechanics["completed"]
+            and not mechanics["failed"]
+            and mechanics["stage"] > 0
+        ):
+            days_since = day - mechanics["day_started"]
+            if days_since >= mechanics["min_gap"] and self._stage_conditions_met("mechanics"):
+                event = self._get_stage_event("mechanics")
+                if event is not None:
+                    return event
 
         # ── Phase 2: Normal eligible check ─────────────────────────────────────
         eligible = {}
@@ -444,14 +534,17 @@ class StorylineSystem:
         if not eligible:
             return None
 
-        chosen = random.choice(list(eligible.keys()))
+        unlock_eligible = [(priority, name) for name in eligible if (priority := _unlock_priority(name)) is not None]
+        if unlock_eligible:
+            chosen = min(unlock_eligible)[1]
+        else:
+            chosen = random.choice(list(eligible.keys()))
         event = eligible[chosen]
         sl = self.storylines[chosen]
         # Auto-advance pool arcs (their intro events don't call sl.advance)
         if sl["stage"] == 0 and chosen in _POOL_ARCS:
-            sl["stage"] = 1
-            sl["day_started"] = day
-        return event
+            _mark_started(chosen)
+        return _finalize_event(chosen, event)
 
     def _sync_pool_triggered_arcs(self):
         """
@@ -460,22 +553,55 @@ class StorylineSystem:
         the old has_met tracking system. Without this, arcs could double-fire.
         """
         p = self.player
+        single_shot_arcs = {"collector", "grimy_gus", "vinnie", "marvin", "witch"}
+        self._sync_phil_storyline_state()
         syncs = [
             ("stray_cat",        lambda: p.has_met("Stray Cat Fed")),
             ("jameson",          lambda: p.has_met("Cowboy")),
-            ("phil",             lambda: p.has_met("Interrogator")),
             ("mime",             lambda: p.has_met("Mime")),
             ("betsy",            lambda: p.has_met("Betsy")),
             ("gas_station_hero", lambda: p.has_met("Gas Station Hero")),
             ("collector",        lambda: p.has_met("The Collector")),
             ("victoria",         lambda: p.has_met("The Rival")),
             ("grimy_gus",        lambda: p.has_met("Grimy Gus")),
+            ("vinnie",           lambda: p.has_met("Vinnie") or p.get_loan_shark_debt() > 0),
+            ("marvin",           lambda: p.has_item("Map") or p.has_item("Worn Map")),
+            ("witch",            lambda: p.has_met("Witch")),
         ]
         for name, met_fn in syncs:
             sl = self.storylines.get(name)
             if sl and sl["stage"] == 0 and not sl["completed"] and not sl["failed"] and met_fn():
                 sl["stage"] = 1
                 sl["day_started"] = p.get_day()
+                if name in single_shot_arcs:
+                    sl["completed"] = True
+
+    def _sync_phil_storyline_state(self):
+        p = self.player
+        sl = self.storylines.get("phil")
+        if sl is None or sl["failed"]:
+            return
+
+        if not p.has_met("Interrogator"):
+            return
+
+        completed = False
+        if p.has_danger("Final Interrogation"):
+            stage = 3
+        elif p.has_danger("Even Further Interrogation"):
+            stage = 2
+        elif p.has_danger("Further Interrogation"):
+            stage = 1
+        else:
+            stage = 4
+            completed = True
+
+        if stage > sl["stage"]:
+            sl["stage"] = stage
+            sl["day_started"] = p.get_day()
+
+        if completed:
+            sl["completed"] = True
 
     def advance(self, name):
         """Advance a storyline to the next stage. Call from within event methods."""
@@ -687,9 +813,9 @@ class StorylineSystem:
                     return getattr(p, events[stage])
 
             case "gas_station_hero":
-                # Stage 0: You witness a robbery once you have some standing (rank 1+)
+                # Stage 0: You witness a robbery once you've been around town a bit.
                 if stage == 0:
-                    if p.has_met("Gas Station Hero") or day < 5 or p.get_rank() < 1:
+                    if p.has_met("Gas Station Hero") or day < 5:
                         return None
                 events = ["gas_station_robbery", "gas_station_hero_recognized", "gas_station_hero_interview"]
                 if stage < len(events):
@@ -714,11 +840,50 @@ class StorylineSystem:
                     return getattr(p, events[stage])
 
             case "grimy_gus":
-                # Stage 0: Gus appears once you're off the streets (rank 1+, day 7+)
+                # Stage 0: Gus can surface early even before the run is established.
                 if stage == 0:
-                    if p.has_met("Grimy Gus") or day < 7 or p.get_rank() < 1:
+                    if not p.has_item("Car") or p.has_met("Grimy Gus") or day < 4:
                         return None
                     return getattr(p, "grimy_gus_discovery")
+
+            case "vinnie":
+                # Stage 0: Vinnie should become available early, not only in stalled runs.
+                if stage == 0:
+                    if not p.has_item("Car") or p.has_met("Vinnie") or p.get_loan_shark_debt() > 0 or day < 4:
+                        return None
+                    return getattr(p, "vinnie_referral_card")
+
+            case "marvin":
+                # Stage 0: unlock Marvin routes early; the harness decides when to shop.
+                if stage == 0:
+                    if not p.has_item("Car") or p.has_item("Map") or p.has_item("Worn Map") or day < 3:
+                        return None
+
+                    candidates = []
+                    if day >= 3 and not p.has_met("Windblown Worn Map"):
+                        candidates.append(getattr(p, "windblown_worn_map"))
+                    if day >= 4 and not p.has_met("Flea Market Route Map"):
+                        candidates.append(getattr(p, "flea_market_route_map"))
+                    if day >= 7 and not p.has_met("Laundromat Bulletin Map"):
+                        candidates.append(getattr(p, "laundromat_bulletin_map"))
+                    if not candidates:
+                        return None
+                    return random.choice(candidates)
+
+            case "witch":
+                # Stage 0: introduce the Witch through daylight breadcrumbs before swamp content.
+                if stage == 0:
+                    if not p.has_item("Car") or p.has_met("Witch") or day < 6:
+                        return None
+
+                    candidates = []
+                    if day >= 8 and not p.has_met("Witch Doctor Matchbook"):
+                        candidates.append(getattr(p, "witch_doctor_matchbook"))
+                    if day >= 12 and not p.has_met("Roadside Bone Chimes"):
+                        candidates.append(getattr(p, "roadside_bone_chimes"))
+                    if not candidates:
+                        return None
+                    return random.choice(candidates)
 
             case "mime":
                 # Stage 0: A silent performer materializes after a few days
@@ -745,20 +910,16 @@ class StorylineSystem:
             # ── Mechanics intro arc ────────────────────────────────────────────
 
             case "mechanics":
-                # Conditions: balance >= 200 (enough to care about repair costs)
-                if p.get_balance() < 200:
+                balance = p.get_balance()
+                if balance < 200:
                     return None
-                # Stages 0-2: introduce whichever mechanic hasn't been met yet (random order)
-                unmet = []
                 if not p.has_met("Tom Event"):
-                    unmet.append(_wrap(storyline_mechanics_intro_tom))
-                if not p.has_met("Frank Event"):
-                    unmet.append(_wrap(storyline_mechanics_intro_frank))
+                    return _wrap(storyline_mechanics_intro_tom)
+                if not p.has_item("Car") and not p.has_met("Frank Event"):
+                    return _wrap(storyline_mechanics_intro_frank)
                 if not p.has_met("Oswald Event"):
-                    unmet.append(_wrap(storyline_mechanics_intro_oswald))
-                if not unmet:
-                    return None
-                return random.choice(unmet)
+                    return _wrap(storyline_mechanics_intro_oswald) if balance >= 850 else None
+                return None
 
             # ── Suzy arc ──────────────────────────────────────────────────────
 
@@ -921,16 +1082,7 @@ class StorylineSystem:
             self.storylines["suzy"]["stage"] = 0  # Name known, color question ready
         
         # Phil
-        if p.has_met("Interrogator"):
-            if p.has_danger("Final Interrogation"):
-                self.storylines["phil"]["stage"] = 3
-            elif p.has_danger("Even Further Interrogation"):
-                self.storylines["phil"]["stage"] = 2
-            elif p.has_danger("Further Interrogation"):
-                self.storylines["phil"]["stage"] = 1
-            else:
-                self.storylines["phil"]["stage"] = 4
-                self.storylines["phil"]["completed"] = True
+        self._sync_phil_storyline_state()
         
         # Victoria
         if p.has_met("Victoria Confrontation"):
@@ -953,6 +1105,21 @@ class StorylineSystem:
         if p.has_met("Grimy Gus"):
             self.storylines["grimy_gus"]["stage"] = 1
             self.storylines["grimy_gus"]["completed"] = True
+
+        # Vinnie
+        if p.has_met("Vinnie") or p.get_loan_shark_debt() > 0:
+            self.storylines["vinnie"]["stage"] = 1
+            self.storylines["vinnie"]["completed"] = True
+
+        # Marvin
+        if p.has_item("Map") or p.has_item("Worn Map"):
+            self.storylines["marvin"]["stage"] = 1
+            self.storylines["marvin"]["completed"] = True
+
+        # Witch
+        if p.has_met("Witch"):
+            self.storylines["witch"]["stage"] = 1
+            self.storylines["witch"]["completed"] = True
         
         # Mechanic dreams
         if p.get_tom_dreams() >= 3 and p.get_frank_dreams() >= 3 and p.get_oswald_dreams() >= 3:
@@ -1738,11 +1905,14 @@ def storyline_suzy_animal(p, sl):
 
 
 def storyline_suzy_finale(p, sl):
-    """Suzy Part 4: Suzy brings you her handmade gift."""
+    """Suzy Part 4: Suzy brings you her handmade gift. Good ending: gift + sanity.
+    Bad ending: player rejects it → suzy_the_snitch fires immediately → game over."""
     sl.advance("suzy")
     sl.complete("suzy")
-    p.meet("Suzy Finale")
-    
+    # NOTE: p.meet("Suzy Finale") is intentionally deferred to YES branch only.
+    # Suzy_the_snitch checks that flag as its guard — leaving it unset lets the
+    # bad-path call through cleanly.
+
     color = str(p.get_favorite_color())
     animal = str(p.get_favorite_animal())
     
@@ -1781,6 +1951,7 @@ def storyline_suzy_finale(p, sl):
         type.type("Suzy skip-ropes away, turning back to wave three separate times.")
         print("\n")
         type.type("You look at the drawing. You carefully fold it and put it somewhere safe.")
+        p.meet("Suzy Finale")  # good ending — blocks suzy_the_snitch permanently
         p.add_item("Suzy's Gift")
         p.restore_sanity(10)
         p.heal(10)
@@ -1795,8 +1966,9 @@ def storyline_suzy_finale(p, sl):
         type.type(quote("Maybe I'll find someone who likes it."))
         print("\n")
         type.type("She jump ropes away. You feel like the worst person alive.")
-        p.lose_sanity(10)
-    print("\n")
+        print("\n")
+        # Suzy remembers everything. Cops arrive shortly after.
+        p.suzy_the_snitch()
 
 
 # =====================================================================

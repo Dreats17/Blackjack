@@ -61,6 +61,8 @@ class Blackjack:
         self.__split_hand = None
         self.__used_surrender = False
         self.__insurance_bet = 0
+        self.__bust_streak = 0
+        self.__min_bet_bust_count = 0
 
     def update_player(self):
         self.__balance = self.__player.get_balance()
@@ -295,21 +297,27 @@ class Blackjack:
                 if self.__dealer_happiness == 100:
                     random_chance = random.randrange(3)
                     if random_chance == 0:
-                        self.__bet = random.randrange(int(self.__balance/18), int(self.__balance/8))
+                        lo = max(1, int(self.__balance/18))
+                        hi = max(lo + 1, int(self.__balance/8))
+                        self.__bet = random.randrange(lo, hi)
                         type.slow(bright(yellow("The Dealer's in a good mood. Here's a ") + green("${:,}".format(self.__bet)) + yellow(" hand, on the house!")))
                         print("\n")
                         self.__free_hand = True
                 elif self.__dealer_happiness > 95:
                     random_chance = random.randrange(10)
                     if random_chance == 0:
-                        self.__bet = random.randrange(int(self.__balance/20), int(self.__balance/10))
+                        lo = max(1, int(self.__balance/20))
+                        hi = max(lo + 1, int(self.__balance/10))
+                        self.__bet = random.randrange(lo, hi)
                         type.slow(bright(yellow("The Dealer's in a good mood. Here's a ") + green("${:,}".format(self.__bet)) + yellow(" hand, on the house!")))
                         print("\n")
                         self.__free_hand = True
                 elif self.__dealer_happiness > 90:
                     random_chance = random.randrange(10)
                     if random_chance == 0:
-                        self.__bet = random.randrange(int(self.__balance/25), int(self.__balance/15))
+                        lo = max(1, int(self.__balance/25))
+                        hi = max(lo + 1, int(self.__balance/15))
+                        self.__bet = random.randrange(lo, hi)
                         type.slow(bright(yellow("The Dealer's in a good mood. Here's a ") + green("${:,}".format(self.__bet)) + yellow(" hand, on the house!")))
                         print("\n")
                         self.__free_hand = True
@@ -433,11 +441,16 @@ class Blackjack:
         return forced_min
 
     def set_min_bet(self, balance):
+        balance = int(balance)  # guard against float balance (e.g. 0.0, 109.0)
+        if balance <= 0:
+            self.__min_bet = 1
+            return
+
         balance_str = str(balance)
         balance_len = len(balance_str)
         if balance_len == 1:
             self.__min_bet = 1
-        elif balance_len  == 2:
+        elif balance_len == 2:
             self.__min_bet = int(balance_str[0])
         else:
             new_balance_str = balance_str[0] + balance_str[1]
@@ -530,6 +543,15 @@ class Blackjack:
         else:
             type.fast(red("The Dealer's second card is face down"))
             time.sleep(PAUSE)
+            if self.__player.has_flask_effect("Dealer's Whispers"):
+                print()
+                type.fast(cyan(bright("Your Dealer's Whispers potion murmurs the hidden truth...")))
+                print()
+                if card.value() in [1, 8]:
+                    type.fast(cyan("The hidden card is an " + bright(str(card))))
+                else:
+                    type.fast(cyan("The hidden card is a " + bright(str(card))))
+                print()
         print("\n")
 
         # Prints Dealer's starting hand value. This is a special case (known value or 21 with a wink).
@@ -839,6 +861,23 @@ class Blackjack:
     def hit(self):
         # Hits a player's hand, then types their hand's value
         print()
+
+        if self.__player.has_flask_effect("Imminent Blackjack"):
+            hard_total = self.__hand.value()
+            soft_total = self.__hand.ace_value() if self.__hand.possible_hands() == 2 else 0
+            target_values = set()
+            for running_total in [hard_total, soft_total]:
+                if running_total <= 0 or running_total >= 21:
+                    continue
+                needed_value = 21 - running_total
+                if 1 <= needed_value <= 10:
+                    target_values.add(needed_value)
+                if running_total == 10:
+                    target_values.add(1)
+            if target_values and self.__deck.find_and_move_value_to_top(target_values):
+                type.fast(magenta(bright("Your Imminent Blackjack potion crackles with certainty...")))
+                print()
+            self.__player.remove_flask_effect("Imminent Blackjack")
         
         # Worn Gloves effect: occasionally redraw if the card would bust
         card = self.draw(self.__hand)
@@ -860,6 +899,20 @@ class Blackjack:
                         type.fast(magenta(bright("Your Worn Gloves tingle as the cards shift in your favor!")))
                     print()
                     self.__player.update_worn_gloves_durability()
+
+        if self.__hand.value() > 21 and self.__player.has_flask_effect("No Bust"):
+            self.__hand.remove_last_card()
+            type.fast(magenta(bright("Your Flask of No Bust rejects the draw and spares your hand!")))
+            print()
+            self.__player.update_no_bust_durability()
+            if card.value() in [1, 8]:
+                type.fast(cyan("The " + bright(str(card)) + cyan(" fizzles out before it can bust you.")))
+            else:
+                type.fast(cyan("The " + bright(str(card)) + cyan(" fizzles out before it can bust you.")))
+            print()
+            type.fast(str(self.__hand))
+            print()
+            return
         
         self.print_draw("Player", "next", card)
         if self.__hand.has_ace():

@@ -1,0 +1,85 @@
+OPTIMAL AUTOPLAY PROGRESS CHECKLIST
+Date started: 2026-03-12
+
+Purpose
+- This file is the batch-by-batch visual tracker for autoplay progress.
+- Update it after every meaningful implementation batch.
+- It should stay concise, human-readable, and easy to scan.
+
+How to read this file
+- `[x]` means meaningfully covered and protected by current evidence.
+- `[~]` means partially covered, present in traces, or under active investigation.
+- `[ ]` means not meaningfully covered yet.
+- "Distance to win" means distance to deliberate, repeatable millionaire-capable play, not lucky outlier wins.
+
+Current benchmark checkpoint
+- Scenario suite: 40/40 passed
+- Fixed slice: autotest.py 60 1 20 -> alive 15/20, died 5/20, broke 9/20, car 11/20, rank1+ 7/20, doctor_missed 0/20
+- Current known blocker: bankroll growth from post-car midgame into the 8k to 10k Marvin band
+- Current late-game gap: marvin 0/20, adventure 0/20, airport 0/20, wins 0/20 on the fixed slice
+
+Milestone ladder
+- [~] Milestone 1: reliable no-car survival and car acquisition
+  Status: partly achieved
+  Evidence: car 11/20, ever_car 11/20 on the fixed slice; early avoidable-death handling improved
+- [~] Milestone 2: reliable post-car stabilization and rank-1 conversion
+  Status: partly achieved
+  Evidence: rank1+ 7/20; doctor_missed 0/20; post-car fairness cleanup landed
+- [ ] Milestone 3: reliable 10k funnel
+  Status: not achieved
+  Evidence: strong runs still stall below the real Marvin-buy band too often
+- [ ] Milestone 4: reliable six-figure funnel
+  Status: not achieved
+- [ ] Milestone 5: reliable millionaire funnel
+  Status: not achieved
+- [ ] Milestone 6: full-benchmark balance audit at millionaire-capable strength
+  Status: not achieved
+
+Game ecosystem coverage
+- [x] Early no-car betting safety and car-threshold preservation
+- [x] Doctor urgency and obvious emergency handling
+- [x] Route interruptions and recovery-day bypass behavior
+- [x] Mechanic threshold handling for early car access
+- [x] Carbon monoxide fairness fix and follow-up exhaust danger chain
+- [~] Pawn-shop behavior and pawn-cashout pressure
+- [~] Post-car rank pushing and midgame bankroll growth
+- [~] Marvin access recognition and preservation behavior
+- [~] Convenience-store pressure and low-impact store suppression in growth windows
+- [ ] Gifts and gift-wrapping timing
+- [ ] Dealer happiness thresholds affecting gifts or other systems in real runs
+- [ ] Companion acquisition, feeding, happiness, runaway prevention, and companion-positive routing
+- [ ] Crafting loops and workbench outputs
+- [ ] Crafted-item downstream event value
+- [ ] Loan shark full strategic loop: borrow, warning escalation, repayment, forced-encounter handling
+- [ ] Witch-doctor economy and flask exploitation depth
+- [ ] Adventure unlock to visit to value funnel
+- [ ] Millionaire branch menus and ending conversion
+- [ ] Airport route usage and ending conversion
+
+Fairness and bug-audit coverage
+- [x] Harness is being used to detect unfair repeatable spikes
+- [x] Human-readable fairness changelog exists at docs/10_GAMEPLAY_FAIRNESS_CHANGELOG.md
+- [~] Harness-to-core-game cross-check workflow exists informally through audit work
+- [ ] Explicit mechanic-presence reporting for systems that should appear in gameplay
+- [ ] Expected-but-missing mechanic report
+- [ ] Core-game bug suspect report from harness evidence
+
+Current deliberate next targets
+- [~] Investigate the best post-car seeds that peak below 10k and identify the most common stall cause
+- [ ] Add mechanic-presence reporting for gifts, companions, workbench, crafting outputs, millionaire branches, and gift-effect thresholds
+- [ ] Add focused scenario cases for gifts, dealer happiness effects, companions, and workbench or crafting loops
+
+Most recent completed batch
+- Reframed the master plan around benchmark play, exhaustive case coverage, gameplay audit use, and fairness detection
+- Added a human-readable fairness changelog
+- Added a visible-mechanics checklist, milestone ladder, and deliberate multi-process iteration plan toward 1 million dollars
+
+Next batch update template
+- Batch goal:
+- Files changed:
+- Scenario result:
+- Fixed-slice result:
+- New coverage gained:
+- New fairness finding or bug suspect:
+- Current top blocker:
+- Distance to win change:

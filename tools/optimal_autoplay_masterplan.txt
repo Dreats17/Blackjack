@@ -1,0 +1,1037 @@
+OPTIMAL AUTOPLAY MASTER PLAN
+
+Purpose
+- This document is a guide for the current agent responsible for turning autoplay into a credible near-optimal benchmark player, exhaustive case handler, and game-audit tool.
+- The goal is not only to make the current heuristic bot slightly better.
+- The goal is to build a benchmark player that can answer the real design question: if a strong, informed player plays this game correctly, how often should they survive, progress, and win while engaging with the full useful game system surface?
+- Seeded runs are for optimization, regression protection, and replaying specific failure classes.
+- Random runs are for statistics: how strong the benchmark player is against the game as it actually exists.
+
+What this document contains
+- A concrete diagnosis of why the current autoplay underplays the game.
+- A target architecture for a maintainable, near-optimal autoplay system.
+- A specific implementation plan tied to the current codebase.
+- A benchmark rubric so future versions can be judged against a stable standard.
+- Maintenance guidance so the system stays useful as the game evolves.
+- A practical checklist for expanding coverage until the harness can engage every meaningful winning path and expose fairness problems or broken systems when it cannot.
+
+Autoplay philosophy
+- Autoplay is not only a bot-quality project. It is also a gameplay audit instrument.
+- The benchmark player should try to engage every mechanic that can reasonably improve a run: car progression, doctor care, witch doctor, Marvin, pawn shop, loan shark, companions, gifts, convenience-store synergies, crafting, workbench loops, and endings.
+- The harness should prefer the best available outcome in events, story branches, and shop decisions unless status pressure makes a different choice strategically necessary.
+- Status-prioritized decisions are part of optimal play:
+  - survival and emergency stabilization outrank greed
+  - interrupted or locked-out days must be recorded explicitly
+  - debt, sanity collapse, fatigue, companion upkeep, and durability churn are planner responsibilities
+- If the benchmark player is not engaging with a major mechanic, that is a useful finding. The likely causes are:
+  - the autoplay does not understand the system yet
+  - the unlock path is too weak or too hidden
+  - the mechanic is bugged, absent from real gameplay, or underpowered relative to its setup cost
+- If repeated harness evidence shows a branch or event is unfair, too punitive, too repetitive, or too weak to support progression, the correct response may be a game-balance fix rather than more autoplay heuristics.
+- The harness should be used to compare expected mechanics against actual gameplay. If a system should appear in real runs and does not, treat that as a bug-finding use case and inspect the core game code.
+
+Current March 11 status delta
+- The document's architectural diagnosis is still directionally correct, but it now needs to be read alongside the validated benchmark work already completed.
+- The current defended autoplay baseline is no longer just the original heuristic monolith. It includes benchmark-safe improvements that held under fixed-seed regression and scenario coverage.
+- Latest defended checkpoint:
+  - run_autoplay_scenarios.py = 40/40 passed
+  - autotest.py 60 1 20 = alive 15/20, died 5/20, broke 9/20, car 11/20, rank1+ 7/20, doctor_missed 0/20
+- The biggest March 11 win was not endgame conversion. It was fairness and survival cleanup:
+  - carbon monoxide first exposure no longer acts like an arbitrary flat death spike
+  - the existing damaged exhaust chain now carries the follow-up danger instead
+  - seed 14 converted from a post-car death into an alive day-61 finish
+- The most important March 11 negative finding is also now known:
+  - Marvin routing was not the immediate blocker for the fixed slice
+  - Marvin item prices start at 8,000 dollars, so repeated work on 1.5k to 5k post-car states could not materially move Marvin visits yet
+  - the real short-term bottleneck is bankroll growth into the 8k band, not merely Marvin access or route eligibility
+- Practical implication for next work:
+  - keep the long-term architecture goals in this master plan
+  - but prioritize validated incremental policy upgrades over a full rewrite-first plan
+  - the next useful benchmark work is seed-guided investigation of why strong midgame runs stall below 10k
+
+Recommended reading order for the next agent
+- Read this master plan for the architecture critique, long-term target, and implementation ladder.
+- Then read tools/autotest_audit.txt for the defended checkpoints, seed studies, and regression gates.
+- Then read tools/optimal_autoplay_progress_checklist.txt for the current ecosystem-coverage status, milestone status, and next batch target.
+- Treat the audit plus current checkpoint as the source of truth for what is already validated.
+
+Recommended documentation addition
+- Add a human-readable gameplay changelog for fairness-facing system changes.
+- Suggested file: docs/10_GAMEPLAY_FAIRNESS_CHANGELOG.md
+- When autoplay work changes real player-facing balance or event fairness, that change should be recorded in plain language, not only in harness notes.
+- Good examples from current progress:
+  - carbon monoxide first exposure made survivable instead of flat-spike lethal
+  - robbery autoplay and sub-200 betting safety changes that also reflect more defensible player strategy expectations
+- This changelog should be separate from benchmark notes:
+  - benchmark notes answer whether the bot improved
+  - gameplay changelog answers what changed for human players and why
+
+Current harness expansion priorities
+- The current harness already covers core blackjack decisions, route selection, medical interruption behavior, mechanic thresholds, and some Marvin preservation behavior.
+- The biggest remaining coverage gaps are not generic "more heuristics". They are incomplete optimal-play surfaces with real long-horizon value:
+  - gifts and gift wrapping timing
+  - dealer happiness thresholds and gift-system effects actually appearing in real runs
+  - companion acquisition, hunger, happiness, runaway prevention, and companion-specific route pressure
+  - convenience-store synergies by rank and by current build state
+  - crafted-item loops, workbench usage, and downstream event value from crafted items
+  - pawn-shop value chains beyond one-off collectible liquidation
+- The immediate autoplay priority is full coverage and verification of the mechanics already present so the benchmark can engage every meaningful winning path before new content breadth is added.
+- Content expansion ideas such as more store items, more item-granting events, more crafting outputs, and more pawnable or craft-reactive events are valid game-design follow-ons, but they should not replace coverage and verification of the systems that already exist.
+- If current systems are not giving the player enough positive push to grow stronger over time, the harness should surface that clearly so the game can be rebalanced through event weighting, reward strength, repeatability controls, or branch tuning.
+
+Core judgment
+- The current autoplay in tools/quicktest.py is useful scaffolding and a decent fuzz-style regression harness.
+- It is not a credible benchmark for strong play.
+- Its losses currently reflect both game difficulty and bot weakness, but bot weakness is the larger issue.
+- The main failure is still architectural, but the practical mission is broader than architecture alone: the benchmark must cover the full useful game surface, find missing or unfair systems, and explain why major winning routes are not being realized.
+
+======================================================================
+PART 1: CURRENT SYSTEM REVIEW
+======================================================================
+
+Relevant files
+- tools/autotest.py
+- tools/quicktest.py
+- blackjack.py
+- story/game_flow.py
+- story/locations.py
+- story/storylines.py
+- story/player_core.py
+- story/endings.py
+- story/events_illness.py
+- lists.py
+
+What the current system does well
+- tools/autotest.py is a competent batch runner and reporting layer.
+- The current harness captures a lot of useful telemetry: survival, deaths, unlocks, visits, item provenance, fallback decisions, doctor misses, and aggregate reports.
+- The current autoplay already understands more than a trivial bot does:
+  - blackjack actions such as split, surrender, double, insurance, peek, replay
+  - route choices such as doctor, witch, store, pawn shop, loan shark, Marvin, mechanics, workbench, adventure, stay home
+  - some reserve logic around doctor costs, car needs, rank thresholds, and store budgets
+
+What the current system fundamentally is
+- tools/quicktest.py is still a very large policy blob, but it is no longer only prompt scraping.
+- It monkey-patches blackjack runtime methods and still relies too much on RECENT_TEXT and menu text in some places.
+- It also already contains useful ingredients that should be preserved: state extraction, strategic goal concepts, scenario cases, route tracing, and machine-readable policy surfaces under tools/autoplay/.
+- The practical problem is not that nothing exists. The problem is that coverage is still incomplete, long-horizon optimization is still uneven, and too many important mechanics are not being deliberately engaged often enough.
+
+Why the current autoplay is not a strong benchmark
+
+1. It is prompt-driven instead of state-driven
+- The bot relies heavily on RECENT_TEXT, menu scraping, prompt fragments, string matching, and handcrafted overrides.
+- Examples:
+  - _get_recent_menu_options
+  - _event_yes_no_override
+  - _event_option_override
+  - _detect_mechanic_name
+  - _looks_like_mechanic_intro_offer
+- This makes it brittle and encourages reactive behavior rather than reasoning over game state.
+
+2. It has no explicit global objective function
+- There is no single state value function or long-horizon objective being optimized.
+- Instead, decisions are distributed across local heuristics like:
+  - _wants_store_run
+  - _wants_marvin_run
+  - _wants_mechanic_progression_run
+  - _wants_upgrade_run
+  - _wants_millionaire_push
+  - _should_visit_doctor
+  - _auto_bet
+- These functions are individually plausible, but they do not compose into a coherent strategy.
+
+3. It has no explicit progression planner
+- The real game has a progression graph with prerequisites.
+- Major routes are gated by rank, day, balance, item ownership, breadcrumb events, health/sanity thresholds, mechanic arcs, and special unlocks.
+- The bot does not model that graph directly.
+- Instead it chooses destinations from a rotating or priority-ordered list in _choose_progression_destination and _choose_destination.
+- This is not planning. It is weighted reaction.
+
+3A. It does not yet cover the full useful mechanic surface reliably enough
+- Optimal play in this game is not just about betting and routing.
+- The benchmark must deliberately use and validate:
+  - gifts and gift-wrapping systems
+  - dealer happiness effects
+  - companions and companion upkeep
+  - convenience-store build synergies by rank and run state
+  - pawn-shop realization loops
+  - crafting and workbench loops
+  - millionaire branches and endings
+- If these systems do not appear in real runs, that is not background noise. It is a direct benchmark finding.
+
+4. Blackjack decisions are simplified and locally adjusted
+- _recommended_blackjack_action is basic-strategy-like and hand-authored.
+- _auto_hit_or_stand adds peek-based local correction.
+- _should_take_insurance only buys insurance when Dealer's Whispers confirms dealer blackjack.
+- _should_replay_hand uses reserve and loss-ratio heuristics.
+- _auto_bet aggressively targets rank thresholds, but does not optimize expected run value under health/progression risk.
+- This is smarter than a naive bot, but still far from a game-specific EV policy.
+
+5. Many thresholds are magic numbers without a stable policy framework
+- The file has a large number of hardcoded thresholds:
+  - health/sanity cutoffs
+  - balance gates
+  - item priority weights
+  - reserve targets
+  - visit cooldowns
+  - rank-specific bet ratios
+  - loan triggers
+  - stall-day conditions
+- The problem is not that thresholds exist.
+- The problem is that they are distributed across many functions without a formal policy layer, explanation layer, or validation layer.
+
+6. The bot mixes four different problem types into one file
+- The current file tries to handle all of this in one place:
+  - IO adaptation and prompt interception
+  - event/menu parsing
+  - strategic planning
+  - tactical route choice
+  - blackjack action choice
+  - economy and reserve management
+  - reporting side-effects
+- This makes it hard to improve one area without breaking another.
+
+7. The current system underuses the actual state richness already exposed by the game
+- The game code already has real state that can be reasoned over directly:
+  - health, sanity, status effects, injuries
+  - debt, fraudulent cash, dealer happiness
+  - rank, balance, day
+  - companions
+  - chosen mechanic, mechanic visits, broken items, repairing items
+  - map ownership, car ownership, unlock conditions, progression visits
+- The bot still behaves as if text prompts are the primary truth source.
+
+High-value code observations from the current implementation
+
+Destination selection
+- _choose_progression_destination is the main progression router.
+- It assembles possible route choices, then picks from ordered lists based on rank/day/rotation.
+- This is a key weakness: the route ordering is a handcrafted priority stack, not the result of explicit goal selection.
+- _choose_destination then overlays medical urgency, recovery days, pawn cashouts, store runs, and stay-home fallbacks.
+- Result: sensible local choices, weak long-horizon coordination.
+
+Blackjack controller
+- _recommended_blackjack_action provides simplified action selection.
+- _should_use_peek and _auto_hit_or_stand refine the action with a one-card lookahead.
+- _auto_bet tries to push aggressively toward rank thresholds with safety checks.
+- Result: decent tactical behavior, weak run-level optimization.
+
+Medical policy
+- _needs_doctor, _doctor_visit_is_urgent, _doctor_need_score, _wants_witch_heal, and _should_visit_doctor are among the best parts of the current bot.
+- They are still threshold-based, but they at least attempt seriousness grading.
+- The main weakness is that they are not fed by a larger survival planner or replay suite of saveable-death scenarios.
+
+Progression stalling logic
+- _progress_stall_days tracks lack of progress by rank/balance/car/Marvin access.
+- This is useful telemetry and should be preserved.
+- It should become an input to a real planning system, not just another local heuristic trigger.
+
+Conclusion on current system
+- Keep the reporting and telemetry ideas.
+- Keep some of the current state feature extraction.
+- Keep the validated scenario suites, state modeling, and planner-oriented modules already extracted.
+- Expand coverage until every major mechanic that should help a winning run is either deliberately used or explicitly explained as blocked, bugged, unfair, or underpowered.
+- Replace the decision architecture where needed, but do it in a way that preserves current guardrails and fixed-seed learning.
+
+======================================================================
+PART 2: TARGET AUTOPLAY ARCHITECTURE
+======================================================================
+
+Design goal
+- Build a benchmark autoplay system that behaves like a strong, informed human with stable strategic priorities and good tactical blackjack play.
+- The system must be maintainable, inspectable, robust against writing changes, and suitable for auditing whether the game itself is fair and fully functioning.
+
+Non-goals
+- Do not keep expanding the current heuristic monolith.
+- Do not treat prompt parsing as the long-term interface.
+- Do not optimize only for one-night bankroll growth if that degrades overall win rate.
+- Do not confuse missing mechanic engagement with proof that the mechanic is bad before checking whether the mechanic actually appears and functions in gameplay.
+
+Architecture overview
+- Split autoplay into five layers.
+
+Layer 1: Adapter layer
+Purpose:
+- Interface with the existing game runtime.
+- Capture structured state.
+- Translate game prompts into stable decision requests.
+
+Responsibilities:
+- Hook or wrap menu prompts and yes/no prompts.
+- Build structured choice objects rather than relying on raw prose where possible.
+- Extract game state snapshots before and after decisions.
+- Maintain compatibility with current runtime until deeper refactors are made.
+
+Outputs:
+- GameState snapshot
+- DecisionRequest object
+- DecisionTrace object
+
+Layer 2: State model layer
+Purpose:
+- Normalize the real game into a machine-friendly strategic state.
+
+State categories to model explicitly:
+- Core:
+  day, balance, rank, health, sanity, alive, location context
+- Risk:
+  statuses, injuries, urgent medical flag, doctor affordability, witch affordability
+- Progression:
+  car owned, map access, Marvin access, Witch met, mechanic route availability, mechanic visits, upgrade access, millionaire status, ending opportunity
+- Economy:
+  loan debt, warning level, fraudulent cash, pawn sale potential, store inventory opportunities
+- Combat/gambling edge:
+  active blackjack items, flask effects, broken items, repairing items, dealer happiness, extra-round items
+- Resources:
+  inventory, flasks, companions, food, repair kits, emergency items
+- Opportunity flags:
+  can unlock car, can advance mechanic arc, can visit Marvin profitably, can visit witch profitably, can adventure safely, can convert millionaire state to ending
+
+Critical state dynamics the planner must model explicitly
+- The real run is not just route choice plus blackjack.
+- Several systems can pre-empt normal planning or change what decisions even exist.
+
+Interrupt hierarchy
+- The planner must recognize that many afternoons never reach normal destination choice.
+- A practical decision-order model should look like this:
+  - daily passive updates and forced morning systems
+  - millionaire morning override if active
+  - storyline event override if active
+  - fatigue-based day-event suppression
+  - afternoon travel restriction lockouts such as Wind, Rain, Battery, Engine, or Wasted Afternoon
+  - random car trouble interruption
+  - companion-afternoon diversion if offered and chosen
+  - only then normal destination selection
+- The autoplay should expose this ordering in traces so a missed route is not misdiagnosed as a bad route policy when the route was never actually available.
+
+Recurring resource churn cycles
+- The benchmark player must manage recurring drains, not just static reserves.
+- Important cycles include:
+  - fatigue accumulation and recovery
+  - sanity loss, broken-state pressure, and madness confrontation risk
+  - companion hunger, happiness decay, bonding, runaway risk, and companion-specific food pressure
+  - debt growth through interest and warning escalation
+  - fraudulent cash accumulation and blending through blackjack
+  - item durability loss, breakage, repair queues, and repair opportunity cost
+  - flask acquisition, active effects, expiry, and replacement timing
+- These cycles should be visible in state snapshots as first-class planner inputs, not hidden as local tactical heuristics.
+
+High-consequence branch systems
+- Some choices are not just local EV decisions; they permanently redirect the run.
+- The planner and trace layer should account for:
+  - millionaire conversion branches such as mechanic ending route, airport escape, or continued gambling
+  - sanity collapse branches such as full madness ending versus surviving as Broken
+  - storyline yes/no branches with run-ending or run-shaping outcomes
+  - companion-heavy secret ending routes and betrayal-style dark branches
+- These should be modeled as branch funnels with explicit prerequisites, not treated as generic event choices.
+
+Layer 3: Strategic planner
+Purpose:
+- Choose the current top-level run goal.
+
+This is the missing core of the current bot.
+
+Planner output should be one explicit StrategicGoal at a time, such as:
+- survive_emergency
+- stabilize_health
+- acquire_car
+- preserve_car
+- bootstrap_blackjack_edge
+- unlock_marvin
+- exploit_marvin
+- advance_mechanic_arc
+- repair_or_upgrade_gear
+- reduce_debt_risk
+- push_next_rank
+- reach_adventure_threshold
+- exploit_adventure
+- convert_millionaire_to_ending
+
+Planner requirements:
+- Must use explicit prerequisites and blockers.
+- Must score long-horizon expected value, not just immediate convenience.
+- Must explain its choice in a trace.
+- Must distinguish between planned actions and interrupt-driven fallback handling.
+
+Strategic systems that deserve dedicated planner support
+- Debt is not just a reserve penalty.
+- The loan shark system is a full strategic subsystem with:
+  - borrow versus avoid-borrow policy
+  - repay timing policy
+  - warning-tier escalation handling
+  - forced-encounter risk management
+  - fraudulent-cash blending strategy
+- Sanity is not just another hit point track.
+- The planner should explicitly track low-sanity danger tiers, broken-state tolerance, and whether a run is still pursuing stable survival or is already in a degraded high-variance branch.
+- Companion management should also be strategic, not only tactical.
+- Companion count, happiness, feeding pressure, and secret-ending potential all affect whether the run should pursue growth, maintain the current roster, or reduce obligations.
+
+Example planner reasoning format:
+- current_goal = acquire_car
+- blockers = insufficient_cash, urgent_health_risk
+- supporting_actions = doctor_visit, safe_betting, pawn_sale
+- suppressed_actions = Marvin, store_luxury, adventure
+
+Layer 4: Tactical policy layer
+Purpose:
+- Given a strategic goal, choose the best immediate action.
+
+Sub-policies:
+- route_policy
+- blackjack_policy
+- purchase_policy
+- medical_policy
+- debt_policy
+- repair_policy
+- event_choice_policy
+
+Each sub-policy should accept:
+- GameState
+- StrategicGoal
+- DecisionRequest
+
+And return:
+- chosen_action
+- reason
+- confidence
+- expected_value_estimate or utility_estimate
+
+Layer 5: Evaluation and reporting layer
+Purpose:
+- Run seeded benchmarks.
+- Store machine-readable traces.
+- Report strategic funnels and failure categories.
+- Report mechanic presence, fairness candidates, and expected-but-missing systems.
+
+This layer can remain close to tools/autotest.py, but should prefer structured outputs over regexing plain text.
+
+======================================================================
+PART 3: HOW TO IMPLEMENT IT IN THIS REPO
+======================================================================
+
+Recommended file structure
+- Keep tools/autotest.py as batch runner and summary renderer.
+- Replace tools/quicktest.py gradually, not all at once.
+- Introduce a new package under tools or a new autoplay package, for example:
+  tools/autoplay/
+  tools/autoplay/adapter.py
+  tools/autoplay/state.py
+  tools/autoplay/planner.py
+  tools/autoplay/policies/blackjack_policy.py
+  tools/autoplay/policies/route_policy.py
+  tools/autoplay/policies/medical_policy.py
+  tools/autoplay/policies/purchase_policy.py
+  tools/autoplay/policies/debt_policy.py
+  tools/autoplay/policies/event_policy.py
+  tools/autoplay/policies/repair_policy.py
+  tools/autoplay/trace.py
+  tools/autoplay/config.py
+  tools/autoplay/interfaces.py
+
+Do not delete the current quicktest immediately
+- First wrap the existing quicktest behavior behind interfaces.
+- Then move logic out incrementally.
+- Preserve current reporting until the replacement is stable.
+
+Step-by-step implementation plan
+
+Visible-mechanics checklist
+- The benchmark is not complete until the following systems visibly appear in real runs often enough to evaluate them:
+  - car acquisition and mechanic progression
+  - doctor and witch-doctor stabilization paths
+  - worn-map and map unlock paths
+  - Marvin visits and Marvin purchase-to-use funnels
+  - convenience-store purchases by rank and build context
+  - pawn-shop liquidation and follow-up value realization
+  - loan shark borrowing, repayment, warning escalation, and fraudulent-cash blending
+  - gifts, dealer happiness thresholds, and gift effect payoffs
+  - companions, feeding, happiness, runaways, and companion-positive branches
+  - crafting inputs, workbench visits, outputs, and downstream item-event payoffs
+  - adventure unlocks and adventure exploitation
+  - millionaire reach, millionaire branch menus, airport route, mechanic route, and ending conversion
+- If a listed system does not appear, the next agent should explicitly decide whether the cause is:
+  - autoplay incompleteness
+  - progression weakness or balance weakness
+  - missing content surface in normal gameplay
+  - a core game bug
+
+Multi-process iteration plan to 1 million dollars
+- The implementation should proceed as a deliberate multi-process loop, not a single rewrite.
+- Process 1: Coverage process
+  - add scenario cases and traces until every major route, event family, and subsystem has explicit coverage
+  - verify that mechanics expected in normal gameplay actually appear in runs
+- Process 2: Prevention process
+  - use fixed seeded failures to identify the most common preventable deaths, stalls, and underpowered branches
+  - fix the most common preventions first
+- Process 3: Fairness and balance process
+  - when repeated evidence shows an event or branch is too punitive, too repetitive, or too weak to support progression, tune the core game rather than hiding the issue with heuristics
+- Process 4: Progression process
+  - deliberately improve the run funnel in stages:
+    - get off your feet consistently
+    - stabilize early survival and medical handling
+    - convert car access into rank 1 and map access
+    - convert map access into reliable 8k to 10k bankroll growth
+    - convert 10k+ runs into Marvin leverage and stronger blackjack edge
+    - convert strong late-game runs into 100k, then 500k, then 1 million dollars
+    - convert millionaire state into endings deliberately rather than incidentally
+- Process 5: Statistics process
+  - use random seeded batches to measure whether the benchmark is actually getting stronger against the full game
+  - use fixed-seed suites to protect known wins and prevent regressions
+- A run to 1 million dollars should not be treated as a lucky outlier. The benchmark should eventually make that path deliberate, explainable, and repeatable enough to evaluate the game around it.
+
+Phase 1: Extract a stable state snapshot model
+Objective:
+- Build a GameState dataclass that can be produced from the live player and current context.
+
+Minimum fields for GameState:
+- day
+- balance
+- rank
+- health
+- sanity
+- has_car
+- has_map
+- has_worn_map
+- has_marvin_access
+- has_met_witch
+- has_met_vinnie
+- has_met_gus
+- chosen_mechanic
+- mechanic_visits
+- statuses
+- injuries
+- loan_debt
+- loan_warning_level
+- fraudulent_cash
+- dealer_happiness
+- companions
+- inventory
+- broken_items
+- repairing_items
+- flask_effects
+- available_routes
+- available_menu_options
+- current_context_tag
+- current_progress_goal_candidates
+
+Implementation notes:
+- Pull this from player methods and known helper functions.
+- Do not infer core state from RECENT_TEXT unless absolutely necessary.
+- RECENT_TEXT should become a compatibility fallback, not a primary data source.
+
+Phase 2: Add explicit DecisionRequest objects
+Decision request categories:
+- route_select
+- yes_no
+- menu_select
+- blackjack_bet
+- blackjack_action
+- insurance_decision
+- second_chance_decision
+- purchase_select
+- repair_select
+- upgrade_select
+- loan_decision
+- event_branch
+
+Each DecisionRequest should contain:
+- request_type
+- stable_context_id if available
+- normalized options
+- raw prompt text
+- raw recent text
+- game_state snapshot
+
+Phase 3: Build the strategic planner first
+Do this before rewriting every tactical policy.
+
+Why:
+- The current core failure is missing long-horizon planning.
+- Route choice, spending, loan behavior, and aggression all depend on the current strategic goal.
+
+Suggested first planner heuristic version
+- Not true reinforcement learning yet.
+- Start with explicit scored goals.
+
+Goal scoring dimensions:
+- survival urgency
+- progression opportunity
+- irreversible risk reduction
+- expected power increase
+- expected bankroll growth
+- ending conversion potential
+- debt risk
+- stall-break value
+- interrupt exposure
+- maintenance burden
+
+Required planner-side emergency and maintenance goals
+- Add explicit goals for systems the current master plan only implied:
+  - handle_forced_interrupt
+  - recover_from_car_trouble
+  - reduce_fatigue_pressure
+  - stabilize_sanity
+  - preserve_companion_roster
+  - contain_debt_escalation
+  - blend_fraudulent_cash_safely
+  - restore_blackjack_edge_after_breakage
+- This keeps forced-system handling from leaking back into ad hoc route heuristics.
+
+Pseudocode sketch:
+- if urgent medical risk: goal = survive_emergency
+- elif no car and viable car path exists: goal = acquire_car
+- elif car but no edge items and Marvin path is open: goal = exploit_marvin
+- elif chosen mechanic path exists and upgrades/repairs matter: goal = advance_mechanic_arc or repair_or_upgrade_gear
+- elif millionaire branch is reachable and health is stable: goal = convert_millionaire_to_ending
+- elif rank threshold progression is the highest leverage path: goal = push_next_rank
+- else: goal = bootstrap_blackjack_edge or stabilize_health
+
+Phase 4: Replace route selection with planner-backed route policy
+Current weak points to replace:
+- _choose_progression_destination
+- _choose_destination
+
+New route policy requirements:
+- Enumerate all currently available routes.
+- Score each route relative to the active StrategicGoal.
+- Suppress routes that violate safety constraints.
+- Record the score breakdown.
+
+Example route score breakdown:
+- route = Doctor's Office
+- total = 92
+- reasons:
+  urgent_status_bonus = +70
+  affordable_now_bonus = +15
+  prevents_death_penalty_avoidance = +25
+  progression_delay_penalty = -18
+
+Phase 5: Replace blackjack policy with EV-based evaluation
+Current weak points to replace:
+- _recommended_blackjack_action
+- _should_use_peek
+- _should_take_insurance
+- _should_replay_hand
+- _auto_bet
+- _auto_hit_or_stand
+
+Desired blackjack policy behavior
+- Compute expected value of hit, stand, double, split, surrender, insurance, peek, replay under the custom rules.
+- Include custom items and flask effects.
+- Include durability costs and opportunity costs.
+- Include run-level reserve constraints.
+
+Two practical implementation options
+
+Option A: Exact or semi-exact evaluator
+- Best if deck state is available enough to simulate accurately.
+- Build outcome trees for current hand and dealer upcard.
+- Harder due to custom mechanics and special effects.
+
+Option B: Monte Carlo evaluator
+- Recommended first.
+- For the current blackjack state:
+  - clone the hand/dealer/deck state if possible
+  - simulate many rollouts for each action
+  - estimate expected delta in bankroll and strategic value
+- Add a run-value term, not just immediate chip EV.
+
+Blackjack action utility should combine:
+- immediate expected chip value
+- probability of bust/loss/push/win/blackjack
+- reserve preservation value
+- rank-threshold progress value
+- durability consumption cost
+- effect consumption cost
+
+Bet sizing policy redesign
+- Do not let betting be only a rank-threshold pressure function.
+- Bet sizing should consider:
+  - current goal
+  - bankroll volatility tolerance
+  - survival reserve
+  - doctor/witch needs
+  - pending route opportunities
+  - current blackjack edge from items/flasks
+  - debt pressure
+  - millionaire conversion strategy
+
+Good design pattern:
+- target_risk_profile = conservative, balanced, aggressive, conversion_push
+- choose profile from strategic goal
+- use profile to set bet bands
+
+Phase 6: Replace event and menu decisions with structured policy routing
+Current weak points to replace:
+- _event_yes_no_override
+- _event_option_override
+
+Near-term approach:
+- Group event choices by reusable semantics:
+  - pay money now for likely safety
+  - accept suspicious bargain
+  - investigate unknown danger
+  - protect companion
+  - trade sanity for cash
+  - trade health for progression
+  - refuse or accept storyline advancement
+  - choose between branching ending funnels
+  - feed companions now versus preserve player resources
+  - de-escalate or provoke debt-related threats
+- Stop adding one-off prompt strings as the main policy mechanism.
+
+Long-term better approach:
+- Add structured event ids and option ids in the game layer.
+- Then map event ids to policy logic.
+
+Important note on event scope
+- Event policy must not only cover ordinary random events.
+- It must also cover:
+  - storyline branches
+  - millionaire afternoon menus
+  - companion crisis menus
+  - debt menus and forced debt encounters
+  - car-trouble repair acceptance and interruption handling
+- These currently behave like separate subsystems and should not be left implicit.
+
+Phase 7: Add structured traces and machine-readable output
+Every decision should emit a trace entry.
+
+Minimum DecisionTrace fields:
+- cycle
+- day
+- context
+- request_type
+- options
+- game_state_summary
+- strategic_goal
+- chosen_action
+- score_breakdown
+- reason
+- confidence
+
+This is mandatory for maintenance.
+- If the next agent cannot explain why the bot chose an action, the system will regress into opaque heuristics again.
+
+Phase 8: Add explicit system-appearance and fairness auditing
+Objective:
+- Make the harness answer not only "did the bot win?" but also "did the game expose and reward the mechanics that should matter?"
+
+Deliverables:
+- mechanic-appearance summaries
+- unlock -> engagement -> value funnel summaries
+- expected-but-missing mechanic reports
+- fairness-candidate reports for overly punitive or repetitive branches
+- cross-check workflow from harness findings back to core game code
+
+======================================================================
+PART 4: BENCHMARK RUBRIC
+======================================================================
+
+Purpose of the benchmark
+- The benchmark is not to prove the bot is perfect.
+- The benchmark is to measure whether it behaves like a strong human, whether balance changes are being judged against a competent baseline, and whether important mechanics are actually appearing and paying off in real gameplay.
+
+Primary benchmark categories
+
+1. Survival metrics
+- alive_rate
+- death_rate
+- median_day_of_death
+- saveable_death_rate
+- emergency_misplay_rate
+
+2. Progression metrics
+- car_acquisition_rate
+- map_access_rate
+- Marvin_visit_rate_after_access
+- Witch_visit_rate_after_meet
+- mechanic_progression_rate
+- upgrade_access_rate
+- adventure_unlock_rate
+- adventure_visit_rate_after_unlock
+- millionaire_reach_rate
+- ending_conversion_rate
+- millionaire_branch_selection_rate
+- secret_ending_conversion_rate
+
+3. Economy metrics
+- median_peak_balance
+- median_final_balance
+- broke_rate
+- debt_entry_rate
+- debt_resolution_rate
+- fraudulent_cash_conversion_value
+- pawn_realization_rate
+- interest_paid_rate
+- warning_tier_exposure_rate
+
+4. Tactical blackjack metrics
+- average_bet_fraction_by_phase
+- replay_use_quality
+- insurance_accuracy
+- peek_value_capture
+- split_ev_capture
+- surrender_accuracy
+- double_accuracy
+- bust_avoidance_with_relevant_items
+
+5. Maintenance and interruption metrics
+- fatigue_block_rate
+- forced_interrupt_rate
+- wasted_afternoon_rate
+- car_trouble_recovery_rate
+- route_never_reached_rate
+
+6. Resource exploitation metrics
+- item_purchase_to_use_rate
+- flask_purchase_to_use_rate
+- upgrade_purchase_rate
+- repair_completion_rate
+- companion_gain_rate
+- companion_runaway_rate
+- broken_state_survival_rate
+
+7. Maintainability metrics
+- fallback_prompt_decision_rate
+- decisions_without_trace_reason_rate
+- regex-only decision rate
+- raw-text-coupled decision rate
+
+8. Coverage and audit metrics
+- mechanic_presence_rate_in_real_runs
+- unlock_to_engagement_rate
+- engagement_to_value_realization_rate
+- event_outcome_best_choice_rate
+- unfair_event_repeat_rate
+- fairness_fix_candidate_rate
+- expected_mechanic_missing_rate
+- core_game_bug_suspect_rate
+
+Benchmark tiers
+
+Tier 0: Harness sanity
+- Bot runs stably across fixed seeds.
+- No crashes.
+- Low unknown-prompt fallback rate.
+
+Tier 1: Competent survival player
+- Doctor misses and obvious avoidable deaths drop sharply.
+- Survival rate materially exceeds the current bot.
+- Car and rank progression stabilize.
+
+Tier 2: Strong human analogue
+- Unlock-to-visit conversion improves.
+- Marvin, Witch, mechanic, pawn shop, loan shark, companions, and adventure systems are exploited deliberately.
+- The bot reaches millionaire and ending branches with meaningful regularity.
+
+Tier 3: Balance benchmark player
+- The bot is good enough that systematic underperformance now suggests balance or content pacing issues rather than bot incompetence.
+
+Suggested benchmark methodology
+- Maintain three fixed seed suites.
+
+Suite A: Smoke seeds
+- 10 to 20 seeds
+- Fast regression check
+- Run on every significant policy change
+
+Suite B: Core benchmark seeds
+- 100 seeds
+- Main comparison baseline
+- Used for trend tracking and policy acceptance
+
+Suite C: Long-run evaluation seeds
+- 300+ seeds
+- Used before trusting conclusions about balance
+
+Scenario suites to add in addition to full-run seeds
+- saveable_doctor_deaths
+- low_cash_no_car_recovery
+- Marvin_access_but_no_visit cases
+- Witch affordability cases
+- debt pressure cases
+- forced loan shark encounter cases
+- millionaire conversion cases
+- adventure-eligible routing cases
+- item-rich blackjack edge cases
+- high-fatigue missed-event cases
+- broken-state survival cases
+- companion food crisis cases
+- car-trouble interruption cases
+- route-lockout weather cases
+
+Acceptance philosophy
+- Do not gate on one headline number only.
+- Use a bundle of metrics.
+- Example acceptance rule for a major autoplay improvement:
+  - alive_rate improves
+  - saveable_death_rate drops
+  - fallback_prompt_decision_rate does not rise materially
+  - Marvin/Witch/mechanic conversion improves
+  - ending_conversion_rate does not regress
+  - mechanic presence and coverage do not silently decline
+  - fairness findings become more legible, not less
+
+======================================================================
+PART 5: MAINTENANCE RULES
+======================================================================
+
+Rule 1: Prefer structured state over text scraping
+- If a decision can be made from player/game state, do not make it from RECENT_TEXT.
+- Raw text is a compatibility fallback only.
+
+Rule 2: Every major policy decision must be explainable
+- If a route or blackjack action cannot emit a reason trace, the policy is not maintainable.
+
+Rule 3: Add scenario tests when a death or failure looks avoidable
+- Every obvious avoidable death should become a replayable case.
+- The system should learn from specific failure classes.
+
+Rule 4: Keep strategy and IO separated
+- Prompt parsing, monkey-patching, and runtime adaptation should not contain strategic reasoning.
+- The strategic layer should consume normalized DecisionRequest and GameState objects.
+
+Rule 5: Centralize tunable weights
+- Item priorities, goal weights, reserve rules, aggression profiles, and route weights should live in policy config tables, not scattered magic numbers.
+
+Rule 6: Optimize for run value, not only immediate chips
+- A winning benchmark player in this game is not just a good blackjack hand player.
+- It is a good run manager.
+
+Rule 6A: Make interrupts and lockouts visible in traces
+- If a day was consumed by fatigue, weather, car trouble, debt violence, companion care, or a storyline override, the trace should say so explicitly.
+- Otherwise route-policy regressions and content-balance problems will be misread.
+
+Rule 6B: Treat recurring drains as planner responsibilities
+- Fatigue, sanity, debt, durability, fraudulent cash, and companion upkeep should not be scattered as local reserve checks.
+- They belong in the strategic layer and should appear in planner scoring and benchmark reporting.
+
+Rule 7: Protect reporting continuity during migration
+- Preserve enough of the current tools/autotest.py outputs that historical comparison remains possible.
+- Add JSON outputs instead of replacing text immediately.
+
+Rule 8: Do not claim optimality too early
+- Use language like benchmark_player, strong_policy, or near_optimal_candidate until the metrics support stronger claims.
+
+======================================================================
+PART 6: CONCRETE TASK CHECKLIST FOR THE NEXT AGENT
+======================================================================
+
+Track A: Autoplay-completeness checklist
+- [ ] Create a GameState snapshot model that can be produced at every decision point.
+- [ ] Create DecisionRequest and DecisionTrace types as the stable interface between prompts and policy.
+- [ ] Build a first strategic planner with explicit goal selection and trace output.
+- [ ] Replace route selection with planner-backed route scoring that subsumes _choose_progression_destination and _choose_destination.
+- [ ] Replace blackjack action policy with rollout-based or otherwise game-specific EV evaluation that subsumes _recommended_blackjack_action, _auto_hit_or_stand, _should_take_insurance, _should_replay_hand, and much of _auto_bet.
+- [ ] Add machine-readable trace output for autotest consumption.
+- [ ] Build scenario-based regression cases for the most obvious avoidable failures.
+- [ ] Build scenario-based regression cases for status-prioritized decisions where health, sanity, debt, fatigue, travel restriction, or companion pressure should override greedy play.
+- [ ] Expand coverage until the harness can deliberately engage gifts, dealer-happiness-sensitive gift effects, companions, convenience-store synergies, crafting/workbench loops, pawn realization chains, and millionaire/ending funnels.
+- [ ] Verify that every major event family and route family has a best-outcome policy path, not only a generic fallback.
+
+Track B: Game-audit and fairness checklist
+- [ ] Track unlock -> engagement -> value funnels for every major mechanic that should help a run.
+- [ ] Add coverage reporting for whether mechanics actually appear in gameplay when they should: gifts, companions, pawn loops, workbench outputs, crafted-item follow-ups, and late-game branches.
+- [ ] Use seeded replays to identify the most common preventable failures, then fix the most common prevention first.
+- [ ] Treat obviously unfair repeatable spikes, excessively punitive nuisance branches, and dead-end progression mechanics as balance candidates.
+- [ ] Compare missing or underused mechanics against the core game code to determine whether the issue is autoplay weakness, balance weakness, or a game bug.
+- [ ] Add human-readable fairness notes whenever autoplay work leads to player-facing system changes.
+
+Supporting tasks
+- Refactor item and flask priorities into config.
+- Reduce one-off prompt override logic.
+- Add event semantic categories.
+- Add richer millionaire and ending conversion logic.
+- Add structured progression funnel summaries.
+- Add explicit interrupt and lockout summaries.
+- Add recurring-drain summaries for fatigue, debt, sanity, durability, and companions.
+- Add coverage summaries for mechanic presence, unfair-event candidates, and expected-but-missing systems.
+
+Implementation-order milestone ladder
+- Milestone 1: Reliable no-car survival and car acquisition
+  - reduce early preventable deaths
+  - stabilize doctor handling and no-car reserve logic
+  - get off your feet consistently
+- Milestone 2: Reliable post-car stabilization
+  - convert car access into rank 1, worn-map access, and reduced medical collapse
+  - verify doctor, pawn, convenience store, and mechanic systems are showing up correctly
+- Milestone 3: Reliable 10k funnel
+  - convert 1k to 5k midgame runs into 8k to 10k runs deliberately
+  - verify Marvin, gifts, companions, and convenience-store synergies are participating in that climb
+- Milestone 4: Reliable six-figure funnel
+  - convert Marvin and item-edge runs into repeatable 10k to 100k growth
+  - verify crafting, workbench, debt, and millionaire-prep systems are helping instead of stalling progress
+- Milestone 5: Reliable millionaire funnel
+  - convert strong late runs into 1 million dollars with deliberate risk management rather than lucky outliers
+  - verify the airport, mechanic, and other millionaire-ending branches are available and used correctly
+- Milestone 6: Full-benchmark game audit
+  - once the benchmark can reach 1 million dollars deliberately, use it to decide which remaining failures are autoplay weaknesses and which are genuine balance or gameplay problems
+
+Deliberate iteration loop
+- Step 1: pick the most common preventable failure or the most important missing mechanic from fixed-seed evidence
+- Step 2: reproduce it with a scenario case or a focused seed replay
+- Step 3: decide whether the cause is autoplay incompleteness, missing mechanic engagement, unfair balance, or a core gameplay bug
+- Step 4: implement the smallest high-confidence fix in the appropriate layer
+- Step 5: rerun scenarios, rerun fixed benchmark seeds, and inspect funnel deltas
+- Step 6: record the result in the audit and fairness changelog when it affects player-facing gameplay
+- Step 7: move to the next highest-frequency blocker in the milestone ladder above
+
+Batch visibility rule
+- Every meaningful work batch should update tools/optimal_autoplay_progress_checklist.txt.
+- That checklist is the at-a-glance view of:
+  - how much of the game ecosystem is covered
+  - which milestone the benchmark is currently blocked on
+  - how close the bot is to deliberate millionaire-capable play
+
+======================================================================
+PART 7: PRACTICAL PITFALLS TO AVOID
+======================================================================
+
+Pitfall 1: Trying to make the current quicktest file clean by adding more helpers
+- That will improve readability somewhat but not solve the planning problem.
+
+Pitfall 2: Replacing route heuristics before building a strategic goal layer
+- Route scoring without a goal will just become a different heuristic soup.
+
+Pitfall 3: Overfitting to a small seed set
+- A few good seeds can make a bad policy look smart.
+
+Pitfall 4: Evaluating blackjack only by immediate chip EV
+- In this game, cash reserve and progression opportunities matter.
+
+Pitfall 4A: Treating forced systems as route-policy failures
+- A missed doctor, Marvin, or mechanic visit may be caused by fatigue suppression, travel restriction, car trouble, or debt interruption rather than poor destination scoring.
+- If the trace does not distinguish this, tuning will target the wrong layer.
+
+Pitfall 4B: Modeling items and companions as static assets
+- Edge items break.
+- Flasks expire.
+- Companions require upkeep and can leave.
+- A planner that assumes monotonic growth in power will overestimate run stability.
+
+Pitfall 5: Ignoring maintainability telemetry
+- If fallback prompt handling grows again, the architecture is drifting backward.
+
+Pitfall 6: Calling the new bot optimal before it can convert major systems reliably
+- It needs to show stable exploitation of Marvin, Witch, mechanics, adventures, and endings before it can be trusted as a balance benchmark.
+
+======================================================================
+PART 8: MINIMUM SUCCESS DEFINITION
+======================================================================
+
+The autoplay can start to be trusted as a balance benchmark when all of the following are true:
+- It survives far more often than the current bot.
+- It materially reduces saveable deaths.
+- It converts unlocks into visits and visits into value.
+- It reaches and exploits major progression systems deliberately.
+- It can deliberately build runs through the 10k funnel, the six-figure funnel, and eventually the 1 million dollar funnel rather than reaching those states only as statistical accidents.
+- It emits enough trace information that a bad decision can be understood and corrected.
+- Its performance remains stable across fixed benchmark seed suites.
+
+Final instruction to the next agent
+- Do not treat this as a narrow tuning problem only.
+- Treat it as a combined decision-architecture, optimal-play coverage, and game-audit problem.
+- Build the planner and interfaces first, but keep using seeded evidence to close the most common preventable failures.
+- Then tune the policies against fixed benchmarks while checking whether major mechanics actually appear and help the run.
+- The current bot already proves that raw heuristic accumulation is not enough.
+- The finished benchmark should not merely survive more often. It should engage the game's winning possibilities from beginning to end, explain its decisions, and surface when the game itself is too unfair, too weakly rewarding, or bugged.

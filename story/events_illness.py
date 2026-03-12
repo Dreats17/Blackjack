@@ -48,8 +48,102 @@ def quote(text):
 def space_quote(text):
     return ("\"" + text + "\" ")
 
-class MedicalMixin:
-    """Medical: All illnesses, injuries, and medical conditions"""
+class IllnessMixin:
+    """Illness events: All illnesses, injuries, and medical conditions"""
+
+    # ==========================================
+    # DISPATCHER — called by the event system
+    # ==========================================
+
+    def random_illness(self):
+        """Pick a rank-appropriate illness at random and trigger it."""
+        rank = self.get_rank()
+
+        minor = [
+            self.contract_cold, self.contract_flu, self.contract_strep_throat,
+            self.contract_ear_infection, self.contract_sinus_infection,
+            self.contract_pink_eye, self.contract_ringworm, self.contract_scabies,
+            self.contract_uti, self.migraine_severe, self.vertigo_episode,
+            self.asthma_attack, self.dirty_needle_stick, self.unclean_water,
+            self.mold_exposure, self.bee_sting_allergy, self.bad_oysters,
+            self.rat_bite, self.bad_mushrooms, self.slip_in_shower,
+            self.fall_down_stairs, self.kitchen_accident, self.bar_fight_aftermath,
+            self.severe_anxiety_attack, self.severe_depression_episode,
+            self.insomnia_chronic, self.stress_breakdown, self.trauma_flashback,
+            self.dislocated_shoulder, self.broken_wrist, self.broken_nose,
+            self.deep_laceration, self.whiplash_injury, self.broken_hand,
+        ]
+        moderate = [
+            self.contract_pneumonia, self.contract_bronchitis, self.contract_stomach_flu,
+            self.contract_mono, self.contract_shingles, self.contract_lyme_disease,
+            self.contract_tetanus, self.contract_rabies_scare, self.contract_staph_infection,
+            self.develop_diabetes_symptoms, self.high_blood_pressure_crisis,
+            self.severe_allergic_reaction, self.kidney_stones, self.gallbladder_attack,
+            self.appendicitis_attack, self.blood_clot_in_leg, self.seizure_episode,
+            self.pancreatitis_attack, self.severe_burn_injury, self.concussion_injury,
+            self.broken_ribs_injury, self.broken_ankle, self.torn_acl,
+            self.herniated_disc, self.puncture_wound, self.frostbite,
+            self.heat_stroke, self.hypothermia, self.second_degree_burns,
+            self.electrical_burn, self.chemical_burn, self.crush_injury,
+            self.gym_accident, self.lead_poisoning, self.asbestos_exposure,
+            self.mercury_poisoning, self.dental_disaster, self.dog_attack_severe,
+            self.ptsd_flashback, self.food_truck_nightmare, self.public_pool_infection,
+            self.homeless_shelter_outbreak, self.bad_tattoo_infection, self.wasp_nest_encounter,
+        ]
+        severe = [
+            self.contract_measles, self.skull_fracture, self.collapsed_lung,
+            self.ruptured_spleen, self.liver_laceration, self.detached_retina,
+            self.gangrene_infection, self.drug_overdose_survival, self.botched_surgery,
+            self.covid_complications, self.earthquake_injury, self.explosion_nearby,
+            self.coma_awakening, self.prison_shiv_wound, self.sleep_deprivation_crisis,
+            self.caught_in_fire, self.frozen_outdoors, self.heat_exhaustion_collapse,
+            self.mma_fight_aftermath, self.motorcycle_crash, self.pool_diving_accident,
+            self.electric_shock, self.assault_aftermath, self.workplace_injury,
+        ]
+
+        # Severity weights per rank: [minor, moderate, severe]
+        # Rank 0=poor, 1=cheap, 2=modest, 3=rich, 4=doughman, 5=nearly
+        severity_weights = [
+            [8, 2, 0],  # poor: mostly minor ailments
+            [6, 3, 1],  # cheap: starting to see real problems
+            [4, 4, 2],  # modest: balanced danger
+            [2, 4, 4],  # rich: serious injuries more common
+            [1, 3, 6],  # doughman: life-threatening events dominate
+            [1, 2, 7],  # nearly: severe and life-threatening
+        ]
+        weights = severity_weights[min(rank, 5)]
+        severity = random.choices(["minor", "moderate", "severe"], weights=weights, k=1)[0]
+        if severity == "minor":
+            random.choice(minor)()
+        elif severity == "moderate":
+            random.choice(moderate)()
+        else:
+            random.choice(severe)()
+
+    # ==========================================
+    # BASIC COMMON ILLNESSES (also in minor pool)
+    # ==========================================
+
+    def contract_cold(self):
+        type.type("It started with a tickle in your throat. Then the sniffles. Then the coughing.")
+        print("\n")
+        type.type("Your nose is running like a faucet. Your head feels stuffed with cotton.")
+        print("\n")
+        type.type("Just a common " + red("cold") + ". Nothing serious, but you feel miserable.")
+        self.add_status("Cold")
+        self.hurt(5)
+        self.start_night()
+
+    def contract_flu(self):
+        type.type("It hits you like a truck. One moment you're fine, the next you can barely move.")
+        print("\n")
+        type.type("Fever. Chills. Body aches so severe you can't get comfortable in any position.")
+        print("\n")
+        type.type("Your throat is raw. Your cough is painful. This is the " + red("flu") + " - the real deal.")
+        self.add_status("Flu")
+        self.hurt(12)
+        self.lose_sanity(1)
+        self.start_night()
 
     def contract_pneumonia(self):
         # EVENT: Contract pneumonia from exposure/weakened immune system
@@ -63,7 +157,7 @@ class MedicalMixin:
         print("\n")
         type.type("You need a doctor. Soon.")
         self.add_status("Pneumonia")
-        self.damage(15)
+        self.hurt(15)
         self.lose_sanity(2)
         self.start_night()
 
@@ -78,7 +172,7 @@ class MedicalMixin:
         print("\n")
         type.type(red("Bronchitis") + " has set in.")
         self.add_status("Bronchitis")
-        self.damage(8)
+        self.hurt(8)
         self.start_night()
 
     def contract_strep_throat(self):
@@ -92,7 +186,7 @@ class MedicalMixin:
         print("\n")
         type.type("Without antibiotics, this could get much, much worse.")
         self.add_status("Strep Throat")
-        self.damage(10)
+        self.hurt(10)
         self.start_night()
 
     def contract_stomach_flu(self):
@@ -106,7 +200,7 @@ class MedicalMixin:
         print("\n")
         type.type(red("Stomach flu") + " has you in its grip.")
         self.add_status("Stomach Flu")
-        self.damage(12)
+        self.hurt(12)
         self.lose_sanity(1)
         self.start_night()
 
@@ -121,7 +215,7 @@ class MedicalMixin:
         print("\n")
         type.type(red("Ear infection") + ". Nasty one.")
         self.add_status("Ear Infection")
-        self.damage(5)
+        self.hurt(5)
         self.start_night()
 
     def contract_sinus_infection(self):
@@ -133,7 +227,7 @@ class MedicalMixin:
         print("\n")
         type.type("The " + red("sinus infection") + " has fully taken hold.")
         self.add_status("Sinus Infection")
-        self.damage(6)
+        self.hurt(6)
         self.start_night()
 
     def contract_uti(self):
@@ -147,7 +241,7 @@ class MedicalMixin:
         print("\n")
         type.type(red("Urinary tract infection") + ". If it spreads to your kidneys...")
         self.add_status("UTI")
-        self.damage(8)
+        self.hurt(8)
         self.start_night()
 
     def contract_pink_eye(self):
@@ -161,7 +255,7 @@ class MedicalMixin:
         print("\n")
         type.type(red("Conjunctivitis") + ". Pink eye. Extremely contagious.")
         self.add_status("Pink Eye")
-        self.damage(3)
+        self.hurt(3)
         self.start_night()
 
     def contract_mono(self):
@@ -175,7 +269,7 @@ class MedicalMixin:
         print("\n")
         type.type("It could take months to fully recover.")
         self.add_status("Mononucleosis")
-        self.damage(20)
+        self.hurt(20)
         self.lose_sanity(3)
         self.start_night()
 
@@ -190,7 +284,7 @@ class MedicalMixin:
         print("\n")
         type.type(red("Shingles") + ". And without treatment, the nerve damage could be permanent.")
         self.add_status("Shingles")
-        self.damage(18)
+        self.hurt(18)
         self.lose_sanity(2)
         self.start_night()
 
@@ -205,7 +299,7 @@ class MedicalMixin:
         print("\n")
         type.type(red("Lyme disease") + ". Caught early, treatable. Left untreated... devastating.")
         self.add_status("Lyme Disease")
-        self.damage(15)
+        self.hurt(15)
         self.lose_sanity(2)
         self.start_night()
 
@@ -218,7 +312,7 @@ class MedicalMixin:
         print("\n")
         type.type(red("Ringworm") + ". Contagious. Spreading. Needs treatment.")
         self.add_status("Ringworm")
-        self.damage(3)
+        self.hurt(3)
         self.start_night()
 
     def contract_scabies(self):
@@ -232,7 +326,7 @@ class MedicalMixin:
         print("\n")
         type.type(red("Scabies") + ". Your skin is infested.")
         self.add_status("Scabies")
-        self.damage(5)
+        self.hurt(5)
         self.lose_sanity(2)
         self.start_night()
 
@@ -247,7 +341,7 @@ class MedicalMixin:
         print("\n")
         type.type(red("Staph infection") + ". If it gets into your bloodstream, it could kill you.")
         self.add_status("Staph Infection")
-        self.damage(20)
+        self.hurt(20)
         self.lose_sanity(1)
         self.start_night()
 
@@ -262,7 +356,7 @@ class MedicalMixin:
         print("\n")
         type.type(red("Tetanus") + ". Lockjaw. Without antitoxin, the spasms will get worse until you can't breathe.")
         self.add_status("Tetanus")
-        self.damage(25)
+        self.hurt(25)
         self.lose_sanity(3)
         self.start_night()
 
@@ -277,7 +371,7 @@ class MedicalMixin:
         print("\n")
         type.type("Once symptoms appear, " + red("rabies") + " is almost always fatal. But maybe there's still time...")
         self.add_status("Possible Rabies")
-        self.damage(10)
+        self.hurt(10)
         self.lose_sanity(5)
         self.start_night()
 
@@ -292,7 +386,7 @@ class MedicalMixin:
         print("\n")
         type.type(red("Measles") + ". You thought it was eradicated. You were wrong.")
         self.add_status("Measles")
-        self.damage(18)
+        self.hurt(18)
         self.lose_sanity(2)
         self.start_night()
 
@@ -308,7 +402,7 @@ class MedicalMixin:
         print("\n")
         type.type(red("Diabetes") + ". Your blood sugar is out of control. You need medication.")
         self.add_status("Uncontrolled Diabetes")
-        self.damage(15)
+        self.hurt(15)
         self.start_night()
 
     def high_blood_pressure_crisis(self):
@@ -322,7 +416,7 @@ class MedicalMixin:
         print("\n")
         type.type("Without intervention, you could stroke out any minute.")
         self.add_status("Blood Pressure Crisis")
-        self.damage(20)
+        self.hurt(20)
         self.lose_sanity(2)
         self.start_night()
 
@@ -337,7 +431,7 @@ class MedicalMixin:
         print("\n")
         type.type(red("Anaphylaxis") + ". You need epinephrine. NOW.")
         self.add_status("Anaphylaxis")
-        self.damage(30)
+        self.hurt(30)
         self.lose_sanity(3)
         self.start_night()
 
@@ -352,7 +446,7 @@ class MedicalMixin:
         print("\n")
         type.type(red("Asthma attack") + ". Severe one. You need a nebulizer treatment.")
         self.add_status("Severe Asthma")
-        self.damage(20)
+        self.hurt(20)
         self.lose_sanity(3)
         self.start_night()
 
@@ -365,7 +459,7 @@ class MedicalMixin:
         print("\n")
         type.type(red("Kidney stone") + ". Trying to pass through a tube not meant for jagged rocks.")
         self.add_status("Kidney Stones")
-        self.damage(25)
+        self.hurt(25)
         self.lose_sanity(4)
         self.start_night()
 
@@ -378,7 +472,7 @@ class MedicalMixin:
         print("\n")
         type.type(red("Gallbladder attack") + ". You might need surgery.")
         self.add_status("Gallbladder Attack")
-        self.damage(20)
+        self.hurt(20)
         self.lose_sanity(2)
         self.start_night()
 
@@ -391,7 +485,7 @@ class MedicalMixin:
         print("\n")
         type.type(red("Appendicitis") + ". If it ruptures, you'll die of sepsis.")
         self.add_status("Appendicitis")
-        self.damage(30)
+        self.hurt(30)
         self.lose_sanity(3)
         self.start_night()
 
@@ -404,7 +498,7 @@ class MedicalMixin:
         print("\n")
         type.type("If it breaks loose and travels to your lungs, it's called a pulmonary embolism. And it can kill you in seconds.")
         self.add_status("DVT")
-        self.damage(15)
+        self.hurt(15)
         self.lose_sanity(3)
         self.start_night()
 
@@ -417,7 +511,7 @@ class MedicalMixin:
         print("\n")
         type.type(red("Migraine") + ". Severe. You're completely incapacitated.")
         self.add_status("Severe Migraine")
-        self.damage(10)
+        self.hurt(10)
         self.lose_sanity(4)
         self.start_night()
 
@@ -430,7 +524,7 @@ class MedicalMixin:
         print("\n")
         type.type(red("Vertigo") + ". Something is wrong with your inner ear.")
         self.add_status("Vertigo")
-        self.damage(5)
+        self.hurt(5)
         self.lose_sanity(3)
         self.start_night()
 
@@ -447,7 +541,7 @@ class MedicalMixin:
         print("\n")
         type.type(red("Seizure") + ". Grand mal. You don't know when the next one will come.")
         self.add_status("Seizure Disorder")
-        self.damage(20)
+        self.hurt(20)
         self.lose_sanity(5)
         self.start_night()
 
@@ -460,7 +554,7 @@ class MedicalMixin:
         print("\n")
         type.type(red("Pancreatitis") + ". Your pancreas is inflamed. It's eating itself.")
         self.add_status("Pancreatitis")
-        self.damage(25)
+        self.hurt(25)
         self.lose_sanity(3)
         self.start_night()
 
@@ -474,7 +568,7 @@ class MedicalMixin:
         print("\n")
         type.type(red("Severe burns") + ". Risk of infection. Possible need for skin grafts.")
         self.add_injury("Severe Burns")
-        self.damage(25)
+        self.hurt(25)
         self.lose_sanity(3)
         self.start_night()
 
@@ -487,7 +581,7 @@ class MedicalMixin:
         print("\n")
         type.type(red("Concussion") + ". Your brain bounced around inside your skull.")
         self.add_injury("Concussion")
-        self.damage(15)
+        self.hurt(15)
         self.lose_sanity(4)
         self.start_night()
 
@@ -500,7 +594,7 @@ class MedicalMixin:
         print("\n")
         type.type(red("Broken ribs") + ". Nothing to do but wait for them to heal. And pray they don't puncture a lung.")
         self.add_injury("Broken Ribs")
-        self.damage(20)
+        self.hurt(20)
         self.lose_sanity(2)
         self.start_night()
 
@@ -513,7 +607,7 @@ class MedicalMixin:
         print("\n")
         type.type(red("Dislocated shoulder") + ". Needs reduction immediately.")
         self.add_injury("Dislocated Shoulder")
-        self.damage(18)
+        self.hurt(18)
         self.lose_sanity(2)
         self.start_night()
 
@@ -526,7 +620,7 @@ class MedicalMixin:
         print("\n")
         type.type(red("Broken hand") + ". Going to need surgery to pin those bones.")
         self.add_injury("Broken Hand")
-        self.damage(15)
+        self.hurt(15)
         self.lose_sanity(2)
         self.start_night()
 
@@ -539,7 +633,7 @@ class MedicalMixin:
         print("\n")
         type.type(red("Broken wrist") + ". Colles fracture. Classic. Painful.")
         self.add_injury("Broken Wrist")
-        self.damage(12)
+        self.hurt(12)
         self.lose_sanity(1)
         self.start_night()
 
@@ -552,7 +646,7 @@ class MedicalMixin:
         print("\n")
         type.type(red("Broken ankle") + ". You're not going anywhere fast.")
         self.add_injury("Broken Ankle")
-        self.damage(15)
+        self.hurt(15)
         self.lose_sanity(2)
         self.start_night()
 
@@ -565,7 +659,7 @@ class MedicalMixin:
         print("\n")
         type.type(red("Torn ACL") + ". Going to need reconstruction surgery. And months of rehab.")
         self.add_injury("Torn ACL")
-        self.damage(20)
+        self.hurt(20)
         self.lose_sanity(3)
         self.start_night()
 
@@ -578,7 +672,7 @@ class MedicalMixin:
         print("\n")
         type.type(red("Herniated disc") + ". Every movement is agony. You might need surgery.")
         self.add_injury("Herniated Disc")
-        self.damage(18)
+        self.hurt(18)
         self.lose_sanity(3)
         self.start_night()
 
@@ -591,7 +685,7 @@ class MedicalMixin:
         print("\n")
         type.type(red("Deep laceration") + ". Maybe nicked an artery. Definitely needs sutures.")
         self.add_injury("Deep Laceration")
-        self.damage(22)
+        self.hurt(22)
         self.start_night()
 
     def puncture_wound(self):
@@ -603,7 +697,7 @@ class MedicalMixin:
         print("\n")
         type.type(red("Puncture wound") + ". Internal bleeding likely. Needs imaging. Needs surgery maybe.")
         self.add_injury("Puncture Wound")
-        self.damage(25)
+        self.hurt(25)
         self.lose_sanity(2)
         self.start_night()
 
@@ -616,7 +710,7 @@ class MedicalMixin:
         print("\n")
         type.type(red("Second degree burns") + ". Going to scar. Risk of infection is high.")
         self.add_status("Second Degree Burns")
-        self.damage(15)
+        self.hurt(15)
         self.start_night()
 
     def frostbite(self):
@@ -628,7 +722,7 @@ class MedicalMixin:
         print("\n")
         type.type(red("Frostbite") + ". You might lose those extremities.")
         self.add_injury("Frostbite")
-        self.damage(20)
+        self.hurt(20)
         self.lose_sanity(3)
         self.start_night()
 
@@ -641,7 +735,7 @@ class MedicalMixin:
         print("\n")
         type.type(red("Heat stroke") + ". Your body can't cool itself. You're cooking from the inside.")
         self.add_status("Heat Stroke")
-        self.damage(25)
+        self.hurt(25)
         self.lose_sanity(4)
         self.start_night()
 
@@ -654,7 +748,7 @@ class MedicalMixin:
         print("\n")
         type.type(red("Hypothermia") + ". Your core temperature is dropping. You're dying of cold.")
         self.add_status("Hypothermia")
-        self.damage(25)
+        self.hurt(25)
         self.lose_sanity(5)
         self.start_night()
 
@@ -667,7 +761,7 @@ class MedicalMixin:
         print("\n")
         type.type(red("Crush injury") + ". You need dialysis. You need it now.")
         self.add_injury("Crush Injury")
-        self.damage(35)
+        self.hurt(35)
         self.lose_sanity(5)
         self.start_night()
 
@@ -680,7 +774,7 @@ class MedicalMixin:
         print("\n")
         type.type(red("Chemical burn") + ". Acid or base, it doesn't matter. The tissue is destroyed.")
         self.add_injury("Chemical Burn")
-        self.damage(22)
+        self.hurt(22)
         self.lose_sanity(2)
         self.start_night()
 
@@ -693,7 +787,7 @@ class MedicalMixin:
         print("\n")
         type.type(red("Electrical burn") + ". Internal damage unknown. Cardiac monitoring required.")
         self.add_injury("Electrical Burns")
-        self.damage(28)
+        self.hurt(28)
         self.lose_sanity(3)
         self.start_night()
 
@@ -706,7 +800,7 @@ class MedicalMixin:
         print("\n")
         type.type(red("Whiplash") + ". Neck sprain. Might be worse - need imaging to know.")
         self.add_injury("Whiplash")
-        self.damage(12)
+        self.hurt(12)
         self.lose_sanity(1)
         self.start_night()
 
@@ -719,7 +813,7 @@ class MedicalMixin:
         print("\n")
         type.type(red("Fractured jaw") + ". Going to need wiring. Liquid diet for weeks.")
         self.add_injury("Fractured Jaw")
-        self.damage(18)
+        self.hurt(18)
         self.lose_sanity(2)
         self.start_night()
 
@@ -732,7 +826,7 @@ class MedicalMixin:
         print("\n")
         type.type(red("Skull fracture") + ". Brain swelling likely. Emergency surgery required.")
         self.add_injury("Skull Fracture")
-        self.damage(40)
+        self.hurt(40)
         self.lose_sanity(6)
         self.start_night()
 
@@ -745,7 +839,7 @@ class MedicalMixin:
         print("\n")
         type.type(red("Pneumothorax") + ". Collapsed lung. Needs a chest tube. Now.")
         self.add_injury("Collapsed Lung")
-        self.damage(30)
+        self.hurt(30)
         self.lose_sanity(4)
         self.start_night()
 
@@ -758,7 +852,7 @@ class MedicalMixin:
         print("\n")
         type.type(red("Ruptured spleen") + ". You're bleeding out internally. Surgery. Immediately.")
         self.add_injury("Ruptured Spleen")
-        self.damage(35)
+        self.hurt(35)
         self.lose_sanity(4)
         self.start_night()
 
@@ -771,7 +865,7 @@ class MedicalMixin:
         print("\n")
         type.type(red("Liver laceration") + ". Every second counts.")
         self.add_injury("Liver Laceration")
-        self.damage(40)
+        self.hurt(40)
         self.lose_sanity(5)
         self.start_night()
 
@@ -784,7 +878,7 @@ class MedicalMixin:
         print("\n")
         type.type(red("Ruptured eardrum") + ". May heal on its own. May need surgery. Hearing loss possible.")
         self.add_injury("Ruptured Eardrum")
-        self.damage(10)
+        self.hurt(10)
         self.lose_sanity(3)
         self.start_night()
 
@@ -797,7 +891,7 @@ class MedicalMixin:
         print("\n")
         type.type(red("Retinal detachment") + ". Without surgery, permanent blindness in that eye.")
         self.add_injury("Detached Retina")
-        self.damage(8)
+        self.hurt(8)
         self.lose_sanity(5)
         self.start_night()
 
@@ -810,7 +904,7 @@ class MedicalMixin:
         print("\n")
         type.type(red("Orbital fracture") + ". Your eye socket is broken. Reconstructive surgery needed.")
         self.add_injury("Orbital Fracture")
-        self.damage(20)
+        self.hurt(20)
         self.lose_sanity(4)
         self.start_night()
 
@@ -823,7 +917,7 @@ class MedicalMixin:
         print("\n")
         type.type(red("Broken nose") + ". Needs to be set before it heals crooked.")
         self.add_injury("Broken Nose")
-        self.damage(8)
+        self.hurt(8)
         self.lose_sanity(1)
         self.start_night()
 
@@ -836,7 +930,7 @@ class MedicalMixin:
         print("\n")
         type.type(red("Broken clavicle") + ". Going to need a sling for weeks. Maybe surgery.")
         self.add_injury("Broken Collarbone")
-        self.damage(15)
+        self.hurt(15)
         self.lose_sanity(2)
         self.start_night()
 
@@ -849,7 +943,7 @@ class MedicalMixin:
         print("\n")
         type.type(red("Tooth abscess") + ". If it reaches your bloodstream or your brain, you're dead.")
         self.add_status("Tooth Abscess")
-        self.damage(15)
+        self.hurt(15)
         self.lose_sanity(3)
         self.start_night()
 
@@ -862,7 +956,7 @@ class MedicalMixin:
         print("\n")
         type.type(red("Sepsis") + ". Blood poisoning. Without IV antibiotics, you'll be dead within hours.")
         self.add_status("Sepsis")
-        self.damage(35)
+        self.hurt(35)
         self.lose_sanity(5)
         self.start_night()
 
@@ -875,7 +969,7 @@ class MedicalMixin:
         print("\n")
         type.type(red("Severe dehydration") + ". You need IV fluids. Lots of them.")
         self.add_status("Severe Dehydration")
-        self.damage(20)
+        self.hurt(20)
         self.lose_sanity(3)
         self.start_night()
 
@@ -888,7 +982,7 @@ class MedicalMixin:
         print("\n")
         type.type(red("Malnutrition") + ". Your body is eating itself to survive.")
         self.add_status("Malnutrition")
-        self.damage(15)
+        self.hurt(15)
         self.lose_sanity(2)
         self.start_night()
 
@@ -901,7 +995,7 @@ class MedicalMixin:
         print("\n")
         type.type(red("Nerve damage") + ". May be permanent. May need surgery. May never fully recover.")
         self.add_injury("Nerve Damage")
-        self.damage(12)
+        self.hurt(12)
         self.lose_sanity(4)
         self.start_night()
 
@@ -914,7 +1008,7 @@ class MedicalMixin:
         print("\n")
         type.type(red("Ruptured tendon") + ". Needs surgical reattachment. Months of recovery.")
         self.add_injury("Ruptured Tendon")
-        self.damage(18)
+        self.hurt(18)
         self.lose_sanity(2)
         self.start_night()
 
@@ -927,7 +1021,7 @@ class MedicalMixin:
         print("\n")
         type.type(red("Muscle tear") + ". Grade III. Complete rupture. Surgery likely.")
         self.add_injury("Muscle Tear")
-        self.damage(15)
+        self.hurt(15)
         self.lose_sanity(1)
         self.start_night()
 
@@ -940,7 +1034,7 @@ class MedicalMixin:
         print("\n")
         type.type(red("Gangrene") + ". Amputation may be the only option to save your life.")
         self.add_status("Gangrene")
-        self.damage(30)
+        self.hurt(30)
         self.lose_sanity(6)
         self.start_night()
 
@@ -978,7 +1072,7 @@ class MedicalMixin:
         print("\n")
         type.type(red("Chronic insomnia") + ". Your body is breaking down without rest.")
         self.add_status("Chronic Insomnia")
-        self.damage(10)
+        self.hurt(10)
         self.lose_sanity(5)
         self.start_night()
 
@@ -1009,7 +1103,7 @@ class MedicalMixin:
         type.type("You need to get to a doctor. Get tested. Get prophylaxis. NOW.")
         self.add_status("Needle Exposure")
         self.add_danger("Possible Blood Disease")
-        self.damage(5)
+        self.hurt(5)
         self.lose_sanity(4)
         self.start_night()
 
@@ -1022,7 +1116,7 @@ class MedicalMixin:
         print("\n")
         type.type(red("Shellfish poisoning") + ". Vibrio bacteria. Could be fatal without treatment.")
         self.add_status("Shellfish Poisoning")
-        self.damage(20)
+        self.hurt(20)
         self.lose_sanity(2)
         self.start_night()
 
@@ -1036,7 +1130,7 @@ class MedicalMixin:
         type.type(red("Rat bite fever") + ". Without antibiotics, this could kill you.")
         self.add_status("Rat Bite Fever")
         self.add_injury("Rat Bite")
-        self.damage(15)
+        self.hurt(15)
         self.start_night()
 
     def bad_mushrooms(self):
@@ -1048,7 +1142,7 @@ class MedicalMixin:
         print("\n")
         type.type(red("Amanita poisoning") + ". Death cap mushroom. You need a liver transplant or you're dead.")
         self.add_status("Mushroom Poisoning")
-        self.damage(40)
+        self.hurt(40)
         self.lose_sanity(5)
         self.start_night()
 
@@ -1061,7 +1155,7 @@ class MedicalMixin:
         print("\n")
         type.type(red("Waterborne illness") + ". You need treatment before you lose too many fluids.")
         self.add_status("Waterborne Illness")
-        self.damage(18)
+        self.hurt(18)
         self.start_night()
 
     def mold_exposure(self):
@@ -1075,7 +1169,7 @@ class MedicalMixin:
         print("\n")
         type.type(red("Toxic mold exposure") + ". The spores are in your lungs. This could be chronic.")
         self.add_status("Mold Toxicity")
-        self.damage(12)
+        self.hurt(12)
         self.lose_sanity(3)
         self.start_night()
 
@@ -1090,7 +1184,7 @@ class MedicalMixin:
         print("\n")
         type.type(red("Severe bee allergy") + ". You need epinephrine NOW.")
         self.add_status("Anaphylaxis")
-        self.damage(30)
+        self.hurt(30)
         self.lose_sanity(3)
         self.start_night()
 
@@ -1105,7 +1199,7 @@ class MedicalMixin:
         print("\n")
         type.type(red("Lead poisoning") + ". Your brain is being damaged. You need chelation therapy.")
         self.add_status("Lead Poisoning")
-        self.damage(15)
+        self.hurt(15)
         self.lose_sanity(4)
         self.start_night()
 
@@ -1121,7 +1215,7 @@ class MedicalMixin:
         type.type(red("Asbestos exposure") + ". The fibers are embedded in your lungs forever. Mesothelioma is possible.")
         self.add_status("Asbestos Damage")
         self.add_danger("Cancer Risk")
-        self.damage(15)
+        self.hurt(15)
         self.lose_sanity(5)
         self.start_night()
 
@@ -1136,7 +1230,7 @@ class MedicalMixin:
         print("\n")
         type.type(red("Mercury poisoning") + ". Heavy metal toxicity. Neurological damage may be permanent.")
         self.add_status("Mercury Poisoning")
-        self.damage(18)
+        self.hurt(18)
         self.lose_sanity(4)
         self.start_night()
 
@@ -1158,7 +1252,7 @@ class MedicalMixin:
         print("\n")
         type.type(red("Herniated disc") + ". Your gym career is over before it started.")
         self.add_injury("Herniated Disc")
-        self.damage(20)
+        self.hurt(20)
         self.lose_sanity(3)
         self.start_night()
 
@@ -1176,7 +1270,7 @@ class MedicalMixin:
         type.type(red("Concussion") + " and a nasty gash on your head.")
         self.add_injury("Concussion")
         self.add_injury("Deep Laceration")
-        self.damage(25)
+        self.hurt(25)
         self.lose_sanity(3)
         self.start_night()
 
@@ -1192,7 +1286,7 @@ class MedicalMixin:
         type.type(red("Broken collarbone") + ". Possibly broken ribs too.")
         self.add_injury("Broken Collarbone")
         self.add_injury("Broken Ribs")
-        self.damage(30)
+        self.hurt(30)
         self.lose_sanity(3)
         self.start_night()
 
@@ -1210,7 +1304,7 @@ class MedicalMixin:
         if random.randint(1, 3) == 1:
             self.add_injury("Broken Ribs")
             type.type(" Those ribs are definitely cracked.")
-        self.damage(22)
+        self.hurt(22)
         self.lose_sanity(2)
         self.start_night()
 
@@ -1225,7 +1319,7 @@ class MedicalMixin:
         print("\n")
         type.type(red("Broken ankle") + ". The workers rush over, but the damage is done.")
         self.add_injury("Broken Ankle")
-        self.damage(18)
+        self.hurt(18)
         self.lose_sanity(2)
         self.start_night()
 
@@ -1239,7 +1333,7 @@ class MedicalMixin:
         type.type(red("Broken nose") + ". " + red("Broken hand") + ". Maybe a black eye too.")
         self.add_injury("Broken Nose")
         self.add_injury("Broken Hand")
-        self.damage(25)
+        self.hurt(25)
         self.lose_sanity(3)
         self.start_night()
 
@@ -1252,7 +1346,7 @@ class MedicalMixin:
         print("\n")
         type.type(red("Deep laceration") + ". Nearly severed your finger.")
         self.add_injury("Deep Laceration")
-        self.damage(15)
+        self.hurt(15)
         self.start_night()
 
     def grease_fire(self):
@@ -1264,7 +1358,7 @@ class MedicalMixin:
         print("\n")
         type.type(red("Second degree burns") + " covering your arms. Some might be third degree.")
         self.add_status("Second Degree Burns")
-        self.damage(25)
+        self.hurt(25)
         self.lose_sanity(4)
         self.start_night()
 
@@ -1277,7 +1371,7 @@ class MedicalMixin:
         print("\n")
         type.type(red("Torn ACL") + ". Season over. Maybe career over.")
         self.add_injury("Torn ACL")
-        self.damage(20)
+        self.hurt(20)
         self.lose_sanity(3)
         self.start_night()
 
@@ -1291,7 +1385,7 @@ class MedicalMixin:
         type.type(red("Broken leg") + ". " + red("Severe burns") + " from the friction and exhaust.")
         self.add_injury("Broken Leg")
         self.add_injury("Severe Burns")
-        self.damage(40)
+        self.hurt(40)
         self.lose_sanity(5)
         self.start_night()
 
@@ -1305,7 +1399,7 @@ class MedicalMixin:
         type.type(red("Deep lacerations") + ". Possible " + red("rabies exposure") + ". Definitely need stitches.")
         self.add_injury("Deep Laceration")
         self.add_status("Possible Rabies")
-        self.damage(28)
+        self.hurt(28)
         self.lose_sanity(4)
         self.start_night()
 
@@ -1318,7 +1412,7 @@ class MedicalMixin:
         print("\n")
         type.type(red("Fractured spine") + ". You're lucky you're not paralyzed.")
         self.add_injury("Fractured Spine")
-        self.damage(35)
+        self.hurt(35)
         self.lose_sanity(6)
         self.start_night()
 
@@ -1331,7 +1425,7 @@ class MedicalMixin:
         print("\n")
         type.type(red("Chemical burn") + ". Whatever that was, it ate through your flesh.")
         self.add_injury("Chemical Burn")
-        self.damage(22)
+        self.hurt(22)
         self.lose_sanity(3)
         self.start_night()
 
@@ -1344,7 +1438,7 @@ class MedicalMixin:
         print("\n")
         type.type(red("Electrical burns") + ". Internal damage unknown. Your heart is still skipping beats.")
         self.add_injury("Electrical Burns")
-        self.damage(30)
+        self.hurt(30)
         self.lose_sanity(4)
         self.start_night()
 
@@ -1357,7 +1451,7 @@ class MedicalMixin:
         print("\n")
         type.type(red("Crush injury") + ". They saved the arm. Barely. Function uncertain.")
         self.add_injury("Crush Injury")
-        self.damage(40)
+        self.hurt(40)
         self.lose_sanity(6)
         self.start_night()
 
@@ -1373,7 +1467,7 @@ class MedicalMixin:
         self.add_injury("Concussion")
         if random.randint(1, 2) == 1:
             self.add_injury("Ruptured Spleen")
-        self.damage(45)
+        self.hurt(45)
         self.lose_sanity(7)
         self.start_night()
 
@@ -1387,7 +1481,7 @@ class MedicalMixin:
         type.type(red("Severe burns") + ". Smoke inhalation. " + red("Collapsed lung") + " from the heat damage.")
         self.add_injury("Severe Burns")
         self.add_injury("Collapsed Lung")
-        self.damage(45)
+        self.hurt(45)
         self.lose_sanity(6)
         self.start_night()
 
@@ -1401,7 +1495,7 @@ class MedicalMixin:
         type.type(red("Frostbite") + ". Amputation might be necessary. " + red("Hypothermia") + " damage to your organs.")
         self.add_injury("Frostbite")
         self.add_status("Hypothermia")
-        self.damage(35)
+        self.hurt(35)
         self.lose_sanity(5)
         self.start_night()
 
@@ -1414,7 +1508,7 @@ class MedicalMixin:
         print("\n")
         type.type(red("Heat stroke") + ". Your body temperature hit 106. You're lucky to be alive.")
         self.add_status("Heat Stroke")
-        self.damage(30)
+        self.hurt(30)
         self.lose_sanity(4)
         self.start_night()
 
@@ -1428,7 +1522,7 @@ class MedicalMixin:
         type.type(red("Overdose") + ". They gave you Narcan. Or charcoal. Whatever it took to save your life.")
         self.add_status("Severe Dehydration")
         self.add_status("Seizure Disorder")
-        self.damage(35)
+        self.hurt(35)
         self.lose_sanity(8)
         self.start_night()
 
@@ -1441,7 +1535,7 @@ class MedicalMixin:
         print("\n")
         type.type(red("Anaphylaxis") + ". Severe allergic reaction. You almost died in that restaurant.")
         self.add_status("Anaphylaxis")
-        self.damage(25)
+        self.hurt(25)
         self.lose_sanity(5)
         self.start_night()
 
@@ -1455,7 +1549,7 @@ class MedicalMixin:
         type.type(red("Surgical complications") + ". Now you're fighting for your life instead of recovering.")
         self.add_status("Sepsis")
         self.add_injury("Puncture Wound")
-        self.damage(40)
+        self.hurt(40)
         self.lose_sanity(6)
         self.start_night()
 
@@ -1469,7 +1563,7 @@ class MedicalMixin:
         type.type(red("Tooth abscess") + " gone systemic. " + red("Sepsis") + " is setting in.")
         self.add_status("Tooth Abscess")
         self.add_status("Sepsis")
-        self.damage(35)
+        self.hurt(35)
         self.lose_sanity(5)
         self.start_night()
 
@@ -1483,7 +1577,7 @@ class MedicalMixin:
         type.type(red("Cardiac event") + ". You need help. NOW.")
         self.add_status("Blood Pressure Crisis")
         self.add_danger("Heart Condition")
-        self.damage(30)
+        self.hurt(30)
         self.lose_sanity(5)
         self.start_night()
 
@@ -1497,7 +1591,7 @@ class MedicalMixin:
         type.type(red("Severe food poisoning") + ". E. coli or Salmonella. You need IV fluids.")
         self.add_status("Stomach Flu")
         self.add_status("Severe Dehydration")
-        self.damage(25)
+        self.hurt(25)
         self.lose_sanity(3)
         self.start_night()
 
@@ -1513,7 +1607,7 @@ class MedicalMixin:
         self.add_status("Pink Eye")
         if random.randint(1, 2) == 1:
             self.add_status("UTI")
-        self.damage(12)
+        self.hurt(12)
         self.start_night()
 
     def hiking_disaster(self):
@@ -1526,7 +1620,7 @@ class MedicalMixin:
         type.type(red("Broken ankle") + ". " + red("Broken wrist") + ". Miles from help.")
         self.add_injury("Broken Ankle")
         self.add_injury("Broken Wrist")
-        self.damage(30)
+        self.hurt(30)
         self.lose_sanity(4)
         self.start_night()
 
@@ -1539,7 +1633,7 @@ class MedicalMixin:
         print("\n")
         type.type(red("Multiple wasp stings") + ". Possible " + red("anaphylaxis") + ".")
         self.add_status("Anaphylaxis")
-        self.damage(30)
+        self.hurt(30)
         self.lose_sanity(4)
         self.start_night()
 
@@ -1552,7 +1646,7 @@ class MedicalMixin:
         print("\n")
         type.type(red("Lyme disease") + ". That one tick has changed your life.")
         self.add_status("Lyme Disease")
-        self.damage(15)
+        self.hurt(15)
         self.lose_sanity(3)
         self.start_night()
 
@@ -1565,7 +1659,7 @@ class MedicalMixin:
         print("\n")
         type.type(red("Pneumonia") + ". Maybe something worse. The conditions were ripe for disease.")
         self.add_status("Pneumonia")
-        self.damage(18)
+        self.hurt(18)
         self.lose_sanity(2)
         self.start_night()
 
@@ -1579,7 +1673,7 @@ class MedicalMixin:
         type.type(red("Puncture wound") + ". Perforated bowel. " + red("Sepsis") + " is a certainty without immediate surgery.")
         self.add_injury("Puncture Wound")
         self.add_status("Sepsis")
-        self.damage(45)
+        self.hurt(45)
         self.lose_sanity(6)
         self.start_night()
 
@@ -1594,7 +1688,7 @@ class MedicalMixin:
         self.add_status("Stomach Flu")
         self.add_status("Ear Infection")
         self.add_status("Pink Eye")
-        self.damage(20)
+        self.hurt(20)
         self.lose_sanity(3)
         self.start_night()
 
@@ -1607,7 +1701,7 @@ class MedicalMixin:
         print("\n")
         type.type(red("Staph infection") + " from a dirty needle. Your new tattoo might kill you.")
         self.add_status("Staph Infection")
-        self.damage(18)
+        self.hurt(18)
         self.lose_sanity(2)
         self.start_night()
 
@@ -1622,7 +1716,7 @@ class MedicalMixin:
         self.add_injury("Dislocated Shoulder")
         self.add_injury("Concussion")
         self.add_injury("Broken Ribs")
-        self.damage(40)
+        self.hurt(40)
         self.lose_sanity(5)
         self.start_night()
 
@@ -1636,7 +1730,7 @@ class MedicalMixin:
         type.type(red("Severe respiratory infection") + ". " + red("DVT") + " from lying in bed. Long-term effects unknown.")
         self.add_status("Pneumonia")
         self.add_status("DVT")
-        self.damage(35)
+        self.hurt(35)
         self.lose_sanity(6)
         self.start_night()
 
@@ -1649,7 +1743,7 @@ class MedicalMixin:
         print("\n")
         type.type(red("Crush injury") + ". Toxins flooding your system. Kidneys failing.")
         self.add_injury("Crush Injury")
-        self.damage(40)
+        self.hurt(40)
         self.lose_sanity(7)
         self.start_night()
 
@@ -1663,7 +1757,7 @@ class MedicalMixin:
         type.type(red("Fractured spine") + ". " + red("Broken collarbone") + ". Internal injuries unknown.")
         self.add_injury("Fractured Spine")
         self.add_injury("Broken Collarbone")
-        self.damage(45)
+        self.hurt(45)
         self.lose_sanity(8)
         self.start_night()
 
@@ -1677,7 +1771,7 @@ class MedicalMixin:
         type.type(red("Multiple lacerations") + ". " + red("Puncture wounds") + " from glass shards.")
         self.add_injury("Deep Laceration")
         self.add_injury("Puncture Wound")
-        self.damage(35)
+        self.hurt(35)
         self.lose_sanity(4)
         self.start_night()
 
@@ -1690,7 +1784,7 @@ class MedicalMixin:
         print("\n")
         type.type(red("Torn ACL") + ". Also " + red("dislocated kneecap") + ". Reconstruction required.")
         self.add_injury("Torn ACL")
-        self.damage(25)
+        self.hurt(25)
         self.lose_sanity(3)
         self.start_night()
 
@@ -1706,7 +1800,7 @@ class MedicalMixin:
         self.add_injury("Concussion")
         self.add_status("Second Degree Burns")
         self.add_injury("Puncture Wound")
-        self.damage(45)
+        self.hurt(45)
         self.lose_sanity(7)
         self.start_night()
 
@@ -1719,7 +1813,7 @@ class MedicalMixin:
         print("\n")
         type.type(red("Staph infection") + " from improper aftercare. Possible permanent ear deformity.")
         self.add_status("Staph Infection")
-        self.damage(12)
+        self.hurt(12)
         self.lose_sanity(2)
         self.start_night()
 
@@ -1732,7 +1826,7 @@ class MedicalMixin:
         print("\n")
         type.type(red("Broken hand") + ". Multiple metacarpal fractures. Surgical repair needed.")
         self.add_injury("Broken Hand")
-        self.damage(18)
+        self.hurt(18)
         self.lose_sanity(2)
         self.start_night()
 
@@ -1746,7 +1840,7 @@ class MedicalMixin:
         type.type(red("Parasitic infection") + ". Anisakis worms from raw fish. They're eating you from inside.")
         self.add_status("Waterborne Illness")
         self.add_status("Stomach Flu")
-        self.damage(22)
+        self.hurt(22)
         self.lose_sanity(5)
         self.start_night()
 
@@ -1761,7 +1855,7 @@ class MedicalMixin:
         self.add_injury("Nerve Damage")
         self.add_status("DVT")
         self.add_status("Malnutrition")
-        self.damage(30)
+        self.hurt(30)
         self.lose_sanity(8)
         self.start_night()
 
@@ -1800,7 +1894,7 @@ class MedicalMixin:
         type.type(red("Chronic insomnia") + " induced psychosis. " + red("Severe depression") + ". You need medical intervention.")
         self.add_status("Chronic Insomnia")
         self.add_status("Severe Depression")
-        self.damage(15)
+        self.hurt(15)
         self.lose_sanity(12)
         self.start_night()
 

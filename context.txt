@@ -152,53 +152,77 @@ Root files:
   lists.py            (4307 lines) — Lists class. Event pools, shop inventories, companion dialogue, quotes, all data lists.
 
 story/ package:
-  __init__.py         (6 lines)    — Exports Player class
-  player_core.py      (842 lines)  — Player class definition. ALL state variables. Mixin composition. hurt/heal/kill/status methods.
-  game_flow.py        (1135 lines) — GameFlowMixin: start_day(), daily item effects, adventure areas, pest control, car checks
-  day_cycle.py        (371 lines)  — DayCycleMixin: end_day() day summary, opening_lines(), start_night(), dream dispatch
-  economy.py          (117 lines)  — EconomyMixin: balance, rank calculation, selling
-  event_dispatch.py   (137 lines)  — EventDispatchMixin: day_event(), night_event() — random event dispatchers
-  events_day.py       (11141 lines)— DayEventsMixin: ALL day event methods (~300+ events, organized by wealth rank)
-  events_night.py     (2165 lines) — NightEventsMixin: ALL night event methods
-  locations.py        (4256 lines) — LocationsMixin: afternoon() choices, doctor, witch doctor, mechanics, convenience store, pawn shop, loan shark, phone calls, airport
-  adventures.py       (3311 lines) — AdventuresMixin: Beach, Forest, Mountain, City adventure areas with multi-stage events
-  car_events.py       (1182 lines) — CarEventsMixin: Random car trouble during afternoon, repairs, breakdowns
-  medical.py          (1808 lines) — MedicalMixin: Injuries, illnesses, doctor visits, treatments, witch doctor flasks
-  mechanics_intro.py  (279 lines)  — MechanicsIntroMixin: First-time meeting with Tom, Frank, Oswald mechanics
-  systems.py          (1881 lines) — SystemsMixin: Companion system, achievement system, gambling stats/grimoire, loan shark, pawn shop, dealer happiness, gift wrapping, durability helpers
-  durability.py       (484 lines)  — DurabilityMixin: Item durability tracking, breaking, repair
-  storylines.py       (4498 lines) — StorylineSystem class + all storyline event methods (20+ multi-part narratives)
-  endings.py          (2811 lines) — EndingsMixin: All ending sequences (Salvation, Resurrection, Bliss, Sanctuary, Tom/Frank/Oswald endings, Eternity, Madness, Broken)
+  __init__.py              (5 lines)    — Exports Player class
+  player_core.py           (861 lines)  — Player class definition. ALL state variables. Mixin composition. hurt/heal/kill/status methods.
+  game_flow.py             (1112 lines) — GameFlowMixin: start_day(), daily item effects, pest control, car checks
+  day_cycle.py             (370 lines)  — DayCycleMixin: end_day() day summary, opening_lines(), start_night(), dream dispatch
+  economy.py               (116 lines)  — EconomyMixin: balance, rank calculation, selling
+  event_dispatch.py        (148 lines)  — EventDispatchMixin: day_event(), night_event() — random event dispatchers
+  events_night.py          (2355 lines) — NightEventsMixin: ALL night event methods
+  locations.py             (4595 lines) — LocationsMixin: afternoon() choices, doctor, witch doctor, mechanics, convenience store, pawn shop, loan shark, phone calls, airport
+  adventures.py            (4140 lines) — AdventuresMixin: Beach, Forest, Mountain, City adventure areas with multi-stage events
+  events_car.py            (1214 lines) — CarEventsMixin: Random car trouble during afternoon, repairs, breakdowns
+  events_illness.py        (1902 lines) — IllnessMixin: Injuries, illnesses, doctor visits, treatments, witch doctor flasks
+  mechanics_intro.py       (563 lines)  — MechanicsStorylineMixin: First meetings with Tom/Frank/Oswald + all 3 mechanic dream chains
+  systems.py               (1907 lines) — SystemsMixin: Companion system, achievement system, gambling stats/grimoire, loan shark, pawn shop, dealer happiness, gift wrapping, durability helpers
+  durability.py            (484 lines)  — DurabilityMixin: Item durability tracking, breaking, repair
+  storylines.py            (4617 lines) — StorylineSystem class + all storyline event methods (20+ multi-part narratives)
+  endings.py               (2800 lines) — EndingsMixin: All ending sequences (Salvation, Resurrection, Bliss, Sanctuary, Tom/Frank/Oswald endings, Eternity, Madness, Broken)
+
+  Day events are split into 11 themed files (formerly one 11k-line monolith):
+  events_day_survival.py   (1740 lines) — DaySurvivalMixin: Health, car, weather, food, basic hardship events
+  events_day_people.py     (1787 lines) — DayPeopleMixin: Stranger encounters, NPCs, social events
+  events_day_animals.py    (1167 lines) — DayAnimalsMixin: Animal encounters, companion opportunities
+  events_day_casino.py     (216 lines)  — DayCasinoMixin: Casino-specific encounters (Dealer story beats)
+  events_day_wealth.py     (1843 lines) — DayWealthMixin: Wealth-tier events, luxury/poverty extremes
+  events_day_dark.py       (2354 lines) — DayDarkMixin: Horror, violence, trauma, addiction events
+  events_day_companions.py (1668 lines) — DayCompanionsMixin: Companion-focused day events
+  events_day_items.py      (857 lines)  — DayItemsMixin: Item-find, item-interaction events
+  events_day_surreal.py    (474 lines)  — DaySurrealMixin: Paranormal, absurd, surreal events
+  events_day_numbers.py    (449 lines)  — DayNumbersMixin: Secret events gated by exact balance/day/stat values
+  events_day_storylines.py (1156 lines) — DayStorylinesMixin: Events tied to multi-part storylines
 
 tools/ (dev utilities, not part of the game):
-  fix_quotes.py, game_documentation.py, interactive_event_runner.py, LottoTest.py, split_story.py, storylines_design.py, test_gameplay.py
+  fix_quotes.py, game_documentation.py, interactive_event_runner.py, LottoTest.py, split_story.py, split_events_day.py, storylines_design.py, test_gameplay.py
 
 docs/ (player-facing documentation):
   01-09 markdown guide files (see docs/ folder)
 
-TOTAL: ~36,000 lines of game code across 18 source files.
+TOTAL: ~48,000 lines of game code across 28 source files.
 
 ================================================================================
 4. CLASS ARCHITECTURE — THE MIXIN PATTERN
 ================================================================================
-The Player class is built from 14 mixins. This is the ONLY inheritance pattern.
+The Player class is built from 25 mixins. This is the ONLY inheritance pattern.
 Defined in player_core.py:
 
 class Player(
-    SystemsMixin,        # Companions, achievements, gambling stats, loan shark, pawn shop, dealer happiness, gifts
-    EconomyMixin,        # Balance, rank, selling
-    DayCycleMixin,       # End day summary, opening, night start, dream dispatch
-    DayEventsMixin,      # ~300+ random day events
-    NightEventsMixin,    # ~100+ random night events
-    AdventuresMixin,     # Beach/Forest/Mountain/City adventure content
-    MechanicsIntroMixin, # First meetings with Tom/Frank/Oswald
-    GameFlowMixin,       # start_day(), daily item effects, pest control, car trouble
-    LocationsMixin,      # afternoon() location choices, all shop interactions
-    DurabilityMixin,     # Item durability tracking
-    EventDispatchMixin,  # day_event()/night_event() dispatchers
-    EndingsMixin,        # All ending sequences
-    MedicalMixin,        # Injuries, illness, doctor/witch doctor
-    CarEventsMixin,      # Random car trouble events
+    SystemsMixin,           # Companions, achievements, gambling stats, loan shark, pawn shop, dealer happiness, gifts
+    EconomyMixin,           # Balance, rank, selling
+    DayCycleMixin,          # End day summary, opening, night start, dream dispatch
+    # ── Day event mixins (11 themed files) ──
+    DaySurvivalMixin,       # Health, car, weather, food, basic hardship events
+    DayPeopleMixin,         # Stranger encounters, NPCs, social events
+    DayAnimalsMixin,        # Animal encounters, companion opportunities
+    MechanicsStorylineMixin,# Tom/Frank/Oswald first meetings + full dream chains
+    DayCasinoMixin,         # Casino-specific encounters
+    DayWealthMixin,         # Wealth-tier events, luxury/poverty extremes
+    DayDarkMixin,           # Horror, violence, trauma, addiction events
+    DayCompanionsMixin,     # Companion-focused day events
+    DayItemsMixin,          # Item-find and item-interaction events
+    DaySurrealMixin,        # Paranormal, absurd, surreal events
+    DayNumbersMixin,        # Secret events gated by exact balance/day/stat values
+    DayStorylinesMixin,     # Events tied to multi-part storylines
+    # ── Other event domains ──
+    IllnessMixin,           # Injuries, illness, doctor/witch doctor
+    CarEventsMixin,         # Random car trouble events
+    NightEventsMixin,       # ~100+ random night events
+    AdventuresMixin,        # Beach/Forest/Mountain/City adventure content
+    GameFlowMixin,          # start_day(), daily item effects, pest control, car trouble
+    LocationsMixin,         # afternoon() location choices, all shop interactions
+    DurabilityMixin,        # Item durability tracking
+    EventDispatchMixin,     # day_event()/night_event() dispatchers
+    EndingsMixin,           # All ending sequences
 ):
 
 All mixins access player state via self._ prefixed attributes (single underscore, "protected").
@@ -704,17 +728,17 @@ opening_lines() and night start          → story/day_cycle.py
 Dream chain dispatch                     → story/day_cycle.py _get_pending_dream
 Balance/rank/selling                     → story/economy.py
 day_event()/night_event() dispatch       → story/event_dispatch.py
-ALL day event methods (~300+)            → story/events_day.py
+ALL day event methods (~375, 11 files)   → story/events_day_*.py
 ALL night event methods                  → story/events_night.py
 Afternoon location choices               → story/locations.py afternoon()
-Doctor/witch doctor                      → story/locations.py + story/medical.py
+Doctor/witch doctor                      → story/locations.py + story/events_illness.py
 Mechanic shops (Tom/Frank/Oswald)        → story/locations.py
 Convenience store                        → story/locations.py
 Pawn shop / Loan shark                   → story/locations.py + story/systems.py
 Adventure areas (Beach/Forest/etc.)      → story/adventures.py
 Car trouble events                       → story/car_events.py
 Injuries/illness/treatment               → story/medical.py
-First mechanic meetings                  → story/mechanics_intro.py
+Mechanic NPC meetings + dream chains     → story/mechanics_intro.py (MechanicsStorylineMixin)
 Companion system                         → story/systems.py (add/feed/pet/update/bonuses)
 Achievement system                       → story/systems.py (check_achievements, unlock)
 Gambling stats / Grimoire                → story/systems.py

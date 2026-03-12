@@ -282,6 +282,13 @@ class GameFlowMixin:
                 return 8
             case "Mechanic":
                 return 9
+            case "Ant Bites":
+                return 10
+            case "Flu":
+                return 11
+            case "Wild Rat Attack":
+                return 12
+        raise ValueError(f"Unknown day mark: {mark}")
 
     def mark_day(self, mark, time="day"):
         i = self.get_mark_index(mark)

@@ -66,6 +66,25 @@ class Lists:
         self.__loan_shark_dialogue = self.make_loan_shark_dialogue()
         self.__dealer_betrayal_list = self.make_dealer_betrayal_dialogue_list()
 
+    def _night_event_allowed(self, event_name):
+        one_off_night_events = {
+            "drowning_dream": "Drowning Dream",
+        }
+        met_name = one_off_night_events.get(event_name)
+        if met_name is None:
+            return True
+        return not self.__player.has_met(met_name)
+
+    def _pull_night_event(self, pool_name, factory):
+        pool = getattr(self, pool_name)
+        while True:
+            while pool:
+                event_name = pool.pop()
+                if self._night_event_allowed(event_name):
+                    setattr(self, pool_name, pool)
+                    return event_name
+            pool = factory()
+
     # ==========================================
     # ACHIEVEMENT SYSTEM DATA
     # ==========================================
@@ -1357,6 +1376,7 @@ class Lists:
         a_list.append("coin_flip_stranger")
         a_list.append("seagull_attack")
         a_list.append("lucky_penny")
+        a_list.append("vinnie_referral_card")
         a_list.append("stray_cat")
         a_list.append("three_legged_dog")
         a_list.append("opossum_in_trash")
@@ -1423,6 +1443,7 @@ class Lists:
         a_list.append("soulless_emptiness")
         a_list.append("soulless_mirror")
         a_list.append("painkiller_withdrawal")
+        a_list.append("empty_event")
         a_list.append("unpaid_tickets_boot")
         a_list.append("booted_car_impound")
         a_list.append("mystery_car_problem_worsens")
@@ -1704,9 +1725,20 @@ class Lists:
         a_list.append("social_encounter")
         a_list.append("rubber_band_save")
         a_list.append("penny_luck")
+        a_list.append("grimy_gus_discovery")
+        a_list.append("vinnie_referral_card")
+        a_list.append("windblown_worn_map")
+        a_list.append("flea_market_route_map")
+        a_list.append("laundromat_bulletin_map")
+        a_list.append("witch_doctor_matchbook")
+        a_list.append("roadside_bone_chimes")
+        a_list.append("trusty_tom_coupon_mailer")
+        a_list.append("filthy_frank_radio_giveaway")
+        a_list.append("oswald_concierge_card")
         # Conditional
         a_list.append("got_a_cold")
         a_list.append("cold_gets_worse")
+        a_list.append("empty_event")
         # One-Time
         a_list.append("turn_to_god")
         a_list.append("hungry_cow")
@@ -1870,6 +1902,16 @@ class Lists:
         a_list.append("found_phone")
         a_list.append("street_performer_duel")
         a_list.append("compliment_stranger")
+        a_list.append("vinnie_referral_card")
+        a_list.append("grimy_gus_discovery")
+        a_list.append("windblown_worn_map")
+        a_list.append("flea_market_route_map")
+        a_list.append("laundromat_bulletin_map")
+        a_list.append("witch_doctor_matchbook")
+        a_list.append("roadside_bone_chimes")
+        a_list.append("trusty_tom_coupon_mailer")
+        a_list.append("filthy_frank_radio_giveaway")
+        a_list.append("oswald_concierge_card")
         a_list.append("forgotten_birthday")
         a_list.append("book_club_invite")
         a_list.append("car_compliment")
@@ -1976,6 +2018,8 @@ class Lists:
         a_list.append("street_performer")
         a_list.append("power_outage_area")
         a_list.append("construction_noise")
+        a_list.append("empty_event")
+        a_list.append("starving_cow")
         # Item-Using Events
         a_list.append("important_document")
         a_list.append("caught_fishing")
@@ -2122,6 +2166,7 @@ class Lists:
         a_list = []
         a_list.append("swamp_wade")
         a_list.append("swamp_swim")
+        a_list.append("woodlands_river")
         a_list.append("beach_stroll")
         a_list.append("mysterious_lights")
         a_list.append("midnight_snack_run")
@@ -2228,12 +2273,23 @@ class Lists:
         a_list.append("hungry_termites")
         a_list.append("wealth_anxiety")
         a_list.append("tax_man")
+        a_list.append("empty_event")
+        a_list.append("even_further_interrogation")
         # One-Time
         a_list.append("the_rival")
         a_list.append("the_bodyguard_offer")
         a_list.append("high_roller_invitation")
         a_list.append("old_friend_recognition")
         a_list.append("grimy_gus_discovery")
+        a_list.append("vinnie_referral_card")
+        a_list.append("windblown_worn_map")
+        a_list.append("flea_market_route_map")
+        a_list.append("laundromat_bulletin_map")
+        a_list.append("witch_doctor_matchbook")
+        a_list.append("roadside_bone_chimes")
+        a_list.append("trusty_tom_coupon_mailer")
+        a_list.append("filthy_frank_radio_giveaway")
+        a_list.append("oswald_concierge_card")
         a_list.append("the_gambler_ghost")
         # Secret Events
         a_list.append("exactly_250000")
@@ -2423,6 +2479,8 @@ class Lists:
         a_list.append("prayer_ignored")
         # Conditional
         a_list.append("the_temptation")
+        a_list.append("even_further_interrogation")
+        a_list.append("cow_army")
         # One-Time Events
         a_list.append("likely_death")
         a_list.append("the_veteran")
@@ -2629,6 +2687,7 @@ class Lists:
         a_list.append("prayer_ignored")
         # Conditional
         a_list.append("too_close_to_quit")
+        a_list.append("cow_army")
         # One-Time
         a_list.append("the_warning")
         a_list.append("the_celebration")
@@ -2784,33 +2843,376 @@ class Lists:
         random.shuffle(a_list)
         return a_list
     
+# ============================================
+# WEIGHTED DAY EVENT POOL
+# ============================================
+
+    # Events defined in events_illness.py — routed through random_illness() dispatcher.
+    # Conditional illness follow-ups (knife_wound_infection, etc.) are NOT here;
+    # they stay in the pool and self-guard via has_danger() checks.
+    _ILLNESS_NAMES = frozenset({
+        "contract_cold", "contract_flu", "contract_pneumonia", "contract_bronchitis",
+        "contract_strep_throat", "contract_stomach_flu", "contract_ear_infection",
+        "contract_sinus_infection", "contract_uti", "contract_pink_eye", "contract_mono",
+        "contract_shingles", "contract_lyme_disease", "contract_ringworm", "contract_scabies",
+        "contract_staph_infection", "contract_tetanus", "contract_rabies_scare",
+        "contract_measles", "develop_diabetes_symptoms", "high_blood_pressure_crisis",
+        "severe_allergic_reaction", "asthma_attack", "kidney_stones", "gallbladder_attack",
+        "appendicitis_attack", "blood_clot_in_leg", "migraine_severe", "vertigo_episode",
+        "seizure_episode", "pancreatitis_attack", "severe_burn_injury", "concussion_injury",
+        "broken_ribs_injury", "dislocated_shoulder", "broken_hand", "broken_wrist",
+        "broken_ankle", "torn_acl", "herniated_disc", "deep_laceration", "puncture_wound",
+        "second_degree_burns", "frostbite", "heat_stroke", "hypothermia", "crush_injury",
+        "chemical_burn", "electrical_burn", "whiplash_injury", "jaw_fracture", "skull_fracture",
+        "collapsed_lung", "ruptured_spleen", "liver_laceration", "ruptured_eardrum",
+        "detached_retina", "orbital_fracture", "broken_nose", "broken_collarbone",
+        "tooth_abscess", "blood_poisoning", "severe_dehydration", "malnutrition",
+        "nerve_damage", "tendon_rupture", "muscle_tear", "gangrene_infection",
+        "severe_anxiety_attack", "severe_depression_episode", "insomnia_chronic",
+        "ptsd_flashback", "dirty_needle_stick", "bad_oysters", "rat_bite", "bad_mushrooms",
+        "unclean_water", "mold_exposure", "bee_sting_allergy", "lead_poisoning",
+        "asbestos_exposure", "mercury_poisoning", "gym_accident", "slip_in_shower",
+        "fall_down_stairs", "car_accident_minor", "construction_site_accident",
+        "bar_fight_aftermath", "kitchen_accident", "grease_fire", "sports_injury",
+        "motorcycle_crash", "dog_attack_severe", "pool_diving_accident", "chemical_spill",
+        "electric_shock", "workplace_injury", "assault_aftermath", "caught_in_fire",
+        "frozen_outdoors", "heat_exhaustion_collapse", "drug_overdose_survival",
+        "allergic_reaction_restaurant", "botched_surgery", "dental_disaster", "gym_collapse",
+        "food_truck_nightmare", "public_pool_infection", "hiking_disaster", "wasp_nest_encounter",
+        "camping_tick_bite", "homeless_shelter_outbreak", "prison_shiv_wound", "daycare_plague",
+        "bad_tattoo_infection", "mma_fight_aftermath", "covid_complications",
+        "earthquake_injury", "carnival_ride_accident", "window_crash", "trampoline_disaster",
+        "explosion_nearby", "botched_piercing", "weight_dropping", "bad_sushi",
+        "coma_awakening", "stress_breakdown", "trauma_flashback", "sleep_deprivation_crisis",
+    })
+
+    # Events defined in events_car.py — routed through random_car_trouble() dispatcher.
+    # Conditional follow-ups (leaking_battery_worsens, etc.) are NOT here;
+    # they stay in the pool and self-guard via has_danger() checks.
+    _CAR_TROUBLE_NAMES = frozenset({
+        "dead_battery_afternoon", "corroded_battery_terminals", "battery_acid_leak",
+        "engine_overheating", "check_engine_light_on", "engine_wont_turn_over",
+        "strange_engine_noise", "engine_oil_empty", "oil_leak_spotted", "slow_tire_leak",
+        "tire_blowout", "bald_tires_noticed", "nail_in_tire", "headlights_burned_out",
+        "alternator_failing", "fuse_blown", "car_alarm_malfunction", "starter_motor_grinding",
+        "brakes_squealing", "brake_fluid_leak", "abs_light_on", "ran_out_of_gas",
+        "fuel_pump_whining", "clogged_fuel_filter", "transmission_slipping", "stuck_in_gear",
+        "radiator_leak", "thermostat_stuck", "water_pump_failing", "power_steering_failure",
+        "wheel_alignment_off", "suspension_creaking", "broken_ball_joint", "exhaust_leak_loud",
+        "catalytic_converter_stolen", "hail_damage", "flooded_engine", "windshield_cracked",
+        "frozen_door_locks", "frozen_fuel_line", "mystery_breakdown", "key_wont_turn",
+        "car_wont_go_in_reverse", "window_wont_roll_up", "trunk_wont_close",
+        "gas_pedal_sticking", "parking_brake_stuck",
+    })
+
+    # Tonal weight per event across the 6 ranks [poor, cheap, modest, rich, doughman, nearly].
+    # Higher number = more copies in the pool = more likely to fire at that rank.
+    # Default for unlisted events (conditionals, chains, companions, items) is [1,1,1,1,1,1].
+    # Events with weight 0 at a rank are skipped even if the builder includes them.
+    _DAY_EVENT_TONE = {
+
+        # ── SILLY / GOOFY ───────────────────────────────────────────────────────
+        # Playful, absurd, zero stakes. Dominant early, completely absent late.
+        "duck_army":               [4, 3, 2, 1, 0, 0],
+        "sentient_sandwich":       [4, 3, 2, 1, 0, 0],
+        "motivational_raccoon":    [4, 3, 2, 1, 0, 0],
+        "pigeon_mafia":            [4, 3, 2, 1, 0, 0],
+        "sock_puppet_therapist":   [4, 3, 2, 1, 0, 0],
+        "dance_battle":            [4, 3, 2, 1, 0, 0],
+        "alien_abduction":         [3, 2, 1, 0, 0, 0],
+        "hungry_cow":              [3, 3, 2, 1, 0, 0],
+        "ice_cream_truck":         [3, 3, 2, 1, 0, 0],
+        "kid_on_bike":             [3, 3, 2, 1, 0, 0],
+        "the_mime":                [3, 2, 1, 0, 0, 0],
+        "opossum_in_trash":        [4, 3, 2, 1, 0, 0],
+        "raccoon_gang_raid":       [4, 3, 2, 1, 0, 0],
+        "sewer_rat":               [3, 3, 2, 1, 0, 0],
+        "raccoon_raid":            [3, 3, 2, 1, 0, 0],
+        "raccoon_invasion":        [3, 3, 2, 1, 0, 0],
+
+        # ── MUNDANE / PEACEFUL ──────────────────────────────────────────────────
+        # Quiet slice-of-life colour. Rich to have, feels out of place at high stakes.
+        "morning_stretch":         [3, 3, 2, 1, 0, 0],
+        "cloud_watching":          [3, 3, 2, 1, 0, 0],
+        "bird_droppings":          [3, 3, 2, 1, 0, 0],
+        "car_alarm_symphony":      [3, 3, 2, 1, 0, 0],
+        "lucky_penny":             [3, 3, 2, 1, 0, 0],
+        "seagull_attack":          [3, 3, 2, 1, 0, 0],
+        "motivational_graffiti":   [3, 3, 2, 1, 0, 0],
+        "dropped_ice_cream":       [3, 3, 2, 1, 0, 0],
+        "talking_to_yourself":     [3, 3, 2, 1, 0, 0],
+        "wrong_number":            [3, 3, 2, 1, 0, 0],
+        "trash_treasure":          [3, 3, 2, 1, 0, 0],
+        "coin_flip_stranger":      [3, 3, 2, 1, 0, 0],
+        "stray_cat":               [3, 3, 2, 1, 0, 0],
+        "three_legged_dog":        [3, 3, 2, 1, 0, 0],
+        "estranged_dog":           [3, 3, 2, 1, 0, 0],
+        "radio_static":            [3, 3, 2, 1, 0, 0],
+        "mysterious_note":         [3, 3, 2, 1, 0, 0],
+        "ant_invasion":            [3, 3, 2, 1, 0, 0],
+        "left_window_down":        [3, 3, 2, 1, 0, 0],
+        "vending_machine_luck":    [3, 3, 2, 1, 0, 0],
+        "conspiracy_theorist":     [3, 3, 2, 0, 0, 0],
+        "freight_truck":           [3, 3, 2, 1, 0, 0],
+        "roadkill_philosophy":     [3, 2, 1, 0, 0, 0],
+        "street_musician":         [2, 2, 1, 0, 0, 0],
+        "deja_vu_again":           [2, 2, 1, 0, 0, 0],
+        "car_wash_encounter":      [2, 2, 1, 0, 0, 0],
+        "mosquito_bite_infection": [3, 2, 1, 0, 0, 0],
+        "got_a_tan":               [3, 3, 2, 1, 0, 0],
+
+        # ── SMALL EVERYDAY STRUGGLES ────────────────────────────────────────────
+        # Present at all ranks but clearly fading as stakes grow.
+        "good_hair_day":           [2, 2, 2, 1, 1, 0],
+        "bad_hair_day":            [2, 2, 2, 1, 1, 0],
+        "nice_weather":            [2, 2, 2, 1, 1, 0],
+        "terrible_weather":        [2, 2, 2, 1, 1, 0],
+        "back_pain":               [2, 2, 2, 1, 1, 0],
+        "stretching_helps":        [2, 2, 2, 1, 1, 0],
+        "weird_noise":             [2, 2, 2, 1, 0, 0],
+        "found_twenty":            [2, 2, 2, 1, 0, 0],
+        "lost_wallet":             [2, 2, 2, 1, 0, 0],
+        "sunburn":                 [2, 2, 2, 1, 0, 0],
+        "flat_tire":               [2, 2, 1, 0, 0, 0],
+        "flat_tire_again":         [2, 2, 1, 0, 0, 0],
+        "car_battery_dead":        [2, 2, 1, 0, 0, 0],
+        "found_gift_card":         [2, 2, 2, 1, 0, 0],
+        "random_kindness":         [2, 2, 2, 1, 1, 0],
+        "random_cruelty":          [2, 2, 2, 2, 1, 1],
+        "someone_stole_your_stuff":[2, 2, 2, 1, 0, 0],
+        "prayer_answered":         [2, 2, 2, 2, 2, 2],
+        "prayer_ignored":          [2, 2, 2, 2, 2, 2],
+        "found_old_photo":         [2, 2, 2, 1, 1, 1],
+        "threw_out_old_photo":     [1, 1, 2, 2, 2, 1],
+        "morning_fog":             [2, 2, 2, 1, 0, 0],
+        "car_wont_start":          [2, 2, 1, 0, 0, 0],
+        "strong_winds":            [2, 2, 2, 1, 0, 0],
+        "beautiful_sunrise":       [2, 2, 2, 1, 1, 0],
+
+        # ── POOR/CHEAP SPECIFIC ─────────────────────────────────────────────────
+        # Events that only make thematic sense while broke.
+        "seat_cash":               [3, 0, 0, 0, 0, 0],
+        "sun_visor_bills":         [2, 3, 1, 0, 0, 0],
+        "fortune_cookie":          [2, 2, 1, 0, 0, 0],
+        "broken_atm":              [2, 2, 1, 0, 0, 0],
+        "lottery_scratch":         [2, 2, 1, 0, 0, 0],
+        "parking_lot_poker":       [2, 2, 1, 0, 0, 0],
+        "free_sample_spree":       [2, 2, 1, 0, 0, 0],
+        "phone_scam_call":         [2, 2, 1, 0, 0, 0],
+        "yard_sale_find":          [2, 2, 1, 0, 0, 0],
+        "friendly_drunk":          [2, 2, 1, 0, 0, 0],
+        "completely_broke_wisdom": [3, 1, 0, 0, 0, 0],
+        "rock_bottom":             [2, 2, 1, 0, 0, 0],
+        "grimy_gus_discovery":     [1, 3, 3, 2, 0, 0],
+        "vinnie_referral_card":    [3, 4, 3, 2, 1, 0],
+        "windblown_worn_map":      [2, 5, 4, 2, 0, 0],
+        "flea_market_route_map":   [1, 4, 4, 2, 0, 0],
+        "laundromat_bulletin_map": [0, 3, 4, 2, 0, 0],
+        "witch_doctor_matchbook": [0, 1, 2, 1, 0, 0],
+        "roadside_bone_chimes":   [0, 1, 2, 1, 0, 0],
+        "trusty_tom_coupon_mailer": [0, 2, 2, 1, 0, 0],
+        "filthy_frank_radio_giveaway": [0, 1, 2, 1, 0, 0],
+        "oswald_concierge_card":   [0, 1, 1, 1, 0, 0],
+
+        # ── GRITTY DANGER ───────────────────────────────────────────────────────
+        # Real consequence events. Rare early (player is scraping by), escalate
+        # through mid game, then level off at endgame where tone shifts darker.
+        "back_alley_shortcut":     [1, 1, 2, 3, 0, 0],
+        "food_poisoning":          [1, 1, 2, 2, 1, 0],
+        "attacked_by_dog":         [1, 1, 1, 0, 0, 0],
+        "carbon_monoxide":         [1, 1, 2, 2, 2, 1],
+        "gas_station_robbery":     [0, 1, 1, 1, 0, 0],
+        "drug_dealer_encounter":   [0, 1, 2, 3, 3, 2],
+        "electrocution_hazard":    [0, 1, 1, 1, 0, 0],
+        "car_explosion":           [0, 1, 1, 2, 2, 1],
+        "heart_attack_scare":      [0, 0, 1, 2, 3, 4],
+
+        # ── DARK / HORROR ───────────────────────────────────────────────────────
+        # Heavy, irreversible, life-threatening. Must feel EARNED by wealth.
+        # Near-absent early, completely dominant at doughman/nearly.
+        "blood_moon_bargain":      [0, 0, 1, 2, 3, 4],
+        "the_empty_room":          [0, 0, 1, 2, 3, 4],
+        "the_dying_dealer":        [0, 0, 0, 1, 3, 3],
+        "the_high_roller_suicide": [0, 0, 0, 0, 2, 4],
+        "casino_hitman":           [0, 0, 0, 0, 0, 4],
+        "organ_harvester":         [0, 0, 0, 1, 3, 3],
+        "the_bridge_call":         [0, 0, 0, 1, 3, 4],
+        "the_relapse":             [0, 0, 0, 1, 3, 4],
+        "cancer_diagnosis":        [0, 0, 0, 1, 3, 3],
+        "casino_overdose":         [0, 0, 0, 1, 3, 3],
+        "withdrawal_nightmare":    [0, 0, 0, 1, 3, 3],
+        "the_desperate_gambler":   [0, 0, 0, 1, 3, 3],
+        "loan_shark_visit":        [0, 0, 0, 1, 3, 3],
+        "likely_death":            [0, 0, 0, 0, 3, 0],  # one-time, doughman only
+        "the_confession":          [0, 0, 0, 1, 2, 3],
+        "the_anniversary_loss":    [0, 0, 0, 1, 2, 3],
+        "survivor_guilt":          [0, 0, 0, 1, 2, 3],
+        "the_scar_story":          [0, 0, 0, 1, 2, 2],
+        "the_winning_streak_paranoia": [0, 0, 0, 1, 2, 3],
+        "old_gambling_buddy":      [0, 0, 0, 1, 2, 2],
+
+        # ── SURREAL / EXISTENTIAL ───────────────────────────────────────────────
+        # Tone escalates from quirky oddity to genuine dread as wealth grows.
+        "time_loop":               [1, 1, 2, 2, 3, 3],
+        "mirror_stranger":         [1, 1, 2, 2, 3, 3],
+        "the_glitch":              [1, 1, 2, 2, 3, 3],
+        "fourth_wall_break":       [1, 1, 2, 2, 3, 3],
+        "wrong_universe":          [1, 1, 2, 2, 0, 0],  # too playful at endgame
+        "the_collector":           [0, 0, 1, 2, 3, 3],
+        # Existential events kept at 1 copy at rich — a whisper, not a shout.
+        # They're conditional anyway (require prior status/danger) so mostly
+        # they self-guard. The player feels them as a vague unease, nothing more.
+        "soulless_emptiness":      [0, 0, 1, 1, 3, 3],
+        "soulless_mirror":         [0, 0, 1, 1, 3, 3],
+        "soulless_recognition":    [0, 0, 1, 1, 3, 3],
+        "haunted_by_losses":       [0, 0, 1, 1, 3, 3],
+        "wealth_anxiety":          [0, 0, 1, 1, 3, 3],
+        "bridge_contemplation":    [0, 0, 1, 1, 3, 4],
+        "devils_bargain_consequence": [0, 0, 0, 1, 3, 4],
+        "insomniac_revelation":    [1, 1, 1, 2, 2, 2],
+        "the_sleeping_stranger":   [2, 2, 1, 1, 0, 0],
+        "the_cat_knows":           [1, 1, 1, 1, 1, 1],
+        "rain_on_the_roof":        [1, 1, 1, 1, 1, 1],
+        "found_old_photo":         [2, 2, 2, 1, 1, 1],
+        "perfect_health_moment":   [1, 1, 1, 1, 1, 1],
+        "first_sunrise":           [2, 1, 1, 1, 1, 0],
+        "the_veteran_gambler":     [0, 1, 1, 1, 2, 2],
+        "the_crow_council":        [0, 1, 1, 1, 2, 2],
+        "birthday_forgotten":      [0, 0, 0, 1, 2, 2],
+        "item_hoarder":            [0, 0, 1, 1, 2, 2],
+        "companion_reunion":       [0, 1, 1, 1, 1, 1],
+        # Nothing happens. Days disappear. Present everywhere; fades at top tiers
+        # where you're too active (or too terrified) to waste a whole day doing nothing.
+        "empty_event":             [2, 2, 2, 1, 1, 0],
+        # ── CHAIN / CONDITIONAL ─────────────────────────────────────────────────
+        # All self-guard via has_danger/has_met; weight just lets them surface
+        # when their condition becomes active. [0] = excluded at that rank.
+        "starving_cow":            [0, 1, 2, 0, 0, 0],  # Betsy chain pt.2 (modest peak)
+        "cow_army":                [0, 0, 0, 0, 2, 1],  # Betsy finale — doughman/nearly
+        "even_further_interrogation": [0, 0, 0, 1, 1, 0],  # Interrogation pt.3 — rich+
+
+        # ── WEALTH-TIER MID (modest / rich) ─────────────────────────────────────
+        # Rich tier is the calm before the storm — VIP events dominate, the world
+        # is rewarding the player, everything feels almost too good. Darkness
+        # starts at doughman; here it is only a whisper the player can ignore.
+        "luxury_car_passes":       [0, 0, 2, 4, 2, 1],
+        "paparazzi_mistake":       [0, 0, 2, 4, 2, 1],
+        "imposter_syndrome":       [0, 0, 2, 4, 2, 1],
+        "charity_opportunity":     [0, 0, 2, 4, 2, 1],
+        "investment_opportunity":  [0, 0, 2, 4, 2, 1],
+        "expensive_taste":         [0, 0, 2, 4, 2, 1],
+        "autograph_request":       [0, 0, 1, 4, 2, 1],
+        "casino_regular":          [0, 0, 1, 4, 2, 1],
+        "mysterious_package":      [0, 0, 1, 3, 2, 1],
+        "rich_persons_problems":   [0, 0, 1, 4, 2, 1],
+        "investment_pitch":        [0, 0, 1, 4, 2, 1],
+        "news_van":                [0, 0, 1, 3, 2, 1],
+        "fancy_restaurant_mistake":[0, 0, 2, 4, 2, 1],
+        "luxury_problems":         [0, 0, 2, 4, 2, 1],
+        "left_trunk_open":         [0, 0, 1, 3, 2, 1],
+        "classy_encounter":        [0, 0, 0, 4, 2, 1],
+        "wine_and_dine":           [0, 0, 0, 4, 2, 1],
+        "cigar_circle":            [0, 0, 0, 4, 2, 1],
+        "lucky_rabbit_encounter":  [0, 0, 0, 4, 2, 1],
+        "old_rival_encounter":     [0, 0, 1, 2, 2, 1],
+        "media_known_harassed":    [0, 0, 1, 1, 2, 1],  # whisper at rich
+        "media_known_documentary": [0, 0, 1, 1, 2, 1],  # whisper at rich
+        "high_roller_room_visit":  [0, 0, 0, 3, 3, 2],
+        "high_roller_whale":       [0, 0, 0, 3, 3, 2],
+
+        # ── WEALTH-TIER HIGH (doughman / nearly) ────────────────────────────────
+        # Endgame pressure events. The casino knows you. Everyone knows you.
+        "reporters_found_you":     [0, 0, 0, 1, 3, 4],
+        "casino_knows":            [0, 0, 0, 0, 3, 4],
+        "casino_owner_meeting":    [0, 0, 0, 0, 3, 4],
+        "almost_there":            [0, 0, 0, 0, 2, 4],
+        "the_weight_of_wealth":    [0, 0, 0, 0, 3, 4],
+        "wealth_paranoia":         [0, 0, 0, 1, 3, 4],
+        "millionaire_fantasy":     [0, 0, 0, 0, 3, 3],
+        "high_roller_room":        [0, 0, 0, 0, 3, 3],
+        "last_stretch":            [0, 0, 0, 0, 0, 4],
+        "strange_visitors":        [0, 0, 0, 0, 2, 4],
+        "the_final_temptation":    [0, 0, 0, 0, 2, 4],
+        "high_stakes_feeling":     [0, 0, 0, 0, 3, 4],
+        "casino_security":         [0, 0, 0, 1, 3, 3],
+        "wealthy_doubts":          [0, 0, 0, 1, 3, 3],
+        "people_watching":         [0, 0, 0, 1, 2, 2],
+        "money_counting_ritual":   [0, 0, 0, 0, 3, 3],
+        "nervous_habits":          [0, 0, 0, 1, 3, 3],
+        "millionaire_milestone":   [0, 0, 0, 0, 3, 3],
+        "old_rival_returns":       [0, 0, 0, 1, 3, 2],
+        "casino_comps":            [0, 0, 0, 0, 3, 3],
+        "thunderstorm":            [0, 0, 0, 1, 3, 4],
+        "too_close_to_quit":       [0, 0, 0, 0, 0, 3],
+    }
+
+    def make_weighted_day_pool(self, rank):
+        """Build a shuffled and tonally weighted event pool for the given rank.
+
+        Each event is looked up in _DAY_EVENT_TONE; the value at [rank] is the
+        number of times it appears in the pool (0 = excluded at this rank).
+        Unlisted events default to 1 copy — this covers conditional follow-ups,
+        companion events, crafted-item events, chain events, and one-time story
+        events (all of which self-guard via has_danger/has_met etc.).
+
+        Illness and car-trouble names are stripped entirely and replaced by
+        dispatcher entries ('random_illness', 'random_car_trouble') whose copy
+        count escalates with rank, so danger naturally compounds with wealth.
+        """
+        builders = [
+            self.make_poor_day_events_list,
+            self.make_cheap_day_events_list,
+            self.make_modest_day_events_list,
+            self.make_rich_day_events_list,
+            self.make_doughman_day_events_list,
+            self.make_nearly_day_events_list,
+        ]
+        base_events = [
+            e for e in builders[rank]()
+            if e not in self._ILLNESS_NAMES and e not in self._CAR_TROUBLE_NAMES
+        ]
+        default = [1, 1, 1, 1, 1, 1]
+        pool = []
+        for e in base_events:
+            copies = self._DAY_EVENT_TONE.get(e, default)[rank]
+            if copies > 0:
+                pool.extend([e] * copies)
+        # Illness: rich tier drops to 3 — they can afford doctors.
+        # Doughman spikes back to 5; stress and dark money take their toll.
+        # Car: rich drops to 1 — valet, good mechanics, it's handled.
+        illness_copies = [2, 2, 3, 3, 5, 5][rank]
+        car_copies     = [3, 3, 3, 1, 2, 1][rank]
+        pool += ["random_illness"] * illness_copies + ["random_car_trouble"] * car_copies
+        random.shuffle(pool)
+        return pool
+
 # Get Event
     def get_day_event(self):
         rank = self.__player.get_rank()
         match rank:
             case 0:
-                if len(self.__poor_day_events)==0:
-                    self.__poor_day_events = self.make_poor_day_events_list()
+                if len(self.__poor_day_events) == 0:
+                    self.__poor_day_events = self.make_weighted_day_pool(0)
                 return self.__poor_day_events.pop()
             case 1:
-                if len(self.__cheap_day_events)==0:
-                    self.__cheap_day_events = self.make_cheap_day_events_list()
+                if len(self.__cheap_day_events) == 0:
+                    self.__cheap_day_events = self.make_weighted_day_pool(1)
                 return self.__cheap_day_events.pop()
             case 2:
-                if len(self.__modest_day_events)==0:
-                    self.__modest_day_events = self.make_modest_day_events_list()
+                if len(self.__modest_day_events) == 0:
+                    self.__modest_day_events = self.make_weighted_day_pool(2)
                 return self.__modest_day_events.pop()
             case 3:
-                if len(self.__rich_day_events)==0:
-                    self.__rich_day_events = self.make_rich_day_events_list()
+                if len(self.__rich_day_events) == 0:
+                    self.__rich_day_events = self.make_weighted_day_pool(3)
                 return self.__rich_day_events.pop()
             case 4:
-                if len(self.__doughman_day_events)==0:
-                    self.__doughman_day_events = self.make_doughman_day_events_list()
+                if len(self.__doughman_day_events) == 0:
+                    self.__doughman_day_events = self.make_weighted_day_pool(4)
                 return self.__doughman_day_events.pop()
             case 5:
-                if len(self.__nearly_day_events)==0:
-                    self.__nearly_day_events = self.make_nearly_day_events_list()
+                if len(self.__nearly_day_events) == 0:
+                    self.__nearly_day_events = self.make_weighted_day_pool(5)
                 return self.__nearly_day_events.pop()
     
 
@@ -2818,35 +3220,23 @@ class Lists:
         rank = self.__player.get_rank()
         match rank:
             case 0:
-                if len(self.__poor_night_events)==0:
-                    self.__poor_night_events = self.make_poor_night_events_list()
-                return self.__poor_night_events.pop()
+                return self._pull_night_event("_Lists__poor_night_events", self.make_poor_night_events_list)
             case 1:
-                if len(self.__cheap_night_events)==0:
-                    self.__cheap_night_events = self.make_cheap_night_events_list()
-                return self.__cheap_night_events.pop()
+                return self._pull_night_event("_Lists__cheap_night_events", self.make_cheap_night_events_list)
             case 2:
-                if len(self.__modest_night_events)==0:
-                    self.__modest_night_events = self.make_modest_night_events_list()
-                return self.__modest_night_events.pop()
+                return self._pull_night_event("_Lists__modest_night_events", self.make_modest_night_events_list)
             case 3:
-                if len(self.__rich_night_events)==0:
-                    self.__rich_night_events = self.make_rich_night_events_list()
-                return self.__rich_night_events.pop()
+                return self._pull_night_event("_Lists__rich_night_events", self.make_rich_night_events_list)
             case 4:
-                if len(self.__doughman_night_events)==0:
-                    self.__doughman_night_events = self.make_doughman_night_events_list()
-                return self.__doughman_night_events.pop()
+                return self._pull_night_event("_Lists__doughman_night_events", self.make_doughman_night_events_list)
             case 5:
-                if len(self.__nearly_night_events)==0:
-                    self.__nearly_night_events = self.make_nearly_night_events_list()
-                return self.__nearly_night_events.pop()
+                return self._pull_night_event("_Lists__nearly_night_events", self.make_nearly_night_events_list)
 
-    def make_shop_list(self):
+    def make_shop_list(self, on_foot=False):
         a_list = []
         if(not self.__player.has_danger("Doctor Ban")):
             a_list.append("Doctor's Office")
-        if(self.__player.has_met("Witch")):
+        if((not on_foot) and self.__player.has_met("Witch")):
             a_list.append("Witch Doctor's Tower")
         if(self.__player.has_met("Tom")):
             a_list.append("Trusty Tom's Trucks and Tires")
@@ -2854,8 +3244,9 @@ class Lists:
             a_list.append("Filthy Frank's Flawless Fixtures")
         if(self.__player.has_met("Oswald")):
             a_list.append("Oswald's Optimal Outoparts")
-        a_list.append("Convenience Store")
-        if(self.__player.has_item("Map")):
+        if(not on_foot):
+            a_list.append("Convenience Store")
+        if((not on_foot) and (self.__player.has_item("Map") or self.__player.has_item("Worn Map"))):
             a_list.append("Marvin's Mystical Merchandise")
         # Pawn Shop - unlocked by meeting Grimy Gus
         if(self.__player.has_met("Grimy Gus")):
@@ -2869,10 +3260,10 @@ class Lists:
            self.__player.has_item("Rich Friend's Number")):
             a_list.append("Make a Phone Call")
         # Car Workbench - unlocked by owning a Tool Kit
-        if(self.__player.has_item("Tool Kit")):
+        if((not on_foot) and self.__player.has_item("Tool Kit")):
             a_list.append("Car Workbench")
         # Airport unlocks when you're a millionaire
-        if(self.__player.get_balance() >= 1000000):
+        if((not on_foot) and self.__player.get_balance() >= 1000000):
             a_list.append("Airport")
         return a_list
 
@@ -4124,6 +4515,8 @@ class Lists:
             a_list.append("You cough, then keep coughing. After each convulsion in your body, you try to catch your breath, only to cough even more. Trying desperately to get some air, you stick your head out the window, and directly into the freight truck that's driving by.")
         if self.__player.has_status("Hepatitis"):
             a_list.append("The side of your body gives out a sharp pain. You reach for it, before screaming in agony. As you spit out blood, you watch as the world around you starts to darken.")
+        if not a_list:
+            a_list.append("Your body finally gives out. You collapse in the front seat of your car, staring at the ceiling, and that's that.")
         random.shuffle(a_list)
         return a_list.pop()
 

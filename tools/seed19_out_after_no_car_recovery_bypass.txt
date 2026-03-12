@@ -1,0 +1,2 @@
+Results -> C:\Users\Dreat\MeFolder\BJ\Blackjack\tools\test_out.txt
+Errors: 0

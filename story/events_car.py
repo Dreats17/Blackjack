@@ -51,26 +51,58 @@ def space_quote(text):
 class CarEventsMixin:
     """Car events: All vehicle breakdown, repair, and consequence events"""
 
-    def contract_cold(self):
-        type.type("It started with a tickle in your throat. Then the sniffles. Then the coughing.")
-        print("\n")
-        type.type("Your nose is running like a faucet. Your head feels stuffed with cotton.")
-        print("\n")
-        type.type("Just a common " + red("cold") + ". Nothing serious, but you feel miserable.")
-        self.add_status("Cold")
-        self.damage(5)
-        self.start_night()
+    # ==========================================
+    # DISPATCHER — called by the event system
+    # ==========================================
 
-    def contract_flu(self):
-        type.type("It hits you like a truck. One moment you're fine, the next you can barely move.")
-        print("\n")
-        type.type("Fever. Chills. Body aches so severe you can't get comfortable in any position.")
-        print("\n")
-        type.type("Your throat is raw. Your cough is painful. This is the " + red("flu") + " - the real deal.")
-        self.add_status("Flu")
-        self.damage(12)
-        self.lose_sanity(1)
-        self.start_night()
+    def random_car_trouble(self):
+        """Pick a rank-appropriate car problem at random and trigger it."""
+        rank = self.get_rank()
+
+        cheap = [
+            self.corroded_battery_terminals, self.fuse_blown, self.abs_light_on,
+            self.slow_tire_leak, self.headlights_burned_out, self.windshield_cracked,
+            self.hail_damage, self.key_wont_turn, self.window_wont_roll_up,
+            self.trunk_wont_close, self.bald_tires_noticed, self.exhaust_leak_loud,
+            self.thermostat_stuck, self.nail_in_tire, self.check_engine_light_on,
+            self.strange_engine_noise, self.wheel_alignment_off, self.suspension_creaking,
+            self.car_wont_go_in_reverse, self.gas_pedal_sticking, self.parking_brake_stuck,
+            self.frozen_door_locks,
+        ]
+        mid = [
+            self.dead_battery_afternoon, self.engine_overheating, self.battery_acid_leak,
+            self.alternator_failing, self.brake_fluid_leak, self.fuel_pump_whining,
+            self.clogged_fuel_filter, self.radiator_leak, self.water_pump_failing,
+            self.power_steering_failure, self.frozen_fuel_line, self.car_alarm_malfunction,
+            self.starter_motor_grinding, self.brakes_squealing, self.ran_out_of_gas,
+            self.mystery_breakdown, self.engine_wont_turn_over, self.engine_oil_empty,
+            self.oil_leak_spotted, self.tire_blowout, self.flooded_engine,
+        ]
+        expensive = [
+            self.catalytic_converter_stolen, self.transmission_slipping, self.stuck_in_gear,
+            self.broken_ball_joint, self.flooded_engine, self.mystery_breakdown,
+            self.tire_blowout, self.engine_wont_turn_over,
+        ]
+
+        # Cost weights per rank: [cheap, mid, expensive]
+        # As rank increases the car is older and problems get worse,
+        # but the player can also afford repairs — tension increases either way
+        cost_weights = [
+            [7, 2, 1],  # poor: mostly cheap annoyances
+            [5, 3, 2],  # cheap: mid problems start appearing
+            [3, 4, 3],  # modest: balanced
+            [2, 4, 4],  # rich: expensive problems more common
+            [1, 3, 6],  # doughman: car is falling apart
+            [1, 2, 7],  # nearly: everything is breaking at once
+        ]
+        weights = cost_weights[min(rank, 5)]
+        tier = random.choices(["cheap", "mid", "expensive"], weights=weights, k=1)[0]
+        if tier == "cheap":
+            random.choice(cheap)()
+        elif tier == "mid":
+            random.choice(mid)()
+        else:
+            random.choice(expensive)()
 
     # ==========================================
     # CAR TROUBLE AFTERNOON EVENTS

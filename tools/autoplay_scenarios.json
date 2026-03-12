@@ -1,0 +1,735 @@
+{
+  "suites": {
+    "blackjack_bet": [
+      {
+        "details": {
+          "bet": 96,
+          "goal": "survive_emergency",
+          "trace_metadata": {
+            "max_ratio": 0.2,
+            "mechanic_gap": 0,
+            "mechanic_threshold_push_window": false,
+            "pending_marvin_active": false,
+            "pending_marvin_shortfall": 0,
+            "plan": {
+              "goal": "survive_emergency",
+              "reason": "highest scored goal survive_emergency=48.0",
+              "scores": {
+                "stabilize_health": 41.25,
+                "survive_emergency": 48.0
+              }
+            },
+            "pressure_bet": 200,
+            "ratio": 0.12,
+            "store_budget": 0
+          },
+          "trace_reason": "goal=survive_emergency blackjack_bet phase=car_ready survival=True edge=1"
+        },
+        "passed": true,
+        "scenario_id": "saveable_doctor_death_bet_reserve",
+        "summary": "bet=96 max_bet=96"
+      },
+      {
+        "details": {
+          "bet": 20,
+          "goal": "acquire_car",
+          "trace_metadata": {
+            "max_ratio": 0.16,
+            "mechanic_gap": 0,
+            "mechanic_threshold_push_window": false,
+            "pending_marvin_active": false,
+            "pending_marvin_shortfall": 0,
+            "plan": {
+              "goal": "acquire_car",
+              "reason": "highest scored goal acquire_car=96.0",
+              "scores": {
+                "acquire_car": 96.0,
+                "push_next_rank": 24.0
+              }
+            },
+            "pressure_bet": 0,
+            "ratio": 0.12,
+            "store_budget": 0
+          },
+          "trace_reason": "goal=acquire_car blackjack_bet phase=car_rush survival=False edge=3"
+        },
+        "passed": true,
+        "scenario_id": "no_car_preserves_tom_threshold",
+        "summary": "bet=20 max_bet=20"
+      },
+      {
+        "details": {
+          "bet": 22,
+          "goal": "acquire_car",
+          "trace_metadata": {
+            "max_ratio": 0.5,
+            "mechanic_gap": 59,
+            "mechanic_threshold_push_window": false,
+            "pending_marvin_active": false,
+            "pending_marvin_shortfall": 0,
+            "plan": {
+              "goal": "acquire_car",
+              "reason": "highest scored goal acquire_car=84.0",
+              "scores": {
+                "acquire_car": 84.0
+              }
+            },
+            "pressure_bet": 0,
+            "ratio": 0.34,
+            "store_budget": 8
+          },
+          "trace_reason": "goal=acquire_car blackjack_bet phase=car_rush survival=True edge=0"
+        },
+        "passed": true,
+        "scenario_id": "no_car_bridges_tom_threshold_band",
+        "summary": "bet=22 max_bet=22"
+      },
+      {
+        "details": {
+          "bet": 11,
+          "goal": "acquire_car",
+          "trace_metadata": {
+            "max_ratio": 0.66,
+            "mechanic_gap": 150,
+            "mechanic_threshold_push_window": false,
+            "pending_marvin_active": false,
+            "pending_marvin_shortfall": 0,
+            "plan": {
+              "goal": "acquire_car",
+              "reason": "highest scored goal acquire_car=70.0",
+              "scores": {
+                "acquire_car": 70.0
+              }
+            },
+            "pressure_bet": 0,
+            "ratio": 0.52,
+            "store_budget": 0
+          },
+          "trace_reason": "goal=acquire_car blackjack_bet phase=car_rush survival=False edge=3"
+        },
+        "passed": true,
+        "scenario_id": "no_car_low_bankroll_pushes_for_car",
+        "summary": "bet=11 max_bet=11"
+      },
+      {
+        "details": {
+          "bet": 24,
+          "goal": "acquire_car",
+          "trace_metadata": {
+            "max_ratio": 0.22,
+            "mechanic_gap": 26,
+            "mechanic_threshold_push_window": false,
+            "pending_marvin_active": false,
+            "pending_marvin_shortfall": 0,
+            "plan": {
+              "goal": "acquire_car",
+              "reason": "highest scored goal acquire_car=84.0",
+              "scores": {
+                "acquire_car": 84.0
+              }
+            },
+            "pressure_bet": 0,
+            "ratio": 0.18,
+            "store_budget": 0
+          },
+          "trace_reason": "goal=acquire_car blackjack_bet phase=car_rush survival=True edge=0"
+        },
+        "passed": true,
+        "scenario_id": "pre_tom_doctor_window_preserves_cash",
+        "summary": "bet=24 max_bet=31"
+      },
+      {
+        "details": {
+          "bet": 40,
+          "goal": "acquire_car",
+          "trace_metadata": {
+            "max_ratio": 0.43,
+            "mechanic_gap": 40,
+            "mechanic_threshold_push_window": true,
+            "pending_marvin_active": false,
+            "pending_marvin_shortfall": 0,
+            "plan": {
+              "goal": "acquire_car",
+              "reason": "highest scored goal acquire_car=84.0",
+              "scores": {
+                "acquire_car": 84.0
+              }
+            },
+            "pressure_bet": 40,
+            "ratio": 0.35,
+            "store_budget": 0
+          },
+          "trace_reason": "goal=acquire_car blackjack_bet phase=car_rush survival=False edge=0"
+        },
+        "passed": true,
+        "scenario_id": "first_mechanic_threshold_pushes_for_one_hand_cross",
+        "summary": "bet=40 min_bet=40"
+      },
+      {
+        "details": {
+          "bet": 5500,
+          "goal": "blend_fraudulent_cash_safely",
+          "trace_metadata": {
+            "max_ratio": 0.7,
+            "mechanic_gap": 0,
+            "mechanic_threshold_push_window": false,
+            "pending_marvin_active": false,
+            "pending_marvin_shortfall": 0,
+            "plan": {
+              "goal": "blend_fraudulent_cash_safely",
+              "reason": "highest scored goal blend_fraudulent_cash_safely=47.0",
+              "scores": {
+                "blend_fraudulent_cash_safely": 47.0,
+                "push_next_rank": 42.0
+              }
+            },
+            "pressure_bet": 0,
+            "ratio": 0.3,
+            "store_budget": 0
+          },
+          "trace_reason": "goal=blend_fraudulent_cash_safely blackjack_bet phase=car_ready survival=False edge=6"
+        },
+        "passed": true,
+        "scenario_id": "fraudulent_cash_blend_case",
+        "summary": "bet=5500 balance=4000"
+      },
+      {
+        "details": {
+          "bet": 1080,
+          "goal": "push_next_rank",
+          "trace_metadata": {
+            "max_ratio": 0.1,
+            "mechanic_gap": 0,
+            "mechanic_threshold_push_window": false,
+            "pending_marvin_active": true,
+            "pending_marvin_shortfall": 0,
+            "plan": {
+              "goal": "push_next_rank",
+              "reason": "highest scored goal push_next_rank=30.0",
+              "scores": {
+                "exploit_marvin": 0.0,
+                "push_next_rank": 30.0
+              }
+            },
+            "pressure_bet": 0,
+            "ratio": 0.06,
+            "store_budget": 0
+          },
+          "trace_reason": "goal=push_next_rank blackjack_bet phase=car_ready survival=False edge=5"
+        },
+        "passed": true,
+        "scenario_id": "marvin_preserve_cash_window",
+        "summary": "bet=1080 max_bet=1200"
+      },
+      {
+        "details": {
+          "bet": 680,
+          "goal": "push_next_rank",
+          "trace_metadata": {
+            "max_ratio": 0.78,
+            "mechanic_gap": 0,
+            "mechanic_threshold_push_window": false,
+            "pending_marvin_active": false,
+            "pending_marvin_shortfall": 0,
+            "plan": {
+              "goal": "push_next_rank",
+              "reason": "highest scored goal push_next_rank=42.0",
+              "scores": {
+                "exploit_marvin": 0.0,
+                "push_next_rank": 42.0
+              }
+            },
+            "pressure_bet": 0,
+            "ratio": 0.34,
+            "store_budget": 0
+          },
+          "trace_reason": "goal=push_next_rank blackjack_bet phase=car_ready survival=False edge=4"
+        },
+        "passed": true,
+        "scenario_id": "post_car_midgame_growth_window_pushes_harder",
+        "summary": "bet=680 min_bet=600"
+      }
+    ],
+    "event_inline": [
+      {
+        "details": {
+          "choice": "decline",
+          "expected": "decline",
+          "goal": "push_next_rank",
+          "trace_reason": "decline_suspicious_offer"
+        },
+        "passed": true,
+        "scenario_id": "inline_decline_suspicious_offer",
+        "summary": "choice=decline expected=decline"
+      },
+      {
+        "details": {
+          "choice": "2",
+          "expected": "2",
+          "goal": "push_next_rank",
+          "trace_reason": "companion_sick_pay_choice"
+        },
+        "passed": true,
+        "scenario_id": "inline_companion_sick_choice",
+        "summary": "choice=2 expected=2"
+      },
+      {
+        "details": {
+          "choice": "free",
+          "expected": "free",
+          "goal": "stabilize_health",
+          "trace_reason": "cheap_inline_low_balance"
+        },
+        "passed": true,
+        "scenario_id": "inline_cheap_choice_prefers_free_when_broke",
+        "summary": "choice=free expected=free"
+      },
+      {
+        "details": {
+          "choice": "health",
+          "expected": "health",
+          "goal": "push_next_rank",
+          "trace_reason": "wish_inline_choice:health"
+        },
+        "passed": true,
+        "scenario_id": "inline_wish_prefers_health",
+        "summary": "choice=health expected=health"
+      },
+      {
+        "details": {
+          "choice": "feed",
+          "expected": "feed",
+          "goal": "push_next_rank",
+          "trace_reason": "pet_or_feed_gate"
+        },
+        "passed": true,
+        "scenario_id": "inline_pet_feed_uses_tuna",
+        "summary": "choice=feed expected=feed"
+      }
+    ],
+    "event_option": [
+      {
+        "details": {
+          "choice": "tell him to prove it",
+          "expected": "tell him to prove it",
+          "goal": "push_next_rank",
+          "trace_reason": "protect_lucky_prove_it"
+        },
+        "passed": true,
+        "scenario_id": "protect_companion_branch",
+        "summary": "choice=tell him to prove it expected=tell him to prove it"
+      },
+      {
+        "details": {
+          "choice": "Walk away",
+          "expected": "Walk away",
+          "goal": "survive_emergency",
+          "trace_reason": "generic_low_resource_choice:walk"
+        },
+        "passed": true,
+        "scenario_id": "generic_low_resource_walkaway_branch",
+        "summary": "choice=Walk away expected=Walk away"
+      },
+      {
+        "details": {
+          "choice": "pull it out",
+          "expected": "pull it out",
+          "goal": "recover_from_car_trouble",
+          "trace_reason": "car_triage_self_repair"
+        },
+        "passed": true,
+        "scenario_id": "car_trouble_option_branch",
+        "summary": "choice=pull it out expected=pull it out"
+      },
+      {
+        "details": {
+          "choice": "hide",
+          "expected": "hide",
+          "goal": "acquire_car",
+          "trace_reason": "hide_robbery_cover"
+        },
+        "passed": true,
+        "scenario_id": "gas_station_robbery_prefers_hide",
+        "summary": "choice=hide expected=hide"
+      }
+    ],
+    "event_yes_no": [
+      {
+        "details": {
+          "answer": "no",
+          "expected": "no",
+          "goal": "push_next_rank",
+          "trace_reason": "event_no:accept the devil's offer?"
+        },
+        "passed": true,
+        "scenario_id": "suspicious_bargain_refusal",
+        "summary": "answer=no expected=no"
+      },
+      {
+        "details": {
+          "answer": "no",
+          "expected": "no",
+          "goal": "push_next_rank",
+          "trace_reason": "loyalty_bonus_money_refusal"
+        },
+        "passed": true,
+        "scenario_id": "loyalty_bonus_money_refusal",
+        "summary": "answer=no expected=no"
+      },
+      {
+        "details": {
+          "answer": "yes",
+          "expected": "yes",
+          "goal": "stabilize_health",
+          "trace_reason": "cupcake_sanity_gate"
+        },
+        "passed": true,
+        "scenario_id": "cupcake_sanity_gate",
+        "summary": "answer=yes expected=yes"
+      }
+    ],
+    "mechanic_offer": [
+      {
+        "details": {
+          "answer": "yes",
+          "balance": 200,
+          "day": 5,
+          "expected": "yes",
+          "met": [],
+          "recent": "Tom pulls a big red wrench out of his pocket. Yep, this thing's busted alright!"
+        },
+        "passed": true,
+        "scenario_id": "tom_offer_accepted_at_threshold",
+        "summary": "answer=yes expected=yes"
+      }
+    ],
+    "route": [
+      {
+        "details": {
+          "goal": "survive_emergency",
+          "goal_reason": "highest scored goal survive_emergency=81.0",
+          "route": "Doctor's Office",
+          "trace_reason": "goal=survive_emergency selected Doctor's Office score=294.0 margin=300.5"
+        },
+        "passed": true,
+        "scenario_id": "saveable_doctor_death",
+        "summary": "goal=survive_emergency route=Doctor's Office expected_goal=survive_emergency expected_route=Doctor's Office"
+      },
+      {
+        "details": {
+          "goal": "exploit_marvin",
+          "goal_reason": "highest scored goal exploit_marvin=32.0",
+          "route": "Marvin",
+          "trace_reason": "goal=exploit_marvin selected Marvin score=188.0 margin=188.0"
+        },
+        "passed": true,
+        "scenario_id": "marvin_access_but_no_visit",
+        "summary": "goal=exploit_marvin route=Marvin expected_goal=exploit_marvin expected_route=Marvin"
+      },
+      {
+        "details": {
+          "goal": "restock_supplies",
+          "goal_reason": "highest scored goal restock_supplies=94.0",
+          "route": "Convenience Store",
+          "trace_reason": "goal=restock_supplies selected Convenience Store score=185.5 margin=167.5"
+        },
+        "passed": true,
+        "scenario_id": "companion_food_crisis",
+        "summary": "goal=restock_supplies route=Convenience Store expected_goal=restock_supplies expected_route=Convenience Store"
+      },
+      {
+        "details": {
+          "goal": "contain_debt_escalation",
+          "goal_reason": "highest scored goal contain_debt_escalation=89.0",
+          "route": "Loan Shark",
+          "trace_reason": "goal=contain_debt_escalation selected Loan Shark score=189.0 margin=88.6"
+        },
+        "passed": true,
+        "scenario_id": "debt_pressure_case",
+        "summary": "goal=contain_debt_escalation route=Loan Shark expected_goal=contain_debt_escalation expected_route=Loan Shark"
+      },
+      {
+        "details": {
+          "goal": "reduce_fatigue_pressure",
+          "goal_reason": "highest scored goal reduce_fatigue_pressure=89.2",
+          "route": "Stay Home",
+          "trace_reason": "goal=reduce_fatigue_pressure selected Stay Home score=138.0 margin=138.0"
+        },
+        "passed": true,
+        "scenario_id": "high_fatigue_missed_event_case",
+        "summary": "goal=reduce_fatigue_pressure route=Stay Home expected_goal=reduce_fatigue_pressure expected_route=Stay Home"
+      },
+      {
+        "details": {
+          "goal": "recover_from_car_trouble",
+          "goal_reason": "highest scored goal recover_from_car_trouble=64.0",
+          "route": "Tom's Auto Shop",
+          "trace_reason": "goal=recover_from_car_trouble selected Tom's Auto Shop score=194.7 margin=176.7"
+        },
+        "passed": true,
+        "scenario_id": "car_trouble_interruption_case",
+        "summary": "goal=recover_from_car_trouble route=Tom's Auto Shop expected_goal=recover_from_car_trouble expected_route=Tom's Auto Shop"
+      }
+    ],
+    "route_interrupt": [
+      {
+        "details": {
+          "balance": 350,
+          "day": 14,
+          "expected": "Doctor's Office",
+          "health": 24,
+          "injuries": [
+            "Broken Ribs"
+          ],
+          "route": "Doctor's Office",
+          "sanity": 45,
+          "statuses": []
+        },
+        "passed": true,
+        "scenario_id": "urgent_medical_interrupt_route",
+        "summary": "route=Doctor's Office expected=Doctor's Office"
+      },
+      {
+        "details": {
+          "balance": 500,
+          "day": 18,
+          "expected": "Stay Home",
+          "health": 58,
+          "injuries": [
+            "Scraped Knee"
+          ],
+          "route": "Stay Home",
+          "sanity": 40,
+          "statuses": []
+        },
+        "passed": true,
+        "scenario_id": "recovery_day_interrupt_route",
+        "summary": "route=Stay Home expected=Stay Home"
+      },
+      {
+        "details": {
+          "balance": 500,
+          "day": 18,
+          "expected": "Convenience Store",
+          "health": 68,
+          "injuries": [
+            "Scraped Knee"
+          ],
+          "route": "Convenience Store",
+          "sanity": 34,
+          "statuses": []
+        },
+        "passed": true,
+        "scenario_id": "recovery_day_store_bypass_route",
+        "summary": "route=Convenience Store expected=Convenience Store"
+      },
+      {
+        "details": {
+          "balance": 300,
+          "day": 18,
+          "expected": "Grimy Gus's Pawn Emporium",
+          "health": 66,
+          "injuries": [
+            "Scraped Knee"
+          ],
+          "route": "Grimy Gus's Pawn Emporium",
+          "sanity": 34,
+          "statuses": []
+        },
+        "passed": true,
+        "scenario_id": "recovery_day_pawn_bypass_route",
+        "summary": "route=Grimy Gus's Pawn Emporium expected=Grimy Gus's Pawn Emporium"
+      },
+      {
+        "details": {
+          "balance": 160,
+          "day": 10,
+          "expected": "Trusty Tom's Trucks and Tires",
+          "health": 54,
+          "injuries": [
+            "Scraped Knee"
+          ],
+          "route": "Trusty Tom's Trucks and Tires",
+          "sanity": 45,
+          "statuses": []
+        },
+        "passed": true,
+        "scenario_id": "recovery_day_no_car_mechanic_bypass_route",
+        "summary": "route=Trusty Tom's Trucks and Tires expected=Trusty Tom's Trucks and Tires"
+      },
+      {
+        "details": {
+          "balance": 190,
+          "day": 10,
+          "expected": "Trusty Tom's Trucks and Tires",
+          "health": 58,
+          "injuries": [
+            "Broken Leg"
+          ],
+          "route": "Trusty Tom's Trucks and Tires",
+          "sanity": 42,
+          "statuses": [
+            "Flu",
+            "Ringworm",
+            "Sinus Infection"
+          ]
+        },
+        "passed": true,
+        "scenario_id": "recovery_day_no_car_mild_status_stack_bypass_route",
+        "summary": "route=Trusty Tom's Trucks and Tires expected=Trusty Tom's Trucks and Tires"
+      },
+      {
+        "details": {
+          "balance": 300,
+          "day": 10,
+          "expected": "Trusty Tom's Trucks and Tires",
+          "health": 50,
+          "injuries": [
+            "Broken Leg"
+          ],
+          "route": "Trusty Tom's Trucks and Tires",
+          "sanity": 45,
+          "statuses": []
+        },
+        "passed": true,
+        "scenario_id": "no_car_progression_defers_nonurgent_doctor_route",
+        "summary": "route=Trusty Tom's Trucks and Tires expected=Trusty Tom's Trucks and Tires"
+      },
+      {
+        "details": {
+          "balance": 176,
+          "day": 19,
+          "expected": "Doctor's Office",
+          "health": 79,
+          "injuries": [
+            "Broken Leg"
+          ],
+          "route": "Doctor's Office",
+          "sanity": 96,
+          "statuses": []
+        },
+        "passed": true,
+        "scenario_id": "car_injury_doctor_preempts_progression",
+        "summary": "route=Doctor's Office expected=Doctor's Office"
+      }
+    ],
+    "state_goal": [
+      {
+        "details": {
+          "available_routes": [],
+          "expected": "acquire_car",
+          "goal": "acquire_car",
+          "opportunity_flags": {
+            "can_advance_mechanic_arc": false,
+            "can_adventure_safely": false,
+            "can_cashout_pawn_inventory": false,
+            "can_contain_debt_escalation": false,
+            "can_convert_millionaire_to_ending": false,
+            "can_preserve_companions": false,
+            "can_recover_from_car_trouble": false,
+            "can_reduce_debt_risk": false,
+            "can_reduce_fatigue_pressure": false,
+            "can_repair_or_upgrade": false,
+            "can_restock_supplies": false,
+            "can_restore_blackjack_edge": false,
+            "can_unlock_car": true,
+            "can_visit_marvin": false,
+            "can_visit_witch": false
+          }
+        },
+        "passed": true,
+        "scenario_id": "no_car_store_hints_do_not_create_store_goal",
+        "summary": "goal=acquire_car expected=acquire_car"
+      },
+      {
+        "details": {
+          "available_routes": [],
+          "expected": "push_next_rank",
+          "goal": "push_next_rank",
+          "opportunity_flags": {
+            "can_advance_mechanic_arc": false,
+            "can_adventure_safely": false,
+            "can_cashout_pawn_inventory": false,
+            "can_contain_debt_escalation": false,
+            "can_convert_millionaire_to_ending": false,
+            "can_preserve_companions": false,
+            "can_recover_from_car_trouble": false,
+            "can_reduce_debt_risk": false,
+            "can_reduce_fatigue_pressure": false,
+            "can_repair_or_upgrade": false,
+            "can_restock_supplies": false,
+            "can_restore_blackjack_edge": false,
+            "can_unlock_car": false,
+            "can_visit_marvin": false,
+            "can_visit_witch": false
+          }
+        },
+        "passed": true,
+        "scenario_id": "low_cash_marvin_access_does_not_force_marvin_goal",
+        "summary": "goal=push_next_rank expected=push_next_rank"
+      },
+      {
+        "details": {
+          "available_routes": [
+            "Marvin's Mystical Merchandise",
+            "Convenience Store"
+          ],
+          "expected": "exploit_marvin",
+          "goal": "exploit_marvin",
+          "opportunity_flags": {
+            "can_advance_mechanic_arc": false,
+            "can_adventure_safely": false,
+            "can_cashout_pawn_inventory": false,
+            "can_contain_debt_escalation": false,
+            "can_convert_millionaire_to_ending": false,
+            "can_preserve_companions": false,
+            "can_recover_from_car_trouble": false,
+            "can_reduce_debt_risk": false,
+            "can_reduce_fatigue_pressure": false,
+            "can_repair_or_upgrade": false,
+            "can_restock_supplies": false,
+            "can_restore_blackjack_edge": false,
+            "can_unlock_car": false,
+            "can_visit_marvin": true,
+            "can_visit_witch": false
+          }
+        },
+        "passed": true,
+        "scenario_id": "strong_marvin_window_prefers_marvin_goal",
+        "summary": "goal=exploit_marvin expected=exploit_marvin"
+      },
+      {
+        "details": {
+          "available_routes": [],
+          "expected": "push_next_rank",
+          "goal": "push_next_rank",
+          "opportunity_flags": {
+            "can_advance_mechanic_arc": false,
+            "can_adventure_safely": false,
+            "can_cashout_pawn_inventory": false,
+            "can_contain_debt_escalation": false,
+            "can_convert_millionaire_to_ending": false,
+            "can_preserve_companions": false,
+            "can_recover_from_car_trouble": false,
+            "can_reduce_debt_risk": false,
+            "can_reduce_fatigue_pressure": false,
+            "can_repair_or_upgrade": false,
+            "can_restock_supplies": false,
+            "can_restore_blackjack_edge": false,
+            "can_unlock_car": false,
+            "can_visit_marvin": false,
+            "can_visit_witch": false
+          }
+        },
+        "passed": true,
+        "scenario_id": "healthy_midgame_store_pressure_defers_to_rank_push",
+        "summary": "goal=push_next_rank expected=push_next_rank"
+      }
+    ]
+  },
+  "summary": {
+    "failed": 0,
+    "passed": 40,
+    "total": 40
+  }
+}

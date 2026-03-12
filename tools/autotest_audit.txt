@@ -1,0 +1,544 @@
+AUTOTEST / QUICKTEST AUDIT
+Date: 2026-03-10
+
+Scope reviewed
+- tools/autotest.py
+- tools/quicktest.py
+- tools/test_gameplay.py
+- tools/interactive_event_runner.py
+- blackjack.py
+- story/game_flow.py
+- story/locations.py
+- story/storylines.py
+- story/player_core.py
+- story/endings.py
+- story/events_illness.py
+- lists.py
+- Existing outputs in tools/test_out.txt and tools/cumulative_test_out.txt
+- Fresh validation run: python tools/autotest.py 120 1 30
+
+Executive assessment
+- tools/autotest.py is a solid batch runner and reporting layer.
+- tools/quicktest.py is the real autoplay policy engine.
+- The real game is materially more complex than the harness alone suggests: blackjack EV is only one part of the problem.
+- As an observability tool, this setup is good.
+- As an "optimal player," it is not close to optimal yet.
+
+Bottom line
+- The harness measures a lot of useful things, but the policy it is measuring is still mostly heuristic, brittle, and heavily coupled to prompt text.
+- The actual game also has hard progression gates around Marvin, Witch, mechanics, adventures, airport endings, debt, and medical status handling.
+- Because of that, some weak metrics reflect both policy quality and real game structure.
+- The current autoplay appears better at broad exploration and regression spotting than at maximizing survival, bankroll growth, or ending progression.
+
+Evidence
+- Fresh seeded run, 30 seeds x 120 cycles:
+  alive=8/30
+  died=22/30
+  broke=8/30
+  car=11/30
+  ever_car=14/30
+  location=12/30
+  rank1+=8/30
+  doctor_missed=4/30
+  marvin=0/30
+  adventure=0/30
+
+- Existing larger batch, 300 random seeds x 120 cycles:
+  alive=64/300
+  died=236/300
+  broke=64/300
+  car=106/300
+  ever_car=126/300
+  location=107/300
+  rank1+=75/300
+  doctor_missed=78/300
+  marvin=8/300
+  adventure=0/300
+  wins=0/300
+
+Interpretation
+- Survival is low.
+- Conversion from unlocks to useful visits is weak.
+- Progression beyond early-to-mid game is inconsistent.
+- Zero adventure visits should not be read as a pure routing bug. Actual adventure access in story/game_flow.py is rank-gated and event-gated, so reaching adventures is structurally hard.
+- Marvin and Witch are also not simple menu entries. story/storylines.py requires a Car plus specific breadcrumb events before those routes exist.
+- The system is instrumented well enough to show these problems clearly, which is a strength.
+
+Game systems the current autoplay must actually optimize across
+- blackjack.py: blackjack choices plus custom actions and item effects such as insurance, peek, double, split, surrender, No Bust, Second Chance, Dealer's Hesitation, Imminent Blackjack, dealer happiness, and forced-bet pressure.
+- story/locations.py and lists.py: dynamic afternoon route generation including doctor, witch, mechanics, convenience store, Marvin, pawn shop, loan shark, phone calls, workbench, and airport.
+- story/storylines.py: unlock gates for Grimy Gus, Vinnie, Marvin, Witch, and mechanic arcs, with day thresholds, balance thresholds, and breadcrumb requirements.
+- story/game_flow.py: adventure unlock logic tied to rank and prior event completion, plus daily progression, status updates, and car-trouble handling.
+- story/player_core.py: debt, fraudulent cash, dealer happiness, pawn reputation, visit counters, companions, and gift systems.
+- story/events_illness.py: much larger illness and injury surface than the original harness review implied, which increases the importance of medical triage quality.
+- story/endings.py: millionaire branching and airport/mechanic endings, which means a truly strong bot should be able to convert late-game bankroll into explicit win-state progress.
+
+Senior-engineer findings
+
+1. High: The architecture does not match the name "autotest"
+What I see:
+- tools/autotest.py mostly launches tools/quicktest.py, parses text output, and aggregates metrics.
+- It does not contain the actual decision policy.
+
+Why this matters:
+- Anyone reading the code can easily assume autotest is the player.
+- That makes debugging slower and makes responsibility boundaries blurry.
+
+Actionable fix:
+- Rename the roles in code and docs.
+- Treat tools/autotest.py as batch_runner/reporter.
+- Treat tools/quicktest.py as autoplay_policy/simulator_adapter.
+- Put a short module docstring at the top of both files stating that contract explicitly.
+
+2. High: The autoplay policy is not empirically optimal by the metrics that matter
+What I see:
+- Large batches still show low survival and weak endgame reach.
+- 300-run sample has 0 adventure visits and 0 wins.
+- Unlock conversion is poor: marvin_access=120/300 but marvin=8/300.
+- loan unlocks exist but actual visits are almost nonexistent.
+- Some of the zeroes are partly explained by real gates. For example, adventures require rank thresholds plus prerequisite event chains, and Marvin/Witch require Car plus breadcrumbs.
+
+Why this matters:
+- A policy that unlocks content but cannot capitalize on it is not optimizing game outcomes.
+- The current heuristics appear to overfit local choices and underperform on long-horizon progression.
+- The correct standard is not "did the bot instantly reach hidden content" but "once prerequisites are plausibly reachable, does the bot drive toward them deliberately?" Right now the answer is still mostly no.
+
+Actionable fix:
+- Define an explicit objective score for autoplay.
+- Example weighted score:
+  score = survival + rank progression + peak bankroll + ending reach + content conversion - doctor_missed - dead-end loops
+- Fail CI or flag regressions when core metrics decline over fixed seed sets.
+- Track funnel metrics for each progression path:
+  unlocked -> visited -> purchased -> used -> survived after use
+- Separate funnel reporting into two stages:
+  prereq_reached -> route_unlocked -> route_visited -> value_realized
+
+3. High: Decision-making is too dependent on raw prompt text and recent output buffers
+What I see:
+- tools/quicktest.py makes many choices by scanning RECENT_TEXT, parsing numbered menus from output, and matching phrases like "whaddya say", "you game", "come again", and similar strings.
+- Fallback Review in reports confirms that generic fallback handlers are used regularly.
+
+Why this matters:
+- This is brittle.
+- Small writing changes in story text can silently change behavior.
+- It also mixes UI text with game semantics, which makes policy logic fragile and hard to reason about.
+
+Actionable fix:
+- Add structured choice APIs in the game layer.
+- Every prompt that matters should expose a stable decision id and structured option ids.
+- Example:
+  prompt_id = mechanic_intro_tom
+  options = [accept_repair, decline_repair]
+- Make quicktest choose on ids, not prose.
+- Keep the text parser only as a temporary compatibility layer, not the primary control surface.
+
+4. High: The betting and routing logic is a large heuristic monolith with many magic numbers
+What I see:
+- tools/quicktest.py contains a very large amount of threshold-driven behavior around betting, medical decisions, car repair reserves, route selection, store spending, and unlock timing.
+- There are many intertwined conditions and repeated cap/reserve adjustments.
+
+Why this matters:
+- This is hard to verify and easy to regress.
+- Local fixes will keep shifting behavior in unexpected ways.
+- It is also difficult to answer basic questions like "why did the bot make this bet on day 17?"
+
+Actionable fix:
+- Split policy into modules:
+  blackjack_policy
+  bankroll_policy
+  health_policy
+  travel_policy
+  purchase_policy
+  fallback_policy
+- Move tunable numbers into named policy tables or dataclasses.
+- Emit a per-decision trace reason, not just final outcome summaries.
+- Add golden-seed regression tests that assert policy decisions for known states.
+
+5. Medium-High: The blackjack strategy is better than basic scripting, but still not truly optimal
+What I see:
+- The actual blackjack engine supports split, surrender, double, peek, insurance, and Second Chance.
+- It also includes materially game-changing effects such as No Bust, Imminent Blackjack, Dealer's Hesitation, dealer happiness interactions, Lucky Coin style reversals, free-hand effects, and durability consumption.
+- That is a good improvement over a naive bot.
+- However, it still uses a simplified rule table and hand-authored logic rather than a game-specific EV engine.
+
+Why this matters:
+- "Optimal" in this game is not just standard blackjack basic strategy.
+- The game has custom items, flasks, durability costs, insurance variants, fake cash, dealer-state effects, and progression pressure.
+- A static rules table will miss EV shifts introduced by those systems.
+
+Actionable fix:
+- Build a game-specific blackjack evaluator.
+- For a given state, estimate EV for hit, stand, double, split, surrender, insurance, peek, and replay.
+- Include item effects, durability cost, free-hand effects, and reserve pressure.
+- If exact calculation is too expensive, use Monte Carlo rollouts from the current hand state.
+
+6. Medium: Postmortem medical analysis exists, but the learning loop is incomplete
+What I see:
+- tools/autotest.py reports doctor_missed and has a useful doctor_likely_saveable heuristic.
+- The 300-run report shows doctor_missed=78.
+- The real game now has a much wider illness/injury space in story/events_illness.py than the harness-level review alone revealed.
+- That means triage quality is even more central to optimal play than the original audit suggested.
+
+Why this matters:
+- This is useful telemetry, but it is still mostly retrospective.
+- The policy is not converting enough of that evidence into prevention.
+
+Actionable fix:
+- Promote postmortem categories into explicit policy test cases.
+- Build a replay suite of saveable deaths.
+- For each one, assert that the policy now routes to doctor or witch instead of gambling again.
+- Track "saveable death rate" as a top-line metric.
+
+7. Medium: Unlock-to-visit conversion is weak, which suggests strategy dead zones
+What I see:
+- Large mismatch between access and actual exploitation.
+- Example from the 300-run report:
+  marvin_access=120, marvin=8
+  loan unlocks are much higher than visits
+  upgrade and adventure usage are near zero
+- The actual route surface is also deeper than a generic "shop visit" label suggests. Marvin, pawn, loan shark, workbench, airport, and phone calls all have multi-step value chains after unlock.
+
+Why this matters:
+- The bot is paying the cost to unlock systems, but not reliably harvesting the reward.
+- That usually means destination policy is not stateful enough after unlock.
+
+Actionable fix:
+- Add per-system conversion dashboards:
+  map acquired -> marvin visited -> item bought -> item used -> survival delta
+  witch met -> witch visited -> flask bought -> flask consumed -> bankroll delta
+  car acquired -> mechanic progression -> upgrade purchased -> route expansion
+- Expand this to late-game systems too:
+  millionaire state -> airport/mechanic branch offered -> ending selected
+  tool kit acquired -> workbench visited -> part crafted/disassembled -> car reliability delta
+- Use these funnels to target the biggest drop-off.
+
+11. Medium: The harness does not model the full progression graph explicitly enough
+What I see:
+- Route choice in tools/quicktest.py is mostly heuristic and text-driven, but the real game has a concrete progression graph.
+- make_shop_list in lists.py controls which afternoon destinations even exist.
+- story/storylines.py and story/game_flow.py define hard prerequisites for major systems and endings.
+
+Why this matters:
+- Without an explicit model of prerequisites, the bot cannot reason cleanly about when it should save for a Car, push mechanic progression, chase map breadcrumbs, preserve health for rank unlocks, or convert a millionaire state into an ending.
+- The result is a bot that reacts to prompts rather than planning around the actual state machine.
+
+Actionable fix:
+- Add an explicit progression planner layer.
+- Represent major routes as stateful goals with prerequisites, costs, and expected payoff.
+- Example goals:
+  survive_to_next_day
+  acquire_car
+  unlock_marvin
+  unlock_witch
+  advance_mechanic_arc
+  reach_adventure_rank_gate
+  convert_millionaire_state_to_ending
+- Make routing and spending decisions subordinate to the current goal, instead of relying on flat heuristics alone.
+
+8. Medium: Report parsing is tightly coupled to human-readable text output
+What I see:
+- tools/autotest.py parses tools/test_out.txt with regexes against display text.
+
+Why this matters:
+- Formatting changes can break analytics even when gameplay is still correct.
+- Text logs are good for humans, but weak as the primary machine interface.
+
+Actionable fix:
+- Emit structured JSON alongside the existing text report.
+- Keep the text report for readability.
+- Have autotest consume JSON first and fall back to text only for backward compatibility.
+
+9. Medium: tools/test_gameplay.py is misleading and should not be trusted as evidence of optimal play
+What I see:
+- It says it simulates optimal gameplay, but the core round body does not actually drive a real blackjack round.
+- It logs before/after balance and comments that the round logic "would need to be adapted based on actual game interface."
+
+Why this matters:
+- This file overclaims what it tests.
+- It will mislead future maintainers and can create false confidence.
+
+Actionable fix:
+- Either delete it, rename it to prototype_gameplay_stub.py, or wire it to the real quicktest/autoplay hooks.
+- Do not describe it as optimal gameplay until it is actually exercising the real game loop.
+
+10. Low-Medium: Global monkey-patching and shared globals make the harness harder to evolve safely
+What I see:
+- tools/quicktest.py monkey-patches blackjack runtime methods and relies on globals like CURRENT_PLAYER, RECENT_TEXT, LAST_INPUT_FINGERPRINT, and counters.
+
+Why this matters:
+- This creates hidden coupling and makes parallelism, isolated testing, and reuse harder.
+- It also increases the odds of state leakage between scenarios.
+
+Actionable fix:
+- Move runtime behavior behind a test adapter object.
+- Inject policy and IO adapters instead of mutating module-level state where possible.
+- Wrap each run in a stateful class instance instead of process-wide globals.
+
+What this system already does well
+- Good batch reporting and seed-based reproducibility.
+- Strong coverage-oriented telemetry for shops, mechanics, items, event polarity, and medical cohorts.
+- Useful postmortem analysis for doctor misses and no-car runs.
+- Better-than-naive blackjack automation: split, surrender, insurance, peek, replay, and several item-aware choices are all considered.
+- Good use of cumulative output files instead of generating many throwaway reports.
+
+Most important next steps
+1. Separate UI parsing from decision semantics.
+2. Replace heuristic-only blackjack choices with EV-based evaluation.
+3. Refactor quicktest into smaller policy modules with explicit reason tracing.
+4. Turn doctor_missed, unlock conversion, and progression funnels into regression gates.
+5. Remove or rename misleading tools like tools/test_gameplay.py.
+
+Practical scorecard
+- Reporting quality: strong
+- Reproducibility: strong
+- Completeness of game understanding in the current policy: weak to moderate
+- Maintainability: weak to moderate
+- True gameplay optimality: weak
+- Regression-detection value: high
+
+Final verdict
+- Keep autotest.
+- Trust it as a measurement harness.
+- Do not trust the current autoplay to represent near-optimal play.
+- The highest-value engineering investment is not more ad-hoc heuristics. It is a cleaner decision interface plus EV-driven policy evaluation.
+
+================================================================================
+MARCH 11 DELTA — AUTOPLAY TUNING CHECKPOINT
+================================================================================
+Date: 2026-03-11
+
+Scope of this delta
+- Focused only on the recent fixed-seed autoplay tuning loop, not on the broader architectural review above.
+- Validation baseline used throughout this round: python tools/autotest.py 60 1 20
+- Regression suite status at checkpoint: python tools/run_autoplay_scenarios.py -> 38/38 passing
+
+Checkpoint summary
+- Current validated slice:
+  alive=14/20
+  died=6/20
+  broke=9/20
+  car=11/20
+  ever_car=11/20
+  location=15/20
+  rank1+=6/20
+  doctor_missed=0/20
+- This is materially better than the earlier March 10 broad audit baseline, but it is still far from optimal.
+- The main progress came from fixing early avoidable failures, not from solving late-game planning.
+
+Validated changes now in the repo
+1. Night-event one-off enforcement
+- Drowning Dream is now enforced as a one-off in lists.py at night-event selection time.
+- Reason: rank-based night pools are prebuilt during Lists initialization, so pool-construction-only filtering was insufficient.
+- Outcome: repeated Drowning Dream pressure dropped without needing brittle per-pool edits.
+
+2. Robbery choice policy fix
+- tools/autoplay/policies/event_policy.py now prefers hide over comply for the normalized robbery branch ['comply', 'hide', 'hero'].
+- Scenario coverage: gas_station_robbery_prefers_hide.
+- Outcome: the repeated early hostage-gun death cluster was removed from the fixed slice.
+
+3. Conservative sub-$200 no-car betting
+- tools/autoplay/policies/blackjack_policy.py was retuned so no-car states below $200 are conservative by default.
+- The broad pre-Tom push was narrowed to the $170-$199 band when doctor pressure is absent.
+- The mechanic threshold push is narrow and intentional instead of broadly aggressive.
+- Sub-$160 no-car states now stall more often instead of forcing rush behavior.
+- early_caution was corrected from aggressive clamps to conservative clamps.
+- This remains the highest-value autoplay improvement from the March 11 tuning cycle.
+
+4. Narrow route-layer no-car recovery bypass
+- tools/quicktest.py retains a small route exception for mild no-car recovery-day clutter so progression is not blocked by non-urgent status stacks.
+- This is scenario-covered, but it did not materially move the fixed 1-20 slice on its own.
+
+Current fixed-slice shape
+- Surviving seeds: 1, 6, 10, 15, 18 plus additional broke/alive long-tail runs that do not die within the 60-cycle window.
+- Broke seeds: 2, 3, 4, 5, 7, 8, 16, 17, 20
+- Death seeds: 9, 11, 12, 13, 14, 19
+- The remaining failures are no longer dominated by one obvious bad autoplay branch.
+
+What the remaining failures appear to be
+1. Genuine medical cascades
+- Several failures now come from real injury/illness spirals rather than obviously bad betting.
+- The fixed slice shows heavy route interruption pressure: recovery_day=152, urgent_medical=65, medical_stabilization=40.
+- doctor_missed is now 0/20, which is important: the bot is no longer simply ignoring obvious treatment needs.
+
+2. Early no-car economic dead runs
+- No-car review still shows 9/20 runs ending without durable progression.
+- Four of those no-car failures happen by day 10.
+- In the bad no-car cohort, the player usually never reaches the first mechanic threshold at all rather than reaching it and refusing it.
+
+3. Benchmark-active loss branches that still matter
+- The current 1-20 Event Economy output identifies several expensive branches worth future targeted review:
+  storyline:dealer_past:stage2 total=-1849 avg=-205.4 hits=9
+  day:binocular_scope_discovery total=-1518 avg=-505.9 hits=3
+  storyline:phil:stage3 total=-628 avg=-125.6 hits=5
+  storyline:kyle:stage4 total=-467 avg=-51.9 hits=9
+- These are better targets for surgical tuning than broad bankroll softening.
+
+Failed experiments that were tested and reverted
+1. Removing Broken Wrist from severe doctor gating
+- This regressed the fixed slice by converting seed 6 from ok to broke.
+- Conclusion: doctor severity relaxations are very easy to over-loosen.
+
+2. Softening low-bankroll flat_tire and lost_wallet losses
+- This looked attractive for early-economy relief but regressed the slice by converting seed 4 from early broke into later untreated-wounds death.
+- Conclusion: direct early-random-economy relief can just delay collapse into worse downstream medical failures.
+
+3. Broader medical / Tom-buffer experiments
+- Multiple broader route or mechanic-buffer experiments were explored and not kept because they reduced overall benchmark quality or shifted failures instead of reducing them.
+
+Practical conclusion from the March 11 tuning cycle
+- The current checkpoint is real and worth preserving.
+- The betting policy is no longer the main obvious problem below $200; the easy overbetting errors were largely removed.
+- The next improvements should be benchmark-specific and surgical:
+  - analyze seed 2 style doctor/recovery routing loops more narrowly
+  - analyze benchmark-active high-loss story branches instead of globally reducing random event costs
+  - avoid broad medical-threshold relaxation unless it is backed by fixed-seed proof
+
+Recommended next work from this checkpoint
+1. Add a small per-seed audit appendix for the still-bad fixed seeds, especially 2, 8, 19, and 20.
+2. Investigate whether dealer_past:stage2, binocular_scope_discovery, phil:stage3, or kyle:stage4 have benchmark-visible branches that can be made less punishing without flattening the game.
+3. Keep the fixed slice and scenario suite as hard regression gates for any further autoplay tuning.
+
+Per-seed appendix from the current checkpoint
+
+Seed 2: long no-car medical/recovery grind
+- Final state: broke on day 54, peak only $120, never had Car.
+- Injury/status stack at the end is severe: Broken Collarbone, Broken Leg, Broken Ribs, Broken Wrist, Fractured Spine, Severe Dehydration, Stomach Flu.
+- Route visibility shows 44 interrupts, almost all recovery_day, with acquire_car repeatedly blocked.
+- Interpretation: this is not primarily a bad-bet seed anymore. It is a long no-car recovery loop where the player never reaches the first mechanic threshold and keeps getting routed back into medical stabilization.
+
+Seed 8: exact-threshold car conversion that still zeroes out
+- Final state: broke on day 8, but this run does acquire Car.
+- Peak is $188 on day 7, then the mechanic interaction on day 8 converts that run into Car ownership and immediate $0.
+- Mechanic intro records Tom accepted at the $200 threshold.
+- Interpretation: seed 8 is no longer evidence of pure no-car stagnation. It is a thin-margin exact-threshold mechanic conversion that leaves no reserve. This is a narrower problem than the old broad sub-$200 betting issue.
+
+Seed 19: reaches the mechanic threshold, then dies before conversion matters
+- Final state: dead on day 13, peak exactly $200, no Car, cause: Drowned in your car. Some nightmares are real.
+- Route visibility still shows recovery_day interruptions and suppressed acquire_car goals, but the key fact is that the run does reach the first mechanic threshold.
+- The terminal event chain is not bankruptcy-first; it is a Betsy injury plus Flu/Ringworm pressure followed by Drowning Dream.
+- Interpretation: seed 19 is now more of a benchmark-active fatal-event/medical timing case than a simple bankroll-failure case.
+
+Seed 20: late no-car medical trap with repeated urgent-doctor routing
+- Final state: broke on day 50, peak $179 on day 34, never had Car.
+- Injury/status stack is heavy but survivable for a long time: Broken Leg, Deep Laceration, Fractured Spine, Scraped Knee, Possible Rabies, Shellfish Poisoning.
+- Route visibility shows 25 interrupts and 23 suppressed routes, dominated by urgent_medical=16 and recovery_day=9.
+- Interpretation: this seed is the clearest example of a long doctor-heavy no-car stall. The autoplay is no longer missing the doctor; it is trapped in treatment and never converts the run into mechanic progress.
+
+Appendix takeaway
+- The current remaining failures are not one homogeneous class.
+- Seed 2 and seed 20 are route-pressure / medical-lock economy failures.
+- Seed 8 is a thin-reserve mechanic-conversion bankruptcy.
+- Seed 19 is a threshold-reaching run that is still vulnerable to a benchmark-active fatal event chain.
+- That distribution reinforces the main conclusion of this audit delta: broad betting relaxations or broad early-economy nerfs are unlikely to help much from here. The next changes should be seed-specific, route-specific, or branch-specific.
+
+Hard regression gates for any further tuning
+- Keep `tools/run_autoplay_scenarios.py` at 38/38 passing before accepting any new autoplay change.
+- Keep the fixed benchmark slice at `tools/autotest.py 60 1 20` and treat the current March 11 checkpoint (`alive=14/20`, `died=6/20`, `broke=9/20`, `car=11/20`, `doctor_missed=0/20`) as the floor to defend.
+- Reject any candidate change that improves one seed family by reintroducing doctor misses, early robbery deaths, or repeated Drowning Dream behavior.
+- Prefer branch-specific edits plus seed rechecks over broad betting, doctor-threshold, or generic event-economy relaxations.
+
+Concrete source touchpoints for the current expensive branches
+
+1. `storyline:dealer_past:stage2`
+- Trigger/gating lives in `story/storylines.py` under the `dealer_past` dispatch: stage 0 starts once day >= 15 and total blackjack hands >= 30.
+- The expensive benchmark branch called out by autotest corresponds to the later Dealer Past arc, especially the sequence implemented by `storyline_dealer_journal`, `storyline_dealer_question`, `storyline_dealer_answer`, and `storyline_dealer_choice` in `story/storylines.py`.
+- Audit implication: this is not a generic economy problem. It is a specific late narrative branch with benchmark-visible downside, so future tuning should inspect the cash / survival consequences inside those story functions rather than loosening global betting rules.
+
+2. `day:binocular_scope_discovery`
+- Implementation lives in `story/events_day_items.py` as `binocular_scope_discovery`.
+- The branch is highly swingy by construction: one roll yields direct cash, one avoids danger, one is neutral exploration, one creates a rescue decision with optional reward, and one is flavor-only.
+- Audit implication: because the benchmark reports only three hits but a very large negative average, this looks like a narrow high-volatility branch worth direct review inside that function rather than a systemic autoplay planner failure.
+
+3. `storyline:phil:stage3`
+- Phil is a pool-backed storyline arc, not a standalone wrapper chain like Kyle or Dealer Past.
+- Trigger/gating lives in `story/storylines.py`, where the `phil` storyline dispatch maps to four existing player methods: `interrogation`, `further_interrogation`, `even_further_interrogation`, and `final_interrogation`.
+- Those implementations are split across `story/events_day_people.py`, `story/events_day_casino.py`, and `story/events_day_wealth.py`.
+- Audit implication: any future Phil tuning has to inspect both storyline progression and the specific event-method outcomes, because the branch cost is distributed across multiple event files rather than isolated in one storyline wrapper.
+
+4. `storyline:kyle:stage4`
+- Trigger/gating lives in `story/storylines.py`, where Kyle starts at day >= 5 and then advances through the standalone functions `storyline_kyle_regular`, `storyline_kyle_problem`, `storyline_kyle_after_hours`, `storyline_kyle_secret`, and `storyline_kyle_finale`.
+- The benchmark-active late loss is therefore localized to the Kyle wrapper chain in `story/storylines.py`, not spread across the random day-event pool.
+- Audit implication: this is one of the cleanest branch-specific tuning targets left, because the whole arc is centralized and the late-stage cost can be inspected without touching broader route or betting logic.
+
+Source-mapping takeaway
+- The remaining expensive branches are split across two distinct architectures: centralized standalone arcs (`dealer_past`, `kyle`) and pool-backed player methods (`phil`), with `binocular_scope_discovery` as a single standalone day-item event.
+- That means future audit work should be organized by code ownership, not just by benchmark label.
+- In practice: Kyle and Dealer Past can be tuned in `story/storylines.py`; Binocular Scope can be tuned in `story/events_day_items.py`; Phil requires coordinated review across the storyline dispatcher and the underlying event-method files.
+
+Additional fatal-seed appendix from the current checkpoint
+
+Seed 13: early fatal medical cascade before any real progression
+- Final state: dead on day 8, peak only $141 on day 5, never had Car.
+- The run opens with immediate physical damage: Broken Hand and Broken Nose on day 2, then Deep Laceration on day 4, then Drowning Dream on day 7, then a doctor visit on day 8.
+- Route visibility shows only interrupts, not suppression-heavy late-game routing: recovery_day=6 and urgent_medical=1, with acquire_car blocked throughout.
+- Planner traces show the bot already in `survive_emergency` mode by the final cycle and correctly taking the urgent medical override to the Doctor's Office.
+- Interpretation: seed 13 is strong evidence that some remaining deaths are not betting mistakes and not doctor-miss mistakes. This run is an early stacked-injury spiral that kills the player even though the planner does switch into emergency behavior.
+
+Seed 14: post-car fatal branch after successful early conversion
+- Final state: dead on day 43, peak $148 on day 18, does acquire Car on day 19 and later unlocks Worn Map, Witch, Grimy Gus, and Vinnie.
+- Unlike seed 13, this run clears the first mechanic threshold cleanly and enters the pawn-shop / route-progression phase for a long stretch.
+- Route visibility shows a mixed late-game profile: applied=20, interrupt=16, suppressed=5, dominated by recovery_day=14 rather than pure no-car suppression.
+- The terminal cause is not simple bankruptcy or untreated injuries: the run dies on `day:carbon_monoxide` after an extended post-car storyline sequence including `kyle:stage3`, `dr_feelgood:stage4`, and repeated `betsy:stage1` pressure.
+- Interpretation: seed 14 is the mirror image of seed 13. It is not an early bootstrap failure at all; it is a late post-car fatal branch. That makes it a good candidate for branch-level audit work, especially around benchmark-active late-day events, rather than for any broad early-economy adjustment.
+
+Fatal-seed takeaway
+- Seed 13 and seed 14 reinforce the same structural conclusion as the broke-seed appendix: the remaining failures are heterogeneous.
+- Seed 13 is an early emergency-medicine death before progression ever stabilizes.
+- Seed 14 is a later post-car fatal event chain after the run has already converted into the broader route economy.
+- That means future autoplay tuning should keep treating early no-car stalls, thin-reserve mechanic conversions, and post-car fatal branches as separate failure classes in the audit.
+
+Post-car fatal branch note: seed 14 and carbon monoxide
+- The terminal seed-14 death is not coming from the Betsy arc itself. The actual kill event is `carbon_monoxide` in `story/events_day_dark.py`.
+- That event is part of the general poor-tier deadly day pool in `lists.py`, not a one-off storyline-only branch. In other words, this is a benchmark-active lethal random event that can still hit post-car runs.
+- The event body itself is structurally high variance: 50% severe survival, 30% rescue / hospital outcome, 20% direct death.
+- On survival it adds `Damaged Exhaust`, which then feeds into a separate conditional repair / relapse chain in `story/events_day_survival.py` via `damaged_exhaust_fixed` and `damaged_exhaust_again`.
+- Seed 14 dies on the front-door carbon monoxide event before that follow-up chain matters, so the audit should classify it as an immediate lethal pool hit rather than a slow exhaust-maintenance failure.
+
+Post-car fatal branch note: seed 14 and surrounding pressure
+- `car_battery_dead` is present in the same broad survival pool and shows up in seed 14 before the final death, but its implementation is a nuisance / resource drain branch, not a direct killer.
+- The repeated `betsy:stage1` pressure in this seed should be read as surrounding run pressure, not as the literal kill source. The Betsy arc's next concrete event implementation lives in `story/events_day_animals.py` as `starving_cow`, while the actual death string for this seed comes from `carbon_monoxide`.
+- Practical implication: if seed 14 becomes a future tuning target, the first audit pass should inspect whether post-car runs are overexposed to poor-tier deadly day events after route conversion, rather than trying to solve the death by weakening Betsy or mechanic policy globally.
+
+Early fatal branch note: seed 13 and cumulative injury damage
+- Seed 13 is not killed by one bespoke story event. Its death string comes from the generic damage path in `story/player_core.py`, where `hurt()` kills the player with `You have succumbed to your wounds.` once health is driven to zero.
+- The meaningful source events in the seed are early stacked injury producers: `bar_fight_aftermath` in `story/events_illness.py` adds Broken Nose and Broken Hand with a 25-damage hit, `kitchen_accident` in the same file adds Deep Laceration with another 15-damage hit, and `drowning_dream` in `story/events_day_dark.py` adds a large additional health / sanity collapse.
+- `rock_bottom` also appears in the seed log, but its implementation in `story/events_day_numbers.py` is actually a modest recovery / resolve event, not a killer.
+- Practical implication: seed 13 should be classified as an early cumulative-injury death spiral from general pool events plus Drowning Dream pressure. The planner does reach urgent medical routing, but only after the health budget is already too thin.
+
+Thin-reserve mechanic conversion note: seed 8 and Tom's exact-threshold offer
+- Seed 8's current checkpoint behavior is mechanically precise, not vague bad luck. The mechanics storyline in `story/storylines.py` does not even surface until balance >= 200.
+- Once that gate is crossed, stage 0 dispatches to Tom first. Tom's implementation in `story/mechanics_intro.py` rolls a repair price from `[150, 200, 250, 300, 350]` and, on acceptance, immediately subtracts the full repair price and adds `Car`.
+- The seed-8 artifact shows the narrow version of that interaction: the run peaks at $188 on day 7, enters day 8 at exactly the mechanic threshold, gets a $200 Tom offer, accepts it, gains `Car`, and lands at $0.
+- Practical implication: seed 8 is best understood as a thin-reserve exact-threshold mechanic conversion created by the interaction between the storyline gate and Tom's offer ladder. It is not the same class as seed 2 / seed 20 no-car stalls, and it is not a post-car fatal-branch problem like seed 14.
+
+Refined taxonomy takeaway
+- The audit can now point to three distinct root-cause families with source grounding.
+- Seed 13 style failures are early cumulative-injury deaths driven by stacked damage events and a health floor that is already gone before treatment stabilizes.
+- Seed 8 style failures are exact-threshold mechanic conversions where the car is obtained but no reserve survives the purchase.
+- Seed 14 style failures are later post-car runs that still die to benchmark-active lethal day-pool branches.
+- That source-level taxonomy is the main reason broad policy changes are a poor next move from this checkpoint.
+
+Post-audit winner checkpoint: carbon monoxide first-exposure tuning
+- A narrow follow-up change was applied in `story/events_day_dark.py` to `carbon_monoxide`.
+- The first tuning pass removed the branch's arbitrary first-hit instant-death outcome and pushed lethal risk into the existing `Damaged Exhaust` chain.
+- That was directionally correct but incomplete: seed 14 stopped dying and instead degraded into a late doctor-and-broke spiral.
+- The winning second pass kept the first-hit survival behavior but reduced only the fallback first-exposure penalties enough to avoid automatically forcing a late emergency-medical collapse.
+- The repeat-exposure risk remains lethal, and the repair / relapse follow-up in `story/events_day_survival.py` still matters.
+
+Validated winner metrics
+- Regression suite remained green: `tools/run_autoplay_scenarios.py` -> 38/38 passing.
+- Fixed benchmark slice improved from the prior defended floor of `alive=14/20`, `died=6/20`, `broke=9/20`, `rank1+=6/20` to:
+  `alive=15/20`, `died=5/20`, `broke=9/20`, `rank1+=7/20`, `doctor_missed=0/20`.
+- This is the first March 11 follow-up change that strictly beats the defended checkpoint instead of merely shifting one failure bucket into another.
+
+Seed-14 outcome after the winning pass
+- Seed 14 no longer dies to `day:carbon_monoxide` and no longer degrades into a broke state at day 49.
+- It now survives the full 60-cycle slice and finishes as an alive run on day 61 with `$117`, peak `$1500`, `Car`, `Worn Map`, and the usual post-car unlock chain intact.
+- Practical implication: the carbon monoxide branch is still severe, but it now behaves like a survivable hazard on first exposure and a real maintenance / repeat-risk problem after that, which matches the existing `Damaged Exhaust` system better than the previous flat death spike.
+
+Next defended bottleneck: money conversion beyond rank 1
+- The new checkpoint is better on survival and slightly better on progression (`rank1+=7/20`), but it still does a poor job converting post-car survival into higher-rank money growth.
+- The fixed slice now shows `marvin_access=10/20`, `worn_map=10/20`, and the usual unlock chain online, but actual visits remain `marvin=0/20`, `adventure=0/20`, `airport=0/20`, and `wins=0/20`.
+- Goal telemetry points in the same direction: `push_next_rank=1401` requests is high, but that goal is still blocked `263` times, while `cashout_pawn_inventory=694` remains one of the dominant applied late-game goals.
+- Shop telemetry also shows a conversion gap rather than a pure unlock gap: `Pawn Shop` is visited in `4/20` runs with `76` total visits, while `Marvin` is unlocked in `10/20` runs and visited in `0/20`.
+- Practical implication: the next tuning phase should treat the current carbon-monoxide checkpoint as locked and focus on post-car bankroll conversion, especially the handoff from pawn-shop churn into rank-pushing, Marvin capture, or other late-game money routes.
