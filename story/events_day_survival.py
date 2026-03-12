@@ -1722,8 +1722,13 @@ class DaySurvivalMixin:
             print("\n")
             type.type("You watch a trash can blow down the street like a tumbleweed. Nature is angry today.")
         print("\n")
-        if self.has_item("Umbrella") or self.has_item("Poncho"):
-            gear = "Poncho" if self.has_item("Poncho") else "Umbrella"
+        if self.has_item("Umbrella") or self.has_item("Poncho") or self.has_item("Plastic Poncho"):
+            if self.has_item("Poncho"):
+                gear = "Poncho"
+            elif self.has_item("Plastic Poncho"):
+                gear = "Plastic Poncho"
+            else:
+                gear = "Umbrella"
             type.type("Good thing you've got that " + magenta(bright(gear)) + ". You're not letting a little apocalyptic weather ruin your plans.")
             print("\n")
             type.type("You suit up, step out into the deluge, and walk to the casino like a soggy but determined lunatic.")

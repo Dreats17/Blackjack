@@ -828,6 +828,14 @@ class Lists:
             "Hand Warmers": 3,
             "Rubber Bands": 1,
             "Breath Mints": 1,
+            "Matches": 1,
+            "Birdseed": 1,
+            "Bread": 1,
+            "Cheese": 1,
+            "Baking Soda": 1,
+            "Battery Terminal Cleaner": 3,
+            "Cheap Sunscreen": 2,
+            "Premium Sunscreen": 6,
             
             # Car Items
             "Jumper Cables": 20,
@@ -3292,7 +3300,8 @@ class Lists:
         food_items = [
             ("Candy Bar", 5), ("Bag of Chips", 8), ("Turkey Sandwich", 15),
             ("Energy Drink", 12), ("Beef Jerky", 10), ("Cup Noodles", 7),
-            ("Granola Bar", 6), ("Hot Dog", 8), ("Microwave Burrito", 9)
+            ("Granola Bar", 6), ("Hot Dog", 8), ("Microwave Burrito", 9),
+            ("Cheese", 4), ("Bread", 3),
         ]
         random.shuffle(food_items)
         for i in range(min(3, len(food_items))):  # 3 random food items
@@ -3342,6 +3351,12 @@ class Lists:
                 a_list.append(("Rubber Bands", 2))
             if random.randrange(6) == 0 and not self.__player.has_item("Worn Map"):
                 a_list.append(("Worn Map", 8))
+            if random.randrange(4) == 0 and not self.__player.has_item("Matches"):
+                a_list.append(("Matches", 2))
+            if random.randrange(4) == 0 and not self.__player.has_item("Birdseed"):
+                a_list.append(("Birdseed", 4))
+            if random.randrange(5) == 0 and not self.__player.has_item("Baking Soda"):
+                a_list.append(("Baking Soda", 3))
         
         # === RANK 1 (Cheap): More options ===
         if rank == 1:
@@ -3361,6 +3376,10 @@ class Lists:
                 a_list.append(("Air Freshener", 7))
             if random.randrange(5) == 0 and not self.__player.has_item("Dog Whistle"):
                 a_list.append(("Dog Whistle", 22))
+            if random.randrange(4) == 0 and not self.__player.has_item("Premium Sunscreen"):
+                a_list.append(("Premium Sunscreen", 18))
+            if random.randrange(5) == 0 and not self.__player.has_item("Battery Terminal Cleaner"):
+                a_list.append(("Battery Terminal Cleaner", 10))
         
         # === RANK 2 (Modest): Quality items ===
         if rank == 2:

@@ -295,7 +295,7 @@ class DayAnimalsMixin:
             type.type("You've been adopted by a squirrel. You decide to call it " + cyan(bright("Squirrelly")) + ".")
             print("\n")
             type.type("Squirrelly will ride around in your car now, hiding acorns in increasingly creative places.")
-            self.add_item("Squirrelly")
+            self.add_item("Squirrely")
             self.add_companion("Squirrelly", "Squirrel")
             self.increment_statistic("companions_befriended")
             self.unlock_achievement("first_friend")
@@ -824,8 +824,13 @@ class DayAnimalsMixin:
         print("\n")
         type.type("Most rats run away. This one stays, twitching its whiskers.")
         print("\n")
-        if self.has_item("Cheese") or self.has_item("Sandwich"):
-            item = "Cheese" if self.has_item("Cheese") else "Sandwich"
+        if self.has_item("Cheese") or self.has_item("Sandwich") or self.has_item("Turkey Sandwich"):
+            if self.has_item("Cheese"):
+                item = "Cheese"
+            elif self.has_item("Turkey Sandwich"):
+                item = "Turkey Sandwich"
+            else:
+                item = "Sandwich"
             answer = ask.yes_or_no("Offer it some food? ")
             if answer == "yes":
                 type.type("You toss a bit of " + item + " near the drain. The rat grabs it and disappears.")
