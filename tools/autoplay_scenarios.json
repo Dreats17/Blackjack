@@ -167,10 +167,10 @@
       },
       {
         "details": {
-          "bet": 5500,
+          "bet": 5000,
           "goal": "blend_fraudulent_cash_safely",
           "trace_metadata": {
-            "max_ratio": 0.7,
+            "max_ratio": 0.36,
             "mechanic_gap": 0,
             "mechanic_threshold_push_window": false,
             "pending_marvin_active": false,
@@ -184,14 +184,14 @@
               }
             },
             "pressure_bet": 0,
-            "ratio": 0.3,
+            "ratio": 0.24,
             "store_budget": 0
           },
           "trace_reason": "goal=blend_fraudulent_cash_safely blackjack_bet phase=car_ready survival=False edge=6"
         },
         "passed": true,
         "scenario_id": "fraudulent_cash_blend_case",
-        "summary": "bet=5500 balance=4000"
+        "summary": "bet=5000 balance=4000"
       },
       {
         "details": {
@@ -223,10 +223,10 @@
       },
       {
         "details": {
-          "bet": 680,
+          "bet": 540,
           "goal": "push_next_rank",
           "trace_metadata": {
-            "max_ratio": 0.78,
+            "max_ratio": 0.36,
             "mechanic_gap": 0,
             "mechanic_threshold_push_window": false,
             "pending_marvin_active": false,
@@ -240,14 +240,14 @@
               }
             },
             "pressure_bet": 0,
-            "ratio": 0.34,
+            "ratio": 0.24,
             "store_budget": 0
           },
           "trace_reason": "goal=push_next_rank blackjack_bet phase=car_ready survival=False edge=4"
         },
         "passed": true,
         "scenario_id": "post_car_midgame_growth_window_pushes_harder",
-        "summary": "bet=680 min_bet=600"
+        "summary": "bet=540 min_bet=540"
       }
     ],
     "event_inline": [
@@ -305,6 +305,17 @@
         "passed": true,
         "scenario_id": "inline_pet_feed_uses_tuna",
         "summary": "choice=feed expected=feed"
+      },
+      {
+        "details": {
+          "choice": "3",
+          "expected": "3",
+          "goal": "preserve_companion_roster",
+          "trace_reason": "hungry_companions_gate"
+        },
+        "passed": true,
+        "scenario_id": "companion_hungry_runaway_risk_buys_food",
+        "summary": "choice=3 expected=3"
       }
     ],
     "event_option": [
@@ -351,6 +362,28 @@
         "passed": true,
         "scenario_id": "gas_station_robbery_prefers_hide",
         "summary": "choice=hide expected=hide"
+      },
+      {
+        "details": {
+          "choice": "Visit Tom's Trusty Trucks and Tires",
+          "expected": "Visit Tom's Trusty Trucks and Tires",
+          "goal": "convert_millionaire_to_ending",
+          "trace_reason": "millionaire_mechanic_ending:Tom"
+        },
+        "passed": true,
+        "scenario_id": "millionaire_afternoon_prefers_mechanic_ending",
+        "summary": "choice=Visit Tom's Trusty Trucks and Tires expected=Visit Tom's Trusty Trucks and Tires"
+      },
+      {
+        "details": {
+          "choice": "Drive to the Airport",
+          "expected": "Drive to the Airport",
+          "goal": "convert_millionaire_to_ending",
+          "trace_reason": "generic_non_risky_choice"
+        },
+        "passed": true,
+        "scenario_id": "millionaire_afternoon_airport_when_no_mechanic",
+        "summary": "choice=Drive to the Airport expected=Drive to the Airport"
       }
     ],
     "event_yes_no": [
@@ -385,6 +418,50 @@
         },
         "passed": true,
         "scenario_id": "cupcake_sanity_gate",
+        "summary": "answer=yes expected=yes"
+      },
+      {
+        "details": {
+          "answer": "yes",
+          "expected": "yes",
+          "goal": "push_next_rank",
+          "trace_reason": "gift_wrap_happiness_gate"
+        },
+        "passed": true,
+        "scenario_id": "gift_wrap_accepted_when_dealer_sad",
+        "summary": "answer=yes expected=yes"
+      },
+      {
+        "details": {
+          "answer": "no",
+          "expected": "no",
+          "goal": "push_next_rank",
+          "trace_reason": "gift_wrap_happiness_gate"
+        },
+        "passed": true,
+        "scenario_id": "gift_wrap_declined_when_dealer_happy",
+        "summary": "answer=no expected=no"
+      },
+      {
+        "details": {
+          "answer": "no",
+          "expected": "no",
+          "goal": "survive_emergency",
+          "trace_reason": "gift_wrap_happiness_gate"
+        },
+        "passed": true,
+        "scenario_id": "gift_wrap_declined_in_emergency",
+        "summary": "answer=no expected=no"
+      },
+      {
+        "details": {
+          "answer": "yes",
+          "expected": "yes",
+          "goal": "push_next_rank",
+          "trace_reason": "workbench_craft_confirm"
+        },
+        "passed": true,
+        "scenario_id": "workbench_craft_confirm_says_yes",
         "summary": "answer=yes expected=yes"
       }
     ],
@@ -544,29 +621,29 @@
         "details": {
           "balance": 160,
           "day": 10,
-          "expected": "Trusty Tom's Trucks and Tires",
+          "expected": "Stay Home",
           "health": 54,
           "injuries": [
             "Scraped Knee"
           ],
-          "route": "Trusty Tom's Trucks and Tires",
+          "route": "Stay Home",
           "sanity": 45,
           "statuses": []
         },
         "passed": true,
         "scenario_id": "recovery_day_no_car_mechanic_bypass_route",
-        "summary": "route=Trusty Tom's Trucks and Tires expected=Trusty Tom's Trucks and Tires"
+        "summary": "route=Stay Home expected=Stay Home"
       },
       {
         "details": {
           "balance": 190,
           "day": 10,
-          "expected": "Trusty Tom's Trucks and Tires",
+          "expected": "Stay Home",
           "health": 58,
           "injuries": [
             "Broken Leg"
           ],
-          "route": "Trusty Tom's Trucks and Tires",
+          "route": "Stay Home",
           "sanity": 42,
           "statuses": [
             "Flu",
@@ -576,24 +653,24 @@
         },
         "passed": true,
         "scenario_id": "recovery_day_no_car_mild_status_stack_bypass_route",
-        "summary": "route=Trusty Tom's Trucks and Tires expected=Trusty Tom's Trucks and Tires"
+        "summary": "route=Stay Home expected=Stay Home"
       },
       {
         "details": {
           "balance": 300,
           "day": 10,
-          "expected": "Trusty Tom's Trucks and Tires",
+          "expected": "Doctor's Office",
           "health": 50,
           "injuries": [
             "Broken Leg"
           ],
-          "route": "Trusty Tom's Trucks and Tires",
+          "route": "Doctor's Office",
           "sanity": 45,
           "statuses": []
         },
         "passed": true,
         "scenario_id": "no_car_progression_defers_nonurgent_doctor_route",
-        "summary": "route=Trusty Tom's Trucks and Tires expected=Trusty Tom's Trucks and Tires"
+        "summary": "route=Doctor's Office expected=Doctor's Office"
       },
       {
         "details": {
@@ -611,6 +688,66 @@
         "passed": true,
         "scenario_id": "car_injury_doctor_preempts_progression",
         "summary": "route=Doctor's Office expected=Doctor's Office"
+      },
+      {
+        "details": {
+          "balance": 1800,
+          "day": 22,
+          "expected": "Car Workbench",
+          "health": 80,
+          "injuries": [],
+          "route": "Car Workbench",
+          "sanity": 55,
+          "statuses": []
+        },
+        "passed": true,
+        "scenario_id": "workbench_craft_route_fires_when_ingredients_ready",
+        "summary": "route=Car Workbench expected=Car Workbench"
+      },
+      {
+        "details": {
+          "balance": 700,
+          "day": 15,
+          "expected": "Convenience Store",
+          "health": 82,
+          "injuries": [],
+          "route": "Convenience Store",
+          "sanity": 60,
+          "statuses": []
+        },
+        "passed": true,
+        "scenario_id": "crafting_ingredient_completing_boost_triggers_store",
+        "summary": "route=Convenience Store expected=Convenience Store"
+      },
+      {
+        "details": {
+          "balance": 700,
+          "day": 15,
+          "expected": "Convenience Store",
+          "health": 82,
+          "injuries": [],
+          "route": "Convenience Store",
+          "sanity": 60,
+          "statuses": []
+        },
+        "passed": true,
+        "scenario_id": "crafting_ingredient_starting_boost_triggers_store",
+        "summary": "route=Convenience Store expected=Convenience Store"
+      },
+      {
+        "details": {
+          "balance": 15000,
+          "day": 25,
+          "expected": "Witch Doctor's Tower",
+          "health": 80,
+          "injuries": [],
+          "route": "Witch Doctor's Tower",
+          "sanity": 55,
+          "statuses": []
+        },
+        "passed": true,
+        "scenario_id": "witch_flask_only_run_fires_when_healthy_and_affordable",
+        "summary": "route=Witch Doctor's Tower expected=Witch Doctor's Tower"
       }
     ],
     "state_goal": [
@@ -622,6 +759,7 @@
           "opportunity_flags": {
             "can_advance_mechanic_arc": false,
             "can_adventure_safely": false,
+            "can_borrow_to_bootstrap": false,
             "can_cashout_pawn_inventory": false,
             "can_contain_debt_escalation": false,
             "can_convert_millionaire_to_ending": false,
@@ -649,6 +787,7 @@
           "opportunity_flags": {
             "can_advance_mechanic_arc": false,
             "can_adventure_safely": false,
+            "can_borrow_to_bootstrap": false,
             "can_cashout_pawn_inventory": false,
             "can_contain_debt_escalation": false,
             "can_convert_millionaire_to_ending": false,
@@ -679,6 +818,7 @@
           "opportunity_flags": {
             "can_advance_mechanic_arc": false,
             "can_adventure_safely": false,
+            "can_borrow_to_bootstrap": false,
             "can_cashout_pawn_inventory": false,
             "can_contain_debt_escalation": false,
             "can_convert_millionaire_to_ending": false,
@@ -706,6 +846,7 @@
           "opportunity_flags": {
             "can_advance_mechanic_arc": false,
             "can_adventure_safely": false,
+            "can_borrow_to_bootstrap": false,
             "can_cashout_pawn_inventory": false,
             "can_contain_debt_escalation": false,
             "can_convert_millionaire_to_ending": false,
@@ -729,7 +870,7 @@
   },
   "summary": {
     "failed": 0,
-    "passed": 40,
-    "total": 40
+    "passed": 51,
+    "total": 51
   }
 }

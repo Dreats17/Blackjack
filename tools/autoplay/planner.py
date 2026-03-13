@@ -126,6 +126,11 @@ def choose_strategic_goal(game_state: GameState) -> StrategicPlan:
             score("exploit_marvin", 6.0)
         if game_state.marvin_strong_window and game_state.marvin_candidate_price >= 10_000:
             score("exploit_marvin", 18.0)
+        # Extra boost when the best affordable item is genuinely high-priority (≥84).
+        # Ensures Marvin beats routine store restocking even if marvin_strong_window is
+        # False (e.g. exact $10k balance where condition 3 just barely fails by $100).
+        if game_state.marvin_affordable_priority >= 84:
+            score("exploit_marvin", 14.0)
     elif game_state.has_car and not game_state.has_marvin_access:
         score("unlock_marvin", 22.0)
 
@@ -144,8 +149,16 @@ def choose_strategic_goal(game_state: GameState) -> StrategicPlan:
     if game_state.opportunity_flags.get("can_adventure_safely"):
         if game_state.rank >= 2:
             score("exploit_adventure", 18.0)
+            # At rank 2+ with adventure safe, also boost push_next_rank so the planner
+            # considers adventure as a valid push-forward action.
+            score("push_next_rank", 8.0)
         else:
             score("reach_adventure_threshold", 16.0)
+
+    # Proactive borrowing: when Vinnie is available and balance is low, score
+    # push_next_rank higher so the loan route beats the convenience store.
+    if game_state.opportunity_flags.get("can_borrow_to_bootstrap"):
+        score("push_next_rank", 14.0)
 
     if game_state.opportunity_flags.get("can_convert_millionaire_to_ending"):
         score("convert_millionaire_to_ending", 200.0)

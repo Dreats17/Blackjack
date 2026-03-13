@@ -38,7 +38,7 @@ def bright(text):
 
 
 class Blackjack:
-    __slots__=["__balance", "__bet", "__min_bet", "__dealer_happiness", "__deck", "__hand", "__dealer_hand", "__player", "__used_peek", "__dealer_warning", "__free_hand", "__used_second_chance", "__used_pocket_aces", "__lucky_coin_triggered", "__used_double_down", "__used_split", "__split_hand", "__used_surrender", "__insurance_bet", "__bust_streak", "__min_bet_bust_count", "__dealer_forced_min_bet", "__dealer_forced_all_in"]
+    __slots__=["__balance", "__bet", "__min_bet", "__dealer_happiness", "__deck", "__hand", "__dealer_hand", "__player", "__used_peek", "__dealer_warning", "__free_hand", "__used_second_chance", "__used_pocket_aces", "__lucky_coin_triggered", "__used_double_down", "__used_split", "__split_hand", "__used_surrender", "__insurance_bet", "__bust_streak", "__min_bet_bust_count", "__dealer_forced_min_bet", "__dealer_forced_all_in", "__fraudulent_portion"]
 
     def __init__(self, player):
         self.__balance = 50
@@ -63,6 +63,7 @@ class Blackjack:
         self.__insurance_bet = 0
         self.__bust_streak = 0
         self.__min_bet_bust_count = 0
+        self.__fraudulent_portion = 0   # fake-cash portion of the current bet (reset each hand)
 
     def update_player(self):
         self.__balance = self.__player.get_balance()
@@ -82,6 +83,7 @@ class Blackjack:
         self.__split_hand = None
         self.__used_surrender = False
         self.__insurance_bet = 0
+        self.__fraudulent_portion = 0
 
     def play_round(self, count=None):
         # Updates the player
@@ -480,13 +482,15 @@ class Blackjack:
 
         if(self.__min_bet<=int(bet)<=total_available):
             self.__bet = bet
-            # Calculate fraudulent portion (blend fake with real)
-            if bet > self.__balance and self.__player.get_fraudulent_cash() > 0:
-                fraudulent_portion = min(bet - self.__balance, self.__player.get_fraudulent_cash())
-                real_portion = bet - fraudulent_portion
-                # Blend the fraudulent cash through the system
-                self.__player.blend_fraudulent_cash(fraudulent_portion)
-                type.fast(yellow(f"(Blending ${fraudulent_portion:,} fraudulent cash with ${real_portion:,} real money)"))
+            # Loan money is always spent first — it buffers real cash from losses.
+            # On a loss, only the real portion comes out of your balance.
+            # On a win, you keep the full payout (fake cash launders through the house).
+            fake_available = self.__player.get_fraudulent_cash()
+            if fake_available > 0:
+                self.__fraudulent_portion = min(bet, fake_available)
+                real_portion = bet - self.__fraudulent_portion
+                self.__player.blend_fraudulent_cash(self.__fraudulent_portion)
+                type.fast(yellow(f"(${self.__fraudulent_portion:,} loan money in — ${real_portion:,} is yours)"))
                 print("\n")
             return True
         elif((int(bet) < self.__min_bet)):
@@ -1056,6 +1060,10 @@ class Blackjack:
                 tattered_cloak_saved = True
                 self.__player.update_tattered_cloak_durability()
 
+        # Real loss = only the portion of the bet funded by real cash.
+        # Loan money is spent first, so on a loss you only forfeit what you put in yourself.
+        real_loss = self.__bet - self.__fraudulent_portion
+
         match status:
             case "Player Blackjack": 
                 message = random.randrange(8)
@@ -1129,16 +1137,23 @@ class Blackjack:
                     type.fast(red(bright("You had " + green("${:,}".format(self.__balance)) + red(" and lost your free bet of ") + green("${:,}".format(self.__bet)))))
                     print("\n")
                     type.fast(red(bright("Your balance is still " + green("${:,}".format(self.__balance)))))
-                elif self.__balance - self.__bet == 0:
+                elif real_loss <= 0:
                     type.fast(red(bright("You had " + green("${:,}".format(self.__balance)) + red(" and lost your bet of ") + green("${:,}".format(self.__bet)))))
                     print("\n")
-                    type.fast(red(bright("Your new balance is " + "${:,}".format(self.__balance) + " - ${:,}".format(self.__bet) + " = ${:,}".format(self.__balance-self.__bet))))
-                    self.__balance -= self.__bet
+                    type.fast(yellow(bright(f"Your loan money covered the full loss. Your balance is still " + green("${:,}".format(self.__balance)))))
+                elif self.__balance - real_loss <= 0:
+                    type.fast(red(bright("You had " + green("${:,}".format(self.__balance)) + red(" and lost your bet of ") + green("${:,}".format(self.__bet)))))
+                    print("\n")
+                    type.fast(red(bright("Your new balance is " + "${:,}".format(self.__balance) + " - ${:,}".format(real_loss) + " = ${:,}".format(self.__balance-real_loss))))
+                    self.__balance -= real_loss
                 else:
                     type.fast(red(bright("You had " + green("${:,}".format(self.__balance)) + red(" and lost your bet of ") + green("${:,}".format(self.__bet)))))
                     print("\n")
-                    type.fast(red(bright("Your new balance is " + green("${:,}".format(self.__balance) + red(" - ${:,}".format(self.__bet)) + green(" = ${:,}".format(self.__balance-self.__bet))))))
-                    self.__balance -= self.__bet
+                    type.fast(red(bright("Your new balance is " + green("${:,}".format(self.__balance) + red(" - ${:,}".format(real_loss)) + green(" = ${:,}".format(self.__balance-real_loss))))))
+                    self.__balance -= real_loss
+                if self.__fraudulent_portion > 0 and real_loss > 0:
+                    print()
+                    type.fast(yellow(f"(${self.__fraudulent_portion:,} in loan money absorbed the rest)"))
 
             case "Dealer Wins":
                 message = random.randrange(8)
@@ -1155,16 +1170,23 @@ class Blackjack:
                     type.fast(red(bright("You had " + green("${:,}".format(self.__balance)) + red(" and lost your free bet of ") + green("${:,}".format(self.__bet)))))
                     print("\n")
                     type.fast(red(bright("Your balance is still " + green("${:,}".format(self.__balance)))))
-                elif self.__balance - self.__bet == 0:
+                elif real_loss <= 0:
                     type.fast(red(bright("You had " + green("${:,}".format(self.__balance)) + red(" and lost your bet of ") + green("${:,}".format(self.__bet)))))
                     print("\n")
-                    type.fast(red(bright("Your new balance is " + "${:,}".format(self.__balance) + " - ${:,}".format(self.__bet) + " = ${:,}".format(self.__balance-self.__bet))))
-                    self.__balance -= self.__bet
+                    type.fast(yellow(bright(f"Your loan money covered the full loss. Your balance is still " + green("${:,}".format(self.__balance)))))
+                elif self.__balance - real_loss <= 0:
+                    type.fast(red(bright("You had " + green("${:,}".format(self.__balance)) + red(" and lost your bet of ") + green("${:,}".format(self.__bet)))))
+                    print("\n")
+                    type.fast(red(bright("Your new balance is " + "${:,}".format(self.__balance) + " - ${:,}".format(real_loss) + " = ${:,}".format(self.__balance-real_loss))))
+                    self.__balance -= real_loss
                 else:
                     type.fast(red(bright("You had " + green("${:,}".format(self.__balance)) + red(" and lost your bet of ") + green("${:,}".format(self.__bet)))))
                     print("\n")
-                    type.fast(red(bright("Your new balance is " + green("${:,}".format(self.__balance) + red(" - ${:,}".format(self.__bet)) + green(" = ${:,}".format(self.__balance-self.__bet))))))
-                    self.__balance -= self.__bet
+                    type.fast(red(bright("Your new balance is " + green("${:,}".format(self.__balance) + red(" - ${:,}".format(real_loss)) + green(" = ${:,}".format(self.__balance-real_loss))))))
+                    self.__balance -= real_loss
+                if self.__fraudulent_portion > 0 and real_loss > 0:
+                    print()
+                    type.fast(yellow(f"(${self.__fraudulent_portion:,} in loan money absorbed the rest)"))
 
             case "Player Bust":
                 message = random.randrange(8)
@@ -1182,16 +1204,23 @@ class Blackjack:
                     type.fast(red(bright("You had " + green("${:,}".format(self.__balance)) + red(" and lost your free bet of ") + green("${:,}".format(self.__bet)))))
                     print("\n")
                     type.fast(red(bright("Your balance is still " + green("${:,}".format(self.__balance)))))
-                elif self.__balance - self.__bet == 0:
+                elif real_loss <= 0:
                     type.fast(red(bright("You had " + green("${:,}".format(self.__balance)) + red(" and lost your bet of ") + green("${:,}".format(self.__bet)))))
                     print("\n")
-                    type.fast(red(bright("Your new balance is " + "${:,}".format(self.__balance) + " - ${:,}".format(self.__bet) + " = ${:,}".format(self.__balance-self.__bet))))
-                    self.__balance -= self.__bet
+                    type.fast(yellow(bright(f"Your loan money covered the full loss. Your balance is still " + green("${:,}".format(self.__balance)))))
+                elif self.__balance - real_loss <= 0:
+                    type.fast(red(bright("You had " + green("${:,}".format(self.__balance)) + red(" and lost your bet of ") + green("${:,}".format(self.__bet)))))
+                    print("\n")
+                    type.fast(red(bright("Your new balance is " + "${:,}".format(self.__balance) + " - ${:,}".format(real_loss) + " = ${:,}".format(self.__balance-real_loss))))
+                    self.__balance -= real_loss
                 else:
                     type.fast(red(bright("You had " + green("${:,}".format(self.__balance)) + red(" and lost your bet of ") + green("${:,}".format(self.__bet)))))
                     print("\n")
-                    type.fast(red(bright("Your new balance is " + green("${:,}".format(self.__balance) + red(" - ${:,}".format(self.__bet)) + green(" = ${:,}".format(self.__balance-self.__bet))))))
-                    self.__balance -= self.__bet
+                    type.fast(red(bright("Your new balance is " + green("${:,}".format(self.__balance) + red(" - ${:,}".format(real_loss)) + green(" = ${:,}".format(self.__balance-real_loss))))))
+                    self.__balance -= real_loss
+                if self.__fraudulent_portion > 0 and real_loss > 0:
+                    print()
+                    type.fast(yellow(f"(${self.__fraudulent_portion:,} in loan money absorbed the rest)"))
 
             case "Tie":
                 message = random.randrange(8)
@@ -1268,6 +1297,7 @@ class Blackjack:
         self.__player.set_balance(self.__balance)
         self.__player.gambling_result(status, self.__bet)  # Sanity effects from gambling
         self.__player.status()
+        self._check_hot_money_noticed()
         self.end_round_dealer_happiness(status)
 
         print()
@@ -1427,6 +1457,80 @@ class Blackjack:
         if value > 0: self.anger_dealer(value + modifier)
         elif value < 0: self.calm_dealer(-(value))
 
+    def _check_hot_money_noticed(self):
+        """Per-hand check: did the dealer notice hot (loan) money in this bet?
+
+        The loan shark's money is convincing, but every dollar run through the dealer
+        raises their suspicion.  The chance of being caught scales with:
+          - The fraction of the bet that was fake (more fake = more suspicious).
+          - How much total fake cash the dealer has already processed this session
+            (approaching the has_too_much_fake_cash threshold = near-certain notice).
+
+        Consequences range from a suspicious squint (dealer anger spike) to having the
+        hot bills confiscated outright.  Refusing to cooperate makes things worse.
+        """
+        if self.__fraudulent_portion <= 0:
+            return
+
+        fake_ratio = self.__fraudulent_portion / max(1, self.__bet)
+        # Base chance: 4 – 20 % per hand, scaled by how much of the bet is hot.
+        notice_chance = max(4, int(fake_ratio * 20))
+        # Triple the chance once the dealer has processed a suspicious volume of fake cash.
+        if self.__player.has_too_much_fake_cash():
+            notice_chance = min(75, notice_chance * 3)
+
+        if random.randrange(100) >= notice_chance:
+            return  # The Dealer didn't notice — this time.
+
+        # --- Dealer noticed ---
+        print()
+        severity = random.randrange(3)
+
+        if severity == 0:
+            # Mild: a suspicious glance, nothing more.
+            msg = random.randrange(3)
+            if msg == 0: type.fast(yellow("The Dealer pauses, turning one of your bills over slowly in his hand."))
+            if msg == 1: type.fast(yellow("The Dealer holds a bill up briefly, squinting at the serial number."))
+            if msg == 2: type.fast(yellow("The Dealer glances at one of your notes, then back at you."))
+            print()
+            type.fast(yellow('"Funny-looking paper," he mutters, then slides it back without a word.'))
+            self.anger_dealer(8, message=True)
+
+        elif severity == 1:
+            # Moderate: the Dealer pockets a bill and docks your balance.
+            msg = random.randrange(3)
+            if msg == 0: type.fast(red("The Dealer holds a bill up to the light, then sets it aside with a flat look."))
+            if msg == 1: type.fast(red("The Dealer examines one of your bills closely, then tucks it under the table."))
+            if msg == 2: type.fast(red("The Dealer pulls a bill from the pile and studies it with narrowed eyes."))
+            print()
+            type.fast(red('"I don\'t take hot money," he says. He keeps the bill.'))
+            self.anger_dealer(15, message=True)
+            # Confiscate half the fake portion from real balance as a "silence fee".
+            penalty = min(self.__balance, self.__fraudulent_portion // 2)
+            if penalty > 0:
+                self.__balance -= penalty
+                self.__player.set_balance(self.__balance)
+                print()
+                type.fast(red(f"${penalty:,} taken. The Dealer doesn't ask questions. He takes answers."))
+
+        else:
+            # Severe: the Dealer makes a scene and takes the full fake amount.
+            msg = random.randrange(3)
+            if msg == 0: type.fast(red(bright("The Dealer slams his hand on the table.")))
+            if msg == 1: type.fast(red(bright("The Dealer stands up, staring hard at your money.")))
+            if msg == 2: type.fast(red(bright("The Dealer goes very still. The table goes very quiet.")))
+            print()
+            type.fast(red(bright('"YOU. Are using HOT MONEY."')))
+            print()
+            type.fast(red("He reaches across and grabs a fistful of your bills. The whole table goes quiet."))
+            self.anger_dealer(30, message=True)
+            penalty = min(self.__balance, self.__fraudulent_portion)
+            if penalty > 0:
+                self.__balance -= penalty
+                self.__player.set_balance(self.__balance)
+                print()
+                type.fast(red(f"${penalty:,} confiscated. Call it a tax on bad decisions."))
+        print()
 
     def draw(self, hand):
         card = self.__deck.draw()
@@ -1452,6 +1556,7 @@ class Blackjack:
         # Resets hands
         self.__hand = Hand("Player")
         self.__dealer_hand = Hand("Dealer")
+        self.__fraudulent_portion = 0
 
     def hard_reset(self):
         # Resets hands, deck, and possibly anything else I can think of

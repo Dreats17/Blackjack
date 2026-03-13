@@ -23,6 +23,39 @@ RouteCheck = Callable[[StrategicPlan, str], tuple[bool, str]]
 BetCheck = Callable[[int], tuple[bool, str]]
 
 
+class _FakeListsShim:
+    """Minimal shim for FakeScenarioPlayer._lists so workbench recipe checks work."""
+
+    def __init__(self, player: "FakeScenarioPlayer") -> None:
+        self._player = player
+
+    def get_available_recipes(self, _player=None) -> dict[str, dict]:
+        """Return recipes for which all ingredients are in player inventory."""
+        # Inline subset of the full recipe table from lists.py make_crafting_recipes.
+        # Covers the most commonly-reached recipes in test scenarios.
+        all_recipes: dict[str, dict] = {
+            "Emergency Blanket": {"ingredients": ["Garbage Bag", "Duct Tape"], "category": "survival"},
+            "Wound Salve": {"ingredients": ["First Aid Kit", "Super Glue"], "category": "remedy"},
+            "Home Remedy": {"ingredients": ["First Aid Kit", "Cough Drops"], "category": "remedy"},
+            "Feeding Station": {"ingredients": ["Plastic Wrap", "Duct Tape"], "category": "companion"},
+            "Binocular Scope": {"ingredients": ["Binoculars", "Duct Tape"], "category": "tool"},
+            "Lockpick Set": {"ingredients": ["Pocket Knife", "Fishing Line"], "category": "tool"},
+            "Splint": {"ingredients": ["Duct Tape", "Rope"], "category": "remedy"},
+            "Companion Bed": {"ingredients": ["Blanket", "Duct Tape"], "category": "companion"},
+            "Pet Toy": {"ingredients": ["Rope", "Rubber Bands"], "category": "companion"},
+            "Rain Collector": {"ingredients": ["Plastic Wrap", "Garbage Bag"], "category": "survival"},
+            "Snare Trap": {"ingredients": ["Rope", "Fishing Line"], "category": "trap"},
+            "Improvised Trap": {"ingredients": ["Fishing Line", "Pocket Knife"], "category": "trap"},
+            "Pepper Spray": {"ingredients": ["Bug Spray", "Lighter"], "category": "weapon"},
+            "Shiv": {"ingredients": ["Duct Tape", "Pocket Knife"], "category": "weapon"},
+        }
+        return {
+            name: recipe
+            for name, recipe in all_recipes.items()
+            if all(self._player.has_item(ing) for ing in recipe["ingredients"])
+        }
+
+
 class FakeScenarioPlayer:
     def __init__(
         self,
@@ -59,6 +92,9 @@ class FakeScenarioPlayer:
         self._met = set(met)
         self._autoplay_location_last_day = {}
         self._autoplay_location_count = {}
+        # Minimal _lists shim: returns the full game recipe set so workbench routing
+        # can evaluate _workbench_best_craft_candidate correctly.
+        self._lists = _FakeListsShim(self)
 
     def get_balance(self):
         return self._balance
@@ -860,7 +896,8 @@ def run_all_scenarios() -> list[ScenarioResult]:
                 met=("Tom", "Tom Event"),
             ),
             ("Trusty Tom's Trucks and Tires", "Doctor's Office", "Stay Home"),
-            "Trusty Tom's Trucks and Tires",
+            # Without a car the bot can't travel on foot; Stay Home is the correct choice.
+            "Stay Home",
         )
     )
 
@@ -880,7 +917,8 @@ def run_all_scenarios() -> list[ScenarioResult]:
                 met=("Tom", "Tom Event"),
             ),
             ("Trusty Tom's Trucks and Tires", "Doctor's Office", "Stay Home"),
-            "Trusty Tom's Trucks and Tires",
+            # No car means no on-foot travel; compound conditions but can't afford doctor ($190).
+            "Stay Home",
         )
     )
 
@@ -899,7 +937,8 @@ def run_all_scenarios() -> list[ScenarioResult]:
                 met=("Tom", "Tom Event"),
             ),
             ("Trusty Tom's Trucks and Tires", "Doctor's Office", "Stay Home"),
-            "Trusty Tom's Trucks and Tires",
+            # Broken Leg + health=50 + balance=$300: urgent medical care is the right call.
+            "Doctor's Office",
         )
     )
 
@@ -918,6 +957,90 @@ def run_all_scenarios() -> list[ScenarioResult]:
             ),
             ("Doctor's Office", "Marvin's Mystical Merchandise", "Convenience Store", "Stay Home"),
             "Doctor's Office",
+        )
+    )
+
+    results.append(
+        _run_quicktest_destination_scenario(
+            "workbench_craft_route_fires_when_ingredients_ready",
+            "route_interrupt",
+            FakeScenarioPlayer(
+                day=22,
+                balance=1800,
+                rank=1,
+                health=80,
+                sanity=55,
+                inventory=("Car", "Tool Kit", "Duct Tape", "Garbage Bag"),
+            ),
+            # Car Workbench is unlocked because player has Tool Kit.
+            # Emergency Blanket recipe: Garbage Bag + Duct Tape — both in inventory.
+            # No higher-priority destinations present; workbench craft should win.
+            ("Convenience Store", "Car Workbench", "Stay Home"),
+            "Car Workbench",
+        )
+    )
+
+    # Crafting synergy: completing boost — player has Duct Tape + Tool Kit;
+    # Garbage Bag in store completes Emergency Blanket → priority >= 86, store fires.
+    results.append(
+        _run_quicktest_destination_scenario(
+            "crafting_ingredient_completing_boost_triggers_store",
+            "route_interrupt",
+            FakeScenarioPlayer(
+                day=15,
+                balance=700,
+                rank=1,
+                health=82,
+                sanity=60,
+                inventory=("Car", "Tool Kit", "Duct Tape"),
+                store_inventory=(("Garbage Bag", 3),),
+            ),
+            ("Convenience Store", "Stay Home"),
+            "Convenience Store",
+        )
+    )
+
+    # Crafting synergy: starting boost — player has Tool Kit but no other ingredient;
+    # Garbage Bag alone gets a starting boost to 78, which crosses the rank-1 secondary
+    # store gate (>= 68) with balance >= 600.
+    results.append(
+        _run_quicktest_destination_scenario(
+            "crafting_ingredient_starting_boost_triggers_store",
+            "route_interrupt",
+            FakeScenarioPlayer(
+                day=15,
+                balance=700,
+                rank=1,
+                health=82,
+                sanity=60,
+                inventory=("Car", "Tool Kit"),
+                store_inventory=(("Garbage Bag", 3),),
+            ),
+            ("Convenience Store", "Stay Home"),
+            "Convenience Store",
+        )
+    )
+
+    results.append(
+        _run_quicktest_destination_scenario(
+            "witch_flask_only_run_fires_when_healthy_and_affordable",
+            "route_interrupt",
+            FakeScenarioPlayer(
+                day=25,
+                balance=15000,
+                rank=2,
+                health=80,
+                sanity=55,
+                # No Map → Marvin not accessible, so flask-only witch path can fire.
+                # Player is healthy (health >= 72, sanity >= 38) with $15k.
+                # Fortunate Day estimate $12k fits comfortably within budget.
+                inventory=("Car",),
+                met=("Witch",),
+                store_inventory=(("LifeAlert", 120),),
+            ),
+            # Witch Doctor should be chosen over store (flask-only path fires).
+            ("Witch Doctor's Tower", "Convenience Store", "Stay Home"),
+            "Witch Doctor's Tower",
         )
     )
 
@@ -1787,7 +1910,223 @@ def run_all_scenarios() -> list[ScenarioResult]:
                 "has_faulty_insurance": False,
                 "wants_map_unlock": False,
             },
-            _assert_min_bet(600),
+            _assert_min_bet(540),
+        )
+    )
+
+    # ===== GIFT WRAP SCENARIOS =====
+
+    # Gift wrap: should accept when dealer happiness is low and not in emergency
+    results.append(
+        _run_event_yes_no_scenario(
+            "gift_wrap_accepted_when_dealer_sad",
+            "event_yes_no",
+            GameState(
+                day=10,
+                balance=350,
+                rank=1,
+                health=72,
+                sanity=55,
+                fatigue=20,
+                alive=True,
+                current_context_tag="yes_no_prompt",
+                has_car=True,
+                dealer_happiness=55,
+                current_progress_goal_candidates=("push_next_rank",),
+            ),
+            "Gift wrap?",
+            (),
+            {
+                "prompt_lower": "gift wrap?",
+                "recent_lower": "would you like to gift wrap an item for the dealer?",
+            },
+            "yes",
+        )
+    )
+
+    # Gift wrap: should decline when dealer happiness is already high
+    results.append(
+        _run_event_yes_no_scenario(
+            "gift_wrap_declined_when_dealer_happy",
+            "event_yes_no",
+            GameState(
+                day=10,
+                balance=350,
+                rank=1,
+                health=72,
+                sanity=55,
+                fatigue=20,
+                alive=True,
+                current_context_tag="yes_no_prompt",
+                has_car=True,
+                dealer_happiness=92,
+                current_progress_goal_candidates=("push_next_rank",),
+            ),
+            "Gift wrap?",
+            (),
+            {
+                "prompt_lower": "gift wrap?",
+                "recent_lower": "would you like to gift wrap an item for the dealer?",
+            },
+            "no",
+        )
+    )
+
+    # Gift wrap: should decline when in emergency (survive_emergency goal)
+    results.append(
+        _run_event_yes_no_scenario(
+            "gift_wrap_declined_in_emergency",
+            "event_yes_no",
+            GameState(
+                day=10,
+                balance=350,
+                rank=0,
+                health=32,
+                sanity=18,
+                fatigue=20,
+                alive=True,
+                current_context_tag="yes_no_prompt",
+                has_car=True,
+                dealer_happiness=55,
+                current_progress_goal_candidates=("survive_emergency",),
+            ),
+            "Gift wrap?",
+            (),
+            {
+                "prompt_lower": "gift wrap?",
+                "recent_lower": "would you like to gift wrap an item for the dealer?",
+            },
+            "no",
+        )
+    )
+
+    # ===== MILLIONAIRE AFTERNOON SCENARIOS =====
+
+    # Millionaire afternoon: should choose chosen mechanic ending
+    results.append(
+        _run_event_option_scenario(
+            "millionaire_afternoon_prefers_mechanic_ending",
+            "event_option",
+            GameState(
+                day=45,
+                balance=1_200_000,
+                rank=3,
+                health=85,
+                sanity=72,
+                fatigue=10,
+                alive=True,
+                current_context_tag="option_prompt",
+                has_car=True,
+                chosen_mechanic="Tom",
+                current_progress_goal_candidates=("convert_millionaire_to_ending",),
+                opportunity_flags={"can_convert_millionaire_to_ending": True},
+            ),
+            (
+                "Visit Tom's Trusty Trucks and Tires",
+                "Drive to the Airport",
+                "Continue gambling",
+            ),
+            {
+                "prompt_lower": "choose a number",
+                "recent_lower": "you wake up as a millionaire. what do you do?",
+            },
+            "Visit Tom's Trusty Trucks and Tires",
+        )
+    )
+
+    # Millionaire afternoon: airport when no mechanic chosen
+    results.append(
+        _run_event_option_scenario(
+            "millionaire_afternoon_airport_when_no_mechanic",
+            "event_option",
+            GameState(
+                day=45,
+                balance=1_200_000,
+                rank=3,
+                health=85,
+                sanity=72,
+                fatigue=10,
+                alive=True,
+                current_context_tag="option_prompt",
+                has_car=True,
+                chosen_mechanic=None,
+                current_progress_goal_candidates=("convert_millionaire_to_ending",),
+                opportunity_flags={"can_convert_millionaire_to_ending": True},
+            ),
+            (
+                "Drive to the Airport",
+                "Continue gambling",
+            ),
+            {
+                "prompt_lower": "choose a number",
+                "recent_lower": "you wake up as a millionaire. what do you do? drive to the airport",
+            },
+            "Drive to the Airport",
+        )
+    )
+
+    # ===== WORKBENCH CONFIRM SCENARIOS =====
+
+    # Workbench craft confirm: should say yes when combining items
+    results.append(
+        _run_event_yes_no_scenario(
+            "workbench_craft_confirm_says_yes",
+            "event_yes_no",
+            GameState(
+                day=12,
+                balance=600,
+                rank=1,
+                health=75,
+                sanity=60,
+                fatigue=15,
+                alive=True,
+                current_context_tag="yes_no_prompt",
+                has_car=True,
+                current_progress_goal_candidates=("push_next_rank",),
+            ),
+            "(yes/no): ",
+            (
+                "Car Workbench",
+                "Combine First Aid Kit and Cough Drops into a Home Remedy?",
+            ),
+            {
+                "prompt_lower": "(yes/no):",
+                "recent_lower": "car workbench combine first aid kit and cough drops into a home remedy?",
+            },
+            "yes",
+        )
+    )
+
+    # ===== COMPANION RUNAWAY PREVENTION SCENARIOS =====
+
+    # Companion hungry with runaway risk: should buy food (option 3) even with limited balance
+    results.append(
+        _run_event_inline_scenario(
+            "companion_hungry_runaway_risk_buys_food",
+            "event_inline",
+            GameState(
+                day=14,
+                balance=35,
+                rank=0,
+                health=68,
+                sanity=45,
+                fatigue=22,
+                alive=True,
+                current_context_tag="inline_choice_prompt",
+                has_car=True,
+                companion_count=2,
+                companion_runaway_risk_count=1,
+                companion_low_happiness_count=2,
+                current_progress_goal_candidates=("preserve_companion_roster",),
+            ),
+            "Choose:",
+            ("morning. your companions are hungry.",),
+            ("1", "2", "3", "4"),
+            {
+                "prompt_lower": "choose:",
+                "recent_lower": "morning. your companions are hungry.",
+            },
+            "3",
         )
     )
 

@@ -323,7 +323,7 @@ def choose_blackjack_bet(request: DecisionRequest, plan: StrategicPlan) -> tuple
         has_car
         and rank <= 1
         and progression_ready
-        and phase == "car_ready"
+        and phase in ("rank_one_rush", "rank_two_rush")
         and not wants_store
         and not wants_pawn
         and not wants_doctor
@@ -332,8 +332,25 @@ def choose_blackjack_bet(request: DecisionRequest, plan: StrategicPlan) -> tuple
         and not pending_marvin_active
         and health >= 62
         and sanity >= 34
-        and edge_score >= 2
         and 1200 <= balance < 8000
+    )
+    # Rank 2 → 3 push window: the bot has a car, good health, and enough balance to
+    # aggressively push toward rank 3 ($100k).  Floor protection already ensures the
+    # bot can't lose below $10k in one hand; this window boosts the bet ratio so the
+    # bot grows fast enough to reach rank 3 within the run time limit.
+    rank_three_growth_window = (
+        has_car
+        and rank == 2
+        and progression_ready
+        and phase == "million_rush"
+        and not wants_store
+        and not wants_doctor
+        and not urgent_doctor
+        and not survival_mode
+        and not pending_marvin_active
+        and health >= 58
+        and sanity >= 30
+        and 15000 <= balance < 100000
     )
 
     if total_available <= 0:
@@ -379,6 +396,19 @@ def choose_blackjack_bet(request: DecisionRequest, plan: StrategicPlan) -> tuple
             ratio = max(ratio, 0.28)
     if balance >= 25000 and edge_score >= 6:
         ratio = min(ratio, 0.30 if balance < 100000 else 0.18)
+    # Rank 2 cushion: cap ratio by balance tier to prevent rank regression.
+    # At $10k-$13k (very close to floor): ultra-conservative.
+    # At $13k-$25k (still in danger zone): moderately conservative.
+    # At $25k-$50k (growth zone): still needs protection vs bad streaks.
+    if rank == 2 and balance < 13000:
+        ratio = min(ratio, 0.08)
+    elif rank == 2 and balance < 25000:
+        ratio = min(ratio, 0.16)
+    elif rank == 2 and balance < 50000:
+        ratio = min(ratio, 0.24)
+    # Rank 3 cushion: cap ratio when balance is within 1.3x of the $100k floor.
+    if rank == 3 and balance < 130000:
+        ratio = min(ratio, 0.14)
     if stalled_run and not survival_mode:
         if phase == "car_rush":
             ratio = max(ratio, 0.26 if balance < 350 else 0.18)
@@ -391,6 +421,18 @@ def choose_blackjack_bet(request: DecisionRequest, plan: StrategicPlan) -> tuple
             ratio = max(ratio, 0.30 if edge_score >= 4 else 0.26)
         else:
             ratio = max(ratio, 0.24)
+    if rank_three_growth_window:
+        # Boost ratio in the rank-2→3 push; floor protection caps actual bet at
+        # balance - $10k so the bot can't lose below rank 2 floor regardless.
+        # Cushion guards above further restrict this boost when near the $10k/$25k/$50k bands.
+        ratio = max(ratio, 0.34 if edge_score >= 5 else 0.30)
+    # Re-apply rank cushions after any growth-window boosts so they remain hard upper bounds.
+    if rank == 2 and balance < 13000:
+        ratio = min(ratio, 0.08)
+    elif rank == 2 and balance < 25000:
+        ratio = min(ratio, 0.16)
+    elif rank == 2 and balance < 50000:
+        ratio = min(ratio, 0.24)
     if pending_marvin_active and not survival_mode:
         if pending_marvin_shortfall > 0:
             ratio = min(ratio, 0.12 if edge_score >= 5 else 0.10)
@@ -509,6 +551,16 @@ def choose_blackjack_bet(request: DecisionRequest, plan: StrategicPlan) -> tuple
             max_ratio = max(max_ratio, 0.40)
     if balance >= 25000 and edge_score >= 6:
         max_ratio = min(max_ratio, 0.38 if balance < 100000 else 0.24)
+    # Rank 2 cushion: cap max_ratio by balance tier (mirrors ratio guards above).
+    if rank == 2 and balance < 13000:
+        max_ratio = min(max_ratio, 0.12)
+    elif rank == 2 and balance < 25000:
+        max_ratio = min(max_ratio, 0.24)
+    elif rank == 2 and balance < 50000:
+        max_ratio = min(max_ratio, 0.34)
+    # Rank 3 cushion: cap max_ratio when balance is within 1.3x of the $100k floor.
+    if rank == 3 and balance < 130000:
+        max_ratio = min(max_ratio, 0.18)
     if stalled_run and not survival_mode:
         if phase == "car_rush":
             max_ratio = max(max_ratio, 0.36 if balance < 350 else 0.24)
@@ -521,6 +573,17 @@ def choose_blackjack_bet(request: DecisionRequest, plan: StrategicPlan) -> tuple
             max_ratio = max(max_ratio, 0.70 if edge_score >= 4 else 0.62)
         else:
             max_ratio = max(max_ratio, 0.58)
+    if rank_three_growth_window:
+        # Allow betting up to 55% of balance; floor protection will cap to surplus anyway.
+        # Cushion guards from above further restrict at $10k-$50k balance bands.
+        max_ratio = max(max_ratio, 0.55 if edge_score >= 5 else 0.48)
+    # Re-apply rank cushions after any growth-window boosts so they remain hard upper bounds.
+    if rank == 2 and balance < 13000:
+        max_ratio = min(max_ratio, 0.12)
+    elif rank == 2 and balance < 25000:
+        max_ratio = min(max_ratio, 0.24)
+    elif rank == 2 and balance < 50000:
+        max_ratio = min(max_ratio, 0.34)
     if pending_marvin_active and not survival_mode:
         if pending_marvin_shortfall > 0:
             max_ratio = min(max_ratio, 0.18 if edge_score >= 5 else 0.15)
@@ -819,6 +882,13 @@ def choose_blackjack_bet(request: DecisionRequest, plan: StrategicPlan) -> tuple
                 blend_slice = min(fake_cash, max(200, int(fake_cash * 0.30)))
             if blend_slice > 0:
                 bet = max(bet, min(total_available, max(min_bet, balance + blend_slice)))
+                # The blend can push the bet above what the rank-protection floor computed
+                # earlier.  Re-apply: losing the bet must not drop real balance below floor.
+                # (balance - floor) is the real surplus we can risk; adding fake_cash gives
+                # the maximum bet that still lands at floor on a full loss.
+                if floor and balance > floor:
+                    blend_floor_cap = max(min_bet, (balance - floor) + fake_cash)
+                    bet = min(bet, blend_floor_cap)
 
     if bet > total_available:
         bet = int(total_available)

@@ -1,5 +1,10 @@
 from __future__ import annotations
 
+from ..config import (
+    GIFT_WRAP_HAPPINESS_THRESHOLD,
+    GIFT_WRAP_MIN_BALANCE,
+    MILLIONAIRE_ENDING_PREFERENCE,
+)
 from ..interfaces import DecisionOption, DecisionRequest
 from ..planner import StrategicPlan
 from ..trace import DecisionTrace
@@ -202,7 +207,7 @@ def _inline_trace(request: DecisionRequest, plan: StrategicPlan, chosen: str, re
 
 
 def choose_event_yes_no(request: DecisionRequest, plan: StrategicPlan) -> tuple[str | None, DecisionTrace | None]:
-    prompt_lower = str(request.metadata.get("prompt_lower", "") or "")
+    prompt_lower = str(request.metadata.get("prompt_lower", "") or "").strip()
     recent = str(request.metadata.get("recent_lower", "") or "")
     cost = request.metadata.get("cost")
     balance = int(request.game_state.get("balance", 0) or 0)
@@ -211,7 +216,6 @@ def choose_event_yes_no(request: DecisionRequest, plan: StrategicPlan) -> tuple[
     rank = int(request.game_state.get("rank", 0) or 0)
 
     always_yes = {
-        "moo?",
         "do you ask if he's okay?",
         "do you listen?",
         "stand up for kyle?",
@@ -267,6 +271,12 @@ def choose_event_yes_no(request: DecisionRequest, plan: StrategicPlan) -> tuple[
         "listen to him?",
         "do the interview?",
         "do you promise?",
+        # Phil's final interrogation: "Will you leave?" → answer "yes" = 25% death,
+        # "no" = 33% death. Always say yes for the better odds (bot normally hits
+        # threat_context_refusal and says no, which is the worse choice).
+        '"answer me. "',
+        '"answer me."',
+        "answer me.",
     }
     always_no = {
         "take the pill?",
@@ -297,6 +307,27 @@ def choose_event_yes_no(request: DecisionRequest, plan: StrategicPlan) -> tuple[
         return "yes", _yes_no_trace(request, plan, "yes", f"event_yes:{prompt_lower}", 0.82)
     if prompt_lower in always_no:
         return "no", _yes_no_trace(request, plan, "no", f"event_no:{prompt_lower}", 0.82)
+
+    # Betsy the cow: "Moo? " prompt. Two different events with very different costs.
+    # hungry_cow  (stage 0): $100 per feeding — affordable, pay unless it would block car acquisition.
+    # starving_cow (stage 1): $10,000 per feeding — only pay if we genuinely have it.
+    # cow_army    (stage 2): $100,000 per feeding — refuse unless Doughman/nearly rich.
+    # Differentiator: "tractor" in recent → stage 1 ($10k); "army" in recent → stage 2 ($100k).
+    if prompt_lower == "moo?":
+        rank = int(request.game_state.get("rank", 0) or 0)
+        needs_car = not bool(request.game_state.get("has_car", False))
+        if "army" in recent or "hundred thousand" in recent or "100,000" in recent:
+            # cow_army: $100k per round — only pay if Doughman (rank 4+)
+            answer = "yes" if rank >= 4 and balance >= 100000 else "no"
+            return answer, _yes_no_trace(request, plan, answer, "betsy_army_budget_gate", 0.85)
+        if "tractor" in recent:
+            # starving_cow: $10,000 per round — only pay if we can afford it
+            answer = "yes" if balance >= 10000 else "no"
+            return answer, _yes_no_trace(request, plan, answer, "betsy_tractor_budget_gate", 0.85)
+        # hungry_cow: $100 per round. Pay unless it would block car acquisition.
+        car_reserve = 250 if needs_car else 0
+        answer = "yes" if balance >= 100 + car_reserve else "no"
+        return answer, _yes_no_trace(request, plan, answer, "betsy_hungry_budget_gate", 0.82)
 
     if prompt_lower == "take the money?" and "loyalty bonus" in recent:
         return "no", _yes_no_trace(request, plan, "no", "loyalty_bonus_money_refusal", 0.8)
@@ -341,6 +372,32 @@ def choose_event_yes_no(request: DecisionRequest, plan: StrategicPlan) -> tuple[
     if prompt_lower == "pay to get your car back? ($800)":
         answer = "yes" if balance - int(cost or 800) >= 700 else "no"
         return answer, _yes_no_trace(request, plan, answer, "car_recovery_gate", 0.74)
+
+    # Gift wrap decision: wrap an item when dealer happiness is below the useful threshold
+    # and we have enough balance and aren't in an emergency.
+    if "gift wrap" in prompt_lower:
+        dealer_happiness = int(request.game_state.get("dealer_happiness", 50) or 50)
+        # Emergency check: goal-based and stats-based for belt-and-suspenders safety
+        in_emergency_goal = plan.goal in {"survive_emergency", "acquire_car", "contain_debt_escalation"}
+        in_emergency_stats = health < 45 or sanity < 20 or not request.game_state.get("has_car", True)
+        in_emergency = in_emergency_goal or in_emergency_stats
+        answer = (
+            "yes"
+            if (
+                balance >= GIFT_WRAP_MIN_BALANCE
+                and dealer_happiness < GIFT_WRAP_HAPPINESS_THRESHOLD
+                and not in_emergency
+            )
+            else "no"
+        )
+        return answer, _yes_no_trace(request, plan, answer, "gift_wrap_happiness_gate", 0.8)
+
+    # Confirm crafting at workbench: always accept when the autoplay chose to craft.
+    # Require "car workbench" in recent to avoid false positives from other yes/no contexts.
+    if "(yes/no):" in prompt_lower and "car workbench" in recent and "crafted" not in recent and (
+        "combine" in recent or "what do you want to craft" in recent
+    ):
+        return "yes", _yes_no_trace(request, plan, "yes", "workbench_craft_confirm", 0.9)
 
     if not prompt_lower:
         if any(
@@ -405,7 +462,9 @@ def choose_event_option(request: DecisionRequest, plan: StrategicPlan) -> tuple[
     elif normalized == ["wrong person", "play along", "run"]:
         chosen_index, reason = 0, "wrong_person"
     elif normalized == ["step back", "stay", "call for help"]:
-        chosen_index, reason = 2, "call_for_help"
+        # "stay" meets Bridge Angel (+20 sanity) and unlocks bridge_angel_returns (+15)
+        # and call_bridge_angel (+30) — 65 total vs 25 from "call for help" alone.
+        chosen_index, reason = 1, "stay_meets_bridge_angel"
     elif normalized == ["bail out", "investigate", "ignore it"]:
         chosen_index, reason = 0, "bail_out"
     elif normalized == ["try it", "sell it", "throw it away"]:
@@ -430,6 +489,45 @@ def choose_event_option(request: DecisionRequest, plan: StrategicPlan) -> tuple[
         chosen_index, reason = 2, "ask_for_help"
     elif normalized == ["worm", "robot", "spin move", "moonwalk", "interpretive dance"]:
         chosen_index, reason = 3, "moonwalk"
+
+    # Millionaire afternoon menu: choose between mechanic ending and airport.
+    # Options like "Visit Tom's...", "Drive to the Airport", "Continue gambling".
+    if chosen_index is None:
+        millionaire_labels = {
+            opt.label.lower(): idx
+            for idx, opt in enumerate(options)
+        }
+        is_millionaire_menu = (
+            any("drive to the airport" in lbl for lbl in millionaire_labels)
+            and any(
+                keyword in lbl
+                for keyword in ("tom", "frank", "oswald", "mechanic")
+                for lbl in millionaire_labels
+            )
+        )
+        if is_millionaire_menu:
+            chosen_mechanic = str(request.game_state.get("chosen_mechanic") or "")
+            for pref in MILLIONAIRE_ENDING_PREFERENCE:
+                if pref == "mechanic" and chosen_mechanic:
+                    for lbl, idx in millionaire_labels.items():
+                        if chosen_mechanic.lower() in lbl:
+                            chosen_index = idx
+                            reason = f"millionaire_mechanic_ending:{chosen_mechanic}"
+                            break
+                elif pref == "mechanic":
+                    for lbl, idx in millionaire_labels.items():
+                        if any(name in lbl for name in ("tom", "frank", "oswald")):
+                            chosen_index = idx
+                            reason = "millionaire_mechanic_ending_any"
+                            break
+                elif pref == "airport":
+                    for lbl, idx in millionaire_labels.items():
+                        if "airport" in lbl:
+                            chosen_index = idx
+                            reason = "millionaire_airport_ending"
+                            break
+                if chosen_index is not None:
+                    break
 
     if chosen_index is None:
         chosen_index, reason, confidence = _choose_generic_option(options, request)
@@ -500,7 +598,11 @@ def choose_event_inline_choice(request: DecisionRequest, plan: StrategicPlan) ->
         if "what do you do?\n1. break it up carefully" in recent or "break it up carefully" in recent:
             return "1", _inline_trace(request, plan, "1", "break_it_up_carefully", 0.82)
         if "morning. your companions are hungry." in recent:
-            chosen = "3" if balance >= 20 else "4"
+            # If companion runaway risk is high, prefer buying food (option 3) over skipping (option 4)
+            companion_runaway_risk = int(request.game_state.get("companion_runaway_risk_count", 0) or 0)
+            low_happiness = int(request.game_state.get("companion_low_happiness_count", 0) or 0)
+            urgent_companion_need = companion_runaway_risk > 0 or low_happiness > 0
+            chosen = "3" if (balance >= 20 or urgent_companion_need) else "4"
             return chosen, _inline_trace(request, plan, chosen, "hungry_companions_gate", 0.82)
         if "something's wrong." in recent and "is gone." in recent and "search the immediate area" in recent:
             return "1", _inline_trace(request, plan, "1", "search_immediate_area", 0.8)

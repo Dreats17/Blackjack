@@ -697,6 +697,11 @@ class DaySurvivalMixin:
         elif self.has_fire_source():
             type.type("You manage to generate some warmth with what you have. It's not comfortable, but you survive.")
             self.hurt(5)
+        elif self.has_item("Blanket"):
+            type.type("You wrap yourself in the " + magenta(bright("Blanket")) + " and pull it tight.")
+            print("\n")
+            type.type("Not perfect. But enough. You make it through.")
+            self.hurt(8)
         else:
             type.type("You shiver through the entire night, curled up in a ball, teeth chattering.")
             print("\n")
@@ -868,6 +873,8 @@ class DaySurvivalMixin:
         print("\n")
         type.type("The new penny feels luckier. Is that possible?")
         self.add_status("Lucky")
+        self.change_balance(random.randint(5, 20))
+        self.restore_sanity(3)
         print("\n")
 
     def rubber_band_save(self):
@@ -1197,6 +1204,15 @@ class DaySurvivalMixin:
             print("\n")
             type.type("Slight redness. Could've been way worse. Thank you, past-you.")
             self.hurt(3)
+            self.restore_sanity(4)
+            print("\n")
+            return
+        if self.has_item("Sunglasses"):
+            type.type("You fell asleep with the window cracked, but at least you'd had your " + magenta(bright("Sunglasses")) + " on.")
+            print("\n")
+            type.type("Your arms got scorched, but your eyes are fine. Small mercy. You look vaguely cool while suffering.")
+            self.hurt(8)
+            self.restore_sanity(2)
             print("\n")
             return
         if self.has_item("Umbrella"):
@@ -1204,6 +1220,7 @@ class DaySurvivalMixin:
             print("\n")
             type.type("Half your arm is burnt, half is fine. The umbrella line is visible. You look ridiculous but functional.")
             self.hurt(7)
+            self.restore_sanity(2)
             print("\n")
             return
         variant = random.randrange(3)
@@ -1240,6 +1257,7 @@ class DaySurvivalMixin:
         if self.has_item("First Aid Kit"):
             type.type("Good thing you have that " + magenta(bright("First Aid Kit")) + ". You clean it, disinfect it, bandage it. Almost like a real adult.")
             self.hurt(3)
+            self.restore_sanity(3)
         else:
             type.type("You don't have anything to treat it with. You tear off a piece of your shirt and wrap it. Field medicine at its finest.")
             self.hurt(10)
@@ -1307,7 +1325,7 @@ class DaySurvivalMixin:
             type.type("Luckily, your " + magenta(bright("Tool Kit")) + " has cables in it. You flag someone down and get a jump in ten minutes.")
             print("\n")
             type.type("Having tools makes you feel like a competent human being. The bar is low, but you cleared it.")
-            self.lose_sanity(2)
+            self.restore_sanity(5)
         else:
             type.type("You stand on the roadside, holding imaginary cables, hoping someone takes pity on you.")
             print("\n")
@@ -1404,6 +1422,21 @@ class DaySurvivalMixin:
         print("\n")
 
     def someone_stole_your_stuff(self):
+        if self.has_item("Binoculars"):
+            variant = random.randrange(2)
+            if variant == 0:
+                type.type("From across the parking lot, you catch movement with your " + magenta(bright("Binoculars")) + ". Someone circling your car.")
+                print("\n")
+                type.type("You walk over, casual. They scatter before you arrive.")
+                type.type(" Nothing taken. The binoculars paid for themselves.")
+                self.restore_sanity(5)
+            else:
+                type.type("You spot a figure trying your door handle through your " + magenta(bright("Binoculars")) + " from fifty yards.")
+                print("\n")
+                type.type("You sprint back. They run. Nobody wins, nobody loses.")
+                self.restore_sanity(4)
+            print("\n")
+            return
         if self.has_item("Padlock") or self.has_item("Car Alarm Rigging"):
             device = "Car Alarm Rigging" if self.has_item("Car Alarm Rigging") else "Padlock"
             variant = random.randrange(2)
@@ -1419,7 +1452,7 @@ class DaySurvivalMixin:
                 type.type("They see your " + magenta(bright(device)) + " and think better of it. Smart.")
                 print("\n")
                 type.type("You make a mental note to sleep lighter anyway.")
-            self.lose_sanity(3)
+            self.restore_sanity(5)
             print("\n")
             return
         variant = random.randrange(3)
@@ -1722,14 +1755,20 @@ class DaySurvivalMixin:
             print("\n")
             type.type("You watch a trash can blow down the street like a tumbleweed. Nature is angry today.")
         print("\n")
-        if self.has_item("Umbrella") or self.has_item("Poncho"):
-            gear = "Poncho" if self.has_item("Poncho") else "Umbrella"
+        if self.has_item("Umbrella") or self.has_item("Poncho") or self.has_item("Plastic Poncho"):
+            if self.has_item("Poncho"):
+                gear = "Poncho"
+            elif self.has_item("Plastic Poncho"):
+                gear = "Plastic Poncho"
+            else:
+                gear = "Umbrella"
             type.type("Good thing you've got that " + magenta(bright(gear)) + ". You're not letting a little apocalyptic weather ruin your plans.")
             print("\n")
             type.type("You suit up, step out into the deluge, and walk to the casino like a soggy but determined lunatic.")
             print("\n")
             type.type("People in the parking lot stare at you. You don't care. You have places to be and money to lose.")
             print("\n")
+            self.restore_sanity(5)
             return
         self.add_travel_restriction("Rain")
         return

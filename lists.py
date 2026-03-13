@@ -815,6 +815,32 @@ class Lists:
             "Energy Drink": 3,
             "Coffee Thermos": 10,
             "Road Map": 3,
+            # Convenience store items previously unsellable
+            "Duct Tape": 4,
+            "Water Bottles": 3,
+            "Road Flares": 8,
+            "Bug Spray": 5,
+            "Binoculars": 20,
+            "Garbage Bag": 1,
+            "Plastic Wrap": 2,
+            "Fishing Line": 6,
+            "Super Glue": 4,
+            "Hand Warmers": 3,
+            "Rubber Bands": 1,
+            "Breath Mints": 1,
+            "Matches": 1,
+            "Birdseed": 1,
+            "Fish": 5,
+            "Bread": 1,
+            "Sandwich": 2,
+            "Cheese": 1,
+            "Baking Soda": 1,
+            "Battery Terminal Cleaner": 3,
+            "Cheap Sunscreen": 2,
+            "Premium Sunscreen": 6,
+            "Poncho": 4,
+            "Running Shoes": 15,
+            "Filled Locket": 25,
             
             # Car Items
             "Jumper Cables": 20,
@@ -1546,6 +1572,45 @@ class Lists:
         a_list.append("road_flare_torch_encounter")
         a_list.append("feeding_station_morning")
         a_list.append("splint_injury_event")
+        # ITEM USE EVENTS - no-use item activation
+        a_list.append("road_talisman_protection")
+        a_list.append("silver_horseshoe_luck")
+        a_list.append("mystery_potion_effect")
+        a_list.append("feelgood_bottle_moment")
+        a_list.append("persistent_bottle_refill")
+        a_list.append("ritual_token_ceremony")
+        a_list.append("council_feather_blessing")
+        a_list.append("cowboy_jacket_encounter")
+        a_list.append("found_phone_call")
+        a_list.append("alien_crystal_event")
+        a_list.append("dimensional_coin_flip")
+        a_list.append("radio_numbers_broadcast")
+        a_list.append("mysterious_envelope_reveal")
+        a_list.append("lockbox_contents")
+        a_list.append("hollow_tree_stash_find")
+        a_list.append("vision_map_navigate")
+        a_list.append("secret_route_shortcut")
+        a_list.append("street_cat_ally_benefit")
+        a_list.append("old_photograph_memory")
+        a_list.append("beach_romance_call")
+        a_list.append("apartment_key_visit")
+        a_list.append("fake_flower_gift")
+        a_list.append("empty_locket_memory")
+        a_list.append("stack_of_flyers_opportunity")
+        a_list.append("mysterious_key_lockbox_open")
+        a_list.append("suspicious_package_open")
+        a_list.append("stolen_watch_recognition")
+        a_list.append("underwater_camera_photos")
+        a_list.append("witch_ward_dark_protection")
+        a_list.append("deck_of_cards_street_game")
+        a_list.append("ace_of_spades_blackjack_omen")
+        a_list.append("dealer_joker_revelation")
+        a_list.append("magic_acorn_planting")
+        a_list.append("treasure_map_follow")
+        a_list.append("capture_fairy_release")
+        a_list.append("lucky_lure_fishing")
+        a_list.append("mysterious_code_decode")
+        a_list.append("swamp_gold_attention")
         # Chain Starter Events
         a_list.append("hermit_trail_discovery")
         a_list.append("lost_dog_flyers_found")
@@ -1595,6 +1660,7 @@ class Lists:
         a_list.append("nightmare")
         # Conditional Night
         a_list.append("stray_cat_dies")
+        a_list.append("giant_oyster_opening")
         # One-Time (Rabbit)
         a_list.append("chase_the_rabbit")
         random.shuffle(a_list)
@@ -1680,11 +1746,10 @@ class Lists:
         a_list.append("cocaine_temptation")
         a_list.append("cocaine_crash")
         a_list.append("cocaine_heart_attack")
+        a_list.append("voodoo_doll_temptation")
         a_list.append("soulless_emptiness")
         a_list.append("soulless_mirror")
         a_list.append("soulless_recognition")
-        a_list.append("burn_scars_stares")
-        a_list.append("burn_scars_infection")
         a_list.append("weakened_immune_cold")
         a_list.append("weakened_immune_pneumonia")
         a_list.append("unpaid_tickets_boot")
@@ -1819,6 +1884,45 @@ class Lists:
         a_list.append("road_flare_torch_encounter")
         a_list.append("feeding_station_morning")
         a_list.append("splint_injury_event")
+        # ITEM USE EVENTS - no-use item activation
+        a_list.append("road_talisman_protection")
+        a_list.append("silver_horseshoe_luck")
+        a_list.append("mystery_potion_effect")
+        a_list.append("feelgood_bottle_moment")
+        a_list.append("persistent_bottle_refill")
+        a_list.append("ritual_token_ceremony")
+        a_list.append("council_feather_blessing")
+        a_list.append("cowboy_jacket_encounter")
+        a_list.append("found_phone_call")
+        a_list.append("alien_crystal_event")
+        a_list.append("dimensional_coin_flip")
+        a_list.append("radio_numbers_broadcast")
+        a_list.append("mysterious_envelope_reveal")
+        a_list.append("lockbox_contents")
+        a_list.append("hollow_tree_stash_find")
+        a_list.append("vision_map_navigate")
+        a_list.append("secret_route_shortcut")
+        a_list.append("street_cat_ally_benefit")
+        a_list.append("old_photograph_memory")
+        a_list.append("beach_romance_call")
+        a_list.append("apartment_key_visit")
+        a_list.append("fake_flower_gift")
+        a_list.append("empty_locket_memory")
+        a_list.append("stack_of_flyers_opportunity")
+        a_list.append("mysterious_key_lockbox_open")
+        a_list.append("suspicious_package_open")
+        a_list.append("stolen_watch_recognition")
+        a_list.append("underwater_camera_photos")
+        a_list.append("witch_ward_dark_protection")
+        a_list.append("deck_of_cards_street_game")
+        a_list.append("ace_of_spades_blackjack_omen")
+        a_list.append("dealer_joker_revelation")
+        a_list.append("magic_acorn_planting")
+        a_list.append("treasure_map_follow")
+        a_list.append("capture_fairy_release")
+        a_list.append("lucky_lure_fishing")
+        a_list.append("mysterious_code_decode")
+        a_list.append("swamp_gold_attention")
         # Chain Starter Events
         a_list.append("hermit_trail_discovery")
         a_list.append("lost_dog_flyers_found")
@@ -1885,6 +1989,7 @@ class Lists:
         # Conditional Night
         a_list.append("stray_cat_dies")
         a_list.append("stray_cat_has_kittens")
+        a_list.append("giant_oyster_opening")
         # One-Time Conditional (Suzy)
         a_list.append("whats_my_favorite_color")
         # One-Time (Rabbit)
@@ -1982,6 +2087,7 @@ class Lists:
         a_list.append("painkiller_overdose")
         a_list.append("cocaine_temptation")
         a_list.append("cocaine_crash")
+        a_list.append("voodoo_doll_temptation")
         a_list.append("soulless_emptiness")
         a_list.append("soulless_mirror")
         a_list.append("soulless_recognition")
@@ -2106,6 +2212,45 @@ class Lists:
         a_list.append("road_flare_torch_encounter")
         a_list.append("feeding_station_morning")
         a_list.append("splint_injury_event")
+        # ITEM USE EVENTS - no-use item activation
+        a_list.append("road_talisman_protection")
+        a_list.append("silver_horseshoe_luck")
+        a_list.append("mystery_potion_effect")
+        a_list.append("feelgood_bottle_moment")
+        a_list.append("persistent_bottle_refill")
+        a_list.append("ritual_token_ceremony")
+        a_list.append("council_feather_blessing")
+        a_list.append("cowboy_jacket_encounter")
+        a_list.append("found_phone_call")
+        a_list.append("alien_crystal_event")
+        a_list.append("dimensional_coin_flip")
+        a_list.append("radio_numbers_broadcast")
+        a_list.append("mysterious_envelope_reveal")
+        a_list.append("lockbox_contents")
+        a_list.append("hollow_tree_stash_find")
+        a_list.append("vision_map_navigate")
+        a_list.append("secret_route_shortcut")
+        a_list.append("street_cat_ally_benefit")
+        a_list.append("old_photograph_memory")
+        a_list.append("beach_romance_call")
+        a_list.append("apartment_key_visit")
+        a_list.append("fake_flower_gift")
+        a_list.append("empty_locket_memory")
+        a_list.append("stack_of_flyers_opportunity")
+        a_list.append("mysterious_key_lockbox_open")
+        a_list.append("suspicious_package_open")
+        a_list.append("stolen_watch_recognition")
+        a_list.append("underwater_camera_photos")
+        a_list.append("witch_ward_dark_protection")
+        a_list.append("deck_of_cards_street_game")
+        a_list.append("ace_of_spades_blackjack_omen")
+        a_list.append("dealer_joker_revelation")
+        a_list.append("magic_acorn_planting")
+        a_list.append("treasure_map_follow")
+        a_list.append("capture_fairy_release")
+        a_list.append("lucky_lure_fishing")
+        a_list.append("mysterious_code_decode")
+        a_list.append("swamp_gold_attention")
         # Hermit Chain
         a_list.append("hermit_trail_discovery")
         a_list.append("hermit_camp_return")
@@ -2180,6 +2325,7 @@ class Lists:
         a_list.append("nightmare")
         # Conditional Night
         a_list.append("stray_cat_has_kittens")
+        a_list.append("giant_oyster_opening")
         # One-Time (Rabbit)
         a_list.append("chase_the_third_rabbit")
         random.shuffle(a_list)
@@ -2240,6 +2386,7 @@ class Lists:
         a_list.append("cocaine_temptation")
         a_list.append("cocaine_crash")
         a_list.append("cocaine_heart_attack")
+        a_list.append("voodoo_doll_temptation")
         a_list.append("soulless_emptiness")
         a_list.append("soulless_mirror")
         a_list.append("soulless_recognition")
@@ -2335,6 +2482,45 @@ class Lists:
         a_list.append("road_flare_torch_encounter")
         a_list.append("feeding_station_morning")
         a_list.append("splint_injury_event")
+        # ITEM USE EVENTS - no-use item activation
+        a_list.append("road_talisman_protection")
+        a_list.append("silver_horseshoe_luck")
+        a_list.append("mystery_potion_effect")
+        a_list.append("feelgood_bottle_moment")
+        a_list.append("persistent_bottle_refill")
+        a_list.append("ritual_token_ceremony")
+        a_list.append("council_feather_blessing")
+        a_list.append("cowboy_jacket_encounter")
+        a_list.append("found_phone_call")
+        a_list.append("alien_crystal_event")
+        a_list.append("dimensional_coin_flip")
+        a_list.append("radio_numbers_broadcast")
+        a_list.append("mysterious_envelope_reveal")
+        a_list.append("lockbox_contents")
+        a_list.append("hollow_tree_stash_find")
+        a_list.append("vision_map_navigate")
+        a_list.append("secret_route_shortcut")
+        a_list.append("street_cat_ally_benefit")
+        a_list.append("old_photograph_memory")
+        a_list.append("beach_romance_call")
+        a_list.append("apartment_key_visit")
+        a_list.append("fake_flower_gift")
+        a_list.append("empty_locket_memory")
+        a_list.append("stack_of_flyers_opportunity")
+        a_list.append("mysterious_key_lockbox_open")
+        a_list.append("suspicious_package_open")
+        a_list.append("stolen_watch_recognition")
+        a_list.append("underwater_camera_photos")
+        a_list.append("witch_ward_dark_protection")
+        a_list.append("deck_of_cards_street_game")
+        a_list.append("ace_of_spades_blackjack_omen")
+        a_list.append("dealer_joker_revelation")
+        a_list.append("magic_acorn_planting")
+        a_list.append("treasure_map_follow")
+        a_list.append("capture_fairy_release")
+        a_list.append("lucky_lure_fishing")
+        a_list.append("mysterious_code_decode")
+        a_list.append("swamp_gold_attention")
         # Hermit Chain
         a_list.append("hermit_trail_discovery")
         a_list.append("hermit_camp_return")
@@ -2461,6 +2647,7 @@ class Lists:
         a_list.append("painkiller_overdose")
         a_list.append("cocaine_crash")
         a_list.append("cocaine_heart_attack")
+        a_list.append("voodoo_doll_temptation")
         a_list.append("soulless_emptiness")
         a_list.append("soulless_mirror")
         a_list.append("soulless_recognition")
@@ -2571,6 +2758,45 @@ class Lists:
         a_list.append("road_flare_torch_encounter")
         a_list.append("feeding_station_morning")
         a_list.append("splint_injury_event")
+        # ITEM USE EVENTS - no-use item activation
+        a_list.append("road_talisman_protection")
+        a_list.append("silver_horseshoe_luck")
+        a_list.append("mystery_potion_effect")
+        a_list.append("feelgood_bottle_moment")
+        a_list.append("persistent_bottle_refill")
+        a_list.append("ritual_token_ceremony")
+        a_list.append("council_feather_blessing")
+        a_list.append("cowboy_jacket_encounter")
+        a_list.append("found_phone_call")
+        a_list.append("alien_crystal_event")
+        a_list.append("dimensional_coin_flip")
+        a_list.append("radio_numbers_broadcast")
+        a_list.append("mysterious_envelope_reveal")
+        a_list.append("lockbox_contents")
+        a_list.append("hollow_tree_stash_find")
+        a_list.append("vision_map_navigate")
+        a_list.append("secret_route_shortcut")
+        a_list.append("street_cat_ally_benefit")
+        a_list.append("old_photograph_memory")
+        a_list.append("beach_romance_call")
+        a_list.append("apartment_key_visit")
+        a_list.append("fake_flower_gift")
+        a_list.append("empty_locket_memory")
+        a_list.append("stack_of_flyers_opportunity")
+        a_list.append("mysterious_key_lockbox_open")
+        a_list.append("suspicious_package_open")
+        a_list.append("stolen_watch_recognition")
+        a_list.append("underwater_camera_photos")
+        a_list.append("witch_ward_dark_protection")
+        a_list.append("deck_of_cards_street_game")
+        a_list.append("ace_of_spades_blackjack_omen")
+        a_list.append("dealer_joker_revelation")
+        a_list.append("magic_acorn_planting")
+        a_list.append("treasure_map_follow")
+        a_list.append("capture_fairy_release")
+        a_list.append("lucky_lure_fishing")
+        a_list.append("mysterious_code_decode")
+        a_list.append("swamp_gold_attention")
         # Hermit Chain
         a_list.append("hermit_trail_discovery")
         a_list.append("hermit_camp_return")
@@ -2775,6 +3001,45 @@ class Lists:
         a_list.append("road_flare_torch_encounter")
         a_list.append("feeding_station_morning")
         a_list.append("splint_injury_event")
+        # ITEM USE EVENTS - no-use item activation
+        a_list.append("road_talisman_protection")
+        a_list.append("silver_horseshoe_luck")
+        a_list.append("mystery_potion_effect")
+        a_list.append("feelgood_bottle_moment")
+        a_list.append("persistent_bottle_refill")
+        a_list.append("ritual_token_ceremony")
+        a_list.append("council_feather_blessing")
+        a_list.append("cowboy_jacket_encounter")
+        a_list.append("found_phone_call")
+        a_list.append("alien_crystal_event")
+        a_list.append("dimensional_coin_flip")
+        a_list.append("radio_numbers_broadcast")
+        a_list.append("mysterious_envelope_reveal")
+        a_list.append("lockbox_contents")
+        a_list.append("hollow_tree_stash_find")
+        a_list.append("vision_map_navigate")
+        a_list.append("secret_route_shortcut")
+        a_list.append("street_cat_ally_benefit")
+        a_list.append("old_photograph_memory")
+        a_list.append("beach_romance_call")
+        a_list.append("apartment_key_visit")
+        a_list.append("fake_flower_gift")
+        a_list.append("empty_locket_memory")
+        a_list.append("stack_of_flyers_opportunity")
+        a_list.append("mysterious_key_lockbox_open")
+        a_list.append("suspicious_package_open")
+        a_list.append("stolen_watch_recognition")
+        a_list.append("underwater_camera_photos")
+        a_list.append("witch_ward_dark_protection")
+        a_list.append("deck_of_cards_street_game")
+        a_list.append("ace_of_spades_blackjack_omen")
+        a_list.append("dealer_joker_revelation")
+        a_list.append("magic_acorn_planting")
+        a_list.append("treasure_map_follow")
+        a_list.append("capture_fairy_release")
+        a_list.append("lucky_lure_fishing")
+        a_list.append("mysterious_code_decode")
+        a_list.append("swamp_gold_attention")
         # Hermit Chain
         a_list.append("hermit_trail_discovery")
         a_list.append("hermit_camp_return")
@@ -3234,6 +3499,10 @@ class Lists:
 
     def make_shop_list(self, on_foot=False):
         a_list = []
+        # There is no on-foot travel in this game.
+        # Without a car the afternoon is skipped entirely (game calls night_event directly).
+        if on_foot:
+            return a_list
         if(not self.__player.has_danger("Doctor Ban")):
             a_list.append("Doctor's Office")
         if((not on_foot) and self.__player.has_met("Witch")):
@@ -3275,7 +3544,8 @@ class Lists:
         food_items = [
             ("Candy Bar", 5), ("Bag of Chips", 8), ("Turkey Sandwich", 15),
             ("Energy Drink", 12), ("Beef Jerky", 10), ("Cup Noodles", 7),
-            ("Granola Bar", 6), ("Hot Dog", 8), ("Microwave Burrito", 9)
+            ("Granola Bar", 6), ("Hot Dog", 8), ("Microwave Burrito", 9),
+            ("Cheese", 4), ("Bread", 3), ("Sandwich", 8),
         ]
         random.shuffle(food_items)
         for i in range(min(3, len(food_items))):  # 3 random food items
@@ -3325,6 +3595,12 @@ class Lists:
                 a_list.append(("Rubber Bands", 2))
             if random.randrange(6) == 0 and not self.__player.has_item("Worn Map"):
                 a_list.append(("Worn Map", 8))
+            if random.randrange(4) == 0 and not self.__player.has_item("Matches"):
+                a_list.append(("Matches", 2))
+            if random.randrange(4) == 0 and not self.__player.has_item("Birdseed"):
+                a_list.append(("Birdseed", 4))
+            if random.randrange(5) == 0 and not self.__player.has_item("Baking Soda"):
+                a_list.append(("Baking Soda", 3))
         
         # === RANK 1 (Cheap): More options ===
         if rank == 1:
@@ -3344,6 +3620,14 @@ class Lists:
                 a_list.append(("Air Freshener", 7))
             if random.randrange(5) == 0 and not self.__player.has_item("Dog Whistle"):
                 a_list.append(("Dog Whistle", 22))
+            if random.randrange(4) == 0 and not self.__player.has_item("Premium Sunscreen"):
+                a_list.append(("Premium Sunscreen", 18))
+            if random.randrange(5) == 0 and not self.__player.has_item("Battery Terminal Cleaner"):
+                a_list.append(("Battery Terminal Cleaner", 10))
+            if random.randrange(4) == 0 and not self.__player.has_item("Poncho"):
+                a_list.append(("Poncho", 12))
+            if random.randrange(5) == 0 and not self.__player.has_item("Running Shoes"):
+                a_list.append(("Running Shoes", 45))
         
         # === RANK 2 (Modest): Quality items ===
         if rank == 2:

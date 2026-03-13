@@ -207,6 +207,8 @@ class DayAnimalsMixin:
         print("\n")
         type.type("You feel... guilty? But also lucky. Definitely lucky.")
         self.add_status("Lucky")
+        self.restore_sanity(5)
+        self.change_balance(random.randint(10, 50))
         print("\n")
 
     def hungry_cow(self):
@@ -295,7 +297,7 @@ class DayAnimalsMixin:
             type.type("You've been adopted by a squirrel. You decide to call it " + cyan(bright("Squirrelly")) + ".")
             print("\n")
             type.type("Squirrelly will ride around in your car now, hiding acorns in increasingly creative places.")
-            self.add_item("Squirrelly")
+            self.add_item("Squirrely")
             self.add_companion("Squirrelly", "Squirrel")
             self.increment_statistic("companions_befriended")
             self.unlock_achievement("first_friend")
@@ -824,8 +826,13 @@ class DayAnimalsMixin:
         print("\n")
         type.type("Most rats run away. This one stays, twitching its whiskers.")
         print("\n")
-        if self.has_item("Cheese") or self.has_item("Sandwich"):
-            item = "Cheese" if self.has_item("Cheese") else "Sandwich"
+        if self.has_item("Cheese") or self.has_item("Sandwich") or self.has_item("Turkey Sandwich"):
+            if self.has_item("Cheese"):
+                item = "Cheese"
+            elif self.has_item("Turkey Sandwich"):
+                item = "Turkey Sandwich"
+            else:
+                item = "Sandwich"
             answer = ask.yes_or_no("Offer it some food? ")
             if answer == "yes":
                 type.type("You toss a bit of " + item + " near the drain. The rat grabs it and disappears.")
@@ -835,7 +842,9 @@ class DayAnimalsMixin:
                 type.type("This continues for a week. You feed the rat, it brings you coins.")
                 print("\n")
                 type.type("Eventually, the rat just... moves in. You call it " + cyan(bright("Slick")) + ". It's very good at finding money.")
+                self.use_item(item)
                 self.change_balance(random.randint(5, 15))
+                self.restore_sanity(8)
                 self.add_companion("Slick")
                 self.increment_statistic("companions_befriended")
                 if not self.has_achievement("first_friend"):

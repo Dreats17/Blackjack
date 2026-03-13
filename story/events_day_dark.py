@@ -1598,7 +1598,11 @@ class DayDarkMixin:
             type.type("Someone runs over with a stick. Beats the dog off you. It finally lets go and runs.")
             print("\n")
             type.type("Your arm is a mess of blood and torn muscle. You can see bone.")
-            self.hurt(40)
+            if self.has_item("Scrap Armor"):
+                type.type(" The makeshift padding took the worst of it.")
+                self.hurt(20)
+            else:
+                self.hurt(40)
             self.lose_sanity(15)
             self.add_danger("Dog Bite Wound")
             if self.get_balance() >= 600:
@@ -1634,7 +1638,11 @@ class DayDarkMixin:
             type.type("You jump back, heart pounding. That could have killed you.")
             print("\n")
             type.type("You report the hazard to the shop owner. They seem unimpressed.")
-            self.hurt(10)
+            if self.has_item("Scrap Armor"):
+                type.type(" Your jury-rigged gear absorbed some of the shock.")
+                self.hurt(4)
+            else:
+                self.hurt(10)
             self.lose_sanity(8)
         elif chance < 8:
             type.type("The current grabs you. Your muscles seize. You can't move. Can't breathe.")
@@ -1644,7 +1652,11 @@ class DayDarkMixin:
             type.type("Your heart is racing. Irregular. Your hands won't stop shaking.")
             print("\n")
             type.type("The hospital keeps you overnight for observation. Arrhythmia.")
-            self.hurt(35)
+            if self.has_item("Scrap Armor"):
+                type.type(" Your armor took some of the brunt.")
+                self.hurt(18)
+            else:
+                self.hurt(35)
             self.lose_sanity(15)
             if self.get_balance() >= 500:
                 type.type("Hospital: " + red(bright("$500")) + ".")
@@ -2300,6 +2312,7 @@ class DayDarkMixin:
         type.type("You put it in your pocket. It feels like it weighs a hundred pounds.")
         self.add_item("Angel's Number")
         self.restore_sanity(15)
+        self._storyline_system.advance("bridge_angel")
         print("\n")
 
     def call_bridge_angel(self):
@@ -2318,6 +2331,7 @@ class DayDarkMixin:
         print("\n")
         type.type(quote("You're stronger than you think. I believe in you."))
         self.restore_sanity(30)
+        self._storyline_system.complete("bridge_angel")
         print("\n")
 
     # === GAS STATION HERO CHAIN ===
@@ -2362,5 +2376,55 @@ class DayDarkMixin:
             type.type("You decline. You're not a hero. You just did what anyone would do.")
         print("\n")
 
+    # === VOODOO DOLL ===
+
+    def voodoo_doll_temptation(self):
+        """The Voodoo Doll calls out to be used. Powerful, but costs sanity."""
+        if not self.has_item("Voodoo Doll"):
+            self.day_event()
+            return
+        if self.has_met("Voodoo Doll Used"):
+            self.day_event()
+            return
+        self.meet("Voodoo Doll Used")
+        type.type("The " + cyan(bright("Voodoo Doll")) + " has been sitting in your bag. A small wax figure, handmade, crude.")
+        print("\n")
+        type.type("You take it out. It's warm in your hand. Warmer than it should be.")
+        print("\n")
+        type.type("The swamp witch said: " + quote("You know what to do with this.") + " Do you?")
+        print("\n")
+        action = ask.option("What do you do with it?", ["stick a pin in it", "burn it", "keep it safe"])
+        print("\n")
+        if action == "stick a pin in it":
+            type.type("You find a pin. You push it in slowly.")
+            print("\n")
+            type.type("...")
+            print("\n")
+            type.type("Somewhere across town, someone stubs their toe. You can't know this. But you do.")
+            print("\n")
+            type.type("More importantly: a rival gambler who had it out for you is suddenly... distracted tonight.")
+            self.change_balance(random.randint(200, 800))
+            self.lose_sanity(random.choice([8, 10, 15]))
+            type.type("The doll crumbles to wax dust in your hands. The deed is done.")
+            self.use_item("Voodoo Doll")
+        elif action == "burn it":
+            type.type("You hold the doll over your lighter. It resists, hissing and spitting black smoke.")
+            print("\n")
+            type.type("Then it goes. Fast. Too fast. A flash of heat and it's ash.")
+            print("\n")
+            type.type("You smell something you can't place. Not unpleasant. Like turned earth after rain.")
+            print("\n")
+            type.type("Your hands stop shaking. For the first time in weeks.")
+            self.restore_sanity(random.choice([15, 20]))
+            self.heal(10)
+            self.use_item("Voodoo Doll")
+        else:
+            type.type("You put it back. Some things are better left undone.")
+            print("\n")
+            type.type("But it's warmer now than when you picked it up. Like it noticed you almost went through with it.")
+            self.lose_sanity(3)
+        print("\n")
+
     # === HIGH ROLLER KEYCARD CHAIN ===
+
 

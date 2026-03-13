@@ -40,6 +40,19 @@ STORE_PROGRESSION_PRIORITIES: dict[str, int] = {
     "Antique Pocket Watch": 20,
     "Lottery Ticket": 14,
     "Lucky Penny": 12,
+    # Crafting ingredients (Car Workbench recipes) — verified from lists.py make_crafting_recipes
+    # These items have priority 0 elsewhere and are therefore NEVER bought without this table.
+    # With the crafting synergy boost in _store_item_priority, the effective priority
+    # becomes recipe_priority + 4 (starting boost) or + 12 (completing boost), so an
+    # ingredient for Emergency Blanket (74) reaches 78 or 86 respectively.
+    # Base priorities here ensure items are considered even before the synergy fires.
+    "Garbage Bag": 72,    # Emergency Blanket (74), Rain Collector (58), Smoke Signal Kit (60); all ranks
+    "Plastic Wrap": 70,   # Feeding Station (78), Water Purifier (64), Rain Collector (58); all ranks
+    "Fishing Line": 72,   # Lockpick Set (72), Improvised Trap (62), Fishing Rod (54); rank 2 store
+    "Rope": 64,           # Fishing Rod (54), Splint (70), Snare Trap (52); all ranks car-maintenance store
+    "Bungee Cords": 56,   # Car Alarm Rigging (66), Slingshot (46); all ranks car-maintenance store
+    "Rubber Bands": 30,   # Dream Catcher (50), Slingshot (46); rank 0 store only
+    "Breath Mints": 30,   # Smelling Salts (66) needs Hand Warmers + Breath Mints; rank 0 store only
 }
 
 STORE_MUST_HAVE_ITEMS: frozenset[str] = frozenset(
@@ -63,8 +76,11 @@ MARVIN_ITEM_PRIORITIES: dict[str, int] = {
     "Faulty Insurance": 90,
     "Dirty Old Hat": 72,
     "Golden Watch": 80,
-    "Health Indicator": 0,
-    "Delight Indicator": 0,
+    # Health Indicator ($8k-$9.5k): shows real-time HP — useful for planning doctor visits.
+    # Delight Indicator ($8.5k-$10k): shows dealer/NPC happiness — feeds gift-wrap gate logic.
+    # Both are the cheapest Marvin items alongside Rusty Compass and Gambler's Grimoire.
+    "Health Indicator": 64,
+    "Delight Indicator": 68,
     "Worn Gloves": 90,
     "Tattered Cloak": 86,
     "Gambler's Chalice": 84,
@@ -79,25 +95,37 @@ MARVIN_ITEM_PRIORITIES: dict[str, int] = {
 }
 
 MARVIN_PRICE_ESTIMATES: dict[str, int] = {
-    "Delight Indicator": 8500,
-    "Health Indicator": 8000,
-    "Dirty Old Hat": 25000,
-    "Golden Watch": 29000,
-    "Faulty Insurance": 10000,
-    "Enchanting Silver Bar": 10000,
-    "Sneaky Peeky Shades": 35000,
-    "Quiet Sneakers": 15000,
-    "Lucky Coin": 12000,
-    "Worn Gloves": 18000,
-    "Tattered Cloak": 22000,
-    "Rusty Compass": 8000,
-    "Pocket Watch": 20000,
-    "Gambler's Chalice": 28000,
-    "Twin's Locket": 35000,
-    "White Feather": 15000,
-    "Dealer's Grudge": 22000,
-    "Gambler's Grimoire": 8000,
-    "Animal Whistle": 50000,
+    # Mid-range estimates based on code-verified price ranges from locations.py.
+    # Previously these were set at the upper end ($8k+) which prevented the bot
+    # from recognising affordable items at $3k-$6k balance.  Updated to use the
+    # midpoint of each item's actual random.choice range so the bot visits Marvin
+    # once it can realistically afford something.
+    # Actual price ranges (from locations.py, rank-1 tier):
+    #   Rusty Compass:   random.choice([3000, 3500, 4000, 5000, 6000, 7500])  → median ~4500
+    #   Health Indicator:random.choice([3000, 3200, 4000, 4500, 5500, 7000])  → median ~4500
+    #   Delight Indicator:random.choice([4000, 4250, 4500, 5500, 6000, 9000]) → median ~5500
+    #   Faulty Insurance:random.choice([3500, 4000, 5000, 5500, 6000, 7000])  → median ~5000
+    #   Lucky Coin:      random.choice([5000, 5500, 6000, 7000, 8000, 10000]) → median ~6500
+    #   Gambler's Grimoire: random.choice([6000, 7500, 9000])                 → median ~7500
+    "Delight Indicator": 5500,
+    "Health Indicator": 5000,
+    "Dirty Old Hat": 22000,
+    "Golden Watch": 26000,
+    "Faulty Insurance": 5000,
+    "Enchanting Silver Bar": 9000,
+    "Sneaky Peeky Shades": 19000,
+    "Quiet Sneakers": 9000,
+    "Lucky Coin": 6500,
+    "Worn Gloves": 16000,
+    "Tattered Cloak": 12000,
+    "Rusty Compass": 5000,
+    "Pocket Watch": 18000,
+    "Gambler's Chalice": 26000,
+    "Twin's Locket": 32000,
+    "White Feather": 13000,
+    "Dealer's Grudge": 20000,
+    "Gambler's Grimoire": 7500,
+    "Animal Whistle": 48000,
 }
 
 MARVIN_ITEM_ORDER: tuple[str, ...] = (
@@ -171,23 +199,31 @@ WITCH_FLASK_PRIORITIES: dict[str, int] = {
     "Imminent Blackjack": 66,
     "Anti-Virus": 58,
     "Anti-Venom": 54,
-    "Fortunate Day": 44,
-    "Fortunate Night": 28,
+    # Fortunate Day/Night are the cheapest flasks (min $12k each from code).
+    # Raising their priorities enables the flask-only visit path at rank 2 ($10k+).
+    "Fortunate Day": 58,    # was 44; gives all day events a positive tilt
+    "Fortunate Night": 44,  # was 28; gives all night events a positive tilt
 }
 
+# Price estimates use minimum values from visit_witch_doctor random.choice() ranges.
+# Using minimums means the bot will attempt a visit when it CAN afford the cheapest
+# roll; if the actual roll is higher the bot will decline, but healing may still apply.
 WITCH_FLASK_PRICE_ESTIMATES: dict[str, int] = {
-    "No Bust": 30000,
-    "Imminent Blackjack": 50000,
-    "Dealer's Whispers": 32000,
-    "Bonus Fortune": 45000,
-    "Anti-Venom": 27000,
-    "Anti-Virus": 28000,
-    "Fortunate Day": 18000,
-    "Fortunate Night": 20000,
-    "Second Chance": 36000,
-    "Split Serum": 40000,
-    "Dealer's Hesitation": 28000,
-    "Pocket Aces": 55000,
+    # Conservative estimates — set near the upper end of each flask's price range.
+    # The actual game prices in locations.py were reduced ~25%, so visits are
+    # triggered at the old balance threshold but the bot pays less on average.
+    "No Bust": 25000,
+    "Imminent Blackjack": 40000,
+    "Dealer's Whispers": 23000,
+    "Bonus Fortune": 35000,
+    "Anti-Venom": 25000,
+    "Anti-Virus": 26000,
+    "Fortunate Day": 12000,
+    "Fortunate Night": 12000,
+    "Second Chance": 28000,
+    "Split Serum": 30000,
+    "Dealer's Hesitation": 20000,
+    "Pocket Aces": 45000,
 }
 
 
@@ -205,7 +241,7 @@ RANK_TUNER_PROFILES: dict[int, dict[str, float | int]] = {
         "store_balance_gate": 250,
         "store_health_gate": 60,
         "store_sanity_gate": 30,
-        "marvin_min_balance": 9000,
+        "marvin_min_balance": 5000,
         "marvin_floor_buffer": 3000,
         "upgrade_floor_buffer": 150000,
     },
@@ -222,25 +258,25 @@ RANK_TUNER_PROFILES: dict[int, dict[str, float | int]] = {
         "store_balance_gate": 600,
         "store_health_gate": 60,
         "store_sanity_gate": 28,
-        "marvin_min_balance": 9500,
+        "marvin_min_balance": 5500,
         "marvin_floor_buffer": 3000,
         "upgrade_floor_buffer": 180000,
     },
     2: {
-        "bet_ratio": 0.30,
-        "bet_ratio_safe": 0.20,
-        "max_ratio": 0.46,
+        "bet_ratio": 0.28,
+        "bet_ratio_safe": 0.18,
+        "max_ratio": 0.42,
         "pressure_factor": 0.74,
-        "surplus_push": 0.56,
-        "floor_keep_base": 0.98,
-        "floor_keep_mid": 0.94,
-        "floor_keep_high": 0.88,
+        "surplus_push": 0.54,
+        "floor_keep_base": 1.00,
+        "floor_keep_mid": 0.96,
+        "floor_keep_high": 0.90,
         "store_priority_min": 86,
         "store_balance_gate": 5000,
         "store_health_gate": 58,
         "store_sanity_gate": 26,
         "marvin_min_balance": 9500,
-        "marvin_floor_buffer": 1500,
+        "marvin_floor_buffer": 5000,
         "upgrade_floor_buffer": 140000,
     },
     3: {
@@ -297,6 +333,78 @@ RANK_TUNER_PROFILES: dict[int, dict[str, float | int]] = {
 }
 
 
+# Crafting recipe strategic priorities (higher = more worth crafting)
+# Categories: companion items > remedies > survival > tools > traps > weapons > charms
+CRAFTING_RECIPE_PRIORITIES: dict[str, int] = {
+    # Companion items - high value when companions present
+    "Companion Bed": 88,
+    "Pet Toy": 72,
+    "Feeding Station": 78,
+    # Remedies - good when injured or sick
+    "Home Remedy": 82,
+    "Wound Salve": 84,
+    "Splint": 70,
+    "Smelling Salts": 66,
+    # Survival - broad utility
+    "Emergency Blanket": 74,
+    "Fire Starter Kit": 68,
+    "Water Purifier": 64,
+    "Rain Collector": 58,
+    "Smoke Signal Kit": 60,
+    # Tools - utility
+    "Binocular Scope": 76,
+    "Lockpick Set": 72,
+    "Fishing Rod": 54,
+    "Signal Mirror": 48,
+    # Traps - situational
+    "Improvised Trap": 62,
+    "Car Alarm Rigging": 66,
+    "Snare Trap": 52,
+    # Weapons - defensive
+    "Road Flare Torch": 70,
+    "Pepper Spray": 68,
+    "Shiv": 56,
+    "Slingshot": 46,
+    # Charms - low direct utility
+    "Lucky Charm Bracelet": 44,
+    "Dream Catcher": 50,
+    "Worry Stone": 40,
+}
+
+# Minimum strategic priority to bother crafting.
+# Recipes with priority >= this threshold are considered worth crafting.
+# Companion items receive a +18 bonus in quicktest.py when companions are present,
+# which may push them above this threshold even if their base priority is below it.
+CRAFTING_MIN_PRIORITY: int = 60
+
+# At rank 2+, store visits only block adventure when the best store candidate has at
+# least this priority — i.e., truly urgent items like Tool Kit (93), Spare Tire (100),
+# Road Flares (96), or First Aid Kit (100).  Lower-priority items (Duct Tape ~62,
+# crafting ingredients 54-72) should NOT cancel a valid adventure run.
+CRITICAL_STORE_PRIORITY_THRESHOLD: int = 90
+
+# Gift wrapping: dealer_happiness threshold below which gift-wrapping is worth doing
+GIFT_WRAP_HAPPINESS_THRESHOLD: int = 78
+
+# Gift wrapping: minimum balance to spend on wrapping (wrapping costs a small amount)
+GIFT_WRAP_MIN_BALANCE: int = 30
+
+# Items worth gifting to the dealer (sorted by value to the gift system)
+GIFT_WORTHY_ITEMS: tuple[str, ...] = (
+    "Vintage Wine",
+    "Fancy Pen",
+    "Leather Gloves",
+    "Lucky Rabbit Foot",
+    "Antique Pocket Watch",
+    "Silver Flask",
+)
+
+# Millionaire ending preference order by strategic weight (mechanic ending > airport by default)
+# "mechanic" means visit chosen mechanic for the special ending
+# "airport" means drive to the airport
+MILLIONAIRE_ENDING_PREFERENCE: tuple[str, ...] = ("mechanic", "airport")
+
+
 def get_rank_tuner(rank: int) -> dict[str, float | int]:
     normalized_rank = max(0, min(int(rank), max(RANK_TUNER_PROFILES)))
     return dict(RANK_TUNER_PROFILES[normalized_rank])
@@ -328,6 +436,10 @@ def get_upgrade_price_estimate(item_name: str) -> int:
 
 def get_witch_flask_base_priority(flask_name: str) -> int:
     return WITCH_FLASK_PRIORITIES.get(flask_name, 0)
+
+
+def get_crafting_recipe_priority(recipe_name: str) -> int:
+    return CRAFTING_RECIPE_PRIORITIES.get(recipe_name, 0)
 
 
 def get_witch_flask_price_estimate(flask_name: str) -> int:

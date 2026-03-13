@@ -487,7 +487,7 @@ class DayPeopleMixin:
             type.type("The thief struggles with it for a minute, then gives up and runs off.")
             print("\n")
             type.type("Close call. The padlock saved you.")
-            # Padlock doesn't get consumed - it's protection
+            self.restore_sanity(6)
         elif self.has_item("Pocket Knife"):
             type.type("You grab your " + magenta(bright("Pocket Knife")) + " and brandish it!")
             print("\n")
@@ -557,6 +557,7 @@ class DayPeopleMixin:
             tip = random.randint(100, 300)
             type.type("They hand you " + green(bright("${:,}".format(tip))) + " and drive off.")
             self.change_balance(tip)
+            self.restore_sanity(8)
         else:
             type.type("You point them in the right direction. They barely acknowledge you before driving off.")
             print("\n")

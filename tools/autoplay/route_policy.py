@@ -43,7 +43,8 @@ def _score_goal_alignment(goal: str, tags: set[str]) -> float:
         "preserve_companion_roster": {"store": 70.0, "stay_home": 24.0, "pawn": -28.0, "adventure": -20.0},
         "restock_supplies": {"store": 102.0, "stay_home": 18.0, "pawn": -16.0, "loan": -12.0, "adventure": -24.0},
         "acquire_car": {"mechanic": 85.0, "loan": 28.0, "store": 10.0, "marvin": -18.0, "adventure": -25.0},
-        "bootstrap_blackjack_edge": {"store": 14.0, "stay_home": 18.0, "adventure": -18.0},
+        # bootstrap_blackjack_edge: borrowing from Vinnie buys edge items we couldn't afford yet.
+        "bootstrap_blackjack_edge": {"store": 14.0, "loan": 22.0, "stay_home": 18.0, "adventure": -18.0},
         "reduce_debt_risk": {"loan": 95.0, "pawn": 18.0, "marvin": -15.0, "adventure": -20.0},
         "contain_debt_escalation": {"loan": 105.0, "pawn": 22.0, "marvin": -18.0, "adventure": -28.0},
         "cashout_pawn_inventory": {"pawn": 108.0, "loan": 18.0, "store": -8.0, "marvin": -12.0, "adventure": -24.0},
@@ -57,7 +58,9 @@ def _score_goal_alignment(goal: str, tags: set[str]) -> float:
         "reach_adventure_threshold": {"marvin": 26.0, "mechanic": 16.0, "adventure": 10.0},
         "exploit_adventure": {"adventure": 90.0, "marvin": 12.0, "loan": -10.0},
         "convert_millionaire_to_ending": {"upgrade": 14.0, "adventure": -30.0, "loan": -40.0},
-        "push_next_rank": {"marvin": 20.0, "store": 8.0, "adventure": 10.0, "stay_home": -5.0},
+        # push_next_rank: loan shark is a direct bankroll multiplier at rank 0-1 — far more
+        # efficient than the store for a cash-poor player.  Adventure is also valid at rank 2+.
+        "push_next_rank": {"marvin": 20.0, "store": 8.0, "adventure": 14.0, "loan": 30.0, "stay_home": -5.0},
     }
     goal_weights = mapping.get(goal, {})
     return sum(goal_weights.get(tag, 0.0) for tag in tags)
@@ -77,6 +80,13 @@ def _score_route_opportunity(tags: set[str], metadata: dict[str, object]) -> flo
     loan_pressure = float(metadata.get("loan_pressure", 0) or 0)
     if "loan" in tags and metadata.get("wants_loan"):
         total += 52.0 + min(32.0, loan_pressure / 4.0)
+    # In poverty-escape mode the bot can't afford any mechanic quote; boosting the
+    # loan shark ensures it visits Vinnie first to raise capital, breaking the
+    # "try Tom → can't pay → try again" loop.
+    if "loan" in tags and metadata.get("poverty_loan_mode"):
+        total += 100.0
+    if "mechanic" in tags and metadata.get("poverty_loan_mode"):
+        total -= 80.0
 
     marvin_priority = float(metadata.get("marvin_priority", 0) or 0)
     if "marvin" in tags and metadata.get("wants_marvin"):

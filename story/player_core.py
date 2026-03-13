@@ -209,6 +209,8 @@ class Player(
             "companions_befriended": 0,
             "loans_taken": 0,
             "loans_repaid": 0,
+            "total_borrowed": 0,
+            "total_repaid": 0,
             "times_robbed": 0,
             "times_hospitalized": 0,
             "mechanic_visits": 0,
@@ -401,6 +403,8 @@ class Player(
         return len(self._flask_effects)
 
     def add_status(self, status):
+        if status not in self._status_effects:
+            self.increment_statistic("illnesses_contracted")
         self._status_effects.add(status)
 
     def has_status(self, status):
@@ -410,6 +414,8 @@ class Player(
         self._status_effects.remove(status)
 
     def add_injury(self, injury):
+        if injury not in self._injuries:
+            self.increment_statistic("injuries_sustained")
         self._injuries.add(injury)
 
     def has_injury(self, injury):
@@ -472,10 +478,16 @@ class Player(
     # ============================================
     
     def apply_necronomicon_effects(self):
-        """The Necronomicon slowly corrupts you."""
+        """The Necronomicon slowly corrupts you. Occasionally grants dark visions."""
         if self.has_item("Necronomicon"):
-            if random.randrange(5) == 0:  # 20% chance per day
-                self.lose_sanity(random.choice([1, 2, 3]))
+            roll = random.randrange(10)
+            if roll == 0:  # 10% chance: dark vision — money, but heavy sanity cost
+                amount = random.randint(100, 500)
+                self.change_balance(amount)
+                self.lose_sanity(random.choice([8, 10, 12]))
+                return True
+            elif roll <= 2:  # rolls 1 or 2 → 20% chance: simple corruption
+                self.lose_sanity(random.choice([2, 3, 5]))
                 return True
         return False
     
@@ -493,7 +505,63 @@ class Player(
                 self.restore_sanity(1)
                 return True
         return False
-    
+
+    def apply_daily_item_flavor(self):
+        """Once per ~3 days, one carried collectible gets a quiet passive moment.
+        Returns (item_name, text_with_{item}_placeholder) or None. Applies its stat effect."""
+        if random.randrange(3) != 0:
+            return None
+
+        # (item, flavor_text_with_{item}, effect_type, effect_val)
+        # effect_type: "sanity" | "heal" | "sanity_heal" | "money" | "sanity_money"
+        candidates = [
+            ("Filled Locket",       "Your eyes catch the {item} hanging from the mirror. Those two faces, watching over you. You feel less alone.",         "sanity",       2),
+            ("Moon Shard",          "The {item} glows softly on the dash. Cool and white. Something about it settled your dreams.",                          "sanity_heal",  (3, 2)),
+            ("Midnight Rose",       "The {item} is still alive. Somehow. Against all odds. It smells faintly of something you can't name.",                  "sanity",       2),
+            ("Rabbit's Blessing",   "You find a few dollars in a jacket pocket you forgot. The {item}, working quietly.",                                    "sanity_money", (2, 5, 25)),
+            ("Championship Medal",  "You glance at the {item} in your bag. You won something once. That's real.",                                           "sanity",       2),
+            ("Key to the City",     "The {item} catches someone's eye at the counter. They wave off the fee.",                                              "money",        (25, 100)),
+            ("Bear King's Respect", "People step aside today without knowing why. The {item} carries weight even here.",                                     "sanity",       3),
+            ("Kraken's Memory",     "The {item} pulses behind your eyes. A thousand years of ocean depth, compressed into a moment.",                        "sanity_heal",  (4, 3)),
+            ("Fight Champion Belt", "The {item} in your bag reminds you what you're capable of. You've won before. You can win again.",                      "sanity",       3),
+            ("Deep Stone",          "The {item} glows faint bioluminescent blue. Cold. Deep. Ancient. Calming.",                                            "sanity",       3),
+            ("Antique Ring",        "The {item} catches morning light. Whatever story it holds, it isn't yours — but you're part of it now.",                "sanity",       2),
+            ("Kraken Pearl",        "The {item} pulses in your bag. The deep ocean remembers you.",                                                         "sanity",       4),
+            ("Mermaid Crown",       "Light catches the {item} through the window. Whatever you are, you've touched something larger.",                       "sanity",       4),
+            ("Hero Medal",          "The {item} sits heavy in your pocket. You earned it. That's real, even when nothing else feels real.",                  "sanity",       3),
+            ("Giant Bear Tooth",    "Someone glances at the {item} on your dash and doesn't mess with you. Some trophies communicate silently.",             "sanity",       2),
+            ("Crab Racing Trophy",  "You glance at the {item}. You won something against all odds. Doesn't hurt to remember that.",                         "sanity",       3),
+            ("Tortoise Trophy",     "You glance at the {item}. Slow and steady somehow won. You're still here.",                                            "sanity",       3),
+            ("Matched Pearls",      "The {item} catch morning light. The ocean made something perfect, and you found both of them.",                         "sanity",       3),
+            ("Pink Pearl",          "The {item} catches morning light. Something beautiful from the deep, riding in your pocket.",                           "sanity",       3),
+            ("Mermaid Pearl",       "The {item} sits warm in your palm. A gift from another world entirely.",                                               "sanity",       3),
+            ("Ancient Sea Map",     "The {item} shows coastlines that may not exist anymore. The world was different, once.",                                "sanity",       3),
+            ("Cannon Gem",          "The {item} catches light at an angle that makes no sense. You stare at it longer than you meant to.",                   "sanity",       2),
+            ("Pirate Treasure",     "The {item} is heavy in the back. Heavy in a satisfying way. The weight of things earned.",                             "sanity",       3),
+            ("Treasure Chest",      "The {item} sits in the back, locked. Something good inside. Yours.",                                                   "sanity",       3),
+        ]
+
+        available = [(item, text, etype, eval_) for item, text, etype, eval_ in candidates if self.has_item(item)]
+        if not available:
+            return None
+
+        item_name, text, effect_type, val = random.choice(available)
+
+        if effect_type == "sanity":
+            self.restore_sanity(val)
+        elif effect_type == "heal":
+            self.heal(val)
+        elif effect_type == "sanity_heal":
+            self.restore_sanity(val[0])
+            self.heal(val[1])
+        elif effect_type == "money":
+            self.change_balance(random.randint(val[0], val[1]))
+        elif effect_type == "sanity_money":
+            self.restore_sanity(val[0])
+            self.change_balance(random.randint(val[1], val[2]))
+
+        return (item_name, text)
+
     def has_fire_source(self):
         """Check if player can make fire."""
         return (self.has_item("Lighter") or self.has_item("Matches") or 
@@ -688,7 +756,9 @@ class Player(
             "Mysterious Lockbox", "Mysterious Key", "Mysterious Code",
             "Fountain Water", "Treasure Map", "Joe's Treasure Map",
             # Secret Items (2 items)
-            "Dealer's Joker", "Ace of Spades"
+            "Dealer's Joker", "Ace of Spades",
+            # Sentimental Items
+            "Filled Locket"
         ]
     
     def get_collectible_prices(self):
@@ -763,6 +833,8 @@ class Player(
             # Secret Items
             "Dealer's Joker": 50000,
             "Ace of Spades": 1000,
+            # Sentimental Items
+            "Filled Locket": 500,
         }
     
     def get_gus_total_collectibles(self):

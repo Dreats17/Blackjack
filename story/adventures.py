@@ -1346,6 +1346,8 @@ class AdventuresMixin:
                     if r1 == "lettuce":
                         if self.has_item("Lettuce") or random.random() < 0.3:
                             type.type("You wave lettuce in front of City Slicker's face. It SNAPS to attention and starts moving!")
+                            if self.has_item("Lettuce"):
+                                self.use_item("Lettuce")
                             race_score += 2
                         else:
                             type.type("You don't have lettuce! City Slicker continues his existential wandering.")
@@ -2248,6 +2250,8 @@ class AdventuresMixin:
                     if motivate == "food":
                         if self.has_item("Fish") or self.has_item("Live Fish"):
                             type.type("You dangle fish in front of Deathclaw. He ROCKETS forward!")
+                            fish_item = "Fish" if self.has_item("Fish") else "Live Fish"
+                            self.use_item(fish_item)
                             result = random.choice(["1st", "2nd", "1st", "1st"])
                         else:
                             type.type("You mime having food. Deathclaw is unimpressed.")
@@ -3313,9 +3317,12 @@ class AdventuresMixin:
                 print("\n")
             
             elif action == "share_food":
-                if self.has_item("Food"):
+                food_items = ["Turkey Sandwich", "Beef Jerky", "Granola Bar", "Hot Dog",
+                              "Candy Bar", "Bread", "Cheese", "Cup Noodles", "Microwave Burrito"]
+                shared_food = next((f for f in food_items if self.has_item(f)), None)
+                if shared_food:
                     type.type("You share what you have. It's not much, but their gratitude is real.")
-                    self.use_item("Food")
+                    self.use_item(shared_food)
                 else:
                     type.type("You don't have any food. But you sit with them while they eat what they have.")
                 print("\n")

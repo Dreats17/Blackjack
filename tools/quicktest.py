@@ -56,9 +56,14 @@ import story
 import typer as _typer
 from tools.autoplay import DecisionOption, DecisionRequest, DecisionTrace, build_game_state_snapshot, choose_route_option, choose_strategic_goal
 from tools.autoplay.config import (
+    CRAFTING_MIN_PRIORITY,
+    CRAFTING_RECIPE_PRIORITIES,
+    GIFT_WRAP_HAPPINESS_THRESHOLD,
+    GIFT_WRAP_MIN_BALANCE,
     MARVIN_ITEM_ORDER,
     STORE_CAR_SURVIVAL_PRIORITIES,
     STORE_MUST_HAVE_ITEMS,
+    get_crafting_recipe_priority,
     get_rank_tuner,
     get_marvin_base_priority,
     get_marvin_price_estimate,
@@ -91,6 +96,8 @@ MECHANIC_DECISIONS = []
 EARLY_MECHANIC_DAY_LIMIT = 10
 EARLY_MECHANIC_THRESHOLD = 200
 FALLBACK_DECISIONS = Counter()
+FLASK_PURCHASES = Counter()  # tracks which witch flasks are bought during the run
+ITEMS_EVER_BROKEN = Counter()  # accumulates all items that break across cycles
 EVER_HAD_CAR = False
 DECISION_REQUESTS = []
 DECISION_TRACES = []
@@ -171,6 +178,11 @@ def _render_item_history(entries):
 
 def _capture_type(self, *args, **kwargs):
     _remember_text(*args)
+    text = " ".join(str(part) for part in args if part is not None)
+    text = ANSI_RE.sub("", text)
+    if text:
+        _story_file.write(text)
+        _story_file.flush()
 
 
 def _get_recent_menu_options(limit=40):
@@ -777,6 +789,7 @@ def _structured_economy_hints(player):
         "marvin_affordable_priority": int(marvin_affordable_priority),
         "marvin_candidate_price": marvin_candidate_price,
         "marvin_strong_window": int(marvin_strong_window),
+        "fake_cash": int(player.get_fraudulent_cash()) if hasattr(player, "get_fraudulent_cash") else 0,
     }
 
 
@@ -1086,6 +1099,8 @@ def _needs_doctor(player):
         or (player.has_item("Car") and len(injuries) >= 1 and 60 <= player._health < 85)
         or (player._health < 55 and len(injuries) >= 1)
         or (player._health < 60 and len(statuses) >= 1)
+        # Visit when 3+ total conditions are present — compound accumulation is dangerous.
+        or (len(injuries) + len(statuses) >= 3)
         or len(injuries) >= 2
         or (player._health < 50 and len(statuses) >= 2)
         or (player._sanity < 24 and len(statuses) >= 2)
@@ -1106,11 +1121,16 @@ def _doctor_visit_is_urgent(player):
     urgent_injuries = {"ruptured spleen", "concussion", "broken ribs", "punctured lung"}
     injuries = _injury_names(player)
     return (
-        player._health < 30
+        player._health < 35
         or player._sanity < 12
         or any(status in urgent_statuses for status in statuses)
         or any(injury in urgent_injuries for injury in injuries)
         or (player._health < 42 and len(statuses) >= 2)
+        or (player._health < 48 and len(statuses) + len(injuries) >= 3)
+        # Compound accumulation: treat as urgent when overwhelming conditions exist
+        or len(injuries) >= 3
+        or len(statuses) >= 5
+        or (len(injuries) >= 2 and len(statuses) >= 3)
     )
 
 
@@ -1152,6 +1172,28 @@ def _doctor_heal_cost_estimate(player):
     if player.has_item("Faulty Insurance"):
         return max(0, int(balance * 0.18))
     return max(0, int(balance * 0.48))
+
+
+def _doctor_cash_reserve(player):
+    """Cash to hold back for a doctor/witch visit that is currently needed.
+
+    Returns 0 when the player is healthy — there is no reason to reserve funds for
+    a hypothetical future visit.  Only reserves when a visit is actually warranted.
+    """
+    if player is None:
+        return 0
+    if _doctor_visit_is_urgent(player):
+        if _wants_witch_heal(player):
+            return _witch_heal_cost_estimate(player)
+        return _doctor_heal_cost_estimate(player)
+    if _needs_doctor(player):
+        estimate = _witch_heal_cost_estimate(player) if player.has_met("Witch") else _doctor_heal_cost_estimate(player)
+        return min(max(60, int(estimate * 0.75)), max(0, int(player.get_balance())))
+    if _wants_witch_heal(player):
+        return _witch_heal_cost_estimate(player)
+    if _wants_doctor_visit(player):
+        return _doctor_heal_cost_estimate(player)
+    return 0
 
 
 def _flask_count(player):
@@ -1249,6 +1291,64 @@ def _wants_witch_heal(player):
     return score >= 60 or potion_priority >= 72
 
 
+def _wants_witch_flask_only_run(player):
+    """Return True when visiting the Witch Doctor purely to buy a flask (no healing needed).
+
+    Verified from locations.py visit_witch_doctor:
+      - Heal costs 5-25% of balance (optional — player can say NO).
+      - Cheapest flasks are Fortunate Day ($12k-$18k) and Fortunate Night ($12k-$20k).
+      - Flask prices are freshly randomised each visit, so we use min estimates to decide
+        whether a visit is worth attempting; the bot will skip if the actual price is too high.
+    Only fires when:
+      - Not already needing healing (use _wants_witch_heal for that path).
+      - Has met the Witch and has fewer than 2 active flasks.
+      - Balance covers the heal cost buffer PLUS the cheapest affordable flask.
+      - Health/sanity are high enough that the visit isn't health-motivated.
+      - Has not visited the Witch recently (gap > 5 days).
+      - Marvin does NOT have better, affordable high-priority items waiting (defer to Marvin first).
+    """
+    if player is None or not player.has_met("Witch"):
+        return False
+    if _needs_doctor(player):
+        return False  # Use _wants_witch_heal for that combined path
+    if _flask_count(player) >= 2:
+        return False
+    if player.get_health() < 72 or player.get_sanity() < 38:
+        return False
+
+    witch_gap = _days_since_location(player, "doctor:witch")
+    if witch_gap == 0:
+        return False
+    if witch_gap is not None and witch_gap <= 5:
+        return False
+
+    # Defer to Marvin when he has high-priority affordable items: a flask purchase
+    # can drain cash needed for Marvin buys (Rusty Compass $8k, Grimoire $8k, etc.).
+    if _wants_marvin_run(player) and _best_marvin_affordable_priority(player) >= 72:
+        return False
+
+    balance = player.get_balance()
+    heal_buffer = _witch_heal_cost_estimate(player)
+    affordable_priority = _best_affordable_witch_flask_priority(player)
+    if affordable_priority < 58:
+        return False
+    # Need balance to comfortably cover the flask purchase plus a heal buffer.
+    # The heal is optional (bot will say NO to heal on a flask-only visit) but we
+    # keep a buffer to avoid arriving just barely short of the flask price.
+    # Find cheapest flask estimate that's affordable AND meets the priority threshold
+    for flask_name in ["Fortunate Day", "Fortunate Night", "Dealer's Hesitation",
+                       "Anti-Virus", "Anti-Venom", "Dealer's Whispers", "No Bust",
+                       "Second Chance", "Bonus Fortune", "Split Serum",
+                       "Imminent Blackjack", "Pocket Aces"]:
+        priority = _witch_flask_priority(flask_name, player)
+        if priority < 58:
+            continue
+        est = get_witch_flask_price_estimate(flask_name)
+        if balance >= est + heal_buffer:
+            return True
+    return False
+
+
 def _should_visit_doctor(player):
     if player is None or not _needs_doctor(player):
         return False
@@ -1293,6 +1393,18 @@ def _should_visit_doctor(player):
 
     if urgent:
         return balance >= estimated_cost
+
+    # Critical compound illness: visit even at very low balance to break the
+    # illness-spiral before it becomes fatal.  4+ statuses or 3+ injuries signals
+    # that treatment is overdue regardless of remaining cash.
+    if balance >= estimated_cost and balance > 30:
+        if len(statuses) >= 4:
+            return True
+        if len(injuries) >= 3:
+            return True
+        if len(statuses) >= 2 and len(injuries) >= 2:
+            return True
+
     if player.has_item("Car"):
         if len(injuries) >= 2 and remaining_balance >= 70:
             return True
@@ -1301,7 +1413,10 @@ def _should_visit_doctor(player):
                 return True
         if len(statuses) >= 2 and remaining_balance >= 90 and player.get_health() < 80:
             return True
-    if remaining_balance < 120:
+        # 3+ combined injuries+statuses: treat as compound accumulation regardless of HP.
+        if len(injuries) + len(statuses) >= 3 and remaining_balance >= 120:
+            return True
+    if remaining_balance < 100:
         return False
     if player.get_health() < 62 and remaining_balance >= 120:
         return True
@@ -1390,21 +1505,76 @@ def _rank_tuner(player):
     return get_rank_tuner(rank)
 
 
-def _doctor_cash_reserve(player):
+def _rank_protection_floor(player):
+    """Minimum balance to keep so a single purchase can't drop the player out of their rank.
+
+    At ranks > 1 there should be strict rules about catastrophic spending.  The floor
+    is the balance threshold of the CURRENT rank — a rank-2 player ($10k–$99k) should
+    not spend down below $10,000 (the rank-2 entry threshold) in one shot.
+
+    This prevents the bot from wiping out its rank cushion with a single low-priority
+    purchase.  High-priority items (≥88) already have their own push-window override.
+
+    Returns 0 at rank 0/1 because those ranks have minimal consequence.
+    """
     if player is None:
         return 0
-    if _doctor_visit_is_urgent(player):
-        if _wants_witch_heal(player):
-            return _witch_heal_cost_estimate(player)
-        return _doctor_heal_cost_estimate(player)
-    if _needs_doctor(player):
-        estimate = _witch_heal_cost_estimate(player) if player.has_met("Witch") else _doctor_heal_cost_estimate(player)
-        return min(max(60, int(estimate * 0.75)), max(0, int(player.get_balance())))
-    if _wants_witch_heal(player):
-        return _witch_heal_cost_estimate(player)
-    if _wants_doctor_visit(player):
-        return _doctor_heal_cost_estimate(player)
-    return 0
+    rank = int(player.get_rank())
+    # Balance thresholds per rank (index = rank): 0→$0, 1→$1k, 2→$10k, 3→$100k, 4→$500k, 5→$900k.
+    # Must stay in sync with _rank_from_balance() and usage in Marvin buy decision.
+    thresholds = [0, 1000, 10000, 100000, 500000, 900000]
+    if rank <= 1:
+        return 0
+    return thresholds[rank]
+
+
+def _in_rank_push_window(player):
+    """True when the bot is actively pushing toward the next rank or a win milestone.
+
+    Used to unlock more aggressive spend/loan decisions — e.g. borrowing right before
+    a Marvin purchase so the post-purchase balance stays healthy, or allowing a deeper
+    balance dip when buying a high-priority edge item.  The gate prevents these more
+    aggressive strategies from firing during ordinary grinding when any downside is
+    hard to recover from.
+    """
+    if player is None or not player.has_item("Car"):
+        return False
+    if _wants_doctor_visit(player) or _doctor_visit_is_urgent(player):
+        return False
+    if player.get_health() < 50 or player.get_sanity() < 24:
+        return False
+
+    balance = player.get_balance()
+    rank = int(player.get_rank())
+    target = _rank_target(balance)   # next rank threshold
+    floor = _rank_floor(balance)     # current rank floor
+
+    # Don't push if we're stalled for too long — suggests a structural problem, not
+    # just a temporary gap before a good purchase.
+    if _progress_stall_days(player) > 12:
+        return False
+
+    # "Pushing for a rank up": within the top half of the current rank bracket,
+    # OR in the lower half but with a clear Marvin target identified.
+    # e.g. rank 1 ($1k–$10k): pushing when balance >= $4.6k (= 1k + 40%*9k).
+    # e.g. rank 2 ($10k–$100k): pushing when balance >= $28k (= 10k + 20%*90k).
+    # We use a low 20% threshold for rank 2+ because rank brackets are wide and
+    # the loan-before-Marvin strategy is most valuable early in the bracket.
+    push_pct = 0.20 if rank >= 2 else 0.40
+    rank_span = max(1, target - floor)
+    push_threshold = floor + int(rank_span * push_pct)
+
+    # "Pushing for a win": at rank 2+ with strong edge, healthy state — not
+    # necessarily near the rank ceiling but positioned to sustain aggressive play.
+    pushing_for_win = (
+        rank >= 2
+        and _blackjack_edge_score(player) >= 4
+        and player.get_health() >= 65
+        and player.get_sanity() >= 32
+        and balance >= floor + int(rank_span * 0.10)
+    )
+
+    return balance >= push_threshold or pushing_for_win
 
 
 def _needs_recovery_day(player):
@@ -1484,6 +1654,15 @@ def _cash_safety_reserve(player, priority=0):
         else:
             reserve = max(reserve, int(floor * tuner["floor_keep_base"]))
 
+    # Rank protection: at ranks > 1, do not let optional spending drop the player
+    # more than one full rank.  This is a hard lower bound — the tuner coefficients
+    # above already keep the balance near the CURRENT rank floor, but if the current
+    # balance is far above that floor (e.g. $50k at rank 2) the protection floor
+    # matters for ensuring a single large purchase cannot drop two ranks at once.
+    protection_floor = _rank_protection_floor(player)
+    if protection_floor > 0:
+        reserve = max(reserve, protection_floor)
+
     return min(balance, reserve)
 
 
@@ -1531,6 +1710,40 @@ def _store_item_priority(item_name, player):
         priority += 4
     if item_name == "Lucky Penny" and player.get_rank() == 0:
         priority += 4
+    # Crafting synergy: if this item is an ingredient in a high-priority recipe and
+    # the player has a Tool Kit, boost the priority so that crafting ingredients
+    # trigger store visits even before the other ingredients are in inventory.
+    # This breaks the chicken-and-egg deadlock where neither ingredient of a two-
+    # ingredient recipe would ever be bought because the other wasn't present first.
+    # Two tiers:
+    #   - "completing" boost: all other ingredients present → recipe_priority + 16
+    #     (+16 brings Emergency Blanket from 74 → 90, crossing the midgame-growth-
+    #     window gate of >=90 that otherwise suppresses cheap low-impact store items)
+    #   - "starting" boost:   no other ingredients yet       → recipe_priority + 6
+    #     (+6 brings Emergency Blanket from 74 → 80, which crosses the rank-0 threshold
+    #     of 80 so the first ingredient gets bought at rank 0 too)
+    # Capped at rank <= 1 (rank 2+ blocks non-survival store trips anyway).
+    if player.has_item("Tool Kit") and int(player.get_rank()) <= 1:
+        try:
+            for recipe_name, recipe in player._lists.get_crafting_recipes().items():
+                if player.has_item(recipe_name):
+                    continue  # already crafted this recipe
+                ingredients = recipe.get("ingredients", [])
+                if item_name not in ingredients:
+                    continue
+                recipe_priority = get_crafting_recipe_priority(recipe_name)
+                if recipe_priority < CRAFTING_MIN_PRIORITY:
+                    continue
+                others = [ing for ing in ingredients if ing != item_name]
+                if all(player.has_item(ing) for ing in others):
+                    # Completing boost: buying this finishes the recipe (crosses 90 gate)
+                    priority = max(priority, recipe_priority + 16)
+                else:
+                    # Starting boost: buying this makes progress toward the recipe
+                    priority = max(priority, recipe_priority + 6)
+                break
+        except Exception:
+            pass
     return priority
 
 
@@ -1737,6 +1950,19 @@ def _best_marvin_candidate(player, budget):
 
 
 def _marvin_loan_plan(player):
+    """Return a loan plan to fund a Marvin purchase, or None if not applicable.
+
+    Two modes:
+    1. Buy-enable  – the target item is unaffordable outright; borrow the shortfall.
+    2. Buffer-preserve – the item IS affordable but buying it leaves the player nearly
+       broke (dropping 2 ranks or below the post-purchase safety floor); borrow enough
+       so the post-purchase balance stays comfortable.
+
+    Mode 2 only activates during a rank-push or win-push window — i.e. when the player
+    is actively pushing toward the next rank / a win milestone and has the health/edge
+    to sustain aggressive play.  This mirrors the user intent of "loans right before a
+    purchase, when pushing for a rank up or a win."
+    """
     if player is None or not player.has_item("Car") or not _has_marvin_access(player):
         return None
     if not player.has_met("Vinnie") or int(player.get_loan_shark_debt()) > 0:
@@ -1747,33 +1973,71 @@ def _marvin_loan_plan(player):
         return None
 
     balance = player.get_balance()
-    if balance < 2000 or balance >= 26000:
-        return None
-
-    current = _best_marvin_candidate(player, balance)
-    if current is not None and current[0] >= 84:
-        return None
-
+    rank = int(player.get_rank())
     doctor_reserve = max(80, _doctor_cash_reserve(player))
     if balance <= doctor_reserve:
         return None
+
+    # Upper balance cap: no need to borrow when already flush.
+    # Expanded from old $26k cap to allow buffer-preserve loans at higher ranks.
+    max_balance_for_plan = {0: 10000, 1: 20000, 2: 60000, 3: 200000}.get(rank, 60000)
+    if balance >= max_balance_for_plan:
+        return None
+
+    in_push = _in_rank_push_window(player)
+
+    # Post-purchase safety floor: minimum balance to retain after buying.
+    # During a push window we allow a deeper dip (protection_floor // 2 at minimum),
+    # because the improved edge score will repay the short-term pain faster.
+    protection_floor = _rank_protection_floor(player)
+    if in_push:
+        post_purchase_min = max(doctor_reserve, protection_floor // 2)
+    else:
+        post_purchase_min = max(doctor_reserve, protection_floor)
+
+    # Check whether the current best affordable item already qualifies — if so, skip
+    # borrowing; we'll just buy it.
+    current = _best_marvin_candidate(player, balance)
+    current_ok = current is not None and current[0] >= 84
 
     for loan_amount in (500, 1000, 2500, 5000):
         candidate = _best_marvin_candidate(player, balance + loan_amount)
         if candidate is None:
             continue
         priority, price, item_name = candidate
+
         shortfall = max(0, price - balance)
-        if shortfall == 0 or shortfall > loan_amount:
+
+        # Mode 1: buy-enable — need the loan just to afford the item.
+        if shortfall > 0:
+            if shortfall > loan_amount:
+                continue
+            if balance + loan_amount - price < doctor_reserve:
+                continue
+            if item_name == "Faulty Insurance" and priority >= 84:
+                return {"borrow": loan_amount, "price": price, "priority": priority, "item": item_name, "mode": "buy_enable"}
+            if priority >= 88 and shortfall <= loan_amount:
+                return {"borrow": loan_amount, "price": price, "priority": priority, "item": item_name, "mode": "buy_enable"}
+            if priority >= 84 and shortfall <= 2500:
+                return {"borrow": loan_amount, "price": price, "priority": priority, "item": item_name, "mode": "buy_enable"}
             continue
-        if balance + loan_amount - price < doctor_reserve:
+
+        # Mode 2: buffer-preserve — can afford the item but post-purchase balance is
+        # dangerously low.  Only during a push window, and only for high-priority items.
+        if not in_push:
             continue
-        if item_name == "Faulty Insurance" and priority >= 88 and shortfall <= loan_amount:
-            return {"borrow": loan_amount, "price": price, "priority": priority, "item": item_name}
-        if priority >= 92 and shortfall <= 2500:
-            return {"borrow": loan_amount, "price": price, "priority": priority, "item": item_name}
-        if priority >= 84 and shortfall <= 1500:
-            return {"borrow": loan_amount, "price": price, "priority": priority, "item": item_name}
+        if current_ok:
+            continue  # can already afford a great item without a loan
+        post_purchase = balance - price
+        if post_purchase >= post_purchase_min + loan_amount:
+            continue  # buffer is already fine even without borrowing
+        needed_buffer = post_purchase_min - post_purchase
+        if needed_buffer <= 0 or needed_buffer > loan_amount:
+            continue
+        if priority < 80:
+            continue
+        return {"borrow": loan_amount, "price": price, "priority": priority, "item": item_name, "mode": "buffer_preserve"}
+
     return None
 
 
@@ -2065,55 +2329,170 @@ def _wants_upgrade_run(player):
     return _best_upgrade_candidate(player) is not None
 
 
+def _workbench_best_craft_candidate(player):
+    """Returns (recipe_name, priority) for the best craftable item, or None.
+
+    Uses player._lists.get_available_recipes to find what can be crafted,
+    then ranks them by get_crafting_recipe_priority.  Companion items get a
+    bonus when companions are present so the bot prefers them.
+    """
+    if player is None or not hasattr(player, "_lists"):
+        return None
+    try:
+        available = player._lists.get_available_recipes(player)
+    except Exception:
+        return None
+    if not available:
+        return None
+    companion_count = _companion_count(player)
+    best_name = None
+    best_priority = -1
+    for name in available:
+        priority = get_crafting_recipe_priority(name)
+        recipe = available[name]
+        if recipe.get("category") == "companion" and companion_count > 0:
+            priority += 18
+        if priority > best_priority:
+            best_name = name
+            best_priority = priority
+    if best_name is None or best_priority < CRAFTING_MIN_PRIORITY:
+        return None
+    return (best_name, best_priority)
+
+
+def _wants_workbench_craft_run(player):
+    """Return True when visiting the Car Workbench to craft an item is worthwhile.
+
+    Requires Tool Kit in inventory (which unlocks the Car Workbench in make_shop_list)
+    and at least one craftable recipe above the minimum priority threshold.
+    Verified from lists.py: Car Workbench is unlocked by has_item("Tool Kit").
+    """
+    if player is None or not player.has_item("Car") or not player.has_item("Tool Kit"):
+        return False
+    if _wants_doctor_visit(player) or _doctor_visit_is_urgent(player):
+        return False
+    workbench_gap = _days_since_location(player, "shop:car_workbench")
+    if workbench_gap == 0:
+        return False
+    # Don't return for crafting more than every 2 days (low opportunity cost when nothing new is ready)
+    if workbench_gap is not None and workbench_gap <= 2:
+        return False
+    return _workbench_best_craft_candidate(player) is not None
+
+
+def _choose_workbench_menu(options, player):
+    """Choose from workbench main menu: craft if viable, otherwise pack up."""
+    leave_choice = None
+    craft_choice = None
+    for number, label in options:
+        lowered = label.lower()
+        if "pack up" in lowered or "leave" in lowered:
+            leave_choice = number
+        elif "craft something" in lowered or lowered.startswith("1.") or number == 1:
+            craft_choice = number
+
+    candidate = _workbench_best_craft_candidate(player)
+    if candidate is not None and craft_choice is not None:
+        name, priority = candidate
+        return _record_numeric_menu_trace(
+            player,
+            request_type="menu_select",
+            stable_context_id="workbench_menu",
+            menu_options=options,
+            chosen_number=craft_choice,
+            reason=f"workbench_craft_viable:{name}",
+            confidence=0.78,
+        )
+    # No viable recipe: pack up
+    target = leave_choice if leave_choice is not None else (options[-1][0] if options else 1)
+    return _record_numeric_menu_trace(
+        player,
+        request_type="menu_select",
+        stable_context_id="workbench_menu",
+        menu_options=options,
+        chosen_number=target,
+        reason="workbench_pack_up_no_recipes",
+        confidence=0.88,
+    )
+
+
+def _choose_workbench_craft(options, player):
+    """Pick the best recipe from the workbench craft sub-menu."""
+    if not options:
+        return options[-1][0] if options else 1
+    cancel_choice = None
+    companion_count = _companion_count(player)
+    best_number = None
+    best_priority = -1
+    companion_recipes = frozenset(
+        name for name, recipe in CRAFTING_RECIPE_PRIORITIES.items()
+        if name in ("Companion Bed", "Pet Toy", "Feeding Station")
+    )
+    for number, label in options:
+        lowered = label.lower()
+        if "never mind" in lowered or "cancel" in lowered:
+            cancel_choice = number
+            continue
+        # Match recipe name from the label (number. Name <- ingredients)
+        label_stripped = label.split("←")[0].strip()
+        label_stripped = label_stripped.lstrip("0123456789. ").strip()
+        priority = get_crafting_recipe_priority(label_stripped)
+        if priority <= 0:
+            # Try matching any known recipe name inside the label
+            for known_name in CRAFTING_RECIPE_PRIORITIES:
+                if known_name.lower() in lowered:
+                    priority = get_crafting_recipe_priority(known_name)
+                    label_stripped = known_name
+                    break
+        if priority <= 0:
+            continue
+        if label_stripped in companion_recipes and companion_count > 0:
+            priority += 18
+        if priority > best_priority:
+            best_priority = priority
+            best_number = number
+
+    if best_number is not None:
+        return _record_numeric_menu_trace(
+            player,
+            request_type="menu_select",
+            stable_context_id="workbench_craft_menu",
+            menu_options=options,
+            chosen_number=best_number,
+            reason="workbench_recipe_selected",
+            confidence=0.82,
+        )
+    # No good recipe found: cancel
+    target = cancel_choice if cancel_choice is not None else (options[-1][0] if options else 1)
+    return _record_numeric_menu_trace(
+        player,
+        request_type="menu_select",
+        stable_context_id="workbench_craft_menu",
+        menu_options=options,
+        chosen_number=target,
+        reason="workbench_no_viable_recipe_cancel",
+        confidence=0.8,
+    )
+
+
 def _wants_doctor_visit(player):
     return player is not None and _should_visit_doctor(player)
 
 
 def _defer_doctor_for_no_car_progression(player, route_labels, planned_goal=None):
-    if player is None or player.has_item("Car") or _doctor_visit_is_urgent(player):
-        return False
-
-    if planned_goal is None:
-        planned_goal = choose_strategic_goal(
-            _current_game_state(player, context_tag="no_car_doctor_deferral")
-        ).goal
-
-    if planned_goal != "acquire_car":
-        return False
-
-    injuries = _injury_names(player)
-    statuses = _status_names(player)
-    severe_injuries = {"ruptured spleen", "concussion", "broken ribs", "punctured lung"}
-    severe_statuses = {
-        "appendicitis", "anaphylaxis", "blood pressure crisis", "dvt", "gangrene", "heat stroke",
-        "hypothermia", "kidney stones", "needle exposure", "pancreatitis", "pneumonia",
-        "possible rabies", "seizure disorder", "sepsis", "severe asthma", "severe dehydration",
-        "staph infection", "tetanus", "uncontrolled diabetes", "waterborne illness",
-    }
-    progression_routes = {
-        "Trusty Tom's Trucks and Tires",
-        "Filthy Frank's Flawless Fixtures",
-        "Oswald's Optimal Outoparts",
-        "Grimy Gus's Pawn Emporium",
-        "Vinnie's Back Alley Loans",
-    }
-
-    if not any(label in route_labels for label in progression_routes):
-        return False
-
-    return (
-        player.get_health() >= 50
-        and player.get_sanity() >= 28
-        and len(injuries) <= 1
-        and len(statuses) <= 2
-        and not any(injury in severe_injuries for injury in injuries)
-        and not any(status in severe_statuses for status in statuses)
-        and _doctor_need_score(player) < 92
-    )
+    # Since there is no on-foot travel, the Doctor is never in the route menu when
+    # the player has no car.  This function is kept as a no-op to avoid breaking
+    # call-sites while the dead-code is cleaned up gradually.
+    return False
 
 
 def _medical_destination_label(player):
-    if player is None or not _needs_doctor(player):
+    if player is None:
+        return None
+    # Healing path: needs the doctor in some form
+    if not _needs_doctor(player):
+        # Flask-only witch visit is handled in _choose_progression_destination,
+        # not here, so it doesn't override medical priority routing.
         return None
     game_state = _current_game_state(player, context_tag="medical_destination")
     options = [
@@ -2212,6 +2591,7 @@ def _choose_witch_flask(options, player):
     if policy_choice is not None:
         return policy_choice
     if best_choice is not None:
+        FLASK_PURCHASES[best_choice[2]] += 1
         return _record_numeric_menu_trace(
             player,
             request_type="purchase_select",
@@ -2258,6 +2638,50 @@ def _wants_millionaire_push(player):
         return False
     balance = player.get_balance()
     return balance >= 100000 and balance < 1000000 and player.get_health() >= 65 and player.get_sanity() >= 40
+
+
+def _choose_millionaire_afternoon(options, player):
+    """Choose from millionaire afternoon menu.
+
+    Preference order: chosen mechanic ending > any mechanic ending > airport ending.
+    The "continue gambling" option is also available but we prefer ending.
+    Traces the decision for post-run review.
+    """
+    if not options:
+        return 1
+    mechanic_choice = None
+    airport_choice = None
+    chosen_mechanic = _chosen_mechanic_name(player)
+    for number, label in options:
+        lowered = label.lower()
+        if "airport" in lowered:
+            airport_choice = number
+            continue
+        # Check for mechanic visit option
+        if any(name in lowered for name in ("tom", "frank", "oswald")):
+            if chosen_mechanic and chosen_mechanic.lower() in lowered:
+                mechanic_choice = number  # prefer the chosen mechanic
+            elif mechanic_choice is None:
+                mechanic_choice = number  # fallback to any mechanic
+
+    # Prefer mechanic ending; fall back to airport; fall back to last option
+    target = mechanic_choice if mechanic_choice is not None else (airport_choice or options[-1][0])
+    reason = (
+        f"millionaire_mechanic_ending:{chosen_mechanic}"
+        if target == mechanic_choice and mechanic_choice is not None
+        else "millionaire_airport_ending"
+        if target == airport_choice
+        else "millionaire_afternoon_fallback"
+    )
+    return _record_numeric_menu_trace(
+        player,
+        request_type="menu_select",
+        stable_context_id="millionaire_afternoon",
+        menu_options=options,
+        chosen_number=target,
+        reason=reason,
+        confidence=0.85,
+    )
 
 
 def _repair_item_priorities(player):
@@ -2733,8 +3157,9 @@ def _adapter_yes_no_fallback(prompt_lower, player, cost=None):
     if prompt_lower == "take the cat to a vet? ($200)":
         if player is None or cost is None:
             return "no"
-        return "yes" if _can_afford_optional_purchase(player, cost, 88) else "no"
-
+        # Saving the cat: +15 sanity now, prevents -25 sanity from stray_cat_dies later.
+        # Net +40 sanity vs not paying — always save if balance allows any flexibility.
+        return "yes" if (player.get_balance() >= cost + 40) else "no"
     if prompt_lower == "buy it for $50?":
         if player is None or cost is None:
             return "no"
@@ -2791,13 +3216,19 @@ def _should_buy_car_repair(player, cost, recent):
         return _can_afford_optional_purchase(player, target_cost, priority)
 
     if "frank" in recent:
+        # Frank's sympathy: saying yes when broke adds a "Frank" Danger to the player.
+        # Decline Frank when we cannot afford his quote to avoid that danger.
         if not player.has_met("Tom Event"):
             return False
         target_cost = cost if cost is not None else 100
+        if cost is not None and balance < cost:
+            return False
         if target_cost <= 100 and balance >= target_cost:
             return True
         return can_pay(target_cost, 92)
     if "tom" in recent:
+        # Tom's sympathy: saying yes when broke triggers a 50% chance of a $50 discount.
+        # No money is lost on failure, so always say yes to Tom even when broke.
         target_cost = cost if cost is not None else 250
         if target_cost <= balance and balance >= 200:
             return True
@@ -2807,6 +3238,8 @@ def _should_buy_car_repair(player, cost, recent):
             return True
         return balance >= 200
     if "stuart" in recent or "oswald" in recent:
+        # Oswald's sympathy: saying yes when broke gives a free $50-100 tip regardless.
+        # Always say yes to Oswald — even without a car fix, we receive free cash.
         target_cost = cost if cost is not None else 900
         if target_cost <= balance and balance >= 850:
             return True
@@ -2814,11 +3247,15 @@ def _should_buy_car_repair(player, cost, recent):
             return True
         return can_pay(target_cost, 75)
     if "i can fix this up for like" in recent:
+        # Frank's offer phrase. Decline when broke (same as the "frank" branch above).
         target_cost = cost if cost is not None else 100
+        if cost is not None and balance < cost:
+            return False
         if target_cost <= 100 and balance >= target_cost:
             return True
         return can_pay(target_cost, 92)
     if "this thing's busted alright" in recent or "could ya do" in recent:
+        # Tom's intro / discount prompt. Apply the Tom sympathy logic.
         target_cost = cost if cost is not None else 250
         if target_cost <= balance and balance >= 200:
             return True
@@ -2828,6 +3265,7 @@ def _should_buy_car_repair(player, cost, recent):
             return True
         return balance >= 200
     if "get you back on the road" in recent or "fix your limousine" in recent:
+        # Oswald's intro phrases. Apply the Oswald sympathy logic (free tip).
         target_cost = cost if cost is not None else 900
         if target_cost <= balance and balance >= 850:
             return True
@@ -2974,7 +3412,13 @@ def _poverty_escape_loan_mode(player):
 
     if player.get_health() < 48 or player.get_sanity() < 26:
         return False
-    if edge_score < 2:
+    # Require at least one edge item even at very low balance.
+    # Borrowing with edge_score=0 (no useful items) means gambling with borrowed money
+    # at a raw house edge — the 20%/week interest will compound faster than the expected
+    # win rate.  At rank 0 edge_score>=1 is a reasonable floor; edge_score>=2 for rank 1+.
+    if rank == 0 and edge_score < 1:
+        return False
+    if rank >= 1 and edge_score < 2:
         return False
 
     if rank == 0:
@@ -3021,12 +3465,18 @@ def _wants_loan_shark_run(player):
     if fake_cash > 0:
         return False
 
+    edge_score = _blackjack_edge_score(player)
+    # Require at least 1 edge item before proactive borrowing: without any edge advantage
+    # the bot is gambling at the raw house edge, and 20%/wk interest compounds faster
+    # than the expected win rate.  (Exception: repaying existing debt is always allowed.)
+    if edge_score < 1:
+        return False
+
     if balance < 500:
         return True
     if player.get_rank() <= 0 and balance < 900 and player.get_health() >= 48 and player.get_sanity() >= 24:
         return True
 
-    edge_score = _blackjack_edge_score(player)
     if player.get_health() < 42 or player.get_sanity() < 22:
         return False
     if wants_doctor:
@@ -3047,17 +3497,13 @@ def _wants_loan_shark_run(player):
     if _has_marvin_access(player) and _best_marvin_affordable_priority(player) < 84 and balance < 6000 and edge_score >= 3:
         return True
     if player.get_rank() == 0:
-        if edge_score < 2:
-            return False
-        if balance < 150:
-            return True
         if balance < 325:
             return True
         if balance < 900:
             return True
-        if balance < 1800 and edge_score >= 3:
+        if balance < 1800 and edge_score >= 2:
             return True
-        return balance < 1400 and edge_score >= 4
+        return balance < 1400 and edge_score >= 3
     if player.get_rank() == 1 and not player.has_item("Map"):
         return balance < 3600 and edge_score >= 3 and player.get_sanity() >= 30
     return balance < max(3600, _rank_floor(balance)) and edge_score >= 3
@@ -3081,12 +3527,26 @@ def _has_adventure_utility(player):
 def _wants_adventure_run(player):
     if not _adventure_ready(player):
         return False
-    if _wants_doctor_visit(player) or _wants_store_run(player):
+
+    # Doctor visits always block adventures (health/safety first).
+    if _wants_doctor_visit(player):
         return False
+    # Store blocks adventures at rank 0-1: gathering edge items is more important than
+    # spending the afternoon on a low-yield adventure.  At rank 2+ the player has already
+    # made it past the critical progression bottleneck, so only truly urgent supply runs
+    # (Tool Kit, Spare Tire, Road Flares, First Aid Kit — all priority >= 90) block adventures.
+    rank_val = int(player.get_rank())
+    if _wants_store_run(player):
+        if rank_val < 2:
+            return False
+        # At rank 2+ only block if the store trip is truly urgent.
+        store_cands = _store_purchase_candidates(player)
+        if store_cands and store_cands[0][0] >= 90:
+            return False
 
     balance = player.get_balance()
     floor = _rank_floor(balance)
-    rank = int(player.get_rank())
+    rank = rank_val
 
     if rank <= 0:
         return False
@@ -3116,7 +3576,9 @@ def _wants_adventure_run(player):
     if rank == 2:
         if utility_push:
             return balance >= max(600, floor - 650) and player.get_health() >= 58 and player.get_sanity() >= 26
-        return balance >= floor and player.get_health() >= 65 and player.get_sanity() >= 32
+        # No utility items at rank 2: The Road is open — go if we can afford it and have a
+        # comfortable buffer.  floor at $10k → need balance >= $10k (i.e., just above floor).
+        return balance >= max(floor, 8000) and player.get_health() >= 65 and player.get_sanity() >= 32
     return balance >= floor + 1000 and player.get_health() >= 68 and player.get_sanity() >= 36
 
 
@@ -3158,6 +3620,10 @@ def _choose_progression_destination(labels, options, player):
         )
     )
     upgrade_choice = labels.get("Oswald's Optimal Outoparts") if _wants_upgrade_run(player) else None
+    # Car Workbench for crafting: separate from the Oswald upgrade path.
+    # Unlocked by has_item("Tool Kit") per make_shop_list in lists.py.
+    # Low urgency — placed after Marvin/mechanic/adventure in all orderings.
+    workbench_craft_choice = labels.get("Car Workbench") if _wants_workbench_craft_run(player) else None
     loan_choice = labels.get("Vinnie's Back Alley Loans") if _wants_loan_shark_run(player) else None
     marvin_loan_plan = _marvin_loan_plan(player)
     poverty_loan_push = loan_choice is not None and _poverty_escape_loan_mode(player)
@@ -3165,36 +3631,40 @@ def _choose_progression_destination(labels, options, player):
     doctor_choice = labels.get("Doctor's Office") if _wants_doctor_visit(player) else None
 
     if loan_choice is not None and marvin_loan_plan is not None:
-        ordered = [loan_choice, marvin_choice, mechanic_progression_choice, adventure_choice, upgrade_choice, store_choice, doctor_choice]
+        ordered = [loan_choice, marvin_choice, mechanic_progression_choice, adventure_choice, upgrade_choice, workbench_craft_choice, store_choice, doctor_choice]
     elif poverty_loan_push:
-        ordered = [loan_choice, mechanic_progression_choice, marvin_choice, store_choice, adventure_choice, upgrade_choice, doctor_choice]
+        ordered = [loan_choice, mechanic_progression_choice, marvin_choice, store_choice, adventure_choice, upgrade_choice, workbench_craft_choice, doctor_choice]
     elif marvin_choice is not None and (_best_marvin_affordable_priority(player) >= 84 or marvin_bootstrap):
-        ordered = [marvin_choice, mechanic_progression_choice, adventure_choice, upgrade_choice, loan_choice, store_choice, doctor_choice]
+        ordered = [marvin_choice, mechanic_progression_choice, adventure_choice, upgrade_choice, loan_choice, workbench_craft_choice, store_choice, doctor_choice]
     elif player.get_rank() >= 2:
         if mechanic_bootstrap:
-            ordered = [mechanic_progression_choice, marvin_choice, upgrade_choice, loan_choice, adventure_choice, store_choice, doctor_choice]
+            ordered = [mechanic_progression_choice, marvin_choice, upgrade_choice, loan_choice, adventure_choice, workbench_craft_choice, store_choice, doctor_choice]
         else:
+            # Rotate through three orderings so adventures get their slot regularly.
+            # Rotation 0 (most days): marvin → mechanic → upgrade → adventure → loan
+            # Rotation 1: mechanic → adventure → marvin → upgrade → loan
+            # Rotation 2: adventure → marvin → mechanic → upgrade → loan
             rotation = day % 3
             if rotation == 1:
-                ordered = [mechanic_progression_choice, marvin_choice, upgrade_choice, loan_choice, adventure_choice, store_choice, doctor_choice]
+                ordered = [mechanic_progression_choice, adventure_choice, marvin_choice, upgrade_choice, loan_choice, workbench_craft_choice, store_choice, doctor_choice]
             elif rotation == 2:
-                ordered = [marvin_choice, mechanic_progression_choice, upgrade_choice, loan_choice, adventure_choice, store_choice, doctor_choice]
+                ordered = [adventure_choice, marvin_choice, mechanic_progression_choice, upgrade_choice, loan_choice, workbench_craft_choice, store_choice, doctor_choice]
             else:
-                ordered = [upgrade_choice, mechanic_progression_choice, marvin_choice, loan_choice, adventure_choice, store_choice, doctor_choice]
+                ordered = [marvin_choice, mechanic_progression_choice, upgrade_choice, adventure_choice, loan_choice, workbench_craft_choice, store_choice, doctor_choice]
             if adventure_push:
-                ordered = [marvin_choice, adventure_choice, mechanic_progression_choice, upgrade_choice, loan_choice, store_choice, doctor_choice]
+                ordered = [adventure_choice, marvin_choice, mechanic_progression_choice, upgrade_choice, loan_choice, workbench_craft_choice, store_choice, doctor_choice]
     else:
         if mechanic_bootstrap:
             if marvin_priority_push:
-                ordered = [marvin_choice, mechanic_progression_choice, loan_choice, store_choice, adventure_choice, upgrade_choice, doctor_choice]
+                ordered = [marvin_choice, mechanic_progression_choice, loan_choice, store_choice, adventure_choice, upgrade_choice, workbench_craft_choice, doctor_choice]
             else:
-                ordered = [mechanic_progression_choice, marvin_choice, loan_choice, store_choice, adventure_choice, upgrade_choice, doctor_choice]
+                ordered = [mechanic_progression_choice, marvin_choice, loan_choice, store_choice, adventure_choice, upgrade_choice, workbench_craft_choice, doctor_choice]
         elif marvin_choice is not None:
-            ordered = [marvin_choice, mechanic_progression_choice, adventure_choice, loan_choice, store_choice, upgrade_choice, doctor_choice]
+            ordered = [marvin_choice, mechanic_progression_choice, adventure_choice, loan_choice, store_choice, workbench_craft_choice, upgrade_choice, doctor_choice]
         elif adventure_push:
-            ordered = [mechanic_progression_choice, adventure_choice, loan_choice, store_choice, upgrade_choice, doctor_choice]
+            ordered = [mechanic_progression_choice, adventure_choice, loan_choice, store_choice, workbench_craft_choice, upgrade_choice, doctor_choice]
         else:
-            ordered = [mechanic_progression_choice, loan_choice, marvin_choice, store_choice, adventure_choice, upgrade_choice, doctor_choice]
+            ordered = [mechanic_progression_choice, loan_choice, marvin_choice, store_choice, workbench_craft_choice, adventure_choice, upgrade_choice, doctor_choice]
 
     for choice in ordered:
         if choice is not None:
@@ -3221,11 +3691,19 @@ def _legacy_choose_destination(options, player):
         if (
             "Marvin's Mystical Merchandise" == progression_label
             or progression_label.startswith("Drive to ")
+            # Loan shark bootstrapping is just as time-sensitive as Marvin — give it the
+            # same priority bypass so it isn't blocked by the pawn/store guards below.
+            or ("Vinnie's Back Alley Loans" == progression_label and _poverty_escape_loan_mode(player))
         ):
             return progression_choice
 
     if "Grimy Gus's Pawn Emporium" in labels and _wants_pawn_cashout(player):
         return labels["Grimy Gus's Pawn Emporium"]
+
+    # Flask-only witch visit: healthy player with affordable flask at rank 2+.
+    # Placed after pawn shop and progression so it doesn't override Marvin/adventure.
+    if "Witch Doctor's Tower" in labels and _wants_witch_flask_only_run(player):
+        return labels["Witch Doctor's Tower"]
 
     if medical_choice in labels:
         return labels[medical_choice]
@@ -3257,6 +3735,14 @@ def _planner_choose_destination(options, player):
     loan_pressure = max(
         int(player.get_loan_shark_debt()) if hasattr(player, "get_loan_shark_debt") else 0,
         (int(player.get_loan_shark_warning_level()) if hasattr(player, "get_loan_shark_warning_level") else 0) * 200,
+    )
+    # Poverty escape: flag when the bot has a car, no debt, and not enough cash to
+    # pay even the cheapest mechanic quote ($150 at Tom). Visiting Vinnie first for a
+    # loan breaks the "visit Tom but can't pay" loop.
+    poverty_loan_mode = bool(
+        _poverty_escape_loan_mode(player)
+        and game_state.balance < 150
+        and _wants_loan_shark_run(player)
     )
     mechanic_urgency = 0
     if _wants_mechanic_progression_run(player):
@@ -3318,8 +3804,11 @@ def _planner_choose_destination(options, player):
             "medical_choice": _medical_destination_label(player),
             "wants_doctor": _wants_doctor_visit(player) and not defer_doctor,
             "wants_witch": _wants_witch_heal(player),
+            "wants_witch_flask_only": _wants_witch_flask_only_run(player),
+            "wants_workbench_craft": _wants_workbench_craft_run(player),
             "wants_marvin": _wants_marvin_run(player),
             "wants_loan": _wants_loan_shark_run(player),
+            "poverty_loan_mode": poverty_loan_mode,
             "wants_store": wants_store,
             "wants_adventure": _wants_adventure_run(player),
             "wants_upgrade": _wants_upgrade_run(player),
@@ -3417,52 +3906,50 @@ def _choose_destination(options, player):
             and player.get_health() >= 50
             and player.get_sanity() >= 30
         )
-        mechanic_window_open = (
-            recovery_plan.goal == "acquire_car"
-            and any(
-                label in labels
-                for label in (
-                    "Trusty Tom's Trucks and Tires",
-                    "Filthy Frank's Flawless Fixtures",
-                    "Oswald's Optimal Outoparts",
-                )
-            )
-        )
-        mild_no_car_medical_clutter = (
-            player.get_health() >= 56
-            and player.get_sanity() >= 34
+        # Loan shark visits are an economic activity with no physical risk; allow them
+        # through recovery pressure when mild conditions are met.
+        loan_recovery_bypass = (
+            "Vinnie's Back Alley Loans" in labels
+            and _wants_loan_shark_run(player)
+            and player.get_health() >= 55
+            and player.get_sanity() >= 32
             and len(recovery_injuries) <= 1
-            and len(recovery_statuses) <= 3
             and not any(injury in severe_recovery_injuries for injury in recovery_injuries)
             and not any(status in severe_recovery_statuses for status in recovery_statuses)
-            and _doctor_need_score(player) < 72
         )
-        no_car_recovery_push = (
-            recovery_plan.goal == "acquire_car"
-            and _needs_car(player)
-            and not _stranded_no_car_mode(player)
-            and (
-                (
-                    player.get_health() >= 50
-                    and player.get_sanity() >= 28
-                    and len(recovery_injuries) <= 1
-                    and len(recovery_statuses) <= 2
-                    and not any(injury in severe_recovery_injuries for injury in recovery_injuries)
-                    and not any(status in severe_recovery_statuses for status in recovery_statuses)
-                    and _doctor_need_score(player) < 96
-                )
-                or mild_no_car_medical_clutter
-            )
-            and (mechanic_window_open or store_window_open or pawn_window_open or loan_window_open)
-        )
+        # NOTE: mechanic_window_open, mild_no_car_medical_clutter, and
+        # no_car_recovery_push have been removed.  There is no on-foot travel
+        # in this game, so the afternoon route menu is never shown without a
+        # car.  Mechanics drive to the player via random day events; their
+        # shops only appear in the menu AFTER the player has bought a car
+        # from them.  Any route logic conditioned on "no car AND in the menu"
+        # is dead code.
         if mild_recovery_pressure and (store_window_open or pawn_window_open or marvin_window_open):
             allow_recovery_override = False
-        if no_car_recovery_push:
+        if mild_recovery_pressure and loan_recovery_bypass:
             allow_recovery_override = False
 
     if allow_recovery_override and _needs_recovery_day(player) and "Stay Home" in labels:
         _record_route_interrupt_trace(player, labels["Stay Home"], "recovery-day override -> Stay Home", "stabilize_health", "recovery_day")
         return labels["Stay Home"]
+
+    # Loan shark bootstrap interrupt: when Vinnie is met, no debt, and the player is
+    # cash-poor (rank 0 < $900, rank 1 no-map < $3k), borrowing from Vinnie is almost
+    # always the best available move.  Without this interrupt the route scorer ranks the
+    # convenience store above the loan shark because push_next_rank's store bonus slightly
+    # exceeds the loan bonus in edge cases (store_spend high, loan_pressure=0 first visit).
+    # This mirrors the medical/flask interrupts — it fires after all safety checks so it
+    # never overrides doctor, recovery day, or urgent cases.
+    if "Vinnie's Back Alley Loans" in labels and _poverty_escape_loan_mode(player):
+        _record_route_interrupt_trace(player, labels["Vinnie's Back Alley Loans"], "poverty-escape loan bootstrap", "push_next_rank", "poverty_loan_bootstrap")
+        return labels["Vinnie's Back Alley Loans"]
+
+    # Flask-only witch visit: inserted before the planner so it isn't buried
+    # by the planner's store bias.  It's deliberately after medical/recovery
+    # overrides so it never interferes with urgent healing or rest.
+    if "Witch Doctor's Tower" in labels and _wants_witch_flask_only_run(player):
+        _record_route_interrupt_trace(player, labels["Witch Doctor's Tower"], "witch flask-only visit", "exploit_witch_flask", "witch_flask_only")
+        return labels["Witch Doctor's Tower"]
 
     planner_choice = _planner_choose_destination(options, player)
     if planner_choice is not None:
@@ -3682,9 +4169,24 @@ def _looks_like_pawn_menu(options):
     )
 
 
+def _looks_like_store_menu(options):
+    """Return True when options look like the Kyle convenience-store item menu.
+
+    The store always appends "I'm not buying anything" as the last option.
+    We rely on this structural feature rather than scanning recent text because
+    the item list can easily exceed the 120-char recent window, causing the old
+    ``"what do you want?" in recent`` check to miss the store entirely and fall
+    through to the generic last-option fallback ("I'm not buying anything").
+    Item price labels use ANSI color codes (e.g. green/bright "$3"), so checking
+    for a literal " - $" pattern is unreliable; the exit-option text is plain.
+    """
+    labels = [label.lower() for _number, label in options]
+    return any("i'm not buying anything" in label for label in labels)
+
+
 def _decide_yes_no(prompt=""):
     player = CURRENT_PLAYER
-    prompt_lower = (prompt or "").lower()
+    prompt_lower = (prompt or "").lower().strip()
     recent = _recent_lower(80)
     recent_mechanic = _recent_lower(20)
     cost = _extract_cash_amount(prompt, recent)
@@ -3733,7 +4235,11 @@ def _decide_yes_no(prompt=""):
         return finalize(event_override, "adapter_budget_gate")
 
     if "spend time with your companions" in prompt_lower:
-        answer = "yes" if player is not None and (_companion_count(player) >= 3 or player.get_sanity() < 55 or player.get_health() < 70) else "no"
+        # Never skip a needed doctor visit to socialise — medical need takes priority.
+        if player is not None and (_doctor_visit_is_urgent(player) or _wants_doctor_visit(player)):
+            answer = "no"
+        else:
+            answer = "yes" if player is not None and (_companion_count(player) >= 3 or player.get_sanity() < 55 or player.get_health() < 72) else "no"
         return finalize(answer, "companion_recovery_gate")
     if any(
         re.search(rf"\b{re.escape(phrase)}\b", recent)
@@ -3749,7 +4255,12 @@ def _decide_yes_no(prompt=""):
         if player is None:
             return finalize("no", "gift_wrap_without_player")
         dealer_happiness = _dealer_happiness(player)
-        if player.get_balance() >= 20 and dealer_happiness < 90:
+        in_emergency = player.get_health() < 45 or player.get_sanity() < 20 or not player.has_item("Car")
+        if (
+            player.get_balance() >= GIFT_WRAP_MIN_BALANCE
+            and dealer_happiness < GIFT_WRAP_HAPPINESS_THRESHOLD
+            and not in_emergency
+        ):
             return finalize("yes", "gift_wrap_for_dealer_happiness")
         return finalize("no", "gift_wrap_not_worth_it")
     if prompt_lower.startswith("sell ") or prompt_lower.startswith("sell the "):
@@ -3763,14 +4274,25 @@ def _decide_yes_no(prompt=""):
     if "continue?" in prompt_lower:
         return finalize("no", "continue_prompt_stop")
     if "heal you" in recent and "witch doctor" in recent:
-        answer = "yes" if _wants_witch_heal(player) else "no"
-        return finalize(answer, "witch_heal_gate")
+        # Say YES to healing if we genuinely need it; say NO on a flask-only visit
+        # (heal costs 5-25% of balance — save that cash for the flask purchase).
+        if _wants_witch_heal(player):
+            answer = "yes"
+            reason = "witch_heal_gate"
+        elif _wants_witch_flask_only_run(player):
+            answer = "no"
+            reason = "witch_flask_only_skip_heal"
+        else:
+            answer = "no"
+            reason = "witch_heal_gate"
+        return finalize(answer, reason)
     if "purchase any of my powerful potions" in recent or "mood to spend some money on my magic potions" in recent:
         if player is None:
             return finalize("no", "witch_potion_without_player")
         if _flask_count(player) >= 2:
             return finalize("no", "witch_potion_capacity_block")
-        answer = "yes" if player.get_balance() >= 12000 else "no"
+        # With new Fortunate Day/Night prices starting at $8k, allow entry at $8k.
+        answer = "yes" if player.get_balance() >= 8000 else "no"
         return finalize(answer, "witch_potion_budget_gate")
     if _should_buy_car_repair(player, cost, recent):
         return finalize("yes", "car_repair_required", 0.82)
@@ -3795,10 +4317,48 @@ def _decide_yes_no(prompt=""):
             priority = _marvin_item_priority(current_offer, player)
             if priority <= 0:
                 return finalize("no", f"marvin_offer_priority_zero:{current_offer}")
+            # At rank 2+, skip low-value items — spending on them wipes out the rank cushion
+            # and leaves the bot vulnerable to gambling variance.  Items like Dirty Old Hat
+            # (priority 62) are not worth the balance dip; only items that meaningfully improve
+            # the edge (priority ≥ 70 base, or high-priority after rank/health adjustments) qualify.
+            rank = int(player.get_rank()) if hasattr(player, "get_rank") else 0
+            if rank >= 2 and priority < 70:
+                return finalize("no", f"marvin_offer_rank2_low_priority:{current_offer}")
+            # At rank 2+, require a bigger post-purchase buffer than just the $10k rank floor
+            # to avoid gambling variance immediately dropping us back to rank 1.  We enforce
+            # an extra $5k cushion: post-purchase balance must stay ≥ $15k.
+            if rank >= 2:
+                balance = player.get_balance()
+                rank2_post_purchase_floor = 15000
+                if balance - cost < rank2_post_purchase_floor and priority < 88:
+                    return finalize("no", f"marvin_offer_rank2_post_purchase_floor:{current_offer}")
             if _can_afford_optional_purchase(player, cost, priority):
                 return finalize("yes", f"marvin_offer_affordable:{current_offer}", 0.8)
-            if priority >= 90 and player.get_balance() >= cost and player.get_balance() - cost >= max(120, _doctor_cash_reserve(player)):
-                return finalize("yes", f"marvin_offer_high_priority:{current_offer}", 0.72)
+            # High-priority Marvin items are justified exceptions to rank-drop protection
+            # when the bot is actively pushing for a rank-up or win.  The improved edge
+            # score from the item will repay the short-term balance dip much faster than
+            # ordinary grinding would.  Outside a push window we still require the normal
+            # reserve (rank-protection floor) to be satisfied.
+            balance = player.get_balance()
+            if priority >= 88 and balance >= cost:
+                in_push = _in_rank_push_window(player)
+                doctor_res = max(120, _doctor_cash_reserve(player))
+                # Always require at least a minimal post-purchase floor so the bot can't
+                # zero out its balance even during a push window.  Use the rank-below
+                # threshold (rank 2→$1k, rank 3→$10k) as the safety net — reuse
+                # _rank_protection_floor on a synthetic rank-1-lower player would be
+                # complex, so derive it directly from the same thresholds constant.
+                _rank_thresholds = [0, 1000, 10000, 100000, 500000, 900000]
+                rank_below_floor = _rank_thresholds[max(0, min(rank - 1, 5))]
+                if in_push:
+                    # During push: require doctor reserve + 1-rank-below safety net.
+                    if balance - cost >= max(doctor_res, rank_below_floor):
+                        return finalize("yes", f"marvin_offer_push_window:{current_offer}", 0.72)
+                else:
+                    # Outside push: require rank protection floor too.
+                    prot = _rank_protection_floor(player)
+                    if balance - cost >= max(doctor_res, prot):
+                        return finalize("yes", f"marvin_offer_high_priority:{current_offer}", 0.68)
             return finalize("no", f"marvin_offer_budget_block:{current_offer}")
         must_have = any(name in recent for name in [
             "faulty insurance", "health indicator", "delight indicator", "rusty compass",
@@ -3974,13 +4534,13 @@ def _decide_raw_input(prompt=""):
         return _choose_inline_choice(inline_choices, player, prompt)
     if "who do you want to sell" in prompt_lower:
         return str(_choose_pawn_sale_item(options, player))
-    if (
+    # Millionaire afternoon menu: mechanic ending vs airport vs continue
+    millionaire_afternoon = (
         "choose a number" in prompt_lower
         or "choose a number" in "\n".join(RECENT_TEXT[-5:]).lower()
-    ) and "drive to the airport" in recent and "continue playing" in recent:
-        for number, label in options:
-            if "drive to the airport" in label.lower():
-                return str(number)
+    ) and "drive to the airport" in recent
+    if millionaire_afternoon:
+        return str(_choose_millionaire_afternoon(options, player))
     if "choose:" in prompt_lower and _looks_like_pawn_menu(options):
         return str(_choose_pawn_menu(options, player))
     if "choose:" in prompt_lower and _looks_like_loan_borrow_menu(options):
@@ -3990,7 +4550,14 @@ def _decide_raw_input(prompt=""):
     if "choose:" in prompt_lower and _looks_like_loan_menu(options):
         return str(_choose_loan_menu(options, player))
     if "choose:" in prompt_lower and "car workbench" in recent:
-        return "5"
+        # Workbench main menu (Pack Up is option 5, Craft Something is option 1)
+        if "pack up" in recent.lower():
+            return str(_choose_workbench_menu(options, player))
+        # Workbench craft sub-menu (recipe list with numbered items)
+        if "what do you want to craft" in recent.lower():
+            return str(_choose_workbench_craft(options, player))
+        # Fallback: pack up
+        return str(options[-1][0] if options else 1)
     if (
         "choose:" in prompt_lower
         and "what would you like to do?" in recent
@@ -4003,6 +4570,14 @@ def _decide_raw_input(prompt=""):
             return str(_choose_pawn_menu(options, player))
         if "who do you want to interact with" in prompt_lower or "after noon with your companions" in recent or "afternoon with your companions" in recent:
             return str(_choose_companion_interaction(options, player))
+        # Store menu must be detected before the route check: the route-menu text
+        # ("Would you like to spend your day driving somewhere?") stays in the
+        # 120-line recent window well into the store visit, causing the route
+        # handler to mis-dispatch store item menus as destination choices.
+        # Checking option structure (has "I'm not buying anything") is reliable
+        # and specific — no other menu uses that exit label.
+        if _looks_like_store_menu(options):
+            return str(_choose_store_item(options, player))
         if "would you like to spend your day driving somewhere" in recent:
             return str(_choose_destination(options, player))
         if _looks_like_loan_borrow_menu(options):
@@ -4020,7 +4595,10 @@ def _decide_raw_input(prompt=""):
         if "which item would you like stuart to upgrade" in recent:
             return str(_choose_upgrade_item(options, player))
         if "car workbench" in recent:
-            return str(options[-1][0] if options else 1)
+            # Craft sub-menu reached via "choose a number" path
+            if "what do you want to craft" in recent.lower():
+                return str(_choose_workbench_craft(options, player))
+            return str(_choose_workbench_menu(options, player))
         return str(options[-1][0] if options else 1)
     if "choose: " in prompt_lower and "who do you want to sell" not in prompt_lower:
         return str(options[-1][0] if options else 1)
@@ -4247,7 +4825,16 @@ def _should_replay_hand(self, status):
 
 def _auto_bet(self):
     """Route bet sizing through the structured blackjack policy."""
-    self._Blackjack__bet = _choose_blackjack_bet_amount(self)
+    bet = _choose_blackjack_bet_amount(self)
+    self._Blackjack__bet = bet
+    # Apply fake-cash-first mechanic: loan money is always spent before real cash.
+    # Mirrors the logic in bet() so end_round() can compute the correct real_loss.
+    player = self._Blackjack__player
+    fake_available = player.get_fraudulent_cash()
+    self._Blackjack__fraudulent_portion = 0
+    if fake_available > 0:
+        self._Blackjack__fraudulent_portion = min(bet, fake_available)
+        player.blend_fraudulent_cash(self._Blackjack__fraudulent_portion)
     return True
 
 
@@ -4405,6 +4992,7 @@ CYCLES = int(sys.argv[1]) if len(sys.argv) > 1 else 300
 SEED = int(sys.argv[2]) if len(sys.argv) > 2 else 42
 LOG = os.path.join(os.path.dirname(os.path.abspath(__file__)), "test_out.txt")
 JSON_LOG = os.path.join(os.path.dirname(os.path.abspath(__file__)), "test_out.json")
+STORY_LOG = os.path.join(os.path.dirname(os.path.abspath(__file__)), "story_out.txt")
 
 CURRENT_CYCLE = None
 CURRENT_EVENTS = []
@@ -4425,6 +5013,8 @@ TRACKED_STATS = [
     "companions_befriended",
     "loans_taken",
     "loans_repaid",
+    "total_borrowed",
+    "total_repaid",
     "times_robbed",
     "times_hospitalized",
     "mechanic_visits",
@@ -4454,15 +5044,25 @@ TRACKED_GAMBLING_STATS = [
 
 def fake_input(_prompt=""):
     _remember_text(_prompt)
-    return _decide_raw_input(_prompt)
+    response = _decide_raw_input(_prompt)
+    # Mirror the prompt + player response into the story log
+    prompt_clean = ANSI_RE.sub("", str(_prompt)).strip()
+    if prompt_clean:
+        _story_file.write(prompt_clean + " ")
+    _story_file.write(f"[{response}]\n")
+    _story_file.flush()
+    return response
 
 
 _log_file = open(LOG, "w", encoding="utf-8")
+_story_file = open(STORY_LOG, "w", encoding="utf-8")
 
 
 def _close_log_file():
     if not _log_file.closed:
         _log_file.close()
+    if not _story_file.closed:
+        _story_file.close()
 
 
 atexit.register(_close_log_file)
@@ -4812,7 +5412,20 @@ install_tracking_hooks()
 import builtins as _builtins
 
 _real_print = _builtins.print
-_builtins.print = lambda *args, **kwargs: None
+
+
+def _story_print(*args, **kwargs):
+    """Capture game print() calls as paragraph breaks in the story log."""
+    text = kwargs.get("sep", " ").join(str(a) for a in args)
+    text = ANSI_RE.sub("", text)
+    # Treat any print() call as a paragraph separator — output its actual content
+    # (which is often "\n" or empty) to keep the story readable.
+    end = kwargs.get("end", "\n")
+    _story_file.write(text + end)
+    _story_file.flush()
+
+
+_builtins.print = _story_print
 _builtins.quit = lambda *args, **kwargs: None
 _builtins.exit = lambda *args, **kwargs: None
 
@@ -4882,6 +5495,8 @@ with patch("builtins.input", fake_input):
         travel_added, travel_removed = set_diff(before["travel_restrictions"], after["travel_restrictions"])
         broken_added, broken_removed = set_diff(before["broken_items"], after["broken_items"])
         repairing_added, repairing_removed = set_diff(before["repairing_items"], after["repairing_items"])
+        for item_name in broken_added:
+            ITEMS_EVER_BROKEN[item_name] += 1
 
         stat_changes = stat_deltas(before["statistics"], after["statistics"], TRACKED_STATS)
         gambling_changes = stat_deltas(before["gambling"], after["gambling"], TRACKED_GAMBLING_STATS)
@@ -5183,6 +5798,8 @@ json_payload = {
     "early_mechanic_funnel": dict(early_mechanic_funnel),
     "mechanic_decisions": list(MECHANIC_DECISIONS),
     "fallback_decisions": dict(FALLBACK_DECISIONS),
+    "flask_purchases": dict(FLASK_PURCHASES),
+    "items_ever_broken": dict(ITEMS_EVER_BROKEN),
     "event_polarity": dict(event_polarity_counts),
     "item_impacts": dict(item_impacts),
     "marvin_provenance": {
@@ -5226,6 +5843,9 @@ json_payload = {
 with open(JSON_LOG, "w", encoding="utf-8") as json_handle:
     json.dump(json_payload, json_handle, indent=2, sort_keys=True)
 
+# Restore real print before closing so final messages are visible
+_builtins.print = _real_print
 _close_log_file()
 print(f"Results -> {LOG}")
+print(f"Story   -> {STORY_LOG}")
 print(f"Errors: {len(errs)}")

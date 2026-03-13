@@ -1647,6 +1647,7 @@ class SystemsMixin:
         self.add_fraudulent_cash(amount)
         self._loan_shark_days_overdue = 0
         self._statistics["loans_taken"] += 1
+        self._statistics["total_borrowed"] += amount
         type.type("Vinnie hands you " + yellow(bright("${:,}".format(amount))) + " in cash.")
         print()
         type.type("It feels... off. The bills are too smooth. Too perfect.")
@@ -1666,10 +1667,12 @@ class SystemsMixin:
             self._loan_shark_days_overdue = 0
             self._loan_shark_warning_level = 0
             self._statistics["loans_repaid"] += 1
+            self._statistics["total_repaid"] += amount
             self._balance -= amount
             type.type("You've paid off your debt completely. Vinnie seems almost disappointed.")
             print("\n")
         else:
+            self._statistics["total_repaid"] += amount
             self._loan_shark_debt -= amount
             self._balance -= amount
             type.type("You pay " + green(bright("${:,}".format(amount))) + ". ")

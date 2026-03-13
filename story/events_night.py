@@ -243,6 +243,7 @@ class NightEventsMixin:
                 type.type("The bear doesn't even twitch. ")
                 type.type("You practically float back to your car, silent as a ghost in fuzzy pink footwear.")
                 print("\n")
+                self.restore_sanity(8)
                 self.update_quiet_sneakers_durability()
                 return
             elif self.has_item("Quiet Sneakers"):
@@ -251,6 +252,7 @@ class NightEventsMixin:
                 print("\n")
                 type.type("You turn and run back up the riverbank, never looking back. Eventually, you make it out of the woods, and return to your car, safe and sound.")
                 print("\n")
+                self.restore_sanity(5)
                 self.update_quiet_sneakers_durability()
                 return
             else:
@@ -723,6 +725,8 @@ class NightEventsMixin:
                 type.type("But then it sees your necklace - teeth from one of its own. It lets out a low rumble... and slowly backs away.")
                 type.type(" The swamp creatures know who you are now. They won't bother you.")
                 print("\n")
+                self.restore_sanity(10)
+                self.add_status("Swamp Respected")
             else:
                 type.type("You surface for air and find yourself face-to-face with a pair of ancient, unblinking eyes. An alligator. At least ten feet long. Neither of you moves.")
                 print("\n")
@@ -1635,6 +1639,7 @@ class NightEventsMixin:
                 type.type("The muggers exchange nervous glances. One by one, they back away and disappear into the night.")
                 type.type(" Bruno nods at you. " + quote("Stay safe out there."))
                 print("\n")
+                self.restore_sanity(12)
             else:
                 type.type("A figure emerges from an alley. Then another. Then a third. They fan out, blocking your path. One has a knife.")
                 print("\n")
@@ -2263,6 +2268,7 @@ class NightEventsMixin:
             print("\n")
             type.type("They leave, but slowly. Deliberately. As if to say: " + quote("We'll be back."))
             print("\n")
+            self.restore_sanity(4)
             return
         variant = random.randrange(2)
         if variant == 0:
@@ -2358,4 +2364,42 @@ class NightEventsMixin:
             print("\n")
             type.type("You wake up and run your tongue along your teeth. All there. But the dream leaves a residue that takes hours to shake.")
         self.lose_sanity(8)
+        print("\n")
+
+    def giant_oyster_opening(self):
+        """Giant Oyster can be cracked open for a pearl or a meal"""
+        if not self.has_item("Giant Oyster"):
+            self.night_event()
+            return
+        if self.has_met("Oyster Opened"):
+            self.night_event()
+            return
+        self.meet("Oyster Opened")
+        type.type("The " + cyan(bright("Giant Oyster")) + " has been in the back of your car. Tonight the smell is too strong. You have to deal with it.")
+        print("\n")
+        answer = ask.yes_or_no("Open it? ")
+        if answer == "yes":
+            type.type("You pry it open with your pocket knife.")
+            print("\n")
+            result = random.randrange(3)
+            if result == 0:
+                type.type("A PEARL. Massive. Perfect. Like nothing you've seen in any store.")
+                print("\n")
+                type.type("This is worth more than it should be to the right buyer.")
+                self.add_item("Pink Pearl")
+                self.change_balance(random.randint(200, 500))
+                self.restore_sanity(15)
+            elif result == 1:
+                type.type("Two pearls. Small, mismatched, but genuine.")
+                self.add_item("Matched Pearls")
+                self.restore_sanity(10)
+            else:
+                type.type("Oyster meat. A lot of it. Briny and fresh. You eat it all.")
+                self.heal(random.randint(15, 25))
+                self.restore_sanity(8)
+            self.use_item("Giant Oyster")
+        else:
+            type.type("You drive it to the water and throw it back in. It deserves better than your back seat.")
+            self.restore_sanity(5)
+            self.use_item("Giant Oyster")
         print("\n")

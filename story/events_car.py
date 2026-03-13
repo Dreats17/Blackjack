@@ -200,6 +200,7 @@ class CarEventsMixin:
             print("\n")
             type.type("Lost an hour, but could have been much worse.")
             self.use_item(item)
+            self.restore_sanity(5)
         elif self.has_item("Water Bottles"):
             type.type("You pour your " + magenta(bright("Water Bottles")) + " into the radiator as an emergency fix.")
             print("\n")
@@ -242,8 +243,10 @@ class CarEventsMixin:
             print("\n")
             if codes[1] == 0:
                 type.type("You tighten your gas cap. Light goes off. Crisis averted.")
+                self.restore_sanity(6)
             elif codes[2]:
                 type.type("Not cheap, but at least you know what's wrong.")
+                self.restore_sanity(4)
                 self.add_danger("Engine Issue: " + codes[0])
             else:
                 type.type("That's a big problem. Expensive to fix.")
@@ -398,6 +401,7 @@ class CarEventsMixin:
             print("\n")
             type.type("You change the tire yourself. It takes an hour, but you're back on the road.")
             self.use_item("Spare Tire")
+            self.restore_sanity(10)
         elif self.has_item("Spare Tire"):
             type.type("You have a spare, but no jack. You spend hours flagging down help.")
             print("\n")
@@ -540,6 +544,7 @@ class CarEventsMixin:
             type.type("You grab your " + magenta(bright("Tool Kit")) + " and disconnect the battery to stop the noise.")
             print("\n")
             type.type("Silence. Sweet silence. But now you need to figure out the real problem.")
+            self.restore_sanity(8)
             self.add_travel_restriction("Wasted Afternoon")
         else:
             type.type("You have no way to disable it. The alarm runs until the battery dies.")
@@ -918,6 +923,7 @@ class CarEventsMixin:
             type.type("You heat your key with your " + magenta(bright("Lighter")) + " and carefully thaw the lock.")
             print("\n")
             type.type("Primitive, but effective.")
+            self.restore_sanity(3)
         else:
             type.type("You spend an hour breathing on the lock, rubbing it with your hands.")
             print("\n")
@@ -1009,8 +1015,9 @@ class CarEventsMixin:
             item = "Plastic Wrap" if self.has_item("Plastic Wrap") else "Garbage Bag"
             type.type("You tape " + magenta(bright(item)) + " over the opening as a temporary fix.")
             print("\n")
-            type.type("You look homeless. More homeless than usual.")
+            type.type("You look homeless. More homeless than usual. But it's sealed.")
             self.use_item(item)
+            self.restore_sanity(3)
             self.add_danger("Broken Window")
         else:
             type.type("Rain, bugs, thieves - everything can get in now.")
@@ -1028,6 +1035,7 @@ class CarEventsMixin:
         if self.has_item("Bungee Cords") or self.has_item("Rope"):
             item = "Bungee Cords" if self.has_item("Bungee Cords") else "Rope"
             type.type("You tie it shut with " + magenta(bright(item)) + ". Ghetto, but it works.")
+            self.restore_sanity(3)
             self.add_danger("Broken Trunk Latch")
         else:
             type.type("You drive holding the trunk with one arm out the window.")

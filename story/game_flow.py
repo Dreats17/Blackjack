@@ -108,7 +108,14 @@ class GameFlowMixin:
                 small_loss = random.randint(5, 25)
                 type.type("You realize you've lost " + red(bright("${:,}".format(small_loss))) + " somewhere. Weird.")
                 self.change_balance(-small_loss)
-        
+
+        # Passive Item Flavor - ~1-in-3 days, one quiet moment from something you're carrying
+        item_flavor = self.apply_daily_item_flavor()
+        if item_flavor:
+            item_name, text = item_flavor
+            type.slow(cyan(text.replace("{item}", bright(item_name))))
+            print("\n")
+
         # Broken state effects at start of day
         if self._is_broken:
             print()
@@ -257,7 +264,13 @@ class GameFlowMixin:
         type.type(yellow("=== CAR TROUBLE ==="))
         print("\n")
         event()
-        
+
+        # If the event left the player stranded for the afternoon, give their
+        # mechanic a chance to drive by and help — the roadside visit system.
+        # The visit may remove "Wasted Afternoon" so the player can still go out.
+        if self.has_travel_restriction("Wasted Afternoon"):
+            self.roadside_mechanic_visit()
+
         return self.has_travel_restriction("Wasted Afternoon")
 
     def get_mark_index(self, mark):
@@ -449,6 +462,9 @@ class GameFlowMixin:
             elif self.has_item("Cough Drops"):
                 type.type("With your " + bright(magenta("Cough Drops")) + " in hand, ")
                 type.type("you begin to suck each drop, one by one, until the box is empty, and your throat feels nice and cool.")
+                self.use_item("Cough Drops")
+                self.remove_status("Sore Throat")
+                self.restore_sanity(4)
             elif days_elapsed == 0:
                 damage += random.choice([1, 3, 5])
             elif days_elapsed == 1:
@@ -533,11 +549,14 @@ class GameFlowMixin:
             type.type("you spray your " + magenta(bright("Pest Control")) + " throughout the vehicle, hoping that it'll solve your pest issues. ")
             self.kill_pests()
             type.type("After giving the wagon a minute to air out, you get back inside.")
+            self.restore_sanity(3)
             print("\n")
 
         # Feeds Squirrely if you have Acorns
         if self.has_item("Bag of Acorns") and self.has_item("Squirrely"):
             type.type("You give Squirrely your " + magenta(bright("Bag of Acorns")) + ", and he goes to town, munching down all of them. What a good squirrel.")
+            self.use_item("Bag of Acorns")
+            self.restore_sanity(3)
             print("\n")
 
         # Gives Squirrely Status Update
@@ -547,8 +566,10 @@ class GameFlowMixin:
                 type.type(self._lists.get_worried_squirrely_update())
             if days_elapsed == 0:
                 type.type("Squirrely is well-fed, and happy as can be.")
+                self.restore_sanity(2)
             elif days_elapsed <= 4:
                 type.type(self._lists.get_fed_squirrely_update())
+                self.restore_sanity(1)
             elif days_elapsed < 6:
                 type.type(self._lists.get_hungry_squirrely_update())
             elif days_elapsed >= 6:
