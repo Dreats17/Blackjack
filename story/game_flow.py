@@ -109,6 +109,57 @@ class GameFlowMixin:
                 type.type("You realize you've lost " + red(bright("${:,}".format(small_loss))) + " somewhere. Weird.")
                 self.change_balance(-small_loss)
         
+        # Filled Locket - Quiet daily comfort from a completed memory
+        if self.apply_filled_locket_effects():
+            type.slow(cyan("Your eyes catch the " + bright("Filled Locket") + " hanging from the mirror. Those two faces, watching over you. You feel less alone."))
+            print("\n")
+
+        # Moon Shard - Moonlit peace
+        if self.apply_moon_shard_effects():
+            type.slow(cyan("The " + bright("Moon Shard") + " glows softly on the dash. Cool and white. Something about it settled your dreams."))
+            print("\n")
+
+        # Midnight Rose - Fading beauty
+        if self.apply_midnight_rose_effects():
+            type.slow(cyan("The " + bright("Midnight Rose") + " is still alive. Somehow. Against all odds. It smells faintly of something you can't name."))
+            print("\n")
+
+        # Rabbit's Blessing - Gentle daily luck
+        if self.apply_rabbit_blessing_effects():
+            type.slow(cyan("The luck of the rabbit moves through your day without fanfare. Just small things going right."))
+            print("\n")
+
+        # Championship Medal - Confidence boost
+        if self.apply_championship_medal_effects():
+            type.slow(cyan("You glance at the " + bright("Championship Medal") + " in your bag. You won something once. You can win again."))
+            print("\n")
+
+        # Key to the City - Occasional civic perk
+        if self.apply_key_to_city_effects():
+            type.slow(cyan("The " + bright("Key to the City") + " catches someone's eye. They wave you through, no charge. A small civic perk."))
+            print("\n")
+
+        # Fountain Water - Emergency auto-heal when near death
+        if self.apply_fountain_water_effects():
+            type.slow(cyan("The " + bright("Fountain Water") + " shimmers in its vial. You don't remember drinking it. But you feel... renewed."))
+            print("\n")
+
+        # Granny's Swamp Nectar - Consumable healing
+        if self.has_item("Granny's Swamp Nectar") and self.get_health() < 50 and random.randrange(4) == 0:
+            type.slow(cyan("You crack open " + bright("Granny's Swamp Nectar") + ". It smells like turpentine and old leaves. You drink it anyway."))
+            print("\n")
+            if random.randrange(3) == 0:
+                type.type("It burns going down. Then warm. Then better. Way better.")
+                self.heal(random.randint(20, 40))
+                self.restore_sanity(8)
+                self.use_item("Granny's Swamp Nectar")
+            else:
+                type.type("It burns going down. Everything burns. Oh no. Oh no no no.")
+                self.hurt(random.randint(5, 15))
+                self.lose_sanity(5)
+                self.use_item("Granny's Swamp Nectar")
+            print("\n")
+
         # Broken state effects at start of day
         if self._is_broken:
             print()

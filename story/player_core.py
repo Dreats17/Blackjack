@@ -505,6 +505,79 @@ class Player(
                 self.restore_sanity(1)
                 return True
         return False
+
+    def apply_witch_ward_effects(self):
+        """Witch's Ward provides passive dark-event protection."""
+        if self.has_item("Witch's Ward"):
+            return True  # Caller checks this to block dark events
+        return False
+
+    def apply_filled_locket_effects(self):
+        """Filled Locket provides quiet daily comfort."""
+        if self.has_item("Filled Locket"):
+            if random.randrange(4) == 0:  # 25% chance per day
+                self.restore_sanity(2)
+                return True
+        return False
+
+    def apply_moon_shard_effects(self):
+        """Moon Shard glows at night, providing rest and clarity."""
+        if self.has_item("Moon Shard"):
+            if random.randrange(5) == 0:  # 20% chance per day
+                self.restore_sanity(3)
+                self.heal(2)
+                return True
+        return False
+
+    def apply_midnight_rose_effects(self):
+        """The Midnight Rose slowly fades but provides daily beauty."""
+        if self.has_item("Midnight Rose"):
+            if random.randrange(6) == 0:  # ~17% chance per day
+                self.restore_sanity(2)
+                return True
+        return False
+
+    def apply_rabbit_blessing_effects(self):
+        """Rabbit's Blessing brings gentle daily luck."""
+        if self.has_item("Rabbit's Blessing"):
+            if random.randrange(5) == 0:  # 20% chance per day
+                self.restore_sanity(2)
+                self.change_balance(random.randint(5, 25))
+                return True
+        return False
+
+    def apply_fountain_water_effects(self):
+        """Fountain Water has powerful one-time healing."""
+        if self.has_item("Fountain Water"):
+            if self.get_health() < 40:  # Auto-triggers when badly hurt
+                self.use_item("Fountain Water")
+                self.heal(50)
+                self.restore_sanity(15)
+                return True
+        return False
+
+    def apply_fight_champion_belt_effects(self):
+        """Fight Champion Belt radiates authority - reduces bully/mugging chances."""
+        if self.has_item("Fight Champion Belt"):
+            return True  # Passive protection
+        return False
+
+    def apply_championship_medal_effects(self):
+        """Championship Medal gives confidence - small sanity buff."""
+        if self.has_item("Championship Medal"):
+            if random.randrange(7) == 0:  # ~14% chance per day
+                self.restore_sanity(2)
+                return True
+        return False
+
+    def apply_key_to_city_effects(self):
+        """Key to the City provides occasional city perks."""
+        if self.has_item("Key to the City"):
+            if random.randrange(8) == 0:  # ~12% chance per day
+                amount = random.randint(25, 100)
+                self.change_balance(amount)
+                return True
+        return False
     
     def has_fire_source(self):
         """Check if player can make fire."""

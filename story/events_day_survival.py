@@ -697,6 +697,11 @@ class DaySurvivalMixin:
         elif self.has_fire_source():
             type.type("You manage to generate some warmth with what you have. It's not comfortable, but you survive.")
             self.hurt(5)
+        elif self.has_item("Blanket"):
+            type.type("You wrap yourself in the " + magenta(bright("Blanket")) + " and pull it tight.")
+            print("\n")
+            type.type("Not perfect. But enough. You make it through.")
+            self.hurt(8)
         else:
             type.type("You shiver through the entire night, curled up in a ball, teeth chattering.")
             print("\n")
@@ -868,6 +873,8 @@ class DaySurvivalMixin:
         print("\n")
         type.type("The new penny feels luckier. Is that possible?")
         self.add_status("Lucky")
+        self.change_balance(random.randint(5, 20))
+        self.restore_sanity(3)
         print("\n")
 
     def rubber_band_save(self):
@@ -1415,6 +1422,21 @@ class DaySurvivalMixin:
         print("\n")
 
     def someone_stole_your_stuff(self):
+        if self.has_item("Binoculars"):
+            variant = random.randrange(2)
+            if variant == 0:
+                type.type("From across the parking lot, you catch movement with your " + magenta(bright("Binoculars")) + ". Someone circling your car.")
+                print("\n")
+                type.type("You walk over, casual. They scatter before you arrive.")
+                type.type(" Nothing taken. The binoculars paid for themselves.")
+                self.restore_sanity(5)
+            else:
+                type.type("You spot a figure trying your door handle through your " + magenta(bright("Binoculars")) + " from fifty yards.")
+                print("\n")
+                type.type("You sprint back. They run. Nobody wins, nobody loses.")
+                self.restore_sanity(4)
+            print("\n")
+            return
         if self.has_item("Padlock") or self.has_item("Car Alarm Rigging"):
             device = "Car Alarm Rigging" if self.has_item("Car Alarm Rigging") else "Padlock"
             variant = random.randrange(2)

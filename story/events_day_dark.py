@@ -1598,7 +1598,11 @@ class DayDarkMixin:
             type.type("Someone runs over with a stick. Beats the dog off you. It finally lets go and runs.")
             print("\n")
             type.type("Your arm is a mess of blood and torn muscle. You can see bone.")
-            self.hurt(40)
+            if self.has_item("Scrap Armor"):
+                type.type(" The makeshift padding took the worst of it.")
+                self.hurt(20)
+            else:
+                self.hurt(40)
             self.lose_sanity(15)
             self.add_danger("Dog Bite Wound")
             if self.get_balance() >= 600:
@@ -1634,7 +1638,11 @@ class DayDarkMixin:
             type.type("You jump back, heart pounding. That could have killed you.")
             print("\n")
             type.type("You report the hazard to the shop owner. They seem unimpressed.")
-            self.hurt(10)
+            if self.has_item("Scrap Armor"):
+                type.type(" Your jury-rigged gear absorbed some of the shock.")
+                self.hurt(4)
+            else:
+                self.hurt(10)
             self.lose_sanity(8)
         elif chance < 8:
             type.type("The current grabs you. Your muscles seize. You can't move. Can't breathe.")
@@ -1644,7 +1652,11 @@ class DayDarkMixin:
             type.type("Your heart is racing. Irregular. Your hands won't stop shaking.")
             print("\n")
             type.type("The hospital keeps you overnight for observation. Arrhythmia.")
-            self.hurt(35)
+            if self.has_item("Scrap Armor"):
+                type.type(" Your armor took some of the brunt.")
+                self.hurt(18)
+            else:
+                self.hurt(35)
             self.lose_sanity(15)
             if self.get_balance() >= 500:
                 type.type("Hospital: " + red(bright("$500")) + ".")
