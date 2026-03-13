@@ -243,6 +243,7 @@ class NightEventsMixin:
                 type.type("The bear doesn't even twitch. ")
                 type.type("You practically float back to your car, silent as a ghost in fuzzy pink footwear.")
                 print("\n")
+                self.restore_sanity(8)
                 self.update_quiet_sneakers_durability()
                 return
             elif self.has_item("Quiet Sneakers"):
@@ -251,6 +252,7 @@ class NightEventsMixin:
                 print("\n")
                 type.type("You turn and run back up the riverbank, never looking back. Eventually, you make it out of the woods, and return to your car, safe and sound.")
                 print("\n")
+                self.restore_sanity(5)
                 self.update_quiet_sneakers_durability()
                 return
             else:
@@ -723,6 +725,8 @@ class NightEventsMixin:
                 type.type("But then it sees your necklace - teeth from one of its own. It lets out a low rumble... and slowly backs away.")
                 type.type(" The swamp creatures know who you are now. They won't bother you.")
                 print("\n")
+                self.restore_sanity(10)
+                self.add_status("Swamp Respected")
             else:
                 type.type("You surface for air and find yourself face-to-face with a pair of ancient, unblinking eyes. An alligator. At least ten feet long. Neither of you moves.")
                 print("\n")
@@ -1635,6 +1639,7 @@ class NightEventsMixin:
                 type.type("The muggers exchange nervous glances. One by one, they back away and disappear into the night.")
                 type.type(" Bruno nods at you. " + quote("Stay safe out there."))
                 print("\n")
+                self.restore_sanity(12)
             else:
                 type.type("A figure emerges from an alley. Then another. Then a third. They fan out, blocking your path. One has a knife.")
                 print("\n")
@@ -2263,6 +2268,7 @@ class NightEventsMixin:
             print("\n")
             type.type("They leave, but slowly. Deliberately. As if to say: " + quote("We'll be back."))
             print("\n")
+            self.restore_sanity(4)
             return
         variant = random.randrange(2)
         if variant == 0:

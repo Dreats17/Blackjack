@@ -478,10 +478,16 @@ class Player(
     # ============================================
     
     def apply_necronomicon_effects(self):
-        """The Necronomicon slowly corrupts you."""
+        """The Necronomicon slowly corrupts you. Occasionally grants dark visions."""
         if self.has_item("Necronomicon"):
-            if random.randrange(5) == 0:  # 20% chance per day
-                self.lose_sanity(random.choice([1, 2, 3]))
+            roll = random.randrange(10)
+            if roll == 0:  # 10% chance: dark vision - money at sanity cost
+                amount = random.randint(100, 500)
+                self.change_balance(amount)
+                self.lose_sanity(random.choice([8, 10, 12]))
+                return True
+            elif roll <= 2:  # 20% chance: simple corruption
+                self.lose_sanity(random.choice([2, 3, 5]))
                 return True
         return False
     

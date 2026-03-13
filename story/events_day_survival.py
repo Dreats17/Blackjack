@@ -1197,6 +1197,7 @@ class DaySurvivalMixin:
             print("\n")
             type.type("Slight redness. Could've been way worse. Thank you, past-you.")
             self.hurt(3)
+            self.restore_sanity(4)
             print("\n")
             return
         if self.has_item("Sunglasses"):
@@ -1204,6 +1205,7 @@ class DaySurvivalMixin:
             print("\n")
             type.type("Your arms got scorched, but your eyes are fine. Small mercy. You look vaguely cool while suffering.")
             self.hurt(8)
+            self.restore_sanity(2)
             print("\n")
             return
         if self.has_item("Umbrella"):
@@ -1211,6 +1213,7 @@ class DaySurvivalMixin:
             print("\n")
             type.type("Half your arm is burnt, half is fine. The umbrella line is visible. You look ridiculous but functional.")
             self.hurt(7)
+            self.restore_sanity(2)
             print("\n")
             return
         variant = random.randrange(3)
@@ -1247,6 +1250,7 @@ class DaySurvivalMixin:
         if self.has_item("First Aid Kit"):
             type.type("Good thing you have that " + magenta(bright("First Aid Kit")) + ". You clean it, disinfect it, bandage it. Almost like a real adult.")
             self.hurt(3)
+            self.restore_sanity(3)
         else:
             type.type("You don't have anything to treat it with. You tear off a piece of your shirt and wrap it. Field medicine at its finest.")
             self.hurt(10)
@@ -1314,7 +1318,7 @@ class DaySurvivalMixin:
             type.type("Luckily, your " + magenta(bright("Tool Kit")) + " has cables in it. You flag someone down and get a jump in ten minutes.")
             print("\n")
             type.type("Having tools makes you feel like a competent human being. The bar is low, but you cleared it.")
-            self.lose_sanity(2)
+            self.restore_sanity(5)
         else:
             type.type("You stand on the roadside, holding imaginary cables, hoping someone takes pity on you.")
             print("\n")
@@ -1426,7 +1430,7 @@ class DaySurvivalMixin:
                 type.type("They see your " + magenta(bright(device)) + " and think better of it. Smart.")
                 print("\n")
                 type.type("You make a mental note to sleep lighter anyway.")
-            self.lose_sanity(3)
+            self.restore_sanity(5)
             print("\n")
             return
         variant = random.randrange(3)
@@ -1742,6 +1746,7 @@ class DaySurvivalMixin:
             print("\n")
             type.type("People in the parking lot stare at you. You don't care. You have places to be and money to lose.")
             print("\n")
+            self.restore_sanity(5)
             return
         self.add_travel_restriction("Rain")
         return

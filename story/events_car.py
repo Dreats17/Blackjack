@@ -540,6 +540,7 @@ class CarEventsMixin:
             type.type("You grab your " + magenta(bright("Tool Kit")) + " and disconnect the battery to stop the noise.")
             print("\n")
             type.type("Silence. Sweet silence. But now you need to figure out the real problem.")
+            self.restore_sanity(8)
             self.add_travel_restriction("Wasted Afternoon")
         else:
             type.type("You have no way to disable it. The alarm runs until the battery dies.")
@@ -918,6 +919,7 @@ class CarEventsMixin:
             type.type("You heat your key with your " + magenta(bright("Lighter")) + " and carefully thaw the lock.")
             print("\n")
             type.type("Primitive, but effective.")
+            self.restore_sanity(3)
         else:
             type.type("You spend an hour breathing on the lock, rubbing it with your hands.")
             print("\n")

@@ -207,6 +207,8 @@ class DayAnimalsMixin:
         print("\n")
         type.type("You feel... guilty? But also lucky. Definitely lucky.")
         self.add_status("Lucky")
+        self.restore_sanity(5)
+        self.change_balance(random.randint(10, 50))
         print("\n")
 
     def hungry_cow(self):
@@ -840,7 +842,9 @@ class DayAnimalsMixin:
                 type.type("This continues for a week. You feed the rat, it brings you coins.")
                 print("\n")
                 type.type("Eventually, the rat just... moves in. You call it " + cyan(bright("Slick")) + ". It's very good at finding money.")
+                self.use_item(item)
                 self.change_balance(random.randint(5, 15))
+                self.restore_sanity(8)
                 self.add_companion("Slick")
                 self.increment_statistic("companions_befriended")
                 if not self.has_achievement("first_friend"):
