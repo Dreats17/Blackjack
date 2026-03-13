@@ -883,12 +883,24 @@ def choose_blackjack_bet(request: DecisionRequest, plan: StrategicPlan) -> tuple
             if blend_slice > 0:
                 bet = max(bet, min(total_available, max(min_bet, balance + blend_slice)))
                 # The blend can push the bet above what the rank-protection floor computed
-                # earlier.  Re-apply: losing the bet must not drop real balance below floor.
-                # (balance - floor) is the real surplus we can risk; adding fake_cash gives
-                # the maximum bet that still lands at floor on a full loss.
+                # earlier.  Re-apply using ONLY real balance surplus: the game's blackjack
+                # class deducts the full bet from real balance regardless of the fake_cash
+                # portion, so adding fake_cash to the cap would allow negative real balance.
                 if floor and balance > floor:
-                    blend_floor_cap = max(min_bet, (balance - floor) + fake_cash)
+                    blend_floor_cap = max(min_bet, balance - floor)  # real surplus only — no fake_cash
                     bet = min(bet, blend_floor_cap)
+
+    # Final hard streak protection: after ALL bet adjustments (including fake-cash
+    # blending), cap the bet so that 3 consecutive full losses cannot push the REAL
+    # balance below the rank floor.  The game deducts losses from real balance even
+    # when fake_cash is included in the bet, so this guard must be applied last.
+    # Only enforced when the real surplus above floor is >= $1,500 to avoid
+    # over-constraining bets when the balance is still close to the floor.
+    if floor and balance > floor:
+        real_streak_surplus = balance - floor
+        if real_streak_surplus >= 1500:
+            final_streak_cap = max(min_bet, real_streak_surplus // 3)
+            bet = min(bet, final_streak_cap)
 
     if bet > total_available:
         bet = int(total_available)

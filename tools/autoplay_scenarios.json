@@ -167,7 +167,7 @@
       },
       {
         "details": {
-          "bet": 5000,
+          "bet": 1000,
           "goal": "blend_fraudulent_cash_safely",
           "trace_metadata": {
             "max_ratio": 0.36,
@@ -191,11 +191,11 @@
         },
         "passed": true,
         "scenario_id": "fraudulent_cash_blend_case",
-        "summary": "bet=5000 balance=4000"
+        "summary": "bet=1000 balance=4000"
       },
       {
         "details": {
-          "bet": 1080,
+          "bet": 666,
           "goal": "push_next_rank",
           "trace_metadata": {
             "max_ratio": 0.1,
@@ -219,7 +219,7 @@
         },
         "passed": true,
         "scenario_id": "marvin_preserve_cash_window",
-        "summary": "bet=1080 max_bet=1200"
+        "summary": "bet=666 max_bet=1200"
       },
       {
         "details": {

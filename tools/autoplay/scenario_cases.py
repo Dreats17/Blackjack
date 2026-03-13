@@ -214,8 +214,18 @@ def _assert_min_bet(min_bet: int) -> BetCheck:
 
 
 def _assert_balance_blend(balance: int) -> BetCheck:
+    """Asserts that fake-cash blending does NOT push the bet above real balance.
+
+    The game's blackjack class deducts the full bet from real balance even when
+    fraudulent cash is included.  The corrected blend_floor_cap caps the bet at
+    (balance - floor), not (balance - floor + fake_cash), to prevent the real
+    balance from going negative.  Combined with the final streak protection that
+    caps at (real_surplus // 3), the bet will be well below real balance.
+    """
+
     def checker(bet: int) -> tuple[bool, str]:
-        ok = bet > balance
+        # Bet must be positive but must NOT exceed real balance
+        ok = 1 <= bet <= balance
         return ok, f"bet={bet} balance={balance}"
 
     return checker

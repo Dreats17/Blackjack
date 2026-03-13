@@ -12,13 +12,18 @@ How to read this file
 - `[ ]` means not meaningfully covered yet.
 - "Distance to win" means distance to deliberate, repeatable millionaire-capable play, not lucky outlier wins.
 
-Current benchmark checkpoint (Batch 3 — 2026-03-12)
-- Scenario suite: 47/47 passed (unchanged — no new scenarios yet in this batch)
-- Fixed slice BEFORE batch 3: autotest.py 60 1 20 -> alive 15/20, car 15/20, rank1+ 9/20,
-  marvin 2/20, crafting 0/20, loan 0/20, witch_doctor 2/20, adventure 0/20
-- Best peak before: $140,685 seed 16 rank 3
-- Current known blocker: crafting ingredient acquisition + workbench routing missing entirely;
-  flask-only witch visits never triggered; Marvin Health/Delight Indicator never bought
+Current benchmark checkpoint (Batch 4 — 2026-03-13)
+- Scenario suite: 47/47 passed (no new scenarios in this batch)
+- Fixed slice AFTER batch 4: autotest.py 60 1 20 -> alive 10/20, car 11/20, rank1+ 9/20,
+  marvin 1/20, crafting 0/20, loan 1/20, witch_doctor 0/20, adventure 0/20
+- Best peak: $4,296 seed 8 rank 1 (was $6,990; bank-wipe prevented by streak protection)
+- Current known blocker: fake_cash loan-shark over-betting caused catastrophic single-night
+  losses (verified: $6,990→-$1,500 from $8,490 bet on one cycle). Fixed in Batch 4.
+  Remaining blocker: witch_doctor/crafting unreachable in 60-day runs due to balance cap.
+
+Fixed slice BEFORE batch 3 (for reference):
+- autotest.py 60 1 20: alive 15/20, car 15/20, rank1+ 9/20, marvin 2/20, crafting 0/20,
+  loan 0/20, witch_doctor 2/20, adventure 0/20 | best peak $140,685 seed 16 rank 3 (long run)
 
 Milestone ladder
 - [~] Milestone 1: reliable no-car survival and car acquisition
@@ -84,6 +89,9 @@ Fairness and bug-audit coverage
 - [x] Metrics reporting: autotest.py reports crafting, companion, mechanic_end in Visit summary line
 - [x] Masterplan CORE GAME MECHANIC TRUTHS updated with code-verified facts for Marvin, Witch Doctor,
       Convenience Store, Car Workbench/Crafting, Adventure system, and Loan Shark.
+- [x] Fake_cash/loan-shark over-betting bug found and fixed (Batch 4): blend_floor_cap was adding
+      fake_cash to floor protection, allowing real balance to go deeply negative after a loan.
+      Code-verified: blackjack.py deducts full bet from real balance regardless of fraudulent_cash.
 - [~] Harness-to-core-game cross-check workflow exists informally through audit work
 - [ ] Expected-but-missing mechanic report
 - [ ] Core-game bug suspect report from harness evidence
@@ -91,6 +99,17 @@ Fairness and bug-audit coverage
 AI decision tracking (items to manually review)
 The following decisions were changed or added in batch 3. Each can be reverted by inspecting
 the trace reason fields in autoplay_scenarios.json or the DECISION_TRACES output from quicktest.
+
+Batch 4 changes:
+1. blend_floor_cap corrected: changed from (balance - floor) + fake_cash to (balance - floor)
+   in tools/autoplay/policies/blackjack_policy.py choose_blackjack_bet().
+   Old behavior: fake_cash portion inflated the cap, allowing bet > real balance with floor safety.
+   Revert: restore + fake_cash in blend_floor_cap calculation.
+
+2. Final hard streak protection added: caps bet at (real_surplus // 3) when surplus >= $1,500.
+   Applied AFTER all other bet adjustments (including fake-cash blending) as a last-resort guard.
+   Old behavior: no final cap existed — growth-window and blend boosts could bypass floor guards.
+   Revert: remove the final "if floor and balance > floor: real_streak_surplus" block.
 
 Batch 3 changes:
 1. Crafting ingredient priorities: added Garbage Bag(58), Plastic Wrap(54), Fishing Line(60),
@@ -132,16 +151,37 @@ Previous batch decisions (batch 1-2):
    Revert: restore simple balance check in event_policy.py choose_event_inline_choice
 
 Current deliberate next targets
-- [ ] Run full autotest after batch 3 and record new fixed-slice numbers
+- [x] Run full autotest after batch 3 and record new fixed-slice numbers (done: batch 4 above)
 - [ ] Add scenario cases for workbench_craft routing (routes to Car Workbench when ingredients ready)
 - [ ] Add scenario case for witch_flask_only_run (visits witch for Fortunate Day when healthy + $13k+)
 - [ ] Investigate: does crafting actually fire in practice now? Check crafting=N/20 in new run
+  NOTE: crafting=0/20 in batch 4 — reason: bot never accumulates Tool Kit in 60-day runs
 - [ ] Investigate: does witch_doctor count improve with flask-only path?
+  NOTE: witch_doctor=0/20 in batch 4 — reason: $12k min flask price never reached in 60-day runs
 - [ ] Expand adventure unlock: once Rusty Compass is in Marvin priorities (82), verify adventure fires at rank 2
 - [ ] Add focused scenario cases for loan shark: borrow then repay cycle at rank 0 with car
 - [ ] Track actual Fortunate Day flask purchase rate vs Marvin visit timing
+- [ ] Investigate alive regression: 15/20→10/20 after batch 3+4 changes. RNG shift from routing
+  changes seems likely. Drowning-dream deaths (6/20) are unblockable 10% RNG. Gun-violence (3/20)
+  deaths via Phil/Interrogator already use optimal choice (yes=25% death vs no=33%).
+- [ ] Extend test runs to 300+ days to see if streak-protected bot survives the Marvin/flask band
 
-Most recent completed batch (Batch 3 — 2026-03-12)
+Most recent completed batch (Batch 4 — 2026-03-13)
+- Diagnosed fake_cash over-betting: loan-shark money was included in bet sizing with a
+  blend_floor_cap that added fake_cash to the allowed surplus. The game's blackjack class
+  deducts the full bet from REAL balance regardless of fake_cash, so the cap was wrong.
+- Fixed blend_floor_cap: changed from (balance - floor) + fake_cash to (balance - floor).
+  This prevents one bet from sending real balance below the rank floor even with a $5k loan.
+- Added final hard streak protection: caps the bet at (real_surplus // 3) when surplus >= $1,500.
+  Applied AFTER all bet adjustments (including fake-cash blending) so no code path bypasses it.
+  Ensures 3 consecutive losing hands never push real balance below rank floor.
+- Code-verified the fake_cash flow: blackjack.py blends fraudulent_portion only when bet >
+  balance, but still deducts full bet from balance. This confirms floor cap must not include
+  fake_cash. Loan shark route in game_flow verified: take_loan() adds to _fraudulent_cash pool.
+- Batch 4 autotest results recorded (60-day fixed slice, seeds 1-20):
+  alive 10/20, car 11/20, rank1+ 9/20, best peak $4,296 seed 8
+
+Previous batch (Batch 3 — 2026-03-12)
 - Code-verified all prices from visit_marvin, visit_witch_doctor, make_convenience_store_inventory
 - Added crafting ingredient priorities to STORE_PROGRESSION_PRIORITIES (5 items)
 - Fixed Marvin Health Indicator and Delight Indicator from priority 0 to 64/68
