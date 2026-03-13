@@ -109,6 +109,13 @@ class GameFlowMixin:
                 type.type("You realize you've lost " + red(bright("${:,}".format(small_loss))) + " somewhere. Weird.")
                 self.change_balance(-small_loss)
 
+        # Passive Item Flavor - ~1-in-3 days, one quiet moment from something you're carrying
+        item_flavor = self.apply_daily_item_flavor()
+        if item_flavor:
+            item_name, text = item_flavor
+            type.slow(cyan(text.replace("{item}", bright(item_name))))
+            print("\n")
+
         # Broken state effects at start of day
         if self._is_broken:
             print()
