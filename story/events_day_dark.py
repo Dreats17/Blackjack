@@ -2364,5 +2364,55 @@ class DayDarkMixin:
             type.type("You decline. You're not a hero. You just did what anyone would do.")
         print("\n")
 
+    # === VOODOO DOLL ===
+
+    def voodoo_doll_temptation(self):
+        """The Voodoo Doll calls out to be used. Powerful, but costs sanity."""
+        if not self.has_item("Voodoo Doll"):
+            self.day_event()
+            return
+        if self.has_met("Voodoo Doll Used"):
+            self.day_event()
+            return
+        self.meet("Voodoo Doll Used")
+        type.type("The " + cyan(bright("Voodoo Doll")) + " has been sitting in your bag. A small wax figure, handmade, crude.")
+        print("\n")
+        type.type("You take it out. It's warm in your hand. Warmer than it should be.")
+        print("\n")
+        type.type("The swamp witch said: " + quote("You know what to do with this.") + " Do you?")
+        print("\n")
+        action = ask.option("What do you do with it?", ["stick a pin in it", "burn it", "keep it safe"])
+        print("\n")
+        if action == "stick a pin in it":
+            type.type("You find a pin. You push it in slowly.")
+            print("\n")
+            type.type("...")
+            print("\n")
+            type.type("Somewhere across town, someone stubs their toe. You can't know this. But you do.")
+            print("\n")
+            type.type("More importantly: a rival gambler who had it out for you is suddenly... distracted tonight.")
+            self.change_balance(random.randint(200, 800))
+            self.lose_sanity(random.choice([8, 10, 15]))
+            type.type("The doll crumbles to wax dust in your hands. The deed is done.")
+            self.use_item("Voodoo Doll")
+        elif action == "burn it":
+            type.type("You hold the doll over your lighter. It resists, hissing and spitting black smoke.")
+            print("\n")
+            type.type("Then it goes. Fast. Too fast. A flash of heat and it's ash.")
+            print("\n")
+            type.type("You smell something you can't place. Not unpleasant. Like turned earth after rain.")
+            print("\n")
+            type.type("Your hands stop shaking. For the first time in weeks.")
+            self.restore_sanity(random.choice([15, 20]))
+            self.heal(10)
+            self.use_item("Voodoo Doll")
+        else:
+            type.type("You put it back. Some things are better left undone.")
+            print("\n")
+            type.type("But it's warmer now than when you picked it up. Like it noticed you almost went through with it.")
+            self.lose_sanity(3)
+        print("\n")
+
     # === HIGH ROLLER KEYCARD CHAIN ===
+
 

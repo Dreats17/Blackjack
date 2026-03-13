@@ -550,6 +550,7 @@ class LocationsMixin:
             type.type("Oh, you have premium coverage! That covers everything. You're all set!")
             print()
             type.type("You walk out without paying a dime.")
+            self.restore_sanity(10)
             self.update_faulty_insurance_durability()
             self.start_night()
             return

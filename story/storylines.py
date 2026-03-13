@@ -4590,6 +4590,7 @@ def storyline_carnival_pack_up(p, sl):
         type.type("Its tiny top hat is slightly crooked.")
         print("\n")
         type.type("So it WAS real. The bear proves it.")
+        p.restore_sanity(10)
     elif p.has_met("Carnival Won Big"):
         type.type("You check your wallet. The carnival cash is still there. ")
         type.type("It doesn't smell like popcorn anymore. It smells like regular money.")
