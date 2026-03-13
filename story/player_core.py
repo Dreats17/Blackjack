@@ -578,6 +578,25 @@ class Player(
                 self.change_balance(amount)
                 return True
         return False
+
+    def apply_witch_favor_rescue(self):
+        """Witch's Favor can auto-rescue from a near-death situation."""
+        if self.has_item("Witch's Favor"):
+            if self.get_health() <= 15:  # Near death
+                self.use_item("Witch's Favor")
+                self.heal(40)
+                self.restore_sanity(10)
+                return True
+        return False
+
+    def apply_captain_compass_effects(self):
+        """Captain's Compass occasionally reveals a shortcut or hidden place."""
+        if self.has_item("Captain's Compass"):
+            if random.randrange(8) == 0:
+                amount = random.randint(30, 150)
+                self.change_balance(amount)
+                return True
+        return False
     
     def has_fire_source(self):
         """Check if player can make fire."""

@@ -160,6 +160,106 @@ class GameFlowMixin:
                 self.use_item("Granny's Swamp Nectar")
             print("\n")
 
+        # Bear King's Respect - animals (and some humans) sense it
+        if self.has_item("Bear King's Respect") and random.randrange(8) == 0:
+            type.slow(cyan("People step aside today without knowing why. The " + bright("Bear King's Respect") + " carries weight even here."))
+            self.restore_sanity(3)
+            print("\n")
+
+        # Kraken's Memory - ancient knowledge surfaces occasionally
+        if self.has_item("Kraken's Memory") and random.randrange(7) == 0:
+            type.slow(cyan("The " + bright("Kraken's Memory") + " pulses behind your eyes. A thousand years of ocean depth, compressed into a moment."))
+            self.restore_sanity(4)
+            self.heal(3)
+            print("\n")
+
+        # Fight Champion Belt - passive confidence
+        if self.apply_fight_champion_belt_effects() and random.randrange(9) == 0:
+            type.slow(cyan("The " + bright("Fight Champion Belt") + " in your bag reminds you what you're capable of. You've won before. You can win again."))
+            self.restore_sanity(3)
+            print("\n")
+
+        # Deep Stone - glows faintly in the dark, calming
+        if self.has_item("Deep Stone") and random.randrange(8) == 0:
+            type.slow(cyan("The " + bright("Deep Stone") + " glows a faint bioluminescent blue. Cold. Deep. Ancient."))
+            self.restore_sanity(3)
+            print("\n")
+
+        # Antique Ring - carries the weight of a story
+        if self.has_item("Antique Ring") and random.randrange(9) == 0:
+            type.slow(cyan("The " + bright("Antique Ring") + " catches morning light. Whatever story it holds, it isn't yours — but you're part of it now."))
+            self.restore_sanity(2)
+            print("\n")
+
+        # Witch's Favor - emergency rescue when near death
+        if self.apply_witch_favor_rescue():
+            type.slow(cyan("Something intercedes. You felt it — a warmth, a pressure, a presence. The " + bright("Witch's Favor") + " crumbles to ash in your pocket."))
+            type.type(" The witch called in her side of the deal.")
+            print("\n")
+
+        # Captain's Compass - navigational luck
+        if self.apply_captain_compass_effects():
+            type.slow(cyan("The " + bright("Captain's Compass") + " needle spins, then locks on something unexpected. You follow it."))
+            self.restore_sanity(3)
+            print("\n")
+
+        # Kraken Pearl - legendary item resonates with deep-water memories
+        if self.has_item("Kraken Pearl") and random.randrange(10) == 0:
+            type.slow(cyan("The " + bright("Kraken Pearl") + " pulses in your bag. The deep ocean remembers you."))
+            self.restore_sanity(4)
+            print("\n")
+
+        # Mermaid Crown - carries an otherworldly authority
+        if self.has_item("Mermaid Crown") and random.randrange(10) == 0:
+            type.slow(cyan("Light catches the " + bright("Mermaid Crown") + " through the window. Whatever you are, you've touched something larger."))
+            self.restore_sanity(4)
+            print("\n")
+
+        # Hero Medal - reminds you of what you're capable of
+        if self.has_item("Hero Medal") and random.randrange(9) == 0:
+            type.slow(cyan("The " + bright("Hero Medal") + " sits heavy in your pocket. You earned it. That's real, even when nothing else feels real."))
+            self.restore_sanity(3)
+            print("\n")
+
+        # Giant Bear Tooth - people sense something about you
+        if self.has_item("Giant Bear Tooth") and random.randrange(9) == 0:
+            type.slow(cyan("Someone glances at the " + bright("Giant Bear Tooth") + " on your dash and doesn't mess with you. Some trophies communicate silently."))
+            self.restore_sanity(2)
+            print("\n")
+
+        # Trophy items - silent reminders of past victories
+        if (self.has_item("Crab Racing Trophy") or self.has_item("Tortoise Trophy")) and random.randrange(10) == 0:
+            trophy = "Crab Racing Trophy" if self.has_item("Crab Racing Trophy") else "Tortoise Trophy"
+            type.slow(cyan("You glance at the " + bright(trophy) + ". You won something against all odds. Doesn't hurt to remember that."))
+            self.restore_sanity(3)
+            print("\n")
+
+        # Pearls - small beauty that grounds you
+        if (self.has_item("Matched Pearls") or self.has_item("Pink Pearl") or self.has_item("Mermaid Pearl")) and random.randrange(10) == 0:
+            pearl = "Matched Pearls" if self.has_item("Matched Pearls") else ("Pink Pearl" if self.has_item("Pink Pearl") else "Mermaid Pearl")
+            type.slow(cyan("The " + bright(pearl) + " catches morning light. The ocean made something perfect, and you found it."))
+            self.restore_sanity(3)
+            print("\n")
+
+        # Ancient Sea Map - curiosity and wonder
+        if self.has_item("Ancient Sea Map") and random.randrange(9) == 0:
+            type.slow(cyan("The " + bright("Ancient Sea Map") + " shows coastlines that may not exist anymore. The world was different, once."))
+            self.restore_sanity(3)
+            print("\n")
+
+        # Cannon Gem - strange light, strange thoughts
+        if self.has_item("Cannon Gem") and random.randrange(9) == 0:
+            type.slow(cyan("The " + bright("Cannon Gem") + " catches light at an angle that makes no sense. You stare at it longer than you meant to."))
+            self.restore_sanity(2)
+            print("\n")
+
+        # Pirate Treasure / Treasure Chest - weight of wealth
+        if (self.has_item("Pirate Treasure") or self.has_item("Treasure Chest")) and random.randrange(9) == 0:
+            treasure = "Pirate Treasure" if self.has_item("Pirate Treasure") else "Treasure Chest"
+            type.slow(cyan("The " + bright(treasure) + " is heavy in the back. Heavy in a satisfying way. The weight of things earned."))
+            self.restore_sanity(3)
+            print("\n")
+
         # Broken state effects at start of day
         if self._is_broken:
             print()

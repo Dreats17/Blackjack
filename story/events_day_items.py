@@ -2009,3 +2009,240 @@ class DayItemsMixin:
             self.restore_sanity(3)
         print("\n")
 
+
+    def treasure_map_follow(self):
+        """Treasure Map / Joe's Map / Fairy's Secret Map leads to a small treasure"""
+        has_map = (self.has_item("Treasure Map") or self.has_item("Joe's Treasure Map") or
+                   self.has_item("Fairy's Secret Map") or self.has_item("Treasure Coordinates"))
+        if not has_map:
+            self.day_event()
+            return
+        if self.has_met("Treasure Map Followed"):
+            self.day_event()
+            return
+        self.meet("Treasure Map Followed")
+        if self.has_item("Fairy's Secret Map"):
+            map_name = "Fairy's Secret Map"
+            type.type("The " + cyan(bright("Fairy's Secret Map")) + " glows faintly. The markings shift in the light — it's leading you somewhere.")
+        elif self.has_item("Treasure Coordinates"):
+            map_name = "Treasure Coordinates"
+            type.type("You've been sitting on these " + cyan(bright("Treasure Coordinates")) + " long enough. Today you follow them.")
+        elif self.has_item("Joe's Treasure Map"):
+            map_name = "Joe's Treasure Map"
+            type.type("Joe's note said he never found the spot. You've got his " + cyan(bright("Joe's Treasure Map")) + " and a free afternoon.")
+        else:
+            map_name = "Treasure Map"
+            type.type("You unfold the " + cyan(bright("Treasure Map")) + " and follow the dotted line until it ends.")
+        print("\n")
+        answer = ask.yes_or_no("Follow it now? ")
+        if answer == "yes":
+            type.type("You drive the route. Then walk. Then dig.")
+            print("\n")
+            result = random.randrange(4)
+            if result == 0:
+                amount = random.randint(300, 1500)
+                type.type("A tin box. Rusted but intact. Inside: cash, rolled tight, and a note that just says " + quote("Good luck, stranger."))
+                type.type(" " + green("${:,}".format(amount)) + ".")
+                self.change_balance(amount)
+                self.restore_sanity(12)
+            elif result == 1:
+                type.type("A glass jar full of old coins. Mostly worthless by themselves.")
+                type.type(" But together, a coin dealer pays well.")
+                amount = random.randint(150, 600)
+                self.change_balance(amount)
+                type.type(" " + green("${:,}".format(amount)) + ".")
+                self.restore_sanity(8)
+            elif result == 2:
+                type.type("Nothing. The spot exists but there's nothing there. Already dug up, long ago.")
+                print("\n")
+                type.type("But you spent a few hours outside, in the open air, searching. That was something.")
+                self.restore_sanity(5)
+                self.heal(5)
+            else:
+                type.type("You find the spot. You dig. You hit something hard.")
+                print("\n")
+                type.type("A box. You open it. Inside: another map. This one is different. Older.")
+                self.add_item("Vision Map") if not self.has_item("Vision Map") else self.change_balance(100)
+                self.restore_sanity(10)
+            self.use_item(map_name)
+        else:
+            type.type("You fold it back up. Another day.")
+            self.lose_sanity(2)
+        print("\n")
+
+    def capture_fairy_release(self):
+        """The Captured Fairy in your bag causes strange dreams — releasing it gives a blessing"""
+        if not self.has_item("Captured Fairy"):
+            self.day_event()
+            return
+        if self.has_met("Fairy Released"):
+            self.day_event()
+            return
+        self.meet("Fairy Released")
+        type.type("The jar in your bag has been vibrating at night. The " + cyan(bright("Captured Fairy")) + " hasn't stopped.")
+        print("\n")
+        type.type("You've been having strange dreams. Colors you can't name. Music with no source.")
+        print("\n")
+        type.type("Today you open the jar.")
+        print("\n")
+        answer = ask.yes_or_no("Let it go? ")
+        if answer == "yes":
+            type.type("The fairy hovers in the air between you. Studies you.")
+            print("\n")
+            type.type("Then it presses something into your palm — a tiny glowing seed — and disappears.")
+            print("\n")
+            type.type("The strange dreams stop. You feel lighter. The curse lifted.")
+            self.use_item("Captured Fairy")
+            self.remove_status("Fairy Cursed") if self.has_status("Fairy Cursed") else None
+            self.restore_sanity(20)
+            self.heal(15)
+            self.add_status("Fairy Blessed")
+            if not self.has_item("Magic Acorn"):
+                self.add_item("Magic Acorn")
+            type.type(" The seed looks like a " + cyan(bright("Magic Acorn")) + ".")
+        else:
+            type.type("You close the jar. The vibrating gets louder.")
+            print("\n")
+            type.type("The dreams that night are worse.")
+            self.lose_sanity(8)
+        print("\n")
+
+    def lucky_lure_fishing(self):
+        """Lucky Lure / Earl's Lucky Lure can be used in a fishing event"""
+        has_lure = self.has_item("Lucky Lure") or self.has_item("Earl's Lucky Lure")
+        if not has_lure:
+            self.day_event()
+            return
+        if self.has_met("Lucky Lure Fished"):
+            self.day_event()
+            return
+        self.meet("Lucky Lure Fished")
+        lure = "Earl's Lucky Lure" if self.has_item("Earl's Lucky Lure") else "Lucky Lure"
+        type.type("You find a spot by the water. You've got the " + cyan(bright(lure)) + " and nothing but time.")
+        print("\n")
+        type.type("You tie it on, cast out, and wait. The line goes taut almost immediately.")
+        print("\n")
+        catch = random.randrange(4)
+        if catch == 0:
+            type.type("Something massive. You fight it for twenty minutes. Your arms burn.")
+            print("\n")
+            type.type("You pull up a fish so big the lure bends. You weigh it on your car's bumper somehow.")
+            self.change_balance(random.randint(100, 500))
+            self.restore_sanity(20)
+            self.heal(10)
+            type.type(" Worth " + green("${:,}".format(random.randint(100, 500))) + " to a local fish market.")
+            self.add_item("Fish") if not self.has_item("Fish") else None
+        elif catch == 1:
+            type.type("A nice-sized bass. Clean catch. You let it go after a moment, because that felt right.")
+            self.restore_sanity(15)
+            self.heal(5)
+            self.reduce_fatigue(10)
+        elif catch == 2:
+            type.type("A boot. You caught a boot. The lure is still on it.")
+            type.type(" There's a twenty-dollar bill stuffed in the boot.")
+            self.change_balance(20)
+            self.restore_sanity(8)
+        else:
+            type.type("Three fish in an hour. More than you can eat. You give some to an older man downstream who's been skunked all day.")
+            print("\n")
+            type.type("He starts to cry a little. Says his wife used to bring him here. It's been a hard year.")
+            self.restore_sanity(18)
+            self.heal(8)
+            self.add_item("Live Fish") if not self.has_item("Live Fish") else None
+        print("\n")
+
+    def mysterious_code_decode(self):
+        """Mysterious Code can be decoded for a clue or reward"""
+        if not self.has_item("Mysterious Code"):
+            self.day_event()
+            return
+        if self.has_met("Code Decoded"):
+            self.day_event()
+            return
+        self.meet("Code Decoded")
+        type.type("The " + cyan(bright("Mysterious Code")) + " has been nagging at you. Numbers. Symbols. A pattern.")
+        print("\n")
+        type.type("You spend a morning with a pen and paper, staring at it. Then it clicks.")
+        print("\n")
+        answer = ask.yes_or_no("Work it out now? ")
+        if answer == "yes":
+            result = random.randrange(3)
+            if result == 0:
+                type.type("It's a combination. You find a storage locker nearby that matches.")
+                print("\n")
+                type.type("Inside: boxes of old equipment and a cash box someone forgot to empty.")
+                amount = random.randint(200, 1000)
+                self.change_balance(amount)
+                type.type(" " + green("${:,}".format(amount)) + " in old bills.")
+                self.restore_sanity(12)
+            elif result == 1:
+                type.type("It's coordinates. You drive to the spot. It's a rest stop with a picnic table.")
+                print("\n")
+                type.type("Under the table, taped with duct tape, is an envelope. Inside: a key and a note that just says: " + quote("For emergencies."))
+                self.add_item("Mysterious Key") if not self.has_item("Mysterious Key") else self.change_balance(100)
+                self.restore_sanity(10)
+            else:
+                type.type("It's an old radio frequency. You tune in. Static. Then: a voice.")
+                print("\n")
+                type.type("Someone broadcasting from far away. A woman reading poetry into the dark.")
+                print("\n")
+                type.type("You listen for an hour.")
+                self.restore_sanity(20)
+            self.use_item("Mysterious Code")
+        else:
+            type.type("You fold it up. Maybe the mystery is the point.")
+            self.restore_sanity(3)
+        print("\n")
+
+    def swamp_gold_attention(self):
+        """Swamp Gold attracts attention from people who recognize what it is"""
+        if not self.has_item("Swamp Gold"):
+            self.day_event()
+            return
+        if self.has_met("Swamp Gold Spotted"):
+            self.day_event()
+            return
+        self.meet("Swamp Gold Spotted")
+        type.type("Someone at the gas station stares at the " + cyan(bright("Swamp Gold")) + " jewelry you've been keeping in the cupholder.")
+        print("\n")
+        type.type("They know what it is. The kind that only comes from one place. The swamp.")
+        print("\n")
+        approach = random.randrange(3)
+        if approach == 0:
+            type.type("A woman approaches. Quiet. Respectful.")
+            print("\n")
+            type.type(quote("That belonged to my grandmother. I thought it was gone. The flood — we lost everything."))
+            print("\n")
+            answer = ask.yes_or_no("Give it back? ")
+            if answer == "yes":
+                type.type("You hand it over without asking for anything.")
+                print("\n")
+                type.type("She clutches it. Cries quietly.")
+                print("\n")
+                type.type("Her son comes over. Presses bills into your hand. Way more than it's worth.")
+                amount = random.randint(200, 600)
+                self.change_balance(amount)
+                self.restore_sanity(20)
+                self.use_item("Swamp Gold")
+            else:
+                type.type("You tell her you found it, and you're keeping it. She nods, understanding but sad.")
+                self.lose_sanity(10)
+        elif approach == 1:
+            type.type("A collector. He wants it badly. Swamp provenance means authenticity.")
+            amount = random.randint(300, 900)
+            type.type(" He offers " + green("${:,}".format(amount)) + ".")
+            answer = ask.yes_or_no("Sell it to him? ")
+            if answer == "yes":
+                self.change_balance(amount)
+                self.restore_sanity(5)
+                self.use_item("Swamp Gold")
+            else:
+                type.type("You decline. The collector leaves his number.")
+                self.restore_sanity(3)
+        else:
+            type.type("A man follows you to your car. Wants to know where you found it. His manner makes you uncomfortable.")
+            print("\n")
+            type.type("You get in and drive away. The swamp keeps its secrets. So do you.")
+            self.lose_sanity(5)
+            self.restore_sanity(3)  # Net loss of 2
+        print("\n")
