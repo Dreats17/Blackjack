@@ -4825,7 +4825,16 @@ def _should_replay_hand(self, status):
 
 def _auto_bet(self):
     """Route bet sizing through the structured blackjack policy."""
-    self._Blackjack__bet = _choose_blackjack_bet_amount(self)
+    bet = _choose_blackjack_bet_amount(self)
+    self._Blackjack__bet = bet
+    # Apply fake-cash-first mechanic: loan money is always spent before real cash.
+    # Mirrors the logic in bet() so end_round() can compute the correct real_loss.
+    player = self._Blackjack__player
+    fake_available = player.get_fraudulent_cash()
+    self._Blackjack__fraudulent_portion = 0
+    if fake_available > 0:
+        self._Blackjack__fraudulent_portion = min(bet, fake_available)
+        player.blend_fraudulent_cash(self._Blackjack__fraudulent_portion)
     return True
 
 
