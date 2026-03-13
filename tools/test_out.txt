@@ -1077,4 +1077,6 @@ Final Gambling Statistics
 
 NO ERRORS
 
-NO WARNINGS
+WARNINGS (1):
+  /home/runner/work/Blackjack/Blackjack/story/endings.py:1080: SyntaxWarning: invalid escape sequence '\R'
+  type.slow("\Rot in hell, you fucking bastard.\"")
