@@ -20,6 +20,12 @@ def _score_medical_option(option: DecisionOption, plan: StrategicPlan, request: 
     doctor_cost = float(metadata.get("doctor_cost", 0.0) or 0.0)
     witch_cost = float(metadata.get("witch_cost", 0.0) or 0.0)
     flask_count = int(metadata.get("flask_count", 0) or 0)
+    injury_tick_pressure = float(metadata.get("injury_tick_pressure", 0.0) or 0.0)
+    witch_cleanse_upside = float(metadata.get("witch_cleanse_upside", 0.0) or 0.0)
+    witch_clear_probability = float(metadata.get("witch_clear_probability", 0.0) or 0.0)
+    witch_heal_probability = float(metadata.get("witch_heal_probability", 0.0) or 0.0)
+    witch_retry_value = float(metadata.get("witch_retry_value", 0.0) or 0.0)
+    risk_margin = float(metadata.get("risk_margin", 0.0) or 0.0)
     urgent = bool(metadata.get("urgent_medical"))
     wants_doctor = bool(metadata.get("wants_doctor"))
     wants_witch = bool(metadata.get("wants_witch"))
@@ -36,15 +42,27 @@ def _score_medical_option(option: DecisionOption, plan: StrategicPlan, request: 
             score += 85.0
         elif has_faulty_insurance:
             score += 70.0
-        score += max(0, injuries - 1) * 20.0
+        score += max(0, injuries - 1) * 10.0
         score += max(0, statuses - 1) * 10.0
         score += max(0, 55 - health)
+        score += min(18.0, max(0.0, 0.6 - witch_clear_probability) * 30.0)
+        score -= min(10.0, witch_heal_probability * 10.0)
+        score -= min(24.0, witch_cleanse_upside * 0.45)
+        score -= min(16.0, witch_retry_value * 0.7)
+        if injury_tick_pressure >= 2 and not urgent:
+            score -= 10.0
+        if risk_margin > 8 and injuries >= 1 and statuses <= 1 and not urgent:
+            score -= 12.0
         if plan.goal in {"survive_emergency", "stabilize_health"}:
             score += 24.0
         if plan.goal == "stabilize_sanity":
             score -= 6.0
         if witch_cost < doctor_cost:
             score -= min(24.0, (doctor_cost - witch_cost) / 6.0)
+        if not urgent and not has_real_insurance and not has_faulty_insurance and injuries == 0:
+            score -= min(28.0, max(0.0, doctor_cost - witch_cost) / 4.0)
+        if not urgent and injuries == 0 and statuses >= 1 and witch_cost > 0:
+            score -= 12.0
         return score
 
     if label == "Witch Doctor's Tower":
@@ -61,12 +79,26 @@ def _score_medical_option(option: DecisionOption, plan: StrategicPlan, request: 
             score -= 35.0
         elif has_faulty_insurance:
             score -= 28.0
-        if injuries >= 1:
-            score -= 10.0
+        score += min(26.0, witch_cleanse_upside * witch_clear_probability)
+        score += min(12.0, witch_heal_probability * 16.0)
+        score += min(16.0, injury_tick_pressure * 4.0)
+        score += min(20.0, witch_retry_value)
         if statuses >= 2:
             score -= 10.0
-        if urgent or health < 45 or injuries >= 2 or statuses >= 3:
+        if urgent or health < 34 or (statuses >= 3 and risk_margin < 6):
             score -= 50.0
+        if witch_clear_probability < 0.25:
+            score -= 14.0
+        elif witch_clear_probability < 0.60:
+            score -= 6.0
+        if injuries >= 2 and risk_margin >= 4 and not urgent:
+            score += 18.0
+        if injuries >= 1 and statuses <= 1 and doctor_cost > witch_cost:
+            score += 10.0
+        if not urgent and injuries == 0 and statuses >= 1:
+            score += 16.0
+        if not urgent and not has_real_insurance and not has_faulty_insurance:
+            score += 10.0
         if plan.goal == "stabilize_sanity":
             score += 18.0
         elif plan.goal == "stabilize_health":

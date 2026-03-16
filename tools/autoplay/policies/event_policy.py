@@ -216,6 +216,7 @@ def choose_event_yes_no(request: DecisionRequest, plan: StrategicPlan) -> tuple[
     rank = int(request.game_state.get("rank", 0) or 0)
 
     always_yes = {
+        "promise to keep his secret?",
         "do you ask if he's okay?",
         "do you listen?",
         "stand up for kyle?",
@@ -331,6 +332,11 @@ def choose_event_yes_no(request: DecisionRequest, plan: StrategicPlan) -> tuple[
 
     if prompt_lower == "take the money?" and "loyalty bonus" in recent:
         return "no", _yes_no_trace(request, plan, "no", "loyalty_bonus_money_refusal", 0.8)
+    if prompt_lower == "give him $100 to make him go away?":
+        return "no", _yes_no_trace(request, plan, "no", "investment_pitch_refusal", 0.84)
+    if prompt_lower == "pay $200,000?":
+        answer = "yes" if balance >= 200000 else "no"
+        return answer, _yes_no_trace(request, plan, answer, "casino_enforcement_buyout", 0.9)
     if prompt_lower == "do you run?" and "hendricks" in recent:
         return "no", _yes_no_trace(request, plan, "no", "hendricks_refusal", 0.8)
     if prompt_lower == "do the delivery?" and "feelgood" in recent:
@@ -340,8 +346,8 @@ def choose_event_yes_no(request: DecisionRequest, plan: StrategicPlan) -> tuple[
         answer = "yes" if balance >= 5 and (health < 92 or sanity < 72) else "no"
         return answer, _yes_no_trace(request, plan, answer, "gyro_health_or_sanity_gate", 0.72)
     if prompt_lower == "give him some money to make him go away?":
-        answer = "yes" if balance >= 150 and sanity < 55 else "no"
-        return answer, _yes_no_trace(request, plan, answer, "sanity_relief_payment_gate", 0.7)
+        answer = "yes" if balance >= 20 and sanity < 85 else "no"
+        return answer, _yes_no_trace(request, plan, answer, "street_musician_relief_gate", 0.74)
     if prompt_lower == "buy yourself a cupcake?":
         answer = "yes" if balance >= 20 and sanity < 55 else "no"
         return answer, _yes_no_trace(request, plan, answer, "cupcake_sanity_gate", 0.7)
@@ -403,6 +409,7 @@ def choose_event_yes_no(request: DecisionRequest, plan: StrategicPlan) -> tuple[
         if any(
             phrase in recent
             for phrase in [
+                "do you take the bribe?",
                 "do you search the body?",
                 "do you approach the figure?",
                 "do you open it?",
@@ -554,6 +561,7 @@ def choose_event_inline_choice(request: DecisionRequest, plan: StrategicPlan) ->
     set_map = {
         frozenset({"around", "wait"}): ("wait", "wait_out_event"),
         frozenset({"force", "take"}): ("force", "force_opening"),
+        frozenset({"enter", "judge", "sabotage", "watch"}): ("judge", "sandcastle_judge_cashout"),
         frozenset({"help", "buy", "swim"}): ("help", "help_default"),
         frozenset({"luck", "love", "revenge"}): ("luck", "luck_preference"),
         frozenset({"tough", "beach"}): ("beach", "beach_pick"),

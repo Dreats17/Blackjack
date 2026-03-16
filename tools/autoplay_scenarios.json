@@ -6,6 +6,9 @@
           "bet": 96,
           "goal": "survive_emergency",
           "trace_metadata": {
+            "catalog_push_spend": 0,
+            "catalog_push_window": false,
+            "healthy_pre_shop_escape_window": false,
             "max_ratio": 0.2,
             "mechanic_gap": 0,
             "mechanic_threshold_push_window": false,
@@ -20,6 +23,8 @@
               }
             },
             "pressure_bet": 200,
+            "purchase_push_shortfall": 0,
+            "purchase_push_window": false,
             "ratio": 0.12,
             "store_budget": 0
           },
@@ -34,6 +39,9 @@
           "bet": 20,
           "goal": "acquire_car",
           "trace_metadata": {
+            "catalog_push_spend": 0,
+            "catalog_push_window": false,
+            "healthy_pre_shop_escape_window": false,
             "max_ratio": 0.16,
             "mechanic_gap": 0,
             "mechanic_threshold_push_window": false,
@@ -48,6 +56,8 @@
               }
             },
             "pressure_bet": 0,
+            "purchase_push_shortfall": 0,
+            "purchase_push_window": false,
             "ratio": 0.12,
             "store_budget": 0
           },
@@ -62,7 +72,10 @@
           "bet": 22,
           "goal": "acquire_car",
           "trace_metadata": {
-            "max_ratio": 0.5,
+            "catalog_push_spend": 0,
+            "catalog_push_window": false,
+            "healthy_pre_shop_escape_window": false,
+            "max_ratio": 0.34,
             "mechanic_gap": 59,
             "mechanic_threshold_push_window": false,
             "pending_marvin_active": false,
@@ -75,7 +88,9 @@
               }
             },
             "pressure_bet": 0,
-            "ratio": 0.34,
+            "purchase_push_shortfall": 0,
+            "purchase_push_window": false,
+            "ratio": 0.24,
             "store_budget": 8
           },
           "trace_reason": "goal=acquire_car blackjack_bet phase=car_rush survival=True edge=0"
@@ -86,10 +101,13 @@
       },
       {
         "details": {
-          "bet": 11,
+          "bet": 15,
           "goal": "acquire_car",
           "trace_metadata": {
-            "max_ratio": 0.66,
+            "catalog_push_spend": 0,
+            "catalog_push_window": false,
+            "healthy_pre_shop_escape_window": true,
+            "max_ratio": 0.44,
             "mechanic_gap": 150,
             "mechanic_threshold_push_window": false,
             "pending_marvin_active": false,
@@ -102,20 +120,25 @@
               }
             },
             "pressure_bet": 0,
-            "ratio": 0.52,
+            "purchase_push_shortfall": 0,
+            "purchase_push_window": false,
+            "ratio": 0.34,
             "store_budget": 0
           },
           "trace_reason": "goal=acquire_car blackjack_bet phase=car_rush survival=False edge=3"
         },
         "passed": true,
         "scenario_id": "no_car_low_bankroll_pushes_for_car",
-        "summary": "bet=11 max_bet=11"
+        "summary": "bet=15 min_bet=14"
       },
       {
         "details": {
           "bet": 24,
           "goal": "acquire_car",
           "trace_metadata": {
+            "catalog_push_spend": 0,
+            "catalog_push_window": false,
+            "healthy_pre_shop_escape_window": false,
             "max_ratio": 0.22,
             "mechanic_gap": 26,
             "mechanic_threshold_push_window": false,
@@ -129,6 +152,8 @@
               }
             },
             "pressure_bet": 0,
+            "purchase_push_shortfall": 0,
+            "purchase_push_window": false,
             "ratio": 0.18,
             "store_budget": 0
           },
@@ -143,7 +168,10 @@
           "bet": 40,
           "goal": "acquire_car",
           "trace_metadata": {
-            "max_ratio": 0.43,
+            "catalog_push_spend": 0,
+            "catalog_push_window": false,
+            "healthy_pre_shop_escape_window": false,
+            "max_ratio": 0.28,
             "mechanic_gap": 40,
             "mechanic_threshold_push_window": true,
             "pending_marvin_active": false,
@@ -156,7 +184,9 @@
               }
             },
             "pressure_bet": 40,
-            "ratio": 0.35,
+            "purchase_push_shortfall": 0,
+            "purchase_push_window": false,
+            "ratio": 0.22,
             "store_budget": 0
           },
           "trace_reason": "goal=acquire_car blackjack_bet phase=car_rush survival=False edge=0"
@@ -170,6 +200,9 @@
           "bet": 5000,
           "goal": "blend_fraudulent_cash_safely",
           "trace_metadata": {
+            "catalog_push_spend": 0,
+            "catalog_push_window": false,
+            "healthy_pre_shop_escape_window": false,
             "max_ratio": 0.36,
             "mechanic_gap": 0,
             "mechanic_threshold_push_window": false,
@@ -184,6 +217,8 @@
               }
             },
             "pressure_bet": 0,
+            "purchase_push_shortfall": 0,
+            "purchase_push_window": false,
             "ratio": 0.24,
             "store_budget": 0
           },
@@ -198,6 +233,9 @@
           "bet": 1080,
           "goal": "push_next_rank",
           "trace_metadata": {
+            "catalog_push_spend": 0,
+            "catalog_push_window": false,
+            "healthy_pre_shop_escape_window": false,
             "max_ratio": 0.1,
             "mechanic_gap": 0,
             "mechanic_threshold_push_window": false,
@@ -212,6 +250,8 @@
               }
             },
             "pressure_bet": 0,
+            "purchase_push_shortfall": 0,
+            "purchase_push_window": false,
             "ratio": 0.06,
             "store_budget": 0
           },
@@ -223,9 +263,45 @@
       },
       {
         "details": {
+          "bet": 2024,
+          "goal": "push_next_rank",
+          "trace_metadata": {
+            "catalog_push_spend": 0,
+            "catalog_push_window": false,
+            "healthy_pre_shop_escape_window": false,
+            "max_ratio": 0.36,
+            "mechanic_gap": 0,
+            "mechanic_threshold_push_window": false,
+            "pending_marvin_active": true,
+            "pending_marvin_shortfall": 0,
+            "plan": {
+              "goal": "push_next_rank",
+              "reason": "highest scored goal push_next_rank=42.0",
+              "scores": {
+                "exploit_marvin": 0.0,
+                "push_next_rank": 42.0
+              }
+            },
+            "pressure_bet": 765,
+            "purchase_push_shortfall": 900,
+            "purchase_push_window": true,
+            "ratio": 0.2,
+            "store_budget": 0
+          },
+          "trace_reason": "goal=push_next_rank blackjack_bet phase=rank_two_rush survival=False edge=5"
+        },
+        "passed": true,
+        "scenario_id": "marvin_purchase_push_window_bets_for_margin",
+        "summary": "bet=2024 min_bet=1600"
+      },
+      {
+        "details": {
           "bet": 540,
           "goal": "push_next_rank",
           "trace_metadata": {
+            "catalog_push_spend": 0,
+            "catalog_push_window": false,
+            "healthy_pre_shop_escape_window": false,
             "max_ratio": 0.36,
             "mechanic_gap": 0,
             "mechanic_threshold_push_window": false,
@@ -240,6 +316,8 @@
               }
             },
             "pressure_bet": 0,
+            "purchase_push_shortfall": 0,
+            "purchase_push_window": false,
             "ratio": 0.24,
             "store_budget": 0
           },
@@ -248,9 +326,212 @@
         "passed": true,
         "scenario_id": "post_car_midgame_growth_window_pushes_harder",
         "summary": "bet=540 min_bet=540"
+      },
+      {
+        "details": {
+          "bet": 2232,
+          "goal": "push_next_rank",
+          "trace_metadata": {
+            "catalog_push_spend": 0,
+            "catalog_push_window": false,
+            "healthy_pre_shop_escape_window": false,
+            "max_ratio": 0.36,
+            "mechanic_gap": 0,
+            "mechanic_threshold_push_window": false,
+            "pending_marvin_active": true,
+            "pending_marvin_shortfall": 1800,
+            "plan": {
+              "goal": "push_next_rank",
+              "reason": "highest scored goal push_next_rank=42.0",
+              "scores": {
+                "exploit_marvin": 0.0,
+                "push_next_rank": 42.0
+              }
+            },
+            "pressure_bet": 2736,
+            "purchase_push_shortfall": 0,
+            "purchase_push_window": false,
+            "ratio": 0.22,
+            "store_budget": 0
+          },
+          "trace_reason": "goal=push_next_rank blackjack_bet phase=rank_two_rush survival=False edge=4"
+        },
+        "passed": true,
+        "scenario_id": "near_marvin_shortfall_growth_window_stays_aggressive",
+        "summary": "bet=2232 min_bet=1100"
+      },
+      {
+        "details": {
+          "bet": 1872,
+          "goal": "push_next_rank",
+          "trace_metadata": {
+            "catalog_push_spend": 0,
+            "catalog_push_window": false,
+            "healthy_pre_shop_escape_window": false,
+            "max_ratio": 0.36,
+            "mechanic_gap": 0,
+            "mechanic_threshold_push_window": false,
+            "pending_marvin_active": true,
+            "pending_marvin_shortfall": 5800,
+            "plan": {
+              "goal": "push_next_rank",
+              "reason": "highest scored goal push_next_rank=42.0",
+              "scores": {
+                "exploit_marvin": 0.0,
+                "push_next_rank": 42.0
+              }
+            },
+            "pressure_bet": 0,
+            "purchase_push_shortfall": 0,
+            "purchase_push_window": false,
+            "ratio": 0.22,
+            "store_budget": 0
+          },
+          "trace_reason": "goal=push_next_rank blackjack_bet phase=rank_two_rush survival=False edge=4"
+        },
+        "passed": true,
+        "scenario_id": "rank_one_core_marvin_unlock_bets_harder",
+        "summary": "bet=1872 min_bet=1450"
+      },
+      {
+        "details": {
+          "bet": 1500,
+          "goal": "push_next_rank",
+          "trace_metadata": {
+            "catalog_push_spend": 0,
+            "catalog_push_window": false,
+            "healthy_pre_shop_escape_window": false,
+            "max_ratio": 0.4,
+            "mechanic_gap": 0,
+            "mechanic_threshold_push_window": false,
+            "pending_marvin_active": true,
+            "pending_marvin_shortfall": 7500,
+            "plan": {
+              "goal": "push_next_rank",
+              "reason": "highest scored goal push_next_rank=22.0",
+              "scores": {
+                "exploit_marvin": 0.0,
+                "push_next_rank": 22.0
+              }
+            },
+            "pressure_bet": 0,
+            "purchase_push_shortfall": 0,
+            "purchase_push_window": false,
+            "ratio": 0.24,
+            "store_budget": 0
+          },
+          "trace_reason": "goal=push_next_rank blackjack_bet phase=million_rush survival=False edge=5"
+        },
+        "passed": true,
+        "scenario_id": "rank_two_marvin_upgrade_window_uses_surplus",
+        "summary": "bet=1500 min_bet=1400"
+      },
+      {
+        "details": {
+          "bet": 3348,
+          "goal": "push_next_rank",
+          "trace_metadata": {
+            "catalog_push_spend": 15000,
+            "catalog_push_window": true,
+            "healthy_pre_shop_escape_window": false,
+            "max_ratio": 0.58,
+            "mechanic_gap": 0,
+            "mechanic_threshold_push_window": false,
+            "pending_marvin_active": false,
+            "pending_marvin_shortfall": 0,
+            "plan": {
+              "goal": "push_next_rank",
+              "reason": "highest scored goal push_next_rank=42.0",
+              "scores": {
+                "exploit_marvin": 0.0,
+                "push_next_rank": 42.0
+              }
+            },
+            "pressure_bet": 2700,
+            "purchase_push_shortfall": 0,
+            "purchase_push_window": false,
+            "ratio": 0.3,
+            "store_budget": 0
+          },
+          "trace_reason": "goal=push_next_rank blackjack_bet phase=rank_two_rush survival=False edge=4"
+        },
+        "passed": true,
+        "scenario_id": "catalog_push_window_bets_for_marvin_buyout",
+        "summary": "bet=3348 min_bet=2200"
+      },
+      {
+        "details": {
+          "bet": 200,
+          "goal": "push_next_rank",
+          "trace_metadata": {
+            "catalog_push_spend": 0,
+            "catalog_push_window": false,
+            "healthy_pre_shop_escape_window": false,
+            "max_ratio": 0.34,
+            "mechanic_gap": 0,
+            "mechanic_threshold_push_window": false,
+            "pending_marvin_active": false,
+            "pending_marvin_shortfall": 0,
+            "plan": {
+              "goal": "push_next_rank",
+              "reason": "highest scored goal push_next_rank=30.0",
+              "scores": {
+                "advance_mechanic_arc": 0.0,
+                "push_next_rank": 30.0
+              }
+            },
+            "pressure_bet": 0,
+            "purchase_push_shortfall": 0,
+            "purchase_push_window": false,
+            "ratio": 0.12,
+            "store_budget": 0
+          },
+          "trace_reason": "goal=push_next_rank blackjack_bet phase=car_ready survival=False edge=4"
+        },
+        "passed": true,
+        "scenario_id": "mechanic_dream_reserve_preserves_threshold",
+        "summary": "bet=200 max_bet=200"
+      }
+    ],
+    "companion_menu": [
+      {
+        "details": {
+          "choice": "Spend time with all of them",
+          "companions": {
+            "Lucky": {
+              "bonded": false,
+              "days_owned": 6,
+              "fed_today": false,
+              "happiness": 74,
+              "type": "Three-Legged Dog"
+            },
+            "Mr. Pecks": {
+              "bonded": false,
+              "days_owned": 8,
+              "fed_today": false,
+              "happiness": 14,
+              "type": "Crow"
+            }
+          },
+          "expected": "Spend time with all of them"
+        },
+        "passed": true,
+        "scenario_id": "companion_menu_groups_for_bond_and_runaway_pressure",
+        "summary": "choice=Spend time with all of them expected=Spend time with all of them"
       }
     ],
     "event_inline": [
+      {
+        "details": {
+          "choice": "judge",
+          "expected": "judge",
+          "goal": "push_next_rank",
+          "trace_reason": "sandcastle_judge_cashout"
+        },
+        "passed": true,
+        "scenario_id": "sandcastle_judge_cashout",
+        "summary": "choice=judge expected=judge"
+      },
       {
         "details": {
           "choice": "decline",
@@ -413,11 +694,66 @@
         "details": {
           "answer": "yes",
           "expected": "yes",
+          "goal": "push_next_rank",
+          "trace_reason": "event_yes:promise to keep his secret?"
+        },
+        "passed": true,
+        "scenario_id": "kyle_secret_kept",
+        "summary": "answer=yes expected=yes"
+      },
+      {
+        "details": {
+          "answer": "yes",
+          "expected": "yes",
+          "goal": "push_next_rank",
+          "trace_reason": "street_musician_relief_gate"
+        },
+        "passed": true,
+        "scenario_id": "street_musician_relief_gate",
+        "summary": "answer=yes expected=yes"
+      },
+      {
+        "details": {
+          "answer": "no",
+          "expected": "no",
+          "goal": "push_next_rank",
+          "trace_reason": "investment_pitch_refusal"
+        },
+        "passed": true,
+        "scenario_id": "investment_pitch_refusal",
+        "summary": "answer=no expected=no"
+      },
+      {
+        "details": {
+          "answer": "yes",
+          "expected": "yes",
+          "goal": "push_next_rank",
+          "trace_reason": "casino_enforcement_buyout"
+        },
+        "passed": true,
+        "scenario_id": "casino_enforcement_buyout",
+        "summary": "answer=yes expected=yes"
+      },
+      {
+        "details": {
+          "answer": "yes",
+          "expected": "yes",
           "goal": "stabilize_health",
           "trace_reason": "cupcake_sanity_gate"
         },
         "passed": true,
         "scenario_id": "cupcake_sanity_gate",
+        "summary": "answer=yes expected=yes"
+      },
+      {
+        "details": {
+          "answer": "yes",
+          "expected": "yes",
+          "goal": "push_next_rank",
+          "trace_reason": "blank_prompt_investigate_yes"
+        },
+        "passed": true,
+        "scenario_id": "sandcastle_bribe_yes",
         "summary": "answer=yes expected=yes"
       },
       {
@@ -480,6 +816,52 @@
         "summary": "answer=yes expected=yes"
       }
     ],
+    "purchase_select": [
+      {
+        "details": {
+          "balance": 260,
+          "choice": "Fancy Pen - $25",
+          "dealer_happiness": 87,
+          "expected": "Fancy Pen - $25",
+          "store_inventory": [
+            [
+              "Fancy Pen",
+              25
+            ],
+            [
+              "Duct Tape",
+              12
+            ]
+          ]
+        },
+        "passed": true,
+        "scenario_id": "gift_loop_prefers_giftworthy_item",
+        "summary": "choice=Fancy Pen - $25 expected=Fancy Pen - $25"
+      }
+    ],
+    "quicktest_loan_borrow": [
+      {
+        "details": {
+          "balance": 6200,
+          "choice": "Borrow $5,000",
+          "day": 30,
+          "expected": "Borrow $5,000",
+          "health": 84,
+          "inventory": [
+            "Car",
+            "Map",
+            "Faulty Insurance"
+          ],
+          "met": [
+            "Vinnie"
+          ],
+          "sanity": 66
+        },
+        "passed": true,
+        "scenario_id": "marvin_unlock_loan_prefers_large_borrow",
+        "summary": "choice=Borrow $5,000 expected=Borrow $5,000"
+      }
+    ],
     "route": [
       {
         "details": {
@@ -494,8 +876,19 @@
       },
       {
         "details": {
+          "goal": "restock_supplies",
+          "goal_reason": "highest scored goal restock_supplies=61.5",
+          "route": "Convenience Store",
+          "trace_reason": "goal=restock_supplies selected Convenience Store score=285.0 margin=267.0"
+        },
+        "passed": true,
+        "scenario_id": "catalog_push_store_buyout_prefers_store_route",
+        "summary": "goal=restock_supplies route=Convenience Store expected_goal=restock_supplies expected_route=Convenience Store"
+      },
+      {
+        "details": {
           "goal": "exploit_marvin",
-          "goal_reason": "highest scored goal exploit_marvin=32.0",
+          "goal_reason": "highest scored goal exploit_marvin=58.0",
           "route": "Marvin",
           "trace_reason": "goal=exploit_marvin selected Marvin score=188.0 margin=188.0"
         },
@@ -748,6 +1141,81 @@
         "passed": true,
         "scenario_id": "witch_flask_only_run_fires_when_healthy_and_affordable",
         "summary": "route=Witch Doctor's Tower expected=Witch Doctor's Tower"
+      },
+      {
+        "details": {
+          "balance": 260,
+          "day": 17,
+          "expected": "Convenience Store",
+          "health": 74,
+          "injuries": [],
+          "route": "Convenience Store",
+          "sanity": 58,
+          "statuses": []
+        },
+        "passed": true,
+        "scenario_id": "gift_loop_store_run_pushes_convenience_store",
+        "summary": "route=Convenience Store expected=Convenience Store"
+      },
+      {
+        "details": {
+          "balance": 2200,
+          "day": 24,
+          "expected": "Filthy Frank's Flawless Fixtures",
+          "health": 82,
+          "injuries": [],
+          "route": "Filthy Frank's Flawless Fixtures",
+          "sanity": 68,
+          "statuses": []
+        },
+        "passed": true,
+        "scenario_id": "mechanic_route_prefers_dream_leader",
+        "summary": "route=Filthy Frank's Flawless Fixtures expected=Filthy Frank's Flawless Fixtures"
+      },
+      {
+        "details": {
+          "balance": 14200,
+          "day": 64,
+          "expected": "Marvin's Mystical Merchandise",
+          "health": 86,
+          "injuries": [],
+          "route": "Marvin's Mystical Merchandise",
+          "sanity": 72,
+          "statuses": []
+        },
+        "passed": true,
+        "scenario_id": "rich_marvin_conversion_interrupt_beats_store_and_pawn",
+        "summary": "route=Marvin's Mystical Merchandise expected=Marvin's Mystical Merchandise"
+      },
+      {
+        "details": {
+          "balance": 2400,
+          "day": 26,
+          "expected": "Marvin's Mystical Merchandise",
+          "health": 84,
+          "injuries": [],
+          "route": "Marvin's Mystical Merchandise",
+          "sanity": 66,
+          "statuses": []
+        },
+        "passed": true,
+        "scenario_id": "rank_one_marvin_conversion_interrupt_beats_store",
+        "summary": "route=Marvin's Mystical Merchandise expected=Marvin's Mystical Merchandise"
+      },
+      {
+        "details": {
+          "balance": 11800,
+          "day": 58,
+          "expected": "Marvin's Mystical Merchandise",
+          "health": 80,
+          "injuries": [],
+          "route": "Marvin's Mystical Merchandise",
+          "sanity": 64,
+          "statuses": []
+        },
+        "passed": true,
+        "scenario_id": "witch_powered_marvin_followup_beats_store",
+        "summary": "route=Marvin's Mystical Merchandise expected=Marvin's Mystical Merchandise"
       }
     ],
     "state_goal": [
@@ -870,7 +1338,7 @@
   },
   "summary": {
     "failed": 0,
-    "passed": 51,
-    "total": 51
+    "passed": 72,
+    "total": 72
   }
 }

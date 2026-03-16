@@ -5,6 +5,8 @@ Purpose
 - This file is the batch-by-batch visual tracker for autoplay progress.
 - Update it after every meaningful implementation batch.
 - It should stay concise, human-readable, and easy to scan.
+- Standard benchmark target: until non-death collapse reporting is added, use a 300-day cumulative slice so strong runs have time to either recover or fully fail.
+- Standard slice for current tuning: autotest.py 300 1 80 unless a narrower regression slice is explicitly being checked.
 
 How to read this file
 - `[x]` means meaningfully covered and protected by current evidence.
@@ -12,7 +14,23 @@ How to read this file
 - `[ ]` means not meaningfully covered yet.
 - "Distance to win" means distance to deliberate, repeatable millionaire-capable play, not lucky outlier wins.
 
-Current benchmark checkpoint (Batch 4 REVERTED — 2026-03-13)
+Current benchmark checkpoint (Batch 5 — 2026-03-13)
+- Standard benchmark now in use: autotest.py 300 1 80.
+- Current 300-day slice result: alive 34/80, died 46/80, broke 34/80, car 54/80,
+  rank1+ 40/80, marvin 8/80, witch_doctor 8/80, upgrade 5/80, crafting 0/80,
+  companion 0/80, adventure 0/80, airport 0/80, wins 0/80.
+- Current 300-day late-run takeaway: extending the slice exposes many strong rank-1/rank-2 collapses
+  as eventual deaths instead of hiding them as surviving low-balance endings.
+- Current 300-day anchors: best peak $107,796 seed 1 rank 3; longest run day 158 seed 57 rank 1.
+- Historical 100-day slice result before the 300-day switch: alive 42/80, died 38/80, broke 32/80, car 54/80,
+  rank1+ 40/80, marvin 8/80, witch_doctor 8/80, upgrade 5/80, crafting 0/80,
+  companion 0/80, adventure 0/80, airport 0/80, wins 0/80.
+- Presence report now surfaces expected-vs-engaged systems directly in autotest:
+  gift_unlock 15/80, wrapped_gift 0/80, workbench_unlock 5/80, workbench_visit 1/80,
+  marvin_items 2/80, companion_roster 64/80.
+- Scenario suite: 52/52 passed after adding the near-Marvin growth window case.
+
+- Historical note: Batch 4 changes were fully reverted after regression was confirmed:
 - Batch 4 changes were fully reverted after regression was confirmed:
   - final_streak_cap capped ALL bets at (surplus // 3) for balance > floor + $1,500.
     This over-restricted normal growth bets at all ranks, causing alive/car regressions.
@@ -93,12 +111,15 @@ Fairness and bug-audit coverage
 - [x] Human-readable fairness changelog exists at docs/10_GAMEPLAY_FAIRNESS_CHANGELOG.md
 - [x] Mechanic-presence reporting: coverage_flags includes K=crafting, Q=companion, E=mechanic_end, $=airport_win
 - [x] Metrics reporting: autotest.py reports crafting, companion, mechanic_end in Visit summary line
+- [x] Expected-vs-engaged system presence reporting now exists in autotest summary
+  (gift unlock vs wrapped gift, workbench unlock vs visit vs crafting, Marvin access vs item-run,
+  companion roster presence vs companion-specific routing payoff, millionaire reach vs ending conversion)
 - [x] Masterplan CORE GAME MECHANIC TRUTHS updated with code-verified facts for Marvin, Witch Doctor,
       Convenience Store, Car Workbench/Crafting, Adventure system, and Loan Shark.
 - [~] Fake_cash/loan-shark: blend_floor_cap issue identified but Batch 4 fix was regressive and reverted.
       The correct fix (Betsy danger reserves) is a pending next-target. Do NOT add a global bet cap.
 - [~] Harness-to-core-game cross-check workflow exists informally through audit work
-- [ ] Expected-but-missing mechanic report
+- [x] Expected-but-missing mechanic report
 - [ ] Core-game bug suspect report from harness evidence
 
 AI decision tracking (items to manually review)
@@ -153,28 +174,33 @@ Current deliberate next targets
 - [x] Run full autotest after batch 3 and record new fixed-slice numbers (done: batch 4 reverted)
 - [ ] Add scenario cases for workbench_craft routing (routes to Car Workbench when ingredients ready)
 - [ ] Add scenario case for witch_flask_only_run (visits witch for Fortunate Day when healthy + $13k+)
-- [ ] Investigate: does crafting actually fire in practice now? Check crafting=N/20 in new run
-  NOTE: crafting=0/20 — reason: bot never accumulates Tool Kit in 60-day runs
-- [ ] Investigate: does witch_doctor count improve with flask-only path?
-  NOTE: witch_doctor=0/20 — reason: $12k min flask price never reached in 60-day runs
+- [~] Investigate: does crafting actually fire in practice now?
+  NOTE: 100-day slice still shows workbench_unlock=5/80, workbench_visit=1/80, crafting=0/80.
+- [~] Investigate: does witch_doctor count improve with flask-only path?
+  NOTE: 100-day slice improved to witch_doctor=8/80, but flask-buy runs are still low and not converting.
 - [ ] Expand adventure unlock: once Rusty Compass is in Marvin priorities (82), verify adventure fires at rank 2
 - [ ] Add focused scenario cases for loan shark: borrow then repay cycle at rank 0 with car
 - [ ] Track actual Fortunate Day flask purchase rate vs Marvin visit timing
 - [ ] Add danger-based reserves for Betsy Tractor ($10k) and Betsy Army ($100k) dangers
   to prevent gambling from consuming the reserve needed for forced event payments.
   Root cause verified in seed 20 300-cycle run: gambling drained $8k then Betsy took $10k.
-- [ ] Extend test runs to 300+ days to track rank 2 → 3 progress
+- [x] Switch the working cumulative benchmark to 300 days while death-only collapse reporting is the main late-run failure lens
+- [~] Restore a shorter benchmark only after non-death collapse reporting exists alongside the death tables
 
-Most recent completed batch (Batch 4 REVERTED — 2026-03-13)
-- Batch 4 introduced two changes that caused a regression and were fully reverted:
-  1. final_streak_cap: capped ALL bets at (balance - floor) // 3 when surplus >= $1,500.
-     This blocked normal growth-phase betting at every rank. Alive dropped 15→10, car 15→11.
-  2. blend_floor_cap: changed (balance - floor) + fake_cash → (balance - floor).
-     While logically appealing, this interacts with total_available caps and over-constrains.
-- Lesson: targeted danger-aware reserves (Betsy Tractor, Betsy Army) are the correct fix
-  for event-cost collisions, not a global bet cap that reduces every bet.
-- Scenario suite reverted to 51/51 passing with original `bet > balance` blend assertion.
-- Post-revert benchmark: alive 11/20, car 11/20, rank1+ 9/20, best peak $6,990 seed 16.
+Most recent completed batch (Batch 5 — 2026-03-13)
+- Added explicit final-state telemetry export for dealer happiness, gift-system state, and store purchases.
+- Added autotest presence reporting so missing systems are visible as unlock/presence/engagement/payoff.
+- Added a focused near-Marvin shortfall betting window instead of a global reserve reduction.
+- Added a scenario for the near-Marvin growth case; scenario suite is now 52/52 passing.
+- Standard benchmark temporarily updated to 300 days across 80 seeds so late collapses have time to resolve into visible outcomes.
+- 300-day benchmark result: alive 34/80, car 54/80, rank1+ 40/80, marvin 8/80, marvin_items 2/80,
+  gift_unlock 15/80, workbench_unlock 5/80, workbench_visit 1/80, companion_roster 64/80, wins 0/80.
+- 300-day benchmark late-collapse signal: deaths rise to 46/80, with rank-1 cohorts showing many eventual
+  compound-trauma-collapse outcomes that were not visible on the shorter slice.
+- 100-day benchmark result before the 300-day switch: alive 42/80, car 54/80, rank1+ 40/80, marvin 8/80, marvin_items 2/80,
+  gift_unlock 15/80, workbench_unlock 5/80, workbench_visit 1/80, companion_roster 64/80, wins 0/80.
+- Main takeaway: system absence is no longer the hidden problem. The blocker is conversion:
+  systems are present in many runs, but they are still not being turned into rank-2/ending momentum quickly enough.
 
 Previous batch (Batch 3 — 2026-03-12)
 - Code-verified all prices from visit_marvin, visit_witch_doctor, make_convenience_store_inventory

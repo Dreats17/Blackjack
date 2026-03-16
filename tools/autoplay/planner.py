@@ -56,6 +56,18 @@ def choose_strategic_goal(game_state: GameState) -> StrategicPlan:
         and game_state.store_best_purchase_priority < 90
         and game_state.store_target_spend <= max(180.0, game_state.balance * 0.08)
     )
+    growth_push_window = (
+        game_state.has_car
+        and health >= 62
+        and sanity >= 32
+        and fatigue < 76
+        and injuries <= 2
+        and statuses <= 2
+        and (
+            (game_state.rank <= 1 and 1000 <= game_state.balance < 20000)
+            or (game_state.rank == 2 and game_state.balance < 120000)
+        )
+    )
 
     score("survive_emergency", max(0.0, 55.0 - health) * 3.0)
     score("survive_emergency", max(0.0, 30.0 - sanity) * 2.4)
@@ -87,6 +99,10 @@ def choose_strategic_goal(game_state: GameState) -> StrategicPlan:
             score("restock_supplies", -18.0)
         if midgame_growth_window:
             score("restock_supplies", -20.0)
+        if growth_push_window and game_state.store_best_purchase_priority < 92:
+            score("restock_supplies", -24.0)
+        if growth_push_window and game_state.store_target_spend <= max(260.0, game_state.balance * 0.10):
+            score("restock_supplies", -18.0)
 
     if game_state.opportunity_flags.get("can_contain_debt_escalation"):
         score("contain_debt_escalation", debt_pressure + 28.0)
@@ -121,16 +137,34 @@ def choose_strategic_goal(game_state: GameState) -> StrategicPlan:
     if game_state.opportunity_flags.get("can_visit_marvin"):
         score("exploit_marvin", 16.0 + min(40.0, game_state.marvin_affordable_priority * 0.5))
         if game_state.rank <= 1:
-            score("exploit_marvin", 10.0)
+            score("exploit_marvin", 14.0)
+            if game_state.has_worn_map and not game_state.has_map and game_state.balance >= 1200:
+                score("exploit_marvin", 22.0)
+            if game_state.marvin_affordable_priority >= 56 and game_state.balance >= 1800:
+                score("exploit_marvin", 18.0)
+            if 1200 <= game_state.balance < 10000 and game_state.health >= 62 and game_state.sanity >= 34:
+                score("exploit_marvin", 14.0)
+            if game_state.marvin_candidate_price > game_state.balance and game_state.marvin_candidate_price <= game_state.balance + 5000:
+                score("exploit_marvin", 16.0)
         if fatigue < 72 and sanity >= 32:
             score("exploit_marvin", 6.0)
         if game_state.marvin_strong_window and game_state.marvin_candidate_price >= 10_000:
+            score("exploit_marvin", 18.0)
+        if game_state.rank >= 2 and game_state.balance >= 7000 and game_state.marvin_affordable_priority >= 72:
             score("exploit_marvin", 18.0)
         # Extra boost when the best affordable item is genuinely high-priority (≥84).
         # Ensures Marvin beats routine store restocking even if marvin_strong_window is
         # False (e.g. exact $10k balance where condition 3 just barely fails by $100).
         if game_state.marvin_affordable_priority >= 84:
             score("exploit_marvin", 14.0)
+        if game_state.rank <= 1 and game_state.marvin_affordable_priority >= 72:
+            score("exploit_marvin", 12.0)
+        if growth_push_window:
+            score("exploit_marvin", 18.0)
+            if game_state.marvin_candidate_price > game_state.balance and game_state.marvin_candidate_price <= game_state.balance + 10_000:
+                score("exploit_marvin", 16.0)
+            if game_state.marvin_affordable_priority >= 72:
+                score("exploit_marvin", 10.0)
     elif game_state.has_car and not game_state.has_marvin_access:
         score("unlock_marvin", 22.0)
 
@@ -142,9 +176,13 @@ def choose_strategic_goal(game_state: GameState) -> StrategicPlan:
 
     if game_state.opportunity_flags.get("can_repair_or_upgrade"):
         score("repair_or_upgrade_gear", 24.0 + len(game_state.broken_items) * 8.0)
+        if growth_push_window:
+            score("repair_or_upgrade_gear", 14.0)
 
     if game_state.opportunity_flags.get("can_restore_blackjack_edge"):
         score("restore_blackjack_edge_after_breakage", 30.0 + len(game_state.broken_items) * 12.0 + len(game_state.repairing_items) * 6.0)
+        if growth_push_window:
+            score("restore_blackjack_edge_after_breakage", 12.0)
 
     if game_state.opportunity_flags.get("can_adventure_safely"):
         if game_state.rank >= 2:
@@ -158,7 +196,11 @@ def choose_strategic_goal(game_state: GameState) -> StrategicPlan:
     # Proactive borrowing: when Vinnie is available and balance is low, score
     # push_next_rank higher so the loan route beats the convenience store.
     if game_state.opportunity_flags.get("can_borrow_to_bootstrap"):
-        score("push_next_rank", 14.0)
+        score("push_next_rank", 26.0)
+        if game_state.rank <= 1 and 1200 <= game_state.balance < 10000 and game_state.has_marvin_access:
+            score("push_next_rank", 18.0)
+        if growth_push_window:
+            score("push_next_rank", 18.0)
 
     if game_state.opportunity_flags.get("can_convert_millionaire_to_ending"):
         score("convert_millionaire_to_ending", 200.0)
@@ -171,6 +213,12 @@ def choose_strategic_goal(game_state: GameState) -> StrategicPlan:
         score("push_next_rank", 12.0)
     if midgame_growth_window:
         score("push_next_rank", 12.0)
+    if growth_push_window:
+        score("push_next_rank", 24.0)
+        if game_state.has_marvin_access:
+            score("push_next_rank", 10.0)
+        if game_state.rank <= 1 and game_state.balance < 12000:
+            score("push_next_rank", 12.0)
 
     if fatigue >= 70:
         score("push_next_rank", -12.0)
@@ -180,7 +228,10 @@ def choose_strategic_goal(game_state: GameState) -> StrategicPlan:
     if debt_pressure >= 40.0:
         score("exploit_marvin", -8.0)
     if game_state.store_target_spend > 0:
-        score("push_next_rank", -min(12.0, game_state.store_target_spend / 20.0))
+        if growth_push_window and game_state.store_best_purchase_priority < 92 and game_state.store_target_spend <= max(260.0, game_state.balance * 0.10):
+            score("push_next_rank", -min(4.0, game_state.store_target_spend / 60.0))
+        else:
+            score("push_next_rank", -min(12.0, game_state.store_target_spend / 20.0))
     if game_state.pawn_planned_sale_value > 0 and game_state.balance < 450:
         score("push_next_rank", -10.0)
 

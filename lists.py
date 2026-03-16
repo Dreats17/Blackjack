@@ -3170,6 +3170,12 @@ class Lists:
         "gas_pedal_sticking", "parking_brake_stuck",
     })
 
+    _CAR_DEPENDENT_DAY_NAMES = _CAR_TROUBLE_NAMES | frozenset({
+        "car_battery_dead", "flat_tire_again", "mystery_car_problem_worsens",
+        "fuel_leak_fire", "fuel_leak_fixed", "damaged_exhaust_fixed",
+        "damaged_exhaust_again", "unpaid_tickets_boot", "booted_car_impound",
+    })
+
     # Tonal weight per event across the 6 ranks [poor, cheap, modest, rich, doughman, nearly].
     # Higher number = more copies in the pool = more likely to fire at that rank.
     # Default for unlisted events (conditionals, chains, companions, items) is [1,1,1,1,1,1].
@@ -3432,9 +3438,12 @@ class Lists:
             self.make_doughman_day_events_list,
             self.make_nearly_day_events_list,
         ]
+        has_car = self.__player.has_item("Car")
         base_events = [
             e for e in builders[rank]()
-            if e not in self._ILLNESS_NAMES and e not in self._CAR_TROUBLE_NAMES
+            if e not in self._ILLNESS_NAMES
+            and e not in self._CAR_TROUBLE_NAMES
+            and (has_car or e not in self._CAR_DEPENDENT_DAY_NAMES)
         ]
         default = [1, 1, 1, 1, 1, 1]
         pool = []
@@ -3447,7 +3456,9 @@ class Lists:
         # Car: rich drops to 1 — valet, good mechanics, it's handled.
         illness_copies = [2, 2, 3, 3, 5, 5][rank]
         car_copies     = [3, 3, 3, 1, 2, 1][rank]
-        pool += ["random_illness"] * illness_copies + ["random_car_trouble"] * car_copies
+        pool += ["random_illness"] * illness_copies
+        if has_car:
+            pool += ["random_car_trouble"] * car_copies
         random.shuffle(pool)
         return pool
 
@@ -3574,9 +3585,9 @@ class Lists:
             a_list.append(("Sunglasses", 22))
         if random.randrange(5) == 0 and not self.__player.has_item("Lighter"):
             a_list.append(("Lighter", 5))
-        if random.randrange(4) == 0 and not self.__player.has_item("Duct Tape"):
+        if (self.__player.has_item("Tool Kit") or random.randrange(4) == 0) and not self.__player.has_item("Duct Tape"):
             a_list.append(("Duct Tape", 12))
-        if random.randrange(5) == 0 and not self.__player.has_item("Pocket Knife"):
+        if (self.__player.has_item("Tool Kit") or random.randrange(5) == 0) and not self.__player.has_item("Pocket Knife"):
             a_list.append(("Pocket Knife", 35))
         
         # === RANK 0 (Poor): Basic survival items ===
@@ -3639,9 +3650,9 @@ class Lists:
                 a_list.append(("Lettuce", 4))
             if random.randrange(3) == 0 and not self.__player.has_item("Padlock"):
                 a_list.append(("Padlock", 30))
-            if random.randrange(4) == 0 and not self.__player.has_item("Fishing Line"):
+            if (self.__player.has_item("Tool Kit") or random.randrange(4) == 0) and not self.__player.has_item("Fishing Line"):
                 a_list.append(("Fishing Line", 18))
-            if random.randrange(3) == 0 and not self.__player.has_item("Super Glue"):
+            if (self.__player.has_item("Tool Kit") or random.randrange(3) == 0) and not self.__player.has_item("Super Glue"):
                 a_list.append(("Super Glue", 12))
             if random.randrange(4) == 0 and not self.__player.has_item("Hand Warmers"):
                 a_list.append(("Hand Warmers", 10))
@@ -3716,13 +3727,13 @@ class Lists:
         # Emergency/Repair
         if random.randrange(6) == 0 and not self.__player.has_item("Gas Can"):
             a_list.append(("Gas Can", 25))
-        if random.randrange(7) == 0 and not self.__player.has_item("Tool Kit"):
+        if not self.__player.has_item("Tool Kit"):
             a_list.append(("Tool Kit", 85))
         if random.randrange(5) == 0 and not self.__player.has_item("WD-40"):
             a_list.append(("WD-40", 12))
-        if random.randrange(6) == 0 and not self.__player.has_item("Bungee Cords"):
+        if (self.__player.has_item("Tool Kit") or random.randrange(6) == 0) and not self.__player.has_item("Bungee Cords"):
             a_list.append(("Bungee Cords", 15))
-        if random.randrange(7) == 0 and not self.__player.has_item("Rope"):
+        if (self.__player.has_item("Tool Kit") or random.randrange(7) == 0) and not self.__player.has_item("Rope"):
             a_list.append(("Rope", 20))
         if random.randrange(8) == 0 and not self.__player.has_item("Exhaust Tape"):
             a_list.append(("Exhaust Tape", 18))
@@ -3949,6 +3960,10 @@ class Lists:
         random_chance = random.randrange(5)
         if (random_chance<=1) and (not self.__player.has_item("Pocket Watch")):
             a_list.append("Pocket Watch")
+
+        random_chance = random.randrange(5)
+        if (random_chance<=1) and (not self.__player.has_item("Marvin's Monocle")):
+            a_list.append("Marvin's Monocle")
 
         # New mystical gambling items
         random_chance = random.randrange(5)

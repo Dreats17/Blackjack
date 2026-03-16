@@ -660,7 +660,7 @@ class SystemsMixin:
         if effect_type == 0:
             # Randomly lose some money
             loss = random.randint(1, min(100, self._balance // 10 + 1))
-            self._balance -= loss
+            self.spend_balance(loss)
             return ("money_loss", loss, "You blink and some money is gone. Did you spend it? Did someone take it? Does it matter?")
         elif effect_type == 1:
             # Randomly gain a small amount (hallucinated winnings that turn out to be real?)
@@ -1069,6 +1069,9 @@ class SystemsMixin:
         print()
         type.fast(f"Current Balance: {green(bright('${:,}'.format(self._balance)))}")
         print()
+        if self.can_see_fraudulent_cash():
+            type.fast(f"Monocle Read: {yellow(bright('${:,}'.format(self.visible_fraudulent_cash())))} hot cash")
+            print()
         type.fast(f"Highest Balance: {green('${:,}'.format(stats['highest_balance']))}")
         print()
         type.fast(f"Lowest Balance: {red('${:,}'.format(stats['lowest_balance']))}")
@@ -1642,8 +1645,9 @@ class SystemsMixin:
         return self._loan_shark_debt
     
     def take_loan(self, amount):
-        """Take a loan from the loan shark - gives FRAUDULENT cash"""
-        self._loan_shark_debt += amount
+        """Take a loan from the loan shark - adds hot cash into your visible bankroll."""
+        fee = int(amount * self.get_loan_shark_fee_rate())
+        self._loan_shark_debt += amount + fee
         self.add_fraudulent_cash(amount)
         self._loan_shark_days_overdue = 0
         self._statistics["loans_taken"] += 1
@@ -1654,9 +1658,14 @@ class SystemsMixin:
         print()
         type.type(quote("Don't worry about it. Money is money. Just don't let anyone look too close."))
         print()
-        type.type(quote("Gamble with it. Blend it in with your real cash. No one will know the difference."))
+        type.type(quote("Spend it. Gamble with it. Fold it into the stack you already got. No one should know the difference."))
         print()
-        type.type(quote("Oh, and the interest is 20% per week. Don't be late."))
+        if fee > 0:
+            type.type(quote("And because you know what you're holding, I added a fee. Your debt just got heavier."))
+            print()
+            type.type("Total debt added: " + red(bright("${:,}".format(amount + fee))))
+            print()
+        type.type(quote("Oh, and the interest is ") + red(bright(f"{int(self.get_loan_shark_interest_rate() * 100)}%")) + quote(" per week. Don't be late."))
         print("\n")
     
     def repay_loan(self, amount):
@@ -1668,13 +1677,13 @@ class SystemsMixin:
             self._loan_shark_warning_level = 0
             self._statistics["loans_repaid"] += 1
             self._statistics["total_repaid"] += amount
-            self._balance -= amount
+            self.spend_balance(amount)
             type.type("You've paid off your debt completely. Vinnie seems almost disappointed.")
             print("\n")
         else:
             self._statistics["total_repaid"] += amount
             self._loan_shark_debt -= amount
-            self._balance -= amount
+            self.spend_balance(amount)
             type.type("You pay " + green(bright("${:,}".format(amount))) + ". ")
             type.type("You still owe " + red(bright("${:,}".format(self._loan_shark_debt))) + ".")
             print("\n")
@@ -1688,7 +1697,7 @@ class SystemsMixin:
         
         # Add interest every 7 days
         if self._loan_shark_days_overdue % 7 == 0:
-            interest = int(self._loan_shark_debt * 0.20)
+            interest = int(self._loan_shark_debt * self.get_loan_shark_interest_rate())
             self._loan_shark_debt += interest
             print()
             type.type(red("Interest accrued on your loan: ") + red(bright("${:,}".format(interest))))
@@ -1747,34 +1756,35 @@ class SystemsMixin:
         return self._fraudulent_cash
     
     def add_fraudulent_cash(self, amount):
-        """Add fake money from loan shark"""
+        """Add fake money from loan shark into the visible bankroll."""
+        self._balance += amount
         self._fraudulent_cash += amount
     
     def blend_fraudulent_cash(self, amount):
-        """Convert fake cash to real through gambling - track what Dealer gets"""
-        if amount > self._fraudulent_cash:
-            amount = self._fraudulent_cash
-        self._fraudulent_cash -= amount
-        self._dealer_fake_cash_total += amount
-        return amount
+        """Mark fraudulent cash as having passed through the Dealer."""
+        return self._consume_fraudulent_cash(amount, dealer_receives=True)
     
     def get_dealer_fake_cash_total(self):
         return self._dealer_fake_cash_total
+
+    def get_dealer_fake_cash_danger_level(self):
+        total = max(0, int(self._dealer_fake_cash_total))
+        level = 0
+        threshold = 1000
+        while total >= threshold:
+            level += 1
+            threshold *= 10
+        return level
     
     def has_too_much_fake_cash(self):
-        """Dealer stops gaining happiness if he has too much fake money - threshold based on rank"""
-        # Lower ranks: Higher threshold (Dealer isn't sophisticated, doesn't notice)
-        # Higher ranks: Lower threshold (Dealer is sharp, notices fake cash quickly)
-        thresholds = {
-            0: 50000,    # Poor - Dealer doesn't care much, it's all pennies to him
-            1: 30000,    # Modest - Still fairly lenient
-            2: 15000,    # Well-off - Starting to scrutinize
-            3: 5000,     # Rich - Very attentive to larger sums
-            4: 2000,     # Very Rich - Expert eye, notices quickly
-            5: 500       # Almost Millionaire - Dealer VERY suspicious of high roller money
-        }
-        threshold = thresholds.get(self._rank, 15000)
-        return self._dealer_fake_cash_total >= threshold
+        """Dealer danger rises each time cumulative hot cash crosses another power-of-ten threshold."""
+        return self.get_dealer_fake_cash_danger_level() > 0
+
+    def get_loan_shark_interest_rate(self):
+        return float(getattr(self, "_loan_shark_interest_rate", 0.20))
+
+    def get_loan_shark_fee_rate(self):
+        return float(getattr(self, "_loan_shark_fee_rate", 0.0))
     
     # ==========================================
     # DEALER HAPPINESS SYSTEM
@@ -1854,7 +1864,7 @@ class SystemsMixin:
         
         self.use_item(item_name)
         self._gift_wrapped_item = item_name
-        self._balance -= wrap_cost
+        self.spend_balance(wrap_cost)
         return True
     
     def get_wrapped_gift(self):

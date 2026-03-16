@@ -20,17 +20,30 @@ import re
 import subprocess
 import sys
 import time
-from collections import Counter
+from collections import Counter, defaultdict
 from dataclasses import dataclass, field
 from datetime import datetime
+from typing import cast
+
+try:
+    import msvcrt
+except ImportError:
+    msvcrt = None
 
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+if ROOT not in sys.path:
+    sys.path.insert(0, ROOT)
+
+from tools.autoplay.config import MARVIN_ITEM_ORDER, WITCH_FLASK_PRIORITIES
+
 QUICKTEST = os.path.join(ROOT, "tools", "quicktest.py")
 REPORT = os.path.join(ROOT, "tools", "test_out.txt")
 REPORT_JSON = os.path.join(ROOT, "tools", "test_out.json")
 STORY_OUT = os.path.join(ROOT, "tools", "story_out.txt")
 CUMULATIVE_REPORT = os.path.join(ROOT, "tools", "cumulative_test_out.txt")
+STOP_KEY = "s"
+STOP_POLL_SECONDS = 0.1
 
 
 @dataclass
@@ -87,6 +100,7 @@ class RunResult:
     fallback_decisions: dict[str, int] = field(default_factory=dict)
     event_polarity: dict[str, int] = field(default_factory=dict)
     item_impacts: dict[str, dict[str, int]] = field(default_factory=dict)
+    item_provenance: dict[str, dict[str, list[tuple[int | None, str]]]] = field(default_factory=dict)
     cycle_records: list[CycleRecord] = field(default_factory=list)
     marvin_item_provenance: dict[str, dict[str, list[tuple[int | None, str]]]] = field(default_factory=dict)
     decision_request_counts: dict[str, int] = field(default_factory=dict)
@@ -124,6 +138,19 @@ class RunResult:
     repairing_items_list: list[str] = field(default_factory=list)
     flask_purchases: dict[str, int] = field(default_factory=dict)
     items_ever_broken: dict[str, int] = field(default_factory=dict)
+    dealer_happiness: int | None = None
+    gift_system_unlocked: bool = False
+    has_wrapped_gift: bool = False
+    store_purchases: int = 0
+    loan_shark_debt: int = 0
+    loan_shark_warning_level: int = 0
+    fraudulent_cash: int = 0
+    gus_items_sold_count: int = 0
+    gus_total_collectibles: int = 0
+    gift_deliveries: list[dict[str, object]] = field(default_factory=list)
+    dealer_free_hands: list[dict[str, object]] = field(default_factory=list)
+    mechanic_dreams: dict[str, object] = field(default_factory=dict)
+    companion_details: dict[str, dict[str, object]] = field(default_factory=dict)
 
     @property
     def reached_location(self) -> bool:
@@ -222,6 +249,10 @@ class RunResult:
         return "Tool Kit" in self.inventory
 
     @property
+    def visited_car_workbench(self) -> bool:
+        return self.location_hits.get("shop:car_workbench", 0) > 0
+
+    @property
     def visited_adventure(self) -> bool:
         return any(name.startswith("adventure:") for name in self.location_hits)
 
@@ -255,6 +286,21 @@ class RunResult:
         if not self.millionaire_reached:
             return False
         return self.visited_tom or self.visited_frank or self.visited_oswald
+
+    @property
+    def won_any_ending(self) -> bool:
+        return self.won_millionaire_ending or self.won_mechanic_ending
+
+    @property
+    def terminal_ending_name(self) -> str:
+        match = re.search(r"\| ending: ([a-z0-9_]+)", self.result_note.lower())
+        return match.group(1) if match else ""
+
+    @property
+    def display_outcome(self) -> str:
+        if self.outcome == "ending" and self.terminal_ending_name:
+            return self.terminal_ending_name
+        return self.outcome
 
     @property
     def doctor_likely_saveable(self) -> bool:
@@ -335,15 +381,28 @@ class RunResult:
 
     @property
     def outcome(self) -> str:
+        note = self.result_note.lower()
         if self.timed_out:
             return "timeout"
-        if "player died" in self.result_note:
+        if "player died" in note:
             return "died"
-        if "player hit $0" in self.result_note:
+        if "player hit $0" in note:
             return "broke"
+        if "stalled during cycle" in note:
+            return "stalled"
+        if "reached cycle cap" in note:
+            return "capped"
+        if "terminal ending" in note:
+            return "win" if self.won_any_ending else "ending"
         if self.return_code not in (0, None):
-            return f"rc{self.return_code}"
-        return "ok"
+            return "crash"
+        if note in {"", "missing report"}:
+            return "crash"
+        return "crash"
+
+    @property
+    def survived_run(self) -> bool:
+        return self.outcome == "capped"
 
     @property
     def death_group(self) -> str:
@@ -509,6 +568,208 @@ SHOP_ROWS = [
     ("Airport", lambda result: result.millionaire_reached or result.visited_airport, "shop:airport"),
 ]
 
+ADVENTURE_ROWS = [
+    ("Road", "adventure:road"),
+    ("Woodlands", "adventure:woodlands"),
+    ("Swamp", "adventure:swamp"),
+    ("Beach", "adventure:beach"),
+    ("Ocean Depths", "adventure:ocean_depths"),
+    ("City", "adventure:city"),
+]
+
+_LITERAL_UNIVERSE_CACHE: dict[tuple[str, ...], tuple[str, ...]] = {}
+_NAMED_UNIVERSE_CACHE: dict[str, tuple[str, ...]] = {}
+
+
+def _story_python_files() -> list[str]:
+    story_root = os.path.join(ROOT, "story")
+    file_paths: list[str] = []
+    for dir_path, _dir_names, file_names in os.walk(story_root):
+        for file_name in file_names:
+            if file_name.endswith(".py"):
+                file_paths.append(os.path.join(dir_path, file_name))
+    file_paths.sort()
+    return file_paths
+
+
+def _literal_call_universe(*method_names: str) -> tuple[str, ...]:
+    cache_key = tuple(sorted(set(method_names)))
+    cached = _LITERAL_UNIVERSE_CACHE.get(cache_key)
+    if cached is not None:
+        return cached
+
+    class _LiteralCollector(ast.NodeVisitor):
+        def __init__(self, method_set: set[str]):
+            self.method_set = method_set
+            self.values: set[str] = set()
+
+        def visit_Call(self, node: ast.Call) -> None:
+            method_name = None
+            if isinstance(node.func, ast.Attribute):
+                method_name = node.func.attr
+            elif isinstance(node.func, ast.Name):
+                method_name = node.func.id
+
+            if method_name in self.method_set and node.args:
+                first_arg = node.args[0]
+                if isinstance(first_arg, ast.Constant) and isinstance(first_arg.value, str):
+                    value = first_arg.value.strip()
+                    if value:
+                        self.values.add(value)
+
+            self.generic_visit(node)
+
+    collected: set[str] = set()
+    for file_path in _story_python_files():
+        try:
+            with open(file_path, "r", encoding="utf-8") as handle:
+                tree = ast.parse(handle.read(), filename=file_path)
+        except (OSError, SyntaxError, UnicodeDecodeError):
+            continue
+        collector = _LiteralCollector(set(cache_key))
+        collector.visit(tree)
+        collected.update(collector.values)
+
+    cached_result = tuple(sorted(collected, key=str.casefold))
+    _LITERAL_UNIVERSE_CACHE[cache_key] = cached_result
+    return cached_result
+
+
+def _known_item_universe() -> tuple[str, ...]:
+    return _literal_call_universe("add_item", "remove_item", "break_item", "repair_item", "fix_item")
+
+
+def _known_status_universe() -> tuple[str, ...]:
+    return _literal_call_universe("add_status", "remove_status")
+
+
+def _known_injury_universe() -> tuple[str, ...]:
+    return _literal_call_universe("add_injury", "heal_injury")
+
+
+def _known_storyline_universe() -> tuple[str, ...]:
+    cached = _NAMED_UNIVERSE_CACHE.get("storylines")
+    if cached is not None:
+        return cached
+
+    storylines_path = os.path.join(ROOT, "story", "storylines.py")
+    try:
+        with open(storylines_path, "r", encoding="utf-8") as handle:
+            tree = ast.parse(handle.read(), filename=storylines_path)
+    except (OSError, SyntaxError, UnicodeDecodeError):
+        return ()
+
+    class _StorylineCollector(ast.NodeVisitor):
+        def __init__(self) -> None:
+            self.values: list[str] = []
+
+        def visit_Assign(self, node: ast.Assign) -> None:
+            for target in node.targets:
+                if isinstance(target, ast.Attribute) and target.attr == "storylines" and isinstance(node.value, ast.Dict):
+                    values = []
+                    for key in node.value.keys:
+                        if isinstance(key, ast.Constant) and isinstance(key.value, str):
+                            value = key.value.strip()
+                            if value:
+                                values.append(value)
+                    if values:
+                        self.values = values
+            self.generic_visit(node)
+
+    collector = _StorylineCollector()
+    collector.visit(tree)
+    result = tuple(sorted(dict.fromkeys(collector.values), key=str.casefold))
+    _NAMED_UNIVERSE_CACHE["storylines"] = result
+    return result
+
+
+def _known_gus_collectible_universe() -> tuple[str, ...]:
+    cached = _NAMED_UNIVERSE_CACHE.get("gus_collectibles")
+    if cached is not None:
+        return cached
+
+    player_core_path = os.path.join(ROOT, "story", "player_core.py")
+    try:
+        with open(player_core_path, "r", encoding="utf-8") as handle:
+            tree = ast.parse(handle.read(), filename=player_core_path)
+    except (OSError, SyntaxError, UnicodeDecodeError):
+        return ()
+
+    class _CollectibleCollector(ast.NodeVisitor):
+        def __init__(self) -> None:
+            self.values: list[str] = []
+
+        def visit_FunctionDef(self, node: ast.FunctionDef) -> None:
+            if node.name != "get_all_collectibles_list":
+                self.generic_visit(node)
+                return
+            for child in ast.walk(node):
+                if isinstance(child, ast.Return) and isinstance(child.value, ast.List):
+                    values = []
+                    for elt in child.value.elts:
+                        if isinstance(elt, ast.Constant) and isinstance(elt.value, str):
+                            value = elt.value.strip()
+                            if value:
+                                values.append(value)
+                    if values:
+                        self.values = values
+                        return
+            self.generic_visit(node)
+
+    collector = _CollectibleCollector()
+    collector.visit(tree)
+    result = tuple(sorted(dict.fromkeys(collector.values), key=str.casefold))
+    _NAMED_UNIVERSE_CACHE["gus_collectibles"] = result
+    return result
+
+
+def _known_companion_universe() -> tuple[str, ...]:
+    lists_path = os.path.join(ROOT, "lists.py")
+    try:
+        with open(lists_path, "r", encoding="utf-8") as handle:
+            tree = ast.parse(handle.read(), filename=lists_path)
+    except (OSError, SyntaxError, UnicodeDecodeError):
+        return ()
+
+    for node in ast.walk(tree):
+        if not isinstance(node, ast.FunctionDef) or node.name != "make_companion_types":
+            continue
+        for child in ast.walk(node):
+            if not isinstance(child, ast.Return) or not isinstance(child.value, ast.Dict):
+                continue
+            names = []
+            for key in child.value.keys:
+                if isinstance(key, ast.Constant) and isinstance(key.value, str):
+                    names.append(key.value)
+            if names:
+                return tuple(sorted(names, key=str.casefold))
+    return ()
+
+
+def _history_entries_for_sources(
+    entries: list[tuple[int | None, str]], source_prefixes: tuple[str, ...]
+) -> list[tuple[int | None, str]]:
+    return [
+        (day, source)
+        for day, source in entries
+        if any(str(source).startswith(prefix) for prefix in source_prefixes)
+    ]
+
+
+def _format_average(total: int, count: int, *, money: bool = False) -> str:
+    if count <= 0:
+        return "-"
+    average = total / count
+    if money:
+        return f"{average:+.1f}"
+    return f"{average:+.1f}"
+
+
+def _truncate_text(value: str, limit: int) -> str:
+    if len(value) <= limit:
+        return value
+    return value[: max(0, limit - 3)] + "..."
+
 
 def _parse_literal_list(raw_value: str) -> list[str]:
     try:
@@ -564,6 +825,9 @@ def _apply_json_report(result: RunResult, payload: dict[str, object]) -> None:
         result.millionaire_reached = bool(run_summary.get("millionaire_reached", result.millionaire_reached))
         result.millionaire_visited = bool(run_summary.get("millionaire_visited", result.millionaire_visited))
         result.death_cause = str(run_summary.get("death_cause", result.death_cause) or "")
+        result_note = str(run_summary.get("result_note", "") or "")
+        if result_note:
+            result.result_note = result_note
 
     if isinstance(final_state, dict):
         result.inventory = [str(item) for item in final_state.get("inventory", result.inventory) or []]
@@ -632,6 +896,23 @@ def _apply_json_report(result: RunResult, payload: dict[str, object]) -> None:
             for item_name, stats in payload["item_impacts"].items()
             if isinstance(stats, dict)
         }
+    if isinstance(payload.get("item_provenance"), dict):
+        result.item_provenance = {
+            str(item_name): {
+                key: [
+                    (
+                        None if entry.get("day") is None else int(entry.get("day")),
+                        str(entry.get("source", "unknown")),
+                    )
+                    for entry in entries
+                    if isinstance(entry, dict)
+                ]
+                for key, entries in history.items()
+                if isinstance(entries, list)
+            }
+            for item_name, history in payload["item_provenance"].items()
+            if isinstance(history, dict)
+        }
     if isinstance(payload.get("marvin_provenance"), dict):
         result.marvin_item_provenance = {
             str(item_name): {
@@ -698,11 +979,78 @@ def _apply_json_report(result: RunResult, payload: dict[str, object]) -> None:
             result.broken_items_list = [str(i) for i in fs["broken_items"]]
         if isinstance(fs.get("repairing_items"), list):
             result.repairing_items_list = [str(i) for i in fs["repairing_items"]]
+        if isinstance(fs.get("dealer_happiness"), (int, float)):
+            result.dealer_happiness = int(fs["dealer_happiness"])
+        result.gift_system_unlocked = bool(fs.get("gift_system_unlocked", result.gift_system_unlocked))
+        result.has_wrapped_gift = bool(fs.get("has_wrapped_gift", result.has_wrapped_gift))
+        if isinstance(fs.get("store_purchases"), (int, float)):
+            result.store_purchases = int(fs["store_purchases"])
+        if isinstance(fs.get("loan_shark_debt"), (int, float)):
+            result.loan_shark_debt = int(fs["loan_shark_debt"])
+        if isinstance(fs.get("loan_shark_warning_level"), (int, float)):
+            result.loan_shark_warning_level = int(fs["loan_shark_warning_level"])
+        if isinstance(fs.get("fraudulent_cash"), (int, float)):
+            result.fraudulent_cash = int(fs["fraudulent_cash"])
+        if isinstance(fs.get("gus_items_sold_count"), (int, float)):
+            result.gus_items_sold_count = int(fs["gus_items_sold_count"])
+        if isinstance(fs.get("gus_total_collectibles"), (int, float)):
+            result.gus_total_collectibles = int(fs["gus_total_collectibles"])
 
     if isinstance(payload.get("flask_purchases"), dict):
         result.flask_purchases = {str(k): int(v) for k, v in payload["flask_purchases"].items()}
     if isinstance(payload.get("items_ever_broken"), dict):
         result.items_ever_broken = {str(k): int(v) for k, v in payload["items_ever_broken"].items()}
+    if isinstance(payload.get("gift_deliveries"), list):
+        result.gift_deliveries = [
+            {
+                "day": None if entry.get("day") is None else int(entry.get("day")),
+                "cycle": None if entry.get("cycle") is None else int(entry.get("cycle")),
+                "item": str(entry.get("item", "")),
+                "happiness_before": None if entry.get("happiness_before") is None else int(entry.get("happiness_before")),
+                "happiness_after": None if entry.get("happiness_after") is None else int(entry.get("happiness_after")),
+                "happiness_change": None if entry.get("happiness_change") is None else int(entry.get("happiness_change")),
+                "alive_after": bool(entry.get("alive_after", True)),
+            }
+            for entry in payload["gift_deliveries"]
+            if isinstance(entry, dict)
+        ]
+    if isinstance(payload.get("dealer_free_hands"), list):
+        result.dealer_free_hands = [
+            {
+                "day": None if entry.get("day") is None else int(entry.get("day")),
+                "cycle": None if entry.get("cycle") is None else int(entry.get("cycle")),
+                "dealer_happiness": int(entry.get("dealer_happiness", 0)),
+                "bet": int(entry.get("bet", 0)),
+                "balance": int(entry.get("balance", 0)),
+                "tier": str(entry.get("tier", "unknown")),
+            }
+            for entry in payload["dealer_free_hands"]
+            if isinstance(entry, dict)
+        ]
+    if isinstance(payload.get("final_state"), dict):
+        fs = payload["final_state"]
+        if isinstance(fs.get("mechanic_dreams"), dict):
+            dreams = fs["mechanic_dreams"]
+            result.mechanic_dreams = {
+                "tom": int(dreams.get("tom", 0)),
+                "frank": int(dreams.get("frank", 0)),
+                "oswald": int(dreams.get("oswald", 0)),
+                "car_mechanic": str(dreams.get("car_mechanic", "") or ""),
+                "chosen": str(dreams.get("chosen", "") or ""),
+            }
+        if isinstance(fs.get("companion_details"), dict):
+            result.companion_details = {
+                str(name): {
+                    "status": str(data.get("status", "unknown")),
+                    "type": str(data.get("type", "unknown")),
+                    "happiness": int(data.get("happiness", 0)),
+                    "days_owned": int(data.get("days_owned", 0)),
+                    "fed_today": bool(data.get("fed_today", False)),
+                    "bonded": bool(data.get("bonded", False)),
+                }
+                for name, data in fs["companion_details"].items()
+                if isinstance(data, dict)
+            }
 
 
 def _record_cycle_event_effects(result: RunResult, lines: list[str]) -> None:
@@ -1051,44 +1399,273 @@ def parse_report(seed: int, return_code: int) -> RunResult:
             result.warning_count = int(warnings_match.group("count"))
 
     return result
+def _supports_stop_key() -> bool:
+    return bool(msvcrt and sys.stdin.isatty() and sys.stdout.isatty())
 
 
-def run_seed(cycles: int, seed: int, timeout_seconds: int = 90) -> RunResult:
-    started_at = time.perf_counter()
+def _consume_stop_request() -> bool:
+    if not _supports_stop_key() or msvcrt is None:
+        return False
+
+    stop_requested = False
+    while msvcrt.kbhit():
+        char = msvcrt.getwch()
+        if char and char.lower() == STOP_KEY:
+            stop_requested = True
+    return stop_requested
+
+
+def _terminate_seed_process(process: subprocess.Popen[str]) -> None:
+    if process.poll() is not None:
+        return
+
+    process.terminate()
     try:
-        completed = subprocess.run(
+        process.communicate(timeout=2)
+    except subprocess.TimeoutExpired:
+        process.kill()
+        process.communicate()
+
+
+def run_seed(cycles: int, seed: int, timeout_seconds: int = 90) -> tuple[RunResult | None, bool]:
+    started_at = time.perf_counter()
+    process = subprocess.Popen(
             [sys.executable, QUICKTEST, str(cycles), str(seed)],
             cwd=ROOT,
-            capture_output=True,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
             text=True,
-            timeout=timeout_seconds,
         )
-        result = parse_report(seed, completed.returncode)
-        result.elapsed_seconds = time.perf_counter() - started_at
-        return result
-    except subprocess.TimeoutExpired:
-        return RunResult(
-            seed=seed,
-            timed_out=True,
-            elapsed_seconds=time.perf_counter() - started_at,
-            result_note=f"timeout>{timeout_seconds}s",
-        )
+    try:
+        while True:
+            if _consume_stop_request():
+                _terminate_seed_process(process)
+                return None, True
+
+            try:
+                process.communicate(timeout=STOP_POLL_SECONDS)
+                result = parse_report(seed, process.returncode)
+                result.elapsed_seconds = time.perf_counter() - started_at
+                return result, False
+            except subprocess.TimeoutExpired:
+                if (time.perf_counter() - started_at) >= timeout_seconds:
+                    _terminate_seed_process(process)
+                    return RunResult(
+                        seed=seed,
+                        timed_out=True,
+                        elapsed_seconds=time.perf_counter() - started_at,
+                        result_note=f"timeout>{timeout_seconds}s",
+                    ), False
+    finally:
+        if process.poll() is None:
+            _terminate_seed_process(process)
 
 
-def _progress_line(index: int, total: int, result: RunResult, started_at: float) -> str:
+def _progress_line(index: int, total: int, result: RunResult, results: list[RunResult], started_at: float) -> str:
     batch_elapsed = time.perf_counter() - started_at
+    average_seed_time = batch_elapsed / index if index else 0.0
+    eta_seconds = max(0.0, average_seed_time * (total - index))
+    percent = (index / total) * 100 if total else 100.0
+
+    summary = _collect_summary(results)
     outcome = result.outcome
-    day = result.day if result.day is not None else "-"
-    balance = result.balance if result.balance is not None else "-"
-    return f"[{index}/{total}] seed={result.seed} {outcome} seed={result.elapsed_seconds:.1f}s total={batch_elapsed:.1f}s day={day} bal={balance}"
+    if outcome == "capped":
+        outcome = "cap"
+
+    day = str(result.day) if result.day is not None else "-"
+    end_balance = _format_int(result.balance)
+    peak_balance = _format_int(result.peak_balance)
+    current_rank = result.rank if result.rank is not None else 0
+    peak_rank = result.peak_rank if result.peak_rank is not None else current_rank
+    coverage = result.coverage_flags
+    coverage_display = coverage if len(coverage) <= 8 else coverage[:8] + "+"
+
+    detail = ""
+    if result.timed_out:
+        detail = " timeout"
+    elif result.outcome == "died":
+        detail = f" {result.death_group}"
+        if result.doctor_likely_saveable and not result.visited_doctor:
+            detail += "/missed-doc"
+    elif result.outcome == "broke":
+        detail = " bankroll-zero"
+    elif result.outcome == "win":
+        detail = " win"
+    elif result.outcome == "ending":
+        detail = f" ending:{result.terminal_ending_name}" if result.terminal_ending_name else " ending"
+    elif result.outcome == "stalled":
+        detail = " stalled"
+    elif result.outcome == "capped":
+        detail = " cycle-cap"
+    elif result.outcome == "crash":
+        detail = " crash"
+    elif result.visited_marvin:
+        detail = " marvin"
+
+    return (
+        f"[{index}/{total} {percent:4.0f}% eta={eta_seconds:4.0f}s] "
+        f"s={result.seed} {outcome}{detail} d={day} end$={end_balance} peak$={peak_balance} "
+        f"r={current_rank}/{peak_rank} cov={coverage_display} t={result.elapsed_seconds:.1f}s "
+        f"roll w={summary['win']} e={summary['ending']} d={summary['died']} b={summary['broke']} c={summary['capped']} x={summary['crash']} "
+        f"r1={summary['rank1']} m={summary['marvin']} i={summary['marvin_items']}"
+    )
+
+
+def _live_result_label(result: RunResult) -> str:
+    outcome = result.outcome
+    if outcome == "capped":
+        outcome = "cap"
+    if result.timed_out:
+        return f"{outcome}:timeout"
+    if result.outcome == "died":
+        if result.doctor_likely_saveable and not result.visited_doctor:
+            return f"{outcome}:{result.death_group}/missed-doc"
+        return f"{outcome}:{result.death_group}"
+    if result.outcome == "broke":
+        return "broke:zero"
+    if result.outcome == "ending":
+        return f"ending:{result.terminal_ending_name}" if result.terminal_ending_name else "ending"
+    if result.outcome == "stalled":
+        return "stalled"
+    if result.outcome == "crash":
+        return "crash"
+    if result.visited_marvin:
+        return f"{outcome}:marvin"
+    return outcome
+
+
+def _recent_result_rows(results: list[RunResult], limit: int = 10) -> list[str]:
+    rows: list[str] = []
+    for result in results[-limit:]:
+        day = str(result.day) if result.day is not None else "-"
+        end_balance = _format_int(result.balance)
+        peak_balance = _format_int(result.peak_balance)
+        current_rank = result.rank if result.rank is not None else 0
+        peak_rank = result.peak_rank if result.peak_rank is not None else current_rank
+        rows.append(
+            f"{result.seed:>6}  {_live_result_label(result):<24} day={day:>3} end$={end_balance:>8} "
+            f"peak$={peak_balance:>8} rank={current_rank}/{peak_rank} t={result.elapsed_seconds:>4.1f}s"
+        )
+    return rows
+
+
+def _top_money_rows(results: list[RunResult], limit: int = 5) -> list[str]:
+    ordered = sorted(
+        results,
+        key=lambda result: (
+            (result.peak_balance or result.balance or 0),
+            (result.day or 0),
+            -(result.seed),
+        ),
+        reverse=True,
+    )[:limit]
+    rows: list[str] = []
+    for index, result in enumerate(ordered, start=1):
+        peak_balance = _format_int(result.peak_balance or result.balance)
+        end_balance = _format_int(result.balance)
+        rows.append(
+            f"{index}. seed={result.seed:<6} peak$={peak_balance:>8} end$={end_balance:>8} "
+            f"day={str(result.day or '-'):>3} rank={result.peak_rank or result.rank or 0}"
+        )
+    return rows or ["(no runs yet)"]
+
+
+def _top_length_rows(results: list[RunResult], limit: int = 5) -> list[str]:
+    ordered = sorted(
+        results,
+        key=lambda result: (
+            (result.day or 0),
+            (result.peak_balance or result.balance or 0),
+            -(result.seed),
+        ),
+        reverse=True,
+    )[:limit]
+    rows: list[str] = []
+    for index, result in enumerate(ordered, start=1):
+        peak_balance = _format_int(result.peak_balance or result.balance)
+        end_balance = _format_int(result.balance)
+        rows.append(
+            f"{index}. seed={result.seed:<6} day={str(result.day or '-'):>3} peak$={peak_balance:>8} "
+            f"end$={end_balance:>8} rank={result.peak_rank or result.rank or 0}"
+        )
+    return rows or ["(no runs yet)"]
+
+
+def _render_live_dashboard(index: int, total: int, results: list[RunResult], started_at: float) -> str:
+    batch_elapsed = time.perf_counter() - started_at
+    average_seed_time = batch_elapsed / index if index else 0.0
+    eta_seconds = max(0.0, average_seed_time * (total - index))
+    percent = (index / total) * 100 if total else 100.0
+    summary = _collect_summary(results)
+
+    lines = [
+        f"AUTOTEST progress  {index}/{total}  {percent:5.1f}%  elapsed={batch_elapsed:6.1f}s  eta={eta_seconds:6.1f}s",
+        (
+            "Outcomes  "
+            f"win={summary['win']}  ending={summary['ending']}  died={summary['died']}  broke={summary['broke']}  "
+            f"capped={summary['capped']}  crash={summary['crash']}  timeout={summary['timeouts']}"
+        ),
+        (
+            "Progress  "
+            f"car={summary['car']}/{summary['total']}  rank1+={summary['rank1']}/{summary['total']}  "
+            f"marvin={summary['marvin']}/{summary['total']}  marvin_items={summary['marvin_items']}/{summary['total']}  "
+            f"doctor_missed={summary['doctor_missed']}"
+        ),
+        "",
+        "Recent 10 Runs",
+        "--------------",
+        *(_recent_result_rows(results, 10) or ["(no completed runs yet)"]),
+        "",
+        "Top 5 By Peak Money",
+        "-------------------",
+        *_top_money_rows(results, 5),
+        "",
+        "Top 5 By Run Length",
+        "-------------------",
+        *_top_length_rows(results, 5),
+    ]
+    return "\n".join(lines)
+
+
+def _should_emit_non_tty_progress(index: int, total: int, result: RunResult) -> bool:
+    if index <= 3 or index >= total:
+        return True
+    if result.timed_out or result.outcome in {"crash", "stalled"}:
+        return True
+    if total <= 20:
+        return True
+    if total <= 100:
+        step = 5
+    elif total <= 250:
+        step = 10
+    else:
+        step = 25
+    return index % step == 0
+
+
+def _render_live_progress(index: int, total: int, result: RunResult, results: list[RunResult], started_at: float) -> None:
+    if not sys.stdout.isatty():
+        if _should_emit_non_tty_progress(index, total, result):
+            print(_progress_line(index, total, result, results, started_at), flush=True)
+        return
+
+    sys.stdout.write("\x1b[2J\x1b[H")
+    sys.stdout.write(_render_live_dashboard(index, total, results, started_at))
+    sys.stdout.write("\n")
+    sys.stdout.flush()
 
 
 def _collect_summary(results: list[RunResult]) -> dict[str, int]:
     total = len(results)
     return {
         "total": total,
+        "win": sum(1 for result in results if result.outcome == "win"),
         "died": sum(1 for result in results if result.outcome == "died"),
         "broke": sum(1 for result in results if result.outcome == "broke"),
+        "ending": sum(1 for result in results if result.outcome == "ending"),
+        "stalled": sum(1 for result in results if result.outcome == "stalled"),
+        "capped": sum(1 for result in results if result.outcome == "capped"),
+        "crash": sum(1 for result in results if result.outcome == "crash"),
         "car": sum(1 for result in results if result.has_car),
         "ever_car": sum(1 for result in results if result.ever_had_car),
         "location": sum(1 for result in results if result.reached_location),
@@ -1108,20 +1685,26 @@ def _collect_summary(results: list[RunResult]) -> dict[str, int]:
         "pawn": sum(1 for result in results if result.visited_pawn),
         "loan": sum(1 for result in results if result.visited_loan_shark),
         "million": sum(1 for result in results if result.millionaire_reached),
-        "wins": sum(1 for result in results if result.won_millionaire_ending),
+        "airport_win": sum(1 for result in results if result.won_millionaire_ending),
         "mechanic_end": sum(1 for result in results if result.won_mechanic_ending),
         "airport": sum(1 for result in results if result.visited_airport),
         "marvin": sum(1 for result in results if result.visited_marvin),
+        "marvin_items": sum(1 for result in results if result.marvin_item_provenance),
         "tom": sum(1 for result in results if result.visited_tom),
         "frank": sum(1 for result in results if result.visited_frank),
         "oswald": sum(1 for result in results if result.visited_oswald),
         "upgrade": sum(1 for result in results if result.visited_upgrade),
+        "gift_unlock": sum(1 for result in results if result.gift_system_unlocked),
+        "wrapped_gift": sum(1 for result in results if result.has_wrapped_gift),
+        "workbench_unlock": sum(1 for result in results if result.has_tool_kit),
+        "workbench_visit": sum(1 for result in results if result.visited_car_workbench),
         "crafting": sum(1 for result in results if result.crafting_used),
         "companion": sum(1 for result in results if result.companion_acquired),
+        "companion_roster": sum(1 for result in results if bool(result.companions_list)),
         "adventure": sum(1 for result in results if result.visited_adventure),
-        "alive": sum(1 for result in results if result.alive),
+        "survived": sum(1 for result in results if result.survived_run),
         "doctor_missed": sum(1 for result in results if result.doctor_likely_saveable and not result.visited_doctor),
-        "timeouts": sum(1 for result in results if result.timed_out),
+        "timeouts": sum(1 for result in results if result.outcome == "timeout"),
         "clean": sum(1 for result in results if result.error_count == 0 and result.warning_count == 0 and not result.timed_out),
     }
 
@@ -1199,6 +1782,9 @@ def _distribution_lines(results: list[RunResult]) -> list[str]:
     def day_of(result: RunResult) -> int:
         return result.day or 0
 
+    def peak_rank_of(result: RunResult) -> int:
+        return result.peak_rank if result.peak_rank is not None else (result.rank or 0)
+
     peak_buckets = [
         ("peak<100", sum(1 for result in results if peak_of(result) < 100)),
         ("100-199", sum(1 for result in results if 100 <= peak_of(result) < 200)),
@@ -1206,7 +1792,14 @@ def _distribution_lines(results: list[RunResult]) -> list[str]:
         ("350-799", sum(1 for result in results if 350 <= peak_of(result) < 800)),
         ("800-1,999", sum(1 for result in results if 800 <= peak_of(result) < 2000)),
         ("2k-4,999", sum(1 for result in results if 2000 <= peak_of(result) < 5000)),
-        ("5k+", sum(1 for result in results if peak_of(result) >= 5000)),
+        ("5k-9,999", sum(1 for result in results if 5000 <= peak_of(result) < 10000)),
+        ("10k-19k", sum(1 for result in results if 10000 <= peak_of(result) < 20000)),
+        ("20k-49k", sum(1 for result in results if 20000 <= peak_of(result) < 50000)),
+        ("50k-99k", sum(1 for result in results if 50000 <= peak_of(result) < 100000)),
+        ("100k-249k", sum(1 for result in results if 100000 <= peak_of(result) < 250000)),
+        ("250k-499k", sum(1 for result in results if 250000 <= peak_of(result) < 500000)),
+        ("500k-999k", sum(1 for result in results if 500000 <= peak_of(result) < 1000000)),
+        ("1m+", sum(1 for result in results if peak_of(result) >= 1000000)),
     ]
     day_buckets = [
         ("day<=10", sum(1 for result in results if day_of(result) <= 10)),
@@ -1215,9 +1808,19 @@ def _distribution_lines(results: list[RunResult]) -> list[str]:
         ("61-90", sum(1 for result in results if 61 <= day_of(result) <= 90)),
         ("91+", sum(1 for result in results if day_of(result) >= 91)),
     ]
+    peak_rank_buckets = [
+        ("rank=0", sum(1 for result in results if peak_rank_of(result) == 0)),
+        ("rank=1", sum(1 for result in results if peak_rank_of(result) == 1)),
+        ("rank=2", sum(1 for result in results if peak_rank_of(result) == 2)),
+        ("rank=3", sum(1 for result in results if peak_rank_of(result) == 3)),
+        ("rank=4", sum(1 for result in results if peak_rank_of(result) == 4)),
+        ("rank>=5", sum(1 for result in results if peak_rank_of(result) >= 5)),
+    ]
 
     lines = ["Distributions"]
     lines.extend(_render_distribution_chart("Peak balance", peak_buckets, total))
+    lines.append("")
+    lines.extend(_render_distribution_chart("Peak rank", peak_rank_buckets, total))
     lines.append("")
     lines.extend(_render_distribution_chart("Run length", day_buckets, total))
     lines.append("")
@@ -1252,7 +1855,7 @@ def _medical_economy_lines(results: list[RunResult]) -> list[str]:
         rows.append({
             "cohort": label,
             "runs": f"{len(cohort)}/{total}",
-            "alive": str(sum(1 for result in cohort if result.alive)),
+            "survived": str(sum(1 for result in cohort if result.survived_run)),
             "peak_avg": _format_int(average(peak_values)),
             "peak_2k": str(sum(1 for result in cohort if (result.peak_balance or result.balance or 0) >= 2000)),
             "end_avg": _format_int(average(end_values)),
@@ -1265,7 +1868,7 @@ def _medical_economy_lines(results: list[RunResult]) -> list[str]:
         [
             ("cohort", "cohort"),
             ("runs", "runs"),
-            ("alive", "alive"),
+            ("survived", "survived"),
             ("peak_avg", "avg-peak$"),
             ("peak_2k", "2k+"),
             ("end_avg", "avg-end$"),
@@ -1275,7 +1878,7 @@ def _medical_economy_lines(results: list[RunResult]) -> list[str]:
         rows,
         {
             "runs": "right",
-            "alive": "right",
+            "survived": "right",
             "peak_avg": "right",
             "peak_2k": "right",
             "end_avg": "right",
@@ -1283,6 +1886,101 @@ def _medical_economy_lines(results: list[RunResult]) -> list[str]:
             "doctor_missed": "right",
         },
     ))
+    lines.append("")
+    return lines
+
+
+def _max_rank_cohort_lines(results: list[RunResult]) -> list[str]:
+    if not results:
+        return []
+
+    def average(values: list[int]) -> int:
+        return round(sum(values) / len(values)) if values else 0
+
+    def max_rank(result: RunResult) -> int:
+        return result.peak_rank if result.peak_rank is not None else (result.rank or 0)
+
+    def render_counter(counter: Counter[str], limit: int = 3) -> str:
+        if not counter:
+            return "none"
+        return " | ".join(f"{name}={count}" for name, count in counter.most_common(limit))
+
+    total = len(results)
+    grouped: dict[int, list[RunResult]] = {}
+    for result in results:
+        grouped.setdefault(max_rank(result), []).append(result)
+
+    rows = []
+    detail_lines: list[str] = []
+    for rank_value in sorted(grouped):
+        cohort = grouped[rank_value]
+        size = len(cohort)
+        peak_values = [result.peak_balance or result.balance or 0 for result in cohort]
+        end_values = [result.balance or 0 for result in cohort]
+        day_values = [result.day or 0 for result in cohort]
+        rows.append({
+            "cohort": f"rank{rank_value}",
+            "runs": f"{size}/{total}",
+            "survived": f"{sum(1 for result in cohort if result.survived_run)}/{size}",
+            "peak_avg": _format_int(average(peak_values)),
+            "end_avg": _format_int(average(end_values)),
+            "day_avg": str(average(day_values)),
+            "ever_car": f"{sum(1 for result in cohort if result.ever_had_car)}/{size}",
+            "doctor": f"{sum(1 for result in cohort if result.visited_doctor)}/{size}",
+            "marvin": f"{sum(1 for result in cohort if result.visited_marvin)}/{size}",
+            "pawn": f"{sum(1 for result in cohort if result.visited_pawn)}/{size}",
+            "loan": f"{sum(1 for result in cohort if result.visited_loan_shark)}/{size}",
+            "witch": f"{sum(1 for result in cohort if result.visited_witch_doctor)}/{size}",
+        })
+
+        route_counter = Counter(
+            result.top_adventure if result.top_adventure != "none" else result.top_location
+            for result in cohort
+        )
+        outcome_counter = Counter(result.display_outcome for result in cohort)
+        death_counter = Counter(result.death_tag for result in cohort if result.outcome == "died")
+        detail_lines.append(
+            f"common rank{rank_value} outcomes {render_counter(outcome_counter)}"
+        )
+        detail_lines.append(
+            f"common rank{rank_value} routes   {render_counter(route_counter)}"
+        )
+        detail_lines.append(
+            f"common rank{rank_value} deaths   {render_counter(death_counter)}"
+        )
+
+    lines = ["Max Rank Cohorts"]
+    lines.extend(_build_text_table(
+        [
+            ("cohort", "cohort"),
+            ("runs", "runs"),
+            ("survived", "survived"),
+            ("peak_avg", "avg-peak$"),
+            ("end_avg", "avg-end$"),
+            ("day_avg", "avg-day"),
+            ("ever_car", "ever-car"),
+            ("doctor", "doctor"),
+            ("marvin", "marvin"),
+            ("pawn", "pawn"),
+            ("loan", "loan"),
+            ("witch", "witchdr"),
+        ],
+        rows,
+        {
+            "runs": "right",
+            "survived": "right",
+            "peak_avg": "right",
+            "end_avg": "right",
+            "day_avg": "right",
+            "ever_car": "right",
+            "doctor": "right",
+            "marvin": "right",
+            "pawn": "right",
+            "loan": "right",
+            "witch": "right",
+        },
+    ))
+    lines.extend(detail_lines)
     lines.append("")
     return lines
 
@@ -1331,18 +2029,50 @@ def _doctor_review_lines(results: list[RunResult]) -> list[str]:
 
 
 def _pawned_item_lines(results: list[RunResult]) -> list[str]:
-    pawn_counter = Counter(item for result in results for item in result.pawned_items)
-    if not pawn_counter:
+    total = len(results)
+    known_items = list(_known_gus_collectible_universe())
+    observed_items = sorted(
+        {item for result in results for item in result.pawned_items},
+        key=str.casefold,
+    )
+    if not known_items:
+        known_items = observed_items
+    else:
+        extras = [item for item in observed_items if item not in known_items]
+        known_items.extend(extras)
+
+    if not known_items:
         return []
 
+    pawn_counter = Counter(item for result in results for item in result.pawned_items)
     pawn_runs = sum(1 for result in results if result.pawned_items)
+    max_total_collectibles = max((result.gus_total_collectibles for result in results), default=len(known_items))
+    max_seed = max(results, key=lambda result: (result.gus_items_sold_count, result.seed), default=None)
+    avg_progress = sum(result.gus_items_sold_count for result in results) / max(1, total)
+    rows = []
+    for item_name in known_items:
+        count = pawn_counter.get(item_name, 0)
+        rows.append({
+            "item": item_name,
+            "runs": f"{count}/{total}",
+            "pct": f"{(count / total) * 100:.0f}%",
+        })
+
     lines = [
-        f"Pawned Collectibles runs={pawn_runs}/{len(results)} unique_items={len(pawn_counter)}",
-        "item                       runs",
-        "-------------------------- ----",
+        f"Pawn Shop / Gus Progress runs-with-sales={pawn_runs}/{total} unique-sold={sum(1 for item in known_items if pawn_counter.get(item, 0) > 0)}/{len(known_items)} "
+        f"avg-unique-sold={avg_progress:.1f}/{max_total_collectibles or len(known_items)} "
+        f"best-seed={('-' if max_seed is None or max_seed.gus_items_sold_count <= 0 else f's{max_seed.seed}={max_seed.gus_items_sold_count}/{max_seed.gus_total_collectibles or max_total_collectibles}')}",
+        f"progress gates 1+={sum(1 for result in results if result.gus_items_sold_count >= 1)}/{total} "
+        f"5+={sum(1 for result in results if result.gus_items_sold_count >= 5)}/{total} "
+        f"10+={sum(1 for result in results if result.gus_items_sold_count >= 10)}/{total} "
+        f"25+={sum(1 for result in results if result.gus_items_sold_count >= 25)}/{total} "
+        f"full={sum(1 for result in results if (result.gus_total_collectibles or max_total_collectibles) > 0 and result.gus_items_sold_count >= (result.gus_total_collectibles or max_total_collectibles))}/{total}",
     ]
-    for item_name, count in pawn_counter.most_common(12):
-        lines.append(f"{item_name:<26} {count:>4}")
+    lines.extend(_build_text_table(
+        [("item", "item"), ("runs", "sold-runs"), ("pct", "sold%")],
+        rows,
+        {"runs": "right", "pct": "right"},
+    ))
     lines.append("")
     return lines
 
@@ -1409,25 +2139,64 @@ def _event_economy_lines(results: list[RunResult]) -> list[str]:
 
 
 def _storyline_audit_lines(results: list[RunResult]) -> list[str]:
+    total = len(results)
+    known_storylines = list(_known_storyline_universe())
+    observed_storylines = sorted(
+        {
+            *{name for result in results for name in result.active_storylines},
+            *{name for result in results for name in result.completed_storylines},
+            *{name for result in results for name in result.failed_storylines},
+        },
+        key=str.casefold,
+    )
+    if not known_storylines:
+        known_storylines = observed_storylines
+    else:
+        extras = [name for name in observed_storylines if name not in known_storylines]
+        known_storylines.extend(extras)
+
     active_counter = Counter(name for result in results for name in result.active_storylines)
     completed_counter = Counter(name for result in results for name in result.completed_storylines)
     failed_counter = Counter(name for result in results for name in result.failed_storylines)
 
-    if not active_counter and not completed_counter and not failed_counter:
+    if not known_storylines and not active_counter and not completed_counter and not failed_counter:
         return []
 
-    def render(counter: Counter[str]) -> str:
-        if not counter:
-            return "none"
-        return " | ".join(f"{name}={count}" for name, count in counter.most_common(6))
+    rows = []
+    for name in known_storylines:
+        active = active_counter.get(name, 0)
+        completed = completed_counter.get(name, 0)
+        failed = failed_counter.get(name, 0)
+        touched = sum(
+            1
+            for result in results
+            if name in result.active_storylines or name in result.completed_storylines or name in result.failed_storylines
+        )
+        rows.append({
+            "storyline": name,
+            "any": f"{touched}/{total}",
+            "completed": f"{completed}/{total}",
+            "failed": f"{failed}/{total}",
+            "active": f"{active}/{total}",
+        })
 
-    return [
-        "Storyline Audit",
-        f"completed  {render(completed_counter)}",
-        f"failed     {render(failed_counter)}",
-        f"active-end {render(active_counter)}",
-        "",
+    lines = [
+        f"Storyline Audit touched-any={sum(1 for result in results if result.active_storylines or result.completed_storylines or result.failed_storylines)}/{total} "
+        f"completed-any={sum(1 for result in results if result.completed_storylines)}/{total} failed-any={sum(1 for result in results if result.failed_storylines)}/{total}"
     ]
+    lines.extend(_build_text_table(
+        [
+            ("storyline", "storyline"),
+            ("any", "any-state"),
+            ("completed", "completed"),
+            ("failed", "failed"),
+            ("active", "active-end"),
+        ],
+        rows,
+        {"any": "right", "completed": "right", "failed": "right", "active": "right"},
+    ))
+    lines.append("")
+    return lines
 
 
 def _no_car_review_lines(results: list[RunResult]) -> list[str]:
@@ -1622,15 +2391,73 @@ def _event_polarity_lines(results: list[RunResult]) -> list[str]:
 
 
 def _item_impact_lines(results: list[RunResult]) -> list[str]:
-    aggregate: dict[str, dict[str, int]] = {}
+    aggregate: dict[str, dict[str, int]] = {
+        item_name: {
+            "got": 0,
+            "got_runs": 0,
+            "used": 0,
+            "broken": 0,
+            "fixed": 0,
+            "hits": 0,
+            "positive": 0,
+            "negative": 0,
+            "neutral": 0,
+            "cash": 0,
+            "health": 0,
+            "sanity": 0,
+        }
+        for item_name in _known_item_universe()
+    }
     for result in results:
         for item_name, stats in result.item_impacts.items():
             entry = aggregate.setdefault(
                 item_name,
-                {"hits": 0, "positive": 0, "negative": 0, "neutral": 0, "cash": 0, "health": 0, "sanity": 0},
+                {
+                    "got": 0,
+                    "got_runs": 0,
+                    "used": 0,
+                    "broken": 0,
+                    "fixed": 0,
+                    "hits": 0,
+                    "positive": 0,
+                    "negative": 0,
+                    "neutral": 0,
+                    "cash": 0,
+                    "health": 0,
+                    "sanity": 0,
+                },
             )
-            for key in entry:
+            for key in ["hits", "positive", "negative", "neutral", "cash", "health", "sanity"]:
                 entry[key] += int(stats.get(key, 0))
+
+        for item_name, history in result.item_provenance.items():
+            entry = aggregate.setdefault(
+                item_name,
+                {
+                    "got": 0,
+                    "got_runs": 0,
+                    "used": 0,
+                    "broken": 0,
+                    "fixed": 0,
+                    "hits": 0,
+                    "positive": 0,
+                    "negative": 0,
+                    "neutral": 0,
+                    "cash": 0,
+                    "health": 0,
+                    "sanity": 0,
+                },
+            )
+            acquired = history.get("acquired", [])
+            used = history.get("used", [])
+            broken = history.get("broken", [])
+            fixed = history.get("fixed", [])
+            entry["got"] += len(acquired)
+            entry["used"] += len(used)
+            entry["broken"] += len(broken)
+            entry["fixed"] += len(fixed)
+            if acquired:
+                entry["got_runs"] += 1
 
     if not aggregate:
         return []
@@ -1639,6 +2466,7 @@ def _item_impact_lines(results: list[RunResult]) -> list[str]:
     ranked = sorted(
         aggregate.items(),
         key=lambda item: (
+            item[1]["got"],
             item[1]["positive"] - item[1]["negative"],
             item[1]["hits"],
             item[1]["cash"],
@@ -1646,9 +2474,15 @@ def _item_impact_lines(results: list[RunResult]) -> list[str]:
         ),
         reverse=True,
     )
-    for item_name, stats in ranked[:15]:
+    total = len(results)
+    for item_name, stats in ranked:
         rows.append({
             "item": item_name,
+            "got": str(stats["got"]),
+            "runs": f"{stats['got_runs']}/{total}",
+            "used": str(stats["used"]),
+            "brk": str(stats["broken"]),
+            "fix": str(stats["fixed"]),
             "hits": str(stats["hits"]),
             "pos": str(stats["positive"]),
             "neg": str(stats["negative"]),
@@ -1658,10 +2492,15 @@ def _item_impact_lines(results: list[RunResult]) -> list[str]:
             "san": str(stats["sanity"]),
         })
 
-    lines = ["Item Impact"]
+    lines = ["Item Acquisition & Impact"]
     lines.extend(_build_text_table(
         [
             ("item", "item"),
+            ("got", "got"),
+            ("runs", "runs"),
+            ("used", "used"),
+            ("brk", "brk"),
+            ("fix", "fix"),
             ("hits", "hits"),
             ("pos", "pos"),
             ("neg", "neg"),
@@ -1671,7 +2510,538 @@ def _item_impact_lines(results: list[RunResult]) -> list[str]:
             ("san", "san"),
         ],
         rows,
-        {"hits": "right", "pos": "right", "neg": "right", "neu": "right", "cash": "right", "hp": "right", "san": "right"},
+        {
+            "got": "right",
+            "runs": "right",
+            "used": "right",
+            "brk": "right",
+            "fix": "right",
+            "hits": "right",
+            "pos": "right",
+            "neg": "right",
+            "neu": "right",
+            "cash": "right",
+            "hp": "right",
+            "san": "right",
+        },
+    ))
+    lines.append("")
+    return lines
+
+
+def _collect_medical_provider_summary(results: list[RunResult], event_label: str) -> dict[str, object]:
+    location_event = f"location:{event_label}"
+    visit_rows: list[dict[str, str]] = []
+    healed_counts: Counter[str] = Counter()
+    healed_runs: defaultdict[str, set[int]] = defaultdict(set)
+    summary: dict[str, object] = {
+        "visit_runs": set(),
+        "heal_runs": set(),
+        "fail_runs": set(),
+        "visits": 0,
+        "heal_visits": 0,
+        "fail_visits": 0,
+        "cash_delta": 0,
+        "health_delta": 0,
+        "sanity_delta": 0,
+        "healed_counts": healed_counts,
+        "healed_runs": healed_runs,
+        "visit_rows": visit_rows,
+    }
+
+    for result in results:
+        run_visits = 0
+        run_heals = 0
+        run_fails = 0
+        for record in result.cycle_records:
+            if location_event not in record.events:
+                continue
+            run_visits += 1
+            summary["visits"] += 1
+            summary["cash_delta"] += record.cash_delta
+            summary["health_delta"] += record.health_delta
+            summary["sanity_delta"] += record.sanity_delta
+            cast(set[int], summary["visit_runs"]).add(result.seed)
+
+            healed_conditions = list(record.statuses_removed) + list(record.injuries_removed)
+            restorative_visit = bool(
+                healed_conditions
+                or record.health_delta > 0
+                or record.sanity_delta > 0
+            )
+            if restorative_visit:
+                run_heals += 1
+                summary["heal_visits"] += 1
+                cast(set[int], summary["heal_runs"]).add(result.seed)
+                for condition in healed_conditions:
+                    healed_counts[condition] += 1
+                    healed_runs[condition].add(result.seed)
+            else:
+                run_fails += 1
+                summary["fail_visits"] += 1
+                cast(set[int], summary["fail_runs"]).add(result.seed)
+
+        if run_visits:
+            visit_rows.append({
+                "seed": str(result.seed),
+                "visits": str(run_visits),
+                "heals": str(run_heals),
+                "fails": str(run_fails),
+                "outcome": result.outcome,
+                "day": str(result.day if result.day is not None else "-"),
+                "rank": str(result.rank if result.rank is not None else "-"),
+                "end$": _format_int(result.balance),
+                "hp": str(result.health if result.health is not None else "-"),
+                "san": str(result.sanity if result.sanity is not None else "-"),
+                "conds": str(len(result.statuses) + len(result.injuries)),
+                "cause": _truncate_text(result.death_cause or result.result_note or "-", 36),
+            })
+
+    visit_rows.sort(
+        key=lambda row: (
+            -int(row["visits"]),
+            -int(row["heals"]),
+            -int(row["fails"]),
+            int(row["seed"]),
+        )
+    )
+    return summary
+
+
+def _medical_provider_lines(results: list[RunResult], title: str, event_label: str) -> list[str]:
+    provider = _collect_medical_provider_summary(results, event_label)
+    visits = int(provider["visits"])
+    if visits <= 0:
+        return [title, "none", ""]
+
+    visit_runs = len(cast(set[int], provider["visit_runs"]))
+    heal_runs = len(cast(set[int], provider["heal_runs"]))
+    fail_runs = len(cast(set[int], provider["fail_runs"]))
+    visit_rows = cast(list[dict[str, str]], provider["visit_rows"])
+    healed_counts = cast(Counter[str], provider["healed_counts"])
+    healed_runs = cast(defaultdict[str, set[int]], provider["healed_runs"])
+
+    lines = [
+        (
+            f"{title} runs={visit_runs}/{len(results)} total-visits={visits} "
+            f"heal-visits={provider['heal_visits']} fail-visits={provider['fail_visits']} "
+            f"cash={_format_int(int(provider['cash_delta']))} "
+            f"avg-cash={_format_average(int(provider['cash_delta']), visits, money=True)} "
+            f"hp={int(provider['health_delta']):+} san={int(provider['sanity_delta']):+} "
+            f"heal-runs={heal_runs} fail-runs={fail_runs}"
+        )
+    ]
+    lines.extend(_build_text_table(
+        [
+            ("seed", "seed"),
+            ("visits", "visits"),
+            ("heals", "heals"),
+            ("fails", "fails"),
+            ("outcome", "outcome"),
+            ("day", "end-day"),
+            ("rank", "rank"),
+            ("end$", "end$"),
+            ("hp", "hp"),
+            ("san", "san"),
+            ("conds", "end-cond"),
+            ("cause", "cause"),
+        ],
+        visit_rows,
+        {
+            "seed": "right",
+            "visits": "right",
+            "heals": "right",
+            "fails": "right",
+            "day": "right",
+            "rank": "right",
+            "end$": "right",
+            "hp": "right",
+            "san": "right",
+            "conds": "right",
+        },
+    ))
+
+    if healed_counts:
+        heal_rows = []
+        for condition, count in healed_counts.most_common():
+            heal_rows.append({
+                "condition": condition,
+                "heals": str(count),
+                "runs": f"{len(healed_runs[condition])}/{len(results)}",
+            })
+        lines.append(f"{title} Heals")
+        lines.extend(_build_text_table(
+            [("condition", "condition"), ("heals", "heals"), ("runs", "runs")],
+            heal_rows,
+            {"heals": "right", "runs": "right"},
+        ))
+
+    fail_rows = [row for row in visit_rows if int(row["fails"]) > 0]
+    if fail_rows:
+        lines.append(f"{title} Fails")
+        lines.extend(_build_text_table(
+            [
+                ("seed", "seed"),
+                ("visits", "visits"),
+                ("fails", "fails"),
+                ("outcome", "outcome"),
+                ("day", "end-day"),
+                ("end$", "end$"),
+                ("conds", "end-cond"),
+                ("cause", "cause"),
+            ],
+            fail_rows,
+            {"seed": "right", "visits": "right", "fails": "right", "day": "right", "end$": "right", "conds": "right"},
+        ))
+
+    lines.append("")
+    return lines
+
+
+def _condition_universe_lines(
+    results: list[RunResult],
+    *,
+    title: str,
+    universe: tuple[str, ...],
+    final_attr: str,
+    added_attr: str,
+    removed_attr: str,
+    doctor_summary: dict[str, object],
+    witch_summary: dict[str, object],
+) -> list[str]:
+    aggregate: dict[str, dict[str, int]] = {}
+    doctor_heals = cast(Counter[str], doctor_summary["healed_counts"])
+    witch_heals = cast(Counter[str], witch_summary["healed_counts"])
+
+    def ensure_entry(name: str) -> dict[str, int]:
+        return aggregate.setdefault(name, {
+            "seen": 0,
+            "seen_runs": 0,
+            "gone": 0,
+            "gone_runs": 0,
+            "end": 0,
+            "died_end": 0,
+            "doctor": 0,
+            "witch": 0,
+        })
+
+    for name in universe:
+        ensure_entry(name)
+
+    for result in results:
+        seen_this_run: set[str] = set()
+        removed_this_run: set[str] = set()
+        final_conditions = set(getattr(result, final_attr))
+
+        for record in result.cycle_records:
+            for name in getattr(record, added_attr):
+                entry = ensure_entry(name)
+                entry["seen"] += 1
+                seen_this_run.add(name)
+            for name in getattr(record, removed_attr):
+                entry = ensure_entry(name)
+                entry["gone"] += 1
+                removed_this_run.add(name)
+
+        for name in seen_this_run:
+            ensure_entry(name)["seen_runs"] += 1
+        for name in removed_this_run:
+            ensure_entry(name)["gone_runs"] += 1
+        for name in final_conditions:
+            entry = ensure_entry(name)
+            entry["end"] += 1
+            if result.outcome == "died":
+                entry["died_end"] += 1
+
+    for name, count in doctor_heals.items():
+        ensure_entry(name)["doctor"] = count
+    for name, count in witch_heals.items():
+        ensure_entry(name)["witch"] = count
+
+    if not aggregate:
+        return []
+
+    rows = []
+    total = len(results)
+    for name, stats in sorted(
+        aggregate.items(),
+        key=lambda item: (
+            item[1]["end"],
+            item[1]["seen_runs"],
+            item[1]["gone_runs"],
+            item[1]["doctor"] + item[1]["witch"],
+            item[0].casefold(),
+        ),
+        reverse=True,
+    ):
+        seen_runs = stats["seen_runs"]
+        baseline_runs = max(seen_runs, stats["end"], stats["gone_runs"])
+        rows.append({
+            "name": name,
+            "seen": str(stats["seen"]),
+            "runs": f"{seen_runs}/{total}",
+            "gone": str(stats["gone"]),
+            "gone_runs": f"{stats['gone_runs']}/{total}",
+            "end": f"{stats['end']}/{total}",
+            "removed_share": "-" if baseline_runs <= 0 else f"{(stats['gone_runs'] / baseline_runs) * 100:.0f}%",
+            "end_share": "-" if baseline_runs <= 0 else f"{(stats['end'] / baseline_runs) * 100:.0f}%",
+            "died": str(stats["died_end"]),
+            "doctor": str(stats["doctor"]),
+            "witch": str(stats["witch"]),
+        })
+
+    lines = [title]
+    lines.append("tracker note: add/remove counts are cycle-diff based; same-cycle cures may not appear in seen/removed totals, but end-of-run conditions are final-state accurate")
+    lines.extend(_build_text_table(
+        [
+            ("name", "name"),
+            ("seen", "seen"),
+            ("runs", "seen-runs"),
+            ("gone", "removed"),
+            ("gone_runs", "removed-runs"),
+            ("end", "end-runs"),
+            ("removed_share", "removed%"),
+            ("end_share", "still-end%"),
+            ("died", "died-end"),
+            ("doctor", "doctor-heals"),
+            ("witch", "witch-heals"),
+        ],
+        rows,
+        {
+            "seen": "right",
+            "runs": "right",
+            "gone": "right",
+            "gone_runs": "right",
+            "end": "right",
+            "removed_share": "right",
+            "end_share": "right",
+            "died": "right",
+            "doctor": "right",
+            "witch": "right",
+        },
+    ))
+    lines.append("")
+    return lines
+
+
+def _dealings_lines(
+    results: list[RunResult],
+    *,
+    title: str,
+    source_prefixes: tuple[str, ...],
+    out_label: str,
+) -> list[str]:
+    aggregate: dict[str, dict[str, int]] = {}
+    total = len(results)
+    for result in results:
+        touched_runs: defaultdict[str, set[str]] = defaultdict(set)
+        for item_name, history in result.item_provenance.items():
+            entry = aggregate.setdefault(
+                item_name,
+                {"in": 0, "out": 0, "used": 0, "brk": 0, "fix": 0, "rep": 0, "runs": 0},
+            )
+            matches = {
+                "in": _history_entries_for_sources(history.get("acquired", []), source_prefixes),
+                "out": _history_entries_for_sources(history.get("removed", []), source_prefixes),
+                "used": _history_entries_for_sources(history.get("used", []), source_prefixes),
+                "brk": _history_entries_for_sources(history.get("broken", []), source_prefixes),
+                "fix": _history_entries_for_sources(history.get("fixed", []), source_prefixes),
+                "rep": _history_entries_for_sources(history.get("repairing", []), source_prefixes),
+            }
+            touched = False
+            for key, entries in matches.items():
+                if entries:
+                    entry[key] += len(entries)
+                    touched_runs[item_name].add(key)
+                    touched = True
+            if touched:
+                entry["runs"] += 1
+
+    if not aggregate:
+        return [title, "none", ""]
+
+    rows = []
+    for item_name, stats in sorted(
+        aggregate.items(),
+        key=lambda item: (
+            item[1]["in"] + item[1]["out"] + item[1]["used"],
+            item[1]["runs"],
+            item[0].casefold(),
+        ),
+        reverse=True,
+    ):
+        if not any(stats.values()):
+            continue
+        rows.append({
+            "item": item_name,
+            "in": str(stats["in"]),
+            "runs": f"{stats['runs']}/{total}",
+            "out": str(stats["out"]),
+            "used": str(stats["used"]),
+            "brk": str(stats["brk"]),
+            "fix": str(stats["fix"]),
+            "rep": str(stats["rep"]),
+        })
+
+    if not rows:
+        return [title, "none", ""]
+
+    lines = [title]
+    lines.extend(_build_text_table(
+        [
+            ("item", "item"),
+            ("in", "acquired"),
+            ("runs", "runs"),
+            ("out", out_label),
+            ("used", "used"),
+            ("brk", "brk"),
+            ("fix", "fix"),
+            ("rep", "repair"),
+        ],
+        rows,
+        {"in": "right", "runs": "right", "out": "right", "used": "right", "brk": "right", "fix": "right", "rep": "right"},
+    ))
+    lines.append("")
+    return lines
+
+
+def _adventure_lines(results: list[RunResult]) -> list[str]:
+    if not results:
+        return ["Adventures", "none", ""]
+
+    rows = []
+    loot_lines = []
+    total = len(results)
+    for display_name, event_label in ADVENTURE_ROWS:
+        location_key = f"location:{event_label}"
+        visit_runs = sum(1 for result in results if result.location_hits.get(event_label, 0) > 0)
+        total_visits = sum(result.location_hits.get(event_label, 0) for result in results)
+
+        item_counter: Counter[str] = Counter()
+        status_added = 0
+        status_removed = 0
+        injuries_added = 0
+        injuries_removed = 0
+        item_runs = 0
+        for result in results:
+            run_got_item = False
+            for item_name, history in result.item_provenance.items():
+                acquired = _history_entries_for_sources(history.get("acquired", []), (location_key,))
+                if acquired:
+                    item_counter[item_name] += len(acquired)
+                    run_got_item = True
+            if run_got_item:
+                item_runs += 1
+            for record in result.cycle_records:
+                if location_key not in record.events:
+                    continue
+                status_added += len(record.statuses_added)
+                status_removed += len(record.statuses_removed)
+                injuries_added += len(record.injuries_added)
+                injuries_removed += len(record.injuries_removed)
+
+        rows.append({
+            "area": display_name,
+            "runs": f"{visit_runs}/{total}",
+            "visits": str(total_visits),
+            "item_gets": str(sum(item_counter.values())),
+            "item_runs": f"{item_runs}/{total}",
+            "status+": str(status_added),
+            "status-": str(status_removed),
+            "inj+": str(injuries_added),
+            "inj-": str(injuries_removed),
+        })
+        if item_counter:
+            loot_lines.append(
+                f"{display_name.lower()} loot " + " | ".join(
+                    f"{item_name}={count}" for item_name, count in item_counter.most_common(6)
+                )
+            )
+
+    lines = ["Adventures"]
+    lines.extend(_build_text_table(
+        [
+            ("area", "area"),
+            ("runs", "runs"),
+            ("visits", "visits"),
+            ("item_gets", "item-gets"),
+            ("item_runs", "item-runs"),
+            ("status+", "status+"),
+            ("status-", "status-"),
+            ("inj+", "inj+"),
+            ("inj-", "inj-"),
+        ],
+        rows,
+        {"runs": "right", "visits": "right", "item_gets": "right", "item_runs": "right", "status+": "right", "status-": "right", "inj+": "right", "inj-": "right"},
+    ))
+    lines.extend(loot_lines)
+    lines.append("")
+    return lines
+
+
+def _run_sorted_lines(title: str, ordered: list[RunResult], primary_label: str, primary_key: str, limit: int = 10) -> list[str]:
+    if not ordered:
+        return []
+
+    rows = []
+    for result in ordered[:limit]:
+        peak_value = result.peak_balance or result.balance or 0
+        peak_day = result.peak_balance_days[0] if result.peak_balance_days else result.day or 0
+        route = result.top_adventure if result.top_adventure != "none" else result.top_location
+        detail = result.death_tag if result.outcome == "died" else _truncate_text(result.result_note or route or "-", 28)
+        if primary_key == "day":
+            primary_value = str(result.day or 0)
+        elif primary_key == "end_balance":
+            primary_value = _format_int(result.balance)
+        else:
+            primary_value = _format_int(peak_value)
+        rows.append({
+            primary_key: primary_value,
+            "seed": str(result.seed),
+            "outcome": result.display_outcome,
+            "rank": str(result.rank if result.rank is not None else "-"),
+            "peak": _format_int(peak_value),
+            "peak_day": str(peak_day),
+            "day": str(result.day if result.day is not None else "-"),
+            "end_balance": _format_int(result.balance),
+            "hp": str(result.health if result.health is not None else "-"),
+            "san": str(result.sanity if result.sanity is not None else "-"),
+            "route": _truncate_text(route or "none", 22),
+            "detail": detail,
+        })
+
+    headers = [(primary_key, primary_label)]
+    if primary_key != "day":
+        headers.append(("day", "day"))
+    if primary_key != "peak":
+        headers.append(("peak", "peak$"))
+    headers.append(("peak_day", "peak-day"))
+    if primary_key != "end_balance":
+        headers.append(("end_balance", "end$"))
+    headers.extend([
+        ("seed", "seed"),
+        ("outcome", "outcome"),
+        ("rank", "rank"),
+        ("hp", "hp"),
+        ("san", "san"),
+        ("route", "route"),
+        ("detail", "detail"),
+    ])
+
+    lines = [title]
+    lines.extend(_build_text_table(
+        headers,
+        rows,
+        {
+            "day": "right",
+            "peak": "right",
+            "peak_day": "right",
+            "end_balance": "right",
+            "seed": "right",
+            "rank": "right",
+            "hp": "right",
+            "san": "right",
+        },
     ))
     lines.append("")
     return lines
@@ -1706,20 +3076,25 @@ def _marvin_provenance_lines(results: list[RunResult]) -> list[str]:
             if history.get("fixed"):
                 entry["fixed_runs"] += 1
 
-    if not aggregate:
-        return ["Marvin Provenance", "none", ""]
-
     def average(values: list[int]) -> str:
         if not values:
             return "-"
         return str(round(sum(values) / len(values)))
 
     rows = []
-    for item_name, stats in sorted(
-        aggregate.items(),
-        key=lambda item: (item[1]["bought_runs"], item[1]["used_runs"], item[0]),
-        reverse=True,
-    )[:12]:
+    for item_name in MARVIN_ITEM_ORDER:
+        stats = cast(dict[str, object], aggregate.get(
+            item_name,
+            {
+                "bought_runs": 0,
+                "used_runs": 0,
+                "broken_runs": 0,
+                "fixed_runs": 0,
+                "buy_days": [],
+                "use_days": [],
+                "use_sources": Counter(),
+            },
+        ))
         rows.append({
             "item": item_name,
             "bought": f"{stats['bought_runs']}/{total}",
@@ -1880,21 +3255,27 @@ def _death_rank_audit_lines(results: list[RunResult]) -> list[str]:
     return lines
 
 
-def _death_sorted_lines(results: list[RunResult], title: str, ordered: list[RunResult], primary_label: str, primary_key: str) -> list[str]:
+def _death_sorted_lines(results: list[RunResult], title: str, ordered: list[RunResult], primary_label: str, primary_key: str, limit: int = 10) -> list[str]:
     if not ordered:
         return []
 
     rows = []
-    for result in ordered:
+    for result in ordered[:limit]:
         cause = result.death_cause or "Unknown"
         if len(cause) > 42:
             cause = cause[:39] + "..."
+        peak_value = result.peak_balance or result.balance or 0
+        peak_day = result.peak_balance_days[0] if result.peak_balance_days else result.day or 0
+        end_balance = result.balance or 0
         rows.append({
-            primary_key: _format_int(result.peak_balance or result.balance) if primary_key == "peak" else str(result.day or 0),
+            primary_key: _format_int(peak_value) if primary_key == "peak" else str(result.day or 0),
             "seed": str(result.seed),
             "rank": str(result.rank if result.rank is not None else "-"),
-            "peak": _format_int(result.peak_balance or result.balance),
+            "peak": _format_int(peak_value),
+            "peak_day": str(peak_day),
             "day": str(result.day if result.day is not None else "-"),
+            "end_balance": _format_int(end_balance),
+            "drop": _format_int(max(0, peak_value - end_balance)),
             "tag": result.death_tag,
             "cause": cause,
         })
@@ -1906,6 +3287,11 @@ def _death_sorted_lines(results: list[RunResult], title: str, ordered: list[RunR
     if primary_key != "peak":
         headers.append(("peak", "peak$"))
     headers.extend([
+        ("peak_day", "peak-day"),
+        ("end_balance", "end$"),
+        ("drop", "drop$"),
+    ])
+    headers.extend([
         ("seed", "seed"),
         ("rank", "rank"),
         ("tag", "tag"),
@@ -1914,7 +3300,15 @@ def _death_sorted_lines(results: list[RunResult], title: str, ordered: list[RunR
     lines.extend(_build_text_table(
         headers,
         rows,
-        {"seed": "right", "rank": "right", "day": "right", "peak": "right"},
+        {
+            "seed": "right",
+            "rank": "right",
+            "day": "right",
+            "peak": "right",
+            "peak_day": "right",
+            "end_balance": "right",
+            "drop": "right",
+        },
     ))
     lines.append("")
     return lines
@@ -2038,7 +3432,7 @@ def _injury_illness_distribution_lines(results: list[RunResult]) -> list[str]:
     def _stat(result: RunResult, key: str) -> int:
         return result.game_statistics.get(key, 0)
 
-    alive_results = [r for r in results if r.alive]
+    survived_results = [r for r in results if r.survived_run]
     dead_results = [r for r in results if r.outcome == "died"]
     broke_results = [r for r in results if r.outcome == "broke"]
 
@@ -2065,7 +3459,7 @@ def _injury_illness_distribution_lines(results: list[RunResult]) -> list[str]:
 
     rows = [
         cohort_row("all", results),
-        cohort_row("alive", alive_results),
+        cohort_row("survived", survived_results),
         cohort_row("died", dead_results),
         cohort_row("broke", broke_results),
     ]
@@ -2087,27 +3481,32 @@ def _injury_illness_distribution_lines(results: list[RunResult]) -> list[str]:
          "avg_inj_end": "right", "avg_ill_end": "right", "max_inj": "right", "max_ill": "right"},
     ))
 
-    # Seed-level breakdown: seeds with most injuries/illnesses
-    sorted_by_inj = sorted(results, key=lambda r: _stat(r, "injuries_sustained"), reverse=True)[:6]
-    sorted_by_ill = sorted(results, key=lambda r: _stat(r, "illnesses_contracted"), reverse=True)[:6]
-    lines.append("most injuries: " + " | ".join(
-        f"s{r.seed}={_stat(r,'injuries_sustained')}(end:{len(r.injuries)})" for r in sorted_by_inj
-    ))
-    lines.append("most illnesses: " + " | ".join(
-        f"s{r.seed}={_stat(r,'illnesses_contracted')}(end:{len(r.statuses)})" for r in sorted_by_ill
-    ))
-    # Least non-zero
-    nonzero_inj = [r for r in results if _stat(r, "injuries_sustained") > 0]
-    nonzero_ill = [r for r in results if _stat(r, "illnesses_contracted") > 0]
-    if nonzero_inj:
-        least_inj = sorted(nonzero_inj, key=lambda r: _stat(r, "injuries_sustained"))[:4]
-        lines.append("least injuries (excl 0): " + " | ".join(
-            f"s{r.seed}={_stat(r,'injuries_sustained')}" for r in least_inj
+    # Seed-level breakdown: keep zero-count seeds visible for auditability.
+    sorted_by_inj = sorted(
+        results,
+        key=lambda r: (_stat(r, "injuries_sustained"), len(r.injuries), r.seed),
+        reverse=True,
+    )
+    sorted_by_ill = sorted(
+        results,
+        key=lambda r: (_stat(r, "illnesses_contracted"), len(r.statuses), r.seed),
+        reverse=True,
+    )
+    lines.append("most injuries: " + (" | ".join(
+        f"s{r.seed}={_stat(r,'injuries_sustained')}(end:{len(r.injuries)})" for r in sorted_by_inj[:10]
+    ) if sorted_by_inj else "none"))
+    lines.append("most illnesses: " + (" | ".join(
+        f"s{r.seed}={_stat(r,'illnesses_contracted')}(end:{len(r.statuses)})" for r in sorted_by_ill[:10]
+    ) if sorted_by_ill else "none"))
+    least_inj = sorted(results, key=lambda r: (_stat(r, "injuries_sustained"), len(r.injuries), r.seed))
+    least_ill = sorted(results, key=lambda r: (_stat(r, "illnesses_contracted"), len(r.statuses), r.seed))
+    if least_inj:
+        lines.append("least injuries (incl 0): " + " | ".join(
+            f"s{r.seed}={_stat(r,'injuries_sustained')}(end:{len(r.injuries)})" for r in least_inj[:10]
         ))
-    if nonzero_ill:
-        least_ill = sorted(nonzero_ill, key=lambda r: _stat(r, "illnesses_contracted"))[:4]
-        lines.append("least illnesses (excl 0): " + " | ".join(
-            f"s{r.seed}={_stat(r,'illnesses_contracted')}" for r in least_ill
+    if least_ill:
+        lines.append("least illnesses (incl 0): " + " | ".join(
+            f"s{r.seed}={_stat(r,'illnesses_contracted')}(end:{len(r.statuses)})" for r in least_ill[:10]
         ))
     lines.append("")
     return lines
@@ -2155,6 +3554,235 @@ def _companion_roster_lines(results: list[RunResult]) -> list[str]:
     return lines
 
 
+def _companion_state_lines(results: list[RunResult]) -> list[str]:
+    if not results:
+        return []
+
+    total = len(results)
+    known_companions = list(_known_companion_universe())
+    observed_companions = sorted(
+        {name for result in results for name in result.companion_details.keys()},
+        key=str.casefold,
+    )
+    if not known_companions:
+        known_companions = observed_companions
+    else:
+        extras = [name for name in observed_companions if name not in known_companions]
+        known_companions.extend(extras)
+
+    runs_with_any = sum(1 for result in results if result.companion_details)
+    runs_with_bonded = sum(
+        1 for result in results if any(bool(data.get("bonded")) for data in result.companion_details.values())
+    )
+    runs_with_lost = sum(
+        1 for result in results if any(str(data.get("status", "")) == "lost" for data in result.companion_details.values())
+    )
+    runs_with_dead = sum(
+        1 for result in results if any(str(data.get("status", "")) == "dead" for data in result.companion_details.values())
+    )
+
+    rows = []
+    for name in known_companions:
+        seen = 0
+        alive = 0
+        lost = 0
+        dead = 0
+        bonded = 0
+        happiness_total = 0
+        max_days = 0
+        companion_type = "-"
+        for result in results:
+            data = result.companion_details.get(name)
+            if not data:
+                continue
+            seen += 1
+            status = str(data.get("status", "unknown"))
+            companion_type = str(data.get("type", companion_type))
+            if status == "alive":
+                alive += 1
+            elif status == "lost":
+                lost += 1
+            elif status == "dead":
+                dead += 1
+            if bool(data.get("bonded")):
+                bonded += 1
+            happiness_total += int(data.get("happiness", 0) or 0)
+            max_days = max(max_days, int(data.get("days_owned", 0) or 0))
+        rows.append({
+            "companion": name,
+            "type": companion_type,
+            "seen": f"{seen}/{total}",
+            "alive": str(alive),
+            "lost": str(lost),
+            "dead": str(dead),
+            "bonded": str(bonded),
+            "avg_happy": "-" if seen == 0 else f"{happiness_total / seen:.1f}",
+            "max_days": str(max_days),
+        })
+
+    lines = [
+        f"Companion State Coverage runs-with-any={runs_with_any}/{total} bonded-runs={runs_with_bonded}/{total} "
+        f"lost-runs={runs_with_lost}/{total} dead-runs={runs_with_dead}/{total}"
+    ]
+    lines.extend(_build_text_table(
+        [
+            ("companion", "companion"),
+            ("type", "type"),
+            ("seen", "seen"),
+            ("alive", "alive"),
+            ("lost", "lost"),
+            ("dead", "dead"),
+            ("bonded", "bonded"),
+            ("avg_happy", "avg-happy"),
+            ("max_days", "max-days"),
+        ],
+        rows,
+        {"seen": "right", "alive": "right", "lost": "right", "dead": "right", "bonded": "right", "avg_happy": "right", "max_days": "right"},
+    ))
+    lines.append("")
+    return lines
+
+
+def _dealer_gift_lines(results: list[RunResult]) -> list[str]:
+    if not results:
+        return []
+
+    total = len(results)
+    deliveries = [entry for result in results for entry in result.gift_deliveries]
+    free_hands = [entry for result in results for entry in result.dealer_free_hands]
+    unlocked_runs = sum(1 for result in results if result.gift_system_unlocked)
+    delivery_runs = sum(1 for result in results if result.gift_deliveries)
+    free_hand_runs = sum(1 for result in results if result.dealer_free_hands)
+
+    lines = [
+        f"Dealer Happiness & Gifts unlocked={unlocked_runs}/{total} gift-runs={delivery_runs}/{total} "
+        f"deliveries={len(deliveries)} free-hand-runs={free_hand_runs}/{total} free-hands={len(free_hands)}"
+    ]
+
+    gift_rows = []
+    gift_counter: Counter[str] = Counter()
+    gift_kills: Counter[str] = Counter()
+    gift_delta_sum: Counter[str] = Counter()
+    gift_runs_by_item: dict[str, set[int]] = defaultdict(set)
+    for result in results:
+        for entry in result.gift_deliveries:
+            item = str(entry.get("item", "") or "unknown")
+            gift_counter[item] += 1
+            gift_runs_by_item[item].add(result.seed)
+            delta = entry.get("happiness_change")
+            if isinstance(delta, int):
+                gift_delta_sum[item] += delta
+            if not bool(entry.get("alive_after", True)):
+                gift_kills[item] += 1
+
+    for item_name in sorted(gift_counter.keys(), key=lambda name: (-gift_counter[name], name.casefold())):
+        count = gift_counter[item_name]
+        gift_rows.append({
+            "item": item_name,
+            "hits": str(count),
+            "runs": f"{len(gift_runs_by_item[item_name])}/{total}",
+            "avg_delta": f"{gift_delta_sum[item_name] / count:+.1f}",
+            "kills": str(gift_kills[item_name]),
+        })
+
+    if gift_rows:
+        lines.extend(_build_text_table(
+            [
+                ("item", "item"),
+                ("hits", "deliveries"),
+                ("runs", "runs"),
+                ("avg_delta", "avg-happy"),
+                ("kills", "kills"),
+            ],
+            gift_rows,
+            {"hits": "right", "runs": "right", "avg_delta": "right", "kills": "right"},
+        ))
+    else:
+        lines.append("no gift deliveries recorded")
+
+    if free_hands:
+        tier_counter: Counter[str] = Counter(str(entry.get("tier", "unknown")) for entry in free_hands)
+        avg_bet = sum(int(entry.get("bet", 0) or 0) for entry in free_hands) / len(free_hands)
+        max_bet = max(int(entry.get("bet", 0) or 0) for entry in free_hands)
+        lines.append(
+            "free hands " +
+            " | ".join(f"{tier}={count}" for tier, count in sorted(tier_counter.items(), key=lambda item: item[0])) +
+            f" | avg-bet=${avg_bet:,.0f} | max-bet=${max_bet:,}"
+        )
+    else:
+        lines.append("free hands none")
+    lines.append("")
+    return lines
+
+
+def _mechanic_dream_progress_lines(results: list[RunResult]) -> list[str]:
+    if not results:
+        return []
+
+    total = len(results)
+    rows = []
+    for key, label in [("tom", "Tom"), ("frank", "Frank"), ("oswald", "Oswald")]:
+        values = [int(result.mechanic_dreams.get(key, 0) or 0) for result in results]
+        rows.append({
+            "mechanic": label,
+            "any": f"{sum(1 for value in values if value >= 1)}/{total}",
+            "2+": f"{sum(1 for value in values if value >= 2)}/{total}",
+            "3+": f"{sum(1 for value in values if value >= 3)}/{total}",
+            "4+": f"{sum(1 for value in values if value >= 4)}/{total}",
+            "max": str(max(values) if values else 0),
+            "avg": f"{(sum(values) / total):.2f}",
+        })
+
+    car_mechanic_counts = Counter(
+        str(result.mechanic_dreams.get("car_mechanic", "") or "none")
+        for result in results
+    )
+    chosen_counts = Counter(
+        str(result.mechanic_dreams.get("chosen", "") or "none")
+        for result in results
+    )
+    frank_gate = sum(
+        1 for result in results
+        if int(result.mechanic_dreams.get("frank", 0) or 0) >= 4 and (result.peak_balance or result.balance or 0) >= 100000
+    )
+    final_gate = sum(
+        1 for result in results
+        if int(result.mechanic_dreams.get("tom", 0) or 0) >= 2
+        and int(result.mechanic_dreams.get("frank", 0) or 0) >= 2
+        and int(result.mechanic_dreams.get("oswald", 0) or 0) >= 2
+        and (result.peak_balance or result.balance or 0) >= 900000
+    )
+
+    lines = ["Mechanic Dream Progress"]
+    lines.extend(_build_text_table(
+        [
+            ("mechanic", "mechanic"),
+            ("any", "1+"),
+            ("2+", "2+"),
+            ("3+", "3+"),
+            ("4+", "4+"),
+            ("max", "max"),
+            ("avg", "avg"),
+        ],
+        rows,
+        {"any": "right", "2+": "right", "3+": "right", "4+": "right", "max": "right", "avg": "right"},
+    ))
+    lines.append(
+        "car mechanic " + " | ".join(
+            f"{name}={count}" for name, count in sorted(car_mechanic_counts.items(), key=lambda item: (-item[1], item[0].casefold()))
+        )
+    )
+    lines.append(
+        "millionaire chosen mechanic " + " | ".join(
+            f"{name}={count}" for name, count in sorted(chosen_counts.items(), key=lambda item: (-item[1], item[0].casefold()))
+        )
+    )
+    lines.append(f"frank dealer-dream gate {frank_gate}/{total}")
+    lines.append(f"final mechanic ending gate {final_gate}/{total}")
+    lines.append("")
+    return lines
+
+
 def _loan_distribution_lines(results: list[RunResult]) -> list[str]:
     """Show loan-taking behaviour and amounts."""
     if not results:
@@ -2166,29 +3794,38 @@ def _loan_distribution_lines(results: list[RunResult]) -> list[str]:
     total_repaid = sum(r.game_statistics.get("loans_repaid", 0) for r in results)
     total_borrowed_amt = sum(r.game_statistics.get("total_borrowed", 0) for r in results)
     total_repaid_amt = sum(r.game_statistics.get("total_repaid", 0) for r in results)
+    open_debt_runs = sum(1 for r in results if r.loan_shark_debt > 0)
+    danger_runs = sum(1 for r in results if r.loan_shark_warning_level >= 2)
+    violent_runs = sum(1 for r in results if r.loan_shark_warning_level >= 3)
+    fake_cash_runs = sum(1 for r in results if r.fraudulent_cash > 0)
 
     lines = [
         f"Loan Distribution runs-with-loans={loan_runs}/{total} "
         f"total-loans={total_loans} total-repaid={total_repaid} "
-        f"total-borrowed=${total_borrowed_amt:,} total-repaid-amt=${total_repaid_amt:,}"
+        f"total-borrowed=${total_borrowed_amt:,} total-repaid-amt=${total_repaid_amt:,}",
+        f"end-state open-debt={open_debt_runs}/{total} warning2+={danger_runs}/{total} warning3+={violent_runs}/{total} fake-cash-end={fake_cash_runs}/{total}"
     ]
 
     # Per-seed breakdown for seeds that took loans
     loan_seeds = sorted(
-        [r for r in results if r.game_statistics.get("loans_taken", 0) > 0],
-        key=lambda r: r.game_statistics.get("loans_taken", 0),
+        [
+            r for r in results
+            if r.game_statistics.get("loans_taken", 0) > 0 or r.loan_shark_debt > 0 or r.fraudulent_cash > 0 or r.visited_loan_shark
+        ],
+        key=lambda r: (r.game_statistics.get("loans_taken", 0), r.loan_shark_debt, r.fraudulent_cash, r.seed),
         reverse=True,
     )
     if loan_seeds:
-        lines.append("seed  loans  repaid  borrowed    repaid-amt  outcome   peak")
-        lines.append("----  -----  ------  ----------  ----------  --------  --------")
-        for r in loan_seeds[:12]:
+        lines.append("seed  loans  repaid  borrowed    repaid-amt  end-debt    warn  fake$      outcome   peak")
+        lines.append("----  -----  ------  ----------  ----------  ----------  ----  ---------  --------  --------")
+        for r in loan_seeds:
             n = r.game_statistics.get("loans_taken", 0)
             rep = r.game_statistics.get("loans_repaid", 0)
             bor = r.game_statistics.get("total_borrowed", 0)
             rep_amt = r.game_statistics.get("total_repaid", 0)
             lines.append(
                 f"{r.seed:>4}  {n:>5}  {rep:>6}  ${bor:>9,}  ${rep_amt:>9,}  "
+                f"${r.loan_shark_debt:>9,}  {r.loan_shark_warning_level:>4}  ${r.fraudulent_cash:>8,}  "
                 f"{r.outcome:<8}  ${r.peak_balance or r.balance or 0:>7,}"
             )
     lines.append("")
@@ -2270,13 +3907,11 @@ def _flask_and_item_breakage_lines(results: list[RunResult]) -> list[str]:
     lines.append(
         f"Flask Purchases runs-bought={runs_bought}/{total} total-purchased={total_flasks}"
     )
-    if flask_total:
-        lines.append("flask                  times-bought  runs")
-        lines.append("---------------------  ------------  ----")
-        for flask_name, count in flask_total.most_common():
-            lines.append(f"{flask_name:<23}{count:>8}  {flask_runs[flask_name]:>4}/{total}")
-    else:
-        lines.append("no flasks purchased")
+    lines.append("flask                  times-bought  runs")
+    lines.append("---------------------  ------------  ----")
+    for flask_name in WITCH_FLASK_PRIORITIES:
+        count = flask_total.get(flask_name, 0)
+        lines.append(f"{flask_name:<23}{count:>8}  {flask_runs[flask_name]:>4}/{total}")
     lines.append("")
 
     # Item breakages
@@ -2317,6 +3952,155 @@ def _flask_and_item_breakage_lines(results: list[RunResult]) -> list[str]:
     return lines
 
 
+def _system_presence_lines(results: list[RunResult]) -> list[str]:
+    if not results:
+        return []
+
+    total = len(results)
+    dealer_values = [result.dealer_happiness for result in results if result.dealer_happiness is not None]
+    dealer_avg = round(sum(dealer_values) / len(dealer_values)) if dealer_values else 0
+    dealer_low = sum(1 for value in dealer_values if value < 78)
+    gift_delivery_runs = sum(1 for result in results if result.gift_deliveries)
+    marvin_item_runs = sum(1 for result in results if result.marvin_item_provenance)
+    flask_runs = sum(1 for result in results if result.flask_purchases)
+    whistle_runs = sum(1 for result in results if "Animal Whistle" in result.inventory)
+    millionaire_visit_runs = sum(1 for result in results if result.millionaire_visited)
+    doctor_runs = sum(1 for result in results if result.visited_doctor)
+    pawn_runs = sum(1 for result in results if result.visited_pawn)
+    loan_runs = sum(1 for result in results if result.visited_loan_shark)
+    store_runs = sum(1 for result in results if result.visited_store)
+    tom_runs = sum(1 for result in results if result.visited_tom)
+    frank_runs = sum(1 for result in results if result.visited_frank)
+    oswald_runs = sum(1 for result in results if result.visited_oswald)
+    doctor_visits_total = sum(result.location_hits.get("doctor", 0) for result in results)
+    store_visits_total = sum(result.location_hits.get("shop:convenience_store", 0) for result in results)
+    pawn_visits_total = sum(result.location_hits.get("shop:pawn_shop", 0) for result in results)
+    loan_visits_total = sum(result.location_hits.get("shop:loan_shark", 0) for result in results)
+    marvin_visits_total = sum(result.location_hits.get("shop:marvin", 0) for result in results)
+    witch_visits_total = sum(result.location_hits.get("doctor:witch", 0) for result in results)
+    tom_visits_total = sum(result.location_hits.get("mechanic:tom", 0) for result in results)
+    frank_visits_total = sum(result.location_hits.get("mechanic:frank", 0) for result in results)
+    oswald_visits_total = sum(result.location_hits.get("mechanic:oswald", 0) for result in results)
+    airport_visits_total = sum(result.location_hits.get("shop:airport", 0) for result in results)
+    workbench_visits_total = sum(result.location_hits.get("shop:car_workbench", 0) for result in results)
+
+    rows = [
+        {
+            "system": "doctor",
+            "present": f"{sum(1 for result in results if result.ever_had_car)}/{total}",
+            "engaged": f"{doctor_runs}/{total}",
+            "payoff": f"{doctor_visits_total}",
+            "notes": "car / doctor-runs / total-visits",
+        },
+        {
+            "system": "store",
+            "present": f"{sum(1 for result in results if result.ever_had_car)}/{total}",
+            "engaged": f"{store_runs}/{total}",
+            "payoff": f"{store_visits_total}",
+            "notes": "car / store-runs / total-visits",
+        },
+        {
+            "system": "pawn",
+            "present": f"{sum(1 for result in results if result.met_gus or result.visited_pawn)}/{total}",
+            "engaged": f"{pawn_runs}/{total}",
+            "payoff": f"{pawn_visits_total}",
+            "notes": "gus / pawn-runs / total-visits",
+        },
+        {
+            "system": "loan",
+            "present": f"{sum(1 for result in results if result.met_vinnie or result.visited_loan_shark)}/{total}",
+            "engaged": f"{loan_runs}/{total}",
+            "payoff": f"{loan_visits_total}",
+            "notes": "vinnie / loan-runs / total-visits",
+        },
+        {
+            "system": "marvin",
+            "present": f"{sum(1 for result in results if result.marvin_access)}/{total}",
+            "engaged": f"{sum(1 for result in results if result.visited_marvin)}/{total}",
+            "payoff": f"{marvin_item_runs}/{total}",
+            "notes": f"access / visit / item-run total-visits={marvin_visits_total}",
+        },
+        {
+            "system": "gift-wrap",
+            "present": f"{sum(1 for result in results if result.gift_system_unlocked)}/{total}",
+            "engaged": f"{gift_delivery_runs}/{total}",
+            "payoff": f"{dealer_low}/{total}",
+            "notes": f"delivered / dealer<78 end / avg={dealer_avg}",
+        },
+        {
+            "system": "workbench",
+            "present": f"{sum(1 for result in results if result.has_tool_kit)}/{total}",
+            "engaged": f"{sum(1 for result in results if result.visited_car_workbench)}/{total}",
+            "payoff": f"{sum(1 for result in results if result.crafting_used)}/{total}",
+            "notes": f"tool-kit / visit / crafted total-visits={workbench_visits_total}",
+        },
+        {
+            "system": "tom",
+            "present": f"{sum(1 for result in results if result.met_tom or result.visited_tom)}/{total}",
+            "engaged": f"{tom_runs}/{total}",
+            "payoff": f"{tom_visits_total}",
+            "notes": "met / mechanic-runs / total-visits",
+        },
+        {
+            "system": "frank",
+            "present": f"{sum(1 for result in results if result.met_frank or result.visited_frank)}/{total}",
+            "engaged": f"{frank_runs}/{total}",
+            "payoff": f"{frank_visits_total}",
+            "notes": "met / mechanic-runs / total-visits",
+        },
+        {
+            "system": "oswald",
+            "present": f"{sum(1 for result in results if result.met_oswald or result.visited_oswald)}/{total}",
+            "engaged": f"{oswald_runs}/{total}",
+            "payoff": f"{oswald_visits_total}",
+            "notes": "met / mechanic-runs / total-visits",
+        },
+        {
+            "system": "companions",
+            "present": f"{whistle_runs}/{total}",
+            "engaged": f"{sum(1 for result in results if result.companions_list)}/{total}",
+            "payoff": f"{sum(1 for result in results if result.companion_acquired)}/{total}",
+            "notes": "whistle / roster / befriended",
+        },
+        {
+            "system": "witch",
+            "present": f"{sum(1 for result in results if result.met_witch)}/{total}",
+            "engaged": f"{sum(1 for result in results if result.visited_witch_doctor)}/{total}",
+            "payoff": f"{flask_runs}/{total}",
+            "notes": f"met / doctor / flask-buy total-visits={witch_visits_total}",
+        },
+        {
+            "system": "millionaire",
+            "present": f"{sum(1 for result in results if result.millionaire_reached)}/{total}",
+            "engaged": f"{millionaire_visit_runs}/{total}",
+            "payoff": f"{sum(1 for result in results if result.visited_airport)}/{total}",
+            "notes": "reach / visitor / airport-runs",
+        },
+        {
+            "system": "airport",
+            "present": f"{sum(1 for result in results if result.millionaire_reached or result.visited_airport)}/{total}",
+            "engaged": f"{sum(1 for result in results if result.visited_airport)}/{total}",
+            "payoff": f"{airport_visits_total}",
+            "notes": "unlock / airport-runs / total-visits",
+        },
+    ]
+
+    lines = ["System Presence"]
+    lines.extend(_build_text_table(
+        [
+            ("system", "system"),
+            ("present", "present"),
+            ("engaged", "engaged"),
+            ("payoff", "payoff"),
+            ("notes", "notes"),
+        ],
+        rows,
+        {"present": "right", "engaged": "right", "payoff": "right"},
+    ))
+    lines.append("")
+    return lines
+
+
 def _mechanic_repair_lines(results: list[RunResult]) -> list[str]:
     """Which items were fixed at mechanics and how often mechanics visited."""
     if not results:
@@ -2350,6 +4134,24 @@ def _mechanic_repair_lines(results: list[RunResult]) -> list[str]:
     return lines
 
 
+def _append_section(lines: list[str], title: str) -> None:
+    if lines and lines[-1] != "":
+        lines.append("")
+    lines.append(title)
+    lines.append("-" * len(title))
+
+
+def _named_ending_line(results: list[RunResult]) -> str:
+    counts = Counter(
+        result.terminal_ending_name or "unknown_ending"
+        for result in results
+        if result.outcome == "ending"
+    )
+    if not counts:
+        return "Named endings none"
+    return "Named endings " + " ".join(f"{name}={count}" for name, count in counts.most_common())
+
+
 def _render_summary_lines(results: list[RunResult], cycles: int, seed_label: str) -> list[str]:
     metrics = _collect_summary(results)
     total = metrics["total"]
@@ -2357,11 +4159,15 @@ def _render_summary_lines(results: list[RunResult], cycles: int, seed_label: str
     lines = [
         f"AUTOTEST cycles={cycles} seeds={seed_label} total={total}",
         (
-            "Longevity "
-            f"alive={metrics['alive']}/{total} "
+            "Outcomes "
+            f"win={metrics['win']}/{total} "
             f"died={metrics['died']}/{total} "
             f"broke={metrics['broke']}/{total} "
-            f"timeouts={metrics['timeouts']} "
+            f"ending={metrics['ending']}/{total} "
+            f"stalled={metrics['stalled']}/{total} "
+            f"capped={metrics['capped']}/{total} "
+            f"crash={metrics['crash']}/{total} "
+            f"timeouts={metrics['timeouts']}/{total} "
             f"doctor_missed={metrics['doctor_missed']}"
         ),
         (
@@ -2399,8 +4205,26 @@ def _render_summary_lines(results: list[RunResult], cycles: int, seed_label: str
             f"adventure={metrics['adventure']}/{total} "
             f"airport={metrics['airport']}/{total} "
             f"mechanic_end={metrics['mechanic_end']}/{total} "
-            f"wins={metrics['wins']}/{total}"
+            f"airport_win={metrics['airport_win']}/{total} "
+            f"wins={metrics['win']}/{total}"
         ),
+        (
+            "Presence "
+            f"gift_unlock={metrics['gift_unlock']}/{total} "
+            f"wrapped_gift={metrics['wrapped_gift']}/{total} "
+            f"workbench_unlock={metrics['workbench_unlock']}/{total} "
+            f"workbench_visit={metrics['workbench_visit']}/{total} "
+            f"marvin_items={metrics['marvin_items']}/{total} "
+            f"companion_roster={metrics['companion_roster']}/{total}"
+        ),
+        (
+            "Outcome labels "
+            "win=successful ending "
+            "ending=named non-win terminal ending "
+            "crash=unexpected runner/report failure "
+            "capped=reached cycle limit"
+        ),
+        _named_ending_line(results),
         "",
     ]
 
@@ -2428,6 +4252,7 @@ def _render_summary_lines(results: list[RunResult], cycles: int, seed_label: str
         route_applied_goal_counts.update(result.route_applied_goal_counts)
         route_suppressed_goal_counts.update(result.route_suppressed_goal_counts)
 
+    _append_section(lines, "Coverage & Routing")
     if request_counts or trace_counts:
         lines.append(
             "Decision Coverage "
@@ -2460,32 +4285,29 @@ def _render_summary_lines(results: list[RunResult], cycles: int, seed_label: str
     lines.extend(_no_car_review_lines(results))
     lines.extend(_stagnation_audit_lines(results))
     lines.extend(_distribution_lines(results))
-    lines.extend(_medical_economy_lines(results))
-    lines.extend(_event_economy_lines(results))
-    lines.extend(_storyline_audit_lines(results))
-    lines.extend(_death_stage_audit_lines(results))
-    lines.extend(_death_rank_audit_lines(results))
-    lines.extend(_fallback_review_lines(results))
-    lines.extend(_event_polarity_lines(results))
-    lines.extend(_item_impact_lines(results))
-    lines.extend(_marvin_provenance_lines(results))
-    # New rich statistics sections
-    lines.extend(_game_statistics_lines(results))
-    lines.extend(_injury_illness_distribution_lines(results))
-    lines.extend(_companion_roster_lines(results))
-    lines.extend(_loan_distribution_lines(results))
-    lines.extend(_gambling_performance_lines(results))
-    lines.extend(_flask_and_item_breakage_lines(results))
-    lines.extend(_mechanic_repair_lines(results))
+    lines.extend(_max_rank_cohort_lines(results))
+    lines.extend(_system_presence_lines(results))
+
+    _append_section(lines, "Seed Overview")
     row_data = []
-    for result in results:
+    seed_snapshot = sorted(
+        results,
+        key=lambda result: (
+            -(result.peak_balance or result.balance or 0),
+            -(result.day or 0),
+            -(result.balance or 0),
+            result.seed,
+        ),
+    )
+    for result in seed_snapshot:
         if result.timed_out:
             row_data.append({
                 "seed": str(result.seed),
-                "outcome": result.outcome,
+                "outcome": result.display_outcome,
                 "car": "-",
-                "rank": "-",
-                "peak": "-",
+                "end_rank": "-",
+                "peak_rank": "-",
+                "peak_balance": "-",
                 "peak_days": "-",
                 "end_day": "-",
                 "end_balance": "-",
@@ -2501,10 +4323,11 @@ def _render_summary_lines(results: list[RunResult], cycles: int, seed_label: str
 
         row_data.append({
             "seed": str(result.seed),
-            "outcome": result.outcome,
+            "outcome": result.display_outcome,
             "car": "Y" if result.has_car else "N",
-            "rank": str(result.rank) if result.rank is not None else "-",
-            "peak": _format_int(result.peak_balance if result.peak_balance is not None else result.balance),
+            "end_rank": str(result.rank) if result.rank is not None else "-",
+            "peak_rank": str(result.peak_rank if result.peak_rank is not None else result.rank) if (result.peak_rank is not None or result.rank is not None) else "-",
+            "peak_balance": _format_int(result.peak_balance if result.peak_balance is not None else result.balance),
             "peak_days": _format_peak_days(result.peak_balance_days),
             "end_day": str(result.day) if result.day is not None else "-",
             "end_balance": _format_int(result.balance),
@@ -2513,13 +4336,15 @@ def _render_summary_lines(results: list[RunResult], cycles: int, seed_label: str
             "route": top_destination,
         })
 
+    lines.append("all seeds ordered by peak balance, then run length")
     lines.extend(_build_text_table(
         [
             ("seed", "seed"),
             ("outcome", "outcome"),
             ("car", "car"),
-            ("rank", "rank"),
-            ("peak", "peak$"),
+            ("end_rank", "rank"),
+            ("peak_rank", "peak-rank"),
+            ("peak_balance", "peak$"),
             ("peak_days", "peak-days"),
             ("end_day", "end-day"),
             ("end_balance", "end$"),
@@ -2531,8 +4356,9 @@ def _render_summary_lines(results: list[RunResult], cycles: int, seed_label: str
         {
             "seed": "right",
             "car": "center",
-            "rank": "right",
-            "peak": "right",
+            "end_rank": "right",
+            "peak_rank": "right",
+            "peak_balance": "right",
             "peak_days": "right",
             "end_day": "right",
             "end_balance": "right",
@@ -2551,25 +4377,52 @@ def _render_summary_lines(results: list[RunResult], cycles: int, seed_label: str
         lines.append("")
 
     death_results = [result for result in results if result.outcome == "died"]
+    bankrupt_results = [result for result in results if result.outcome == "broke"]
+    completed_results = [result for result in results if not result.timed_out]
     lines.extend(_death_sorted_lines(
         results,
-        "Deaths By Run Length",
-        sorted(death_results, key=lambda result: ((result.day or 0), result.death_tag, -(result.peak_balance or result.balance or 0), result.seed))[:20],
+        "Top 10 Deaths By Run Length",
+        sorted(death_results, key=lambda result: (-(result.day or 0), -(result.peak_balance or result.balance or 0), result.death_tag, result.seed))[:20],
         "day",
         "day",
     ))
     lines.extend(_death_sorted_lines(
         results,
-        "Deaths By Peak Balance",
+        "Top 10 Deaths By Peak Balance",
         sorted(death_results, key=lambda result: (-(result.peak_balance or result.balance or 0), -(result.day or 0), result.death_tag, result.seed))[:20],
         "peak$",
         "peak",
     ))
-    lines.extend(_fatal_pressure_lines(results))
-    lines.extend(_fatal_context_lines(results))
-
-    lines.extend(_pawned_item_lines(results))
-    lines.extend(_doctor_review_lines(results))
+    lines.extend(_run_sorted_lines(
+        "Top 10 Bankrupts By Run Length",
+        sorted(bankrupt_results, key=lambda result: (-(result.day or 0), -(result.peak_balance or result.balance or 0), result.seed)),
+        "day",
+        "day",
+    ))
+    lines.extend(_run_sorted_lines(
+        "Top 10 Bankrupts By Peak Balance",
+        sorted(bankrupt_results, key=lambda result: (-(result.peak_balance or result.balance or 0), -(result.day or 0), result.seed)),
+        "peak$",
+        "peak",
+    ))
+    lines.extend(_run_sorted_lines(
+        "Top 10 Runs By Run Length",
+        sorted(completed_results, key=lambda result: (-(result.day or 0), -(result.peak_balance or result.balance or 0), result.seed)),
+        "day",
+        "day",
+    ))
+    lines.extend(_run_sorted_lines(
+        "Top 10 Runs By Peak Balance",
+        sorted(completed_results, key=lambda result: (-(result.peak_balance or result.balance or 0), -(result.day or 0), result.seed)),
+        "peak$",
+        "peak",
+    ))
+    lines.extend(_run_sorted_lines(
+        "Top 10 Runs By End Balance",
+        sorted(completed_results, key=lambda result: (-(result.balance or 0), -(result.peak_balance or result.balance or 0), -(result.day or 0), result.seed)),
+        "end$",
+        "end_balance",
+    ))
 
     ranked = [result for result in results if result.rank is not None]
     if ranked:
@@ -2581,6 +4434,71 @@ def _render_summary_lines(results: list[RunResult], cycles: int, seed_label: str
         lines.append(
             f"Longest run  seed={longest_run.seed} day={longest_run.day} balance={longest_run.balance} peak={longest_run.peak_balance or longest_run.balance} peak_days={','.join(str(day) for day in longest_run.peak_balance_days) or '-'} rank={longest_run.peak_rank or longest_run.rank}"
         )
+        lines.append("")
+
+    _append_section(lines, "Systems, Economy & Content")
+    lines.extend(_medical_economy_lines(results))
+    lines.extend(_event_economy_lines(results))
+    lines.extend(_storyline_audit_lines(results))
+    lines.extend(_adventure_lines(results))
+    lines.extend(_dealings_lines(
+        results,
+        title="Convenience Store Dealings",
+        source_prefixes=("location:shop:convenience_store",),
+        out_label="removed",
+    ))
+    lines.extend(_dealings_lines(
+        results,
+        title="Pawn Shop Dealings",
+        source_prefixes=("location:shop:pawn_shop",),
+        out_label="sold",
+    ))
+    lines.extend(_marvin_provenance_lines(results))
+    doctor_summary = _collect_medical_provider_summary(results, "doctor")
+    witch_summary = _collect_medical_provider_summary(results, "doctor:witch")
+    lines.extend(_condition_universe_lines(
+        results,
+        title="Illness Universe",
+        universe=_known_status_universe(),
+        final_attr="statuses",
+        added_attr="statuses_added",
+        removed_attr="statuses_removed",
+        doctor_summary=doctor_summary,
+        witch_summary=witch_summary,
+    ))
+    lines.extend(_condition_universe_lines(
+        results,
+        title="Injury Universe",
+        universe=_known_injury_universe(),
+        final_attr="injuries",
+        added_attr="injuries_added",
+        removed_attr="injuries_removed",
+        doctor_summary=doctor_summary,
+        witch_summary=witch_summary,
+    ))
+    lines.extend(_medical_provider_lines(results, "Doctor Visits", "doctor"))
+    lines.extend(_medical_provider_lines(results, "Witch Doctor Visits", "doctor:witch"))
+    lines.extend(_game_statistics_lines(results))
+    lines.extend(_injury_illness_distribution_lines(results))
+    lines.extend(_companion_roster_lines(results))
+    lines.extend(_companion_state_lines(results))
+    lines.extend(_loan_distribution_lines(results))
+    lines.extend(_gambling_performance_lines(results))
+    lines.extend(_flask_and_item_breakage_lines(results))
+    lines.extend(_dealer_gift_lines(results))
+    lines.extend(_mechanic_repair_lines(results))
+    lines.extend(_mechanic_dream_progress_lines(results))
+    lines.extend(_system_presence_lines(results))
+    _append_section(lines, "Medical, Fatality & Diagnostics")
+    lines.extend(_death_stage_audit_lines(results))
+    lines.extend(_death_rank_audit_lines(results))
+    lines.extend(_fatal_pressure_lines(results))
+    lines.extend(_fatal_context_lines(results))
+    lines.extend(_doctor_review_lines(results))
+    lines.extend(_pawned_item_lines(results))
+    lines.extend(_fallback_review_lines(results))
+    lines.extend(_event_polarity_lines(results))
+    lines.extend(_item_impact_lines(results))
 
     return lines
 
@@ -2605,23 +4523,57 @@ def render_summary(results: list[RunResult], cycles: int, seed_label: str) -> No
 def main() -> int:
     cycles, seeds, seed_label = parse_args()
     total = len(seeds)
-    results = []
+    results: list[RunResult] = []
     batch_started_at = time.perf_counter()
+    stopped_early = False
+    stopped_during_seed = False
+    stop_seed: int | None = None
 
-    print(f"AUTOTEST starting cycles={cycles} seeds={seed_label} total={total}", flush=True)
+    start_line = f"AUTOTEST starting cycles={cycles} seeds={seed_label} total={total} timeout=90s/seed"
+    if _supports_stop_key():
+        start_line += f" | press '{STOP_KEY}' to stop early and keep completed runs"
+    print(start_line, flush=True)
     for index, seed in enumerate(seeds, start=1):
-        result = run_seed(cycles, seed)
+        if _consume_stop_request():
+            stopped_early = True
+            stop_seed = seed
+            break
+
+        result, stop_requested = run_seed(cycles, seed)
+        if stop_requested:
+            stopped_early = True
+            stopped_during_seed = True
+            stop_seed = seed
+            break
+
+        if result is None:
+            continue
+
         results.append(result)
-        print(_progress_line(index, total, result, batch_started_at), flush=True)
+        _render_live_progress(index, total, result, results, batch_started_at)
+
+    if sys.stdout.isatty():
+        print("", flush=True)
+
+    if stopped_early:
+        completed = len(results)
+        location = f" during seed={stop_seed}" if stopped_during_seed and stop_seed is not None else ""
+        print(
+            f"AUTOTEST stop requested{location}; summarizing completed runs={completed}/{total}",
+            flush=True,
+        )
 
     render_summary(results, cycles, seed_label)
 
-    # Remind where the story log lives (contains the last seed's in-game text)
-    if os.path.isfile(STORY_OUT):
-        if total == 1:
-            print(f"Story log -> {STORY_OUT}  (seed={seeds[0]} in-game narrative)", flush=True)
+    if os.path.isfile(STORY_OUT) and results and not stopped_during_seed:
+        last_completed_seed = results[-1].seed
+        if len(results) == 1:
+            print(f"Story log -> {STORY_OUT}  (seed={last_completed_seed} in-game narrative)", flush=True)
         else:
-            print(f"Story log -> {STORY_OUT}  (last seed={seeds[-1]} in-game narrative; re-run quicktest.py for any specific seed)", flush=True)
+            print(
+                f"Story log -> {STORY_OUT}  (last completed seed={last_completed_seed} in-game narrative; re-run quicktest.py for any specific seed)",
+                flush=True,
+            )
     return 0
 
 

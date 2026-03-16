@@ -74,6 +74,7 @@ class MechanicsStorylineMixin:
             elif((yes_or_no == "y") or (yes_or_no == "yes")):
                 if self._balance >= repair_price:
                     self.meet("Tom")
+                    self.set_car_mechanic("Tom")
                     type.type("\"Really? Awesome! I'll be the best dang mechanic this ol' automobile has ever seen!\" ")
                     type.type("You watch in awe, as Tom, a man who has clearly perfected his craft, fixes up your wagon in no time. Sweet. ")
                     self.change_balance(-repair_price)
@@ -107,6 +108,7 @@ class MechanicsStorylineMixin:
                             elif((yes_or_no_2 == "y") or (yes_or_no_2 == "yes")):
                                 if self._balance >= (repair_price-50):
                                     self.meet("Tom")
+                                    self.set_car_mechanic("Tom")
                                     type.type("\"Really? Awesome! I'll be the best dang mechanic this ol' automobile has ever seen!\" ")
                                     type.type("You watch in awe, as Tom, a man who has clearly perfected his craft, fixes up your wagon in no time. Sweet. ")
                                     self.change_balance(-(repair_price-50))
@@ -169,6 +171,7 @@ class MechanicsStorylineMixin:
                     random_chance = random.randrange(5)
                     if random_chance < 2:
                         self.meet("Frank")
+                        self.set_car_mechanic("Frank")
                         self.add_item("Car")
                         type.type(magenta(bright("Your car has been fixed! You can now drive around!")))
                         print("\n")
@@ -234,6 +237,7 @@ class MechanicsStorylineMixin:
             elif((yes_or_no == "y") or (yes_or_no == "yes")):
                 if self._balance >= repair_price:
                     self.meet("Oswald")
+                    self.set_car_mechanic("Oswald")
                     type.type("\"Jolly good! Stuart!\" ")
                     type.type("You watch as the little man walks to the front of your wagon, opens the hood, and jumps in. ")
                     type.type("You can't really see what's going on, but after a couple of minutes, Stuart jumps back out, covered in oil.")

@@ -51,6 +51,32 @@ def space_quote(text):
 class EconomyMixin:
     """Economy: Balance, rank, selling"""
 
+    def can_see_fraudulent_cash(self):
+        return hasattr(self, "has_item") and self.has_item("Marvin's Monocle")
+
+    def visible_fraudulent_cash(self):
+        return max(0, int(getattr(self, "_fraudulent_cash", 0))) if self.can_see_fraudulent_cash() else 0
+
+    def _consume_fraudulent_cash(self, amount, dealer_receives=False):
+        amount = max(0, int(amount))
+        available = max(0, int(getattr(self, "_fraudulent_cash", 0)))
+        consumed = min(amount, available)
+        if consumed <= 0:
+            return 0
+        self._fraudulent_cash -= consumed
+        if dealer_receives and hasattr(self, "_dealer_fake_cash_total"):
+            self._dealer_fake_cash_total += consumed
+        return consumed
+
+    def spend_balance(self, amount, dealer_receives_fraud=False):
+        amount = max(0, int(amount))
+        if amount <= 0:
+            return 0
+        spent = min(amount, max(0, int(self._balance)))
+        fake_spent = self._consume_fraudulent_cash(spent, dealer_receives=dealer_receives_fraud)
+        self._balance -= spent
+        return fake_spent
+
     def sell_item_to_pawn(self, item_name, base_price):
         """Sell an item to the pawn shop"""
         modifier = self.get_pawn_price_modifier()
@@ -69,22 +95,30 @@ class EconomyMixin:
 
     def set_balance(self, value):
         self._balance = int(value)
+        if hasattr(self, "_fraudulent_cash"):
+            self._fraudulent_cash = max(0, min(int(self._fraudulent_cash), self._balance))
 
     def change_balance(self, value):
         print("\n")
         if (self._balance + value) <= 0:
             self._balance = 0
+            if hasattr(self, "_fraudulent_cash"):
+                self._fraudulent_cash = 0
             type.type("Your new balance is " + red(bright("$0")))
             print("\n")
             self.status()
             return
         else:
             previous_balance = self._balance
-            self._balance = int(self._balance + value)
             if value > 0:
+                self._balance = int(self._balance + value)
                 type.type("Your new balance is " + green(bright("${:,}".format(previous_balance) + " + ${:,}".format(value)) + bright(green(" = " + "${:,}".format(self._balance)))))
             elif value < 0:
+                self.spend_balance(abs(int(value)), dealer_receives_fraud=False)
                 type.type("Your new balance is " + green(bright("${:,}".format(previous_balance))) + red(bright(" - ${:,}".format(abs(value)))) + green(bright(" = ${:,}".format(self._balance))))
+            if self.can_see_fraudulent_cash():
+                print()
+                type.type(cyan("The monocle reveals ") + yellow(bright("${:,}".format(self.visible_fraudulent_cash()))) + cyan(" in hot money."))
         print("\n")
 
     def get_rank(self):

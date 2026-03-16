@@ -179,6 +179,9 @@ class GameFlowMixin:
 
     def check_for_car_trouble(self):
         """Random chance for car trouble to ruin your afternoon. Returns True if car trouble occurred."""
+        if not self.has_item("Car"):
+            return False
+
         # Base 8% chance for any car trouble event
         if random.randrange(100) >= 8:
             return False

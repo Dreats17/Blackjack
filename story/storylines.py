@@ -67,6 +67,8 @@ class StorylineSystem:
 
     def __init__(self, player):
         self.player = player
+        self._last_storyline_event_day = 0
+        self._storyline_cooldown_days = 1
         
         # ==========================================
         # STORYLINE DEFINITIONS
@@ -393,6 +395,20 @@ class StorylineSystem:
                 "escalation": 0.10,
             },
         }
+
+    def _storyline_cooldown_active(self, day):
+        cooldown_days = max(0, int(getattr(self, "_storyline_cooldown_days", 0)))
+        if cooldown_days <= 0:
+            return False
+        if self._last_storyline_event_day <= 0:
+            return False
+        return (day - self._last_storyline_event_day) <= cooldown_days
+
+    def _get_storyline_location(self, name):
+        return {
+            "kyle": "convenience_store",
+            "stuart": "oswald",
+        }.get(name)
     
     # ==========================================
     # CORE SYSTEM METHODS
@@ -409,6 +425,11 @@ class StorylineSystem:
         methods that don't call sl.advance()) receive an auto-advance 0→1 after firing.
         Standalone-function arcs advance themselves via sl.advance() inside the event.
         """
+        day = self.player.get_day()
+        if self._last_storyline_event_day == day:
+            return None
+        cooldown_active = self._storyline_cooldown_active(day)
+
         # Pool arcs: intro events are plain Player methods with no sl.advance() inside.
         # Must be auto-advanced to stage 1 after firing so follow-up stages can unlock.
         _POOL_ARCS = frozenset({
@@ -422,6 +443,12 @@ class StorylineSystem:
             sl = self.storylines[name]
             sl["stage"] = 1
             sl["day_started"] = day
+
+        def _record_storyline_day(event):
+            def _run():
+                event()
+                self._last_storyline_event_day = self.player.get_day()
+            return _run
 
         def _unlock_priority(name):
             p = self.player
@@ -465,13 +492,14 @@ class StorylineSystem:
 
         # Sync arcs whose stage-0 events may have fired via the random pool
         self._sync_pool_triggered_arcs()
-        day = self.player.get_day()
 
         # ── Phase 1: Forced introductions ──────────────────────────────────────
         # Stage-0 arcs past their force_start_day take priority over the pool.
         # Conditions are embedded in _get_stage_event(); None = still not ready.
         forced = {}
         for name, sl in self.storylines.items():
+            if self._get_storyline_location(name) is not None:
+                continue
             if sl["completed"] or sl["failed"] or sl["stage"] != 0:
                 continue
             if day >= sl.get("force_start_day", 9999):
@@ -479,7 +507,7 @@ class StorylineSystem:
                 if event is not None:
                     forced[name] = event
 
-        if forced:
+        if forced and not cooldown_active:
             unlock_forced = [(priority, name) for name in forced if (priority := _unlock_priority(name)) is not None]
             if unlock_forced:
                 chosen = min(unlock_forced)[1]
@@ -488,7 +516,7 @@ class StorylineSystem:
             event = forced[chosen]
             if chosen in _POOL_ARCS:
                 _mark_started(chosen)
-            return _finalize_event(chosen, event)
+            return _record_storyline_day(_finalize_event(chosen, event))
 
         # Keep car progression moving once the mechanics arc has started.
         mechanics = self.storylines.get("mechanics")
@@ -503,11 +531,16 @@ class StorylineSystem:
             if days_since >= mechanics["min_gap"] and self._stage_conditions_met("mechanics"):
                 event = self._get_stage_event("mechanics")
                 if event is not None:
-                    return event
+                    return _record_storyline_day(event)
+
+        if cooldown_active:
+            return None
 
         # ── Phase 2: Normal eligible check ─────────────────────────────────────
         eligible = {}
         for name, sl in self.storylines.items():
+            if self._get_storyline_location(name) is not None:
+                continue
             if sl["completed"] or sl["failed"]:
                 continue
 
@@ -545,7 +578,53 @@ class StorylineSystem:
         # Auto-advance pool arcs (their intro events don't call sl.advance)
         if sl["stage"] == 0 and chosen in _POOL_ARCS:
             _mark_started(chosen)
-        return _finalize_event(chosen, event)
+        return _record_storyline_day(_finalize_event(chosen, event))
+
+    def check_for_location_storyline_event(self, location_name):
+        day = self.player.get_day()
+        if self._last_storyline_event_day == day:
+            return None
+        if self._storyline_cooldown_active(day):
+            return None
+
+        eligible = {}
+        for name, sl in self.storylines.items():
+            if self._get_storyline_location(name) != location_name:
+                continue
+            if sl["completed"] or sl["failed"]:
+                continue
+
+            if sl["stage"] == 0:
+                event = self._get_stage_event(name)
+                if event is not None:
+                    eligible[name] = event
+                continue
+
+            days_since = day - sl["day_started"]
+            if days_since < sl["min_gap"]:
+                continue
+            if not self._stage_conditions_met(name):
+                continue
+
+            days_past_gap = days_since - sl["min_gap"]
+            chance = sl["base_chance"] + (sl["escalation"] * days_past_gap)
+            chance = min(chance, 0.95)
+            if random.random() < chance:
+                event = self._get_stage_event(name)
+                if event is not None:
+                    eligible[name] = event
+
+        if not eligible:
+            return None
+
+        chosen = random.choice(list(eligible.keys()))
+        event = eligible[chosen]
+
+        def _run_location_storyline():
+            event()
+            self._last_storyline_event_day = self.player.get_day()
+
+        return _run_location_storyline
 
     def _sync_pool_triggered_arcs(self):
         """

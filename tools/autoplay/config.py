@@ -70,82 +70,73 @@ STORE_MUST_HAVE_ITEMS: frozenset[str] = frozenset(
 )
 
 MARVIN_ITEM_PRIORITIES: dict[str, int] = {
+    "Faulty Insurance": 100,
+    "Rusty Compass": 99,
+    "Lucky Coin": 97,
     "Pocket Watch": 96,
-    "Lucky Coin": 92,
-    "Gambler's Grimoire": 82,
-    "Faulty Insurance": 90,
-    "Dirty Old Hat": 72,
-    "Golden Watch": 80,
-    # Health Indicator ($8k-$9.5k): shows real-time HP — useful for planning doctor visits.
-    # Delight Indicator ($8.5k-$10k): shows dealer/NPC happiness — feeds gift-wrap gate logic.
-    # Both are the cheapest Marvin items alongside Rusty Compass and Gambler's Grimoire.
-    "Health Indicator": 64,
-    "Delight Indicator": 68,
-    "Worn Gloves": 90,
-    "Tattered Cloak": 86,
-    "Gambler's Chalice": 84,
-    "White Feather": 78,
-    "Twin's Locket": 76,
-    "Dealer's Grudge": 74,
-    "Rusty Compass": 82,
-    "Quiet Sneakers": 84,
-    "Sneaky Peeky Shades": 86,
-    "Enchanting Silver Bar": 56,
-    "Animal Whistle": 72,
+    "White Feather": 95,
+    "Gambler's Chalice": 94,
+    "Sneaky Peeky Shades": 93,
+    "Twin's Locket": 92,
+    "Quiet Sneakers": 90,
+    "Tattered Cloak": 90,
+    "Worn Gloves": 91,
+    "Dealer's Grudge": 89,
+    "Marvin's Monocle": 18,
+    "Health Indicator": 0,
+    "Delight Indicator": 0,
+    "Golden Watch": 88,
+    "Gambler's Grimoire": 87,
+    "Animal Whistle": 84,
+    "Dirty Old Hat": 82,
+    "Enchanting Silver Bar": 50,
 }
 
 MARVIN_PRICE_ESTIMATES: dict[str, int] = {
-    # Mid-range estimates based on code-verified price ranges from locations.py.
-    # Previously these were set at the upper end ($8k+) which prevented the bot
-    # from recognising affordable items at $3k-$6k balance.  Updated to use the
-    # midpoint of each item's actual random.choice range so the bot visits Marvin
-    # once it can realistically afford something.
-    # Actual price ranges (from locations.py, rank-1 tier):
-    #   Rusty Compass:   random.choice([3000, 3500, 4000, 5000, 6000, 7500])  → median ~4500
-    #   Health Indicator:random.choice([3000, 3200, 4000, 4500, 5500, 7000])  → median ~4500
-    #   Delight Indicator:random.choice([4000, 4250, 4500, 5500, 6000, 9000]) → median ~5500
-    #   Faulty Insurance:random.choice([3500, 4000, 5000, 5500, 6000, 7000])  → median ~5000
-    #   Lucky Coin:      random.choice([5000, 5500, 6000, 7000, 8000, 10000]) → median ~6500
-    #   Gambler's Grimoire: random.choice([6000, 7500, 9000])                 → median ~7500
-    "Delight Indicator": 5500,
-    "Health Indicator": 5000,
-    "Dirty Old Hat": 22000,
-    "Golden Watch": 26000,
-    "Faulty Insurance": 5000,
-    "Enchanting Silver Bar": 9000,
-    "Sneaky Peeky Shades": 19000,
-    "Quiet Sneakers": 9000,
-    "Lucky Coin": 6500,
-    "Worn Gloves": 16000,
-    "Tattered Cloak": 12000,
-    "Rusty Compass": 5000,
-    "Pocket Watch": 18000,
-    "Gambler's Chalice": 26000,
-    "Twin's Locket": 32000,
-    "White Feather": 13000,
-    "Dealer's Grudge": 20000,
-    "Gambler's Grimoire": 7500,
-    "Animal Whistle": 48000,
+    # Minimum live-code Marvin prices from story/locations.py.
+    "Delight Indicator": 6500,
+    "Health Indicator": 6000,
+    "Dirty Old Hat": 18000,
+    "Golden Watch": 22000,
+    "Faulty Insurance": 7500,
+    "Enchanting Silver Bar": 7500,
+    "Sneaky Peeky Shades": 26000,
+    "Quiet Sneakers": 11000,
+    "Lucky Coin": 9000,
+    "Worn Gloves": 14000,
+    "Tattered Cloak": 16000,
+    "Rusty Compass": 6000,
+    "Pocket Watch": 15000,
+    "Marvin's Monocle": 10000,
+    "Gambler's Chalice": 21000,
+    "Twin's Locket": 26000,
+    "White Feather": 11000,
+    "Dealer's Grudge": 16000,
+    "Gambler's Grimoire": 6000,
+    "Animal Whistle": 40000,
 }
 
 MARVIN_ITEM_ORDER: tuple[str, ...] = (
-    "Pocket Watch",
-    "Lucky Coin",
-    "Gambler's Grimoire",
     "Faulty Insurance",
-    "Dirty Old Hat",
-    "Golden Watch",
-    "Worn Gloves",
-    "Tattered Cloak",
-    "Gambler's Chalice",
-    "White Feather",
-    "Twin's Locket",
-    "Dealer's Grudge",
     "Rusty Compass",
+    "Lucky Coin",
+    "Pocket Watch",
+    "White Feather",
     "Quiet Sneakers",
+    "Gambler's Chalice",
     "Sneaky Peeky Shades",
-    "Enchanting Silver Bar",
+    "Twin's Locket",
+    "Tattered Cloak",
+    "Worn Gloves",
+    "Dealer's Grudge",
+    "Marvin's Monocle",
+    "Gambler's Grimoire",
+    "Health Indicator",
+    "Delight Indicator",
+    "Golden Watch",
     "Animal Whistle",
+    "Dirty Old Hat",
+    "Enchanting Silver Bar",
 )
 
 UPGRADE_ITEM_PRIORITIES: dict[str, int] = {
@@ -189,41 +180,36 @@ UPGRADE_PRICE_ESTIMATES: dict[str, int] = {
 }
 
 WITCH_FLASK_PRIORITIES: dict[str, int] = {
-    "No Bust": 92,
-    "Second Chance": 90,
-    "Dealer's Whispers": 84,
-    "Bonus Fortune": 80,
-    "Split Serum": 76,
-    "Dealer's Hesitation": 72,
-    "Pocket Aces": 68,
-    "Imminent Blackjack": 66,
+    "No Bust": 98,
+    "Second Chance": 96,
+    "Dealer's Whispers": 94,
+    "Bonus Fortune": 92,
+    "Dealer's Hesitation": 88,
+    "Split Serum": 86,
+    "Pocket Aces": 84,
+    "Imminent Blackjack": 82,
     "Anti-Virus": 58,
     "Anti-Venom": 54,
-    # Fortunate Day/Night are the cheapest flasks (min $12k each from code).
-    # Raising their priorities enables the flask-only visit path at rank 2 ($10k+).
-    "Fortunate Day": 58,    # was 44; gives all day events a positive tilt
-    "Fortunate Night": 44,  # was 28; gives all night events a positive tilt
+    "Fortunate Day": 62,
+    "Fortunate Night": 60,
 }
 
-# Price estimates use minimum values from visit_witch_doctor random.choice() ranges.
-# Using minimums means the bot will attempt a visit when it CAN afford the cheapest
-# roll; if the actual roll is higher the bot will decline, but healing may still apply.
+# Price estimates use minimum live-code values from visit_witch_doctor random.choice() ranges.
+# Using the minimum lets the harness test whether a visit is worth attempting as soon as
+# the cheapest roll is possible; if the actual roll is higher the bot can still decline.
 WITCH_FLASK_PRICE_ESTIMATES: dict[str, int] = {
-    # Conservative estimates — set near the upper end of each flask's price range.
-    # The actual game prices in locations.py were reduced ~25%, so visits are
-    # triggered at the old balance threshold but the bot pays less on average.
-    "No Bust": 25000,
-    "Imminent Blackjack": 40000,
-    "Dealer's Whispers": 23000,
-    "Bonus Fortune": 35000,
-    "Anti-Venom": 25000,
-    "Anti-Virus": 26000,
-    "Fortunate Day": 12000,
-    "Fortunate Night": 12000,
-    "Second Chance": 28000,
-    "Split Serum": 30000,
-    "Dealer's Hesitation": 20000,
-    "Pocket Aces": 45000,
+    "No Bust": 18000,
+    "Imminent Blackjack": 30000,
+    "Dealer's Whispers": 17000,
+    "Bonus Fortune": 26000,
+    "Anti-Venom": 18000,
+    "Anti-Virus": 19000,
+    "Fortunate Day": 8000,
+    "Fortunate Night": 8000,
+    "Second Chance": 21000,
+    "Split Serum": 22000,
+    "Dealer's Hesitation": 15000,
+    "Pocket Aces": 34000,
 }
 
 
@@ -241,8 +227,8 @@ RANK_TUNER_PROFILES: dict[int, dict[str, float | int]] = {
         "store_balance_gate": 250,
         "store_health_gate": 60,
         "store_sanity_gate": 30,
-        "marvin_min_balance": 5000,
-        "marvin_floor_buffer": 3000,
+        "marvin_min_balance": 3500,
+        "marvin_floor_buffer": 1800,
         "upgrade_floor_buffer": 150000,
     },
     1: {
@@ -258,8 +244,8 @@ RANK_TUNER_PROFILES: dict[int, dict[str, float | int]] = {
         "store_balance_gate": 600,
         "store_health_gate": 60,
         "store_sanity_gate": 28,
-        "marvin_min_balance": 5500,
-        "marvin_floor_buffer": 3000,
+        "marvin_min_balance": 4000,
+        "marvin_floor_buffer": 2000,
         "upgrade_floor_buffer": 180000,
     },
     2: {
@@ -275,8 +261,8 @@ RANK_TUNER_PROFILES: dict[int, dict[str, float | int]] = {
         "store_balance_gate": 5000,
         "store_health_gate": 58,
         "store_sanity_gate": 26,
-        "marvin_min_balance": 9500,
-        "marvin_floor_buffer": 5000,
+        "marvin_min_balance": 8000,
+        "marvin_floor_buffer": 3500,
         "upgrade_floor_buffer": 140000,
     },
     3: {
@@ -383,8 +369,10 @@ CRAFTING_MIN_PRIORITY: int = 60
 # crafting ingredients 54-72) should NOT cancel a valid adventure run.
 CRITICAL_STORE_PRIORITY_THRESHOLD: int = 90
 
-# Gift wrapping: dealer_happiness threshold below which gift-wrapping is worth doing
-GIFT_WRAP_HAPPINESS_THRESHOLD: int = 78
+# Gift wrapping: dealer_happiness threshold below which gift-wrapping is worth doing.
+# Keep this just below the first free-hand breakpoint so the bot actively tops up
+# dealer happiness instead of waiting until the relationship has already fallen off.
+GIFT_WRAP_HAPPINESS_THRESHOLD: int = 92
 
 # Gift wrapping: minimum balance to spend on wrapping (wrapping costs a small amount)
 GIFT_WRAP_MIN_BALANCE: int = 30

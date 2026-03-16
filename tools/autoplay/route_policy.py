@@ -50,7 +50,7 @@ def _score_goal_alignment(goal: str, tags: set[str]) -> float:
         "cashout_pawn_inventory": {"pawn": 108.0, "loan": 18.0, "store": -8.0, "marvin": -12.0, "adventure": -24.0},
         "blend_fraudulent_cash_safely": {"marvin": 24.0, "store": 8.0, "adventure": -15.0},
         "unlock_marvin": {"mechanic": 20.0, "store": 8.0, "adventure": 6.0},
-        "exploit_marvin": {"marvin": 95.0, "loan": 35.0, "mechanic": -12.0, "adventure": -10.0},
+        "exploit_marvin": {"marvin": 102.0, "loan": 48.0, "upgrade": 12.0, "mechanic": -12.0, "adventure": -10.0},
         "recover_from_car_trouble": {"mechanic": 92.0, "upgrade": 55.0, "stay_home": 18.0, "adventure": -40.0},
         "advance_mechanic_arc": {"mechanic": 92.0, "upgrade": 35.0, "marvin": -10.0},
         "repair_or_upgrade_gear": {"upgrade": 90.0, "mechanic": 72.0, "marvin": -10.0},
@@ -60,7 +60,7 @@ def _score_goal_alignment(goal: str, tags: set[str]) -> float:
         "convert_millionaire_to_ending": {"upgrade": 14.0, "adventure": -30.0, "loan": -40.0},
         # push_next_rank: loan shark is a direct bankroll multiplier at rank 0-1 — far more
         # efficient than the store for a cash-poor player.  Adventure is also valid at rank 2+.
-        "push_next_rank": {"marvin": 20.0, "store": 8.0, "adventure": 14.0, "loan": 30.0, "stay_home": -5.0},
+        "push_next_rank": {"marvin": 34.0, "store": 2.0, "upgrade": 18.0, "mechanic": 10.0, "adventure": 16.0, "loan": 44.0, "stay_home": -8.0},
     }
     goal_weights = mapping.get(goal, {})
     return sum(goal_weights.get(tag, 0.0) for tag in tags)
@@ -68,10 +68,19 @@ def _score_goal_alignment(goal: str, tags: set[str]) -> float:
 
 def _score_route_opportunity(tags: set[str], metadata: dict[str, object]) -> float:
     total = 0.0
+    catalog_push_kind = str(metadata.get("catalog_push_kind", "") or "")
+    catalog_push_spend = float(metadata.get("catalog_push_spend", 0) or 0)
+    catalog_push_count = float(metadata.get("catalog_push_count", 0) or 0)
+    catalog_push_priority = float(metadata.get("catalog_push_priority", 0) or 0)
 
     store_spend = float(metadata.get("store_spend", 0) or 0)
+    store_actionable_count = float(metadata.get("store_actionable_count", 0) or 0)
     if "store" in tags and metadata.get("wants_store"):
         total += 54.0 + min(34.0, store_spend / 8.0)
+        total += min(18.0, store_actionable_count * 6.0)
+    if "store" in tags and metadata.get("catalog_push_active") and catalog_push_kind == "store":
+        total += 26.0 + min(30.0, catalog_push_spend / 14.0) + min(16.0, catalog_push_count * 5.0)
+        total += min(12.0, catalog_push_priority / 7.0)
 
     pawn_value = float(metadata.get("pawn_value", 0) or 0)
     if "pawn" in tags and metadata.get("wants_pawn"):
@@ -79,18 +88,21 @@ def _score_route_opportunity(tags: set[str], metadata: dict[str, object]) -> flo
 
     loan_pressure = float(metadata.get("loan_pressure", 0) or 0)
     if "loan" in tags and metadata.get("wants_loan"):
-        total += 52.0 + min(32.0, loan_pressure / 4.0)
+        total += 64.0 + min(36.0, loan_pressure / 4.0)
     # In poverty-escape mode the bot can't afford any mechanic quote; boosting the
     # loan shark ensures it visits Vinnie first to raise capital, breaking the
     # "try Tom → can't pay → try again" loop.
     if "loan" in tags and metadata.get("poverty_loan_mode"):
-        total += 100.0
+        total += 120.0
     if "mechanic" in tags and metadata.get("poverty_loan_mode"):
         total -= 80.0
 
     marvin_priority = float(metadata.get("marvin_priority", 0) or 0)
     if "marvin" in tags and metadata.get("wants_marvin"):
         total += 48.0 + min(28.0, marvin_priority / 4.0)
+    if "marvin" in tags and metadata.get("catalog_push_active") and catalog_push_kind == "marvin":
+        total += 28.0 + min(36.0, catalog_push_spend / 300.0) + min(18.0, catalog_push_count * 6.0)
+        total += min(14.0, catalog_push_priority / 6.0)
 
     mechanic_urgency = float(metadata.get("mechanic_urgency", 0) or 0)
     if "mechanic" in tags and metadata.get("wants_mechanic"):
@@ -99,6 +111,24 @@ def _score_route_opportunity(tags: set[str], metadata: dict[str, object]) -> flo
     upgrade_urgency = float(metadata.get("upgrade_urgency", 0) or 0)
     if "upgrade" in tags and metadata.get("wants_upgrade"):
         total += 46.0 + min(28.0, upgrade_urgency / 4.0)
+    if "upgrade" in tags and metadata.get("wants_workbench_craft"):
+        total += 54.0
+
+    planner_goal = str(metadata.get("planner_goal", "") or "")
+    if planner_goal == "push_next_rank":
+        if "loan" in tags:
+            total += 22.0
+        if "marvin" in tags:
+            total += 18.0
+        if "upgrade" in tags:
+            total += 12.0
+        if "store" in tags and store_spend <= 260.0:
+            total -= 12.0
+    elif planner_goal == "exploit_marvin":
+        if "loan" in tags:
+            total += 18.0
+        if "upgrade" in tags and metadata.get("wants_workbench_craft"):
+            total += 10.0
 
     adventure_readiness = float(metadata.get("adventure_readiness", 0) or 0)
     if "adventure" in tags and metadata.get("wants_adventure"):
@@ -134,13 +164,15 @@ def choose_route_option(request: DecisionRequest, plan: StrategicPlan) -> tuple[
         if metadata.get("wants_marvin") and "marvin" in tags:
             total += 22.0
         if metadata.get("wants_loan") and "loan" in tags:
-            total += 16.0
+            total += 24.0
         if metadata.get("wants_store") and "store" in tags:
             total += 12.0
         if metadata.get("wants_adventure") and "adventure" in tags:
             total += 14.0
         if metadata.get("wants_upgrade") and "upgrade" in tags:
-            total += 14.0
+            total += 18.0
+        if metadata.get("wants_workbench_craft") and "upgrade" in tags:
+            total += 18.0
         if metadata.get("wants_mechanic") and "mechanic" in tags:
             total += 18.0
         if metadata.get("wants_pawn") and "pawn" in tags:

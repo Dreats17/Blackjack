@@ -210,6 +210,14 @@ class LocationsMixin:
                     # Player chose an adventure area
                     area_index = choice - len(shops) - 1
                     area_name, area_func = adventure_areas[area_index]
+                    if self.has_danger("Busted Kneecaps"):
+                        type.type("You take two steps toward " + area_name + ", feel Tony's work in both knees, and immediately reconsider.")
+                        print("\n")
+                        type.type(quote("Yeah, no. You can't walk that much right now."))
+                        print("\n")
+                        choice = None
+                        type.type("Choose a number: ")
+                        continue
                     type.type("You fire up the wagon and head for " + area_name + ".")
                     print("\n")
                     adventure = getattr(self, area_func)
@@ -541,7 +549,7 @@ class LocationsMixin:
         self.restore_sanity(random.choice([1, 2, 3]))  # Restores sanity
         type.type("You walk back to the front desk to checkout.")
         print("\n")
-        cost = int((random.randint(35, 60)/100)*self._balance)
+        cost = int((random.randint(30, 50)/100)*self._balance)
         type.type("That will be " + bright(green("${:,}".format(cost))))
         if self.has_item("Real Insurance"):
             print("\n")
@@ -572,7 +580,7 @@ class LocationsMixin:
                 print("\n")
                 type.type("I see, you have insurance. Well, that should give you quite the discount.")
                 print()
-                cost = int((random.randint(10, 35)/100)*self._balance)
+                cost = int((random.randint(10, 30)/100)*self._balance)
                 type.type("That will be " + bright(green("${:,}".format(cost))))
                 self.change_balance(-cost)
                 self.update_faulty_insurance_durability()
@@ -614,7 +622,7 @@ class LocationsMixin:
                 elif random_chance == 5:
                     self._clear_all_status = True
 
-                random_chance = random.randrange(3)
+                random_chance = random.randrange(2)
                 if random_chance == 0:
                     self.heal(100)
                 
@@ -1794,6 +1802,13 @@ class LocationsMixin:
         self.oswald_dialogue()
         print("\n")
 
+        storyline_event = self._storyline_system.check_for_location_storyline_event("oswald")
+        if storyline_event is not None:
+            storyline_event()
+            self.update_rank()
+            self.start_night()
+            return
+
         if(len(self._broken_inventory)>0):
             broken_items = self._lists.make_broken_items_list()
             tips = 0
@@ -2765,6 +2780,14 @@ class LocationsMixin:
             print("\n")
             type.type("You get closer to the boy, and he finally notices you, and puts his phone down.")
         print("\n")
+
+        storyline_event = self._storyline_system.check_for_location_storyline_event("convenience_store")
+        if storyline_event is not None:
+            storyline_event()
+            self.update_rank()
+            self.start_night()
+            return
+
         if(len(self._convenience_store_inventory)==0):
             type.type("As you walk up to the store, you see a white sign hanging on the front door. They're closed. Bummer.")
             print("\n")
@@ -3426,6 +3449,10 @@ class LocationsMixin:
             elif item == "Pocket Watch":
                 type.type("This brass beauty is always running a bit slow, but hey, that works in your favor. Flash it at the table, and you might squeeze in an extra round.")
                 price = random.choice([15000, 19000, 22000])
+            elif item == "Marvin's Monocle":
+                type.type("A polished monocle with a smoky lens and tiny etched markings around the rim. Slip it on, and you can tell exactly how much of your bankroll is hot.")
+                type.type("Useful knowledge. Dangerous knowledge. Marvin seems very proud of that distinction.")
+                price = random.choice([10000, 13000, 16000])
             # New mystical gambling items
             elif item == "Gambler's Chalice":
                 type.type("Ah, the Chalice! Legend says a desperate gambler drank from this cup and doubled his fortune in one night. ")
@@ -3501,6 +3528,24 @@ class LocationsMixin:
         type.type("You drive to the seediest part of town, down a narrow alley behind a row of shuttered businesses. ")
         print("\n")
         
+        if self.has_item("Marvin's Monocle") and not self._loan_shark_monocle_penalty_triggered:
+            type.type("Vinnie's stare catches on the monocle perched on your face, and his smile vanishes.")
+            print("\n")
+            type.type(quote("So Marvin sold you one of those. Means you can tell good paper from bad."))
+            print("\n")
+            type.type(quote("Knowledge like that comes with a service charge."))
+            print("\n")
+            self._loan_shark_interest_rate = max(self._loan_shark_interest_rate, 0.35)
+            self._loan_shark_fee_rate = max(self._loan_shark_fee_rate, 0.10)
+            self._loan_shark_monocle_penalty_triggered = True
+            if self.get_loan_shark_debt() > 0:
+                surcharge = max(100, int(self.get_loan_shark_debt() * 0.10))
+                self._loan_shark_debt += surcharge
+                type.type("Vinnie adds a knowing fee of " + red(bright("${:,}".format(surcharge))) + ".")
+                print("\n")
+            type.type(quote("From now on, the vig's steeper. For smart people, especially."))
+            print("\n")
+        
         if not self.has_met("Vinnie"):
             self.meet("Vinnie")
             type.type("At the end of the alley, a black sedan idles with its headlights off. ")
@@ -3556,6 +3601,13 @@ class LocationsMixin:
                 status_colors = [yellow, yellow, red, red]
                 status_names = ["Overdue", "Very Overdue", "DANGER", "CRITICAL"]
                 type.type("Status: " + status_colors[min(warning_level-1, 3)](bright(status_names[min(warning_level-1, 3)])))
+                print()
+            print()
+        if self.has_item("Marvin's Monocle"):
+            type.type("Monocle read: " + yellow(bright("${:,}".format(self.get_fraudulent_cash()))) + yellow(" hot cash in circulation"))
+            print()
+            if self.get_loan_shark_fee_rate() > 0:
+                type.type("Knowing fee active: " + red(bright(f"{int(self.get_loan_shark_fee_rate() * 100)}%")) + red(" on new loans"))
                 print()
             print()
         
@@ -3618,7 +3670,11 @@ class LocationsMixin:
             loan_options.append(5000)
         
         for i, amount in enumerate(loan_options, 1):
-            type.type(str(i) + ". Borrow " + green("${:,}".format(amount)))
+            total_owed = amount + int(amount * self.get_loan_shark_fee_rate())
+            if total_owed > amount:
+                type.type(str(i) + ". Borrow " + green("${:,}".format(amount)) + " (owe " + red("${:,}".format(total_owed)) + ")")
+            else:
+                type.type(str(i) + ". Borrow " + green("${:,}".format(amount)))
             print()
         type.type(str(len(loan_options) + 1) + ". Never mind")
         print()
@@ -3630,10 +3686,8 @@ class LocationsMixin:
                 type.type(quote("Smart move. Or stupid. We'll see which."))
                 print("\n")
                 self.take_loan(amount)
-                self.increment_statistic("loans_taken")
-                self.increment_statistic("total_borrowed", amount)
                 print("\n")
-                type.type(quote("Remember. 20% interest. Every. Single. Week."))
+                type.type(quote("Remember. The vig compounds every week."))
                 print("\n")
                 type.type(quote("And if you can't pay... Tony will explain the alternatives."))
                 print("\n")
@@ -3686,7 +3740,6 @@ class LocationsMixin:
             if 1 <= choice <= len(repay_options):
                 name, amount = repay_options[choice - 1]
                 self.repay_loan(amount)
-                self.increment_statistic("total_repaid", amount)
             else:
                 if self.get_loan_shark_warning_level() >= 2:
                     type.type(quote("You come here, waste my time, and don't pay? Bold."))
@@ -3776,7 +3829,13 @@ class LocationsMixin:
             print("\n")
             type.type("You double over. He hits you again. And again.")
             print("\n")
-            type.type(quote("That's a reminder. Next time, we take something you can't grow back."))
+            if random.randrange(3) == 0:
+                type.type("Tony kicks the side of your knee. Then the other one. A wet pop. You scream.")
+                print("\n")
+                type.type(quote("Reminder's over. Next stop is your kneecaps."))
+                self.add_danger("Busted Kneecaps")
+            else:
+                type.type(quote("That's a reminder. Next time, we take something you can't grow back."))
             print("\n")
             self.hurt(35)
             self.lose_sanity(15)
@@ -3877,17 +3936,27 @@ class LocationsMixin:
             print("\n")
             type.type(quote("Consider this a payment plan."))
             print("\n")
-            type.type("He pulls out a knife. Grabs your left hand.")
-            print("\n")
-            type.slow(red("..."))
-            print("\n")
-            type.type("You wake up in a hospital. Missing a finger. They found you in a dumpster.")
+            if random.randrange(2) == 0:
+                type.type("He pulls out a knife. Grabs your left hand.")
+                print("\n")
+                type.slow(red("..."))
+                print("\n")
+                type.type("You wake up in a hospital. Missing a finger. They found you in a dumpster.")
+                self.add_danger("Missing Finger")
+            else:
+                type.type("Tony plants one boot on your thigh and raises the bat over your knee.")
+                print("\n")
+                type.slow(red("CRACK."))
+                print("\n")
+                type.type("Then the other side. Just to make the lesson symmetrical.")
+                print("\n")
+                type.type("You wake up in a hospital doped to the eyeballs, both knees wrapped like gifts.")
+                self.add_danger("Busted Kneecaps")
             print("\n")
             type.type("The debt is halved. The message is clear.")
             self._loan_shark_debt = self._loan_shark_debt // 2
             self.hurt(50)
             self.lose_sanity(40)
-            self.add_danger("Missing Finger")
             self.add_status("Severe Trauma")
         else:
             # You don't survive

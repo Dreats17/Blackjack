@@ -117,6 +117,8 @@ class DayCycleMixin:
 
         # Tells you your current balance
         type.type("That brings you to a grand total of " + green(bright("$" + str(self._balance))) + "! ")
+        if self.can_see_fraudulent_cash() and self.visible_fraudulent_cash() > 0:
+            type.type(cyan("The monocle reveals ") + yellow(bright("${:,}".format(self.visible_fraudulent_cash()))) + cyan(" in hot cash. "))
 
         type.type(self._lists.get_rank_comment(self._rank))
 

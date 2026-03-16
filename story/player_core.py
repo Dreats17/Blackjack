@@ -181,7 +181,8 @@ class Player(
         self._rabbit_chase = 0    # 0-6 tracking which rabbit chase event is next
         self._is_millionaire = False  # True when player hits $1M for the first time
         self._millionaire_visited = False  # True after the special morning visitor comes
-        self._chosen_mechanic = None  # Which mechanic the visitor tells you to see ("Tom", "Frank", or "Oswald")
+        self._chosen_mechanic = None  # Which mechanic the millionaire visitor tells you to see ("Tom", "Frank", or "Oswald")
+        self._car_mechanic = None  # Which mechanic actually fixed the player's car during progression
         self._gus_items_sold = set()  # Tracks which collectibles have been sold to Gus
         self._sanity = 100  # Visible stat - starts at 100, decreases with trauma
         self._fatigue = 0  # 0-100: 0=well-rested, 100=exhausted. Affects sleep quality and event access.
@@ -231,6 +232,9 @@ class Player(
         self._loan_shark_debt = 0
         self._loan_shark_days_overdue = 0
         self._loan_shark_warning_level = 0  # 0=none, 1=warning, 2=threat, 3=violence, 4=death
+        self._loan_shark_interest_rate = 0.20
+        self._loan_shark_fee_rate = 0.0
+        self._loan_shark_monocle_penalty_triggered = False
         
         # PAWN SHOP REPUTATION
         self._pawn_shop_reputation = 50  # 0-100, affects prices
@@ -239,7 +243,7 @@ class Player(
         self._companions_sold_count = 0  # Track how many companions sold to Gus for the dark ending
         
         # FRAUDULENT CASH SYSTEM (Loan Shark)
-        self._fraudulent_cash = 0  # Fake money from loan shark - needs to be "blended" through gambling
+        self._fraudulent_cash = 0  # Hot money hidden inside the visible bankroll
         self._dealer_fake_cash_total = 0  # How much fake cash the Dealer has accumulated
         
         # DEALER HAPPINESS SYSTEM
@@ -276,7 +280,29 @@ class Player(
             print()
             type.type("Emergency services arrive just in time. You're rushed to the hospital.")
             print()
-            type.type("They patch you up and send you on your way. Your LifeAlert has been used up.")
+            self.increment_statistic("times_hospitalized")
+            self.increment_statistic("near_death_experiences")
+            self.lose_sanity(8)
+
+            emergency_bill = int((random.randint(15, 35) / 100) * self._balance)
+            if self.has_item("Real Insurance"):
+                type.type("You barely manage to flash your " + bright(cyan("Real Insurance")) + " card before they wheel you inside.")
+                print()
+                type.type("They patch you up and waive the bill. Your LifeAlert has been used up.")
+                self.update_faulty_insurance_durability()
+            elif self.has_item("Faulty Insurance"):
+                type.type("You shakily hand over your " + bright(magenta("Faulty Insurance")) + " card while the paramedics argue with admissions.")
+                print()
+                emergency_bill = int((random.randint(5, 20) / 100) * self._balance)
+                type.type("They patch you up and slap you with a reduced emergency bill of " + red(bright("${:,}".format(emergency_bill))) + ".")
+                self.change_balance(-emergency_bill)
+                self.update_faulty_insurance_durability()
+            else:
+                type.type("They patch you up and send you on your way. Your LifeAlert has been used up.")
+                print()
+                if emergency_bill > 0:
+                    type.type("Emergency bill: " + red(bright("${:,}".format(emergency_bill))) + ".")
+                    self.change_balance(-emergency_bill)
             self._health = 25  # Survive with 25 health
             print()
             return
@@ -717,6 +743,12 @@ class Player(
     
     def set_chosen_mechanic(self, mechanic):
         self._chosen_mechanic = mechanic
+
+    def get_car_mechanic(self):
+        return self._car_mechanic
+
+    def set_car_mechanic(self, mechanic):
+        self._car_mechanic = mechanic
 
     # Gus Pawn Shop tracking
     def get_gus_items_sold(self):
