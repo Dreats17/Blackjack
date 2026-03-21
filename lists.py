@@ -1064,7 +1064,7 @@ class Lists:
                 "description": "A pocket knife taped to a stick. Crude, effective, terrifying.",
                 "pawn_value": 35,
                 "category": "weapon",
-                "craft_text": "You wrap duct tape around the handle of your pocket knife until it feels right. It's ugly. It'll work.",
+                "craft_text": "You wrap duct tape around the handle of your pocket knife until it feels right in your palm — the weight, the grip, the way the blade sits. It's ugly. The handle is lumpy. It looks like something made by someone who needed something made. It'll absolutely work.",
             },
             "Slingshot": {
                 "ingredients": ["Rubber Bands", "Bungee Cords"],
@@ -1108,7 +1108,7 @@ class Lists:
                 "description": "A classic snare loop hidden in the grass. Catches small animals or trips big ones.",
                 "pawn_value": 20,
                 "category": "trap",
-                "craft_text": "You tie a loop in the rope, thread the fishing line through, and set it near a rabbit trail. Primitive. Effective. You feel like a caveman.",
+                "craft_text": "You tie a loop in the rope, thread the fishing line through, and set it in the grass near a trail where something small has been running. Primitive. Effective. You're crouching in a parking lot setting animal traps. At some point between leaving your old life and now, you became a completely different kind of person.",
             },
 
             # === REMEDIES ===
@@ -1117,7 +1117,7 @@ class Lists:
                 "description": "A DIY cold cure: crushed cough drops in warm water, bandages for comfort. Actually works.",
                 "pawn_value": 20,
                 "category": "remedy",
-                "craft_text": "You crush the cough drops into a paste, mix them with clean bandage material from the first aid kit, and make a throat poultice. It looks disgusting. It works.",
+                "craft_text": "You crush the cough drops into a gritty paste, work it into the clean bandage material, and wrap everything into something that looks like a prop from a survivalist nightmare. It's cold. It smells like a candy cane had a fight with a hospital. You press it to your throat. Fifteen minutes later, you feel better. Medicine was doing this for centuries before it got complicated.",
             },
             "Wound Salve": {
                 "ingredients": ["First Aid Kit", "Super Glue"],
@@ -1228,7 +1228,7 @@ class Lists:
                 "description": "Solar still in a bag. Put dirty water in, wait, get clean water out. Science is cool.",
                 "pawn_value": 18,
                 "category": "survival",
-                "craft_text": "You set dirty water in a bowl, cover it with plastic wrap, and put a small weight in the center. The sun evaporates the water, condensation runs down the plastic, and drips into your cup. Clean water. You are a genius.",
+                "craft_text": "You set dirty water in a bowl, cover it with plastic wrap pulled taut, and set a small weight in the center so it sags into a point. An hour in the sun and clean condensation drips into your cup. You drink it. You made that. With your hands. From garbage. You sit with that fact for a while and it feels a little bit like dignity.",
             },
 
             # === COMPANION ITEMS ===
@@ -1470,7 +1470,7 @@ class Lists:
                 "description": "Heat protection. Survival: prevent heat stroke.",
                 "pawn_value": 18,
                 "category": "tonic",
-                "craft_text": "You mix the premium sunscreen with cold water bottles. The resulting mixture is chemically soothing and also just... cold. A cold thing that protects you from hot things. Look, not every invention needs to be complicated.",
+                "craft_text": "You mix the premium sunscreen into a cold water bottle and shake until it emulsifies into something pale and medicinal. You take a test sip. It tastes like beach + science. Your body reads it as cooling and protective, which is technically what it is. You shrug and drink the rest. Not every breakthrough needs to be glamorous.",
                 "hint_vague": "Beat the heat, drink the solution.",
                 "hint_suggestive": "A tonic for hot weather. Premium protection meets hydration.",
                 "tier": 1,
