@@ -84,6 +84,7 @@ class Lists:
                     setattr(self, pool_name, pool)
                     return event_name
             pool = factory()
+            self._apply_inventory_pool_weights(pool, is_night=True)
 
     # ==========================================
     # ACHIEVEMENT SYSTEM DATA
@@ -1063,7 +1064,7 @@ class Lists:
                 "description": "A pocket knife taped to a stick. Crude, effective, terrifying.",
                 "pawn_value": 35,
                 "category": "weapon",
-                "craft_text": "You wrap duct tape around the handle of your pocket knife until it feels right. It's ugly. It'll work.",
+                "craft_text": "You wrap duct tape around the handle of your pocket knife until it feels right in your palm — the weight, the grip, the way the blade sits. It's ugly. The handle is lumpy. It looks like something made by someone who needed something made. It'll absolutely work.",
             },
             "Slingshot": {
                 "ingredients": ["Rubber Bands", "Bungee Cords"],
@@ -1107,7 +1108,7 @@ class Lists:
                 "description": "A classic snare loop hidden in the grass. Catches small animals or trips big ones.",
                 "pawn_value": 20,
                 "category": "trap",
-                "craft_text": "You tie a loop in the rope, thread the fishing line through, and set it near a rabbit trail. Primitive. Effective. You feel like a caveman.",
+                "craft_text": "You tie a loop in the rope, thread the fishing line through, and set it in the grass near a trail where something small has been running. Primitive. Effective. You're crouching in a parking lot setting animal traps. At some point between leaving your old life and now, you became a completely different kind of person.",
             },
 
             # === REMEDIES ===
@@ -1116,7 +1117,7 @@ class Lists:
                 "description": "A DIY cold cure: crushed cough drops in warm water, bandages for comfort. Actually works.",
                 "pawn_value": 20,
                 "category": "remedy",
-                "craft_text": "You crush the cough drops into a paste, mix them with clean bandage material from the first aid kit, and make a throat poultice. It looks disgusting. It works.",
+                "craft_text": "You crush the cough drops into a gritty paste, work it into the clean bandage material, and wrap everything into something that looks like a prop from a survivalist nightmare. It's cold. It smells like a candy cane had a fight with a hospital. You press it to your throat. Fifteen minutes later, you feel better. Medicine was doing this for centuries before it got complicated.",
             },
             "Wound Salve": {
                 "ingredients": ["First Aid Kit", "Super Glue"],
@@ -1227,7 +1228,7 @@ class Lists:
                 "description": "Solar still in a bag. Put dirty water in, wait, get clean water out. Science is cool.",
                 "pawn_value": 18,
                 "category": "survival",
-                "craft_text": "You set dirty water in a bowl, cover it with plastic wrap, and put a small weight in the center. The sun evaporates the water, condensation runs down the plastic, and drips into your cup. Clean water. You are a genius.",
+                "craft_text": "You set dirty water in a bowl, cover it with plastic wrap pulled taut, and set a small weight in the center so it sags into a point. An hour in the sun and clean condensation drips into your cup. You drink it. You made that. With your hands. From garbage. You sit with that fact for a while and it feels a little bit like dignity.",
             },
 
             # === COMPANION ITEMS ===
@@ -1469,7 +1470,7 @@ class Lists:
                 "description": "Heat protection. Survival: prevent heat stroke.",
                 "pawn_value": 18,
                 "category": "tonic",
-                "craft_text": "You mix the premium sunscreen with cold water bottles. The resulting mixture is chemically soothing and also just... cold. A cold thing that protects you from hot things. Look, not every invention needs to be complicated.",
+                "craft_text": "You mix the premium sunscreen into a cold water bottle and shake until it emulsifies into something pale and medicinal. You take a test sip. It tastes like beach + science. Your body reads it as cooling and protective, which is technically what it is. You shrug and drink the rest. Not every breakthrough needs to be glamorous.",
                 "hint_vague": "Beat the heat, drink the solution.",
                 "hint_suggestive": "A tonic for hot weather. Premium protection meets hydration.",
                 "tier": 1,
@@ -2662,6 +2663,18 @@ class Lists:
         a_list.append("walking_stick_hike")
         a_list.append("tinfoil_hat_event")
         a_list.append("reunion_photo_comfort")
+        # NEW CRAFTED ITEM EVENTS (Tier 1 — Gadgets, Disguises, Tonics, Dark Arts, Luxury, Vehicle)
+        a_list.append("headlamp_night_walk")
+        a_list.append("spotlight_hidden_path")
+        a_list.append("brass_knuckles_brawl")
+        a_list.append("stink_bomb_escape")
+        a_list.append("animal_bait_companion")
+        a_list.append("trail_mix_bomb_distraction")
+        a_list.append("forged_documents_police")
+        a_list.append("fortune_cards_warning")
+        a_list.append("luck_totem_windfall")
+        a_list.append("tire_ready_flat")
+        a_list.append("miracle_lube_breakdown")
         # CAR TROUBLE EVENTS - Poor Tier (minor breakdowns, cheap/no fix)
         a_list.append("corroded_battery_terminals")
         a_list.append("fuse_blown")
@@ -2904,6 +2917,12 @@ class Lists:
         a_list.append("companion_brings_friend")
         a_list.append("companion_food_crisis")
         a_list.append("companion_milestone")
+        a_list.append("buddy_dog_whistle_synergy")
+        a_list.append("thunder_running_shoes_synergy")
+        a_list.append("grace_dream_catcher_synergy")
+        a_list.append("echo_camera_synergy")
+        a_list.append("shellbert_worry_stone_synergy")
+        a_list.append("bear_scrap_armor_synergy")
         # CRAFTED ITEM EVENTS
         a_list.append("shiv_confrontation")
         a_list.append("lockpick_opportunity")
@@ -2983,6 +3002,28 @@ class Lists:
         a_list.append("tinfoil_hat_event")
         a_list.append("reunion_photo_comfort")
         a_list.append("junkyard_crown_moment")
+        # NEW CRAFTED ITEM EVENTS (Tier 1 — Gadgets, Disguises, Tonics, Dark Arts, Luxury, Vehicle)
+        a_list.append("headlamp_night_walk")
+        a_list.append("spotlight_hidden_path")
+        a_list.append("brass_knuckles_brawl")
+        a_list.append("stink_bomb_escape")
+        a_list.append("animal_bait_companion")
+        a_list.append("trail_mix_bomb_distraction")
+        a_list.append("forged_documents_police")
+        a_list.append("fortune_cards_warning")
+        a_list.append("luck_totem_windfall")
+        a_list.append("tire_ready_flat")
+        a_list.append("miracle_lube_breakdown")
+        a_list.append("evidence_kit_crime")
+        a_list.append("radio_jammer_checkpoint")
+        a_list.append("security_bypass_locked_room")
+        a_list.append("gentleman_charm_dinner")
+        a_list.append("gas_mask_chemical")
+        a_list.append("voice_soother_persuasion")
+        a_list.append("devils_deck_gambling")
+        a_list.append("blackmail_letter_extortion")
+        a_list.append("kingpin_look_respect")
+        a_list.append("heirloom_set_recognition")
         # CAR TROUBLE EVENTS - Cheap Tier (moderate breakdowns)
         a_list.append("dead_battery_afternoon")
         a_list.append("engine_oil_empty")
@@ -3236,6 +3277,12 @@ class Lists:
         a_list.append("companion_brings_friend")
         a_list.append("companion_food_crisis")
         a_list.append("companion_milestone")
+        a_list.append("buddy_dog_whistle_synergy")
+        a_list.append("thunder_running_shoes_synergy")
+        a_list.append("grace_dream_catcher_synergy")
+        a_list.append("echo_camera_synergy")
+        a_list.append("shellbert_worry_stone_synergy")
+        a_list.append("bear_scrap_armor_synergy")
         # CRAFTED ITEM EVENTS
         a_list.append("shiv_confrontation")
         a_list.append("lockpick_opportunity")
@@ -3328,6 +3375,33 @@ class Lists:
         a_list.append("scrap_armor_event")
         # Crossover Events
         a_list.append("crossover_night_vision_bonus")
+        # NEW CRAFTED ITEM EVENTS (Tier 1 — Gadgets, Disguises, Tonics, Dark Arts, Luxury, Vehicle)
+        a_list.append("headlamp_night_walk")
+        a_list.append("spotlight_hidden_path")
+        a_list.append("brass_knuckles_brawl")
+        a_list.append("stink_bomb_escape")
+        a_list.append("animal_bait_companion")
+        a_list.append("trail_mix_bomb_distraction")
+        a_list.append("forged_documents_police")
+        a_list.append("fortune_cards_warning")
+        a_list.append("luck_totem_windfall")
+        a_list.append("tire_ready_flat")
+        a_list.append("miracle_lube_breakdown")
+        a_list.append("evidence_kit_crime")
+        a_list.append("radio_jammer_checkpoint")
+        a_list.append("security_bypass_locked_room")
+        a_list.append("gentleman_charm_dinner")
+        a_list.append("gas_mask_chemical")
+        a_list.append("voice_soother_persuasion")
+        a_list.append("devils_deck_gambling")
+        a_list.append("blackmail_letter_extortion")
+        a_list.append("kingpin_look_respect")
+        a_list.append("heirloom_set_recognition")
+        a_list.append("emp_device_pursuit")
+        a_list.append("eldritch_candle_entity")
+        a_list.append("road_warrior_ambush")
+        a_list.append("third_eye_foresight")
+        a_list.append("gamblers_aura_blackjack")
         # CAR TROUBLE EVENTS - Modest Tier (expensive repairs)
         a_list.append("engine_wont_turn_over")
         a_list.append("tire_blowout")
@@ -3512,6 +3586,12 @@ class Lists:
         a_list.append("companion_brings_friend")
         a_list.append("companion_food_crisis")
         a_list.append("companion_milestone")
+        a_list.append("buddy_dog_whistle_synergy")
+        a_list.append("thunder_running_shoes_synergy")
+        a_list.append("grace_dream_catcher_synergy")
+        a_list.append("echo_camera_synergy")
+        a_list.append("shellbert_worry_stone_synergy")
+        a_list.append("bear_scrap_armor_synergy")
         # CRAFTED ITEM EVENTS
         a_list.append("shiv_confrontation")
         a_list.append("lockpick_opportunity")
@@ -3609,6 +3689,35 @@ class Lists:
         a_list.append("crossover_artisan_rose_gift")
         a_list.append("crossover_night_vision_bonus")
         a_list.append("crossover_all_chains_complete")
+        # NEW CRAFTED ITEM EVENTS (Tier 1 — Gadgets, Disguises, Tonics, Dark Arts, Luxury, Vehicle)
+        a_list.append("headlamp_night_walk")
+        a_list.append("spotlight_hidden_path")
+        a_list.append("brass_knuckles_brawl")
+        a_list.append("stink_bomb_escape")
+        a_list.append("animal_bait_companion")
+        a_list.append("trail_mix_bomb_distraction")
+        a_list.append("forged_documents_police")
+        a_list.append("fortune_cards_warning")
+        a_list.append("luck_totem_windfall")
+        a_list.append("tire_ready_flat")
+        a_list.append("miracle_lube_breakdown")
+        a_list.append("evidence_kit_crime")
+        a_list.append("radio_jammer_checkpoint")
+        a_list.append("security_bypass_locked_room")
+        a_list.append("gentleman_charm_dinner")
+        a_list.append("gas_mask_chemical")
+        a_list.append("voice_soother_persuasion")
+        a_list.append("devils_deck_gambling")
+        a_list.append("blackmail_letter_extortion")
+        a_list.append("kingpin_look_respect")
+        a_list.append("heirloom_set_recognition")
+        a_list.append("emp_device_pursuit")
+        a_list.append("eldritch_candle_entity")
+        a_list.append("road_warrior_ambush")
+        a_list.append("third_eye_foresight")
+        a_list.append("gamblers_aura_blackjack")
+        a_list.append("ghost_protocol_invisible")
+        a_list.append("immortal_vehicle_breakdown")
         # CAR TROUBLE EVENTS - Rich Tier (catastrophic breakdowns)
         a_list.append("transmission_slipping")
         a_list.append("broken_ball_joint")
@@ -3795,6 +3904,12 @@ class Lists:
         a_list.append("companion_brings_friend")
         a_list.append("companion_food_crisis")
         a_list.append("companion_milestone")
+        a_list.append("buddy_dog_whistle_synergy")
+        a_list.append("thunder_running_shoes_synergy")
+        a_list.append("grace_dream_catcher_synergy")
+        a_list.append("echo_camera_synergy")
+        a_list.append("shellbert_worry_stone_synergy")
+        a_list.append("bear_scrap_armor_synergy")
         # CRAFTED ITEM EVENTS
         a_list.append("shiv_confrontation")
         a_list.append("lockpick_opportunity")
@@ -3892,6 +4007,36 @@ class Lists:
         a_list.append("crossover_artisan_rose_gift")
         a_list.append("crossover_night_vision_bonus")
         a_list.append("crossover_all_chains_complete")
+        # NEW CRAFTED ITEM EVENTS (Tier 1 — Gadgets, Disguises, Tonics, Dark Arts, Luxury, Vehicle)
+        a_list.append("headlamp_night_walk")
+        a_list.append("spotlight_hidden_path")
+        a_list.append("brass_knuckles_brawl")
+        a_list.append("stink_bomb_escape")
+        a_list.append("animal_bait_companion")
+        a_list.append("trail_mix_bomb_distraction")
+        a_list.append("forged_documents_police")
+        a_list.append("fortune_cards_warning")
+        a_list.append("luck_totem_windfall")
+        a_list.append("tire_ready_flat")
+        a_list.append("miracle_lube_breakdown")
+        a_list.append("evidence_kit_crime")
+        a_list.append("radio_jammer_checkpoint")
+        a_list.append("security_bypass_locked_room")
+        a_list.append("gentleman_charm_dinner")
+        a_list.append("gas_mask_chemical")
+        a_list.append("voice_soother_persuasion")
+        a_list.append("devils_deck_gambling")
+        a_list.append("blackmail_letter_extortion")
+        a_list.append("kingpin_look_respect")
+        a_list.append("heirloom_set_recognition")
+        a_list.append("emp_device_pursuit")
+        a_list.append("eldritch_candle_entity")
+        a_list.append("road_warrior_ambush")
+        a_list.append("third_eye_foresight")
+        a_list.append("gamblers_aura_blackjack")
+        a_list.append("ghost_protocol_invisible")
+        a_list.append("immortal_vehicle_breakdown")
+        a_list.append("guardian_angel_lethal")
         # CAR TROUBLE EVENTS - Doughman Tier
         a_list.append("catalytic_converter_stolen")
         a_list.append("transmission_slipping")
@@ -4044,6 +4189,12 @@ class Lists:
         a_list.append("companion_brings_friend")
         a_list.append("companion_food_crisis")
         a_list.append("companion_milestone")
+        a_list.append("buddy_dog_whistle_synergy")
+        a_list.append("thunder_running_shoes_synergy")
+        a_list.append("grace_dream_catcher_synergy")
+        a_list.append("echo_camera_synergy")
+        a_list.append("shellbert_worry_stone_synergy")
+        a_list.append("bear_scrap_armor_synergy")
         # CRAFTED ITEM EVENTS
         a_list.append("shiv_confrontation")
         a_list.append("lockpick_opportunity")
@@ -4141,6 +4292,36 @@ class Lists:
         a_list.append("crossover_artisan_rose_gift")
         a_list.append("crossover_night_vision_bonus")
         a_list.append("crossover_all_chains_complete")
+        # NEW CRAFTED ITEM EVENTS (Tier 1 — Gadgets, Disguises, Tonics, Dark Arts, Luxury, Vehicle)
+        a_list.append("headlamp_night_walk")
+        a_list.append("spotlight_hidden_path")
+        a_list.append("brass_knuckles_brawl")
+        a_list.append("stink_bomb_escape")
+        a_list.append("animal_bait_companion")
+        a_list.append("trail_mix_bomb_distraction")
+        a_list.append("forged_documents_police")
+        a_list.append("fortune_cards_warning")
+        a_list.append("luck_totem_windfall")
+        a_list.append("tire_ready_flat")
+        a_list.append("miracle_lube_breakdown")
+        a_list.append("evidence_kit_crime")
+        a_list.append("radio_jammer_checkpoint")
+        a_list.append("security_bypass_locked_room")
+        a_list.append("gentleman_charm_dinner")
+        a_list.append("gas_mask_chemical")
+        a_list.append("voice_soother_persuasion")
+        a_list.append("devils_deck_gambling")
+        a_list.append("blackmail_letter_extortion")
+        a_list.append("kingpin_look_respect")
+        a_list.append("heirloom_set_recognition")
+        a_list.append("emp_device_pursuit")
+        a_list.append("eldritch_candle_entity")
+        a_list.append("road_warrior_ambush")
+        a_list.append("third_eye_foresight")
+        a_list.append("gamblers_aura_blackjack")
+        a_list.append("ghost_protocol_invisible")
+        a_list.append("immortal_vehicle_breakdown")
+        a_list.append("guardian_angel_lethal")
         # CAR TROUBLE EVENTS - Nearly There Tier
         a_list.append("mystery_breakdown")
         a_list.append("flooded_engine")
@@ -4522,6 +4703,111 @@ class Lists:
         "guardian_angel_lethal":   [0, 0, 0, 0, 2, 3],
     }
 
+    # ── INVENTORY-AWARE POOL EVENTS ─────────────────────────────────────────────
+    _ANIMAL_EVENTS = frozenset({
+        "duck_army", "motivational_raccoon", "pigeon_mafia", "raccoon_gang_raid",
+        "raccoon_raid", "raccoon_invasion", "opossum_in_trash", "stray_cat",
+        "three_legged_dog", "estranged_dog", "bird_droppings", "seagull_attack",
+        "sewer_rat", "hungry_cow", "attacked_by_dog", "stray_cat_returns",
+    })
+    _POSITIVE_DAY_EVENTS = frozenset({
+        "lucky_penny", "found_twenty", "found_gift_card", "vending_machine_luck",
+        "prayer_answered", "random_kindness", "good_hair_day", "nice_weather",
+        "beautiful_sunrise", "found_old_photo", "morning_stretch",
+    })
+    _DARK_DAY_EVENTS = frozenset({
+        "blood_moon_bargain", "the_empty_room", "the_dying_dealer",
+        "organ_harvester", "the_bridge_call", "the_relapse", "casino_overdose",
+        "withdrawal_nightmare", "loan_shark_visit", "the_confession",
+        "the_anniversary_loss", "survivor_guilt", "the_scar_story",
+    })
+    _COMBAT_EVENTS = frozenset({
+        "gas_station_robbery", "back_alley_shortcut", "drug_dealer_encounter",
+        "car_explosion",
+    })
+    _CAMP_EVENTS = frozenset({"fire_starter_campfire"})
+    _NIGHTMARE_EVENTS = frozenset({
+        "nightmare", "nightmare_of_losing", "drowning_dream",
+        "companion_nightmare",
+    })
+    _DARK_NIGHT_EVENTS = frozenset({
+        "blood_moon_bargain", "the_empty_room", "organ_harvester",
+        "withdrawal_nightmare",
+    })
+    _POSITIVE_NIGHT_EVENTS = frozenset({
+        "peaceful_night", "nice_dream", "dream_of_winning", "stargazing",
+        "woodlands_path", "woodlands_river", "woodlands_field", "midnight_walk",
+    })
+
+    def _apply_inventory_pool_weights(self, pool, is_night=False):
+        """Adjust pool by duplicating or removing events based on carried items.
+
+        Boosts add copies of matching events already present in the pool.
+        Suppressions remove one copy of each matching event (if present).
+        The pool is re-shuffled so the inserted entries are spread evenly.
+        """
+        player = self.__player
+        additions = []
+
+        if is_night:
+            # Dream Catcher: –50% nightmare/dark weight → remove 1 copy of each
+            if player.has_item("Dream Catcher"):
+                for event in self._NIGHTMARE_EVENTS | self._DARK_NIGHT_EVENTS:
+                    if event in pool:
+                        pool.remove(event)
+
+            # Road Flare Torch: –15% dark night weight → remove 1 copy of each
+            if player.has_item("Road Flare Torch"):
+                for event in self._DARK_NIGHT_EVENTS:
+                    if event in pool:
+                        pool.remove(event)
+
+            # Flask of Fortunate Night: +15% positive night events
+            if player.has_flask_effect("Fortunate Night"):
+                additions += [e for e in pool if e in self._POSITIVE_NIGHT_EVENTS]
+
+            # Necronomicon: +25% dark weight at night
+            if player.has_item("Necronomicon"):
+                additions += [e for e in pool if e in self._DARK_NIGHT_EVENTS] * 2
+
+            # Animal Whistle: +30% animal events at night
+            if player.has_item("Animal Whistle"):
+                additions += [e for e in pool if e in self._ANIMAL_EVENTS] * 2
+        else:
+            # Necronomicon: +25% dark event weight
+            if player.has_item("Necronomicon"):
+                additions += [e for e in pool if e in self._DARK_DAY_EVENTS] * 2
+
+            # Animal Whistle: +30% animal event weight
+            if player.has_item("Animal Whistle"):
+                additions += [e for e in pool if e in self._ANIMAL_EVENTS] * 2
+
+            # Lucky Charm Bracelet: +10% positive event weight
+            if player.has_item("Lucky Charm Bracelet"):
+                additions += [e for e in pool if e in self._POSITIVE_DAY_EVENTS]
+
+            # Luck Totem: +10% positive event weight (stacks)
+            if player.has_item("Luck Totem"):
+                additions += [e for e in pool if e in self._POSITIVE_DAY_EVENTS]
+
+            # Flask of Fortunate Day: +15% positive events while active
+            if player.has_flask_effect("Fortunate Day"):
+                additions += [e for e in pool if e in self._POSITIVE_DAY_EVENTS]
+
+            # Fire Starter Kit: +20% camp/rest event weight
+            if player.has_item("Fire Starter Kit"):
+                additions += [e for e in pool if e in self._CAMP_EVENTS] * 2
+
+            # Scrap Armor: –20% combat/mugging event weight
+            if player.has_item("Scrap Armor"):
+                for event in self._COMBAT_EVENTS:
+                    if event in pool:
+                        pool.remove(event)
+
+        if additions:
+            pool.extend(additions)
+            random.shuffle(pool)
+
     def make_weighted_day_pool(self, rank):
         """Build a shuffled and tonally weighted event pool for the given rank.
 
@@ -4565,6 +4851,7 @@ class Lists:
         if has_car:
             pool += ["random_car_trouble"] * car_copies
         random.shuffle(pool)
+        self._apply_inventory_pool_weights(pool, is_night=False)
         return pool
 
 # Get Event

@@ -130,6 +130,13 @@ class CarEventsMixin:
             print("\n")
             type.type("Thank God for preparation.")
             self.restore_sanity(5)
+        elif self.has_item("Power Grid"):
+            type.type("You unclip the " + magenta(bright("Power Grid")) + " from your bag and press it to the dead battery.")
+            print("\n")
+            type.type("It kicks the battery back to life with contempt. Engine roars. First try.")
+            print("\n")
+            type.type("You didn't even need to pop the hood all the way.")
+            self.restore_sanity(7)
         else:
             type.type("You have no way to jump it. You're stuck.")
             print("\n")
@@ -188,6 +195,16 @@ class CarEventsMixin:
 
     # === ENGINE PROBLEMS ===
     def engine_overheating(self):
+        if self.has_item("Oracle's Tome") or self.has_item("Gambler's Grimoire"):
+            tome = "Oracle's Tome" if self.has_item("Oracle's Tome") else "Gambler's Grimoire"
+            type.type("This morning, your " + cyan(bright(tome)) + " fell open to a dog-eared page. Two words underlined in red: " + italic("'CHECK COOLANT.'"))
+            print("\n")
+            type.type("So you did. You topped off the reservoir before you left. The engine runs smooth. No steam. No crisis. No lost afternoon.")
+            print("\n")
+            type.type("It's not magic. It's just reading.")
+            self.restore_sanity(5)
+            print("\n")
+            return
         type.type("Steam billows from under your hood. Your temperature gauge is in the red.")
         print("\n")
         type.type("The engine is overheating. You pull over immediately.")
@@ -274,7 +291,14 @@ class CarEventsMixin:
         problem = random.choice(["starter motor", "fuel pump", "ignition coil", "spark plugs"])
         type.type("After some investigation, you suspect it's the " + problem + ".")
         print("\n")
-        if problem == "spark plugs" and self.has_item("Spare Spark Plugs"):
+        if self.has_item("Mobile Workshop"):
+            type.type("You pop the trunk and open the " + magenta(bright("Mobile Workshop")) + " case.")
+            print("\n")
+            type.type("It has exactly what you need for a failing " + problem + ". Five minutes later, the engine roars to life.")
+            print("\n")
+            type.type("You didn't even get your hands that dirty.")
+            self.restore_sanity(8)
+        elif problem == "spark plugs" and self.has_item("Spare Spark Plugs"):
             type.type("Good thing you have " + magenta(bright("Spare Spark Plugs")) + "!")
             print("\n")
             type.type("You swap them out. The engine roars to life.")
@@ -299,6 +323,18 @@ class CarEventsMixin:
         print("\n")
 
     def strange_engine_noise(self):
+        if self.has_item("Lucky Medallion") or self.has_item("Lucky Coin"):
+            coin = "Lucky Medallion" if self.has_item("Lucky Medallion") else "Lucky Coin"
+            type.type("Your engine is making a noise. A bad noise. Grinding? Clicking? Whining?")
+            print("\n")
+            type.type("You reach into your pocket and close your hand around the " + cyan(bright(coin)) + ".")
+            print("\n")
+            type.type("The noise changes pitch. Then fades. Then stops.")
+            print("\n")
+            type.type("You sit in puzzled silence. The engine purrs like nothing happened. You stop asking questions.")
+            self.restore_sanity(5)
+            print("\n")
+            return
         type.type("Your engine is making a noise. A bad noise. Grinding? Clicking? Whining?")
         print("\n")
         noise = random.choice(["grinding", "clicking", "whining", "knocking", "squealing"])
@@ -396,7 +432,15 @@ class CarEventsMixin:
         print("\n")
         type.type("You fight the wheel, heart pounding, and manage to pull to the shoulder.")
         print("\n")
-        if self.has_item("Spare Tire") and self.has_item("Car Jack"):
+        if self.has_item("Tire Ready Kit"):
+            type.type("You open the trunk. The " + magenta(bright("Tire Ready Kit")) + " is already assembled, sitting right there.")
+            print("\n")
+            type.type("Thirty seconds. You're back on the road before the adrenaline even fades.")
+            print("\n")
+            type.type("Preparation is its own kind of luck.")
+            self.use_item("Tire Ready Kit")
+            self.restore_sanity(10)
+        elif self.has_item("Spare Tire") and self.has_item("Car Jack"):
             type.type("You have a " + magenta(bright("Spare Tire")) + " and a " + magenta(bright("Car Jack")) + ".")
             print("\n")
             type.type("You change the tire yourself. It takes an hour, but you're back on the road.")
@@ -673,7 +717,15 @@ class CarEventsMixin:
         print("\n")
         type.type("This is bad. Transmission repairs are the most expensive fixes there are.")
         print("\n")
-        if self.has_item("Transmission Fluid"):
+        if self.has_item("Miracle Lube"):
+            type.type("You pop the hood and squeeze one shot of " + magenta(bright("Miracle Lube")) + " into the transmission.")
+            print("\n")
+            type.type("The grinding stops instantly. The gears shift smooth as silk.")
+            print("\n")
+            type.type("You don't know how it works. You don't care.")
+            self.use_item("Miracle Lube")
+            self.restore_sanity(8)
+        elif self.has_item("Transmission Fluid"):
             type.type("You check the fluid level. Low. You add " + magenta(bright("Transmission Fluid")) + ".")
             print("\n")
             type.type("It helps. Temporarily. The damage is already done.")

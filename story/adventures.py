@@ -1295,6 +1295,16 @@ class AdventuresMixin:
             type.type("The forest is quiet tonight. No adventures find you - or perhaps you weren't ready for them.")
             print("\n")
             type.type("You rest beneath an ancient oak, listening to the wind in the leaves. Sometimes the greatest adventure is simply being still.")
+            if self.has_item("Binoculars") or self.has_item("Binocular Scope"):
+                item_name = "Binocular Scope" if self.has_item("Binocular Scope") else "Binoculars"
+                print("\n")
+                type.type("You pull out your " + cyan(bright(item_name)) + " and scan the treeline. A hidden deer path runs along the ridge — and at the end of it, something glints.")
+                print("\n")
+                type.type("You follow it. Tucked under a root: an old tin with a handful of coins and a folded bill. Someone's forgotten stash.")
+                found = random.randint(15, 45)
+                type.type(" " + green(bright("$" + str(found))) + " well-spotted.")
+                self.earn_money(found)
+                self.restore_sanity(4)
             self.heal(random.randint(15, 30))
             print("\n")
 
@@ -1315,6 +1325,16 @@ class AdventuresMixin:
         print("\n")
         type.type(yellow(bright("=== SWAMP ADVENTURE ===")))
         print("\n")
+        if self.has_item("Gas Mask"):
+            type.type("Through the " + cyan(bright("Gas Mask")) + ", the toxic swamp air becomes just air. You breathe freely where others would be coughing.")
+            print("\n")
+        else:
+            type.type("The rotten air settles in your lungs like a personal insult. You'll be tasting swamp for a week.")
+            self.hurt(5)
+            print("\n")
+        if self.has_item("Water Purifier"):
+            type.type("Your " + cyan(bright("Water Purifier")) + " sits ready to filter whatever questionable water you encounter. No swamp belly today.")
+            print("\n")
         event = random.choice([
             "tortoise_racing", "ogre", "fairy_bottle", "disgusting_mermaid", "gator_wrestling", "casual_day"
         ])

@@ -124,7 +124,7 @@ class DaySurvivalMixin:
     def spider_bite(self):
         # EVENT: A spider that got into the car bites the player
         # CONDITION: Requires "Spider" danger to exist, and no existing "Spider Bite"
-        # EFFECTS: Pest Control kills spider; otherwise lose 1-2 sanity
+        # EFFECTS: Pest Control kills spider; Flask of Anti-Venom neutralizes venom; otherwise lose 1-2 sanity
         # Always adds "Spider Bite" status
         if not self.has_danger("Spider") or self.has_status("Spider Bite"):
             self.day_event()
@@ -138,6 +138,15 @@ class DaySurvivalMixin:
             type.type("You grab your " + magenta(bright("Pest Control")) + " and spray in the direction of the spider. ")
             type.type("A cloud of white liquid covers the spider, and you watch as it slows, and dies. ")
             type.type("Hopefully, that's the end of your spider problems.")
+            print("\n")
+        elif self.has_item("Flask of Anti-Venom"):
+            self.use_item("Flask of Anti-Venom")
+            type.type("The bite stings. You reach for the " + cyan(bright("Flask of Anti-Venom")) + " and uncork it.")
+            print("\n")
+            type.type("A quick sip. The burning in your arm stops almost instantly. The venom loses its grip.")
+            print("\n")
+            type.type("The spider disappears into a vent. But it doesn't matter. Its venom is already beaten.")
+            self.heal(5)
             print("\n")
         else:
             type.type("You attempt to swat it with your hand, but it sneaks into your heater. ")
@@ -200,6 +209,12 @@ class DaySurvivalMixin:
             type.type("The old man laps you twice before you give up, but hey, you tried.")
         print("\n")
         self.heal(random.choice([3, 5, 8]))
+        if self.has_item("Running Shoes") or self.has_item("Pursuit Package"):
+            item_name = "Running Shoes" if self.has_item("Running Shoes") else "Pursuit Package"
+            print("\n")
+            type.type("The " + cyan(bright(item_name)) + " grip the pavement perfectly. You actually break into a real run. Five good minutes. Your lungs open up. You feel good.")
+            self.heal(5)
+            self.restore_sanity(3)
 
     def ant_invasion(self):
         # EVENT: Ants invade your car while you sleep
@@ -417,6 +432,13 @@ class DaySurvivalMixin:
         type.type("That's another " + green(bright("$" + str(bill))) + " dollars.")
         print("\n")
         self.change_balance(bill)
+        if self.has_item("Flask of Fortunate Day"):
+            bonus = random.randint(20, 80)
+            print("\n")
+            type.type("The " + cyan(bright("Flask of Fortunate Day")) + " hums warm in your pocket. Fate tips its hat.")
+            print("\n")
+            type.type("You check one more time and find a few extra bills tucked behind a receipt. Another " + green(bright("$" + str(bonus))) + ".")
+            self.change_balance(bonus)
         print("\n")
 
     def strong_winds(self):
@@ -655,6 +677,18 @@ class DaySurvivalMixin:
         # EFFECTS: Umbrella or Plastic Poncho prevents damage/cold;
         #          otherwise 10 damage and adds "Cold" status
         # Umbrella or Plastic Poncho prevents damage/getting sick
+        
+        # ITEM: Binoculars - spotted the storm coming early
+        if self.has_item("Binoculars"):
+            type.type("Through the " + cyan(bright("Binoculars")) + ", you saw the weather front building twenty minutes ago.")
+            print("\n")
+            type.type("You're already parked under a bridge. Dry. Comfortable. A little smug.")
+            print("\n")
+            type.type("The rain hammers the road twenty feet away. Doesn't touch you.")
+            self.restore_sanity(3)
+            print("\n")
+            return
+
         type.type("The sky opens up without warning. Rain hammers down so hard you can barely hear yourself think.")
         print("\n")
         
@@ -677,6 +711,11 @@ class DaySurvivalMixin:
                 type.type("You feel a cold coming on...")
                 self.add_status("Cold")
                 self.mark_day("Cold")
+        if self.has_item("Water Purifier"):
+            print("\n")
+            type.type("At least the downpour let you fill up with your " + cyan(bright("Water Purifier")) + ". Clean drinking water — a silver lining to a miserable day.")
+            self.restore_sanity(2)
+            self.heal(3)
         print("\n")
 
     def freezing_night(self):
@@ -686,7 +725,36 @@ class DaySurvivalMixin:
         # Hand Warmers can help survive
         type.type("The temperature plummets. Frost forms on your windshield, and you can see your breath inside the car.")
         print("\n")
-        
+
+        # Sacred Flame combo checked first: it consumes Fire Starter Kit, so it must precede
+        # the Emergency Blanket + Fire Starter Kit combo below.
+        if self.has_item("Phoenix Feather") and self.has_item("Fire Starter Kit"):
+            self.use_item("Phoenix Feather")
+            self.use_item("Fire Starter Kit")
+            type.type("The " + cyan(bright("Fire Starter Kit")) + " sparks.")
+            print("\n")
+            type.type("The " + cyan(bright("Phoenix Feather")) + " ignites.")
+            print("\n")
+            type.type("Sacred amber fire fills the air around you. Not cold fire. Not cruel fire. The other kind.")
+            print("\n")
+            type.type("Every wound seals. Every pain ceases. The frostbite, the bruises, the exhaustion — gone.")
+            print("\n")
+            type.type("Both items are ash. But you are whole.")
+            self.heal(100)
+            self.restore_sanity(50)
+            print("\n")
+            return
+
+        if self.has_item("Emergency Blanket") and self.has_item("Fire Starter Kit"):
+            type.type("You wrap yourself in the " + cyan(bright("Emergency Blanket")) + " and get the " + cyan(bright("Fire Starter Kit")) + " going outside.")
+            print("\n")
+            type.type("The reflective foil bounces the fire's heat right back at you. You're in a warm cocoon. Fortress mode.")
+            print("\n")
+            type.type("The cold never had a chance. You sleep well. Genuinely, impressively well.")
+            self.heal(10)
+            self.restore_sanity(5)
+            print("\n")
+            return
         if self.has_item("Hand Warmers"):
             type.type("You crack open your " + magenta(bright("Hand Warmers")) + " and hold them close.")
             print("\n")
@@ -994,7 +1062,7 @@ class DaySurvivalMixin:
     def another_spider_bite(self):
         # EVENT: Spider bites you again on the neck
         # CONDITION: Requires "Spider" danger, not already having "Spider Bite"
-        # EFFECTS: Pest Control kills spider; adds "Spider Bite" status
+        # EFFECTS: Pest Control kills spider; Flask of Anti-Venom neutralizes venom; adds "Spider Bite" status
         if not self.has_danger("Spider") or self.has_status("Spider Bite"):
             self.day_event()
             return
@@ -1006,6 +1074,15 @@ class DaySurvivalMixin:
             type.type("You grab your " + magenta(bright("Pest Control")) + " and spray in the direction of the spider. ")
             type.type("A cloud of white liquid covers the spider, and you watch as it slows, and dies. ")
             type.type("Hopefully, that's the end of your spider problems.")
+        elif self.has_item("Flask of Anti-Venom"):
+            self.use_item("Flask of Anti-Venom")
+            print("\n")
+            type.type("You reach for the " + cyan(bright("Flask of Anti-Venom")) + " before the venom can spread.")
+            print("\n")
+            type.type("The burning stops. You feel it working — neutralizing whatever that spider injected into you.")
+            print("\n")
+            type.type("The spider disappears under the seat. But you've already won this one.")
+            self.heal(5)
         else:
             type.type("The spider, now out of reach, crawls off the seat and onto the floor. ")
             type.type("You stick your head out back, but you aren't sure where the spider went, or if it has a family nearby. This is unfortunate.")

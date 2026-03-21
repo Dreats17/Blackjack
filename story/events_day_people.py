@@ -379,6 +379,25 @@ class DayPeopleMixin:
         # EFFECTS: Breath Mints = $50 (consumed); Expensive Cologne = $100 (consumed);
         #          otherwise lose 3 sanity from humiliation
         # Breath Mints or Expensive Cologne help with social situations
+
+        if self.has_item("Vintage Wine") and (self.has_item("Gambler's Chalice") or self.has_item("Overflowing Goblet")):
+            chalice = "Overflowing Goblet" if self.has_item("Overflowing Goblet") else "Gambler's Chalice"
+            self.use_item("Vintage Wine")
+            type.type("You pour from the " + cyan(bright("Vintage Wine")) + " into the " + cyan(bright(chalice)) + ".")
+            print("\n")
+            type.type("The ritual is absurd and perfect. The wine catches the light like something holy.")
+            print("\n")
+            type.type("Whoever you meet today will give you something. They always do, when you look like someone who has everything.")
+            print("\n")
+            type.type("The important-looking stranger stops. Stares. Then reaches into their coat.")
+            print("\n")
+            gift = random.randint(200, 500)
+            type.type(quote("I don't know why, but... take this.") + " They hand you " + green(bright("${:,}".format(gift))) + " and walk away looking lighter somehow.")
+            self.change_balance(gift)
+            self.restore_sanity(12)
+            print("\n")
+            return
+
         type.type("Someone important-looking approaches your car. They seem friendly, but you're suddenly aware of... yourself.")
         print("\n")
         type.type("When's the last time you showered? How's your breath?")
@@ -400,6 +419,43 @@ class DayPeopleMixin:
             type.type("They're impressed by your style and give you " + green(bright("$100")) + " along with their business card.")
             self.change_balance(100)
             self.use_item("Expensive Cologne")
+        elif self.has_item("Deck of Cards"):
+            type.type("You pull out your " + cyan(bright("Deck of Cards")) + " and fan them smoothly between your fingers.")
+            print("\n")
+            type.type(quote("Oh, you play?") + " they ask. Their whole demeanor changes.")
+            print("\n")
+            type.type("You deal a quick hand right on the hood of your car. Two strangers sharing cards in a parking lot. Somehow it works.")
+            print("\n")
+            winnings = random.randint(20, 60)
+            type.type("They lose gracefully and press " + green(bright("$" + str(winnings))) + " into your palm as they leave. " + quote("Best meeting I've had all week."))
+            self.change_balance(winnings)
+            self.restore_sanity(5)
+        elif self.has_item("Necronomicon"):
+            type.type("The important-looking stranger gets close enough to see what's in your lap. Their eyes fix on the " + cyan(bright("Necronomicon")) + ".")
+            print("\n")
+            type.type(quote("Is that... is that what I think it is?"))
+            print("\n")
+            type.type("They're a collector. A professor. Someone who has spent decades chasing things that shouldn't exist.")
+            print("\n")
+            type.type("Their hands are shaking slightly.")
+            print("\n")
+            type.type(quote("I'll give you two thousand dollars for it. Right now. Cash."))
+            print("\n")
+            answer = ask.yes_or_no("Sell the Necronomicon for $2,000? ")
+            if answer == "yes":
+                type.type("You hand it over. They clutch it like a holy relic and practically sprint to their car.")
+                print("\n")
+                type.type("Two thousand dollars lands in your hand. You feel lighter. Slightly.")
+                self.change_balance(2000)
+                self.use_item("Necronomicon")
+                self.restore_sanity(5)
+            else:
+                type.type("You shake your head. " + quote("It's not for sale."))
+                print("\n")
+                type.type("They look devastated. They leave their card anyway. You don't call.")
+                print("\n")
+                type.type("The book seems heavier now. More present. Like it heard the offer and made a note of it.")
+                self.lose_sanity(5)
         else:
             type.type("You try to be friendly, but they wrinkle their nose and quickly make an excuse to leave.")
             print("\n")
@@ -488,6 +544,15 @@ class DayPeopleMixin:
             print("\n")
             type.type("Close call. The padlock saved you.")
             self.restore_sanity(6)
+        elif self.has_item("Brass Knuckles"):
+            type.type("You spin around and face the thief, fist raised.")
+            print("\n")
+            type.type("The brass knuckles catch the afternoon light. The thief gets a very clear look at them.")
+            print("\n")
+            type.type("He reassesses his life choices in real time and takes off running.")
+            print("\n")
+            type.type("Your stuff is safe. Your hand barely even moved.")
+            self.restore_sanity(5)
         elif self.has_item("Pocket Knife"):
             type.type("You grab your " + magenta(bright("Pocket Knife")) + " and brandish it!")
             print("\n")
@@ -538,15 +603,57 @@ class DayPeopleMixin:
         print("\n")
         
         has_class = (self.has_item("Leather Gloves") or self.has_item("Silk Handkerchief") or 
-                     self.has_item("Gold Chain") or self.has_item("Antique Pocket Watch"))
+                     self.has_item("Gold Chain") or self.has_item("Antique Pocket Watch") or
+                     self.has_item("Gentleman's Charm") or self.has_item("Aristocrat's Touch") or
+                     self.has_item("Fancy Cigars") or self.has_item("Vintage Wine"))
         
         if has_class:
-            if self.has_item("Silk Handkerchief"):
+            if self.has_item("Aristocrat's Touch"):
+                type.type("You lean slightly toward them. Old money. They can tell.")
+                print("\n")
+                type.type("The way you hold yourself. The way you don't explain yourself. The quiet certainty that everything is, and always has been, under control.")
+                print("\n")
+                type.type(quote("Good lord. I'm sorry to have troubled you."))
+                print("\n")
+                tip = random.randint(400, 800)
+                type.type("They hand you " + green(bright("${:,}".format(tip))) + " as if they owe you something. They drive off without another word.")
+                self.change_balance(tip)
+                self.restore_sanity(12)
+                print("\n")
+                return
+            elif self.has_item("Gentleman's Charm"):
+                type.type("You give them your full attention. The cufflinks catch the light at exactly the right moment.")
+                print("\n")
+                type.type("Their eyes flick down, then back up. Something shifts.")
+                print("\n")
+                type.type(quote("You know, I think I'm going to get your card. In case I'm ever in the area again."))
+                print("\n")
+                tip = random.randint(200, 500)
+                type.type("They hand you " + green(bright("${:,}".format(tip))) + " and drive off looking slightly dazed.")
+                self.change_balance(tip)
+                self.restore_sanity(10)
+                print("\n")
+                return
+            elif self.has_item("Silk Handkerchief"):
                 type.type("You dab your brow with your " + magenta(bright("Silk Handkerchief")) + " in a refined manner.")
             elif self.has_item("Antique Pocket Watch"):
                 type.type("You casually check your " + magenta(bright("Antique Pocket Watch")) + ".")
             elif self.has_item("Leather Gloves"):
                 type.type("You adjust your " + magenta(bright("Leather Gloves")) + " with casual elegance.")
+            elif self.has_item("Fancy Cigars"):
+                type.type("You produce a " + cyan(bright("Fancy Cigar")) + " and offer one across.")
+                print("\n")
+                type.type("They take it. Light it. Breathe in.")
+                print("\n")
+                type.type(quote("Cuban?"))
+                print("\n")
+                type.type("You shrug as if to say: naturally.")
+            elif self.has_item("Vintage Wine"):
+                type.type("You mention the " + cyan(bright("Vintage Wine")) + " you've been saving for the right occasion.")
+                print("\n")
+                type.type(quote("1987? You're carrying a '87? In your car?"))
+                print("\n")
+                type.type("They look at you differently now. The way people look at someone who understands something they thought only they understood.")
             else:
                 type.type("Your " + magenta(bright("Gold Chain")) + " catches their eye.")
             print("\n")
@@ -755,6 +862,16 @@ class DayPeopleMixin:
             self.add_item("Secret Route Map")
         else:
             type.type("He shrugs. " + quote("Your loss. The offer stands if you change your mind."))
+        if self.has_item("Deck of Cards"):
+            print("\n")
+            type.type("Before he walks off you pull out your " + cyan(bright("Deck of Cards")) + ".")
+            print("\n")
+            type.type("He stops. Looks at the deck. Looks at you.")
+            print("\n")
+            type.type("You sit down on the curb and deal a hand. For an hour, you're not a man trying to make a million dollars. You're just a guy playing cards.")
+            print("\n")
+            type.type("He beats you three games straight. He has the satisfied smile of someone who is still very good at something.")
+            self.restore_sanity(6)
         print("\n")
 
     # ==========================================
