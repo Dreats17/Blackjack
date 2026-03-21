@@ -209,6 +209,12 @@ class DaySurvivalMixin:
             type.type("The old man laps you twice before you give up, but hey, you tried.")
         print("\n")
         self.heal(random.choice([3, 5, 8]))
+        if self.has_item("Running Shoes") or self.has_item("Pursuit Package"):
+            item_name = "Running Shoes" if self.has_item("Running Shoes") else "Pursuit Package"
+            print("\n")
+            type.type("The " + cyan(bright(item_name)) + " grip the pavement perfectly. You actually break into a real run. Five good minutes. Your lungs open up. You feel good.")
+            self.heal(5)
+            self.restore_sanity(3)
 
     def ant_invasion(self):
         # EVENT: Ants invade your car while you sleep
@@ -693,6 +699,11 @@ class DaySurvivalMixin:
                 type.type("You feel a cold coming on...")
                 self.add_status("Cold")
                 self.mark_day("Cold")
+        if self.has_item("Water Purifier"):
+            print("\n")
+            type.type("At least the downpour let you fill up with your " + cyan(bright("Water Purifier")) + ". Clean drinking water — a silver lining to a miserable day.")
+            self.restore_sanity(2)
+            self.heal(3)
         print("\n")
 
     def freezing_night(self):
@@ -703,6 +714,16 @@ class DaySurvivalMixin:
         type.type("The temperature plummets. Frost forms on your windshield, and you can see your breath inside the car.")
         print("\n")
         
+        if self.has_item("Emergency Blanket") and self.has_item("Fire Starter Kit"):
+            type.type("You wrap yourself in the " + cyan(bright("Emergency Blanket")) + " and get the " + cyan(bright("Fire Starter Kit")) + " going outside.")
+            print("\n")
+            type.type("The reflective foil bounces the fire's heat right back at you. You're in a warm cocoon. Fortress mode.")
+            print("\n")
+            type.type("The cold never had a chance. You sleep well. Genuinely, impressively well.")
+            self.heal(10)
+            self.restore_sanity(5)
+            print("\n")
+            return
         if self.has_item("Hand Warmers"):
             type.type("You crack open your " + magenta(bright("Hand Warmers")) + " and hold them close.")
             print("\n")

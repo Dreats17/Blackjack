@@ -362,7 +362,7 @@ class DayAnimalsMixin:
         print("\n")
         type.type("The rat jumps up onto your backseat, and begins to laugh at you. Now that's just cruel. This rat must be crazy.")
         print("\n")
-        
+
         # Animal Whistle befriend the laughing rat
         if self.has_item("Animal Whistle") and not self.has_companion("Slick"):
             type.type("Wait. The " + magenta(bright("Animal Whistle")) + " vibrates against your chest.")
@@ -375,6 +375,18 @@ class DayAnimalsMixin:
             print()
             self.add_companion("Slick", "Clever Rat")
             self.lose_danger("Rat")
+            return
+
+        if self.has_item("Pepper Spray"):
+            type.type("You grab your " + cyan(bright("Pepper Spray")) + " and give the rat a direct blast.")
+            print("\n")
+            type.type("Blinded and thoroughly unhappy, it leaps off the backseat and vanishes under the door before you can blink.")
+            print("\n")
+            type.type("No bite. No damage. Just a very offended rat and a car that smells like pepper for a week.")
+            self.use_item("Pepper Spray")
+            self.lose_danger("Rat")
+            self.lose_sanity(1)
+            print("\n")
             return
         
         self.lose_sanity(random.choice([1, 2, 3]))  # A laughing rat? That's unsettling
@@ -581,6 +593,16 @@ class DayAnimalsMixin:
             self.increment_statistic("companions_befriended")
             self.unlock_achievement("first_friend")
             print("\n")
+            return
+
+        if self.has_item("Slingshot"):
+            type.type(" — but you're ready.")
+            print("\n")
+            type.type("You step out with your " + cyan(bright("Slingshot")) + ". A well-aimed stone makes your position absolutely clear.")
+            print("\n")
+            type.type("The seagull veers off at the last second, screaming. It does NOT come back.")
+            print("\n")
+            self.restore_sanity(3)
             return
         
         type.type(" and steals your breakfast right out of your hand.")
@@ -1144,6 +1166,17 @@ class DayAnimalsMixin:
         print("\n")
         type.type("Not scurrying past. Not fleeing. " + italic("At you.") + " On purpose.")
         print("\n")
+
+        if self.has_item("Running Shoes") or self.has_item("Pursuit Package"):
+            item_name = "Running Shoes" if self.has_item("Running Shoes") else "Pursuit Package"
+            type.type("Your " + cyan(bright(item_name)) + " are already on.")
+            print("\n")
+            type.type("The rat never closes the gap. You're half a block gone before it leaves the dumpster.")
+            print("\n")
+            type.type("You jog back to your car at a dignified pace. Nobody saw anything.")
+            self.restore_sanity(3)
+            print("\n")
+            return
 
         answer = ask.option("What do you do? ", ["kick it away", "run", "stand your ground"])
         if answer == "kick it away":
