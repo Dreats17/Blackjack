@@ -185,7 +185,7 @@ class DayDarkMixin:
         # CONDITION: Sanity below 30
         # EFFECTS: Physical and mental symptoms, risk of self-harm
         if self.get_sanity() >= 30:
-            self.night_event()
+            self.day_event()
             return
         type.type("You're drenched in sweat in your car seat. Your hands are shaking. Your heart is racing.")
         print("\n")
@@ -388,7 +388,7 @@ class DayDarkMixin:
         # EFFECTS: Player must make a choice - potentially fatal
         # MENTAL HEALTH: Suicidal ideation - explicit content warning
         if self.get_sanity() >= 15:
-            self.night_event()
+            self.day_event()
             return
         type.type("You start your car and drive. You don't know where. Just... driving.")
         print("\n")
@@ -461,7 +461,7 @@ class DayDarkMixin:
         # CONDITION: Won big recently (balance increased by 50K+ today)
         # EFFECTS: Risk losing everything chasing the high
         # ADDICTION: The insatiable need for more
-        if not hasattr(self, '_Player__today_winnings') or self._today_winnings < 50000:
+        if not hasattr(self, '_today_winnings') or self._today_winnings < 50000:
             self.day_event()
             return
         type.type("You're sitting in your car outside the casino. You won big today. Really big. You should walk away.")
@@ -672,10 +672,10 @@ class DayDarkMixin:
 
     def the_high_roller_suicide(self):
         # EVENT: Witness a high roller's complete breakdown and suicide
-        # CONDITION: Balance >= $500,000 (you're in the high roller areas)
+        # CONDITION: Balance >= $400,000 (you're in the high roller areas)
         # EFFECTS: Witness death, major sanity loss
         # MENTAL HEALTH: Witnessing suicide
-        if self.get_balance() < 500000:
+        if self.get_balance() < 400000:
             self.day_event()
             return
         type.type("You head to the casino. In the high roller room, a man starts laughing. It's not a happy sound.")
@@ -760,8 +760,8 @@ class DayDarkMixin:
 
     def the_winning_streak_paranoia(self):
         # SECRET: Won more than $100,000 in a single day
-        if not hasattr(self, '_Player__today_winnings') or self._today_winnings < 100000:
-            self.night_event()
+        if not hasattr(self, '_today_winnings') or self._today_winnings < 100000:
+            self.day_event()
             return
         type.type("You're wide awake in your car. Too much adrenaline. Too much paranoia.")
         print("\n")

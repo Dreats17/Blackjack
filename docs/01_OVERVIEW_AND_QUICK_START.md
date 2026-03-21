@@ -1,41 +1,14 @@
-# Blackjack Roguelike — Overview & Quick Start Guide
+# 01 — Overview & Quick Start
 
-> **Last Updated:** March 5, 2026  
-> **Version:** Current Build (Split Architecture)  
-> **Total Codebase:** ~35,000+ lines across 18 source files
-
----
-
-## Table of Contents
-
-1. [What Is This Game?](#what-is-this-game)
-2. [How to Play](#how-to-play)
-3. [Your Goal](#your-goal)
-4. [Game Loop Summary](#game-loop-summary)
-5. [Controls & Text Speed](#controls--text-speed)
-6. [Wealth Ranks](#wealth-ranks)
-7. [Key Stats at a Glance](#key-stats-at-a-glance)
-8. [Documentation Index](#documentation-index)
-9. [Beginner Tips](#beginner-tips)
+> A blackjack-based text adventure where you gamble your way from $50 to $1,000,000 — or die trying.
 
 ---
 
 ## What Is This Game?
 
-**Blackjack Roguelike** is a terminal-based narrative RPG where you play as a down-on-your-luck drifter living out of your car, trying to gamble your way to **$1,000,000** at a shady casino run by a mysterious, one-eyed Dealer.
+You play as **Johnathan**, a man living in his car with nothing but $50 from Grandma and a desperate need to survive. The Casino — run by a mysterious jade-eyed Dealer — is your only path to a million dollars. But between the cards and the cash, you'll face illness, injury, loan sharks, surreal nightmares, animal companions, therapy sessions, and nine possible endings ranging from triumphant salvation to utter madness.
 
-But this is far more than a card game. Between hands of Blackjack, you'll:
-
-- **Survive** day-to-day life on the road — managing your health, sanity, and fatigue
-- **Explore** locations — shops, mechanic garages, adventure areas, and mysterious encounters
-- **Befriend** over 25 animal companions who ride along in your wagon
-- **Collect** items, flasks (potions), and collectibles to sell or use
-- **Navigate** 14 multi-part storylines with memorable NPCs
-- **Manage** the Dealer's happiness — if he gets too angry, he *will* kill you
-- **Discover** hundreds of random events ranging from absurdist comedy to genuine emotional depth
-- **Choose** your path to one of 8+ major endings
-
-The tone blends dark humor, emotional storytelling, and chaotic randomness. You might befriend a sentient duck army one day and have a heartbreaking phone call with your estranged wife the next.
+This is a **text-based survival RPG** built around a blackjack core loop, with deep systems for health, sanity, economy, companions, crafting, storylines, and multiple endings.
 
 ---
 
@@ -43,141 +16,170 @@ The tone blends dark humor, emotional storytelling, and chaotic randomness. You 
 
 ### Starting the Game
 
-Run `blackjackMain.py` to start. You'll go through an opening sequence, then the main game loop begins.
+Run `blackjackMain.py` to start. The game begins with a short intro sequence, then enters the day/night loop.
 
-### Text Display
-
-All text is displayed with a **typewriter effect** — characters appear one at a time for immersion. You can control the speed:
-
-| Key | Effect |
-|-----|--------|
-| **Spacebar** | Skip to end of current text block instantly |
-| **,** (comma) | Set typing speed to Default |
-| **.** (period) | Set typing speed to Fast |
-| **/** (slash) | Set typing speed to Fastest |
-| **p** | Set typing speed to Print (instant) |
-
-### Input
-
-When the game asks you a question, type your answer and press **Enter**. Common inputs:
-
-- **yes / no** (or **y / n**) for yes/no questions
-- **Numbers** for betting amounts
-- **hit / stand** (or **h / s**) during Blackjack hands
-- **Option names** when given multiple choices (e.g., "peek", "double", "split", "surrender")
-
----
-
-## Your Goal
-
-**Reach $1,000,000.** That's the dream.
-
-You start with **$50** and 3 rounds of Blackjack per day. Between sessions, you live your life — encountering events, visiting shops, and trying not to die.
-
-But reaching a million isn't the only way the game ends. There are **8+ major endings** depending on your choices, relationships, and mental state.
-
----
-
-## Game Loop Summary
-
-Each in-game day follows this cycle:
+### The Core Loop
 
 ```
-┌─────────────────────────────────────┐
-│          MORNING (Start Day)        │
-│  • Wake up (sleep quality report)   │
-│  • Daily system updates             │
-│  • Companion status checks          │
-│  • Loan shark escalation            │
-│  • Random morning event OR          │
-│    storyline event fires            │
-├─────────────────────────────────────┤
-│          AFTERNOON                  │
-│  • Choose activity:                 │
-│    - Visit a SHOP                   │
-│    - Visit the DOCTOR               │
-│    - Visit a MECHANIC               │
-│    - Go on an ADVENTURE             │
-│    - Rest at camp                   │
-│    - Visit Vinnie (Loan Shark)      │
-│    - Visit Gus (Pawn Shop)          │
-├─────────────────────────────────────┤
-│          EVENING (Blackjack)        │
-│  • Drive to the casino              │
-│  • Play 3 rounds of Blackjack       │
-│    (4 with certain items)           │
-│  • Dealer happiness shifts          │
-│  • Gifts delivered if wrapped       │
-├─────────────────────────────────────┤
-│          NIGHT (End Day)            │
-│  • Random night event fires         │
-│  • Companion interactions           │
-│  • Health/sanity updates            │
-│  • Day counter increments           │
-│  • Sleep                            │
-└─────────────────────────────────────┘
+NIGHT → Play blackjack at the Casino
+  ↓
+END OF DAY → Summary, healing, rank check
+  ↓
+MORNING → Events fire, companion bonuses apply
+  ↓
+AFTERNOON → Shop, craft, explore, visit NPCs
+  ↓
+(repeat)
 ```
 
----
+### Your Goal
 
-## Wealth Ranks
-
-Your wealth rank determines which events, shops, and content you can access. Almost everything in the game is tier-gated.
-
-| Rank | Title | Balance Range | What Unlocks |
-|------|-------|---------------|--------------|
-| 0 | **Poor** | $0 – $999 | Basic survival events, Kyle's convenience store |
-| 1 | **Cheap** | $1,000 – $9,999 | More events, mechanic access, companion events |
-| 2 | **Modest** | $10,000 – $99,999 | Squirrelly companion chain, Phil interrogation, more shops |
-| 3 | **Rich** | $100,000 – $499,999 | Victoria rivalry, Bruno bodyguard, Grimy Gus pawn shop |
-| 4 | **Doughman** | $500,000 – $899,999 | GUNMAN event, Betsy the Cow, drastic events |
-| 5 | **Nearly There** | $900,000 – $999,999 | Adventure areas, rabbit chase finale, Suzy finale |
-| 6 | **Millionaire** | $1,000,000+ | WIN — Special morning visitor, airport ending |
-
-> **Important:** Events are drawn from pools specific to your current rank. As you climb ranks, you unlock new content but also face more dangerous events.
+Reach **$1,000,000**. How you get there — and what you do when you arrive — determines your ending.
 
 ---
 
-## Key Stats at a Glance
+## Key Stats
 
-| Stat | Range | What It Does |
-|------|-------|--------------|
-| **Balance ($)** | $0 – $1,000,000+ | Your money. Reach $0 = game over. Reach $1M = win. |
-| **Health (HP)** | 0 – 100 | Physical well-being. At 0 = death. |
-| **Sanity** | 0 – 100 | Mental stability. Low sanity = hallucinations, madness ending risk. |
-| **Fatigue** | 0 – 100 | Exhaustion level. High fatigue = missed events, poor sleep. |
-| **Dealer Happiness** | 0 – 100 | The Dealer's mood. Below 20 = danger. At 0 = he may kill you. |
-| **Day Counter** | 1+ | Tracks how many days you've survived. |
+| Stat | Range | Death At | Purpose |
+|------|-------|----------|---------|
+| **Health** | 0–100 | 0 | Physical condition. Damaged by illness, injury, events. |
+| **Sanity** | 0–100 | — | Mental stability. Affects perception, dialogue, events. Below 30 triggers dark storylines. |
+| **Fatigue** | 0–100 | — | Exhaustion. Too high = missed days. |
+| **Balance** | $0+ | — | Your money. Determines rank and available content. |
+
+---
+
+## Rank System
+
+Your balance determines your rank, which unlocks content:
+
+| Rank | Title | Balance |
+|------|-------|---------|
+| 0 | Poor | $0–$999 |
+| 1 | Cheap | $1,000–$9,999 |
+| 2 | Modest | $10,000–$99,999 |
+| 3 | Rich | $100,000–$399,999 |
+| 4 | Doughman | $400,000–$749,999 |
+| 5 | Nearly | $750,000+ |
+
+---
+
+## Quick Start Strategy
+
+### Days 1–5: Survive
+- Bet **$5–10** per hand. Don't risk big.
+- Save **$50–100** to buy a car from Frank (cheapest mechanic).
+- Take every free healing/sanity option offered.
+
+### Days 5–10: Get Mobile
+- **Buy a car** — this is the #1 priority. It unlocks all shops and locations.
+- Buy the **Worn Map** ($8) — unlocks Marvin's shop and the Witch Doctor.
+
+### Days 10–20: Invest
+- Buy **Tool Kit** ($75) — unlocks crafting at the Car Workbench.
+- Start visiting **Marvin** — his mystical items give you a real edge at blackjack.
+- Watch for **Tanya's Number** (5% spawn after day 12) — needed for the best ending.
+
+### Days 20+: Push for the Million
+- Buy Marvin items: **Lucky Coin** ($4k) → **White Feather** ($5k) → **Sneaky Peeky Shades** ($14k)
+- Use **loans strategically** when you have 2+ Marvin items (edge score ≥ 2).
+- Keep health and sanity above safe levels — runs collapse from stat crises, not bad cards.
+- Visit **Tanya 5+ times** for the best ending (Salvation: Healed).
+
+---
+
+## Key Locations
+
+| Location | Unlock | Purpose |
+|----------|--------|---------|
+| The Casino | Always | Play blackjack |
+| Convenience Store | Car | Buy supplies (rank-based inventory) |
+| Doctor's Office | Car | Heal injuries ($75–$200) |
+| Filthy Frank's | Meet Frank | Cheap car repairs (40% fail) |
+| Trusty Tom's | Meet Tom | Reliable repairs ($150–$350) |
+| Oswald's | Meet Oswald | Perfect repairs ($800–$900) |
+| Marvin's | Worn Map | Buy blackjack-enhancing items |
+| Witch Doctor | Map | Alternative healing + flasks |
+| Vinnie's | Meet Vinnie | Emergency loans (20% weekly interest) |
+| Grimy Gus's | Meet Gus | Pawn shop — sell items for cash |
+| Tanya's Office | Tanya's Number | Therapy sessions → best ending |
+| Car Workbench | Tool Kit | 50+ crafting recipes |
+| Airport | $1,000,000 | Bliss ending — fly away |
+
+---
+
+## The 9 Endings
+
+| # | Ending | Requirements | Tone |
+|---|--------|-------------|------|
+| 1 | **Salvation (Healed)** ⭐ | $1M + Tanya 5+ visits + Met Tom | Best ending — true healing |
+| 2 | **Salvation** | $1M + Met Tom + Answer phone + Agree | Good — bittersweet reunion |
+| 3 | **Resurrection** | $1M + Met Tom + Answer phone + Refuse | Hollow — you said no |
+| 4 | **Destruction** | $1M + Befriend Frank | Dark — violence and crime |
+| 5 | **Transcendence** | $1M + Befriend Oswald | Eerie — become the new Dealer |
+| 6 | **Bliss** | $1M + Own car | Escapist — fly away forever |
+| 7 | **Sanctuary** 🐾 | $1M + 5 companions + Animal Whistle | Secret — animal sanctuary |
+| 8 | **Exhaust** | Low sanity + despair choices | Darkest ending |
+| 9 | **Madness** | Sanity < 30 + shadow entity | Horrifying — mind breaks |
+
+---
+
+## Companions
+
+8 animal companions provide passive bonuses:
+
+| Companion | Type | Key Bonus |
+|-----------|------|-----------|
+| Squirrelly | Squirrel | +2 sanity, +1 luck |
+| Whiskers | Alley Cat | +3 sanity, danger warning |
+| Lucky | Three-Legged Dog | +5 sanity, physical protection |
+| Mr. Pecks | Crow | +1 sanity, 5% money finding |
+| Patches | Opossum | +2 sanity, night bonuses |
+| Rusty | Raccoon | +2 sanity, 3% steal chance |
+| Slick | Rat | +1 sanity, escape routes |
+| Hopper | Rabbit | +2 sanity, +3 luck |
+
+Feed them their favorite foods to keep happiness high. 5+ companions + Animal Whistle = secret Sanctuary ending.
+
+---
+
+## Important Items
+
+| Item | Price | Why It Matters |
+|------|-------|----------------|
+| **Worn Map** | $8 | Unlocks Marvin and Witch Doctor |
+| **Tool Kit** | $75 | Unlocks crafting |
+| **Lucky Coin** | $4,000 | Converts losses to pushes (Marvin) |
+| **Sneaky Peeky Shades** | $14,000 | See the next card (Marvin) |
+| **Spare Tire** | $50 | Prevents flat tire events |
+| **Bug Spray** | $15 | Prevents mosquito swarms |
+| **Tanya's Number** | Event | 5% spawn after day 12 → best ending |
+
+---
+
+## Things to Avoid
+
+| Trap | Why |
+|------|-----|
+| **Necronomicon** ($666) | Cursed — drains sanity, causes bad luck |
+| **Cursed Coin** ($13) | Deceptively cheap, causes bad luck |
+| **Devil's Bargain** | +$10–50k but −25 sanity |
+| **Ignoring health/sanity** | Stat crises kill more runs than bad cards |
+| **Ignoring Tanya** | Miss the best ending in the game |
 
 ---
 
 ## Documentation Index
 
-This guide is split into multiple files for easy navigation:
-
-| File | Contents |
-|------|----------|
-| **01 — Overview & Quick Start** *(this file)* | Game introduction, controls, basic mechanics |
-| **[02 — Core Systems](02_CORE_SYSTEMS.md)** | Health, Sanity, Fatigue, Dealer Happiness, Wealth Ranks, Day/Night cycle |
-| **[03 — Blackjack & Gambling](03_BLACKJACK_AND_GAMBLING.md)** | Rules, betting, special actions (peek/double/split/surrender), dealer mechanics |
-| **[04 — Items, Flasks & Upgrades](04_ITEMS_FLASKS_AND_UPGRADES.md)** | All items, flask potions, upgrade paths, durability, food items |
-| **[05 — Locations, Shops & NPCs](05_LOCATIONS_SHOPS_AND_NPCS.md)** | Every location, shop inventory, NPC descriptions, services |
-| **[06 — Companions](06_COMPANIONS.md)** | All 25+ companions, befriending, feeding, happiness, bonding, betrayal path |
-| **[07 — Events & Storylines](07_EVENTS_AND_STORYLINES.md)** | Random events, 14 multi-part storylines, event chains, secret triggers |
-| **[08 — Endings & Achievements](08_ENDINGS_AND_ACHIEVEMENTS.md)** | All 8+ endings with unlock guides, 240+ achievements by category |
-| **[09 — Secrets & Advanced Strategies](09_SECRETS_AND_ADVANCED_STRATEGIES.md)** | Hidden events, exact-balance triggers, optimal strategies, death avoidance |
-
----
-
-## Beginner Tips
-
-1. **Don't bet everything.** The minimum bet scales with your balance. Betting smart keeps you alive longer.
-2. **Watch the Dealer's mood.** If you win too much, he gets angry. Below 20% happiness, you get a warning. At 0%, he may shoot you.
-3. **Buy a Health Indicator early.** It tells you your exact HP — otherwise you're guessing.
-4. **Feed your companions.** They lose 5 happiness per day if not fed. At 10 or below, they might run away.
-5. **Save your money for Oswald.** You only get one chance at each mechanic. His item upgrades are expensive ($120k–$400k) but dramatically change gameplay.
-6. **Visit Kyle's store often.** After 3–5 purchases, you unlock the gift-wrapping system to boost Dealer happiness.
-7. **Don't ignore your sanity.** Below 25, you start seeing hallucinations. At 0, it's either madness (game over) or permanent "broken" state.
-8. **Flasks are single-use but powerful.** "No Bust" prevents going over 21. "Second Chance" lets you replay a losing hand. Buy them from the Witch Doctor.
-9. **Adventure areas are high risk, high reward.** Woodlands unlocked at rank 3. All are available at rank 5 ($900k+), they offer huge payouts but cost HP and fatigue.
-10. **There is no "right" ending.** Explore different paths — the game has 8+ endings, each telling a different story about who you are.
+| Doc | Contents |
+|-----|---------|
+| [02 — Core Systems](02_CORE_SYSTEMS.md) | Day/night cycle, health, sanity, fatigue, ranks, economy, durability |
+| [03 — Blackjack & Gambling](03_BLACKJACK_AND_GAMBLING.md) | Dealer, blackjack rules, Marvin items, betting, special actions |
+| [04 — Items, Flasks & Upgrades](04_ITEMS_FLASKS_AND_UPGRADES.md) | All items, crafting, pawn prices, flasks |
+| [05 — Locations, Shops & NPCs](05_LOCATIONS_SHOPS_AND_NPCS.md) | Every location, shop, and character |
+| [06 — Companions](06_COMPANIONS.md) | All 8 companions, feeding, happiness, bonuses |
+| [07 — Events & Storylines](07_EVENTS_AND_STORYLINES.md) | Event system, storylines, quest chains |
+| [08 — Endings & Achievements](08_ENDINGS_AND_ACHIEVEMENTS.md) | All 9 endings, 500+ achievements |
+| [09 — Secrets & Advanced Strategies](09_SECRETS_AND_ADVANCED_STRATEGIES.md) | Hidden mechanics, optimal paths, traps |
+| [10 — All Events Reference](10_ALL_EVENTS_REFERENCE.md) | Complete event catalog |
+| [10 — Gameplay Fairness Changelog](10_GAMEPLAY_FAIRNESS_CHANGELOG.md) | Balance changes and fairness notes |

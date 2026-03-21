@@ -2,7 +2,6 @@ import random
 import deckOfCards
 from colorama import Fore, Back, Style
 import time
-import random
 import sys
 import msvcrt
 import typer
@@ -86,6 +85,11 @@ class Blackjack:
         self.__fraudulent_portion = 0
 
     def play_round(self, count=None):
+        # Tanya therapy skip - player is staying in their car tonight
+        if self.__player._skip_blackjack_tonight:
+            self.__player._skip_blackjack_tonight = False
+            return
+
         # Updates the player
         self.update_player()
 
@@ -1426,8 +1430,8 @@ class Blackjack:
                 else:
                     value = 1
 
-        if value > 0: self.anger_dealer(value + modifier)
-        elif value < 0: self.calm_dealer(-(value))
+        if value > 0: self.anger_dealer(int(value) + modifier)
+        elif value < 0: self.calm_dealer(-int(value))
 
     def _check_hot_money_noticed(self):
         """Per-hand check: did the dealer notice hot (loan) money in this bet?

@@ -60,8 +60,8 @@ def get_min_balance_for_rank(rank_name):
         "Cheap": 1000,
         "Modest": 10000,
         "Rich": 100000,
-        "Doughman": 500000,
-        "Nearly There": 900000
+        "Doughman": 400000,
+        "Nearly There": 750000
     }[rank_name]
 
 

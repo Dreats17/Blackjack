@@ -67,9 +67,9 @@ class LocationsMixin:
                 type.type("You hear a loud crash in the distance. A tree must've fallen nearby.")
             else:
                 type.type("The wind pushes the light gray clouds across the sky, and you watch them all afternoon.")
-            
+
             print("\n")
-            
+
             type.type("As the sun begins to fall, you collect your money, and leave the warmth of your wagon. You barrel out into the wind, trudging your way to the casino.")
 
             print("\n")
@@ -96,7 +96,7 @@ class LocationsMixin:
             type.type("the waterfall above you raining water down, splashing in the river, ")
             type.type("leading out to the ocean and the horizon before you. ")
             type.type("The sun looks so bright in the fading orange sky, and the hot sand began to cool below you. ")
-            type.type("Before you get the chance to say goodbye, you wake up, having slept through all of " + bright(yellow("Day " + str(self._day + 1))) + " and " + bright(yellow("Day " + str(self._day + 2))) + "." )
+            type.type("Before you get the chance to say goodbye, you wake up, having slept through all of " + bright(yellow("Day " + str(self._day + 1))) + " and " + bright(yellow("Day " + str(self._day + 2))) + ".")
             random_chance = random.randrange(2)
             if random_chance == 0:
                 self._day += 3
@@ -126,77 +126,114 @@ class LocationsMixin:
                 type.slow(red("Glad the rain didn't permanently wash you away. That would have been a shame."))
             print("\n")
 
-        elif self.has_travel_restriction("Battery"):
-            pass
+        elif any(self.has_travel_restriction(r) for r in [
+            "Battery", "Engine", "Car Trouble", "Dead Battery", "Car Won't Start",
+            "Dead Car", "Totaled Car", "Destroyed Engine", "No Engine", "Flat Tire",
+            "Brake Failure", "Dead Alternator", "Radiator Failure", "No Headlights"
+        ]):
+            restriction_messages = {
+                "Battery": "Your battery gives out before you can go anywhere useful.",
+                "Engine": "Your engine won't turn over. The afternoon disappears while you fight with it.",
+                "Car Trouble": "Your car acts up so badly you lose the whole afternoon dealing with it.",
+                "Dead Battery": "Click. Click. Nothing. Your battery is dead again.",
+                "Car Won't Start": "No matter what you try, your car refuses to start.",
+                "Dead Car": "Your car is completely dead. You're not driving anywhere today.",
+                "Totaled Car": "Your car is in no condition to drive. The afternoon is gone.",
+                "Destroyed Engine": "The engine is beyond repair for now. You're stranded for the afternoon.",
+                "No Engine": "No engine means no driving. You're stuck where you are.",
+                "Flat Tire": "A flat tire kills your plans for the afternoon.",
+                "Brake Failure": "Driving with failed brakes isn't an option. You stay put.",
+                "Dead Alternator": "The alternator is dead, and so are your travel plans.",
+                "Radiator Failure": "The cooling system fails before you can get moving.",
+                "No Headlights": "Without headlights, you're not taking that risk on the road."
+            }
 
-        elif self.has_travel_restriction("Engine"):
-            pass
-        
-        # === CAR TROUBLE CHECK - Random afternoon car problems ===
-        elif self.check_for_car_trouble():
-            # Car trouble event was triggered, afternoon wasted
+            active_restriction = None
+            for restriction in [
+                "Battery", "Engine", "Car Trouble", "Dead Battery", "Car Won't Start",
+                "Dead Car", "Totaled Car", "Destroyed Engine", "No Engine", "Flat Tire",
+                "Brake Failure", "Dead Alternator", "Radiator Failure", "No Headlights"
+            ]:
+                if self.has_travel_restriction(restriction):
+                    active_restriction = restriction
+                    break
+
+            if active_restriction is None:
+                type.type("Your car trouble eats up the whole afternoon.")
+            else:
+                type.type(restriction_messages[active_restriction])
+            print("\n")
+            type.type("You lose the afternoon to car trouble and head straight to the casino at dusk.")
+            print("\n")
+
+            if active_restriction is not None and self.has_travel_restriction(active_restriction):
+                self.remove_travel_restriction(active_restriction)
+            if self.has_travel_restriction("Wasted Afternoon"):
+                self.remove_travel_restriction("Wasted Afternoon")
+
+            self.start_night()
             return
-        
-        # Check for "Wasted Afternoon" restriction (from car trouble events)
+
+        elif self.check_for_car_trouble():
+            print("\n")
+            type.type("You head straight to the casino, hoping for better luck at the tables than you had with your car.")
+            print("\n")
+            self.start_night()
+            return
+
         elif self.has_travel_restriction("Wasted Afternoon"):
-            type.type("Your afternoon was consumed by car trouble. By the time you're done, the sun is setting.")
             print("\n")
             type.type("You head straight to the casino, hoping for better luck at the tables than you had with your car.")
             print("\n")
             self.remove_travel_restriction("Wasted Afternoon")
             self.start_night()
             return
-        
+
         # MILLIONAIRE AFTERNOON - Special choices after the visitor
         elif self.was_millionaire_visited() and self._balance >= 1000000:
             self.millionaire_afternoon()
-            
         elif self.has_item("Car"):
-            # CHECK FOR COMPANION INTERACTIONS
-            if len(self.get_all_companions()) > 0 and not self.has_travel_restriction("Skip Companion Dialogue"):
-                type.type("Your companions gather around as the afternoon sun filters through your wagon.")
-                print("\n")
-                answer = ask.yes_or_no("Spend time with your companions? ")
-                if answer == "yes":
-                    self.companion_afternoon_dialogue()
-                    return  # Afternoon spent with companions
-                else:
-                    type.type("You'll catch up with them later. For now, you have places to be.")
+            if len(self.get_all_companions()) > 0:
+                if self.has_travel_restriction("Skip Companion Dialogue"):
+                    type.type("Your companions keep their distance today. They don't seem ready to talk.")
                     print("\n")
-            
-            choice = None
+                    self.remove_travel_restriction("Skip Companion Dialogue")
+                else:
+                    print("\n")
+                    answer = ask.yes_or_no("Spend time with your companions? ")
+                    if answer == "yes":
+                        self.companion_afternoon_dialogue()
+                        return
+                    print("\n")
+
             shops = self._lists.make_shop_list()
             adventure_areas = self.get_unlocked_adventure_areas()
-            
+
             type.type("Would you like to spend your day driving somewhere? ")
             print()
-            
-            # List shops
+
             for i in range(len(shops)):
                 type.type(str(i+1) + ". " + shops[i])
                 time.sleep(0.5)
                 print()
-            
-            # List unlocked adventure areas
+
             adventure_start = len(shops)
             if len(adventure_areas) > 0:
-                print()
-                type.type(yellow("--- Night Destinations ---"))
+                type.type(yellow("--- Adventure Destinations ---"))
                 print()
                 for i, (area_name, _) in enumerate(adventure_areas):
                     type.type(str(adventure_start + i + 1) + ". Drive to " + area_name)
                     time.sleep(0.5)
                     print()
-            
-            # Stay Home option
+
             stay_home_num = len(shops) + len(adventure_areas) + 1
             type.type(str(stay_home_num) + ". Stay Home")
             time.sleep(0.5)
             print()
-            
+
             type.type("Choose a number: ")
-            total_choices = len(shops) + len(adventure_areas) + 1
-            
+
+            choice = None
             while True:
                 while choice is None:
                     try:
@@ -207,7 +244,6 @@ class LocationsMixin:
                     shop = shops[choice-1]
                     break
                 elif len(shops) < choice <= len(shops) + len(adventure_areas):
-                    # Player chose an adventure area
                     area_index = choice - len(shops) - 1
                     area_name, area_func = adventure_areas[area_index]
                     if self.has_danger("Busted Kneecaps"):
@@ -246,9 +282,10 @@ class LocationsMixin:
             elif shop == "Vinnie's Back Alley Loans": self.visit_loan_shark()
             elif shop == "Airport": self.visit_airport()
             elif shop == "Make a Phone Call": self.visit_phone_call()
+            elif shop == "Tanya's Office": self.visit_tanya()
             elif shop == "Car Workbench": self.visit_workbench()
             else: self.night_event()
-            
+
         else:
             shops = self._lists.make_shop_list(on_foot=True)
 
@@ -302,6 +339,7 @@ class LocationsMixin:
             elif shop == "Grimy Gus's Pawn Emporium": self.visit_pawn_shop()
             elif shop == "Vinnie's Back Alley Loans": self.visit_loan_shark()
             elif shop == "Make a Phone Call": self.visit_phone_call()
+            elif shop == "Tanya's Office": self.visit_tanya()
             else: self.night_event()
 
     #Doctor's Office Interaction    
@@ -544,6 +582,20 @@ class LocationsMixin:
             
             print()
             type.type("Well, that seems to be everything. You still appear a little worse for wear, but this medicine should do the trick.")
+
+        # Injury treatment - doctor removes one injury per visit
+        if len(self._injuries) > 0:
+            injury = random.choice(list(self._injuries))
+            print()
+            type.type("Hold on, let me take a closer look... that " + red(injury.lower()) + " needs attention.")
+            print()
+            type.type("Let me patch you up as best I can.")
+            self.heal_injury(injury)
+            if len(self._injuries) > 0:
+                print()
+                type.type("I've treated the worst of it. Your other injuries will need more visits, but you're heading in the right direction.")
+            print()
+
         print("\n")
         self.heal(100)
         self.restore_sanity(random.choice([1, 2, 3]))  # Restores sanity
@@ -710,62 +762,62 @@ class LocationsMixin:
             if potion == "No Bust":
                 type.type("AHHH, so YOU WANT the Flask of No Bust?")
                 if no_bust_price == 0:
-                    no_bust_price = random.choice([18000, 22000, 25000])
+                    no_bust_price = random.choice([10000, 12000, 14000])
                 price = no_bust_price
             elif potion == "Imminent Blackjack":
                 type.type("I SEE, so YOU WANT the Flask of Imminent Blackjack?")
                 if imminent_blackjack_price == 0:
-                    imminent_blackjack_price = random.choice([30000, 35000, 42000])
+                    imminent_blackjack_price = random.choice([16000, 19000, 22000])
                 price = imminent_blackjack_price
             elif potion == "Dealer's Whispers":
                 type.type("HAHAHA, so YOU WANT the Flask of Dealer's Whispers?")
                 if dealers_whispers_price == 0:
-                    dealers_whispers_price = random.choice([17000, 21000, 25000])
+                    dealers_whispers_price = random.choice([10000, 12000, 14000])
                 price = dealers_whispers_price
             elif potion == "Bonus Fortune":
                 type.type("OOOOOOOOHHH, so YOU WANT the Flask of Bonus Fortune?")
                 if bonus_fortune_price == 0:
-                    bonus_fortune_price = random.choice([26000, 32000, 36000])
+                    bonus_fortune_price = random.choice([13000, 16000, 19000])
                 price = bonus_fortune_price
             elif potion == "Anti-Venom":
                 type.type("OF COURSEEEE, YOU WANT the Flask of Anti-Venom?")
                 if antivenom_price == 0:
-                    antivenom_price = random.choice([18000, 20000, 23000])
+                    antivenom_price = random.choice([9000, 10000, 12000])
                 price = antivenom_price
             elif potion == "Anti-Virus":
                 type.type("AH-HA, YOU WANT the Flask of Anti-Virus?")
                 if antivirus_price == 0:
-                    antivirus_price = random.choice([19000, 21000, 24000])
+                    antivirus_price = random.choice([10000, 11000, 12000])
                 price = antivirus_price
             elif potion == "Fortunate Day":
                 type.type("HEHEHAHAIHEHIA, so YOU WANT the Flask of Fortunate Day?")
                 if fortunate_day_price == 0:
-                    fortunate_day_price = random.choice([8000, 9500, 12000])
+                    fortunate_day_price = random.choice([4000, 5000, 6000])
                 price = fortunate_day_price
             elif potion == "Fortunate Night":
                 type.type("MUAHAHAHAHA, so YOU WANT the Flask of Fortunate Night?")
                 if fortunate_night_price == 0:
-                    fortunate_night_price = random.choice([8000, 10000, 14000])
+                    fortunate_night_price = random.choice([4000, 5000, 7000])
                 price = fortunate_night_price
             elif potion == "Second Chance":
                 type.type("OHOHOHOHO, so YOU WANT the Flask of Second Chance?")
                 if second_chance_price == 0:
-                    second_chance_price = random.choice([21000, 25000, 28000])
+                    second_chance_price = random.choice([11000, 13000, 15000])
                 price = second_chance_price
             elif potion == "Split Serum":
                 type.type("YESYESYES, so YOU WANT the Flask of Split Serum?")
                 if split_serum_price == 0:
-                    split_serum_price = random.choice([22000, 27000, 32000])
+                    split_serum_price = random.choice([11000, 14000, 16000])
                 price = split_serum_price
             elif potion == "Dealer's Hesitation":
                 type.type("MUEHEHEHE, so YOU WANT the Flask of Dealer's Hesitation?")
                 if dealers_hesitation_price == 0:
-                    dealers_hesitation_price = random.choice([15000, 18000, 22000])
+                    dealers_hesitation_price = random.choice([8000, 9000, 11000])
                 price = dealers_hesitation_price
             elif potion == "Pocket Aces":
                 type.type("OOOOOH LALA, so YOU WANT the Flask of Pocket Aces?")
                 if pocket_aces_price == 0:
-                    pocket_aces_price = random.choice([34000, 38000, 44000])
+                    pocket_aces_price = random.choice([17000, 19000, 22000])
                 price = pocket_aces_price
             else: 
                 type.type("Then OUR BUSINESS has been SETTLED. Be GONE. GOODBYE! COME AGAIN!")
@@ -2427,7 +2479,7 @@ class LocationsMixin:
             return quote("Oh, you got that wine from last time? Classy. One-item limit. Manager's orders. Fancy pants.")
         if self.has_danger("Soulless"):
             return quote("...something's different about you. Can't put my finger on it. You got like... empty eyes or something. Creepy. One-item limit. Manager's orders.")
-        if self.get_balance() >= 500000:
+        if self.get_balance() >= 400000:
             return quote("Back again, Mr. Money Bags? One-item limit still applies. Manager doesn't care how rich you are. Manager's orders.")
         if self.get_balance() < 50:
             return quote("You look broke. Brooooke. We got some cheap stuff if you dig around. One-item limit. Manager's orders.")
@@ -3405,78 +3457,78 @@ class LocationsMixin:
 
             if item == "Delight Indicator":
                 type.type("With this little device, you can read how happy anyone is, just by pointing it at them! Could get you out of a lot of trouble.")
-                price = random.choice([6500, 7500, 8500])
+                price = random.choice([3000, 4000, 5000])
             elif item == "Health Indicator":
                 type.type("This gadget lets you see how healthy you are at any given moment. It's great for knowing how imminent a trip to the ER is.")
-                price = random.choice([6000, 7000, 8000])
+                price = random.choice([3000, 4000, 5000])
             elif item == "Dirty Old Hat":
                 type.type("By wearing this, you're telling the whole world \"I'm poor and I'm not afraid to show it!\" It's a foolproof way for people to take pity on you.")
-                price = random.choice([18000, 22000, 26000])
+                price = random.choice([9000, 11000, 13000])
             elif item == "Golden Watch":
                 type.type("This watch was my grandfathers at one point. It's a beauty. If you're a gambling man, anyone in their right mind would wanna see you betting on their table.")
-                price = random.choice([22000, 26000, 30000])
+                price = random.choice([11000, 13000, 15000])
             elif item == "Faulty Insurance":
                 type.type("I got this thing forged by a buddy of mine. It's a fake insurance card. I've used it to get out of so many hospital bills, and you could too!")
-                price = random.choice([7500, 8500, 9500])
+                price = random.choice([4000, 5000, 6000])
             elif item == "Enchanting Silver Bar":
                 type.type("Listen, I know this silver bar looks a bit useless, but I swear, it's awesome. ")
                 type.type("Look at the stock market, this thing is only gonna get more and more expensive. ")
                 type.type("And if I sell it to you, you can sell it off later and make some money.")
-                price = 7500
+                price = 4000
             elif item == "Sneaky Peeky Shades":
                 type.type("These aren't your ordinary pair of glasses. Put them on, and you'll catch glimpses that others can't see. ")
                 type.type("But use them wisely; you only get one peek per night.")
-                price = random.choice([26000, 30000, 34000])
+                price = random.choice([14000, 16000, 18000])
             elif item == "Quiet Sneakers":
                 type.type("Sometimes, the best move is to walk away. Use this when you feel trouble brewing, and avoid the day's misfortunes.")
-                price = random.choice([11000, 14000, 17000])
+                price = random.choice([5000, 7000, 9000])
             elif item == "Lucky Coin":
                 type.type("This here's an old coin with a four-leaf clover on it. ")
                 type.type("My grandma used to say it could turn bad luck into no luck at all. ")
                 type.type("Lost a hand? Flip this, and maybe you'll get your bet back.")
-                price = random.choice([9000, 11000, 13000])
+                price = random.choice([4000, 5000, 6000])
             elif item == "Worn Gloves":
                 type.type("These gloves are pretty beat up, but trust me, they've got some magic left in 'em. ")
                 type.type("Wear these when you play, and you'll feel the cards better. Might just get luckier draws.")
-                price = random.choice([14000, 16000, 19000])
+                price = random.choice([7000, 8000, 10000])
             elif item == "Tattered Cloak":
                 type.type("Don't let the moth holes fool ya. This cloak's got some sneaky enchantment. Dealers sometimes just... forget to collect when you lose. Weird, right?")
-                price = random.choice([16000, 20000, 24000])
+                price = random.choice([8000, 10000, 12000])
             elif item == "Rusty Compass":
                 type.type("The glass is cracked and it's missing a few screws, but this compass still points to opportunity. ")
                 type.type("Carry it around, and you might stumble upon something unexpected.")
-                price = random.choice([6000, 7500, 9000])
+                price = random.choice([3000, 4000, 5000])
             elif item == "Pocket Watch":
                 type.type("This brass beauty is always running a bit slow, but hey, that works in your favor. Flash it at the table, and you might squeeze in an extra round.")
-                price = random.choice([15000, 19000, 22000])
+                price = random.choice([9000, 11000, 13000])
             elif item == "Marvin's Monocle":
                 type.type("A polished monocle with a smoky lens and tiny etched markings around the rim. Slip it on, and you can tell exactly how much of your bankroll is hot.")
                 type.type("Useful knowledge. Dangerous knowledge. Marvin seems very proud of that distinction.")
-                price = random.choice([10000, 13000, 16000])
+                price = random.choice([5000, 7000, 9000])
             # New mystical gambling items
             elif item == "Gambler's Chalice":
                 type.type("Ah, the Chalice! Legend says a desperate gambler drank from this cup and doubled his fortune in one night. ")
                 type.type("The catch? You can only use its power once per visit. Raise your bet, draw one more card, and pray.")
-                price = random.choice([21000, 25000, 29000])
+                price = random.choice([11000, 13000, 15000])
             elif item == "Twin's Locket":
                 type.type("This locket contains portraits of twins who could never agree on anything—except cards. ")
                 type.type("When you're dealt a pair, this little beauty lets you split 'em and play two hands. Double the risk, double the reward.")
-                price = random.choice([26000, 32000, 38000])
+                price = random.choice([14000, 17000, 20000])
             elif item == "White Feather":
                 type.type("Plucked from a chicken that ran from every fight—but lived to tell the tale. ")
                 type.type("When a hand looks hopeless, wave this feather and surrender with dignity. ")
                 type.type("You'll lose half your bet, but keep your pride. Sort of.")
-                price = random.choice([11000, 14000, 17000])
+                price = random.choice([5000, 7000, 9000])
             elif item == "Dealer's Grudge":
                 type.type("The Dealer dropped this jade pendant years ago. It still pulses with his essence. ")
                 type.type("When he shows an Ace, you can invoke the Grudge—take a side bet against his Blackjack. ")
                 type.type("If he gets it, you get paid. If not... well, you lose the side bet.")
-                price = random.choice([16000, 20000, 24000])
+                price = random.choice([8000, 10000, 12000])
             elif item == "Gambler's Grimoire":
                 type.type("This tattered book has a mind of its own. ")
                 type.type("It watches every hand you play, tracking your wins, losses, streaks, and failures. ")
                 type.type("When you break a record—good or bad—it'll let you know. Sarcastically. Very sarcastically.")
-                price = random.choice([6000, 7500, 9000])
+                price = random.choice([3000, 4000, 5000])
             elif item == "Animal Whistle":
                 type.type("Marvin lowers his voice, glancing around conspiratorially.")
                 print("\n")
@@ -3489,7 +3541,7 @@ class LocationsMixin:
                 print("\n")
                 type.type(quote("But here's the secret—if you gather enough of them... if you truly become their shepherd... "))
                 type.type(quote("Something magical happens. I've heard stories of people who left this place with an ark of their own."))
-                price = 40000
+                price = 30000
 
             print()
 
@@ -4725,3 +4777,164 @@ class LocationsMixin:
         print("\n")
         type.slow("Thank you for playing.")
         quit()
+
+    # ============================================
+    # TANYA'S THERAPY OFFICE
+    # ============================================
+
+    def visit_tanya(self):
+        """Visit Tanya the therapist. Sarcastic dialogue that evolves with visits."""
+        visits = self.get_visited_tanya()
+        self.increment_visited_tanya()
+        visits += 1  # current visit number
+        
+        cost = 50 if visits <= 3 else 75 if visits <= 6 else 100
+        
+        if self.get_balance() < cost:
+            type.type("You drive to Tanya's office, but when you check your wallet, you realize you can't afford the session.")
+            print("\n")
+            type.type("You sit in the parking lot for a while, then drive back.")
+            print("\n")
+            return
+        
+        type.type("You park outside the strip mall and walk into Tanya's office.")
+        print("\n")
+        
+        if visits == 1:
+            # FIRST REAL VISIT
+            type.type("The white noise machine is still humming. Tanya is at her desk, eating a granola bar.")
+            print("\n")
+            type.slow(cyan("\"Oh, you actually came back. I owe myself five bucks. Sit down.\""))
+            print("\n")
+            type.type("You sit. She finishes her granola bar, brushes crumbs off her blouse, and pulls out a notepad.")
+            print("\n")
+            type.slow(cyan("\"Alright. Last time you gave me the highlights. This time, give me the lowlights. Start from the beginning. Why are you living in a car and gambling every night?\""))
+            print("\n")
+            type.type("You tell her about Grandma's fifty dollars. About the dealer with the jade eye. About the nights that blur together.")
+            print("\n")
+            type.slow(cyan("\"So your grandmother dies, leaves you fifty bucks, and instead of buying groceries you drove to a casino run by a one-eyed cowboy. That's... honestly impressive in its stupidity.\""))
+            print("\n")
+            type.type("She writes something down.")
+            print("\n")
+            type.slow(cyan("\"I'm writing 'impulse control issues.' Don't take it personally. That's on literally everyone's file here.\""))
+            print("\n")
+            type.slow(cyan("\"Here's your homework: next time you sit at that table, I want you to notice how your body feels right before you bet. Not what you're thinking - what you're FEELING. In your chest. Your hands. Your gut.\""))
+            print("\n")
+            type.slow(cyan("\"That'll be $" + str(cost) + ". I accept cash, checks, and silent weeping.\""))
+            print("\n")
+        elif visits == 2:
+            type.slow(cyan("\"Welcome back. How'd the homework go?\""))
+            print("\n")
+            type.type(quote("I... forgot to do it."))
+            print("\n")
+            type.slow(cyan("\"Shocking. Absolutely no one could have predicted that.\""))
+            print("\n")
+            type.type("She takes a sip of coffee.")
+            print("\n")
+            type.slow(cyan("\"Let me ask you something. Before all this - before the car, the casino, the whole mess - what was your life like? Did you have people?\""))
+            print("\n")
+            type.type("You start to talk. About Rebecca, about Nathan.")
+            print("\n")
+            type.slow(cyan("\"There it is. You left a wife and a kid. And you're playing cards in a shack on a hill.\"\n"))
+            type.type("She doesn't say it mean. She says it like she's reading a weather report. Just facts.")
+            print("\n")
+            type.slow(cyan("\"You know what an addiction is, right? It's not the thing you're addicted to. It's the thing you're running FROM. The cards aren't the problem. The cards are the solution you found for a problem you're too scared to look at.\""))
+            print("\n")
+            type.slow(cyan("\"We'll get there. $" + str(cost) + ". Same deal as last time.\""))
+            print("\n")
+        elif visits == 3:
+            type.slow(cyan("\"Hey. You look different today. Not good-different, but... awake-different.\""))
+            print("\n")
+            type.type("You tell her about your week. The events. The casino. The people you've met on the road.")
+            print("\n")
+            type.slow(cyan("\"You know what I notice? When you talk about the casino, your voice gets flat. Like you're reading from a script. But when you talk about Tom - the mechanic? You light up.\""))
+            print("\n")
+            type.type(quote("Tom's a good guy."))
+            print("\n")
+            type.slow(cyan("\"Tom IS a good guy. And you know what good guys do? They stick around. They don't run. Think about that.\""))
+            print("\n")
+            type.slow(cyan("\"We're making progress. And by 'we' I mean you. I'm just drinking coffee and asking questions. $" + str(cost) + ".\""))
+            print("\n")
+        elif visits == 4:
+            type.slow(cyan("\"Four visits. You know most of my gambling clients don't make it past two? You're either brave or stubborn. Probably stubborn.\""))
+            print("\n")
+            type.type("You laugh. Actually laugh. When was the last time that happened?")
+            print("\n")
+            type.slow(cyan("\"I want to talk about something uncomfortable. I want to talk about what you're afraid of.\""))
+            print("\n")
+            type.type(quote("I'm not afraid of anything."))
+            print("\n")
+            type.slow(cyan("\"Bull. Shit. You're afraid of going home. You're afraid that if you show up at your wife's door with a suitcase full of casino money, she'll look at you and see exactly what you see in the mirror every morning.\""))
+            print("\n")
+            type.type("The room gets very quiet.")
+            print("\n")
+            type.slow(cyan("\"That's the thing about therapy. We don't fix you. We just hold up a mirror and make you look at it until you stop flinching. $" + str(cost) + ".\""))
+            print("\n")
+        elif visits == 5:
+            type.slow(cyan("\"Five. I should get you a loyalty card. Tenth session free. I'm kidding. Nothing is free. Especially emotional labor.\""))
+            print("\n")
+            type.type("She's different today. Softer, maybe. Or maybe you're just better at seeing it.")
+            print("\n")
+            type.slow(cyan("\"I need to tell you something, and you're not going to like it. Ready?\""))
+            print("\n")
+            type.type("You nod.")
+            print("\n")
+            type.slow(cyan("\"You're getting better. And that terrifies you. Because if you get better, you don't have an excuse to stay out here anymore. You'll have to face the music - go home, face your wife, be a father. And the part of you that's been hiding in this car for months would rather keep gambling than deal with any of that.\""))
+            print("\n")
+            type.type("You don't say anything for a long time.")
+            print("\n")
+            type.type(quote("...yeah."))
+            print("\n")
+            type.slow(cyan("\"That 'yeah' is worth more than every dollar you've put on a blackjack table. $" + str(cost) + ". And do the homework this time.\""))
+            print("\n")
+        elif visits >= 6:
+            # Recurring visits after the initial arc
+            late_dialogues = [
+                "\"You're back. Good. Consistency is the unsexy secret to not being a disaster. Let's talk about triggers.\"",
+                "\"How are the nights? Still feel the pull?\" She already knows the answer. She asks anyway.",
+                "\"Progress isn't linear. Some days you'll feel great. Some days you'll want to bet your whole bankroll on a single hand. Both are normal. Neither defines you.\"",
+                "\"You know what I like about you? You keep showing up. Most people don't. Most people quit when it gets hard. You're still here.\"",
+                "\"I've been thinking about your case. And I realize something: you're not addicted to winning. You're addicted to the POSSIBILITY of winning. There's a difference. A big one.\"",
+                "\"Let me ask you this: if you could snap your fingers and be home right now, with your wife and kid, no gambling debt, no baggage - would you do it?\" You hesitate. She notices. \"We'll work on the hesitation.\"",
+            ]
+            dialogue = random.choice(late_dialogues)
+            type.slow(cyan(dialogue))
+            print("\n")
+            type.type("The session goes on. It's becoming routine. And that's the point - routine is the opposite of chaos.")
+            print("\n")
+            type.slow(cyan("\"$" + str(cost) + ". Same time next week. Or whenever your car brings you back. I'll be here.\""))
+            print("\n")
+        
+        self.change_balance(-cost)
+        
+        # Sanity restoration scales with visits
+        sanity_gain = min(5 + visits * 2, 20)
+        self.restore_sanity(sanity_gain)
+        
+        # After 3+ visits, there's a chance you'll skip gambling tonight
+        if visits >= 3 and random.randrange(3) == 0:
+            self.set_tanya_skip_night(True)
+            print()
+            type.slow(cyan("\"Hey. One more thing. Tonight, instead of driving to the casino... just don't. Stay in your car. Read something. Stare at the ceiling. Anything but cards.\""))
+            print("\n")
+            type.type("You nod. And for once, you mean it.")
+            print("\n")
+        
+        # After 5+ visits, higher chance of skipping
+        elif visits >= 5 and random.randrange(2) == 0:
+            self.set_tanya_skip_night(True)
+            print()
+            type.slow(cyan("\"No casino tonight. Doctor's orders. And before you say I'm not that kind of doctor - I know. Just humor me.\""))
+            print("\n")
+
+        # After 7+ visits with very low sanity, trigger the exhaust ending check
+        if visits >= 7 and self.get_sanity() <= 20:
+            type.type("As you walk to your car, Tanya calls after you.")
+            print("\n")
+            type.slow(cyan("\"Hey. I mean it. Don't do anything stupid tonight. Promise me.\""))
+            print("\n")
+            type.type("Her voice is different. No sarcasm. No jokes. Just concern.")
+            print("\n")
+            type.type("You don't promise. She notices.")
+            print("\n")
+            self.add_danger("Tanya Exhaust Warning")

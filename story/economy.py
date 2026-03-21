@@ -131,11 +131,11 @@ class EconomyMixin:
             self._rank = 1
         elif(10000<=self._balance<100000):
             self._rank = 2
-        elif(100000<=self._balance<500000):
+        elif(100000<=self._balance<400000):
             self._rank = 3
-        elif(500000<=self._balance<900000):
+        elif(400000<=self._balance<750000):
             self._rank = 4
-        elif(900000<=self._balance<1000000):
+        elif(750000<=self._balance<1000000):
             self._rank = 5
         else:
             self.status()

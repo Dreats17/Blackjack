@@ -1,0 +1,251 @@
+AI REPORT: AUTOPLAYER STATUS
+
+Date: 2026-03-19
+Repo: blackjack
+Batch reviewed: tools/autotest.py 1000 random 100
+Source file: tools/cumulative_test_out.txt
+
+EXECUTIVE SUMMARY
+
+This batch says the immediate next target is not more Marvin tuning.
+
+The Marvin loan-push work is directionally correct once a run already has a car and Marvin access, but the overall batch regressed upstream. The main bottleneck is still the early funnel into car ownership, first-rank stability, and medical survival. Until that is fixed, Marvin improvements will only help a small minority of runs.
+
+Key numbers from this batch:
+- wins: 0/100
+- died: 35/100
+- broke: 30/100
+- endings: 35/100
+- ever had car: 37/100
+- reached rank 1+: 21/100
+- reached rank 2: 4/100
+- Marvin access: 32/100
+- Marvin visits: 14/100
+- Marvin item runs: 4/100
+- Vinnie unlocks: 24/100
+- Loan visits: 18/100
+
+Bottom line:
+- The handler is still mostly failing before it can exploit the systems we improved.
+- When it does reach Vinnie and Marvin, the new behavior can create real acceleration.
+- The largest expected-value next step is early survival and post-car stabilization, not more late Marvin logic.
+
+WHAT IMPROVED
+
+1. Loan-to-Marvin conversion is real.
+The batch contains multiple strong Vinnie-backed runs that convert into Marvin progression instead of stalling before purchase.
+
+Evidence:
+- Marvin access 32/100, visits 14/100, item runs 4/100.
+- Applied exploit_marvin routes: 16.
+- Marvin conversion interrupts: 28.
+- Loan visits 18/100 with 24/100 Vinnie unlocks means the handler is actually reaching the loan system and using it.
+
+Representative seeds:
+- 950775626: rank 2 peak at 28,020 with top route shop:marvin.
+- 442794764: rank 2 peak at 10,801 with top route shop:marvin.
+- 417093307: rank 2 peak at 20,313 with Marvin-heavy progression.
+- 99581921: top route shop:loan_shark, peak 6,663, showing the loan path can now drive real movement.
+
+2. Mechanic tunneling is much lower than before.
+Tom/Frank/Oswald are not dominating route traffic anymore.
+
+Evidence:
+- Tom visits: 3/100.
+- Frank visits: 0/100.
+- Oswald visits: 2/100.
+
+That means the previous Marvin and recovery work likely did what it was supposed to do: reduce pointless mechanic churn after car access.
+
+WHAT REGRESSED OR STILL FAILS
+
+1. The early funnel is worse than the previous random batch.
+
+Compared with the earlier baseline reviewed in-session, this batch is worse on the key upstream metrics:
+- ever had car fell from 43/100 to 37/100
+- rank 1+ fell from 28/100 to 21/100
+- Marvin access fell from 40/100 to 32/100
+- Marvin visits fell from 18/100 to 14/100
+- Marvin item runs fell from 8/100 to 4/100
+
+Interpretation:
+- The Marvin push is helping the runs that escape rank 0.
+- Fewer runs are escaping rank 0 in the first place.
+
+2. Rank 0 remains the real graveyard.
+
+Evidence:
+- Peak rank 0: 79/100.
+- Common rank 0 outcomes: died 31, madness 24, broke 24.
+- No-car runs: 64/100.
+
+The current autoplayer is still mostly a rank-0 survival machine with occasional breakout runs.
+
+3. Medical pressure is still eating too many runs.
+
+Evidence:
+- doctor_missed: 16
+- survive_emergency goals: 1,802
+- medical_stabilization interrupts: 85
+- urgent_medical interrupts: 75
+- Doctor visits: 29/100, total 94 visits
+- Doctor fail visits: 24
+
+This means the planner is spending a lot of policy budget firefighting damage instead of compounding bankroll.
+
+4. Debt is still acceleration without discipline.
+
+Evidence from loan distribution:
+- runs with loans: 18/100
+- total loans: 19
+- total repaid: 1
+- open debt at end: 18/100
+- warning level 2+: 14/100
+- warning level 3+: 6/100
+
+The handler now borrows effectively more often, but it still does not know how to stabilize after the push.
+
+REPRESENTATIVE SEEDS TO REVIEW NEXT
+
+Use these as the next manual inspection set.
+
+1. 231144229
+- Best peak in the batch: 50,486.
+- Reaches rank 2, then still breaks on day 52.
+- Top route doctor:witch.
+- Best seed for late stabilization, injury pressure, and debt cleanup.
+
+2. 950775626
+- Peak 28,020 by day 22.
+- Top route shop:marvin.
+- Cleanest proof that the Marvin push is working, but it still ends in madness.
+
+3. 417093307
+- Peak 20,313, reaches rank 2, breaks on day 64.
+- Took two loans, repaid only one, ends with open debt.
+- Best seed for post-Marvin debt-exit failure.
+
+4. 442794764
+- Longest run at day 70.
+- Rank 2 peak 10,801 with top route shop:marvin.
+- Ends broke at zero with warning level 4 and 11 illnesses.
+- Best seed for long-run decay after a successful breakout.
+
+5. 128831711
+- Rank 0 run that still peaks at 8,337 and then dies out through doctor-heavy play.
+- Seven doctor visits and five witch visits.
+- Best seed for bad post-car or post-rank transition where cash exists but the run still cannot stabilize.
+
+6. 99581921
+- Top route shop:loan_shark.
+- Peak 6,663, end 4,859, terminal ending at day 32.
+- Good seed for verifying that the Vinnie push creates useful momentum.
+
+7. 1858091564
+- Peak 7,526, ends at 4,379, top route shop:pawn_shop.
+- Took a full 5,000 loan and still ended in madness.
+- Good seed for pawn-heavy diversion versus real progression.
+
+8. 1907880350
+- Peak 5,138, top route shop:car_workbench, ends at 910.
+- Took a 5,000 loan and still never converted into a durable scaling run.
+- Good seed for checking whether workbench/shop logic is stealing focus from rank growth.
+
+9. 809514501
+- Peak 2,562, dies on day 45 from late untreated wounds.
+- Heavy witch usage: 12 witch visits, 4 fails.
+- Best seed for medical churn that still fails to keep the run alive.
+
+10. 1955730663
+- Rank 0 failure, peak only 410, dies on day 18 to nightmare-drowning.
+- Top route shop:convenience_store.
+- Best seed for the pure early funnel failure case where Marvin and debt logic are irrelevant.
+
+CURRENT DIAGNOSIS
+
+The handler now has two distinct quality levels.
+
+Tier 1: escaped runs
+- Can use Vinnie.
+- Can reach Marvin.
+- Can occasionally hit rank 2 and five-figure bankrolls.
+- Still lacks debt cleanup, late threat management, and rich-run stabilization.
+
+Tier 2: the majority of runs
+- Never reach stable car ownership.
+- Spend too much of the run in health and sanity emergencies.
+- Die or break before Marvin and late systems matter.
+
+The next iteration should focus on moving more runs from Tier 2 into Tier 1.
+
+WHAT TO DO NEXT
+
+Priority 1: strengthen the pre-car and early post-car phase.
+
+Concrete targets:
+- Raise ever_car from 37/100 back above 43/100.
+- Raise rank1+ from 21/100 back above 28/100.
+- Cut no-car runs from 64/100 materially.
+
+Likely code targets:
+- tools/quicktest.py
+- tools/autoplay/planner.py
+- tools/autoplay/state.py
+- tools/autoplay/policies/blackjack_policy.py
+
+Specific changes to try:
+- Make early survival more conservative before first car.
+- Hold cleaner reserves around mechanic affordability bands.
+- Reduce avoidable doctor churn immediately after car acquisition.
+- Add a stricter post-car fragile phase that suppresses optional shopping unless the purchase is explicitly phase-correct.
+- Keep rank 0 and fragile rank 1 runs from taking soft-value store detours.
+
+Priority 2: add debt-exit discipline after successful loan pushes.
+
+Evidence says the push works, but the cleanup does not.
+
+Specific changes to try:
+- Once a loan-funded Marvin buy succeeds, add a debt cleanup subphase.
+- Lower aggression after the purchase if the run is already at rank 1 or rank 2.
+- Route to repayment before warning level 2+ becomes common.
+
+Priority 3: improve rich-run stabilization, not richer-run aggression.
+
+The batch already proves that some runs can reach 10k to 50k.
+The issue is keeping them alive and solvent after that.
+
+Specific changes to try:
+- Threat-aware de-risking at rank 2.
+- Better sanity protection once money is no longer the limiting resource.
+- Stronger suppression of unnecessary gambling after major conversion wins.
+
+NOT THE NEXT PRIORITY
+
+Do not spend the next pass mainly on:
+- more mechanic routing work
+- adventure routing
+- airport logic
+- millionaire logic
+
+Those are important later, but this batch does not justify them as the immediate bottleneck.
+
+The best next pass is upstream funnel repair.
+
+SUCCESS CRITERIA FOR THE NEXT PASS
+
+The next pass should be judged on these metrics first:
+- ever had car
+- rank1+
+- rank2
+- doctor_missed
+- no-car runs
+- runs with Marvin access
+
+Only after those improve should Marvin item-run count and richer late-game metrics be treated as the main evaluation target.
+
+SHORT VERSION
+
+The Marvin work is helping the minority of runs that get there.
+The main problem is still that too few runs get there.
+
+Next target: fix the rank-0 to first-car to stable-rank-1 funnel.

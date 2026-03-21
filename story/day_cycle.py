@@ -141,41 +141,53 @@ class DayCycleMixin:
 
     def _get_pending_dream(self):
         """Check if a dream event should fire tonight, replacing the day summary.
-        Dreams are tied to wealth tiers matching when they originally appeared.
+        Dreams only fire for the player's chosen car mechanic, locking them
+        into one storyline early.  Wealth gates are spread across ranks so
+        the full chain completes well before $1M.
         Returns the dream event method or None."""
         eligible = []
         balance = self.get_balance()
+        mechanic = self.get_car_mechanic()
 
-        # Tom dream chain
-        if self.get_tom_dreams() == 0 and balance >= 1000:
-            eligible.append(self.remember_rebecca)
-        elif self.get_tom_dreams() == 1 and balance >= 10000:
-            eligible.append(self.remember_nathan)
-        elif self.get_tom_dreams() == 2 and balance >= 500000:
-            eligible.append(self.remember_johnathan)
+        # No mechanic chosen yet — no dreams
+        if mechanic is None:
+            return None
 
-        # Frank dream chain
-        if self.get_frank_dreams() == 0 and balance >= 1000:
-            eligible.append(self.dealers_anger)
-        elif self.get_frank_dreams() == 1 and balance >= 10000:
-            eligible.append(self.dealers_scar)
-        elif self.get_frank_dreams() == 2 and balance >= 500000:
-            eligible.append(self.dealers_revolver)
-        elif self.get_frank_dreams() == 3 and balance >= 100000 and not self.has_met("Dealer Dream Complete"):
-            eligible.append(self.dealer_in_dreams)
+        # Tom dream chain  (gates: $2,500 / $75,000 / $350,000)
+        if mechanic == "Tom":
+            if self.get_tom_dreams() == 0 and balance >= 2500:
+                eligible.append(self.remember_rebecca)
+            elif self.get_tom_dreams() == 1 and balance >= 75000:
+                eligible.append(self.remember_nathan)
+            elif self.get_tom_dreams() == 2 and balance >= 350000:
+                eligible.append(self.remember_johnathan)
 
-        # Oswald dream chain
-        if self.get_oswald_dreams() == 0 and balance >= 1000:
-            eligible.append(self.casino_bar)
-        elif self.get_oswald_dreams() == 1 and balance >= 10000:
-            eligible.append(self.casino_table)
-        elif self.get_oswald_dreams() == 2 and balance >= 500000:
-            eligible.append(self.casino_riches)
+        # Frank dream chain  (gates: $2,500 / $75,000 / $350,000 / $600,000)
+        elif mechanic == "Frank":
+            if self.get_frank_dreams() == 0 and balance >= 2500:
+                eligible.append(self.dealers_anger)
+            elif self.get_frank_dreams() == 1 and balance >= 75000:
+                eligible.append(self.dealers_scar)
+            elif self.get_frank_dreams() == 2 and balance >= 350000:
+                eligible.append(self.dealers_revolver)
+            elif self.get_frank_dreams() == 3 and balance >= 600000 and not self.has_met("Dealer Dream Complete"):
+                eligible.append(self.dealer_in_dreams)
 
-        # Combined finale — requires significant progress in all chains
-        if (self.get_tom_dreams() >= 2 and self.get_frank_dreams() >= 2 and
-            self.get_oswald_dreams() >= 2 and balance >= 900000 and
-            not self.has_met("Final Dream")):
+        # Oswald dream chain  (gates: $2,500 / $75,000 / $350,000)
+        elif mechanic == "Oswald":
+            if self.get_oswald_dreams() == 0 and balance >= 2500:
+                eligible.append(self.casino_bar)
+            elif self.get_oswald_dreams() == 1 and balance >= 75000:
+                eligible.append(self.casino_table)
+            elif self.get_oswald_dreams() == 2 and balance >= 350000:
+                eligible.append(self.casino_riches)
+
+        # Finale — chosen mechanic's chain is complete and player is near $1M
+        mechanic_dreams = {"Tom": self.get_tom_dreams,
+                           "Frank": self.get_frank_dreams,
+                           "Oswald": self.get_oswald_dreams}
+        if (mechanic in mechanic_dreams and mechanic_dreams[mechanic]() >= 3
+                and balance >= 750000 and not self.has_met("Final Dream")):
             eligible.append(self.final_dream)
 
         if not eligible:
@@ -289,6 +301,8 @@ class DayCycleMixin:
             self.start_night_1()
         elif self.has_travel_restriction("Wind"):
             self.end_day_wind()
+        elif self.get_tanya_skip_night():
+            self.start_night_tanya_skip()
         elif(not self.has_item("Car")):
             self.start_night_car()
         else:
@@ -302,6 +316,52 @@ class DayCycleMixin:
             type.slow(red(bright("Well that's just too bad, isn't it. ")))
             type.slow(red("The Dealer fires three shots into your chest. You bleed out, and as you fade from reality, you see the Dealer reach into your pockets, and take the last 50 dollars from your lifeless body."))
             self.kill()
+
+    def start_night_tanya_skip(self):
+        """Player stays in their car instead of gambling tonight - Tanya's advice."""
+        self.set_tanya_skip_night(False)  # Reset the flag
+        self._skip_blackjack_tonight = True  # Signal to play_round() to skip
+        
+        visits = self.get_visited_tanya()
+        
+        print("\n")
+        type.type("The sun goes down. The casino lights flicker to life in the distance.")
+        print("\n")
+        
+        if visits <= 3:
+            type.type("You sit in the driver's seat. Your hand goes to the ignition. Habit.")
+            print("\n")
+            type.slow("But Tanya's voice is in your head. " + cyan("\"Just don't. Stay in your car.\""))
+            print("\n")
+            type.type("So you don't. You lean the seat back. You stare at the ceiling. You listen to the wind.")
+            print("\n")
+            type.type("It's the longest night you've had in a while. But you make it through.")
+        elif visits <= 5:
+            type.type("You don't even reach for the keys tonight. Progress.")
+            print("\n")
+            type.type("You find an old book wedged under the passenger seat. Something about fishing. You read three chapters before your eyes get heavy.")
+            print("\n")
+            type.slow("For the first time in a long time, you fall asleep without the sound of cards shuffling in your head.")
+        else:
+            type.type("The casino lights don't even tempt you tonight. They're just lights.")
+            print("\n")
+            type.type("You sit in your car and think about Nathan. About how he's probably taller now. About whether he still draws those stick figures with the big heads.")
+            print("\n")
+            type.slow("You feel something unfamiliar. It takes you a minute to place it.")
+            print("\n")
+            type.slow(cyan("Peace. That's what this is."))
+        
+        print("\n")
+        type.type("No blackjack tonight. You just... rest.")
+        print("\n")
+        
+        # Small sanity gain for not gambling
+        self.restore_sanity(5)
+        
+        # Exhaust ending trigger - if player has the warning danger and sanity is critically low
+        if self.has_danger("Tanya Exhaust Warning") and self.get_sanity() <= 15:
+            self.ending_exhaust()
+            return
 
     def start_night_car(self):
         type.type("As the sun begins to set, and the stars light up in the night sky, you walk to the casino, eager to play more Blackjack. ")

@@ -1248,7 +1248,7 @@ class Lists:
     # LOAN SHARK DIALOGUE
     # ==========================================
     
-    def make_loan_shark_dialogue(self):
+    def make_loan_shark_dialogue_legacy(self):
         """Vinnie the loan shark's various dialogue options"""
         return {
             "greeting": [
@@ -1970,8 +1970,12 @@ class Lists:
     
     def make_cheap_night_events_list(self):
         a_list = []
+        a_list.append("woodlands_path")
+        a_list.append("woodlands_river")
         a_list.append("woodlands_river")
         a_list.append("woodlands_field")
+        a_list.append("woodlands_field")
+        a_list.append("swamp_stroll")
         a_list.append("swamp_stroll")
         a_list.append("midnight_snack_run")
         a_list.append("stargazing")
@@ -2309,9 +2313,15 @@ class Lists:
     
     def make_modest_night_events_list(self):
         a_list = []
+        a_list.append("woodlands_path")
+        a_list.append("swamp_wade")
         a_list.append("swamp_wade")
         a_list.append("swamp_swim")
+        a_list.append("swamp_swim")
+        a_list.append("woodlands_field")
         a_list.append("woodlands_river")
+        a_list.append("swamp_stroll")
+        a_list.append("beach_stroll")
         a_list.append("beach_stroll")
         a_list.append("mysterious_lights")
         a_list.append("midnight_snack_run")
@@ -2332,7 +2342,7 @@ class Lists:
         return a_list
     
 
-# Rich Events (100,000 - 500,000)
+# Rich Events (100,000 - 400,000)
     def make_rich_day_events_list(self):
         a_list = []
         # Everytime
@@ -2578,8 +2588,15 @@ class Lists:
     
     def make_rich_night_events_list(self):
         a_list = []
+        a_list.append("swamp_stroll")
+        a_list.append("swamp_wade")
+        a_list.append("swamp_swim")
+        a_list.append("beach_stroll")
+        a_list.append("beach_swim")
         a_list.append("beach_swim")
         a_list.append("beach_dive")
+        a_list.append("beach_dive")
+        a_list.append("city_streets")
         a_list.append("city_streets")
         a_list.append("late_night_radio")
         a_list.append("mysterious_lights")
@@ -2599,7 +2616,7 @@ class Lists:
         return a_list
 
 
-# Doughman Events (500,000 - 900,000)
+# Doughman Events (400,000 - 750,000)
     def make_doughman_day_events_list(self):
         a_list = []
         # Everytime
@@ -2849,7 +2866,13 @@ class Lists:
     
     def make_doughman_night_events_list(self):
         a_list = []
+        a_list.append("beach_stroll")
+        a_list.append("beach_swim")
+        a_list.append("beach_dive")
+        a_list.append("city_streets")
         a_list.append("city_stroll")
+        a_list.append("city_stroll")
+        a_list.append("city_park")
         a_list.append("city_park")
         a_list.append("midnight_walk")
         a_list.append("peaceful_night")
@@ -2864,7 +2887,7 @@ class Lists:
         random.shuffle(a_list)
         return a_list
 
-# Nearly There Events (900,000 +)
+# Nearly There Events (750,000 +)
     def make_nearly_day_events_list(self):
         a_list = []
         # Everytime
@@ -3539,6 +3562,9 @@ class Lists:
            self.__player.has_item("Beach Romance Number") or 
            self.__player.has_item("Rich Friend's Number")):
             a_list.append("Make a Phone Call")
+        # Tanya's therapy office - unlocked by getting her number
+        if(self.__player.has_item("Tanya's Number")):
+            a_list.append("Tanya's Office")
         # Car Workbench - unlocked by owning a Tool Kit
         if((not on_foot) and self.__player.has_item("Tool Kit")):
             a_list.append("Car Workbench")

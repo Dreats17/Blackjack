@@ -143,6 +143,8 @@ class Player(
         self._health = 100
         self._balance = 50
         self._previous_balance = 50
+        self._today_winnings = 0
+        self._balance_at_day_start = 50
         self._rank = 0
         self._day = 1
         self._counting_days = [0] * 13
@@ -156,6 +158,9 @@ class Player(
         self._tom_dreams = 0      # 0=none, 1=rebecca, 2=nathan, 3=johnathan (ready for ending)
         self._frank_dreams = 0    # 0=none, 1=dealers_anger, 2=dealers_scar, 3=dealers_revolver (ready for ending)
         self._oswald_dreams = 0   # 0=none, 1=casino_bar, 2=casino_table, 3=casino_riches (ready for ending)
+        self._visited_tanya = 0   # Tracks how many times player has visited Tanya's therapy office
+        self._tanya_skip_night = False  # If True, player stays in car tonight instead of gambling
+        self._skip_blackjack_tonight = False  # Signal to Blackjack.play_round() to skip
         # Gambling stats for Gambler's Grimoire
         self._gambling_stats = {
             "total_hands": 0,
@@ -707,6 +712,19 @@ class Player(
     
     def advance_oswald_dreams(self):
         self._oswald_dreams += 1
+
+    # Tanya therapy tracking
+    def get_visited_tanya(self):
+        return self._visited_tanya
+    
+    def increment_visited_tanya(self):
+        self._visited_tanya += 1
+    
+    def get_tanya_skip_night(self):
+        return self._tanya_skip_night
+    
+    def set_tanya_skip_night(self, value):
+        self._tanya_skip_night = value
 
     # Suzy storyline tracking
     def get_favorite_color(self):

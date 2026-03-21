@@ -98,11 +98,22 @@ def _score_route_opportunity(tags: set[str], metadata: dict[str, object]) -> flo
         total -= 80.0
 
     marvin_priority = float(metadata.get("marvin_priority", 0) or 0)
+    marvin_future_priority = float(metadata.get("marvin_future_priority", 0) or 0)
+    marvin_future_shortfall = float(metadata.get("marvin_future_shortfall", 0) or 0)
     if "marvin" in tags and metadata.get("wants_marvin"):
         total += 48.0 + min(28.0, marvin_priority / 4.0)
     if "marvin" in tags and metadata.get("catalog_push_active") and catalog_push_kind == "marvin":
         total += 28.0 + min(36.0, catalog_push_spend / 300.0) + min(18.0, catalog_push_count * 6.0)
         total += min(14.0, catalog_push_priority / 6.0)
+    if (
+        "loan" in tags
+        and metadata.get("wants_loan")
+        and metadata.get("wants_marvin")
+        and marvin_priority <= 0
+        and marvin_future_priority >= 56
+        and 0 < marvin_future_shortfall <= 5000
+    ):
+        total += 28.0
 
     mechanic_urgency = float(metadata.get("mechanic_urgency", 0) or 0)
     if "mechanic" in tags and metadata.get("wants_mechanic"):
@@ -127,6 +138,8 @@ def _score_route_opportunity(tags: set[str], metadata: dict[str, object]) -> flo
     elif planner_goal == "exploit_marvin":
         if "loan" in tags:
             total += 18.0
+            if marvin_priority <= 0 and marvin_future_priority >= 56 and 0 < marvin_future_shortfall <= 5000:
+                total += 16.0
         if "upgrade" in tags and metadata.get("wants_workbench_craft"):
             total += 10.0
 
@@ -142,19 +155,69 @@ def _score_route_opportunity(tags: set[str], metadata: dict[str, object]) -> flo
 
 def choose_route_option(request: DecisionRequest, plan: StrategicPlan) -> tuple[DecisionOption | None, DecisionTrace]:
     metadata = dict(request.metadata)
+    game_state = dict(request.game_state)
     best_option: DecisionOption | None = None
     best_total = float("-inf")
     score_by_option: dict[str, float] = {}
     store_spend = float(metadata.get("store_spend", 0) or 0)
     pawn_value = float(metadata.get("pawn_value", 0) or 0)
+    balance = float(game_state.get("balance", 0) or 0)
+    bankroll_emergency = bool(game_state.get("bankroll_emergency")) or balance <= 0
+    fragile_post_car = bool(game_state.get("fragile_post_car"))
 
     for option in request.normalized_options:
         tags = _route_tags(option.label)
         total = _score_goal_alignment(plan.goal, tags)
         total += _score_route_opportunity(tags, metadata)
 
+        if bankroll_emergency:
+            if "loan" in tags and metadata.get("wants_loan"):
+                total += 180.0
+            elif "loan" in tags:
+                total -= 40.0
+            if "pawn" in tags and (metadata.get("wants_pawn") or pawn_value > 0):
+                total += 110.0
+            elif "pawn" in tags:
+                total -= 18.0
+            if "medical" in tags:
+                total += 80.0 if metadata.get("urgent_medical") else 24.0
+            if "stay_home" in tags:
+                total += 46.0
+            if "mechanic" in tags or "marvin" in tags or "upgrade" in tags or "adventure" in tags:
+                total -= 140.0
+            if "store" in tags and store_spend <= 0:
+                total -= 90.0
+
+        if fragile_post_car:
+            if "loan" in tags:
+                total += 28.0
+            if "pawn" in tags:
+                total += 24.0
+            if "medical" in tags and metadata.get("wants_doctor"):
+                total += 22.0
+            if "stay_home" in tags and metadata.get("needs_recovery_day"):
+                total += 18.0
+            if "mechanic" in tags and not metadata.get("wants_mechanic"):
+                total -= 55.0
+            if "marvin" in tags:
+                total -= 34.0
+            if "adventure" in tags:
+                total -= 42.0
+            if "store" in tags and store_spend <= 0:
+                total -= 28.0
+
         if metadata.get("urgent_medical"):
             total += 140.0 if "medical" in tags else -80.0
+        # Proactive medical: even if not "urgent", boost doctor when injuries or low health/sanity
+        health = float(game_state.get("health", 100) or 100)
+        sanity_val = float(game_state.get("sanity", 100) or 100)
+        injury_count = len(tuple(game_state.get("injuries", ()) or ()))
+        status_count = len(tuple(game_state.get("statuses", ()) or ()))
+        if not metadata.get("urgent_medical"):
+            if "medical" in tags and (health < 65 or injury_count >= 1 or status_count >= 2):
+                total += 60.0
+            if "medical" in tags and sanity_val < 40:
+                total += 40.0
         if metadata.get("needs_recovery_day") and "stay_home" in tags:
             total += 28.0
         if metadata.get("wants_doctor") and option.label == "Doctor's Office":

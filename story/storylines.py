@@ -243,10 +243,10 @@ class StorylineSystem:
                 "day_started": 0,
                 "completed": False,
                 "failed": False,
-                "min_gap": 2,
+                "min_gap": 1,
                 "base_chance": 0.40,
                 "escalation": 0.15,
-                "force_start_day": 5,  # First mechanic shows up by day 5
+                "force_start_day": 4,  # First mechanic shows up by day 4
             },
             
             # ==========================================
@@ -393,6 +393,16 @@ class StorylineSystem:
                 "min_gap": 3,
                 "base_chance": 0.15,
                 "escalation": 0.10,
+            },
+            
+            "tanya": {
+                "stage": 0,  # 0=not started, 1=met_tanya (got number), 2=completed (ending triggered)
+                "day_started": 0,
+                "completed": False,
+                "failed": False,
+                "min_gap": 5,
+                "base_chance": 0.06,
+                "escalation": 0.04,
             },
         }
 
@@ -853,6 +863,9 @@ class StorylineSystem:
             
             case "lockbox":
                 return True
+            
+            case "tanya":
+                return p.has_item("Tanya's Number")
         
         return True
     
@@ -1187,6 +1200,13 @@ class StorylineSystem:
                                  _wrap(storyline_lockbox_who_left_it)]
                 if stage < len(lockbox_events):
                     return lockbox_events[stage]
+
+            case "tanya":
+                # Stage 0: Very low odds encounter with a therapist - requires met Tom, day 12+
+                if stage == 0:
+                    if not p.has_met("Tom") or day < 12 or random.random() > 0.05:
+                        return None
+                    return _wrap(storyline_tanya_encounter)
 
         return None
     
@@ -4913,3 +4933,93 @@ def storyline_lockbox_who_left_it(p, sl):
     type.type("You fold the letter and put it in your pocket. Maybe one day you'll pass it on too.")
     p.remove_item("Lockbox")
     print("\n")
+
+
+# =====================================================================
+# TANYA - THE THERAPIST (Secret Tom Route)
+# =====================================================================
+
+def storyline_tanya_encounter(p, sl):
+    """A low-odds encounter with a sarcastic therapist. Requires having met Tom."""
+    type.type("You're sitting in the parking lot of a strip mall, staring at nothing.")
+    print("\n")
+    type.type("There's a laundromat, a closed-down nail salon, and a small office with a sign that reads:")
+    print("\n")
+    type.type(cyan(bright("\"Dr. Tanya Reeves, LCSW - Counseling & Therapy\"")))
+    print("\n")
+    type.type("Underneath, in smaller letters: " + italic("\"Walk-ins welcome. Judgement free. Mostly.\""))
+    print("\n")
+    
+    type.type("You don't know why you're looking at it.")
+    print("\n")
+    type.type("Actually, that's a lie. You know exactly why.")
+    print("\n")
+    
+    answer = ask.yes_or_no("Go inside? ")
+    print()
+    
+    if answer == "yes":
+        type.type("The waiting room smells like lavender and passive aggression. There's a white noise machine humming in the corner and exactly one other person here - an old man asleep in a chair.")
+        print("\n")
+        type.type("A woman pokes her head out from a back office. Mid-forties, reading glasses perched on her nose, coffee stain on her blouse. She looks you up and down.")
+        print("\n")
+        
+        type.slow(cyan("\"You look like you live in your car.\""))
+        print("\n")
+        
+        type.type("You blink.")
+        print("\n")
+        
+        type.type(quote("I... do live in my car."))
+        print("\n")
+        
+        type.slow(cyan("\"Fantastic. At least you're honest. That puts you ahead of most of my clients. Come on back.\""))
+        print("\n")
+        
+        type.type("Her office is small. Cluttered desk. A framed degree from a school you've never heard of. A poster that says " + quote("Hang in There!") + " with a cat dangling from a branch - except someone drew a tiny parachute on the cat in Sharpie.")
+        print("\n")
+        
+        type.slow(cyan("\"I'm Tanya. Sit down. You want water? I've got lukewarm water and room-temperature water. Living the dream over here.\""))
+        print("\n")
+        
+        type.type("You sit. She sits. She stares at you like she's reading a book she's already guessed the ending to.")
+        print("\n")
+        
+        type.slow(cyan("\"So. What's your deal? Gambling? Drinking? Both? Something worse? I've heard it all, honey, so don't bother sugarcoating it.\""))
+        print("\n")
+        
+        type.type("You tell her. Not everything. But enough. The casino. The car. Tom and the wagon. The nights at the blackjack table.")
+        print("\n")
+        
+        type.slow(cyan("\"Blackjack. Classic. At least it's not slots. Slot people are a whole different breed of sad.\""))
+        print("\n")
+        type.slow(cyan("She leans back. \"Look, I'm not gonna fix you in one visit. Nobody does. But if you want to come back, I'm here. Tuesdays, Thursdays, and whenever I feel like opening the door.\""))
+        print("\n")
+        
+        type.type("She scribbles something on a piece of paper and slides it across the desk.")
+        print("\n")
+        
+        type.slow(cyan("\"That's my number. If you call it and I don't pick up, leave a message. If you show up unannounced, bring coffee. I take mine black, like my sense of humor.\""))
+        print("\n")
+        
+        type.type("You take the paper. " + magenta(bright("Tanya's Number")) + " - scrawled in handwriting that looks like a doctor's note from hell.")
+        print("\n")
+        
+        p.add_item("Tanya's Number")
+        p.meet("Tanya")
+        p.restore_sanity(5)
+        sl.advance("tanya")
+        
+        type.type("As you leave, she calls out:")
+        print("\n")
+        type.slow(cyan("\"Hey. The fact that you walked in here? That's the hardest part. Everything else is just showing up.\""))
+        print("\n")
+        type.type("You don't say anything. But you fold the paper carefully and put it in your pocket.")
+        print("\n")
+    else:
+        type.type("You sit in the parking lot for another ten minutes, staring at the sign.")
+        print("\n")
+        type.type("Then you drive away. Maybe another time. Maybe never.")
+        print("\n")
+        type.type("But you remember where it is.")
+        print("\n")

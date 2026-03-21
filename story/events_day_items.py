@@ -53,7 +53,7 @@ class DayItemsMixin:
 
     def item_hoarder(self):
         # SECRET: Have 10+ items - you realize you've become a collector
-        item_count = len(self._items) if hasattr(self, '_Player__items') else 0
+        item_count = len(self._inventory) if hasattr(self, '_inventory') else 0
         if item_count < 10:
             self.day_event()
             return

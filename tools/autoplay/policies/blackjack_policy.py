@@ -276,6 +276,7 @@ def choose_blackjack_bet(request: DecisionRequest, plan: StrategicPlan) -> tuple
     stranded_no_car = _metadata_bool(metadata, "stranded_no_car")
     survival_mode = _metadata_bool(metadata, "survival_mode")
     needs_car = _metadata_bool(metadata, "needs_car")
+    ever_had_car = _metadata_bool(metadata, "ever_had_car")
     has_extra_round_item = _metadata_bool(metadata, "has_extra_round_item")
     urgent_doctor = _metadata_bool(metadata, "urgent_doctor")
     has_met_tom = _metadata_bool(metadata, "has_met_tom")
@@ -283,8 +284,24 @@ def choose_blackjack_bet(request: DecisionRequest, plan: StrategicPlan) -> tuple
     has_met_oswald = _metadata_bool(metadata, "has_met_oswald")
     has_faulty_insurance = _metadata_bool(metadata, "has_faulty_insurance")
     wants_map_unlock = _metadata_bool(metadata, "wants_map_unlock")
+    run_peak_balance = int(_metadata_number(metadata, "run_peak_balance", balance))
+    loan_debt = int(_metadata_number(metadata, "loan_debt"))
+    loan_warning_level = int(_metadata_number(metadata, "loan_warning_level"))
+    lost_car_progress_run = not has_car and ever_had_car and rank >= 1 and balance >= 1000
+    if lost_car_progress_run:
+        needs_car = False
     phase = str(metadata.get("phase", ""))
+    bankroll_emergency = _metadata_bool(metadata, "bankroll_emergency") or phase == "bankroll_emergency"
+    fragile_post_car = _metadata_bool(metadata, "fragile_post_car") or phase == "car_recovery"
     stalled_run = stall_days >= (10 if day <= 30 else 14)
+    next_car_target = 0
+    if needs_car and not has_car:
+        if not has_met_tom:
+            next_car_target = 200
+        elif not has_met_frank:
+            next_car_target = 100
+        elif not has_met_oswald:
+            next_car_target = 850
     pre_tom_breakout_window = (
         needs_car
         and phase == "car_rush"
@@ -292,10 +309,10 @@ def choose_blackjack_bet(request: DecisionRequest, plan: StrategicPlan) -> tuple
         and not has_met_tom
         and not urgent_doctor
         and not wants_doctor
-        and balance >= 170
+        and balance >= 140
         and balance < 200
-        and health >= 70
-        and sanity >= 40
+        and health >= 60
+        and sanity >= 34
     )
     mechanic_threshold_push_window = (
         needs_car
@@ -306,18 +323,17 @@ def choose_blackjack_bet(request: DecisionRequest, plan: StrategicPlan) -> tuple
         and not wants_doctor
         and health >= 60
         and sanity >= 34
-        and balance >= 160
-        and 0 < (200 - balance) <= 40
+        and balance >= 150
+        and 0 < (200 - balance) <= 30
     )
-    mechanic_gap = max(0, 200 - balance) if needs_car and not has_met_tom else 0
+    mechanic_gap = max(0, next_car_target - balance) if next_car_target else 0
     low_balance_stall_window = (
         needs_car
         and phase == "car_rush"
         and not has_car
-        and not has_met_tom
+        and ((not has_met_tom and balance < 160) or (has_met_tom and not has_met_frank and balance < 60))
         and not urgent_doctor
         and not wants_doctor
-        and balance < 160
     )
     midgame_growth_window = (
         has_car
@@ -352,6 +368,19 @@ def choose_blackjack_bet(request: DecisionRequest, plan: StrategicPlan) -> tuple
         and sanity >= 30
         and 15000 <= balance < 100000
     )
+    late_breakout_protection = (
+        rank >= 2
+        and balance >= 10000
+        and (
+            health < 80
+            or sanity < 58
+            or wants_doctor
+            or urgent_doctor
+            or fragile_post_car
+            or loan_debt > 0
+            or loan_warning_level > 0
+        )
+    )
 
     if total_available <= 0:
         trace = DecisionTrace(
@@ -369,6 +398,23 @@ def choose_blackjack_bet(request: DecisionRequest, plan: StrategicPlan) -> tuple
         )
         return 0, trace
 
+    if bankroll_emergency:
+        bet = min(total_available, min_bet)
+        trace = DecisionTrace(
+            cycle=request.metadata.get("cycle"),
+            day=day,
+            context=request.stable_context_id or request.request_type,
+            request_type=request.request_type,
+            strategic_goal=plan.goal,
+            chosen_action=str(bet),
+            reason=f"goal={plan.goal} blackjack_bet_bankroll_emergency",
+            confidence=0.94,
+            options=tuple(option.label for option in request.normalized_options),
+            game_state_summary=state,
+            metadata={"plan": plan.to_dict(), "phase": phase},
+        )
+        return bet, trace
+
     if phase == "car_rush":
         if balance < 100:
             ratio = 0.36
@@ -377,14 +423,28 @@ def choose_blackjack_bet(request: DecisionRequest, plan: StrategicPlan) -> tuple
         elif balance < 350:
             ratio = 0.22
         else:
-            ratio = 0.14
+            ratio = 0.16
+    elif phase == "marvin_push":
+        if balance < 2500:
+            ratio = 0.42
+        elif balance < 6000:
+            ratio = 0.36
+        else:
+            ratio = 0.30
     elif phase == "million_rush" and wants_millionaire_push:
         if balance >= 600000 and has_extra_round_item and dealer_happiness >= 85:
             ratio = max(tuner_bet_ratio, 0.50)
         else:
-            ratio = max(tuner_bet_ratio, 0.34 if balance < 500000 else 0.28)
+            ratio = max(tuner_bet_ratio, 0.34 if balance < 400000 else 0.28)
     else:
         ratio = tuner_bet_ratio if progression_ready else tuner_bet_ratio_safe
+    if fragile_post_car:
+        if balance < 150:
+            ratio = min(ratio, 0.10)
+        elif balance < 400:
+            ratio = min(ratio, 0.12)
+        else:
+            ratio = min(ratio, 0.14)
     if stranded_no_car:
         if balance < 120:
             ratio = max(ratio, 0.42)
@@ -396,6 +456,8 @@ def choose_blackjack_bet(request: DecisionRequest, plan: StrategicPlan) -> tuple
             ratio = max(ratio, 0.28)
     if balance >= 25000 and edge_score >= 6:
         ratio = min(ratio, 0.30 if balance < 100000 else 0.18)
+    if late_breakout_protection:
+        ratio = min(ratio, 0.10 if balance < 25000 else 0.08)
     # Rank 2 cushion: cap ratio by balance tier to prevent rank regression.
     # At $10k-$13k (very close to floor): ultra-conservative.
     # At $13k-$25k (still in danger zone): moderately conservative.
@@ -456,11 +518,11 @@ def choose_blackjack_bet(request: DecisionRequest, plan: StrategicPlan) -> tuple
         ratio = max(ratio, 0.22 if balance >= 1000 else 0.28)
     if low_balance_stall_window:
         if balance < 80:
-            ratio = min(ratio, 0.22)
+            ratio = min(ratio, 0.30)
         elif balance < 120:
-            ratio = min(ratio, 0.18)
+            ratio = min(ratio, 0.24)
         else:
-            ratio = min(ratio, 0.16)
+            ratio = min(ratio, 0.20)
     if pre_tom_breakout_window:
         if balance < 80:
             ratio = max(ratio, 0.52)
@@ -484,15 +546,18 @@ def choose_blackjack_bet(request: DecisionRequest, plan: StrategicPlan) -> tuple
                 ratio = max(ratio, 0.26)
     if early_caution:
         if phase == "car_rush" and balance < 200:
-            ratio = min(ratio, 0.18 if urgent_doctor or wants_doctor else 0.16)
+            if balance < 100:
+                ratio = min(ratio, 0.28 if urgent_doctor or wants_doctor else 0.32)
+            else:
+                ratio = min(ratio, 0.22 if urgent_doctor or wants_doctor else 0.20)
         elif balance < 150:
-            ratio = max(ratio, 0.22)
+            ratio = max(ratio, 0.24)
         elif balance < 350:
-            ratio = max(ratio, 0.18)
+            ratio = max(ratio, 0.20)
         elif balance < 900:
-            ratio = min(ratio, 0.12)
+            ratio = min(ratio, 0.18)
         else:
-            ratio = min(ratio, 0.10)
+            ratio = min(ratio, 0.14)
     if balance >= 25000 and edge_score >= 6:
         ratio = min(ratio, 0.30 if balance < 100000 else 0.18)
 
@@ -500,18 +565,24 @@ def choose_blackjack_bet(request: DecisionRequest, plan: StrategicPlan) -> tuple
         ratio = min(ratio, 0.24)
     elif phase != "car_rush" and balance < 250 and rank == 0:
         ratio = min(ratio, 0.30)
+    if needs_car and phase == "car_rush":
+        if survival_mode:
+            if wants_doctor or urgent_doctor:
+                ratio = min(ratio, 0.18 if balance >= 100 else 0.24)
+            elif stranded_no_car and not has_met_tom:
+                ratio = min(ratio, 0.16 if balance >= 120 else 0.22)
     if needs_car and stranded_no_car and phase == "car_rush":
         if not has_met_tom:
-            if balance >= 200:
+            if balance >= 100:
                 ratio = min(ratio, 0.12)
-        elif not has_met_frank and balance >= 200:
+        elif not has_met_frank and balance >= 100:
             ratio = min(ratio, 0.12)
 
     if distance and distance <= max(100, int(balance * 0.8)):
         if phase == "car_rush":
             pressure_factor = 0.9
         elif phase == "million_rush" and wants_millionaire_push:
-            pressure_factor = 0.9 if balance < 500000 else 0.82
+            pressure_factor = 0.9 if balance < 400000 else 0.82
         else:
             pressure_factor = tuner_pressure_factor if progression_ready else max(0.5, tuner_pressure_factor - 0.14)
         if stranded_no_car:
@@ -530,16 +601,30 @@ def choose_blackjack_bet(request: DecisionRequest, plan: StrategicPlan) -> tuple
         elif balance < 200:
             max_ratio = 0.34
         elif balance < 350:
-            max_ratio = 0.26
+            max_ratio = 0.30
         else:
-            max_ratio = 0.18
+            max_ratio = 0.20
+    elif phase == "marvin_push":
+        if balance < 2500:
+            max_ratio = 0.60
+        elif balance < 6000:
+            max_ratio = 0.54
+        else:
+            max_ratio = 0.46
     elif phase == "million_rush" and wants_millionaire_push:
         if balance >= 600000 and has_extra_round_item and dealer_happiness >= 85:
             max_ratio = 0.72
         else:
-            max_ratio = 0.62 if balance < 500000 else 0.52
+            max_ratio = 0.62 if balance < 400000 else 0.52
     else:
         max_ratio = tuner_max_ratio if progression_ready else min(tuner_max_ratio, 0.45)
+    if fragile_post_car:
+        if balance < 150:
+            max_ratio = min(max_ratio, 0.14)
+        elif balance < 400:
+            max_ratio = min(max_ratio, 0.18)
+        else:
+            max_ratio = min(max_ratio, 0.22)
     if stranded_no_car:
         if balance < 120:
             max_ratio = max(max_ratio, 0.55)
@@ -551,6 +636,8 @@ def choose_blackjack_bet(request: DecisionRequest, plan: StrategicPlan) -> tuple
             max_ratio = max(max_ratio, 0.40)
     if balance >= 25000 and edge_score >= 6:
         max_ratio = min(max_ratio, 0.38 if balance < 100000 else 0.24)
+    if late_breakout_protection:
+        max_ratio = min(max_ratio, 0.14 if balance < 25000 else 0.10)
     # Rank 2 cushion: cap max_ratio by balance tier (mirrors ratio guards above).
     if rank == 2 and balance < 13000:
         max_ratio = min(max_ratio, 0.12)
@@ -584,7 +671,7 @@ def choose_blackjack_bet(request: DecisionRequest, plan: StrategicPlan) -> tuple
         max_ratio = min(max_ratio, 0.24)
     elif rank == 2 and balance < 50000:
         max_ratio = min(max_ratio, 0.34)
-    if pending_marvin_active and not survival_mode:
+    if pending_marvin_active and not survival_mode and phase != "marvin_push":
         if pending_marvin_shortfall > 0:
             max_ratio = min(max_ratio, 0.18 if edge_score >= 5 else 0.15)
         else:
@@ -599,7 +686,7 @@ def choose_blackjack_bet(request: DecisionRequest, plan: StrategicPlan) -> tuple
             max_ratio = min(max_ratio, 0.16)
     elif plan.goal == "restock_supplies" and wants_store:
         max_ratio = min(max_ratio, 0.22 if balance < 1000 else 0.18)
-    elif plan.goal in {"contain_debt_escalation", "reduce_debt_risk"}:
+    elif plan.goal in {"contain_debt_escalation", "reduce_debt_risk"} and phase != "marvin_push":
         max_ratio = min(max_ratio, 0.20 if balance < 10000 else 0.16)
     elif wants_pawn and balance < 500:
         max_ratio = min(max_ratio, 0.22)
@@ -607,11 +694,11 @@ def choose_blackjack_bet(request: DecisionRequest, plan: StrategicPlan) -> tuple
         max_ratio = max(max_ratio, 0.34 if balance >= 1000 else 0.40)
     if low_balance_stall_window:
         if balance < 80:
-            max_ratio = min(max_ratio, 0.24)
+            max_ratio = min(max_ratio, 0.34)
         elif balance < 120:
-            max_ratio = min(max_ratio, 0.20)
+            max_ratio = min(max_ratio, 0.28)
         else:
-            max_ratio = min(max_ratio, 0.18)
+            max_ratio = min(max_ratio, 0.24)
     if pre_tom_breakout_window:
         if balance < 80:
             max_ratio = max(max_ratio, 0.66)
@@ -635,15 +722,18 @@ def choose_blackjack_bet(request: DecisionRequest, plan: StrategicPlan) -> tuple
                 max_ratio = max(max_ratio, 0.40)
     if early_caution:
         if phase == "car_rush" and balance < 200:
-            max_ratio = min(max_ratio, 0.22 if urgent_doctor or wants_doctor else 0.18)
+            if balance < 100:
+                max_ratio = min(max_ratio, 0.36 if urgent_doctor or wants_doctor else 0.40)
+            else:
+                max_ratio = min(max_ratio, 0.28 if urgent_doctor or wants_doctor else 0.26)
         elif balance < 150:
-            max_ratio = min(max_ratio, 0.16)
+            max_ratio = min(max_ratio, 0.22)
         elif balance < 350:
-            max_ratio = min(max_ratio, 0.14)
+            max_ratio = min(max_ratio, 0.20)
         elif balance < 900:
-            max_ratio = min(max_ratio, 0.12)
+            max_ratio = min(max_ratio, 0.18)
         else:
-            max_ratio = min(max_ratio, 0.10)
+            max_ratio = min(max_ratio, 0.14)
     if balance >= 25000 and edge_score >= 6:
         max_ratio = min(max_ratio, 0.38 if balance < 100000 else 0.24)
 
@@ -651,11 +741,17 @@ def choose_blackjack_bet(request: DecisionRequest, plan: StrategicPlan) -> tuple
         max_ratio = min(max_ratio, 0.28)
     elif phase != "car_rush" and balance < 250 and rank == 0:
         max_ratio = min(max_ratio, 0.36)
+    if needs_car and phase == "car_rush":
+        if survival_mode:
+            if wants_doctor or urgent_doctor:
+                max_ratio = min(max_ratio, 0.18 if balance >= 100 else 0.24)
+            elif stranded_no_car and not has_met_tom:
+                max_ratio = min(max_ratio, 0.16 if balance >= 120 else 0.22)
     if needs_car and stranded_no_car and phase == "car_rush":
         if not has_met_tom:
-            if balance >= 200:
+            if balance >= 100:
                 max_ratio = min(max_ratio, 0.16)
-        elif not has_met_frank and balance >= 200:
+        elif not has_met_frank and balance >= 100:
             max_ratio = min(max_ratio, 0.18)
     max_ratio_bet = max(min_bet, int(balance * max_ratio))
     base_bet = max(min_bet, int(balance * ratio))
@@ -678,15 +774,14 @@ def choose_blackjack_bet(request: DecisionRequest, plan: StrategicPlan) -> tuple
 
     if needs_car:
         if stranded_no_car and not has_met_tom:
-            if balance >= 200:
-                bet = min(bet, max(min_bet, balance - 180))
+            if balance >= 100:
+                bet = min(bet, max(min_bet, balance - 80))
         if balance >= 75:
             mechanic_hold = 0
-            if not has_met_tom:
-                if balance >= 200:
-                    mechanic_hold = max(mechanic_hold, 200)
-            elif not has_met_frank and balance >= 200:
+            if not has_met_tom and balance >= 200:
                 mechanic_hold = max(mechanic_hold, 200)
+            elif has_met_tom and not has_met_frank and balance >= 100:
+                mechanic_hold = max(mechanic_hold, 100)
             if not has_met_oswald and balance >= 850:
                 mechanic_hold = max(mechanic_hold, 850)
             if mechanic_hold:
@@ -699,34 +794,34 @@ def choose_blackjack_bet(request: DecisionRequest, plan: StrategicPlan) -> tuple
 
         if day >= 4 and balance >= 150:
             if pre_tom_breakout_window:
-                reserve = 55 if balance < 220 else 75 if balance < 320 else 95
+                reserve = 40 if balance < 220 else 55 if balance < 320 else 75
             elif stranded_no_car:
-                reserve = 55 if balance < 220 else 75 if balance < 320 else 95
+                reserve = 40 if balance < 220 else 55 if balance < 320 else 75
             elif balance < 220:
-                reserve = 150
+                reserve = 110
             elif balance < 320:
-                reserve = 190
+                reserve = 140
             else:
-                reserve = 230
+                reserve = 170
             bet = min(bet, max(min_bet, balance - reserve))
         if balance >= 200:
             if stranded_no_car:
-                reserve = 70 if balance < 350 else 95 if balance < 900 else 120
+                reserve = 55 if balance < 350 else 75 if balance < 900 else 100
             elif day < 5:
                 if balance < 260:
-                    reserve = 90
+                    reserve = 70
                 elif balance < 350:
-                    reserve = 120
+                    reserve = 95
                 elif balance < 500:
-                    reserve = 160
+                    reserve = 120
                 else:
-                    reserve = 220
+                    reserve = 160
             elif balance < 350:
-                reserve = 125
+                reserve = 100
             elif balance < 900:
-                reserve = 175
+                reserve = 140
             else:
-                reserve = 250
+                reserve = 190
             bet = min(bet, max(min_bet, balance - reserve))
         elif day < 5 and balance >= 120:
             reserve = 55 if balance < 160 else 85
@@ -734,26 +829,24 @@ def choose_blackjack_bet(request: DecisionRequest, plan: StrategicPlan) -> tuple
         elif day < 5:
             bet = max(bet, min(balance, max(min_bet, int(balance * 0.4))))
 
-        if (not stranded_no_car) and balance >= 100 and not (has_met_tom or has_met_frank or has_met_oswald):
-            bet = min(bet, max(min_bet, balance - (200 if day >= 5 and balance >= 200 else 100)))
-        if (not stranded_no_car) and balance >= 200 and not has_met_tom:
-            bet = min(bet, max(min_bet, balance - 200))
-        if (not stranded_no_car) and balance >= 200 and has_met_tom and not has_met_frank and not has_car:
-            bet = min(bet, max(min_bet, balance - 200))
-        if (not stranded_no_car) and day >= 8 and balance >= 350 and not has_met_tom:
-            bet = min(bet, max(min_bet, balance - 350))
+        if (not stranded_no_car) and balance >= 100 and not has_met_tom:
+            bet = min(bet, max(min_bet, balance - 100))
+        if (not stranded_no_car) and balance >= 100 and has_met_tom and not has_met_frank:
+            bet = min(bet, max(min_bet, balance - 100))
+        if (not stranded_no_car) and day >= 8 and balance >= 350 and has_met_tom and not has_met_frank:
+            bet = min(bet, max(min_bet, balance - 280))
         if early_caution:
             if balance >= 700:
-                reserve = 240
-            elif balance >= 350:
                 reserve = 180
+            elif balance >= 350:
+                reserve = 130
             elif balance >= 180:
-                reserve = 110
+                reserve = 80
             else:
-                reserve = 55
+                reserve = 40
             bet = min(bet, max(min_bet, balance - reserve))
 
-    elif has_car:
+    elif has_car or lost_car_progress_run:
         if balance < 150:
             reserve = 35
             cap_ratio = 0.22 if progression_ready else 0.14
@@ -802,7 +895,7 @@ def choose_blackjack_bet(request: DecisionRequest, plan: StrategicPlan) -> tuple
             if balance < 250000:
                 reserve = min(reserve, max(25000, int(balance * 0.36)))
                 cap_ratio = max(cap_ratio, 0.56)
-            elif balance < 500000:
+            elif balance < 400000:
                 reserve = min(reserve, max(90000, int(balance * 0.42)))
                 cap_ratio = max(cap_ratio, 0.48)
             else:
@@ -810,8 +903,8 @@ def choose_blackjack_bet(request: DecisionRequest, plan: StrategicPlan) -> tuple
                 cap_ratio = max(cap_ratio, 0.38)
 
         if rank == 1 and not wants_store and not wants_doctor:
-            reserve = min(reserve, 80 if balance < 5000 else 120)
-            cap_ratio = max(cap_ratio, 0.62 if balance < 5000 else 0.56)
+            reserve = min(reserve, 120 if balance < 5000 else 180)
+            cap_ratio = max(cap_ratio, 0.50 if balance < 5000 else 0.44)
         elif rank == 0 and not wants_store and not wants_doctor and balance >= 250:
             reserve = min(reserve, 55 if balance < 400 else 80 if balance < 1000 else 120)
             cap_ratio = max(cap_ratio, 0.42 if balance < 400 else 0.54 if balance < 1000 else 0.58)
@@ -822,9 +915,29 @@ def choose_blackjack_bet(request: DecisionRequest, plan: StrategicPlan) -> tuple
             reserve = min(reserve, max(220, int(floor * 0.92)))
             cap_ratio = max(cap_ratio, 0.34)
 
+        # Drawdown protection: when balance has fallen significantly from peak,
+        # reduce aggression to prevent a losing streak from wiping out the run.
+        # Only applies post-car at rank 1+ where the bot has meaningful capital.
+        if run_peak_balance > 0 and rank >= 1 and balance < run_peak_balance * 0.40:
+            # Severe drawdown (>60% loss from peak): go ultra-conservative
+            cap_ratio = min(cap_ratio, 0.20)
+            reserve = max(reserve, int(balance * 0.40))
+        elif run_peak_balance > 0 and rank >= 1 and balance < run_peak_balance * 0.60:
+            # Moderate drawdown (>40% loss from peak): pull back
+            cap_ratio = min(cap_ratio, 0.30)
+            reserve = max(reserve, int(balance * 0.25))
+
         if edge_score >= 6 and balance >= 25000:
             reserve = max(reserve, int(balance * (0.72 if balance < 100000 else 0.82)))
             cap_ratio = min(cap_ratio, 0.34 if balance < 100000 else 0.22)
+
+        if late_breakout_protection:
+            reserve = max(reserve, int(balance * (0.70 if balance < 25000 else 0.82)))
+            cap_ratio = min(cap_ratio, 0.14 if balance < 25000 else 0.10)
+
+        if fragile_post_car:
+            reserve = max(reserve, 120 if balance < 400 else 180)
+            cap_ratio = min(cap_ratio, 0.16 if balance < 400 else 0.20)
 
         if wants_map_unlock:
             if balance >= 7000:
@@ -853,13 +966,13 @@ def choose_blackjack_bet(request: DecisionRequest, plan: StrategicPlan) -> tuple
 
     if mechanic_threshold_push_window:
         bet = max(bet, min(total_available, max(min_bet, mechanic_gap)))
-    if low_balance_stall_window:
+    if low_balance_stall_window and not pre_tom_breakout_window:
         if balance < 80:
-            conservative_cap = max(min_bet, int(balance * 0.22))
+            conservative_cap = max(min_bet, int(balance * 0.30))
         elif balance < 120:
-            conservative_cap = max(min_bet, int(balance * 0.18))
+            conservative_cap = max(min_bet, int(balance * 0.24))
         else:
-            conservative_cap = max(min_bet, int(balance * 0.16))
+            conservative_cap = max(min_bet, int(balance * 0.20))
         bet = min(bet, conservative_cap)
 
     if fake_cash > 0 and not wants_doctor and not urgent_doctor:

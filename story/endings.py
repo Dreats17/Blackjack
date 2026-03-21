@@ -92,52 +92,28 @@ class EndingsMixin:
         type.slow(cyan("\"To truly finish what you've started, you must visit the one who helped you get here. Your mechanic. They have something important to tell you.\""))
         print("\n")
         
-        # Determine which mechanic to send them to based on who they've met
-        mechanics_met = []
-        if self.has_met("Tom"):
-            mechanics_met.append("Tom")
-        if self.has_met("Frank"):
-            mechanics_met.append("Frank")
-        if self.has_met("Oswald"):
-            mechanics_met.append("Oswald")
+        # Determine which mechanic to send them to — locked by car mechanic
+        chosen = self.get_car_mechanic()
         
-        if len(mechanics_met) == 0:
+        if chosen is None or chosen not in ("Tom", "Frank", "Oswald"):
             # Player never got their car fixed by any mechanic - rare ending path
             type.slow(cyan("\"But I see... you never let anyone in. You fixed things yourself, or left them broken. An interesting choice.\""))
             print("\n")
             type.slow(cyan("\"Very well. Your path is your own. But know this - the airport lies to the east. If you wish to leave this life behind entirely, that is where you must go.\""))
             print("\n")
             self.set_chosen_mechanic("None")
-        elif len(mechanics_met) == 1:
-            chosen = mechanics_met[0]
-            self.set_chosen_mechanic(chosen)
-            if chosen == "Tom":
-                type.slow(cyan("\"Tom. The jolly one with the golden truck. He's been expecting you. Go to him this afternoon.\""))
-            elif chosen == "Frank":
-                type.slow(cyan("\"Frank. The rough one with the tattooed arms. He has something to say. Visit him this afternoon.\""))
-            else:
-                type.slow(cyan("\"Oswald. The quiet genius. He's been waiting for this moment. See him this afternoon.\""))
-            print("\n")
         else:
-            # Multiple mechanics - let the woman choose based on who has the most dream progress
-            dream_scores = {
-                "Tom": self.get_tom_dreams() if self.has_met("Tom") else -1,
-                "Frank": self.get_frank_dreams() if self.has_met("Frank") else -1,
-                "Oswald": self.get_oswald_dreams() if self.has_met("Oswald") else -1
-            }
-            chosen = max([m for m in mechanics_met], key=lambda m: dream_scores[m])
             self.set_chosen_mechanic(chosen)
-            
             if chosen == "Tom":
-                type.slow(cyan("\"You've met several mechanics on your journey, but Tom... Tom has been special to you, hasn't he? The dreams you've shared... they bind you together.\""))
+                type.slow(cyan("\"Tom. The jolly one with the golden truck. You chose him to mend your wagon, and he mended something deeper. The dreams you've shared... they bind you together.\""))
                 print("\n")
                 type.slow(cyan("\"Go to Tom's Trusty Trucks and Tires this afternoon. Your destiny awaits there.\""))
             elif chosen == "Frank":
-                type.slow(cyan("\"You've crossed paths with many, but Frank's fire has left its mark on you. The visions in your sleep... they speak of him.\""))
+                type.slow(cyan("\"Frank. The rough one with the tattooed arms. You trusted him with your car, and he left his mark on your soul. The visions in your sleep... they speak of him.\""))
                 print("\n")
                 type.slow(cyan("\"Go to Filthy Frank's Flawless Fixtures this afternoon. He has answers you seek.\""))
             else:
-                type.slow(cyan("\"Of all the mechanics you've known, Oswald's quiet wisdom has touched you deepest. Your dreams whisper his name.\""))
+                type.slow(cyan("\"Oswald. The quiet genius. You chose his precision over all others. Your dreams whisper his name.\""))
                 print("\n")
                 type.slow(cyan("\"Go to Oswald's Optimal Outparts this afternoon. The final piece awaits.\""))
             print("\n")
@@ -694,6 +670,9 @@ class EndingsMixin:
         quit()
 
     def goodbye_tom(self):
+        # Therapy route: auto-accept (best ending)
+        therapy_healed = self.get_visited_tanya() >= 5
+        
         type.type("You get in your wagon and drive to Tom's Trusty Trucks and Tires.")
         print("\n")
         type.type("The golden truck is parked out front, gleaming in the afternoon sun.")
@@ -716,29 +695,39 @@ class EndingsMixin:
         type.type(quote("There's been someone tryin' to reach ya. A lot. Think it might be important."))
         print("\n")
         
-        answer = ask.yes_or_no("Take the phone call? ")
-        
-        if answer == "yes":
-            type.type("You take the phone. Your hands are trembling.")
+        if therapy_healed:
+            # No choice. Therapy fixed you. You take the call immediately.
+            type.slow("You don't hesitate. Not even for a second.")
             print("\n")
-            type.type("Tom gives you some space, walking back into the garage.")
+            type.slow("You take the phone out of Tom's hand before he's even finished talking.")
             print("\n")
-            type.type("You press the call button.")
-            print("\n")
-            type.type("It rings once. Twice. Then-")
-            print("\n")
-            
-            type.slow(quote("John? John, is that you?"))
-            print("\n")
-            
-            type.slow("The voice on the other end is unmistakable. It's Rebecca. Your wife.")
+            type.slow("Tom blinks. Then he smiles. He's never seen you move that fast.")
             print("\n")
         else:
-            type.type(quote("Well, suit yourself. The phone'll be here if you change your mind."))
-            print("\n")
-            type.type("You leave Tom's shop. Maybe someday you'll be ready to face that call.")
-            print("\n")
-            return
+            answer = ask.yes_or_no("Take the phone call? ")
+            
+            if answer == "yes":
+                type.type("You take the phone. Your hands are trembling.")
+                print("\n")
+                type.type("Tom gives you some space, walking back into the garage.")
+                print("\n")
+            else:
+                type.type(quote("Well, suit yourself. The phone'll be here if you change your mind."))
+                print("\n")
+                type.type("You leave Tom's shop. Maybe someday you'll be ready to face that call.")
+                print("\n")
+                return
+
+        type.type("You press the call button.")
+        print("\n")
+        type.type("It rings once. Twice. Then-")
+        print("\n")
+        
+        type.slow(quote("John? John, is that you?"))
+        print("\n")
+        
+        type.slow("The voice on the other end is unmistakable. It's Rebecca. Your wife.")
+        print("\n")
 
         type.slow(quote("Do you hear that? That's your son, Nathan. He learned to walk a couple months ago. His first word was 'Dada'. God, I wish you were here for that. He needs you in his life, he needs you as a father figure. He remembers you. Sometimes, I pull up old pictures of you, and he reaches out to touch your face. All I want is for you to be here, to make more memories with me and my son. But you can be here, if you come back, come home. We can raise our son together, if you just come back home, to be with me and Nathan. I can forgive you for all of it. I do, I forgive you for everything. None of it matters now, it's all in the past. Just please…come home."))
         print("\n")
@@ -751,12 +740,16 @@ class EndingsMixin:
 
         type.slow(quote("Could you do that for us?"))
 
-        answer = ask.yes_or_no("\"Will you come back home?\"")
-
-        if answer == "yes":
-            self.salvation()
+        if therapy_healed:
+            # No choice here either. You're going home.
+            self.salvation_healed()
         else:
-            self.resurrection()
+            answer = ask.yes_or_no("\"Will you come back home?\"")
+
+            if answer == "yes":
+                self.salvation()
+            else:
+                self.resurrection()
 
     def salvation(self):
         type.slow("\"Yes, yes, yes of course I'll come home!\" Tears begin to stream from your eyes. \"I, I don't know what's gotten over me, I'm so, so incredibly sorry.\" A rush of adrenaline, no, realization comes over you. This whole time, you've been wasting your life away in a beat up wagon, trying to make a living off of gambling at a Blackjack table, while your family was trying, and struggling, to imagine a life without you.")
@@ -883,6 +876,254 @@ class EndingsMixin:
             print("\n")
             type.slow("That's not a bad legacy to leave behind.")
             print("\n")
+
+    # ============================================
+    # SALVATION (HEALED) - THE BEST ENDING
+    # Tanya's therapy route — you go home, fully healed
+    # ============================================
+
+    def salvation_healed(self):
+        print("\n")
+        
+        type.slow("\"Yes.\"")
+        print("\n")
+        
+        type.slow("You don't hesitate. You don't stammer. You don't hedge.")
+        print("\n")
+        
+        type.slow("\"Yes. I'm coming home. Right now. Tonight. I'm coming home.\"")
+        print("\n")
+        
+        type.slow("The phone goes silent for a moment. Then you hear Rebecca crying. But it's different this time. It's not the desperate, broken crying of someone begging. It's relief. Pure, unfiltered relief.")
+        print("\n")
+        
+        type.slow(quote("John... oh God, John, I thought—I thought you were never—"))
+        print("\n")
+        
+        type.slow("\"I know. I know. I'm sorry. I'm so sorry. But I'm different now. I've been talking to someone. A therapist. Her name's Tanya. She's... she's kind of mean, actually. But she helped me see what I was doing. What I was running from.\"")
+        print("\n")
+        
+        type.slow("Rebecca laughs through her tears. You haven't heard that sound in so long.")
+        print("\n")
+        
+        type.slow(quote("A therapist? You went to therapy? You wouldn't even go when we were together."))
+        print("\n")
+        
+        type.slow("\"Yeah, well. It took living in a car and gambling with a one-eyed cowboy to convince me.\"")
+        print("\n")
+        
+        type.slow("She laughs again. You're both laughing now. And crying. It's a mess. It's perfect.")
+        print("\n")
+        
+        type.slow(quote("Dada? Dada!"))
+        print("\n")
+        
+        type.slow("Nathan's voice cuts through everything. Your son. Your baby boy.")
+        print("\n")
+        
+        type.slow("\"Hey, buddy. Yeah, it's Dada. I'm coming home.\"")
+        print("\n")
+        time.sleep(1)
+        
+        type.slow("Tom is standing in the doorway of the garage, arms folded, grinning ear to ear.")
+        print("\n")
+        
+        type.slow(quote("Now THAT'S what I like to hear, yunno!"))
+        print("\n")
+        
+        type.slow("You hang up. You look at Tom. You can barely see through the tears.")
+        print("\n")
+        
+        type.slow("\"Tom, I can't—I don't know how to—\"")
+        print("\n")
+        
+        type.slow(quote("Don't you dare start gettin' sappy on me now. Get in that wagon and go home to your family. The money don't matter. Never did."))
+        print("\n")
+        
+        type.slow("He pulls you into a bear hug. Grease-stained overalls and all.")
+        print("\n")
+        
+        type.slow(quote("You're a good man, John. Always were. Just took ya a minute to figure it out."))
+        print("\n")
+        time.sleep(1)
+        
+        # Companion farewell
+        companion_count = len(self.get_all_companions())
+        if companion_count > 0:
+            type.slow("You look back at the wagon. Your companions are watching.")
+            print("\n")
+            companion_names = list(self.get_all_companions().keys())
+            if companion_count <= 3:
+                names_str = ", ".join(companion_names)
+            else:
+                names_str = companion_names[0] + ", " + companion_names[1] + ", and " + str(companion_count-2) + " others"
+            type.slow(f"{names_str} watch you with understanding.")
+            print("\n")
+            type.slow("Tom puts a hand on your shoulder. " + quote("Don't worry about 'em. I'll take care of every last one. They'll have a good life here at the shop."))
+            print("\n")
+            if self.has_companion("Thunder"):
+                type.slow("Thunder nuzzles your hand one last time. You whisper a thank you into his mane.")
+                print("\n")
+        
+        type.slow("You get in the wagon. Turn the key. The engine rumbles to life — maybe for the last time.")
+        print("\n")
+        
+        type.slow("The dirt road stretches out in front of you. Behind you, the casino sits on its hill, dark and small and far away.")
+        print("\n")
+        
+        type.slow("You don't look back.")
+        print("\n")
+        time.sleep(2)
+        
+        type.slow(bright("~ ~ ~"))
+        print("\n")
+        time.sleep(1)
+        
+        type.slow("You pull into the driveway at 2:47 AM. The porch light is on. She left it on for you.")
+        print("\n")
+        
+        type.slow("Before you even reach the door, it opens. Rebecca is standing there in her pajamas, holding Nathan, who's half asleep and rubbing his eyes.")
+        print("\n")
+        
+        type.slow("Nobody says anything. You just hold them. Both of them. For a very long time.")
+        print("\n")
+        time.sleep(2)
+        
+        type.slow(bright("~ ~ ~"))
+        print("\n")
+        time.sleep(1)
+        
+        type.slow("You keep seeing Tanya. Every Tuesday. She doesn't give you a discount.")
+        print("\n")
+        
+        type.slow(cyan("\"You survived a gambling addiction, an existential crisis, and a one-eyed dealer with a revolver. You can afford seventy-five dollars a week.\""))
+        print("\n")
+        
+        type.slow("She's right. She's always right. You kind of hate that about her.")
+        print("\n")
+        
+        type.slow("The urge to gamble doesn't go away. Not completely. Some nights you dream about the casino. About the felt. About the sound of cards being shuffled. But the dreams get quieter, month by month, until they're just whispers.")
+        print("\n")
+        
+        type.slow("Rebecca doesn't ask about what happened out there. Not the details. She doesn't need to know. She just needs to know you came back.")
+        print("\n")
+        
+        type.slow("And you did.")
+        print("\n")
+        time.sleep(1)
+        
+        type.slow(bright("~ ~ ~"))
+        print("\n")
+        time.sleep(1)
+        
+        type.slow("Nathan's first football game is on a Saturday in October. The leaves are changing. Rebecca packed sandwiches.")
+        print("\n")
+        
+        type.slow("He scores a touchdown — his first. He looks up at the stands, finds you in the crowd, and points.")
+        print("\n")
+        
+        type.slow("You point back.")
+        print("\n")
+        time.sleep(1)
+        
+        type.slow("Dianne is born the following spring. She has Rebecca's eyes and your stubborn streak. She'll be a handful. You can't wait.")
+        print("\n")
+        
+        type.slow("You and Rebecca renew your vows on a warm evening in June. Tom drives up in his golden truck, wearing a suit that's two sizes too big. He cries more than anyone.")
+        print("\n")
+        
+        type.slow(quote("I always knew you'd figure it out, yunno."))
+        print("\n")
+        
+        type.slow("You go back to your desk job. Selling printers. It's not glamorous. But when you come home, Nathan runs to the door, and Dianne reaches up from her crib, and Rebecca kisses you like you've been gone for years.")
+        print("\n")
+        
+        type.slow("Because you were. And she never forgot it. And neither did you.")
+        print("\n")
+        time.sleep(1)
+        
+        type.slow(bright("~ ~ ~"))
+        print("\n")
+        time.sleep(1)
+        
+        type.slow("Years pass. Good years. The kind of years you didn't think you deserved.")
+        print("\n")
+        
+        type.slow("Nathan becomes the highest-scoring wide receiver his high school has ever seen. Every touchdown ends with a point to the stands. To you.")
+        print("\n")
+        
+        type.slow("Dianne writes her first book at seventeen. It's about a man who gets lost and finds his way home. She dedicates it to you.")
+        print("\n")
+        
+        type.slow("Nathan meets Kelly in college. Dianne's novel hits the bestseller list. Thomas is born on a Tuesday — Tanya's day. You take it as a sign.")
+        print("\n")
+        
+        type.slow("And through all of it, you're there. Present. Alive. Healthy.")
+        print("\n")
+        
+        type.slow("No coughing fits. No hospital beds. No tubes. No COPD.")
+        print("\n")
+        
+        type.slow("Because you stopped running the engine in the car. Because Tanya taught you that the car wasn't a home — it was a coffin you hadn't climbed into yet.")
+        print("\n")
+        time.sleep(1)
+        
+        type.slow("You live to see Marissa born. To see Thomas take his first steps. To dance with Rebecca at Nathan's wedding. To hold Dianne's hand when her second book doesn't sell and she thinks about giving up.")
+        print("\n")
+        
+        type.slow("\"Don't,\" you tell her. \"Don't ever give up. Trust me on this one.\"")
+        print("\n")
+        
+        type.slow("She doesn't.")
+        print("\n")
+        time.sleep(2)
+        
+        type.slow(bright("~ ~ ~"))
+        print("\n")
+        time.sleep(1)
+        
+        type.slow("You're sitting on the porch. It's a Sunday. Rebecca is next to you. The grandkids are in the yard.")
+        print("\n")
+        
+        type.slow("Thomas is chasing Marissa around the oak tree. Nathan is flipping burgers on the grill, arguing with Kelly about seasoning. Dianne is on the phone with her publisher, pacing back and forth, gesturing wildly.")
+        print("\n")
+        
+        type.slow("Rebecca takes your hand.")
+        print("\n")
+        
+        type.slow(quote("Do you ever think about it? About that time?"))
+        print("\n")
+        
+        type.slow("You watch Thomas trip over his own feet and land in the grass, laughing.")
+        print("\n")
+        
+        type.slow("\"Sometimes. Less and less.\"")
+        print("\n")
+        
+        type.slow(quote("I'm glad you came home."))
+        print("\n")
+        
+        type.slow("\"Me too.\"")
+        print("\n")
+        time.sleep(2)
+        
+        type.slow("And you mean it. With every single part of you. You mean it.")
+        print("\n")
+        time.sleep(3)
+        
+        # Display achievements
+        self.display_final_achievements()
+        
+        type.slow(bright(green("~ ~ ~ ENDING: SALVATION (HEALED) ~ ~ ~")))
+        print("\n")
+        type.slow(green("You went home. You stayed home. You got better."))
+        print("\n")
+        type.slow(green("Not because the cards let you. Because you let yourself."))
+        print("\n")
+        type.slow(bright(green("This is the best ending.")))
+        print("\n")
+        type.slow("Thank you for playing.")
+        quit()
 
     def resurrection(self):
 
@@ -2795,6 +3036,158 @@ class EndingsMixin:
         self.display_final_achievements()
         
         type.slow(bright(yellow("~ ~ ~ THE END ~ ~ ~")))
+        print("\n")
+        type.slow("Thank you for playing.")
+        quit()
+
+    # ============================================
+    # EXHAUST ENDING (Tanya's Therapy Route - Bad)
+    # ============================================
+
+    def ending_exhaust(self):
+        """The depression ending. After therapy revealed too much, the player can't cope."""
+        
+        print("\n")
+        time.sleep(2)
+        
+        type.slow("You can't sleep.")
+        print("\n")
+        time.sleep(1)
+        
+        type.slow("You've been staring at the ceiling of the wagon for hours. The casino lights pulse in the distance like a heartbeat.")
+        print("\n")
+        
+        type.slow("Tanya was right about everything. That's the problem.")
+        print("\n")
+        
+        type.slow("She peeled back every layer. Showed you exactly what you are. A man who abandoned his wife. His son. Who traded his family for a deck of cards and a one-eyed dealer.")
+        print("\n")
+        
+        type.slow("And the worst part? You understood it. Every session. Every word. You understood.")
+        print("\n")
+        time.sleep(1)
+        
+        type.slow("Understanding doesn't fix anything. It just makes the weight heavier.")
+        print("\n")
+        
+        type.slow("You sit up. Your hand finds the ignition. Not to drive anywhere.")
+        print("\n")
+        time.sleep(1)
+        
+        type.slow("The engine turns over. A familiar rumble.")
+        print("\n")
+        
+        type.slow("You roll the windows up. All of them. One by one.")
+        print("\n")
+        time.sleep(1)
+        
+        type.slow("The exhaust hums beneath you. You can smell it now. Faint at first. Then thicker.")
+        print("\n")
+        
+        type.slow("You think about Nathan. About the stick figures with the big heads. About Rebecca's voice on a phone you never answered.")
+        print("\n")
+        time.sleep(1)
+        
+        type.slow("You think about Tanya. About her stupid granola bars and her stupid white noise machine and how she was the only person in months who actually listened to you.")
+        print("\n")
+        
+        type.slow(cyan("\"Don't do anything stupid tonight. Promise me.\""))
+        print("\n")
+        time.sleep(1)
+        
+        type.slow("You didn't promise. She noticed.")
+        print("\n")
+        
+        type.slow("The air is getting heavier now. Your eyelids are getting heavier too. Everything is getting heavier.")
+        print("\n")
+        time.sleep(2)
+        
+        type.slow("You always thought this would be scarier. But it's not. It's just... quiet.")
+        print("\n")
+        
+        type.slow("Quieter than the casino. Quieter than the cards. Quieter than the voice in your head that's been screaming at you to keep playing, keep betting, keep running.")
+        print("\n")
+        time.sleep(1)
+        
+        type.slow("Finally, quiet.")
+        print("\n")
+        time.sleep(2)
+        
+        type.slow("...")
+        print("\n")
+        time.sleep(2)
+        
+        type.slow("The next morning, Tom drives by on his way to the shop. He sees the wagon on the side of the road. Engine still running.")
+        print("\n")
+        
+        type.slow("He knocks on the window. Then he knocks harder.")
+        print("\n")
+        time.sleep(1)
+        
+        type.slow("Then he stops knocking.")
+        print("\n")
+        time.sleep(2)
+        
+        type.slow("He sits on the curb next to the car for a long time. He doesn't say anything. He just sits there, with his hands on his knees, staring at the dirt.")
+        print("\n")
+        
+        type.slow("Eventually, he pulls out his phone and makes two calls.")
+        print("\n")
+        
+        type.slow("The first one is to the police.")
+        print("\n")
+        time.sleep(1)
+        
+        type.slow("The second one is to a number he found scribbled on a card in the glovebox.")
+        print("\n")
+        
+        type.slow("It rings three times.")
+        print("\n")
+        
+        type.slow(cyan("\"This is Tanya. If this is a new client, I'm booked until—\""))
+        print("\n")
+        
+        type.slow(quote("Ma'am, this is Tom. I'm a friend of John's."))
+        print("\n")
+        time.sleep(1)
+        
+        type.slow("There's a long pause on the other end.")
+        print("\n")
+        
+        type.slow(cyan("\"...is he okay?\""))
+        print("\n")
+        time.sleep(2)
+        
+        type.slow("Tom doesn't answer right away. He looks at the wagon. At the exhaust still curling from the tailpipe.")
+        print("\n")
+        
+        type.slow(quote("No, ma'am. He's not."))
+        print("\n")
+        time.sleep(3)
+        
+        type.slow("The line goes quiet.")
+        print("\n")
+        time.sleep(2)
+        
+        type.slow("Somewhere, in a strip mall office with a broken white noise machine, a therapist puts her phone down and stares at the wall for a very long time.")
+        print("\n")
+        time.sleep(2)
+        
+        type.slow("She had one rule. Don't get attached to clients.")
+        print("\n")
+        
+        type.slow("She broke it.")
+        print("\n")
+        time.sleep(3)
+        
+        # Display achievements
+        self.display_final_achievements()
+        
+        type.slow(bright(red("~ ~ ~ ENDING: EXHAUST ~ ~ ~")))
+        print("\n")
+        type.slow(red("Some wounds don't heal. Some people can't be saved."))
+        print("\n")
+        type.slow(red("Not because they don't know better. Because they do."))
         print("\n")
         type.slow("Thank you for playing.")
         quit()

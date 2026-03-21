@@ -214,6 +214,8 @@ def choose_event_yes_no(request: DecisionRequest, plan: StrategicPlan) -> tuple[
     health = int(request.game_state.get("health", 0) or 0)
     sanity = int(request.game_state.get("sanity", 0) or 0)
     rank = int(request.game_state.get("rank", 0) or 0)
+    has_car = bool(request.game_state.get("has_car", False))
+    has_met_frank = bool(request.metadata.get("has_met_frank", False))
 
     always_yes = {
         "promise to keep his secret?",
@@ -258,6 +260,11 @@ def choose_event_yes_no(request: DecisionRequest, plan: StrategicPlan) -> tuple[
         "follow the duck parade?",
         "throw them some bread/money as tribute?",
         "keep the kitten?",
+        "accept earl's moonshine?",
+        "use the carrot to lure the rabbit?",
+        "open it?",
+        "take the money?",
+        "open it? ",
         "visit him?",
         "give him money?",
         "allow the photoshoot?",
@@ -302,7 +309,11 @@ def choose_event_yes_no(request: DecisionRequest, plan: StrategicPlan) -> tuple[
         "pay $20 for a prophecy?",
         "tell them the truth?",
         "accept his offer?",
+        "throw it away?",
     }
+
+    if prompt_lower == "suggest trusty tom might be able to help?":
+            return "yes", _yes_no_trace(request, plan, "yes", "prefer_tom_stable_intro", 0.88)
 
     if prompt_lower in always_yes:
         return "yes", _yes_no_trace(request, plan, "yes", f"event_yes:{prompt_lower}", 0.82)
@@ -341,6 +352,23 @@ def choose_event_yes_no(request: DecisionRequest, plan: StrategicPlan) -> tuple[
         return "no", _yes_no_trace(request, plan, "no", "hendricks_refusal", 0.8)
     if prompt_lower == "do the delivery?" and "feelgood" in recent:
         return "no", _yes_no_trace(request, plan, "no", "feelgood_delivery_refusal", 0.8)
+
+    # Car repair events — always pay to remove dangers that can kill you
+    if prompt_lower == "pay for the repair? ($100)":
+        answer = "yes" if balance >= 100 else "no"
+        return answer, _yes_no_trace(request, plan, answer, "exhaust_repair_budget_gate", 0.92)
+    if prompt_lower == "pay the mechanic? ($150)":
+        answer = "yes" if balance >= 150 else "no"
+        return answer, _yes_no_trace(request, plan, answer, "fuel_leak_repair_budget_gate", 0.92)
+
+    # Witch soup (blank prompt in swamp_wade) — free 15-30 heal
+    if not prompt_lower and "soup" in recent and ("witch" in recent or "shack" in recent):
+        return "yes", _yes_no_trace(request, plan, "yes", "witch_soup_free_heal", 0.85)
+
+    # Give money to desperate gambler — 70% save a life + 10 sanity
+    if prompt_lower == "give him money?" and ("desperate" in recent or "gambler" in recent):
+        answer = "yes" if balance >= 100 else "no"
+        return answer, _yes_no_trace(request, plan, answer, "desperate_gambler_charity", 0.74)
 
     if prompt_lower == "buy the gyro?":
         answer = "yes" if balance >= 5 and (health < 92 or sanity < 72) else "no"
@@ -420,6 +448,18 @@ def choose_event_yes_no(request: DecisionRequest, plan: StrategicPlan) -> tuple[
                 "do you approach the witch's shack?",
                 "do you try to pull it up and search it?",
                 "do you swim over to investigate?",
+                # Adventure blank prompts — treasure maps, love letters, messages
+                "follow the map",
+                "find the recipient",
+                "decode the message",
+                "treasure",
+                "love letter",
+                # Night blank prompts — exploring, approaching
+                "do you continue",
+                "do you approach",
+                "do you accept",
+                "do you follow",
+                "do you investigate",
             ]
         ):
             return "yes", _yes_no_trace(request, plan, "yes", "blank_prompt_investigate_yes", 0.68)
@@ -474,8 +514,12 @@ def choose_event_option(request: DecisionRequest, plan: StrategicPlan) -> tuple[
         chosen_index, reason = 1, "stay_meets_bridge_angel"
     elif normalized == ["bail out", "investigate", "ignore it"]:
         chosen_index, reason = 0, "bail_out"
+    elif normalized == ["stick a pin in it", "burn it", "keep it safe"]:
+        chosen_index, reason = 1, "burn_voodoo_doll_best_outcome"
     elif normalized == ["try it", "sell it", "throw it away"]:
         chosen_index, reason = 1, "sell_it"
+    elif normalized == ["kick it away", "run", "stand your ground"]:
+        chosen_index, reason = 0, "kick_rat_away"
     elif normalized == ["save the bird", "ignore your phone", "scream"]:
         chosen_index, reason = 1, "ignore_phone"
     elif normalized == ["not interested", "what are you offering", "souls?"]:
@@ -549,6 +593,8 @@ def choose_event_inline_choice(request: DecisionRequest, plan: StrategicPlan) ->
     prompt_lower = str(request.metadata.get("prompt_lower", "") or "")
     recent = str(request.metadata.get("recent_lower", "") or "")
     balance = int(request.game_state.get("balance", 0) or 0)
+    health = int(request.game_state.get("health", 0) or 0)
+    rank = int(request.game_state.get("rank", 0) or 0)
     choices = [str(option.label).strip().lower() for option in request.normalized_options]
     choice_set = set(choices)
     inventory = {str(item).lower() for item in request.game_state.get("inventory", ())}
@@ -583,6 +629,49 @@ def choose_event_inline_choice(request: DecisionRequest, plan: StrategicPlan) ->
         frozenset({"feed", "skip", "sit"}): ("sit", "sit_default"),
         frozenset({"play", "watch", "decline"}): ("watch", "watch_default"),
         frozenset({"approach", "watch", "leave"}): ("watch", "watch_default"),
+        # Road adventure
+        frozenset({"stop", "honk", "drive_past"}): ("stop", "road_stop_hitchhiker"),
+        frozenset({"drop_her_off", "give_money", "offer_food", "talk_more"}): ("give_money", "road_give_money_reward"),
+        frozenset({"touch_stone", "pray", "leave_offering", "read_symbols", "walk_away"}): ("pray", "shrine_pray_free_heal"),
+        frozenset({"help", "sell_water", "entertain", "rob", "ignore"}): ("help", "road_help_caravan"),
+        frozenset({"stop", "toss_food", "follow", "drive_past"}): ("stop", "road_stop_animal"),
+        # Woodlands adventure
+        frozenset({"enter", "bet", "observe"}): ("enter", "woodlands_enter_competition"),
+        frozenset({"track", "trap", "climb"}): ("track", "woodlands_track_best"),
+        frozenset({"rush", "wait", "sabotage"}): ("wait", "woodlands_wait_patience"),
+        frozenset({"fight", "flee", "offer", "submit"}): ("offer", "woodlands_boss_offer_safe"),
+        frozenset({"eyes", "dodge", "dead"}): ("eyes", "woodlands_eyes_staredown"),
+        frozenset({"river", "cliff", "brambles"}): ("river", "woodlands_river_escape"),
+        frozenset({"knock", "peek", "leave"}): ("knock", "woodlands_knock_witch"),
+        frozenset({"memory", "year", "favor"}): ("favor", "woodlands_witch_favor_best"),
+        # Swamp adventure
+        frozenset({"race", "bet", "watch"}): ("bet", "swamp_bet_on_race"),
+        frozenset({"lettuce", "yelling", "poking"}): ("lettuce", "swamp_lettuce_train"),
+        frozenset({"cheer", "pray", "throw"}): ("cheer", "swamp_cheer_turtle"),
+        frozenset({"fight", "bribe", "riddle", "run"}): ("riddle", "swamp_troll_riddle_safest"),
+        frozenset({"kneecaps", "climb", "distract"}): ("distract", "swamp_troll_distract"),
+        frozenset({"free", "keep", "negotiate", "ignore"}): ("free", "fairy_free_for_wish"),
+        frozenset({"money", "luck", "health", "item", "info"}): ("health", "fairy_wish_health"),
+        frozenset({"money", "luck", "health"}): ("health", "fairy_wish_health_simple"),
+        frozenset({"kiss", "talk", "run", "insult"}): ("talk", "mermaid_talk_safe"),
+        # Beach adventure
+        frozenset({"wrestle", "bet", "watch", "nope"}): ("bet", "beach_gator_bet"),
+        frozenset({"circle", "charge", "taunt"}): ("circle", "beach_gator_circle_safe"),
+        frozenset({"jaw_clamp", "roll", "escape"}): ("escape", "beach_gator_escape"),
+        frozenset({"join", "bet", "watch", "nope"}): ("join", "beach_volleyball_join"),
+        frozenset({"bump", "spike", "dive"}): ("spike", "beach_volleyball_spike"),
+        frozenset({"block", "set", "cheer"}): ("block", "beach_volleyball_block"),
+        frozenset({"trust_grandma", "go_hero", "teamwork"}): ("teamwork", "beach_volleyball_teamwork"),
+        frozenset({"classic_castle", "modern", "weird", "huge"}): ("huge", "sandcastle_huge_best"),
+        frozenset({"compete", "bet", "sabotage", "watch"}): ("compete", "beach_fishing_compete"),
+        frozenset({"grouper", "tuna", "marlin"}): ("marlin", "fishing_marlin_biggest"),
+        # Underwater adventure  
+        frozenset({"open", "shake", "throw_back", "sell"}): ("open", "underwater_open_clam"),
+        frozenset({"race", "bet", "catch_own", "watch"}): ("catch_own", "underwater_catch_own_crab"),
+        frozenset({"yelling", "food", "poking", "singing"}): ("singing", "underwater_sing_to_crab"),
+        # City adventure
+        frozenset({"join", "observe", "sabotage", "leave"}): ("join", "city_join_ritual"),
+        frozenset({"wealth", "love", "power", "peace"}): ("peace", "city_ritual_peace_safest"),
     }
     mapped = set_map.get(frozenset(choice_set))
     if mapped is not None:
@@ -595,6 +684,28 @@ def choose_event_inline_choice(request: DecisionRequest, plan: StrategicPlan) ->
     if choice_set == {"pet", "feed", "ignore"}:
         chosen = "feed" if "can of tuna" in inventory else "pet"
         return chosen, _inline_trace(request, plan, chosen, "pet_or_feed_gate", 0.8)
+
+    # Swamp nectar: drink for 67% chance of healing, save only worth it at high rank for item value
+    if choice_set == {"drink", "save", "toss"}:
+        chosen = "save" if rank >= 2 else "drink"
+        return chosen, _inline_trace(request, plan, chosen, "swamp_nectar_drink_or_save", 0.8)
+
+    # Swamp alligator: freeze is worst (guaranteed damage), splash scares it, swim escapes
+    if choice_set == {"freeze", "splash", "swim"}:
+        return "splash", _inline_trace(request, plan, "splash", "alligator_splash_scares", 0.82)
+
+    # Double or walk (road adventure gambling): walk away to preserve winnings
+    if choice_set == {"double", "walk"}:
+        return "walk", _inline_trace(request, plan, "walk", "road_gamble_walk_preserve", 0.8)
+
+    # Again or leave (road adventure): leave to bank winnings
+    if choice_set == {"again", "leave"}:
+        return "leave", _inline_trace(request, plan, "leave", "road_gamble_leave_with_winnings", 0.8)
+
+    # Drink/wash/bottle/leave in woodland spring
+    if choice_set == {"drink", "wash", "bottle", "leave"}:
+        chosen = "drink" if health < 55 else ("bottle" if "water bottles" not in inventory else "wash")
+        return chosen, _inline_trace(request, plan, chosen, "woodland_spring_choice", 0.8)
 
     if prompt_lower == "choose:":
         if "your companion is sick. what do you do?" in recent:

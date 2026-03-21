@@ -711,6 +711,31 @@ def run_all_scenarios() -> list[ScenarioResult]:
 
     results.append(
         _run_snapshot_goal_scenario(
+            "loan_backed_marvin_window_prefers_marvin_goal",
+            "state_goal",
+            FakeScenarioPlayer(
+                day=22,
+                balance=1400,
+                rank=1,
+                health=82,
+                sanity=68,
+                inventory=("Car", "Worn Map"),
+                met=("Vinnie",),
+            ),
+            economy_hints={
+                "marvin_affordable_priority": 0,
+                "marvin_candidate_price": 0,
+                "marvin_future_priority": 72,
+                "marvin_future_shortfall": 3600,
+                "marvin_strong_window": 0,
+            },
+            available_routes=("Marvin's Mystical Merchandise", "Vinnie's Back Alley Loans", "Convenience Store"),
+            expected_goal="exploit_marvin",
+        )
+    )
+
+    results.append(
+        _run_snapshot_goal_scenario(
             "healthy_midgame_store_pressure_defers_to_rank_push",
             "state_goal",
             FakeScenarioPlayer(
@@ -798,6 +823,63 @@ def run_all_scenarios() -> list[ScenarioResult]:
                 "store_spend": 0,
             },
             _assert_goal_and_route("exploit_marvin", "Marvin"),
+        )
+    )
+
+    results.append(
+        _run_route_scenario(
+            "future_only_marvin_push_prefers_loan_route",
+            "route",
+            GameState(
+                day=22,
+                balance=1400,
+                rank=1,
+                health=82,
+                sanity=68,
+                fatigue=10,
+                alive=True,
+                current_context_tag="afternoon_destination",
+                has_car=True,
+                has_worn_map=True,
+                has_marvin_access=True,
+                has_met_vinnie=True,
+                marvin_affordable_priority=0,
+                marvin_candidate_price=0,
+                marvin_future_priority=72,
+                marvin_future_shortfall=3600,
+                opportunity_flags={
+                    "can_visit_marvin": True,
+                    "can_borrow_to_bootstrap": True,
+                },
+                current_progress_goal_candidates=("push_next_rank", "exploit_marvin"),
+            ),
+            ("Marvin", "Loan Shark", "Convenience Store"),
+            {
+                "has_car": True,
+                "has_marvin_access": True,
+                "wants_marvin": True,
+                "wants_loan": True,
+                "wants_store": False,
+                "wants_pawn": False,
+                "wants_upgrade": False,
+                "wants_workbench_craft": False,
+                "wants_adventure": False,
+                "wants_mechanic": False,
+                "wants_doctor": False,
+                "urgent_medical": False,
+                "needs_recovery_day": False,
+                "store_spend": 0,
+                "pawn_value": 0,
+                "loan_pressure": 0,
+                "mechanic_urgency": 0,
+                "upgrade_urgency": 0,
+                "marvin_priority": 0,
+                "marvin_future_priority": 72,
+                "marvin_future_shortfall": 3600,
+                "planner_goal": "exploit_marvin",
+                "rank": 1,
+            },
+            _assert_goal_and_route("exploit_marvin", "Loan Shark"),
         )
     )
 
@@ -2453,6 +2535,25 @@ def run_all_scenarios() -> list[ScenarioResult]:
                 sanity=66,
                 fatigue=8,
                 inventory=("Car", "Map", "Faulty Insurance"),
+                met=("Vinnie",),
+            ),
+            ((1, "Borrow $500"), (2, "Borrow $1,000"), (3, "Borrow $2,500"), (4, "Borrow $5,000"), (5, "Never mind")),
+            "Borrow $5,000",
+        )
+    )
+
+    results.append(
+        _run_quicktest_loan_borrow_scenario(
+            "future_marvin_unlock_prefers_max_borrow",
+            "quicktest_loan_borrow",
+            FakeScenarioPlayer(
+                day=22,
+                balance=1400,
+                rank=1,
+                health=82,
+                sanity=68,
+                fatigue=8,
+                inventory=("Car", "Worn Map"),
                 met=("Vinnie",),
             ),
             ((1, "Borrow $500"), (2, "Borrow $1,000"), (3, "Borrow $2,500"), (4, "Borrow $5,000"), (5, "Never mind")),

@@ -123,28 +123,52 @@ def _opportunity_flags(
     has_map = bool(player and player.has_item("Map"))
     has_worn_map = bool(player and player.has_item("Worn Map"))
     route_tokens = _route_tokens(available_routes)
+    rank = int(_safe_call(player, "get_rank", 0) or 0)
     mechanic_visits = int(_safe_call(player, "get_mechanic_visits", 0) or 0)
     debt = int(_safe_call(player, "get_loan_shark_debt", 0) or 0)
     warning_level = int(_safe_call(player, "get_loan_shark_warning_level", 0) or 0)
     can_access_upgrades = bool(_safe_call(player, "can_access_upgrades", False))
     has_met_witch = bool(player and player.has_met("Witch"))
     marvin_affordable_priority = _economy_hint_value(economy_hints, "marvin_affordable_priority")
+    marvin_future_priority = _economy_hint_value(economy_hints, "marvin_future_priority")
+    marvin_future_shortfall = _economy_hint_value(economy_hints, "marvin_future_shortfall")
     marvin_strong_window = bool(_economy_hint_value(economy_hints, "marvin_strong_window"))
+    marvin_future_window = bool(
+        has_car
+        and (has_map or has_worn_map)
+        and health >= 54
+        and sanity >= 28
+        and (
+            (
+                rank <= 1
+                and balance >= 950
+                and marvin_future_priority >= 56
+                and 0 < marvin_future_shortfall <= 5000
+            )
+            or (
+                rank >= 2
+                and balance >= 7000
+                and marvin_future_priority >= 76
+                and 0 < marvin_future_shortfall <= 12000
+            )
+        )
+    )
     marvin_ready_window = bool(
         has_car
         and (has_map or has_worn_map)
         and health >= 54
         and sanity >= 28
-        and marvin_affordable_priority > 0
         and (
-            marvin_strong_window
+            (marvin_affordable_priority > 0 and marvin_strong_window)
             or (
-                int(_safe_call(player, "get_rank", 0) or 0) <= 1
+                rank <= 1
                 and marvin_affordable_priority >= 44
-                and balance >= 1400
+                and balance >= 1000
             )
+            or marvin_future_window
         )
     )
+    store_priority_gate = 92 if has_car and rank == 0 and balance < 500 else 56
 
     return {
         "can_unlock_car": not has_car and balance >= 120,
@@ -167,7 +191,7 @@ def _opportunity_flags(
         "can_restock_supplies": has_car
         and "store" in route_tokens
         and _economy_hint_value(economy_hints, "store_candidate_count") > 0
-        and _economy_hint_value(economy_hints, "store_best_priority") >= 56,
+        and _economy_hint_value(economy_hints, "store_best_priority") >= store_priority_gate,
         "can_cashout_pawn_inventory": has_car
         and "pawn" in route_tokens
         and _economy_hint_value(economy_hints, "pawn_planned_sale_value") > 0
@@ -183,11 +207,46 @@ def _opportunity_flags(
             and health >= 48
             and sanity >= 26
             and (
-                (int(_safe_call(player, "get_rank", 0) or 0) == 0 and balance < 900)
-                or (int(_safe_call(player, "get_rank", 0) or 0) == 1 and not has_map and balance < 3000)
+                (
+                    rank <= 1
+                    and (has_map or has_worn_map)
+                    and (
+                        marvin_affordable_priority >= 44
+                        or (
+                            marvin_future_priority >= 56
+                            and 0 < marvin_future_shortfall <= 5000
+                        )
+                    )
+                    and balance < (6000 if rank == 0 else 8000)
+                )
+                or (rank == 0 and balance < 900)
+                or (rank == 1 and not has_map and balance < 3000)
             )
         ),
     }
+
+
+def _bankroll_emergency(balance: int) -> bool:
+    return balance <= 0
+
+
+def _fragile_post_car(balance: int, has_car: bool, rank: int, health: int, sanity: int, debt: int, warning_level: int) -> bool:
+    if not has_car or balance <= 0:
+        return False
+    if rank >= 2:
+        if balance >= 15000 and health >= 78 and sanity >= 52 and debt <= 0 and warning_level <= 0:
+            return False
+        if health < 78 or sanity < 52 or debt > 0 or warning_level > 0:
+            return True
+        if balance < 10000:
+            return True
+    if balance < 120:
+        return True
+    if balance < 250 and (health < 70 or sanity < 34 or debt > 0 or warning_level > 0):
+        return True
+    if balance < 400 and (health < 58 or sanity < 28 or warning_level >= 2):
+        return True
+    return False
 
 
 def _goal_candidates(
@@ -207,9 +266,9 @@ def _goal_candidates(
 
     if health < 45 or sanity < 20:
         candidates.append("survive_emergency")
-    if health < 68 or len(statuses) >= 2 or len(injuries) >= 2:
+    if health < 75 or len(statuses) >= 2 or len(injuries) >= 1:
         candidates.append("stabilize_health")
-    if sanity < 34:
+    if sanity < 45:
         candidates.append("stabilize_sanity")
     if flags["can_reduce_fatigue_pressure"]:
         candidates.append("reduce_fatigue_pressure")
@@ -300,6 +359,8 @@ class GameState:
     loan_warning_level: int = 0
     fraudulent_cash: int = 0
     dealer_happiness: int = 50
+    bankroll_emergency: bool = False
+    fragile_post_car: bool = False
     store_candidate_count: int = 0
     store_best_purchase_priority: int = 0
     store_target_spend: int = 0
@@ -308,7 +369,10 @@ class GameState:
     pawn_planned_sale_value: int = 0
     marvin_affordable_priority: int = 0
     marvin_candidate_price: int = 0
+    marvin_future_priority: int = 0
+    marvin_future_shortfall: int = 0
     marvin_strong_window: bool = False
+    edge_score: int = 0
     opportunity_flags: dict[str, bool] = field(default_factory=dict)
     current_progress_goal_candidates: tuple[str, ...] = ()
 
@@ -349,6 +413,10 @@ def build_game_state_snapshot(
     companion_metrics = _companion_metrics(player)
     inventory_food_count = _inventory_food_count(player)
     normalized_economy_hints = dict(economy_hints or {})
+    has_car = bool(player.has_item("Car"))
+    rank = int(_safe_call(player, "get_rank", getattr(player, "_rank", 0)) or 0)
+    loan_debt = int(_safe_call(player, "get_loan_shark_debt", 0) or 0)
+    loan_warning_level = int(_safe_call(player, "get_loan_shark_warning_level", 0) or 0)
     flags = _opportunity_flags(
         player,
         resolved_available_routes,
@@ -363,11 +431,13 @@ def build_game_state_snapshot(
         inventory_food_count,
         normalized_economy_hints,
     )
+    bankroll_emergency = _bankroll_emergency(balance)
+    fragile_post_car = _fragile_post_car(balance, has_car, rank, health, sanity, loan_debt, loan_warning_level)
 
     return GameState(
         day=int(getattr(player, "_day", 0) or 0),
         balance=balance,
-        rank=int(_safe_call(player, "get_rank", getattr(player, "_rank", 0)) or 0),
+        rank=rank,
         health=health,
         sanity=sanity,
         fatigue=fatigue,
@@ -389,7 +459,7 @@ def build_game_state_snapshot(
         companion_bonded_count=companion_metrics["bonded"],
         companion_unfed_count=companion_metrics["unfed"],
         inventory_food_count=inventory_food_count,
-        has_car=bool(player.has_item("Car")),
+        has_car=has_car,
         has_map=bool(player.has_item("Map")),
         has_worn_map=bool(player.has_item("Worn Map")),
         has_marvin_access=bool(player.has_item("Map") or player.has_item("Worn Map")),
@@ -398,10 +468,12 @@ def build_game_state_snapshot(
         has_met_gus=bool(player.has_met("Grimy Gus")),
         chosen_mechanic=str(_safe_call(player, "get_chosen_mechanic", None)) if _safe_call(player, "get_chosen_mechanic", None) not in {None, "", "None"} else None,
         mechanic_visits=int(_safe_call(player, "get_mechanic_visits", 0) or 0),
-        loan_debt=int(_safe_call(player, "get_loan_shark_debt", 0) or 0),
-        loan_warning_level=int(_safe_call(player, "get_loan_shark_warning_level", 0) or 0),
+        loan_debt=loan_debt,
+        loan_warning_level=loan_warning_level,
         fraudulent_cash=int(_safe_call(player, "get_fraudulent_cash", 0) or 0),
         dealer_happiness=int(_safe_call(player, "get_dealer_happiness", 50) or 50),
+        bankroll_emergency=bankroll_emergency,
+        fragile_post_car=fragile_post_car,
         store_candidate_count=_economy_hint_value(normalized_economy_hints, "store_candidate_count"),
         store_best_purchase_priority=_economy_hint_value(normalized_economy_hints, "store_best_priority"),
         store_target_spend=_economy_hint_value(normalized_economy_hints, "store_target_spend"),
@@ -410,7 +482,10 @@ def build_game_state_snapshot(
         pawn_planned_sale_value=_economy_hint_value(normalized_economy_hints, "pawn_planned_sale_value"),
         marvin_affordable_priority=_economy_hint_value(normalized_economy_hints, "marvin_affordable_priority"),
         marvin_candidate_price=_economy_hint_value(normalized_economy_hints, "marvin_candidate_price"),
+        marvin_future_priority=_economy_hint_value(normalized_economy_hints, "marvin_future_priority"),
+        marvin_future_shortfall=_economy_hint_value(normalized_economy_hints, "marvin_future_shortfall"),
         marvin_strong_window=bool(_economy_hint_value(normalized_economy_hints, "marvin_strong_window")),
+        edge_score=_economy_hint_value(normalized_economy_hints, "edge_score"),
         opportunity_flags=flags,
         current_progress_goal_candidates=_goal_candidates(
             player,

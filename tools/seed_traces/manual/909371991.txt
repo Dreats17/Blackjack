@@ -1,0 +1,453 @@
+========================================================================================
+Cycle 01 | Day 2
+State   $ 50 -> 113 (+$63) | HP 100 -> 100 (+0) | SAN 100 -> 100 (+0) | Rank 0 -> 0 | Car N
+Events  day:stray_cat, met:Stray Cat Friend, night:ditched_wallet
+Polarity neutral
+Changes +companions=['Whiskers']
+Stats   days_survived +1, people_met +1, companions_befriended +2
+Gamble  total_hands +3, wins +1, losses +2, blackjacks +1, busts +1, total_won +$6, total_lost +$14
+========================================================================================
+Cycle 02 | Day 3
+State   $ 113 -> 200 (+$87) | HP 100 -> 100 (+0) | SAN 100 -> 100 (+0) | Rank 0 -> 0 | Car N
+Events  storyline:mechanics:stage0, met:Frank Event, night:woodlands_path, met:Woodlands Path Event
+Polarity positive
+Changes +story=['mechanics']
+Stats   days_survived +1, people_met +2
+Gamble  total_hands +3, wins +2, ties +1, blackjacks +1, total_won +$87
+========================================================================================
+Cycle 03 | Day 4
+State   $ 200 -> 284 (+$84) | HP 100 -> 100 (+0) | SAN 100 -> 75 (-25) | Rank 0 -> 0 | Car N
+Events  day:morning_stretch, night:stray_cat_dies, met:Cat Died
+Polarity negative
+Changes none
+Stats   days_survived +1, people_met +1
+Gamble  total_hands +3, wins +3, total_won +$84
+========================================================================================
+Cycle 04 | Day 5
+State   $ 284 -> 100 (-$184) | HP 100 -> 100 (+0) | SAN 75 -> 76 (+1) | Rank 0 -> 0 | Car Y
+Events  storyline:mechanics:stage1, met:Tom Event, met:Tom, night:chase_the_rabbit
+Polarity neutral
+Changes +items=['Car']
+Stats   days_survived +1, people_met +2
+Gamble  total_hands +3, wins +2, losses +1, blackjacks +1, busts +1, total_won +$173, total_lost +$57
+========================================================================================
+Cycle 05 | Day 6
+State   $ 100 -> 141 (+$41) | HP 100 -> 100 (+0) | SAN 76 -> 79 (+3) | Rank 0 -> 0 | Car Y
+Events  day:duck_army
+Polarity positive
+Changes none
+Stats   days_survived +1
+Gamble  total_hands +3, wins +2, ties +1, blackjacks +1, total_won +$41
+========================================================================================
+Cycle 06 | Day 7
+State   $ 141 -> 185 (+$44) | HP 100 -> 100 (+0) | SAN 79 -> 80 (+1) | Rank 0 -> 0 | Car Y
+Events  storyline:marvin:stage0, met:Laundromat Bulletin Map
+Polarity positive
+Changes +items=['Worn Map'] | +story_completed=['marvin']
+Stats   days_survived +1, people_met +1
+Gamble  total_hands +3, wins +2, ties +1, total_won +$44
+========================================================================================
+Cycle 07 | Day 8
+State   $ 185 -> 183 (-$2) | HP 100 -> 100 (+0) | SAN 80 -> 84 (+4) | Rank 0 -> 0 | Car Y
+Events  day:hermit_trail_discovery, met:Hermit Trail Found
+Polarity positive
+Changes +items=["Hermit's Journal"]
+Stats   days_survived +1, people_met +1
+Gamble  total_hands +3, wins +1, losses +1, ties +1, total_won +$18, total_lost +$20
+========================================================================================
+Cycle 08 | Day 9
+State   $ 183 -> 178 (-$5) | HP 100 -> 100 (+0) | SAN 84 -> 84 (+0) | Rank 0 -> 0 | Car Y
+Events  storyline:grimy_gus:stage0, met:Grimy Gus
+Polarity neutral
+Changes +story_completed=['grimy_gus']
+Stats   days_survived +1, people_met +1
+Gamble  total_hands +3, wins +1, losses +2, blackjacks +1, busts +1, total_won +$32, total_lost +$37
+========================================================================================
+Cycle 09 | Day 10
+State   $ 178 -> 160 (-$18) | HP 100 -> 100 (+0) | SAN 84 -> 65 (-19) | Rank 0 -> 0 | Car Y
+Events  day:trauma_flashback, location:doctor, met:Doctor's Office
+Polarity negative
+Changes +status=['PTSD']
+Stats   days_survived +1, people_met +1, illnesses_contracted +1, doctor_visits +1
+Gamble  total_hands +3, wins +3, total_won +$57
+========================================================================================
+Cycle 10 | Day 11
+State   $ 160 -> 8 (-$152) | HP 100 -> 100 (+0) | SAN 65 -> 67 (+2) | Rank 0 -> 0 | Car Y
+Events  storyline:witch:stage0, met:Witch Doctor Matchbook, met:Witch, location:shop:convenience_store, met:Convenience Store
+Polarity positive
+Changes +items=['First Aid Kit', 'Tool Kit'] | -status=['PTSD'] | +story_completed=['witch']
+Stats   days_survived +1, people_met +3
+Gamble  total_hands +3, losses +1, ties +2, busts +1, total_lost +$22
+========================================================================================
+Cycle 11 | Day 12
+State   $ 8 -> 281 (+$273) | HP 100 -> 100 (+0) | SAN 67 -> 57 (-10) | Rank 0 -> 0 | Car Y
+Events  day:mystery_car_problem_worsens, day:wrong_universe, location:shop:convenience_store
+Polarity negative
+Changes +items=['Tire Patch Kit']
+Stats   days_survived +1
+Gamble  total_hands +3, wins +2, losses +1, total_won +$2, total_lost +$1
+========================================================================================
+Cycle 12 | Day 13
+State   $ 281 -> 5,278 (+$4,997) | HP 100 -> 100 (+0) | SAN 57 -> 57 (+0) | Rank 0 -> 0 | Car Y
+Events  storyline:vinnie:stage0, met:Vinnie, location:shop:loan_shark
+Polarity positive
+Changes +story_completed=['vinnie']
+Stats   days_survived +1, people_met +1, loans_taken +1, total_borrowed +5000, loan_shark_visits +1
+Gamble  total_hands +3, wins +1, losses +1, ties +1, total_won +$25, total_lost +$28
+========================================================================================
+Cycle 13 | Day 14
+State   $ 5,278 -> 5,428 (+$150) | HP 100 -> 97 (-3) | SAN 57 -> 60 (+3) | Rank 0 -> 1 | Car Y
+Events  day:lost_dog_whistle_search, day:mosquito_bite_infection, location:shop:marvin
+Polarity neutral
+Changes none
+Stats   days_survived +1, marvin_visits +1
+Gamble  total_hands +3, wins +2, losses +1, busts +1, total_won +$1,107, total_lost +$638
+========================================================================================
+Cycle 14 | Day 15
+State   $ 5,428 -> -880 (-$6,308) | HP 97 -> 93 (-4) | SAN 60 -> 50 (-10) | Rank 1 -> 1 | Car Y
+Events  storyline:sleep_paralysis:stage0, met:Sleep Paralysis, night:swamp_stroll, met:Swamp Stroll Event
+Polarity negative
+Changes +story=['sleep_paralysis']
+Stats   days_survived +1, people_met +2
+Gamble  total_hands +3, losses +3, total_lost +$6,309
+========================================================================================
+Cycle 15 | Day 16
+State   $ -880 -> -880 (+$0) | HP 93 -> 94 (+1) | SAN 50 -> 55 (+5) | Rank 1 -> 1 | Car Y
+Events  day:street_cat_ally_benefit, day:threw_out_old_photo, day:deck_of_cards_street_game, day:cocaine_heart_attack, day:treasure_map_follow, day:silver_horseshoe_luck, day:rock_bottom, day:patches_night_watch, day:time_loop, location:shop:car_workbench, met:Car Workbench
+Polarity positive
+Changes none
+Stats   days_survived +1, people_met +1
+Gamble  total_hands +3, wins +2, losses +1
+========================================================================================
+Cycle 16 | Day 17
+State   $ -880 -> -880 (+$0) | HP 94 -> 99 (+5) | SAN 55 -> 55 (+0) | Rank 1 -> 1 | Car Y
+Events  storyline:mime:stage0, met:Mime, location:mechanic:tom
+Polarity positive
+Changes +story=['mime']
+Stats   days_survived +1, people_met +1, mechanic_visits +1
+Gamble  total_hands +3, wins +2, ties +1
+========================================================================================
+Cycle 17 | Day 18
+State   $ -880 -> -880 (+$0) | HP 99 -> 100 (+1) | SAN 55 -> 71 (+16) | Rank 1 -> 1 | Car Y
+Events  day:damaged_exhaust_fixed, day:the_veteran_gambler, day:sock_puppet_therapist, location:mechanic:tom
+Polarity positive
+Changes none
+Stats   days_survived +1, mechanic_visits +1
+Gamble  total_hands +3, wins +2, losses +1, blackjacks +1, busts +1
+========================================================================================
+Cycle 18 | Day 19
+State   $ -880 -> -880 (+$0) | HP 100 -> 100 (+0) | SAN 71 -> 71 (+0) | Rank 1 -> 1 | Car Y
+Events  storyline:dealer_past:stage0, met:Dealer Photo, met:Asked About Photo, location:mechanic:tom
+Polarity neutral
+Changes +story=['dealer_past']
+Stats   days_survived +1, people_met +2, mechanic_visits +1
+Gamble  total_hands +3, wins +2, losses +1, blackjacks +1
+========================================================================================
+Cycle 19 | Day 20
+State   $ -880 -> -880 (+$0) | HP 100 -> 82 (-18) | SAN 71 -> 69 (-2) | Rank 1 -> 1 | Car Y
+Events  day:malnutrition, night:swamp_stroll, met:Swamp Stroll Event
+Polarity negative
+Changes -items=['First Aid Kit'] | +status=['Malnutrition']
+Stats   days_survived +1, people_met +1, illnesses_contracted +1
+Gamble  total_hands +3, wins +1, losses +1, ties +1, blackjacks +1, busts +1
+========================================================================================
+Cycle 20 | Day 21
+State   $ -880 -> -880 (+$0) | HP 82 -> 50 (-32) | SAN 69 -> 59 (-10) | Rank 1 -> 1 | Car Y
+Events  storyline:gas_station_hero:stage0, night:stargazing
+Polarity negative
+Changes +story=['gas_station_hero']
+Stats   days_survived +1
+Gamble  total_hands +3, losses +3, busts +2
+========================================================================================
+Cycle 21 | Day 22
+State   $ -880 -> -880 (+$0) | HP 50 -> 38 (-12) | SAN 59 -> 44 (-15) | Rank 1 -> 1 | Car Y
+Events  day:got_a_cold, night:drowning_dream, met:Drowning Dream
+Polarity negative
+Changes +status=['Cold']
+Stats   days_survived +1, people_met +1, illnesses_contracted +1
+Gamble  total_hands +3, losses +3, busts +1
+========================================================================================
+Cycle 22 | Day 23
+State   $ -880 -> -880 (+$0) | HP 38 -> 21 (-17) | SAN 44 -> 36 (-8) | Rank 1 -> 1 | Car Y
+Events  storyline:sleep_paralysis:stage1, met:Shadow Spoke, night:giant_oyster_opening, night:woodlands_river, met:Woodlands River Event
+Polarity negative
+Changes +items=['Map']
+Stats   days_survived +1, people_met +2
+Gamble  total_hands +3, losses +3
+========================================================================================
+Cycle 23 | Day 24
+State   $ -880 -> -880 (+$0) | HP 21 -> 33 (+12) | SAN 36 -> 32 (-4) | Rank 1 -> 1 | Car Y
+Events  day:perfect_health_moment, day:gas_pedal_sticking, night:peaceful_night
+Polarity positive
+Changes none
+Stats   days_survived +1
+Gamble  total_hands +3, wins +2, losses +1
+========================================================================================
+Cycle 24 | Day 25
+State   $ -880 -> 0 (+$880) | HP 33 -> 36 (+3) | SAN 32 -> 32 (+0) | Rank 1 -> 1 | Car Y
+Events  storyline:mime:stage1
+Polarity positive
+Changes none
+Stats   days_survived +1
+Gamble  total_hands +3, wins +1, losses +2
+Result  player hit $0 during cycle 24
+
+########################################################################################
+Run Summary | cycles_requested=300 | seed=909371991
+Final    Day 25 | $ 0 | HP 36 | SAN 32 | Rank 1 | Alive=True
+Peak     $ 5,428 | Rank 1
+Peak days    14
+Inventory   ['Car', "Hermit's Journal", 'Map', 'Tire Patch Kit', 'Tool Kit', 'Worn Map']
+Has car            True
+Ever had car       True
+Has map            True
+Has worn map       True
+Has marvin access  True
+Millionaire reached False
+Millionaire visited False
+Death cause        None
+Injuries    []
+Status      ['Cold', 'Malnutrition']
+Pawned items []
+Pawned count 0
+Companions  ['Whiskers']
+Companion detail   ['Whiskers:lost:10%:8d']
+Mechanic dreams   tom=0 frank=0 oswald=0 car=Tom chosen=none
+Dealer gifts
+  none
+Dealer free hands
+  day=11 tier=>90 happy=94 bet=$1 balance=$8
+  day=12 tier=100 happy=100 bet=$16 balance=$253
+  day=14 tier=>90 happy=91 bet=$1 balance=$-880
+Travel restrictions  []
+Broken items        []
+Repairing items     []
+Storylines active     ['dealer_past', 'gas_station_hero', 'mechanics', 'mime', 'sleep_paralysis']
+Storylines completed  ['grimy_gus', 'marvin', 'vinnie', 'witch']
+Storylines failed     []
+Mechanic intro decisions
+  day=3 mechanic=Frank cost=$50 balance=$200 answer=no source=blank
+  day=3 mechanic=Frank cost=$50 balance=$200 answer=no source=yesno
+  day=5 mechanic=Tom cost=$300 balance=$400 answer=yes source=blank
+  day=5 mechanic=Tom cost=$300 balance=$100 answer=no source=yesno
+  day=5 mechanic=Tom cost=$300 balance=$100 answer=no source=blank
+  day=5 mechanic=Tom cost=$300 balance=$100 answer=no source=blank
+  day=5 mechanic=Tom cost=$300 balance=$100 answer=no source=blank
+  day=5 mechanic=Tom cost=$300 balance=$100 answer=no source=blank
+  day=5 mechanic=Tom cost=$300 balance=$100 answer=no source=blank
+  day=5 mechanic=Tom cost=$300 balance=$100 answer=no source=blank
+  day=5 mechanic=Tom cost=$100 balance=$100 answer=no source=blank
+
+Fallback decisions
+  none
+
+Event polarity
+  positive 39
+  negative 26
+  neutral 16
+
+Item impact
+  Worn Map hits=1 pos=1 neg=0 neu=0 cash=+44 hp=+0 san=+1
+  Hermit's Journal hits=1 pos=1 neg=0 neu=0 cash=-2 hp=+0 san=+4
+  Tool Kit hits=1 pos=1 neg=0 neu=0 cash=-152 hp=+0 san=+2
+  First Aid Kit hits=2 pos=1 neg=1 neu=0 cash=-152 hp=-18 san=+0
+  Tire Patch Kit hits=1 pos=0 neg=1 neu=0 cash=+273 hp=+0 san=-10
+
+Marvin provenance
+  none
+
+Planner traces
+  goals push_next_rank=52 | reach_adventure_threshold=47 | advance_mechanic_arc=44 | acquire_car=29 | survive_emergency=21 | restock_supplies=17 | blend_fraudulent_cash_safely=10 | preserve_companion_roster=8
+  cycle=23 day=24 goal=survive_emergency action=1 confidence=0.45 reason=goal=survive_emergency selected Doctor's Office score=240.0 margin=0.0
+  cycle=24 day=24 goal=survive_emergency action=0 confidence=0.95 reason=goal=survive_emergency blackjack_bet_empty_bankroll
+  cycle=24 day=24 goal=survive_emergency action=0 confidence=0.95 reason=goal=survive_emergency blackjack_bet_empty_bankroll
+  cycle=24 day=24 goal=survive_emergency action=stand confidence=0.92 reason=goal=survive_emergency blackjack_action=stand total=16 soft=0 dealer=4
+  cycle=24 day=24 goal=survive_emergency action=0 confidence=0.95 reason=goal=survive_emergency blackjack_bet_empty_bankroll
+  cycle=24 day=24 goal=survive_emergency action=hit confidence=0.92 reason=goal=survive_emergency blackjack_action=hit total=10 soft=0 dealer=11
+  cycle=24 day=24 goal=survive_emergency action=stand confidence=0.92 reason=goal=survive_emergency blackjack_action=stand total=20 soft=0 dealer=11
+  cycle=24 day=? goal=survive_emergency action=yes confidence=0.82 reason=event_yes:applaud the performance?
+
+Route visibility
+  outcomes suppressed=9 | applied=6 | interrupt=2
+  interrupts poverty_loan_bootstrap=1 | marvin_conversion_window=1
+  blocked_goals advance_mechanic_arc=2 | reach_adventure_threshold=2 | push_next_rank=1 | restock_supplies=1 | blend_fraudulent_cash_safely=1 | exploit_marvin=1
+  interrupted_top_goals advance_mechanic_arc=1 | exploit_marvin=1
+  applied_goals advance_mechanic_arc=4 | restock_supplies=2
+  suppressed_goals reach_adventure_threshold=4 | survive_emergency=3 | advance_mechanic_arc=2
+
+Event Distribution | day
+    1  cocaine_heart_attack
+    1  damaged_exhaust_fixed
+    1  deck_of_cards_street_game
+    1  duck_army
+    1  gas_pedal_sticking
+    1  got_a_cold
+    1  hermit_trail_discovery
+    1  lost_dog_whistle_search
+    1  malnutrition
+    1  morning_stretch
+    1  mosquito_bite_infection
+    1  mystery_car_problem_worsens
+    1  patches_night_watch
+    1  perfect_health_moment
+    1  rock_bottom
+    1  silver_horseshoe_luck
+    1  sock_puppet_therapist
+    1  stray_cat
+    1  street_cat_ally_benefit
+    1  the_veteran_gambler
+    1  threw_out_old_photo
+    1  time_loop
+    1  trauma_flashback
+    1  treasure_map_follow
+    1  wrong_universe
+
+Event Distribution | night
+    2  swamp_stroll
+    1  chase_the_rabbit
+    1  ditched_wallet
+    1  drowning_dream
+    1  giant_oyster_opening
+    1  peaceful_night
+    1  stargazing
+    1  stray_cat_dies
+    1  woodlands_path
+    1  woodlands_river
+
+Event Distribution | storyline
+    1  dealer_past:stage0
+    1  gas_station_hero:stage0
+    1  grimy_gus:stage0
+    1  marvin:stage0
+    1  mechanics:stage0
+    1  mechanics:stage1
+    1  mime:stage0
+    1  mime:stage1
+    1  sleep_paralysis:stage0
+    1  sleep_paralysis:stage1
+    1  vinnie:stage0
+    1  witch:stage0
+
+Event Distribution | met
+    2  Swamp Stroll Event
+    1  Asked About Photo
+    1  Car Workbench
+    1  Cat Died
+    1  Convenience Store
+    1  Dealer Photo
+    1  Doctor's Office
+    1  Drowning Dream
+    1  Frank Event
+    1  Grimy Gus
+    1  Hermit Trail Found
+    1  Laundromat Bulletin Map
+    1  Mime
+    1  Shadow Spoke
+    1  Sleep Paralysis
+    1  Stray Cat Friend
+    1  Tom
+    1  Tom Event
+    1  Vinnie
+    1  Witch
+    1  Witch Doctor Matchbook
+    1  Woodlands Path Event
+    1  Woodlands River Event
+
+Event Distribution | location
+    3  mechanic:tom
+    2  shop:convenience_store
+    1  doctor
+    1  shop:car_workbench
+    1  shop:loan_shark
+    1  shop:marvin
+
+Event Distribution | all
+    3  location:mechanic:tom
+    2  location:shop:convenience_store
+    2  met:Swamp Stroll Event
+    2  night:swamp_stroll
+    1  day:cocaine_heart_attack
+    1  day:damaged_exhaust_fixed
+    1  day:deck_of_cards_street_game
+    1  day:duck_army
+    1  day:gas_pedal_sticking
+    1  day:got_a_cold
+    1  day:hermit_trail_discovery
+    1  day:lost_dog_whistle_search
+    1  day:malnutrition
+    1  day:morning_stretch
+    1  day:mosquito_bite_infection
+    1  day:mystery_car_problem_worsens
+    1  day:patches_night_watch
+    1  day:perfect_health_moment
+    1  day:rock_bottom
+    1  day:silver_horseshoe_luck
+    1  day:sock_puppet_therapist
+    1  day:stray_cat
+    1  day:street_cat_ally_benefit
+    1  day:the_veteran_gambler
+    1  day:threw_out_old_photo
+    1  day:time_loop
+    1  day:trauma_flashback
+    1  day:treasure_map_follow
+    1  day:wrong_universe
+    1  location:doctor
+    1  location:shop:car_workbench
+    1  location:shop:loan_shark
+    1  location:shop:marvin
+    1  met:Asked About Photo
+    1  met:Car Workbench
+    1  met:Cat Died
+    1  met:Convenience Store
+    1  met:Dealer Photo
+    1  met:Doctor's Office
+    1  met:Drowning Dream
+
+Final Statistics
+  days_survived          24
+  total_money_earned     0
+  total_money_spent      0
+  items_collected        0
+  items_sold             0
+  events_experienced     0
+  people_met             24
+  injuries_sustained     0
+  illnesses_contracted   3
+  near_death_experiences 0
+  companions_befriended  2
+  loans_taken            1
+  loans_repaid           0
+  total_borrowed         5000
+  total_repaid           0
+  times_robbed           0
+  times_hospitalized     0
+  mechanic_visits        3
+  doctor_visits          1
+  witch_doctor_visits    0
+  casino_visits          0
+  pawn_shop_visits       0
+  marvin_visits          1
+  loan_shark_visits      1
+
+Final Gambling Statistics
+  total_hands            72
+  wins                   34
+  losses                 29
+  blackjacks             8
+  busts                  10
+  ties                   9
+  biggest_win            580
+  biggest_loss           6308
+  current_streak         1
+  best_win_streak        6
+  worst_loss_streak      9
+  total_won              1676
+  total_lost             7126
+  double_downs_won       0
+  splits_won             0
+  surrenders_used        0
+  insurance_collected    0
+
+NO ERRORS
+
+NO WARNINGS

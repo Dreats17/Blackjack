@@ -53,7 +53,7 @@ class DayCompanionsMixin:
 
     def companion_reunion(self):
         # SECRET: Have 3+ companions - they all show up at once
-        companion_count = len(self._companions) if hasattr(self, '_Player__companions') else 0
+        companion_count = len(self._companions) if hasattr(self, '_companions') else 0
         if companion_count < 3:
             self.day_event()
             return

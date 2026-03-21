@@ -996,7 +996,13 @@ class DayWealthMixin:
         if self.has_met("Final Dream"):
             return
         
-        if self.get_tom_dreams() < 2 or self.get_frank_dreams() < 2 or self.get_oswald_dreams() < 2:
+        # Only requires the chosen mechanic's chain at stage 3
+        mechanic = self.get_car_mechanic()
+        if mechanic == "Tom" and self.get_tom_dreams() < 3:
+            return
+        elif mechanic == "Frank" and self.get_frank_dreams() < 3:
+            return
+        elif mechanic == "Oswald" and self.get_oswald_dreams() < 3:
             return
         
         self.meet("Final Dream")
@@ -1511,7 +1517,7 @@ class DayWealthMixin:
         print("\n")
 
     def millionaire_milestone(self):
-        if self.get_balance() >= 900000 and not self.has_met("Almost There Moment"):
+        if self.get_balance() >= 750000 and not self.has_met("Almost There Moment"):
             self.meet("Almost There Moment")
             type.type("Sitting in your car, you're looking at your balance. It's so close to a million. SO close.")
             print("\n")

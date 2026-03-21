@@ -57,6 +57,13 @@ class AdventuresMixin:
 
     # Modest Afternoons (10,000+)
     def road_adventure(self):
+        """
+        Simulates a random road adventure event, presenting narrative choices
+        such as encountering street dice games, hitchhikers, shrines, a
+        broken-down bus, stray dogs, or a solitary walk. Each scenario offers
+        interactive decisions that affect the player's stats, inventory,
+        companions, and story progression.
+        """
         self.meet("Road Adventure Event")
         self.add_fatigue(random.randint(5, 10))
         type.type("You don't drive anywhere in particular. You just... drive. ")
@@ -885,6 +892,14 @@ class AdventuresMixin:
 
     # Nearly There Nights (900,000+)
     def woodlands_adventure(self):
+        """
+        Handles a random narrative event in the woodlands, presenting the player
+        with unique scenarios such as a hunting competition, a legendary bear
+        encounter, a mystical fountain, or a hermit’s cabin. Each event offers
+        interactive choices that can affect the player's status, inventory,
+        health, and balance, with outcomes determined by user input and random
+        chance.
+        """
         self.meet("Woodlands Adventure Event")
         self.add_fatigue(random.randint(8, 15))  # Trekking through the woods
         type.type("The forest is different tonight. Older. Deeper. The trees seem to lean in, listening. An owl hoots three times - an omen, the old folks say.")
@@ -1284,6 +1299,13 @@ class AdventuresMixin:
             print("\n")
 
     def swamp_adventure(self):
+        """
+        Performs a random swamp adventure event, presenting narrative choices
+        such as tortoise racing, ogre encounters, fairy wishes, mermaid
+        interactions, and gator wrestling. Updates player stats, inventory, and
+        status based on user decisions and random outcomes. Intended for
+        interactive, text-based gameplay.
+        """
         self.meet("Swamp Adventure Event")
         self.add_fatigue(random.randint(10, 18))  # Slogging through swamp muck
         type.type("The swamp stretches before you, endless and alive. ")

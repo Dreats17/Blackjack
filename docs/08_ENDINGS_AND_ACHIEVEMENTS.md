@@ -1,322 +1,268 @@
-# 🏆 ENDINGS & ACHIEVEMENTS GUIDE
-
-*Every way your story can end, and every accomplishment along the way.*
+# Endings & Achievements
 
 ---
 
-## TABLE OF CONTENTS
+## Ending Requirements Summary
 
-1. [How Endings Work](#how-endings-work)
-2. [All Endings](#all-endings)
-3. [How Achievements Work](#how-achievements-work)
-4. [Full Achievement List](#full-achievement-list)
-
----
-
-## HOW ENDINGS WORK
-
-The game has **multiple endings** triggered by different conditions. Some are reached through the natural progression of gameplay, others require specific choices or states. Endings range from triumphant escapes to cosmic horror.
-
-All endings display your journey statistics, unlocked achievements, and personalized epilogues based on your companions, items, and choices.
-
----
-
-## ALL ENDINGS
-
-### ✝️ SALVATION — The Family Ending
-**Trigger**: Reach the endgame with enough money and choose the salvation path.
-
-You reconnect with your family — your wife Rebecca (later Dianne), your son Nathan, his wife Kelly, and your grandchildren Thomas and Marissa. You get to hold your grandchildren. You squeeze your family's hands one last time before fading away.
-
-**Companion Enhancement**: If you have companions, a final vision appears showing all your animal friends in their peaceful afterlives. Specific companions get personalized farewell moments (Grace walking with fawns, the Kraken rising to witness your passing, Lucky's tail wagging).
-
-> *"You weren't just a gambler. You were someone who cared for the forgotten, the lost, the wounded. You were loved."*
+| # | Ending | Key Requirements | Tone |
+|---|--------|-----------------|------|
+| 1 | **Salvation (Healed)** ⭐ | $1M + Tanya 5+ visits + Met Tom | Triumphant |
+| 2 | Salvation (Good) | $1M + Met Tom + Answer phone + Agree | Bittersweet |
+| 3 | Resurrection (Refuse) | $1M + Met Tom + Answer phone + Refuse | Hollow |
+| 4a | To Kill a Dealer (Frank) | $1M + Befriend Frank + Accept hit | Dark, violent |
+| 4b | Earning The Dealer's Respect (Frank) | $1M + Befriend Frank + Refuse hit | Redemptive |
+| 5a | Your Very Own Casino (Oswald) | $1M + Befriend Oswald + Accept | Cyclical, eerie |
+| 5b | Becoming a Monstrosity (Oswald) | $1M + Befriend Oswald + **ALL 17** upgraded Marvin items | Horrifying, godlike |
+| 6 | Bliss (Airport) | $1M + Own car | Escapist |
+| 7 | Sanctuary (Animals) | $1M + 5 companions + Animal Whistle | Wholesome (secret) |
+| 8 | Exhaust (Depression) | Low sanity + despair choices | Devastating |
+| 9 | Madness (Sanity Collapse) | Sanity < 30 + shadow entity | Horrifying |
 
 ---
 
-### 🔄 RESURRECTION — The Second Casino
-**Trigger**: Lose everything, get a devastating phone call from your wife, and find a new casino at the end of the road.
+## All Endings
 
-Your wife screams at you. Your son cries. She tells you you're dead to her. You hang up, numb. You stumble to a new casino — another Dealer, another table, another cycle. Grandma's Thanksgiving card hides a $50 bill. The cycle begins again.
+### 1. Salvation (Healed) — The Best Ending ⭐
 
-**Companion Integration**: Your companions watch with confused, worried eyes as you spiral. Lucky tries to comfort you. You push him away.
+**The only ending where John is truly whole again.**
 
-> *"Would you like to play a game of Blackjack?"* — spoken by a new Dealer, in yellow text.
+**Requirements:** Visit Tanya **5+ times**, reach $1,000,000, have met Tom.
 
----
+**How It Plays:** Tom tells you someone's been calling. Because therapy healed you, you **don't get a choice** — you automatically take the phone. No hesitation.
 
-### 💰 MILLIONAIRE PATH — Three Diverging Endings
-**Trigger**: Reach **$1,000,000** balance.
+**The Call:** Rebecca (your wife) is on the line. Nathan says **"Dada!"** You tell Rebecca about Tanya. She laughs through tears.
 
-The morning after hitting a million, a mysterious old woman in white visits your car. She tells you to visit your mechanic, or fly away from the airport. The afternoon presents your choice:
+**Tom's Farewell:** Bear hug. *"You're a good man, John. Always were."*
 
-#### ✈️ BLISS — The Escape
-**Choice**: Board the plane at the airport and fly away.
+**Companion Farewell:** Tom promises to care for them. Thunder gets a special nuzzle goodbye.
 
-You buy a $10,000 one-way ticket. On the plane, you let go of everything — the gambling, the obsession, the cards. You land in a new city. Buy a house. Take up gardening. Learn to cook.
+**20-Year Epilogue:**
+- **The Drive Home** — Don't look back.
+- **Reunion** — Rebecca opens the door. Nathan reaches for you. *"Dada! Dada!"*
+- **5 Years** — Nathan starts kindergarten. You teach him Go Fish, not blackjack. Hardware store job. Monthly therapy with Tanya.
+- **10 Years** — Nathan joins little league. You coach. Sunday dinners with Grandma.
+- **15 Years** — Nathan is 17, asks about your past. You tell him everything. *"Thanks for coming home, Dad."*
+- **20 Years (Age 49)** — Nathan is a teacher (like the Dealer). Porch. Autumn. Rebecca brings coffee. *"Was any of it real?"* She squeezes your hand. *"This is real."*
+- You close your eyes. Lung issues from years of rough living. But you're home.
 
-But late at night, you still dream of the casino. The Dealer's jade eye. The shuffle of cards. You wake in a cold sweat. Then you see the ocean. And you breathe.
-
-> *"To Grandma. Thanks for the fifty bucks."*
-
----
-
-#### 🌿 SANCTUARY — Secret Companion Ending
-**Choice**: Charter a private plane at the airport (requires **5+ companions** AND the **Animal Whistle**).
-
-Costs $100,000 (or everything you have). You fly with all your animals to a hidden valley called the Sanctuary — a haven for people like you, "shepherds" who collect animal families.
-
-Lists all your companions and their bond status. Features companion-specific paradise moments.
-
-> **Secret Ending Title**: *THE SHEPHERD*
+> *"You don't win a million dollars. You win something better."*
 
 ---
 
-#### 🔧 MECHANIC ENDINGS — Visit Your Mechanic
+### 2. Salvation — Good Ending
 
-The woman directs you to whichever mechanic you've bonded with most (based on dream progress). Each mechanic's ending is radically different:
+**Requirements:** $1M + Met Tom + Answer phone + Agree to come home.
 
-##### 🔧 TOM — Goodbye Tom
-Visit Tom's Trusty Trucks and Tires. A heartfelt farewell with the friendly mechanic who fixed your car and your spirit. The warmest of the mechanic endings.
+You take the call with trembling hands. Rebecca begs you to come home. You agree — but it's a choice, not instinct. Die at 49 surrounded by family.
 
-##### 💀 FRANK — The Hate Rally (DESTRUCTION / RETRIBUTION)
-Visit Filthy Frank's Flawless Fixtures. Frank reveals his true nature — he's the leader of a white supremacist biker gang. The shop is full of neo-Nazis. Frank wants you to help him attack the casino and kill the Dealer.
-
-**You get a gun. Two choices:**
-
-**DESTRUCTION** (Shoot the Dealer):
-You kill the Dealer. Frank's gang burns the casino. You become one of them. Years pass in horror. Your companions are killed. You can never leave. The jade eye watches from your rearview mirror forever.
-
-> *"You destroyed the Dealer. But at what cost?"*
-
-**RETRIBUTION** (Shoot Frank):
-You turn the gun on Frank. The Dealer moves like shadow and smoke — his revolver drops six bikers in six shots. The Dealer reveals his name is **Mortimer**. He gives you a jade chip from a man who saved him in **Vienna, 1938**. You go on to build shelters and fund scholarships.
-
-> *"You chose justice. You earned the Dealer's respect."*
-
-##### 🏗️ OSWALD — Transcendence / Eternity
-Visit Oswald's Optimal Outoparts. Oswald proposes a business partnership — you run your own casino using your gambling expertise and his money.
-
-**Accept**: You name your casino. Months pass. It opens. Your first customer is a desperate man with crumpled bills — just like you once were. You become the Dealer. You stop aging. The cycle continues forever.
-
-> *"You became the Dealer."*
-
-**Decline**: Oswald vows to build it anyway, funding it with your upgrade purchases. His upgrade shop remains available.
-
-**ETERNITY** (Secret variant — requires all items upgraded to max):
-You've become a cyborg through Oswald's upgrades. You crush Oswald's skull in his own casino. You sit at a self-checkout blackjack terminal and play forever, winning every hand. The casino crumbles around you over centuries. You remain. A monstrosity playing blackjack for eternity.
-
-> *"You transcended humanity itself."*
+**Key difference from Healed:** You get choices (can refuse), less confidence, no therapy mention, simpler epilogue.
 
 ---
 
-### 🎭 MADNESS — The Shadow Within
-**Trigger**: Sanity reaches 0 (40% chance when sanity depletes; 60% chance you become Broken instead).
+### 3. Resurrection — Refuse Ending
 
-Can also be triggered through the **Madness Confrontation** event, where your shadow-self asks you three philosophical questions. Score below 5/9 sanity points and you lose.
+**Requirements:** $1M + Met Tom + Answer phone + Refuse.
 
-Your shadow takes over your body. You're trapped inside your own mind, watching helplessly as it plays cards forever. The Dealer recognizes what you've become.
-
-> *"Your mind shattered. Something else took the wheel."*
-
-### Surviving Madness
-If you score 5+ on the shadow's questions, you survive the confrontation. Sanity is restored by 30. But you've seen what's growing inside you. You can never unsee it.
+Rebecca asks you to come home. You say no. You continue gambling. Tom is disappointed. A hollow existence.
 
 ---
 
-### 💀 DEATH — Standard Game Over
-**Trigger**: Health reaches 0 from any cause.
+### 4. Frank's Path — Two Branches
 
-Possible causes:
-- The Dealer's wrath (Dealer Happiness reaches 0)
-- Injuries and untreated illnesses
-- Dangerous events (back alleys, attacks, carbon monoxide)
-- Loan shark violence (Tony collects)
-- Starvation / exposure
-- Story event consequences
+**Setup:** $1M + Befriend Frank. Frank proposes a deal: give him $1,000,000 and he'll hire a hitman to kill the Dealer, then you both split the Dealer's fortune.
 
-Death displays your full achievement list and journey statistics.
+> *"You really want this 'Dealer' guy of yours dead? I can make it happen, but trust me, it won't be cheap. Give me $1,000,000 of your money, and the deed will be done."*
 
----
+#### 4a. To Kill a Dealer — Accept the Hit
 
-### 🧠 BROKEN — Not Dead, But Changed
-**Trigger**: Sanity reaches 0 (60% chance).
+You accept Frank's deal. The Dealer is killed. You collect his money — and his jade glass eyeball. You drive away, leaving the casino burning behind you. A dark, violent ending where you become complicit in murder for money.
 
-You don't die. Something inside you snaps. But somehow you continue. You become **BROKEN**:
-- Sanity stays at 0 permanently
-- Colors are too bright, sounds too loud
-- Random hallucinations during gameplay
-- Broken effects include: losing money, finding money, self-harm, numbness, and 15 different hallucination text effects
-- Gameplay continues, but nothing is ever the same
+#### 4b. Earning The Dealer's Respect — Refuse the Hit
 
-> *"You have become BROKEN. Your mind is shattered, but somehow you continue."*
+You refuse Frank's offer. Years later, you return to the casino — but it's transformed. The place is lively, full of people, warm light pouring through the windows. You walk in, call the Dealer by his name, sit down at the table, and get dealt a hand of Blackjack. He respects you for the choice you made. A quiet, redemptive ending.
 
 ---
 
-## HOW ACHIEVEMENTS WORK
+### 5. Oswald's Path — Two Branches
 
-- Achievements unlock **silently** during gameplay — no popup when earned
-- All unlocked achievements are displayed on **death/ending** screens
-- Achievements are sorted by **rarity** (rarest first) in the final display
-- Progress can be viewed anytime via the achievements menu
-- Rarity tiers affect display color:
+**Setup:** $1M + Befriend Oswald. Oswald, ever the entrepreneur, sees an opportunity in your gambling addiction. He proposes funding a Grand Casino with you as the house dealer.
 
-| Rarity | Color | Difficulty |
-|---|---|---|
-| **Legendary** | 🟣 Magenta (bright) | Extremely hard / rare |
-| **Epic** | 🔵 Cyan (bright) | Very hard |
-| **Rare** | 🟡 Yellow (bright) | Hard |
-| **Uncommon** | 🟢 Green | Moderate |
-| **Common** | ⚪ White | Easy / natural progression |
+> *"You love gambling, yes? So why don't you rise the ranks and become the gamblee? ...I know absolutely nothing about gambling, or cards, or dice, or whatever it is you do. But clearly there's business to be had here!"*
 
----
+#### 5a. Your Very Own Casino — Accept
 
-## FULL ACHIEVEMENT LIST
+You accept. Stuart approves: *"That's tight, yo."* You name your casino, slick your hair back, and walk out through the curtains. The lights shine gold, slot machines light up the walls. You sit down at the blackjack table. Your first guest walks in — scrawny, nervous. You look up at them and say:
 
-### 💰 MONEY MILESTONES
+> *"Would you like to play a game of Blackjack?"*
 
-| Achievement | Requirement | Rarity |
-|---|---|---|
-| First Thousand | Reach $1,000 balance | Common |
-| First Ten Thousand | Reach $10,000 balance | Uncommon |
-| Fifty Thousand | Reach $50,000 balance | Common |
-| Hundred Thousand | Reach $100,000 balance | Rare |
-| Quarter Million | Reach $250,000 balance | Common |
-| Half Million | Reach $500,000 balance | Epic |
-| Nine Hundred | Reach $900,000 balance | Common |
-| Millionaire | Reach $1,000,000 balance | Epic |
-| Multi-Millionaire | Reach $2,000,000 balance | Common |
+The cycle repeats. You've become the Dealer.
 
-### 📅 SURVIVAL MILESTONES
+#### 5b. Becoming a Monstrosity — All Items Fully Upgraded
 
-| Achievement | Requirement | Rarity |
-|---|---|---|
-| Three Days | Survive 3 days | Common |
-| Week Survivor | Survive 7 days | Uncommon |
-| Two Weeks | Survive 14 days | Common |
-| Month Survivor | Survive 30 days | Rare |
-| Hundred Days | Survive 100 days | Epic |
-| Two Hundred Days | Survive 200 days | Common |
-| Year Survivor | Survive 365 days | Legendary |
+**Secret branch.** Requires owning **ALL 17 fully upgraded Marvin items** (Delight Manipulator, Health Manipulator, Unwashed Hair, Sapphire Watch, Sneaky Peeky Goggles, Quiet Bunny Slippers, Real Insurance, Lucky Medallion, Velvet Gloves, Invisible Cloak, Golden Compass, Grandfather Clock, Overflowing Goblet, Mirror of Duality, Phoenix Feather, Dealer's Mercy, Oracle's Tome).
 
-### 🃏 GAMBLING MILESTONES
+You enter Oswald's Grand Casino after hours. The marble halls are empty, gold statues of Oswald line the walls. Oswald greets you cheerfully — he can't help it, the Delight Manipulator on your arm forces him to smile even as terror fills his mind.
 
-| Achievement | Requirement | Rarity |
-|---|---|---|
-| First Win | Win your first hand | Common |
-| First Blackjack | Hit your first blackjack | Common |
-| Ten Hands | Play 10 hands | Common |
-| Fifty Hands | Play 50 hands | Common |
-| Card Shark | Play 100 hands | Rare |
-| Two Hundred Hands | Play 200 hands | Common |
-| Five Hundred Hands | Play 500 hands | Common |
-| True Gambler | Play 1,000 hands | Legendary |
-| Blackjack Master | Hit 10 blackjacks | Rare |
-| Blackjack Legend | Hit 25 blackjacks | Epic |
-| Fifty Blackjacks | Hit 50 blackjacks | Common |
-| Three Streak | Win 3 hands in a row | Common |
-| Hot Streak | Win 5 hands in a row | Rare |
-| Win Streak 10 | Win 10 hands in a row | Epic |
-| Big Bet | Biggest single win ≥$1,000 | Common |
-| High Roller | Biggest single win ≥$10,000 | Common |
-| Big Spender | Biggest single win ≥$50,000 | Common |
+You've become something inhuman. A cyborg, a shell of your former self, fueled purely on increasing wealth and power. Each step cracks the golden tiles. The chandelier shakes. Glass crystals fall, cutting Oswald's cheek.
 
-### 🐾 COMPANION ACHIEVEMENTS
+> *"AAAGH. Oh my, I've been cut! This is terrible, and yet so wonderful! I'm having the time of my life! HA-HA-HA"*
 
-| Achievement | Requirement | Rarity |
-|---|---|---|
-| First Friend | Befriend 1 companion | Uncommon |
-| Bonding Time | Reach 50 happiness with any companion | Uncommon |
-| Animal Lover | Have 3+ companions | Rare |
-| Best Friends | Reach 90 happiness with a companion | Rare |
-| Loyal Companion | Keep a companion 30 days | Rare |
-| They All Leave Eventually | 3 companions run away | Rare |
-| Noah's Wagon | Have 5 companions at once | Epic |
-| Unbreakable Bond | Keep a companion 60 days | Epic |
-| The Animal Shepherd | Find the Sanctuary ending | Epic |
-| Zookeeper | Have 10 companions at once | Rare |
-| Noah's Ark | Have 20 companions at once | Epic |
-| Marine Biologist | Collect all water creatures | Epic |
-| Disney Princess | Collect all forest creatures | Epic |
+Using Flask of Dealer's Thoughts, you read Oswald's mind: *"What has this FREAK done to me? Why CAN'T I JUST DIE? I JUST WANT TO DIE!"*
 
-### ❤️ HEALTH & SURVIVAL
+You grab each side of Oswald's head and crush his skull. His brain splatters across the table. You find the automatic card shuffler's "Deal Hand" button, press it, and begin playing Blackjack alone — going all in, getting blackjack, over and over, forever.
 
-| Achievement | Requirement | Rarity |
-|---|---|---|
-| Clinging to Life | Be alive at ≤10 health | Uncommon |
-| Near Death Survivor | Be alive at ≤5 health | Common |
-| Cheated Death | 3+ near-death experiences | Rare |
-| Death Defier | 10+ near-death experiences | Legendary |
-| Broken But Alive | Become Broken (sanity shatter) | Uncommon |
-
-### 👥 SOCIAL
-
-| Achievement | Requirement | Rarity |
-|---|---|---|
-| Social Butterfly | Meet 20+ people | Rare |
-| Meet Suzy | Meet Suzy | Common |
-
-### 📦 ITEMS & COLLECTING
-
-| Achievement | Requirement | Rarity |
-|---|---|---|
-| First Item | Own 1 item | Common |
-| Five Items | Own 5 items | Common |
-| Collector | Own 10 items | Rare |
-| Item Hoarder | Own 15 items | Common |
-| Master Collector | Own 20 items | Legendary |
-
-### 🌟 SPECIAL ACHIEVEMENTS
-
-| Achievement | Requirement | Rarity |
-|---|---|---|
-| Perfect Record | (Special condition) | Legendary |
-| Lottery Winner | (Special condition) | Legendary |
-| Item Master | (Special condition) | Legendary |
-| Philanthropist | (Special condition) | Legendary |
-| Cursed Survival | (Special condition) | Legendary |
-| Casino Legend | (Special condition) | Legendary |
-| Judas | Dark ending path | Legendary |
-| Comeback Master | (Special condition) | Epic |
-| Near Miss | (Special condition) | Epic |
-| Full House | (Special condition) | Epic |
-| Sanity Master | (Special condition) | Epic |
-| Debt Free | Pay off loan shark debt | Epic |
-| Noah's Ark (Companion) | 20 companions | Epic |
-| Night Owl | (Special condition) | Rare |
-| Morning Person | (Special condition) | Rare |
-| Rock Bottom | (Special condition) | Uncommon |
-| Sanity Saved | (Special condition) | Uncommon |
-| Devil's Deal | (Special condition) | Uncommon |
-| Comeback Kid | (Special condition) | Uncommon |
-| Regular | (Special condition) | Uncommon |
-| Treasure Hunter | (Special condition) | Uncommon |
+The most disturbing ending in the game.
 
 ---
 
-### Achievement Display
+### 6. Bliss — Airport Escape
 
-At the end of any playthrough (death or ending), achievements are displayed in a formatted screen:
+**Requirements:** $1M + Own car.
+
+Drive to airport → buy a ticket → fly away. Ocean, freedom. But also alone forever.
+
+---
+
+### 7. Sanctuary — Secret Animal Ending 🐾
+
+**Requirements:** $1M + 5 companions + Animal Whistle.
+
+Hidden airfield appears. You establish an animal sanctuary. Never play another hand of cards.
+
+---
+
+### 8. Exhaust — Depression Ending
+
+**Requirements:** Low sanity + accumulated despair choices.
+
+Therapy reveals the truth. You go to your car. The exhaust. Connected to Bridge Angel storyline.
+
+> **Content Warning:** Depicts suicide. Treated as tragedy, not glorified.
+
+---
+
+### 9. Madness — Sanity Collapse
+
+**Requirements:** Sanity < 30 + shadow entity confrontation.
+
+| Choice | Outcome |
+|--------|---------|
+| Accept the shadow | Consumed by madness |
+| Refuse the shadow | Survive with permanent scars |
+
+Connected to Sleep Paralysis and bridge contemplation storylines.
+
+---
+
+## Morning Visitor System
+
+At $1,000,000, a mysterious woman appears based on your dream progression, directing you toward the appropriate ending.
+
+---
+
+## Achievement System (500+)
+
+### Common 🟢
+
+| Category | Examples |
+|----------|---------|
+| Money | First $1k, $10k, $50k |
+| Survival | 3 days, 7 days |
+| Blackjack | First hand, first blackjack, 10 wins |
+| Social | Meet Tom, Frank, Oswald, Kyle, Vinnie |
+
+### Uncommon 🔵
+
+| Category | Examples |
+|----------|---------|
+| Money | $100k, $250k |
+| Survival | 14 days, 30 days |
+| Blackjack | 50 wins, 100 wins, 10 blackjacks |
+| Items | Own 10 items, first craft, first companion |
+
+### Rare 🟣
+
+| Category | Examples |
+|----------|---------|
+| Money | $500k, $900k |
+| Survival | 100 days |
+| Blackjack | 200+ wins, 10-win streak |
+| Collections | All common items, complete a quest chain |
+| Companions | Bond with all 8 |
+
+### Epic 🟠
+
+| Achievement | Requirement |
+|------------|-------------|
+| Millionaire | Reach $1,000,000 |
+| Year One | Survive 365 days |
+| Blackjack Master | 1,000 hands |
+| Unstoppable | 20+ win streak |
+| Seen It All | All endings |
+
+### Legendary 🔴
+
+| Achievement | Requirement |
+|------------|-------------|
+| Perfect Record | $1M without going broke |
+| Jackpot | Win the lottery |
+| Completionist | All endings unlocked |
+| Hoarder | All items simultaneously |
+| Storyteller | All storylines completed |
+
+### Secret/Dark 💀
+
+**Companion Selling Chain:**
+- "First Blood" (sell 1) → "The Product" (sell 2) → "Meat Cubes" (sell 3+) → "The Factory" ending
+
+**Other:**
+- Dealer happiness path (gifts, cash blending, betrayal)
+- Bridge contemplation, death wish events
+- Buy the Necronomicon
+- Accept the Final Temptation
+
+### Special Chains
+
+| Chain | Achievement |
+|-------|-----------|
+| Pawn Empire | Sell 50+ items at Gus's |
+| Dr. Feelgood | Complete addiction arc |
+| Dream Walker | See all 3 mechanic dream chains |
+| **The Healed** | 5+ Tanya visits + Salvation (Healed) ending |
+
+---
+
+## Ending Unlock Flowchart
 
 ```
-═══════════════════════════════════════
-              ACHIEVEMENTS UNLOCKED
-═══════════════════════════════════════
+                    Reach $1,000,000
+                          |
+          ┌───────────────┼───────────────┐
+          │               │               │
+     Met Tom?      Befriend Frank?   Befriend Oswald?
+          │               │               │
+          ▼               ▼               ▼
+    Phone Rings      Frank's Deal    Oswald's Offer
+          │            /      \          /         \
+    Answer Phone?   Accept   Refuse   Accept    ALL 17 upgraded
+      /       \      │         │        │       Marvin items?
+    Yes        No    ▼         ▼        ▼           │
+     │          │  TO KILL   EARNING   YOUR OWN     ▼
+  Tanya 5+?    │  A DEALER  RESPECT   CASINO    BECOMING A
+   /      \    │                                MONSTROSITY
+ Yes       No  └→ (continue playing)
+  │         │
+  ▼         ▼
+HEALED ⭐  Come home?
+            /      \
+          Yes       No
+           │         │
+           ▼         ▼
+       SALVATION  RESURRECTION
 
-★ First Friend [UNCOMMON]
-  Befriend your first companion.
-
-★ Card Shark [RARE]
-  Play 100 hands.
-
-★ Blackjack Legend [EPIC]
-  Hit 25 blackjacks.
-
-Total: 12/240+ (5.0%)
+Other paths:
+  $1M + Car → BLISS (Airport)
+  $1M + 5 companions + Whistle → SANCTUARY
+  Low sanity + despair → EXHAUST
+  Sanity < 30 + shadow → MADNESS
 ```
-
-Rarity colors are applied (Legendary = magenta, Epic = cyan, Rare = yellow, Uncommon = green, Common = white).
-
----
-
-*← Back to [07 — Events & Storylines](07_EVENTS_AND_STORYLINES.md) | Next: [09 — Secrets & Advanced Strategies](09_SECRETS_AND_ADVANCED_STRATEGIES.md) →*

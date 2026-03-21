@@ -1,0 +1,5221 @@
+"Ugh, not again," you spout as the old wagon shutters, then dies. Stranded on the road again, but this time, your money has gone dry. All but your 50 dollar bill that Grandma gave you on her last Christmas. You've been saving it for when you needed it most, but surely, it won't be enough.
+
+The door creaks open, and you step out into the night sky, coughing up the smoke from your fried vehicle. After pushing your car off the road and between the trees, there isn't much else left for you to do, so you begin to wander down the dark, lonely street.
+
+But at the end of the road, where concrete turned to stone turned to dirt, you notice a light up ahead, on the top of a hill. 
+
+As you waltz into the old, wooden shack, your eyes begin to light up with the fire of a thousand suns. Roulette wheels! Poker tables! And in a dark corner of the abandoned casino, sits a dealer, shuffling cards for a new round of Blackjack. That 50 dollars might just come in handy after all. Thanks, Grandma!
+
+As you go to sit down at the table, you hear the Dealer cough, then watch as he sits up.
+
+In a deep, and yet strained voice, the Dealer, cloaked in darkness, poses a question to you.
+
+Would you like to play a game of Blackjack? [1]
+
+You have $50
+
+Your first card is a Three of Spades
+The Dealer's first card is a Seven of Hearts
+
+Your second card is a Nine of Spades
+The Dealer's second card is face down
+
+As of now, the Dealer's hand has a known value of 7
+Your hand has a value of 12
+
+Your next card is a Four of Spades
+Your hand has a value of 16
+
+Your next card is a Four of Hearts
+Your hand has a value of 20
+
+
+The Dealer's second card is a Jack of Clubs
+The Dealer's hand has a value of 17
+
+The Dealer stands at 17
+
+You outplayed the Dealer to victory! Nice moves.
+You had $50, and with a bet of $10, you've doubled it!
+
+Your new balance is $50 + $10 = $60
+
+Your first card is a Ten of Spades
+The Dealer's first card is a King of Hearts
+
+Your second card is a Jack of Spades
+The Dealer's second card is face down
+
+As of now, the Dealer's hand has a known value of 10
+Your hand has a value of 20
+
+
+The Dealer's second card is a Six of Hearts
+The Dealer's hand has a value of 16
+
+The Dealer's hand has a value under 17 so they hit
+The Dealer's next card is a Three of Diamonds
+The Dealer's hand has a value of 19
+
+The Dealer stands at 19
+
+You topple the Dealer! Are we witnessing a heist?
+You had $60, and with a bet of $18, you've doubled it!
+
+Your new balance is $60 + $18 = $78
+
+Your first card is a Five of Clubs
+The Dealer's first card is a Nine of Diamonds
+
+Your second card is a Seven of Spades
+The Dealer's second card is face down
+
+As of now, the Dealer's hand has a known value of 9
+Your hand has a value of 12
+
+Your next card is an Eight of Hearts
+Your hand has a value of 20
+
+
+The Dealer's second card is a Nine of Clubs
+The Dealer's hand has a value of 18
+
+The Dealer stands at 18
+
+You topple the Dealer! Are we witnessing a heist?
+You had $78, and with a bet of $23, you've doubled it!
+
+Your new balance is $78 + $23 = $101
+
+After playing a few rounds of Blackjack, the dealer points to the door. Without questioning his word, and with your winnings in hand, you scurry to the door, eager to get some sleep after such a long day. Making it back to your car, ditched on the side of the road, but no longer engulfed in smoke, you lay down, and close your eyes. It's time to rest.
+
+══════════════════════════════════════════════════            ~ ~ ~ Day Summary ~ ~ ~══════════════════════════════════════════════════
+
+Congrats! You've survived 1 day!
+
+You started your journey with just $50. 
+Since then, you've accumulated $51. 
+That brings you to a grand total of $101! Poor? Yes. Defeated? Not yet.
+
+Do you think maybe you could be a bit better at Blackjack? Just think about it.
+Take a moment to reflect on this: "No matter how many motivational quotes you know, you will remain a pathetic loser. Yesterday, today, and tomorrow. No matter how much you make, what degree you earn or what lie you tell yourself. A big flop at life you will remain. Don't doubt it for a minute. That's not even addressing your disgustinly deformed physique."
+
+
+
+══════════════════════════════════════════════════Press a key to continue: ~ ~ ~ Morning, Day 2 ~ ~ ~  True══════════════════════════════════════════════════
+
+You wake up and actually want to get out of the car. This is a historic moment.
+
+You look at your tires and wince. The tread is almost gone. Bald spots everywhere.
+
+These tires are dangerous. One good rain and you'll hydroplane.
+
+New tires cost around $400 minimum. You don't have that.
+
+You'll have to risk it. But every drive is now a gamble.
+
+As the sun begins to set, and the stars light up in the night sky, you walk to the casino, eager to play more Blackjack. 
+
+Are you ready to play some Blackjack?
+
+You have $101
+
+Your first card is a Seven of Spades
+The Dealer's first card is a Two of Spades
+
+Your second card is a Five of Spades
+The Dealer's second card is face down
+
+As of now, the Dealer's hand has a known value of 2
+Your hand has a value of 12
+
+Your next card is a Three of Spades
+Your hand has a value of 15
+
+
+The Dealer's second card is a Nine of Hearts
+The Dealer's hand has a value of 11
+
+The Dealer's hand has a value under 17 so they hit
+The Dealer's next card is a Six of Clubs
+The Dealer's hand has a value of 17
+
+The Dealer stands at 17
+
+The Dealer wins. He sweeps your chips away like crumbs off a table.
+You had $101 and lost your bet of $24
+
+Your new balance is $101 - $24 = $77
+
+Your first card is an Ace of Hearts
+The Dealer's first card is a Two of Clubs
+
+Your second card is a Jack of Spades
+The Dealer's second card is face down
+
+As of now, the Dealer's hand has a known value of 2
+Your hand has a value of 21
+
+WOOOOOOO!!! Blackjack!!! WOOOOOOOO!!!
+You had $77, and with a bet of $23, you've tripled it!
+
+Your new balance is $77 + $46 = $123
+
+Your first card is an Ace of Diamonds
+The Dealer's first card is a Queen of Clubs
+
+Your second card is a Seven of Clubs
+The Dealer's second card is an Ace of Spades
+
+The Dealer's hand has a value of 21 ;)
+Your hand has a value of 8, or 18 since you have an ace
+
+Dealer's Blackjack! Well, butter my biscuit, what a surprise!
+You had $123 and lost your bet of $23
+
+Your new balance is $123 - $23 = $100
+
+After playing a few rounds of Blackjack, the dealer points to the door. Without questioning his word, and with your winnings in hand, you scurry to the door, eager to get some sleep. Making it back to your car, ditched on the side of the road, you lay down, and close your eyes. It's time to rest.
+
+══════════════════════════════════════════════════            ~ ~ ~ Day Summary ~ ~ ~══════════════════════════════════════════════════
+
+Woo-hoo! You've survived 2 days!
+
+Yesterday, at this time, you had $101. 
+Since then, you've managed to lose $1. 
+That brings you to a grand total of $100! Hey, at least you can afford... some things. Not many things. But some.
+
+You've got a unique path, and honestly, it's thrilling to watch it unfold.
+This one's straight from the fortune cookie in my lunch: "I honest to God thought Santa Claus was real for the longest time. Mom and Dad just never told me. My parents are fucking cruel."
+
+
+
+══════════════════════════════════════════════════Press a key to continue: ~ ~ ~ Morning, Day 3 ~ ~ ~  True══════════════════════════════════════════════════
+
+You wake up and actually want to get out of the car. This is a historic moment.
+
+The heat is suffocating. Sweat drips down your face and soaks into the seat beneath you. As the sun shines through the car window, you notice a bright green bill tucked between the seat cushions. Must be your lucky day. 
+
+That's another $100 dollars.
+
+Your new balance is $100 + $100 = $200
+
+Rain on the roof. Not a storm — just rain. The soft kind. The kind that taps a lullaby on the metal above you.
+
+For the first time in weeks, your brain shuts up. No calculations. No strategies. No what-ifs.
+
+Just you, the rain, and eight uninterrupted hours.
+
+You wake up and for three seconds — three beautiful seconds — you forget where you are.
+
+As the sun begins to set, and the stars light up in the night sky, you walk to the casino, eager to play more Blackjack. 
+
+Shuffle. Deal. Win. Lose. Repeat. Shall we?
+
+You have $200
+
+Your first card is a Nine of Diamonds
+The Dealer's first card is an Ace of Clubs
+
+Your second card is a Seven of Clubs
+The Dealer's second card is face down
+
+As of now, the Dealer's hand has a known value of 1, or 11, since they have an ace
+Your hand has a value of 16
+
+Your next card is an Ace of Hearts
+Your hand has a value of 17
+
+
+The Dealer's second card is a Six of Diamonds
+The Dealer's hand has a value of 7, or 17 since they have an ace
+
+The Dealer stands at 17
+
+Same number, different people. The philosophical implications are staggering. And boring.
+You had $200, and you win back your bet of $20
+
+Your balance is still $200
+
+Your first card is a Four of Spades
+The Dealer's first card is a King of Clubs
+
+Your second card is a Five of Spades
+The Dealer's second card is face down
+
+As of now, the Dealer's hand has a known value of 10
+Your hand has a value of 9
+
+Your next card is a Queen of Spades
+Your hand has a value of 19
+
+
+The Dealer's second card is a Nine of Clubs
+The Dealer's hand has a value of 19
+
+The Dealer stands at 19
+
+A tie. The Dealer shrugs. You shrug. Everyone shrugs. Moving on.
+You had $200, and you win back your bet of $20
+
+Your balance is still $200
+
+Your first card is a Four of Diamonds
+The Dealer's first card is a Queen of Hearts
+
+Your second card is a Five of Diamonds
+The Dealer's second card is face down
+
+As of now, the Dealer's hand has a known value of 10
+Your hand has a value of 9
+
+Your next card is a Two of Spades
+Your hand has a value of 11
+
+Your next card is a Four of Clubs
+Your hand has a value of 15
+
+Your next card is a Three of Hearts
+Your hand has a value of 18
+
+
+The Dealer's second card is a Five of Clubs
+The Dealer's hand has a value of 15
+
+The Dealer's hand has a value under 17 so they hit
+The Dealer's next card is a Six of Spades
+The Dealer's hand has a value of 21
+
+21. No effort. No suspense. Just the house being the house.
+You had $200 and lost your bet of $20
+
+Your new balance is $200 - $20 = $180
+
+After playing a few rounds of Blackjack, the dealer points to the door. Without questioning his word, and with your winnings in hand, you scurry to the door, eager to get some sleep. Making it back to your car, ditched on the side of the road, you lay down, and close your eyes. It's time to rest.
+
+══════════════════════════════════════════════════            ~ ~ ~ Day Summary ~ ~ ~══════════════════════════════════════════════════
+
+Great job! You've survived 3 days!
+
+Yesterday, at this time, you had $100. 
+Since then, you've accumulated $80. 
+That brings you to a grand total of $180! You're in the 'ramen noodle' tax bracket.
+
+Just so you know, your perseverance is more impressive than perfection.
+Here's a quote my dad used to say: "If I had to rate you from 1 to 10, I'd give you a 9, because I'm the 1 you're missing."
+
+
+
+══════════════════════════════════════════════════Press a key to continue: ~ ~ ~ Morning, Day 4 ~ ~ ~  True══════════════════════════════════════════════════
+
+That might have been the best sleep of your life. You feel incredible.
+
+A scraggly stray cat jumps onto your hood and stares at you through the windshield.
+
+It meows. Loudly. Insistently. Like it's judging your entire existence.
+
+You share your meager rations. The cat purrs and curls up on your hood.
+
+It's still there when you wake up the next morning. You have a friend now.
+
+You decide to call it Whiskers.You have befriended Whiskers!
+
+
+
+Whiskers has been grooming herself since before dawn. Looking sharp for another day of doing nothing.
+
+Having Whiskers by your side makes the world a little less cruel.
+
+You hear scratching at your window. It's your cat friend!
+
+The scraggly stray has returned, meowing insistently.
+
+You open the window a crack. It pushes its head through and purrs.
+
+You're not alone. Not entirely.
+
+As the sun begins to set, and the stars light up in the night sky, you walk to the casino, eager to play more Blackjack. 
+
+The table is set. The cards are ready. Are you?
+
+As the sun begins to set, and the stars light up in the night sky, you walk to the casino, eager to play more Blackjack. 
+
+You keep coming back. Interesting.
+
+You have $180
+
+Your first card is a Four of Clubs
+The Dealer's first card is a Queen of Hearts
+
+Your second card is a Ten of Spades
+The Dealer's second card is face down
+
+As of now, the Dealer's hand has a known value of 10
+Your hand has a value of 14
+
+Your next card is an Eight of Hearts
+Your hand has a value of 22
+
+You busted. The Dealer barely glances at your cards. He already knew.
+You had $180 and lost your bet of $30
+
+Your new balance is $180 - $30 = $150
+
+Your first card is a Three of Hearts
+The Dealer's first card is a King of Hearts
+
+Your second card is a Five of Diamonds
+The Dealer's second card is face down
+
+As of now, the Dealer's hand has a known value of 10
+Your hand has a value of 8
+
+Your next card is a Six of Spades
+Your hand has a value of 14
+
+Your next card is a Seven of Hearts
+Your hand has a value of 21
+
+Blackjack! What a moment! Mom, get the camera!
+You had $150, and with a bet of $30, you've tripled it!
+
+Your new balance is $150 + $60 = $210
+
+Your first card is a Two of Clubs
+The Dealer's first card is an Ace of Diamonds
+
+Your second card is a Five of Clubs
+The Dealer's second card is a King of Diamonds
+
+The Dealer's hand has a value of 21 ;)
+Your hand has a value of 7
+
+Dealer's Blackjack! Well, butter my biscuit, what a surprise!
+You had $210 and lost your bet of $21
+
+Your new balance is $210 - $21 = $189
+
+After playing a few rounds of Blackjack, the dealer points to the door. Without questioning his word, and with your winnings in hand, you scurry to the door, eager to get some sleep. Making it back to your car, ditched on the side of the road, you lay down, and close your eyes. It's time to rest.
+
+══════════════════════════════════════════════════            ~ ~ ~ Day Summary ~ ~ ~══════════════════════════════════════════════════
+
+Fantastic! You've survived 4 days!
+
+Yesterday, at this time, you had $180. 
+Since then, you've accumulated $9. 
+That brings you to a grand total of $189! You're in the 'ramen noodle' tax bracket.
+
+Life's a garden, dig it. You're doing just that, and it's admirable.
+Here's what my cat whispered to me last night: "Grief, I've learned, is really just love. It's all the love you want to give, but cannot. All that unspent love gathers up in the corners of your eyes, the lump in your throat, and in that hollow part of your chest. Grief is just love with no place to go."
+
+
+
+══════════════════════════════════════════════════Press a key to continue: ~ ~ ~ Morning, Day 5 ~ ~ ~  True══════════════════════════════════════════════════
+
+A bird is singing outside your car. You don't want to punch it. Progress.
+
+You hear it before you see it through your windshield. Quacking. So much quacking.
+
+Around the corner comes a parade of ducks. At least thirty of them, waddling in perfect formation.
+
+The lead duck - wearing what appears to be a tiny top hat - stops in front of you and quacks authoritatively.
+
+You fall in line behind the ducks. People stare. You don't care.
+
+The parade leads you through alleys, across a parking lot, and finally to... a fountain full of coins.
+
+The top hat duck looks at you, then at the fountain, then quacks approvingly.
+
+You fish out $16 in loose change. The ducks quack in celebration.
+
+Your new balance is $189 + $16 = $205
+
+
+
+Whiskers is already awake, sitting perfectly still on the dashboard, silhouetted against the sunrise. She looks regal.
+
+Having Whiskers by your side makes the world a little less cruel.
+
+The dream is about water. Rising water. You're in the car and it's filling up. First your feet. Then your lap. Then your chest.
+
+You can't open the doors. The windows are locked. The water is warm, which is somehow worse.
+
+You gasp awake. Bone dry. Heart hammering. You open the car door just to prove you can.
+
+As the sun begins to set, and the stars light up in the night sky, you walk to the casino, eager to play more Blackjack. 
+
+You look... determined. Or desperate. Hard to tell.
+
+You have $205
+
+Your first card is a Five of Spades
+The Dealer's first card is a Queen of Hearts
+
+Your second card is a Ten of Diamonds
+The Dealer's second card is face down
+
+As of now, the Dealer's hand has a known value of 10
+Your hand has a value of 15
+
+Your next card is a Five of Hearts
+Your hand has a value of 20
+
+
+The Dealer's second card is a Four of Spades
+The Dealer's hand has a value of 14
+
+The Dealer's hand has a value under 17 so they hit
+The Dealer's next card is an Ace of Clubs
+The Dealer's hand has a value of 15
+
+The Dealer hits
+The Dealer's next card is a Nine of Clubs
+The Dealer's hand has a value of 24
+
+Dealer hand goes bust! You're one lucky lucy.
+You had $205, and with a bet of $20, you've doubled it!
+
+Your new balance is $205 + $20 = $225
+
+Your first card is an Eight of Diamonds
+The Dealer's first card is a Queen of Diamonds
+
+Your second card is a Ten of Clubs
+The Dealer's second card is face down
+
+As of now, the Dealer's hand has a known value of 10
+Your hand has a value of 18
+
+
+The Dealer's second card is an Eight of Spades
+The Dealer's hand has a value of 18
+
+The Dealer stands at 18
+
+You and the Dealer have the same value. It's a draw. So, so very lame.
+You had $225, and you win back your bet of $25
+
+Your balance is still $225
+
+Your first card is a Seven of Diamonds
+The Dealer's first card is a Nine of Spades
+
+Your second card is a King of Diamonds
+The Dealer's second card is face down
+
+As of now, the Dealer's hand has a known value of 9
+Your hand has a value of 17
+
+
+The Dealer's second card is a Queen of Spades
+The Dealer's hand has a value of 19
+
+The Dealer stands at 19
+
+You simply got outplayed on this one.
+You had $225 and lost your bet of $25
+
+Your new balance is $225 - $25 = $200
+
+After playing a few rounds of Blackjack, the dealer points to the door. Without questioning his word, and with your winnings in hand, you scurry to the door, eager to get some sleep. Making it back to your car, ditched on the side of the road, you lay down, and close your eyes. It's time to rest.
+
+══════════════════════════════════════════════════            ~ ~ ~ Day Summary ~ ~ ~══════════════════════════════════════════════════
+
+Well done! You've survived 5 days!
+
+Yesterday, at this time, you had $189. 
+Since then, you've accumulated $11. 
+That brings you to a grand total of $200! Hey, at least you can afford... some things. Not many things. But some.
+
+You might not be winning the race, but at least you're in the running, right? Sort of?
+I'll leave you with a quote: "If you find yourself at a loss for words, try using someone else's. Plagiarism is just sharing with extra steps."
+
+
+
+══════════════════════════════════════════════════Press a key to continue: ~ ~ ~ Morning, Day 6 ~ ~ ~  True══════════════════════════════════════════════════
+
+You wake up smiling. When's the last time that happened? You can't remember, but it happened today.
+
+A roaring engine blasts into your eardrums. As you jump up out of the front seat, you read 'Filthy Frank's Flawless Fixtures' painted on the hood of a...well...a beater. Waving the vehicle down, the beater slows, then appears to break down, and an old man with tattoo sleeves and long black hair steps out. He kicks his car, and the engine starts blaring once more. 
+
+"Hello, the name's Frank. Now I've got a baseball game to catch, but it looks like you could use some help." Frank pulls a shiny silver hammer out of his pocket, and walks to the hood of your beaten down wagon. "My god. This is just awful. Tell you what, I can fix this up for like 100 bucks, and your engine will be runnin' just as good as mine. You game?" [no]
+
+"What?! How could you not accept my service? I'm the cheapest damn autoshop worker on this here planet! But NOOOO, NOT FRANK! Never Frank. He Voted For Trump! Let's all ridicule frank for his political party. You god damn liberals." Frank spits in your face, and get back in his truck. 
+
+You watch as he revs his engine, gets out of his truck, kicks his beater, gets back in, revs his engine, and speeds off into the horizon. 
+
+Whiskers demands breakfast by walking across your face. Repeatedly.
+
+Having Whiskers by your side makes the world a little less cruel.
+
+Bored out of your mind, you decide to wander along the side of the road, just to get a change of scenery from the dusty leather seats of your wagon. As you take step after step over the asphalt, you notice a ditched wallet, just laying there. I guess it's yours now. 
+
+Inside the wallet, you find $92 dollars.
+
+Your new balance is $200 + $92 = $292
+
+As the sun begins to set, and the stars light up in the night sky, you walk to the casino, eager to play more Blackjack. 
+
+Welcome back to the only place that never judges your choices.
+
+You have $292
+
+Your first card is a Five of Spades
+The Dealer's first card is a Nine of Clubs
+
+Your second card is a Two of Hearts
+The Dealer's second card is face down
+
+As of now, the Dealer's hand has a known value of 9
+Your hand has a value of 7
+
+Your next card is a Three of Clubs
+Your hand has a value of 10
+
+Your next card is a Ten of Hearts
+Your hand has a value of 20
+
+
+The Dealer's second card is a Queen of Spades
+The Dealer's hand has a value of 19
+
+The Dealer stands at 19
+
+You outplayed the Dealer to victory! Nice moves.
+You had $292, and with a bet of $64, you've doubled it!
+
+Your new balance is $292 + $64 = $356
+
+Your first card is a Five of Hearts
+The Dealer's first card is a Six of Clubs
+
+Your second card is a Jack of Spades
+The Dealer's second card is face down
+
+As of now, the Dealer's hand has a known value of 6
+Your hand has a value of 15
+
+
+The Dealer's second card is a Four of Spades
+The Dealer's hand has a value of 10
+
+The Dealer's hand has a value under 17 so they hit
+The Dealer's next card is a Six of Diamonds
+The Dealer's hand has a value of 16
+
+The Dealer hits — a bold choice. He's pushing it.
+The Dealer's next card is a Ten of Clubs
+The Dealer's hand has a value of 26
+
+Dealer goes kaboom! Were they trying to bake a number cake?
+You had $356, and with a bet of $49, you've doubled it!
+
+Your new balance is $356 + $49 = $405
+
+Your first card is a Four of Hearts
+The Dealer's first card is a Five of Clubs
+
+Your second card is a Seven of Spades
+The Dealer's second card is face down
+
+As of now, the Dealer's hand has a known value of 5
+Your hand has a value of 11
+
+Your next card is a Six of Spades
+Your hand has a value of 17
+
+
+The Dealer's second card is a Jack of Hearts
+The Dealer's hand has a value of 15
+
+The Dealer's hand has a value under 17 so they hit
+The Dealer's next card is a Five of Diamonds
+The Dealer's hand has a value of 20
+
+The Dealer stands at 20
+
+Close, but close only counts in horseshoes. And this ain't horseshoes.
+You had $405 and lost your bet of $56
+
+Your new balance is $405 - $56 = $349
+
+After playing a few rounds of Blackjack, the dealer points to the door. Without questioning his word, and with your winnings in hand, you scurry to the door, eager to get some sleep. Making it back to your car, ditched on the side of the road, you lay down, and close your eyes. It's time to rest.
+
+══════════════════════════════════════════════════            ~ ~ ~ Day Summary ~ ~ ~══════════════════════════════════════════════════
+
+Yesss! You've survived 6 days!
+
+Yesterday, at this time, you had $200. 
+Since then, you've accumulated $149. 
+That brings you to a grand total of $349! Poor? Yes. Defeated? Not yet.
+
+Your efforts haven't gone unnoticed. They're just not always mentioned.
+As I tried to parallel park for the 10th time, I remember a passerby that yelled: "In the grand tapestry of existence, one must consider the intricate dance of the cosmos, where each celestial body moves in perfect harmony, except when they don't, which is most of the time, really, leading one to ponder whether the stars are just freestyling it. This brings to mind the importance of breakfast, the most important meal of a day that is itself a construct, much like the notion that socks should always match or that cats have any respect for personal space, which is to say, it's all a matter of perspective, isn't it? And speaking of perspective, have you ever noticed how small a plane looks in the sky, which is itself a vast canvas of blue, or gray, or black, depending on the time, which, as we've established, is a construct?"
+
+
+
+══════════════════════════════════════════════════Press a key to continue: ~ ~ ~ Morning, Day 7 ~ ~ ~  True══════════════════════════════════════════════════
+
+You slept so hard you forgot where you were for a second. That's the good kind of confusion.
+
+
+Whiskers sits with their back to you. The message is clear.
+You wake up and immediately know something is wrong. Your neck is on fire. Not metaphorically.
+
+Sunburn. The kind that hurts when you think about it. The kind where shirts become your enemy.
+
+Whiskers sits with her back to you. The cold shoulder is real.
+
+After spending an hour sitting in your car doing nothing, you feel like you should get some exercise. You get out of the wagon, and begin to jog down the road.
+
+A couple hours go by, and while jogging back, you see the wagon in the distance. You get back to the car, and get in, out of breath from your trip. You start the wagon and run the AC, and you feel good inside.
+
+As the sun begins to set, and the stars light up in the night sky, you walk to the casino, eager to play more Blackjack. 
+
+Nightfall again, huh? Well, you know what's next.
+
+You have $349
+
+Your first card is a Six of Diamonds
+The Dealer's first card is a Five of Clubs
+
+Your second card is a Ten of Spades
+The Dealer's second card is face down
+
+As of now, the Dealer's hand has a known value of 5
+Your hand has a value of 16
+
+
+The Dealer's second card is a Seven of Clubs
+The Dealer's hand has a value of 12
+
+The Dealer's hand has a value under 17 so they hit
+The Dealer's next card is a Three of Clubs
+The Dealer's hand has a value of 15
+
+The Dealer hits. His hand hovers over the deck for just a moment too long before drawing.
+The Dealer's next card is a Ten of Clubs
+The Dealer's hand has a value of 25
+
+Dealer hand goes bust! You're one lucky lucy.
+You had $349, and with a bet of $76, you've doubled it!
+
+Your new balance is $349 + $76 = $425
+
+Your first card is a Queen of Hearts
+The Dealer's first card is a Ten of Hearts
+
+Your second card is a Nine of Clubs
+The Dealer's second card is face down
+
+As of now, the Dealer's hand has a known value of 10
+Your hand has a value of 19
+
+
+The Dealer's second card is a Jack of Diamonds
+The Dealer's hand has a value of 20
+
+The Dealer stands at 20
+
+Dealer wins with the higher hand! Not your day, huh?
+You had $425 and lost your bet of $59
+
+Your new balance is $425 - $59 = $366
+
+Your first card is an Eight of Spades
+The Dealer's first card is a Five of Hearts
+
+Your second card is a Three of Diamonds
+The Dealer's second card is face down
+
+As of now, the Dealer's hand has a known value of 5
+Your hand has a value of 11
+
+Your next card is a Ten of Diamonds
+Your hand has a value of 21
+
+Natural 21. Clean. Surgical. The Dealer didn't even get to play.
+You had $366, and with a bet of $51, you've tripled it!
+
+Your new balance is $366 + $102 = $468
+
+After playing a few rounds of Blackjack, the dealer points to the door. Without questioning his word, and with your winnings in hand, you scurry to the door, eager to get some sleep. Making it back to your car, ditched on the side of the road, you lay down, and close your eyes. It's time to rest.
+
+══════════════════════════════════════════════════            ~ ~ ~ Day Summary ~ ~ ~══════════════════════════════════════════════════
+
+Hurray! You've survived 7 days!
+
+Yesterday, at this time, you had $349. 
+Since then, you've accumulated $119. 
+That brings you to a grand total of $468! Hey, at least you can afford... some things. Not many things. But some.
+
+I would probably wipe that smile off that face if I were you. Just kidding, you're awesome.
+For those who enjoy a bit of bathroom philosophy: "Sometimes I wish I was a bird. So I could fly over certain people and poop on their heads."
+
+
+
+══════════════════════════════════════════════════Press a key to continue: ~ ~ ~ Morning, Day 8 ~ ~ ~  True══════════════════════════════════════════════════
+
+That was some quality sleep. Five stars. Would sleep again.
+
+A blaring engine roars down the road towards you. As you scratch your eyes awake, you read 'Tom's Trusty Trucks and Tires' painted on the hood of a bright gold truck. Waving the vehicle down, the truck slows, then halts, and an old, jolly man jumps out. 
+
+"Well, howdy! The name's Tom. It appears you've gotten yourself in a bit of a pickle, ya think?" Tom pulls a big red wrench out of his pocket, and walks to the hood of your beaten down wagon. "Yep, this thing's busted alright! Tell ya what, for, I don't know, 200 bucks, I'll get this thing replaced for ya, good as new! Whaddya say?" [yes]
+
+"Really? Awesome! I'll be the best dang mechanic this ol' automobile has ever seen!" You watch in awe, as Tom, a man who has clearly perfected his craft, fixes up your wagon in no time. Sweet. 
+
+Your new balance is $468 - $200 = $268
+
+Your car has been fixed! You can now drive around!
+
+"Well, gee, this has been fun. Be seein' you around, ya know?" And with that, you watch as his big golden truck stutters, starts, then drives away.
+
+Whiskers has been scratching the upholstery. Passive-aggressive redecorating.
+
+
+
+
+
+Would you like to spend your day driving somewhere? 
+1. Doctor's Office
+2. Trusty Tom's Trucks and Tires
+3. Convenience Store
+4. Stay Home
+Choose a number: [no]
+Choose a number: [no]
+Choose a number: [no]
+Choose a number: [no]
+Choose a number: [no]
+Choose a number: [no]
+Choose a number: [no]
+Choose a number: [no]
+Choose a number: [no]
+Choose a number: [no]
+Choose a number: [no]
+Choose a number: [no]
+Choose a number: [no]
+Choose a number: [no]
+Choose a number: [no]
+Choose a number: [4]
+
+You wake up to scratching noises. Something is ON your car.
+
+You look up. A family of raccoons is making themselves at home on your roof.
+
+Mom raccoon. Dad raccoon. Three baby raccoons. All staring at you through the windshield with those little bandit masks.
+
+You honk the horn. They don't flinch. You honk again. The babies yawn.
+
+You stare at each other for a full minute. They're not leaving. This is their car now.
+
+You go back to sleep. In the morning, they've left a dead mouse on your hood. A gift? A threat? Both?
+
+As the sun begins to set, and the stars light up in the night sky, you drive over to the casino, eager to play more Blackjack. 
+
+Night falls. The game begins.
+
+You have $268
+
+Your first card is a Nine of Hearts
+The Dealer's first card is an Eight of Hearts
+
+Your second card is a Three of Clubs
+The Dealer's second card is face down
+
+As of now, the Dealer's hand has a known value of 8
+Your hand has a value of 12
+
+Your next card is an Ace of Diamonds
+Your hand has a value of 13
+
+Your next card is a Ten of Clubs
+Your hand has a value of 23
+
+You busted. The Dealer barely glances at your cards. He already knew.
+You had $268 and lost your bet of $42
+
+Your new balance is $268 - $42 = $226
+
+Your first card is an Eight of Clubs
+The Dealer's first card is a Five of Spades
+
+Your second card is a Ten of Spades
+The Dealer's second card is face down
+
+As of now, the Dealer's hand has a known value of 5
+Your hand has a value of 18
+
+
+The Dealer's second card is a Four of Diamonds
+The Dealer's hand has a value of 9
+
+The Dealer's hand has a value under 17 so they hit
+The Dealer's next card is a Ten of Diamonds
+The Dealer's hand has a value of 19
+
+The Dealer stands at 19
+
+The Dealer wins. He sweeps your chips away like crumbs off a table.
+You had $226 and lost your bet of $36
+
+Your new balance is $226 - $36 = $190
+
+The Dealer's in a good mood. Here's a $9 hand, on the house!
+
+Your first card is a Jack of Spades
+The Dealer's first card is a Jack of Hearts
+
+Your second card is a King of Hearts
+The Dealer's second card is an Ace of Hearts
+
+The Dealer's hand has a value of 21 ;)
+Your hand has a value of 20
+
+Dealer's Blackjack! Well, butter my biscuit, what a surprise!
+You had $190 and lost your free bet of $9
+
+Your balance is still $190
+
+After playing a few rounds of Blackjack, the dealer points to the door. Without questioning his word, and with your winnings in hand, you scurry to the door, eager to get some sleep. You make it to your car and drive away from the casino, and you park in a little alcove on the side of the road. You lay down, and close your eyes. It's time to rest.
+
+══════════════════════════════════════════════════            ~ ~ ~ Day Summary ~ ~ ~══════════════════════════════════════════════════
+
+Yessir! You've survived 8 days!
+
+Yesterday, at this time, you had $468. 
+Since then, you've managed to lose $278. 
+That brings you to a grand total of $190! You're basically living paycheck to paycheck. Except there's no paycheck.
+
+I mean, you could definitely make more money, but hey it's a good start.
+Here's a little bit of inspiration for you: "Bananas! Bananas! Bananas! Bananas! Bananas! Bananas! Bananas! Bananas!"
+
+
+
+══════════════════════════════════════════════════Press a key to continue: ~ ~ ~ Morning, Day 9 ~ ~ ~  True══════════════════════════════════════════════════
+
+Your body feels like it got a factory reset overnight. Joints? Smooth. Back? Fine. Mood? Immaculate.
+
+
+Whiskers hides under the seat.
+While walking near the railroad tracks, you spot a rusted metal box half-buried in the gravel.
+
+It's got a padlock on it. Old, but solid.
+
+You don't have anything to open it with. You kick it once. Nothing happens. You walk away, wondering what was inside. That's going to bother you all day.
+
+Whiskers sits in the window with her ears pinned back, watching the world like it failed her.
+
+
+
+═══ AFTERNOON WITH YOUR COMPANIONS ═══
+
+1. Whiskers (Stray Cat) ...2. Spend time with all of them3. Skip and head out
+
+Who do you want to interact with? [1]
+You spend time with Whiskers the Stray Cat.
+
+Whiskers sits just out of reach, tail swishing. Feed me, human.
+
+What would you like to do?1. Feed them2. Pet/Play with them3. Just sit together4. Leave them be
+
+Choose: [4]
+You give Whiskers space. They understand.
+
+As the sun begins to set, and the stars light up in the night sky, you drive over to the casino, eager to play more Blackjack. 
+
+The casino never sleeps. Neither do you, it seems.
+
+You have $190
+
+The Dealer's in a good mood. Here's a $16 hand, on the house!
+
+Your first card is a King of Hearts
+The Dealer's first card is an Eight of Spades
+
+Your second card is a Five of Hearts
+The Dealer's second card is face down
+
+As of now, the Dealer's hand has a known value of 8
+Your hand has a value of 15
+
+Your next card is a Six of Hearts
+Your hand has a value of 21
+
+You hit Blackjack! What's cooking, good looking?
+You had $190, and with a free bet of $16, you've tripled it!
+
+Your new balance is $190 + $32 = $222
+
+Your first card is an Ace of Spades
+The Dealer's first card is an Eight of Hearts
+
+Your second card is a Ten of Hearts
+The Dealer's second card is face down
+
+As of now, the Dealer's hand has a known value of 8
+Your hand has a value of 21
+
+WOOOOOOO!!! Blackjack!!! WOOOOOOOO!!!
+You had $222, and with a bet of $35, you've tripled it!
+
+Your new balance is $222 + $70 = $292
+
+Your first card is a Two of Clubs
+The Dealer's first card is a Seven of Diamonds
+
+Your second card is a Two of Spades
+The Dealer's second card is face down
+
+As of now, the Dealer's hand has a known value of 7
+Your hand has a value of 4
+
+Your next card is a Six of Spades
+Your hand has a value of 10
+
+Your next card is a Seven of Spades
+Your hand has a value of 17
+
+
+The Dealer's second card is a Ten of Spades
+The Dealer's hand has a value of 17
+
+The Dealer stands at 17
+
+Standoff! Equal hands, no winner!
+You had $292, and you win back your bet of $46
+
+Your balance is still $292
+
+After playing a few rounds of Blackjack, the dealer points to the door. Without questioning his word, and with your winnings in hand, you scurry to the door, eager to get some sleep. You make it to your car and drive away from the casino, and you park in a little alcove on the side of the road. You lay down, and close your eyes. It's time to rest.
+
+══════════════════════════════════════════════════            ~ ~ ~ Day Summary ~ ~ ~══════════════════════════════════════════════════
+
+Outstanding! You've survived 9 days!
+
+Yesterday, at this time, you had $190. 
+Since then, you've accumulated $102. 
+That brings you to a grand total of $292! You're in the 'ramen noodle' tax bracket.
+
+If there's one thing I've learned, it's that you must never back down, and never give up.
+If aliens could talk, they'd probably say: "Every corpse on Everest was once an extremely motivated person."
+
+
+
+══════════════════════════════════════════════════Press a key to continue: ~ ~ ~ Morning, Day 10 ~ ~ ~  True══════════════════════════════════════════════════
+
+You wake up smiling. When's the last time that happened? You can't remember, but it happened today.
+
+A sheet of paper slaps against your windshield while you're sitting in the parking lot. At first you think it's trash, but the paper is thick and weathered.
+
+You peel it free and unfold it carefully. It's an old trail map, hand-marked with stars, circles, and notes in the margins.
+
+Somebody used this thing hard. Which means it probably leads somewhere worth finding.
+
+You got the Worn Map!
+
+A new shop has been unlocked: Marvin's Mystical Merchandise
+
+Whiskers hides under the passenger seat and won't come out, no matter how many treats you offer.
+
+
+
+═══ AFTERNOON WITH YOUR COMPANIONS ═══
+
+1. Whiskers (Stray Cat) ...2. Spend time with all of them3. Skip and head out
+
+Who do you want to interact with? [1]
+You spend time with Whiskers the Stray Cat.
+
+Whiskers sits just out of reach, tail swishing. Feed me, human.
+
+What would you like to do?1. Feed them2. Pet/Play with them3. Just sit together4. Leave them be
+
+Choose: [4]
+You give Whiskers space. They understand.
+
+As the sun begins to set, and the stars light up in the night sky, you drive over to the casino, eager to play more Blackjack. 
+
+Take your seat. The wheel of fortune turns for no one.
+
+You have $292
+
+Your first card is a Nine of Diamonds
+The Dealer's first card is a Queen of Clubs
+
+Your second card is a Two of Clubs
+The Dealer's second card is face down
+
+As of now, the Dealer's hand has a known value of 10
+Your hand has a value of 11
+
+Your next card is a Two of Spades
+Your hand has a value of 13
+
+Your next card is a Seven of Hearts
+Your hand has a value of 20
+
+
+The Dealer's second card is an Eight of Hearts
+The Dealer's hand has a value of 18
+
+The Dealer stands at 18
+
+You outplayed the Dealer to victory! Nice moves.
+You had $292, and with a bet of $29, you've doubled it!
+
+Your new balance is $292 + $29 = $321
+
+Your first card is a Seven of Spades
+The Dealer's first card is a Nine of Clubs
+
+Your second card is an Eight of Clubs
+The Dealer's second card is face down
+
+As of now, the Dealer's hand has a known value of 9
+Your hand has a value of 15
+
+Your next card is a Four of Spades
+Your hand has a value of 19
+
+
+The Dealer's second card is a Five of Diamonds
+The Dealer's hand has a value of 14
+
+The Dealer's hand has a value under 17 so they hit
+The Dealer's next card is a Two of Diamonds
+The Dealer's hand has a value of 16
+
+The Dealer hits
+The Dealer's next card is an Ace of Spades
+The Dealer's hand has a value of 17
+
+The Dealer stands at 17
+
+You outplayed the Dealer to victory! Nice moves.
+You had $321, and with a bet of $32, you've doubled it!
+
+Your new balance is $321 + $32 = $353
+
+The Dealer's in a good mood. Here's a $14 hand, on the house!
+
+Your first card is an Ace of Hearts
+The Dealer's first card is a Three of Hearts
+
+Your second card is an Eight of Spades
+The Dealer's second card is face down
+
+As of now, the Dealer's hand has a known value of 3
+Your hand has a value of 9, or 19 since you have an ace
+
+
+The Dealer's second card is a King of Spades
+The Dealer's hand has a value of 13
+
+The Dealer's hand has a value under 17 so they hit
+The Dealer's next card is a Jack of Hearts
+The Dealer's hand has a value of 23
+
+Over 21. The Dealer exhales through his nose like a dragon who just lost a bet. Oh wait.
+You had $353, and with a free bet of $14, you've doubled it!
+
+Your new balance is $353 + $14 = $367
+
+After playing a few rounds of Blackjack, the dealer points to the door. Without questioning his word, and with your winnings in hand, you scurry to the door, eager to get some sleep. You make it to your car and drive away from the casino, and you park in a little alcove on the side of the road. You lay down, and close your eyes. It's time to rest.
+
+══════════════════════════════════════════════════            ~ ~ ~ Day Summary ~ ~ ~══════════════════════════════════════════════════
+
+Keep it up! You've survived 10 days!
+
+Yesterday, at this time, you had $292. 
+Since then, you've accumulated $75. 
+That brings you to a grand total of $367! You're basically living paycheck to paycheck. Except there's no paycheck.
+
+Good progress so far, pal. Keep it up.
+As my doctor was putting me under, he whispered into my ear: "The reason you have to follow your dreams is because even your dreams are trying to get away from you."
+
+
+
+══════════════════════════════════════════════════Press a key to continue: ~ ~ ~ Morning, Day 11 ~ ~ ~  True══════════════════════════════════════════════════
+
+You had a dream about winning at Blackjack. Then you woke up. But you still feel great.
+
+You're about to take a shortcut through a dark alley when Whiskers goes absolutely crazy.
+
+Whiskers arches their back and hisses at the alley entrance. Ears flat. Tail puffed.
+
+You hesitate. Peer into the darkness. And you see them.
+
+Three figures. Waiting. One has something that catches the streetlight. A knife.
+
+You back away slowly. They don't see you. Whiskers just saved you from a mugging.
+
+Whiskers's danger sense kicked in! Ambush avoided!
+
+Whiskers is grooming excessively. Stress cleaning. She's not okay.
+
+
+
+═══ AFTERNOON WITH YOUR COMPANIONS ═══
+
+1. Whiskers (Stray Cat) ...2. Spend time with all of them3. Skip and head out
+
+Who do you want to interact with? [1]
+You spend time with Whiskers the Stray Cat.
+
+Whiskers sits just out of reach, tail swishing. Feed me, human.
+
+What would you like to do?1. Feed them2. Pet/Play with them3. Just sit together4. Leave them be
+
+Choose: [4]
+You give Whiskers space. They understand.
+
+As the sun begins to set, and the stars light up in the night sky, you drive over to the casino, eager to play more Blackjack. 
+
+Another night. Another dance with chance.
+
+You have $367
+
+The Dealer's in a good mood. Here's a $20 hand, on the house!
+
+Your first card is a Three of Hearts
+The Dealer's first card is a Four of Hearts
+
+Your second card is an Eight of Hearts
+The Dealer's second card is face down
+
+As of now, the Dealer's hand has a known value of 4
+Your hand has a value of 11
+
+Your next card is a Four of Clubs
+Your hand has a value of 15
+
+
+The Dealer's second card is a Queen of Spades
+The Dealer's hand has a value of 14
+
+The Dealer's hand has a value under 17 so they hit
+The Dealer's next card is a Ten of Clubs
+The Dealer's hand has a value of 24
+
+Dealer's hand busts! Victory is yours!
+You had $367, and with a free bet of $20, you've doubled it!
+
+Your new balance is $367 + $20 = $387
+
+Your first card is a Queen of Clubs
+The Dealer's first card is a Two of Diamonds
+
+Your second card is a Four of Diamonds
+The Dealer's second card is face down
+
+As of now, the Dealer's hand has a known value of 2
+Your hand has a value of 14
+
+
+The Dealer's second card is a Five of Clubs
+The Dealer's hand has a value of 7
+
+The Dealer's hand has a value under 17 so they hit
+The Dealer's next card is a Nine of Diamonds
+The Dealer's hand has a value of 16
+
+The Dealer hits
+The Dealer's next card is an Ace of Spades
+The Dealer's hand has a value of 17
+
+The Dealer stands at 17
+
+Dealer's number is higher, so I guess you lost. Unfortunate.
+You had $387 and lost your bet of $38
+
+Your new balance is $387 - $38 = $349
+
+Your first card is a Three of Diamonds
+The Dealer's first card is a Two of Spades
+
+Your second card is a Seven of Hearts
+The Dealer's second card is face down
+
+As of now, the Dealer's hand has a known value of 2
+Your hand has a value of 10
+
+Your next card is a Two of Clubs
+Your hand has a value of 12
+
+Your next card is a Seven of Clubs
+Your hand has a value of 19
+
+
+The Dealer's second card is a Nine of Hearts
+The Dealer's hand has a value of 11
+
+The Dealer's hand has a value under 17 so they hit
+The Dealer's next card is an Eight of Diamonds
+The Dealer's hand has a value of 19
+
+The Dealer stands at 19
+
+Same number, different people. The philosophical implications are staggering. And boring.
+You had $349, and you win back your bet of $34
+
+Your balance is still $349
+
+After playing a few rounds of Blackjack, the dealer points to the door. Without questioning his word, and with your winnings in hand, you scurry to the door, eager to get some sleep. You make it to your car and drive away from the casino, and you park in a little alcove on the side of the road. You lay down, and close your eyes. It's time to rest.
+
+══════════════════════════════════════════════════            ~ ~ ~ Day Summary ~ ~ ~══════════════════════════════════════════════════
+
+Way to go! You've survived 11 days!
+
+Yesterday, at this time, you had $367. 
+Since then, you've managed to lose $18. 
+That brings you to a grand total of $349! You're in the 'ramen noodle' tax bracket.
+
+Look at you, using your full potential - just kidding, but seriously, nice effort today.
+You know what you need right now? A quote, from the heart: "Freedom means the right to yell, "THEATRE!" in a crowded fire."
+
+
+
+══════════════════════════════════════════════════Press a key to continue: ~ ~ ~ Morning, Day 12 ~ ~ ~  True══════════════════════════════════════════════════
+
+That was some quality sleep. Five stars. Would sleep again.
+
+At a gas station counter, you spot a black matchbook mixed in with the free local church flyers. 
+
+Stamped on the cover in curling green ink: The Witch Doctor's Tower
+
+Inside is a hand-drawn route through the marsh and a note that reads, "Bring cash, blood, or a good story."
+
+The cashier sees you reading it and mutters that the old woman out there fixes things hospitals can't.
+
+A new shop has been unlocked: Witch Doctor's Tower
+
+Whiskers knocks your coffee off the dashboard. On purpose. While maintaining eye contact.
+
+Your companions keep their distance today. They don't seem ready to talk.
+
+Would you like to spend your day driving somewhere? 
+1. Doctor's Office
+2. Witch Doctor's Tower
+3. Trusty Tom's Trucks and Tires
+4. Convenience Store
+5. Marvin's Mystical Merchandise
+6. Stay Home
+Choose a number: [1]
+
+You get in your car and drive to the Doctor's Office. As you pull up closer to the bright blue building, you notice that the parking lot is concerningly empty. You park your wagon right up front next to the entrance, and step out towards the doors. 
+
+When you enter into the lobby, you're immediately hit with the strong smell of hand sanitizer in the air. The carpets are dull and brown, the light above you is flickering, and the walls are filled with posters telling you to 'Floss More Often!' and 'Wash Your Hands Before You Eat!' If you didn't know any better, you would have guessed you were on a movie set.
+
+Walking towards the front desk, you see a cheery old lady, who looks up from her computer to smile at you. Her gray hair covers her glasses, and her hand trembles as she hands you a pen and a clipboard with some paperwork. Of course it's paperwork.
+
+After filling out your information, you walk back to the front desk, and hand the lady the clipboard. She smiles, and begins to speak to you.
+
+I see you're here for a checkup. The Doctor will see you now.
+
+Hey there champ! How are you? Doing all right? Let's check you out and make sure you're all up to snuff.
+Why, you look just as healthy as the day I met you, fresh from your mother's womb! Let me just give you this lollipop and you'll be free to go.
+
+You walk back to the front desk to checkout.
+
+That will be $146
+
+Your new balance is $349 - $146 = $203
+
+As the sun begins to set, and the stars light up in the night sky, you drive over to the casino, eager to play more Blackjack. 
+
+The cards have been waiting for you.
+
+You have $203
+
+Your first card is a Nine of Diamonds
+The Dealer's first card is a Nine of Spades
+
+Your second card is a Seven of Diamonds
+The Dealer's second card is face down
+
+As of now, the Dealer's hand has a known value of 9
+Your hand has a value of 16
+
+Your next card is a Four of Clubs
+Your hand has a value of 20
+
+
+The Dealer's second card is an Ace of Spades
+The Dealer's hand has a value of 10, or 20 since they have an ace
+
+The Dealer stands at 20
+
+A tie. The Dealer shrugs. You shrug. Everyone shrugs. Moving on.
+You had $203, and you win back your bet of $20
+
+Your balance is still $203
+
+The Dealer's in a good mood. Here's a $11 hand, on the house!
+
+Your first card is a Two of Spades
+The Dealer's first card is a Seven of Hearts
+
+Your second card is a Seven of Clubs
+The Dealer's second card is face down
+
+As of now, the Dealer's hand has a known value of 7
+Your hand has a value of 9
+
+Your next card is an Eight of Clubs
+Your hand has a value of 17
+
+
+The Dealer's second card is a Five of Clubs
+The Dealer's hand has a value of 12
+
+The Dealer's hand has a value under 17 so they hit
+The Dealer's next card is a Queen of Spades
+The Dealer's hand has a value of 22
+
+The Dealer went over 21! Bust! You Win!
+You had $203, and with a free bet of $11, you've doubled it!
+
+Your new balance is $203 + $11 = $214
+
+Your first card is a Three of Hearts
+The Dealer's first card is a Three of Clubs
+
+Your second card is a Jack of Spades
+The Dealer's second card is face down
+
+As of now, the Dealer's hand has a known value of 3
+Your hand has a value of 13
+
+
+The Dealer's second card is a Queen of Clubs
+The Dealer's hand has a value of 13
+
+The Dealer's hand has a value under 17 so they hit
+The Dealer's next card is a Five of Hearts
+The Dealer's hand has a value of 18
+
+The Dealer stands at 18
+
+Your hand is inferior to the Dealer's. Which means you lose.
+You had $214 and lost your bet of $21
+
+Your new balance is $214 - $21 = $193
+
+After playing a few rounds of Blackjack, the dealer points to the door. Without questioning his word, and with your winnings in hand, you scurry to the door, eager to get some sleep. You make it to your car and drive away from the casino, and you park in a little alcove on the side of the road. You lay down, and close your eyes. It's time to rest.
+
+══════════════════════════════════════════════════            ~ ~ ~ Day Summary ~ ~ ~══════════════════════════════════════════════════
+
+Bravo! You've survived 12 days!
+
+Yesterday, at this time, you had $349. 
+Since then, you've managed to lose $156. 
+That brings you to a grand total of $193! Poor? Yes. Defeated? Not yet.
+
+For what it's worth, I think you're doing alright.
+Don't forget what the bible taught you: "Why ponder the meaning of life when you can dance with the whimsical ants under the moonlit spaghetti? It's all about finding the rhythm in the chaos of cereal whispers."
+
+
+
+══════════════════════════════════════════════════Press a key to continue: ~ ~ ~ Morning, Day 13 ~ ~ ~  True══════════════════════════════════════════════════
+
+A bird is singing outside your car. You don't want to punch it. Progress.
+
+You lean against the hood of the wagon and look up. You find Orion's Belt. The Big Dipper. That's... all you know.
+
+But it doesn't matter. The names don't matter. What matters is that something enormous and ancient is looking back at you.
+
+And it doesn't care about your problems. Somehow, that's comforting.
+
+Still, it's beautiful. You feel small, but in a comforting way.
+
+As the sun begins to set, and the stars light up in the night sky, you drive over to the casino, eager to play more Blackjack. 
+
+Sit. Let's see what fate has in store tonight.
+
+Whiskers meows at the door. She wants out. The thought of her leaving makes your chest hurt.
+
+
+
+═══ AFTERNOON WITH YOUR COMPANIONS ═══
+
+1. Whiskers (Stray Cat) ...2. Spend time with all of them3. Skip and head out
+
+Who do you want to interact with? [1]
+You spend time with Whiskers the Stray Cat.
+
+Whiskers sits just out of reach, tail swishing. Feed me, human.
+
+What would you like to do?1. Feed them2. Pet/Play with them3. Just sit together4. Leave them be
+
+Choose: [4]
+You give Whiskers space. They understand.
+
+As the sun begins to set, and the stars light up in the night sky, you drive over to the casino, eager to play more Blackjack. 
+
+Come, sit down, we have a game to play.
+
+You have $193
+
+Your first card is an Eight of Hearts
+The Dealer's first card is a Four of Hearts
+
+Your second card is a Seven of Hearts
+The Dealer's second card is face down
+
+As of now, the Dealer's hand has a known value of 4
+Your hand has a value of 15
+
+
+The Dealer's second card is a Queen of Hearts
+The Dealer's hand has a value of 14
+
+The Dealer's hand has a value under 17 so they hit
+The Dealer's next card is a Two of Hearts
+The Dealer's hand has a value of 16
+
+The Dealer hits
+The Dealer's next card is a Five of Clubs
+The Dealer's hand has a value of 21
+
+The Dealer gets a Blackjack and wins! Too bad! So sad! Get good, kiddo!
+You had $193 and lost your bet of $19
+
+Your new balance is $193 - $19 = $174
+
+The Dealer's in a good mood. Here's a $17 hand, on the house!
+
+Your first card is an Ace of Hearts
+The Dealer's first card is a King of Clubs
+
+Your second card is a Five of Spades
+The Dealer's second card is face down
+
+As of now, the Dealer's hand has a known value of 10
+Your hand has a value of 6, or 16 since you have an ace
+
+Your next card is a Ten of Spades
+Your hand has a value of 16
+
+Your next card is an Ace of Spades
+Your hand has a value of 17
+
+
+The Dealer's second card is a Seven of Spades
+The Dealer's hand has a value of 17
+
+The Dealer stands at 17
+
+Standoff! Equal hands, no winner!
+You had $174, and since this hand was free, your balance hasn't changed
+
+Your balance is still $174
+
+The Dealer's in a good mood. Here's a $9 hand, on the house!
+
+Your first card is a Queen of Clubs
+The Dealer's first card is a King of Spades
+
+Your second card is a Three of Hearts
+The Dealer's second card is face down
+
+As of now, the Dealer's hand has a known value of 10
+Your hand has a value of 13
+
+Your next card is a Seven of Clubs
+Your hand has a value of 20
+
+
+The Dealer's second card is a King of Hearts
+The Dealer's hand has a value of 20
+
+The Dealer stands at 20
+
+Push. Nobody wins. Nobody loses. The universe yawns.
+You had $174, and since this hand was free, your balance hasn't changed
+
+Your balance is still $174
+
+After playing a few rounds of Blackjack, the dealer points to the door. Without questioning his word, and with your winnings in hand, you scurry to the door, eager to get some sleep. You make it to your car and drive away from the casino, and you park in a little alcove on the side of the road. You lay down, and close your eyes. It's time to rest.
+
+══════════════════════════════════════════════════            ~ ~ ~ Day Summary ~ ~ ~══════════════════════════════════════════════════
+
+Superb! You've survived 13 days!
+
+Yesterday, at this time, you had $193. 
+Since then, you've managed to lose $19. 
+That brings you to a grand total of $174! You're in the 'ramen noodle' tax bracket.
+
+Oh, look at you, making small changes like you're actually going to finish something. Adorable.
+Something to ponder on your journey: "Remember, it's not paranoia if your plants are actually plotting against you. Keep them in check by pretending to water them with vinegar."
+
+
+
+══════════════════════════════════════════════════Press a key to continue: ~ ~ ~ Morning, Day 14 ~ ~ ~  True══════════════════════════════════════════════════
+
+You slept so well that you're suspicious. Something this good can't be free.
+
+A sharp knock on your window. You look up to see a gaunt man in a stained trench coat peering at you through the glass. His teeth are yellow, his eyes are bloodshot, and he's holding a pocket watch that looks far too expensive for someone dressed like him.
+
+You roll down the window just a crack.
+
+"Nice pile of cash you got there," he rasps, nodding at the money in your passenger seat. "You look like a collector. A finder of rare things."
+
+He glances around nervously, then leans closer.
+
+"Name's Gus. Grimy Gus, they call me. Got a little shop down on Fifth and Nowhere. ""If you ever find yourself with... unusual items... things that don't belong in the light of day... I can make them disappear. For a fair price."
+
+He taps his nose conspiratorially.
+
+"Collectibles, trinkets, treasures. Things you picked up on your... adventures. I don't ask questions. Just cash on the barrel."
+
+He hands you a grimy business card through the crack in the window. It reads: "Grimy Gus's Pawn Emporium - We Buy What Others Won't"
+
+"Come by sometime. You won't regret it. Probably."
+
+He shuffles off into the morning mist before you can respond.
+
+A new shop has been unlocked: Grimy Gus's Pawn Emporium
+
+Whiskers won't eat. She just stares at the food, then at you, then turns away.
+
+Your companions keep their distance today. They don't seem ready to talk.
+
+Would you like to spend your day driving somewhere? 
+1. Doctor's Office
+2. Witch Doctor's Tower
+3. Trusty Tom's Trucks and Tires
+4. Convenience Store
+5. Marvin's Mystical Merchandise
+6. Grimy Gus's Pawn Emporium
+7. Stay Home
+Choose a number: [1]
+
+You get in your car and drive to the Doctor's Office. 
+
+I see you're here for a checkup. The Doctor will see you now.
+
+Hey there champ! How are you? Doing all right? Let's check you out and make sure you're all up to snuff.
+Why, you look just as healthy as the day I met you, fresh from your mother's womb! Let me just give you this lollipop and you'll be free to go.
+
+You walk back to the front desk to checkout.
+
+That will be $62
+
+Your new balance is $174 - $62 = $112
+
+As the sun begins to set, and the stars light up in the night sky, you drive over to the casino, eager to play more Blackjack. 
+
+You've got that look in your eye. Hope. Or madness. Sometimes they're the same.
+
+You have $112
+
+Your first card is a Two of Clubs
+The Dealer's first card is a Queen of Diamonds
+
+Your second card is a King of Diamonds
+The Dealer's second card is face down
+
+As of now, the Dealer's hand has a known value of 10
+Your hand has a value of 12
+
+Your next card is a Three of Clubs
+Your hand has a value of 15
+
+Your next card is a Six of Hearts
+Your hand has a value of 21
+
+Blackjack! The Dealer's eye twitches. Beautiful.
+You had $112, and with a bet of $11, you've tripled it!
+
+Your new balance is $112 + $22 = $134
+
+Your first card is an Eight of Clubs
+The Dealer's first card is a Nine of Clubs
+
+Your second card is an Eight of Hearts
+The Dealer's second card is face down
+
+As of now, the Dealer's hand has a known value of 9
+Your hand has a value of 16
+
+Your next card is a Seven of Spades
+Your hand has a value of 23
+
+BUST. The most satisfying word in the Dealer's vocabulary.
+You had $134 and lost your bet of $13
+
+Your new balance is $134 - $13 = $121
+
+Your first card is a Nine of Hearts
+The Dealer's first card is a Nine of Diamonds
+
+Your second card is a Five of Diamonds
+The Dealer's second card is face down
+
+As of now, the Dealer's hand has a known value of 9
+Your hand has a value of 14
+
+Your next card is a King of Spades
+Your hand has a value of 24
+
+BUST. The most satisfying word in the Dealer's vocabulary.
+You had $121 and lost your bet of $12
+
+Your new balance is $121 - $12 = $109
+
+After playing a few rounds of Blackjack, the dealer points to the door. Without questioning his word, and with your winnings in hand, you scurry to the door, eager to get some sleep. You make it to your car and drive away from the casino, and you park in a little alcove on the side of the road. You lay down, and close your eyes. It's time to rest.
+
+══════════════════════════════════════════════════            ~ ~ ~ Day Summary ~ ~ ~══════════════════════════════════════════════════
+
+Impressive! You've survived 14 days!
+
+Yesterday, at this time, you had $174. 
+Since then, you've managed to lose $65. 
+That brings you to a grand total of $109! You're basically living paycheck to paycheck. Except there's no paycheck.
+
+Your unique approach to life's challenges is so...inspiring? Yeah, let's go with that.
+I read this once in a magazine: "Why walk when you can dance? Unless dancing is just walking with style, in which case, why not moonwalk everywhere and reverse your way through life's problems?"
+
+
+
+══════════════════════════════════════════════════Press a key to continue: ~ ~ ~ Morning, Day 15 ~ ~ ~  True══════════════════════════════════════════════════
+
+You actually feel rested. Like, genuinely rested. This is what sleeping is supposed to feel like?
+
+They're everywhere. Taped to lampposts, pinned to bulletin boards, shoved under windshield wipers.
+
+Lost dog flyers. Five different dogs. All missing from the same neighborhood.
+
+Each flyer has a phone number. Each number is the same: a local shelter.
+
+You grab a Stack of Flyers. Something about this doesn't feel right. Five dogs from one block? That's not coincidence. That's a pattern.
+
+Whiskers hisses at you when you reach for her. Okay. Message received.
+
+Whiskers looks at you one last time, then slips out the window. You call her name. 'Whiskers!' Nothing. She's gone. The car feels emptier already.
+Whiskers has died.
+
+
+
+Would you like to spend your day driving somewhere? 
+1. Doctor's Office
+2. Witch Doctor's Tower
+3. Trusty Tom's Trucks and Tires
+4. Convenience Store
+5. Marvin's Mystical Merchandise
+6. Grimy Gus's Pawn Emporium
+7. Stay Home
+Choose a number: [4]
+
+You get in your car and drive to the Convenience Store. When pulling into the parking lot, you have to grip the wheel tightly to keep control of the wagon, as the concrete beneath you is littered with potholes. As you drive closer to bright red brick building, you begin to read the sign 'Convenience Store' written in bold. Really? This place really called 'Convenience Store'? They couldn't have come up with anything more creative? You park nearby, and get out, being sure not to trip on the loose chunks of road. 
+
+Walking closer to the store, you notice there's a poster with a smiling dude on it, holding his thumbs up, with the caption 'We Love our Customers! That's why we're limiting each customer to one item per visit. That means there's more for everyone! Sharing is caring!' Looking through the window, the store is barren, with only a few items on the shelf. If not for someone standing at the register, you would have thought the place to be abandoned.
+
+When you open the glass door, you notice a bell above you ring. There's a teenager on his phone, sitting with his feet up on the counter. His face is covered with pimples, and he's in the middle of blowing a bubble with the gum in his mouth.
+
+You get closer to the boy, and he finally notices you, and puts his phone down.
+
+"Sup. Name's Kyle. Got a one-item limit. Manager's orders. I don't make the rules."
+
+What do you want?
+1. Water Bottles - $8
+2. Rope - $20
+3. Spare Tire - $75
+4. Candy Bar - $5
+5. Tool Kit - $85
+6. Motor Oil - $30
+7. Gas Can - $25
+8. Cheese - $4
+9. Plastic Poncho - $6
+10. Radiator Stop Leak - $22
+11. Deck of Cards - $9
+12. Baking Soda - $3
+13. Garbage Bag - $3
+14. Duct Tape - $12
+15. Turkey Sandwich - $15
+16. Pest Control - $25
+17. Cough Drops - $15
+18. Fix-a-Flat - $15
+19. I'm not buying anything
+Choose a number: [5]
+
+You got a Tool Kit!
+Wrenches, screwdrivers, pliers. Everything a car person needs.
+
+Your new balance is $109 - $85 = $24
+
+
+
+Welp. There you go. That's your item. Weird thing to buy, if you ask me. Now get lost, I'm going on break.
+
+As the sun begins to set, and the stars light up in the night sky, you drive over to the casino, eager to play more Blackjack. 
+
+Still alive? Good. The cards would be disappointed otherwise.
+
+You have $24
+
+Your first card is a Nine of Diamonds
+The Dealer's first card is a Nine of Spades
+
+Your second card is an Eight of Hearts
+The Dealer's second card is face down
+
+As of now, the Dealer's hand has a known value of 9
+Your hand has a value of 17
+
+
+The Dealer's second card is an Eight of Clubs
+The Dealer's hand has a value of 17
+
+The Dealer stands at 17
+
+Same number, different people. The philosophical implications are staggering. And boring.
+You had $24, and you win back your bet of $2
+
+Your balance is still $24
+
+Your first card is an Ace of Spades
+The Dealer's first card is an Eight of Spades
+
+Your second card is a Ten of Diamonds
+The Dealer's second card is face down
+
+As of now, the Dealer's hand has a known value of 8
+Your hand has a value of 21
+
+Oh lord have mercy, you got a Blackjack!
+You had $24, and with a bet of $2, you've tripled it!
+
+Your new balance is $24 + $4 = $28
+
+Your first card is an Ace of Hearts
+The Dealer's first card is a Six of Diamonds
+
+Your second card is a Four of Hearts
+The Dealer's second card is face down
+
+As of now, the Dealer's hand has a known value of 6
+Your hand has a value of 5, or 15 since you have an ace
+
+Your next card is a Seven of Diamonds
+Your hand has a value of 12
+
+
+The Dealer's second card is a Seven of Spades
+The Dealer's hand has a value of 13
+
+The Dealer's hand has a value under 17 so they hit
+The Dealer's next card is a Jack of Spades
+The Dealer's hand has a value of 23
+
+Over 21. The Dealer exhales through his nose like a dragon who just lost a bet. Oh wait.
+You had $28, and with a bet of $2, you've doubled it!
+
+Your new balance is $28 + $2 = $30
+
+After playing a few rounds of Blackjack, the dealer points to the door. Without questioning his word, and with your winnings in hand, you scurry to the door, eager to get some sleep. You make it to your car and drive away from the casino, and you park in a little alcove on the side of the road. You lay down, and close your eyes. It's time to rest.
+
+══════════════════════════════════════════════════            ~ ~ ~ Day Summary ~ ~ ~══════════════════════════════════════════════════
+
+Excellent! You've survived 15 days!
+
+Yesterday, at this time, you had $109. 
+Since then, you've managed to lose $79. 
+That brings you to a grand total of $30! You're in the 'ramen noodle' tax bracket.
+
+Congrats on all the hard work so far. It's nice to know you're still alive.
+This quote always gets me going: "Let's embark on a journey, a meandering path not unlike the serpentine wanderings of a leaf caught in a capricious autumn breeze, which, as it dances to the silent music of nature, reminds us of the unpredictable choreography of existence. This leaf, let's call it Gerald, flutters with an elegance borne of happenstance, a fragile vessel for the whims of the wind. Gerald's journey is not linear, nor is it bound by the rigid expectations of society's ceaselessly grinding gears. Instead, Gerald twirls, dips, and soars, embracing the chaos with a grace we can only aspire to. Now, consider the ant, industrious and steadfast, a creature of purpose and communal toil. Our ant, whom we'll name Beatrice, marches diligently on her quest for sustenance, her life a testament to the virtues of hard work and persistence. Yet, in the grand tapestry of the cosmos, what is Beatrice but a speck, a mere blip on the infinite canvas of the universe? And yet, does her insignificance in the face of the vast unknown render her efforts moot? I posit that it does not, for in the grand scheme, all actions, large and small, contribute to the intricate mosaic of existence. But back to Gerald, who by now has traversed the convoluted landscapes of our imagination, touching upon the existential questions that haunt the periphery of our consciousness. What can we learn from Gerald and Beatrice? Is it their resilience, their unyielding will to persist in the face of the insurmountable odds stacked against them by the very nature of their existence? Or is it, perhaps, the simple beauty of their dance, a reminder that life, in all its complexity and confusion, offers moments of sublime beauty, fleeting and precious, to be cherished and remembered? As Gerald finally comes to rest upon the earth, joining Beatrice in the eternal cycle of life and death, we are reminded that all journeys, whether they be of leaves or ants or the human heart, are interconnected in the grand, bewildering dance of the cosmos. So, what was the point of this story, you may ask? Well, that, my friend, is entirely up to you."
+
+
+
+══════════════════════════════════════════════════Press a key to continue: ~ ~ ~ Morning, Day 16 ~ ~ ~  True══════════════════════════════════════════════════
+
+You wake up smiling. When's the last time that happened? You can't remember, but it happened today.
+
+You come back to your car and find a cream-colored business card tucked beneath the wiper blade. The paper is thick, expensive, and somehow greasy at the same time.
+
+On the front, embossed in gold, it reads: Vinnie's Back Alley Loans
+
+On the back is a handwritten note: "If the banks don't believe in you, I might. Come alone."
+
+You glance up and notice a black sedan idling at the far end of the lot. The driver gives you a two-finger salute and pulls away before you can get a plate.
+
+The whole thing feels like a terrible idea. Which probably means it'll be useful someday.
+
+A new shop has been unlocked: Vinnie's Back Alley Loans
+
+Would you like to spend your day driving somewhere? 
+1. Doctor's Office
+2. Witch Doctor's Tower
+3. Trusty Tom's Trucks and Tires
+4. Convenience Store
+5. Marvin's Mystical Merchandise
+6. Grimy Gus's Pawn Emporium
+7. Vinnie's Back Alley Loans
+8. Car Workbench
+9. Stay Home
+Choose a number: [7]
+
+You drive to the seediest part of town, down a narrow alley behind a row of shuttered businesses. 
+
+You got the look of someone who needs capital. Lucky for you, I got capital.
+
+What would you like to do?
+1. Borrow money
+3. Leave
+Choose: [1]
+Vinnie stares at you.
+
+1. Borrow $100
+2. Borrow $500
+3. Borrow $1,000
+4. Borrow $2,500
+5. Borrow $5,000
+6. Never mind
+Choose: [3]
+"Smart move. Or stupid. We'll see which."
+
+Vinnie hands you $1,000 in cash.
+It feels... off. The bills are too smooth. Too perfect.
+"Don't worry about it. Money is money. Just don't let anyone look too close."
+"Spend it. Gamble with it. Fold it into the stack you already got. No one should know the difference."
+"Oh, and the interest is "20%" per week. Don't be late."
+
+
+
+"Remember. The vig compounds every week."
+
+"And if you can't pay... Tony will explain the alternatives."
+
+Current debt: $1,000
+
+What would you like to do?
+1. Borrow money
+2. Repay debt
+3. Leave
+Choose: [4]
+"Don't be a stranger. Money's always available for friends."
+
+As the sun begins to set, and the stars light up in the night sky, you drive over to the casino, eager to play more Blackjack. 
+
+Ready to play? The question is always yes, isn't it?
+
+You have $1,030
+
+Your first card is a Three of Clubs
+The Dealer's first card is a Ten of Hearts
+
+Your second card is a Queen of Diamonds
+The Dealer's second card is face down
+
+As of now, the Dealer's hand has a known value of 10
+Your hand has a value of 13
+
+Your next card is an Eight of Diamonds
+Your hand has a value of 21
+
+You hit Blackjack! What's cooking, good looking?
+You had $1,030, and with a bet of $1,030, you've tripled it!
+
+Your new balance is $1,030 + $2,060 = $3,090
+
+Your first card is a Jack of Diamonds
+The Dealer's first card is a Ten of Diamonds
+
+Your second card is a Five of Clubs
+The Dealer's second card is an Ace of Hearts
+
+The Dealer's hand has a value of 21 ;)
+Your hand has a value of 15
+
+Dealer's Blackjack! Well, butter my biscuit, what a surprise!
+You had $3,090 and lost your bet of $300
+
+Your new balance is $3,090 - $300 = $2,790
+
+Your first card is a Seven of Spades
+The Dealer's first card is a Jack of Spades
+
+Your second card is a Queen of Spades
+The Dealer's second card is face down
+
+As of now, the Dealer's hand has a known value of 10
+Your hand has a value of 17
+
+
+The Dealer's second card is a Two of Clubs
+The Dealer's hand has a value of 12
+
+The Dealer's hand has a value under 17 so they hit
+The Dealer's next card is a King of Diamonds
+The Dealer's hand has a value of 22
+
+Dealer hand goes bust! You're one lucky lucy.
+You had $2,790, and with a bet of $418, you've doubled it!
+
+Your new balance is $2,790 + $418 = $3,208
+
+After playing a few rounds of Blackjack, the dealer points to the door. Without questioning his word, and with your winnings in hand, you scurry to the door, eager to get some sleep. You make it to your car and drive away from the casino, and you park in a little alcove on the side of the road. You lay down, and close your eyes. It's time to rest.
+
+══════════════════════════════════════════════════            ~ ~ ~ Day Summary ~ ~ ~══════════════════════════════════════════════════
+
+You nailed it! You've survived 16 days!
+
+Yesterday, at this time, you had $30. 
+Since then, you've accumulated $3178. 
+That brings you to a grand total of $3208! You're doing okay. And okay is honestly pretty good these days.
+
+I like your work ethic. Your grandma would be proud.
+If you ever feel lost, just remember: "Why go the extra mile when you can just complain about the first one? After all, life is not about the journey or the destination; it's about finding a good parking spot."
+
+
+
+══════════════════════════════════════════════════Press a key to continue: ~ ~ ~ Morning, Day 17 ~ ~ ~  True══════════════════════════════════════════════════
+
+You had a dream about winning at Blackjack. Then you woke up. But you still feel great.
+
+You notice animal tracks in the mud near your car.
+
+The tracks lead into the woods. You don't follow them. You don't have the tools.
+
+Would you like to spend your day driving somewhere? 
+1. Doctor's Office
+2. Witch Doctor's Tower
+3. Trusty Tom's Trucks and Tires
+4. Convenience Store
+5. Marvin's Mystical Merchandise
+6. Grimy Gus's Pawn Emporium
+7. Vinnie's Back Alley Loans
+8. Car Workbench
+9. Stay Home
+Choose a number: [5]
+
+You get in your car and drive to Marvin's Mystical Merchandise. 
+
+Welcome, welcome. I've got some very valuable stuff in stock, just for a fine gambler like you.
+
+While I won't get bogged down in the details of how I got my hands on it, I think you'll wanna check these out:
+
+The first item I've got is the terrific White Feather
+Plucked from a chicken that ran from every fight—but lived to tell the tale. When a hand looks hopeless, wave this feather and surrender with dignity. You'll lose half your bet, but keep your pride. Sort of.
+For $9,000, it can be all yours. You buying? [no]
+
+Not your thing, huh? Well that's ok. The next item I've got is the super duper Dirty Old Hat
+By wearing this, you're telling the whole world "I'm poor and I'm not afraid to show it!" It's a foolproof way for people to take pity on you.
+For $11,000, it can be all yours. You buying? [no]
+
+Not your thing, huh? Well that's ok. The next item I've got is the crazy wacky Faulty Insurance
+I got this thing forged by a buddy of mine. It's a fake insurance card. I've used it to get out of so many hospital bills, and you could too!
+For $6,000, it can be all yours. You buying? [no]
+
+Not your thing, huh? Well that's ok. The next item I've got is the magical Animal Whistle
+Marvin lowers his voice, glancing around conspiratorially.
+
+"This... this is special. Very special. I don't show this to just anyone."
+
+He produces a small silver whistle, carved with intricate animal shapes.
+
+"Blow this, and any creature will trust you. Dog, cat, crow, rat—doesn't matter. ""They'll follow you to the ends of the earth. They'll be your family."
+
+"But here's the secret—if you gather enough of them... if you truly become their shepherd... ""Something magical happens. I've heard stories of people who left this place with an ark of their own."
+For $30,000, it can be all yours. You buying? [no]
+
+Not your thing, huh? Well that's ok. The last item I've got is the kinda mediocre but still awesome Worn Gloves
+These gloves are pretty beat up, but trust me, they've got some magic left in 'em. Wear these when you play, and you'll feel the cards better. Might just get luckier draws.
+For $10,000, it can be all yours. You buying? [no]
+
+Not your thing, huh? Well that's ok. That's all I've got to sell you tonight. Maybe try coming back another day. As the sun begins to set, and the stars light up in the night sky, you drive over to the casino, eager to play more Blackjack. 
+
+Back again? Let's get this show on the road.
+
+The Dealer looks at you strangely. His jade eye narrows.
+He does NOT seem pleased to see you tonight.
+
+You have $3,208
+
+Your first card is a Two of Spades
+The Dealer's first card is a Three of Hearts
+
+Your second card is an Ace of Spades
+The Dealer's second card is face down
+
+As of now, the Dealer's hand has a known value of 3
+Your hand has a value of 3, or 13 since you have an ace
+
+Your next card is a Two of Diamonds
+Your hand has a value of 5, or 15 since you have an ace
+
+Your next card is an Eight of Spades
+Your hand has a value of 13
+
+
+The Dealer's second card is a Six of Hearts
+The Dealer's hand has a value of 9
+
+The Dealer's hand has a value under 17 so they hit
+The Dealer's next card is a Five of Clubs
+The Dealer's hand has a value of 14
+
+The Dealer hits. The card slides off the deck like it was waiting for him.
+The Dealer's next card is a Two of Hearts
+The Dealer's hand has a value of 16
+
+The Dealer hits
+The Dealer's next card is a Ten of Clubs
+The Dealer's hand has a value of 26
+
+Dealer hand goes bust! You're one lucky lucy.
+You had $3,208, and with a bet of $898, you've doubled it!
+
+Your new balance is $3,208 + $898 = $4,106
+
+Your first card is an Ace of Diamonds
+The Dealer's first card is a Queen of Diamonds
+
+Your second card is a Seven of Diamonds
+The Dealer's second card is face down
+
+As of now, the Dealer's hand has a known value of 10
+Your hand has a value of 8, or 18 since you have an ace
+
+Your next card is a Queen of Hearts
+Your hand has a value of 18
+
+
+The Dealer's second card is an Eight of Hearts
+The Dealer's hand has a value of 18
+
+The Dealer stands at 18
+
+Same number, different people. The philosophical implications are staggering. And boring.
+You had $4,106, and you win back your bet of $1,149
+
+Your balance is still $4,106
+
+Your first card is a Jack of Hearts
+The Dealer's first card is a Four of Clubs
+
+Your second card is a Nine of Diamonds
+The Dealer's second card is face down
+
+As of now, the Dealer's hand has a known value of 4
+Your hand has a value of 19
+
+
+The Dealer's second card is a Queen of Clubs
+The Dealer's hand has a value of 14
+
+The Dealer's hand has a value under 17 so they hit
+The Dealer's next card is a Four of Diamonds
+The Dealer's hand has a value of 18
+
+The Dealer stands at 18
+
+Congrats! You Win! Get REKT, Dealer!
+You had $4,106, and with a bet of $1,149, you've doubled it!
+
+Your new balance is $4,106 + $1,149 = $5,255
+
+After playing a few rounds of Blackjack, the dealer points to the door. Without questioning his word, and with your winnings in hand, you scurry to the door, eager to get some sleep. You make it to your car and drive away from the casino, and you park in a little alcove on the side of the road. You lay down, and close your eyes. It's time to rest.
+
+══════════════════════════════════════════════════            ~ ~ ~ Day Summary ~ ~ ~══════════════════════════════════════════════════
+
+Amazing! You've survived 17 days!
+
+Yesterday, at this time, you had $3208. 
+Since then, you've accumulated $2047. 
+That brings you to a grand total of $5255! You definitely have some money. The keyword is 'some'.
+
+Keep pushing the boundaries, even if it's just by a little every day.
+Here's a quote my dad used to say: "Remember, if you can't convince them, confuse them. It's like playing chess with a pigeon; no matter how good you are, the bird is going to knock over the pieces and strut around like it's victorious."
+
+
+
+══════════════════════════════════════════════════Press a key to continue: ~ ~ ~ Morning, Day 18 ~ ~ ~  True══════════════════════════════════════════════════
+
+You slept so hard you forgot where you were for a second. That's the good kind of confusion.
+
+You drive your car to a gas station for supplies. Just snacks. Maybe some coffee.
+
+You're browsing the chips when the door slams open.
+
+"EVERYBODY ON THE GROUND! NOW!"
+
+A man with a shotgun. Ski mask. Shaking hands. This is really happening.
+
+The cashier freezes. A mother clutches her child. An old man drops his coffee.
+
+The robber swings the gun around, wild-eyed.
+
+
+
+You duck behind a shelf. Slowly, carefully, you crawl toward the back.
+
+The robber is focused on the register. You're almost to the storage room...
+
+A chip bag crinkles under your knee. The robber spins.
+
+"I SEE YOU! GET OUT HERE!"
+
+The shotgun is pointed right at you. You raise your hands and step out.
+
+"Think you're smart? Think you can hide from me?"
+
+He hits you with the stock. Your vision explodes into stars.
+
+Your mind feels... foggy. Something isn't right.
+
+
+
+Would you like to spend your day driving somewhere? 
+1. Doctor's Office
+2. Witch Doctor's Tower
+3. Trusty Tom's Trucks and Tires
+4. Convenience Store
+5. Marvin's Mystical Merchandise
+6. Grimy Gus's Pawn Emporium
+7. Vinnie's Back Alley Loans
+8. Car Workbench
+9. Stay Home
+Choose a number: [no]
+Choose a number: [no]
+Choose a number: [no]
+Choose a number: [no]
+Choose a number: [no]
+Choose a number: [no]
+Choose a number: [no]
+Choose a number: [no]
+Choose a number: [no]
+Choose a number: [no]
+Choose a number: [no]
+Choose a number: [no]
+Choose a number: [no]
+Choose a number: [5]
+
+You get in your car and drive to Marvin's Mystical Merchandise. 
+
+Welcome, welcome. I've got some very valuable stuff in stock, just for a fine gambler like you.
+
+While I won't get bogged down in the details of how I got my hands on it, I think you'll wanna check these out:
+
+The first item I've got is the fantastical Delight Indicator
+With this little device, you can read how happy anyone is, just by pointing it at them! Could get you out of a lot of trouble.
+For $4,000, it can be all yours. You buying? [no]
+
+Not your thing, huh? Well that's ok. The next item I've got is the never before seen Enchanting Silver Bar
+Listen, I know this silver bar looks a bit useless, but I swear, it's awesome. Look at the stock market, this thing is only gonna get more and more expensive. And if I sell it to you, you can sell it off later and make some money.
+For $4,000, it can be all yours. You buying? [no]
+
+Not your thing, huh? Well that's ok. The next item I've got is the ingenious Worn Gloves
+These gloves are pretty beat up, but trust me, they've got some magic left in 'em. Wear these when you play, and you'll feel the cards better. Might just get luckier draws.
+For $7,000, it can be all yours. You buying? [no]
+
+Not your thing, huh? Well that's ok. The next item I've got is the all mighty Twin's Locket
+This locket contains portraits of twins who could never agree on anything—except cards. When you're dealt a pair, this little beauty lets you split 'em and play two hands. Double the risk, double the reward.
+For $20,000, it can be all yours. You buying? [no]
+
+Not your thing, huh? Well that's ok. The next item I've got is the stupendous Tattered Cloak
+Don't let the moth holes fool ya. This cloak's got some sneaky enchantment. Dealers sometimes just... forget to collect when you lose. Weird, right?
+For $10,000, it can be all yours. You buying? [no]
+
+Not your thing, huh? Well that's ok. The next item I've got is the majestic Gambler's Chalice
+Ah, the Chalice! Legend says a desperate gambler drank from this cup and doubled his fortune in one night. The catch? You can only use its power once per visit. Raise your bet, draw one more card, and pray.
+For $13,000, it can be all yours. You buying? [no]
+
+Not your thing, huh? Well that's ok. The last item I've got is the one-of-a-kind Golden Watch
+This watch was my grandfathers at one point. It's a beauty. If you're a gambling man, anyone in their right mind would wanna see you betting on their table.
+For $15,000, it can be all yours. You buying? [no]
+
+Not your thing, huh? Well that's ok. That's all I've got to sell you tonight. Maybe try coming back another day. As the sun begins to set, and the stars light up in the night sky, you drive over to the casino, eager to play more Blackjack. 
+
+You feel anxious tonight.
+
+Each night you return. Each night, the cards wait.
+
+The Dealer looks at you strangely. His jade eye narrows.
+He does NOT seem pleased to see you tonight.
+
+You have $5,255
+
+Your first card is a Four of Clubs
+The Dealer's first card is a Two of Diamonds
+
+Your second card is a Nine of Hearts
+The Dealer's second card is face down
+
+As of now, the Dealer's hand has a known value of 2
+Your hand has a value of 13
+
+
+The Dealer's second card is a Jack of Clubs
+The Dealer's hand has a value of 12
+
+The Dealer's hand has a value under 17 so they hit
+The Dealer's next card is a Four of Diamonds
+The Dealer's hand has a value of 16
+
+The Dealer hits
+The Dealer's next card is a Jack of Diamonds
+The Dealer's hand has a value of 26
+
+Dealer hand goes bust! You're one lucky lucy.
+You had $5,255, and with a bet of $1,471, you've doubled it!
+
+Your new balance is $5,255 + $1,471 = $6,726
+
+Your first card is an Ace of Spades
+The Dealer's first card is a Six of Clubs
+
+Your second card is a Seven of Spades
+The Dealer's second card is face down
+
+As of now, the Dealer's hand has a known value of 6
+Your hand has a value of 8, or 18 since you have an ace
+
+
+The Dealer's second card is a Ten of Diamonds
+The Dealer's hand has a value of 16
+
+The Dealer's hand has a value under 17 so they hit
+The Dealer's next card is a Seven of Hearts
+The Dealer's hand has a value of 23
+
+Dealer goes kaboom! Were they trying to bake a number cake?
+You had $6,726, and with a bet of $1,883, you've doubled it!
+
+Your new balance is $6,726 + $1,883 = $8,609
+
+Your first card is a Five of Diamonds
+The Dealer's first card is a Four of Hearts
+
+Your second card is a Queen of Diamonds
+The Dealer's second card is face down
+
+As of now, the Dealer's hand has a known value of 4
+Your hand has a value of 15
+
+
+The Dealer's second card is an Eight of Clubs
+The Dealer's hand has a value of 12
+
+The Dealer's hand has a value under 17 so they hit
+The Dealer's next card is a Seven of Clubs
+The Dealer's hand has a value of 19
+
+The Dealer stands at 19
+
+You simply got outplayed on this one.
+You had $8,609 and lost your bet of $2,410
+
+Your new balance is $8,609 - $2,410 = $6,199
+
+After playing a few rounds of Blackjack, the dealer points to the door. Without questioning his word, and with your winnings in hand, you scurry to the door, eager to get some sleep. You make it to your car and drive away from the casino, and you park in a little alcove on the side of the road. You lay down, and close your eyes. It's time to rest.
+
+══════════════════════════════════════════════════            ~ ~ ~ Day Summary ~ ~ ~══════════════════════════════════════════════════
+
+Yippee! You've survived 18 days!
+
+Yesterday, at this time, you had $5255. 
+Since then, you've accumulated $944. 
+That brings you to a grand total of $6199! You've got a cushion now. A very small, uncomfortable cushion.
+
+I would probably wipe that smile off that face if I were you. Just kidding, you're awesome.
+Something to ponder on your journey: "I walk around like everything's fine, but deep down, inside my shoe, my sock is sliding off."
+
+
+
+══════════════════════════════════════════════════Press a key to continue: ~ ~ ~ Morning, Day 19 ~ ~ ~  True══════════════════════════════════════════════════
+
+
+Your current sanity: 62%
+
+A bird is singing outside your car. You don't want to punch it. Progress.
+
+You turn the key in the ignition. The engine makes a strange noise. A ticking.
+
+Something smells wrong. Gas. Strong and getting stronger.
+
+Instinct screams at you: GET OUT. GET OUT NOW.
+
+
+
+You throw yourself out of the car and run. Don't look back. Just run.
+
+You're ten feet away when the engine catches fire. Fifteen when it explodes.
+
+The shockwave knocks you flat. Heat washes over you. Debris rains down.
+
+Your car—your home—is a fireball. Everything you owned is gone.
+
+But you're alive. Somehow. Alive.
+
+The edges of your vision blur. Reality feels thin.
+
+
+
+Your new balance is $6,199 - $1,239.8000000000002 = $4,960
+
+
+
+
+Your reflection in the rearview mirror blinks before you do.
+
+You have a nice dream for once. About the life you used to have.
+
+A kitchen. Morning sunlight. Coffee in a real mug, not a gas station cup. Someone calls your name from another room.
+
+Waking up is hard. The contrast between the dream and the dashboard is a knife in the chest.
+
+As the sun begins to set, and the stars light up in the night sky, you walk to the casino, eager to play more Blackjack. 
+
+The casino lights seem too bright. Too hungry. They're watching you.
+
+The green felt remembers you. So do I.
+
+The Dealer looks at you strangely. His jade eye narrows.
+He does NOT seem pleased to see you tonight.
+
+You have $4,960
+
+Your first card is a Nine of Diamonds
+The Dealer's first card is an Ace of Hearts
+
+Your second card is an Eight of Clubs
+The Dealer's second card is face down
+
+As of now, the Dealer's hand has a known value of 1, or 11, since they have an ace
+Your hand has a value of 17
+
+
+The Dealer's second card is a Five of Clubs
+The Dealer's hand has a value of 6, or 16 since they have an ace
+
+The Dealer's hand has a value under 17 so they hit
+The Dealer's next card is a Three of Hearts
+The Dealer's hand has a value of 9, or 19 since they have an ace
+
+The Dealer stands at 19
+
+Close, but close only counts in horseshoes. And this ain't horseshoes.
+You had $4,960 and lost your bet of $1,686
+
+Your new balance is $4,960 - $1,686 = $3,274
+
+Your first card is a King of Spades
+The Dealer's first card is a King of Hearts
+
+Your second card is a Seven of Spades
+The Dealer's second card is face down
+
+As of now, the Dealer's hand has a known value of 10
+Your hand has a value of 17
+
+
+The Dealer's second card is an Eight of Diamonds
+The Dealer's hand has a value of 18
+
+The Dealer stands at 18
+
+Your hand is inferior to the Dealer's. Which means you lose.
+You had $3,274 and lost your bet of $1,041
+
+Your new balance is $3,274 - $1,041 = $2,233
+
+Your first card is a Five of Diamonds
+The Dealer's first card is a Queen of Spades
+
+Your second card is a Jack of Spades
+The Dealer's second card is face down
+
+As of now, the Dealer's hand has a known value of 10
+Your hand has a value of 15
+
+Your next card is a Seven of Diamonds
+Your hand has a value of 22
+
+Busted! Did you think this was a game of 'who can count the highest'?
+You had $2,233 and lost your bet of $572
+
+Your new balance is $2,233 - $572 = $1,661
+
+After playing a few rounds of Blackjack, the dealer points to the door. Without questioning his word, and with your winnings in hand, you scurry to the door, eager to get some sleep. Making it back to your car, ditched on the side of the road, you lay down, and close your eyes. It's time to rest.
+
+══════════════════════════════════════════════════            ~ ~ ~ Day Summary ~ ~ ~══════════════════════════════════════════════════
+
+Way to go! You've survived 19 days!
+
+Yesterday, at this time, you had $6199. 
+Since then, you've managed to lose $4538. 
+That brings you to a grand total of $1661! Not rich, not poor. Perfectly mediocre.
+
+You've got a unique path, and honestly, it's thrilling to watch it unfold.
+This one's straight from the fortune cookie in my lunch: "There was a safety meeting at work today. They asked me, 'What steps would you take in the event of a fire?' 'Fucking big ones' was the wrong answer."
+
+
+
+══════════════════════════════════════════════════Press a key to continue: ~ ~ ~ Morning, Day 20 ~ ~ ~  True══════════════════════════════════════════════════
+
+
+Your current sanity: 31%
+
+Your neck doesn't hurt. Your back doesn't hurt. Nothing hurts. Is this a trap?
+
+A glossy black limousine is quietly approaching your wagon. As you sit up from your slumber, you read 'Oswald's Optimal Outoparts' cursively engraved in gold letters on the side of the limo. Waving the vehicle down, the limo slows, then stops before you. The door opens vertically, and a large red carpet is rolled out onto the street. You watch in awe as a man, with a combover and a tuxedo, walks out before you. He coughs, then speaks.
+
+"Why hello there! The name's Oswald, as you can see by my nametag. Do you like my bowtie? Well of course you do! It appears your limousine has broken down." Oswald pulls a gold whistle out of his pocket, and blows into it deeply. "Oh Stuart!" You watch as a bald man in a tailcoat suit, no taller than 4 feet, hobbles over to Oswald's side.
+
+"This is Stuart! He will fix your limousine up for a fair price. Let's say, I don't know, I suppose a fair price is 500,000 dollars. Okay, the look on your face says that I'm making a big mistake. Let's try $900, and Stuart here will get you back on the road! Do you accept?" [yes]
+
+"Jolly good! Stuart!" You watch as the little man walks to the front of your wagon, opens the hood, and jumps in. You can't really see what's going on, but after a couple of minutes, Stuart jumps back out, covered in oil.
+
+Your new balance is $1,661 - $900 = $761
+
+Your car has been fixed! You can now drive around!
+
+"Oh my Stuart! Someone got a little too excited, didn't you? Yep, you're getting a bath as soon as we get back to the shop. Thanks again, stranger, it's been a pleasure doing business with you. I recall it's good custom to tip after events like this, yes? Here, take this." Oswald hands you a bright green bill, worth $100.
+
+Your new balance is $761 + $100 = $861
+
+And with that, you watch as Stuart rolls up the red carpet. Oswald and Stuart get back in the limo, and drive off into the distance.
+
+Would you like to spend your day driving somewhere? 
+1. Doctor's Office
+2. Witch Doctor's Tower
+3. Trusty Tom's Trucks and Tires
+4. Oswald's Optimal Outoparts
+5. Convenience Store
+6. Marvin's Mystical Merchandise
+7. Grimy Gus's Pawn Emporium
+8. Vinnie's Back Alley Loans
+9. Car Workbench
+10. Stay Home
+Choose a number: [yes]
+Choose a number: [yes]
+Choose a number: [yes]
+Choose a number: [yes]
+Choose a number: [yes]
+Choose a number: [yes]
+Choose a number: [yes]
+Choose a number: [yes]
+Choose a number: [yes]
+Choose a number: [yes]
+Choose a number: [yes]
+Choose a number: [yes]
+Choose a number: [yes]
+Choose a number: [yes]
+Choose a number: [yes]
+Choose a number: [10]
+
+
+For a moment, you could have sworn the shadows moved.
+
+As you're walking along the side of the road, something catches your eye. A flash of white, darting between the bushes. A rabbit!
+
+Without thinking, you give chase. The little creature bounds ahead of you, zigging and zagging through the underbrush with seemingly effortless grace.
+
+You run and run, but no matter how fast you go, the rabbit stays just out of reach. Its white tail bobs mockingly in the moonlight.
+
+Finally, you stop, hands on your knees, gasping for breath. When you look up, the rabbit is gone, vanished into the night like it was never there.
+
+You trudge back to your wagon, defeated. But something tells you this isn't the last time you'll see that rabbit.
+
+As the sun begins to set, and the stars light up in the night sky, you drive over to the casino, eager to play more Blackjack. 
+
+The neon signs blur together. For a moment, you can't remember why you came here.
+
+Back for more? The cards appreciate your persistence.
+
+The Dealer looks at you strangely. His jade eye narrows.
+He does NOT seem pleased to see you tonight.
+
+You have $861
+
+Your first card is an Ace of Diamonds
+The Dealer's first card is a Three of Spades
+
+Your second card is a Queen of Hearts
+The Dealer's second card is face down
+
+As of now, the Dealer's hand has a known value of 3
+Your hand has a value of 21
+
+WOOOOOOO!!! Blackjack!!! WOOOOOOOO!!!
+You had $861, and with a bet of $120, you've tripled it!
+
+Your new balance is $861 + $240 = $1,101
+
+Your first card is a King of Hearts
+The Dealer's first card is a Three of Clubs
+
+Your second card is a Jack of Spades
+The Dealer's second card is face down
+
+As of now, the Dealer's hand has a known value of 3
+Your hand has a value of 20
+
+
+The Dealer's second card is a Ten of Clubs
+The Dealer's hand has a value of 13
+
+The Dealer's hand has a value under 17 so they hit
+The Dealer's next card is a Queen of Clubs
+The Dealer's hand has a value of 23
+
+The Dealer overcooked it. Busted! Karma is REAL.
+You had $1,101, and with a bet of $110, you've doubled it!
+
+Your new balance is $1,101 + $110 = $1,211
+
+Your first card is an Ace of Clubs
+The Dealer's first card is a Nine of Diamonds
+
+Your second card is a Two of Spades
+The Dealer's second card is face down
+
+As of now, the Dealer's hand has a known value of 9
+Your hand has a value of 3, or 13 since you have an ace
+
+Your next card is a Ten of Diamonds
+Your hand has a value of 13
+
+Your next card is an Ace of Spades
+Your hand has a value of 14
+
+Your next card is a Two of Hearts
+Your hand has a value of 16
+
+Your next card is an Eight of Spades
+Your hand has a value of 24
+
+BUST. The most satisfying word in the Dealer's vocabulary.
+You had $1,211 and lost your bet of $169
+
+Your new balance is $1,211 - $169 = $1,042
+
+After playing a few rounds of Blackjack, the dealer points to the door. Without questioning his word, and with your winnings in hand, you scurry to the door, eager to get some sleep. You make it to your car and drive away from the casino, and you park in a little alcove on the side of the road. You lay down, and close your eyes. It's time to rest.
+
+As you fall asleep, you dream of sitting at a blackjack table. The familiar green felt stretches out before you, and across from you sits the Dealer, shuffling cards with practiced ease.
+
+You're dealt a hand. A King and an Ace. Blackjack.
+
+But instead of paying out, the Dealer's face contorts with rage. He slams his fist on the table.
+
+"You think you can just WIN?! You think it's that EASY?!"
+
+His yelling gets louder and louder. At first he's yelling at himself, muttering about odds and luck. But then, he turns to you. His eyes bore into yours.
+
+"This is YOUR fault. ALL OF IT."
+
+The screaming grows deafening until you jolt awake, heart pounding.
+
+The Dealer's rage echoes in your mind long after you wake.
+
+
+
+══════════════════════════════════════════════════Press a key to continue: ~ ~ ~ Morning, Day 21 ~ ~ ~  True══════════════════════════════════════════════════
+
+
+Your current sanity: 31%
+
+You slept like a baby. A big, grown baby in a car, but a baby nonetheless.
+
+
+Blood drips from the ceiling of your car. When you look up, it's gone.
+
+You can't breathe. You can't breathe. YOU CAN'T BREATHE.
+
+Your airways have constricted. Every breath is a whistle, a wheeze, barely any air getting through.
+
+Your lips are turning blue. You're panicking, which makes it worse.
+
+Asthma attack. Severe one. You need a nebulizer treatment.As the sun begins to set, and the stars light up in the night sky, you drive over to the casino, eager to play more Blackjack. 
+
+The neon signs blur together. For a moment, you can't remember why you came here.
+
+Another gambler. Another story waiting to unfold.
+
+Would you like to spend your day driving somewhere? 
+1. Doctor's Office
+2. Witch Doctor's Tower
+3. Trusty Tom's Trucks and Tires
+4. Oswald's Optimal Outoparts
+5. Convenience Store
+6. Marvin's Mystical Merchandise
+7. Grimy Gus's Pawn Emporium
+8. Vinnie's Back Alley Loans
+9. Car Workbench
+10. Stay Home
+Choose a number: [1]
+
+You get in your car and drive to the Doctor's Office. 
+
+I see you're here for a checkup. The Doctor will see you now.
+
+Hey there champ! How are you? Doing all right? Let's check you out and make sure you're all up to snuff.
+You know... I've seen a lot of patients, and you've got that look. The distant eyes. The shaking hands. I patch up bodies, not minds. You should talk to someone. Not me. A professional. Someone who knows about... this kind of thing.
+You're wheezing badly. Let's get you on the nebulizer right away. Asthma attack - severe one. Breathe deep.
+
+Well, that seems to be everything. You still appear a little worse for wear, but this medicine should do the trick.
+
+You walk back to the front desk to checkout.
+
+That will be $448
+
+Your new balance is $1,042 - $448 = $594
+
+As the sun begins to set, and the stars light up in the night sky, you drive over to the casino, eager to play more Blackjack. 
+
+The neon signs blur together. For a moment, you can't remember why you came here.
+
+The night is young. Your wallet, however...
+
+The Dealer looks at you strangely. His jade eye narrows.
+He does NOT seem pleased to see you tonight.
+
+You have $594
+
+Your first card is an Eight of Spades
+The Dealer's first card is an Eight of Diamonds
+
+Your second card is a Four of Hearts
+The Dealer's second card is face down
+
+As of now, the Dealer's hand has a known value of 8
+Your hand has a value of 12
+
+Your next card is a Ten of Hearts
+Your hand has a value of 22
+
+Bust! Should've stopped while you were ahead.
+You had $594 and lost your bet of $95
+
+Your new balance is $594 - $95 = $499
+
+Your first card is a Jack of Hearts
+The Dealer's first card is a Six of Spades
+
+Your second card is a Nine of Hearts
+The Dealer's second card is face down
+
+As of now, the Dealer's hand has a known value of 6
+Your hand has a value of 19
+
+
+The Dealer's second card is a Three of Clubs
+The Dealer's hand has a value of 9
+
+The Dealer's hand has a value under 17 so they hit
+The Dealer's next card is a Five of Diamonds
+The Dealer's hand has a value of 14
+
+The Dealer hits. Mechanical. Practiced. He's done this a million times.
+The Dealer's next card is an Ace of Spades
+The Dealer's hand has a value of 15
+
+The Dealer hits. He doesn't look happy about it.
+The Dealer's next card is a Five of Spades
+The Dealer's hand has a value of 20
+
+The Dealer stands at 20
+
+The house always wins. Today, you're the proof.
+You had $499 and lost your bet of $69
+
+Your new balance is $499 - $69 = $430
+
+Your first card is an Eight of Clubs
+The Dealer's first card is a Ten of Clubs
+
+Your second card is a Three of Diamonds
+The Dealer's second card is an Ace of Hearts
+
+The Dealer's hand has a value of 21 ;)
+Your hand has a value of 11
+
+You just witnessed greatness. You only wish you were this good.
+You had $430 and lost your bet of $60
+
+Your new balance is $430 - $60 = $370
+
+After playing a few rounds of Blackjack, the dealer points to the door. Without questioning his word, and with your winnings in hand, you scurry to the door, eager to get some sleep. You make it to your car and drive away from the casino, and you park in a little alcove on the side of the road. You lay down, and close your eyes. It's time to rest.
+
+══════════════════════════════════════════════════            ~ ~ ~ Day Summary ~ ~ ~══════════════════════════════════════════════════
+
+Keep it up! You've survived 21 days!
+
+Yesterday, at this time, you had $1042. 
+Since then, you've managed to lose $672. 
+That brings you to a grand total of $370! You're basically living paycheck to paycheck. Except there's no paycheck.
+
+Good progress so far, pal. Keep it up.
+Don't forget what the bible taught you: "Have you ever wondered why you can't taste your tongue?"
+
+
+
+══════════════════════════════════════════════════Press a key to continue: ~ ~ ~ Morning, Day 22 ~ ~ ~  True══════════════════════════════════════════════════
+
+
+Your current sanity: 30%
+
+You stretch out and feel every vertebra in your spine crack in the most satisfying way. Today is going to be good.
+
+The sound of hooves trotting on pavement drifts through your window, along with some distant whistling. You sit up, and through your windshield, you see a man wearing a full cowboy suit, with matching black hat and boots, and a short brown beard. 
+
+He's riding a magnificent horse, muscular, but nimble, each step powerful, but precise. The man reaches your window, and in a deep southern accent, he begins to talk to you.
+
+"Howdy, partner! The name's Jameson. Davey Jameson. "I happen to notice you were admiring my steed. He's a beauty, isn't he. ""You see, it's common courtesy when a cowboy rides by, "to give their mighty steed a carrot, as a way to express your gratitude for their hardwork and commitment to the job."
+
+"You my friend, you are carrotless. That's quite a disrespectful showing towards my steed. ""My, my, this can't do at all. What if another cowboy comes by, you're just gonna disrespect their steed, too? ""Tell you what, I happen to have one spare carrot in my pouch. Take this, and be ready. ""You never know when a cowboy's gonna come trotting by."
+
+Davey Jameson hands you his Carrot, and smiles.
+
+"See, with this carrot in your possession, you're ready for anytime a cowboy strolls on down this road. ""Just give their steed a carrot, and they'll be very grateful."
+
+And with that, Jameson reins his horse high into the air, gives you a yee-haw, then dashes off down the road.
+
+Would you like to spend your day driving somewhere? 
+1. Doctor's Office
+2. Witch Doctor's Tower
+3. Trusty Tom's Trucks and Tires
+4. Oswald's Optimal Outoparts
+5. Convenience Store
+6. Marvin's Mystical Merchandise
+7. Grimy Gus's Pawn Emporium
+8. Vinnie's Back Alley Loans
+9. Car Workbench
+10. Stay Home
+Choose a number: [4]
+
+You get in your car and drive to Oswald's Optimal Outoparts. 
+
+"Oh my! A customer! A real, live, breathing customer!"
+
+A man in an impeccably clean suit practically bounces toward you. His smile is so wide it looks painful. Behind him, a hulking figure in overalls works silently on a car engine.
+
+"Welcome, welcome, welcome to Oswald's Optimal Outoparts! ""I'm Oswald, and that magnificent specimen of mechanical mastery is Stuart. Say hello, Stuart!"
+
+Stuart grunts without looking up.
+
+"Isn't he wonderful? Best mechanic this side of anywhere! ""Of course, he wouldn't be where he is today without my business acumen. My entrepreneurial spirit! My VISION!"
+
+Oswald gestures grandly around the shop.
+
+"You see, I'm not just a mechanic. I'm a businessman! An investor! ""I see opportunity where others see obstacles. ""Why, just last week I was thinking about expanding into the entertainment industry. ""Casinos! Gambling! There's SO much money to be made!"
+
+His eyes glitter with something between excitement and obsession.
+
+"But enough about my brilliant plans! What can we do for you today, my new friend?"
+
+Oswald glances at Stuart, then back at you.
+
+"Come back when we know each other a bit better, yes? Trust is built over time!"
+
+As the sun begins to set, and the stars light up in the night sky, you drive over to the casino, eager to play more Blackjack. 
+
+The neon signs blur together. For a moment, you can't remember why you came here.
+
+You smell like daylight and poor decisions. Sit.
+
+The Dealer looks at you strangely. His jade eye narrows.
+He does NOT seem pleased to see you tonight.
+
+You have $370
+
+Your first card is a Two of Clubs
+The Dealer's first card is a Ten of Diamonds
+
+Your second card is a Seven of Clubs
+The Dealer's second card is face down
+
+As of now, the Dealer's hand has a known value of 10
+Your hand has a value of 9
+
+Your next card is a Six of Diamonds
+Your hand has a value of 15
+
+Your next card is a Seven of Diamonds
+Your hand has a value of 22
+
+You busted! How'd it feel?
+You had $370 and lost your bet of $37
+
+Your new balance is $370 - $37 = $333
+
+Your first card is a Two of Diamonds
+The Dealer's first card is a Jack of Clubs
+
+Your second card is a Five of Diamonds
+The Dealer's second card is face down
+
+As of now, the Dealer's hand has a known value of 10
+Your hand has a value of 7
+
+Your next card is an Ace of Clubs
+Your hand has a value of 8, or 18 since you have an ace
+
+Your next card is an Ace of Spades
+Your hand has a value of 9, or 19 since you have an ace
+
+
+The Dealer's second card is an Eight of Hearts
+The Dealer's hand has a value of 18
+
+The Dealer stands at 18
+
+You beat the house. For now. Enjoy it while it lasts.
+You had $333, and with a bet of $33, you've doubled it!
+
+Your new balance is $333 + $33 = $366
+
+Your first card is a Jack of Hearts
+The Dealer's first card is a Three of Diamonds
+
+Your second card is a Three of Hearts
+The Dealer's second card is face down
+
+As of now, the Dealer's hand has a known value of 3
+Your hand has a value of 13
+
+
+The Dealer's second card is a Four of Spades
+The Dealer's hand has a value of 7
+
+The Dealer's hand has a value under 17 so they hit
+The Dealer's next card is a Queen of Diamonds
+The Dealer's hand has a value of 17
+
+The Dealer stands at 17
+
+The house always wins. Today, you're the proof.
+You had $366 and lost your bet of $36
+
+Your new balance is $366 - $36 = $330
+
+After playing a few rounds of Blackjack, the dealer points to the door. Without questioning his word, and with your winnings in hand, you scurry to the door, eager to get some sleep. You make it to your car and drive away from the casino, and you park in a little alcove on the side of the road. You lay down, and close your eyes. It's time to rest.
+
+══════════════════════════════════════════════════            ~ ~ ~ Day Summary ~ ~ ~══════════════════════════════════════════════════
+
+Impressive! You've survived 22 days!
+
+Yesterday, at this time, you had $370. 
+Since then, you've managed to lose $40. 
+That brings you to a grand total of $330! You're in the 'ramen noodle' tax bracket.
+
+I like your work ethic. Your grandma would be proud.
+I read this once in a magazine: "Keep your friends close, your enemies closer, and receipts for all major purchases. You never know when you'll need to return something, or someone."
+
+
+
+══════════════════════════════════════════════════Press a key to continue: ~ ~ ~ Morning, Day 23 ~ ~ ~  True══════════════════════════════════════════════════
+
+
+Interest accrued on your loan: $200
+You now owe Vinnie $1,200.
+
+
+Your current sanity: 29%
+
+You slept so well that you're suspicious. Something this good can't be free.
+
+
+You forgot your own name for a moment. It came back. Eventually.
+
+
+You feel fractured.
+
+
+Your thoughts are echoing. Echoing. Echoing.
+
+
+The trees outside your car window are too still. Unnaturally still.
+
+A wild-eyed man knocks frantically on your car window.
+
+"THEY'RE LISTENING! THE BIRDS AREN'T REAL! THE CASINO IS A FRONT FOR THE LIZARD PEOPLE!"
+
+You nod politely while slowly rolling up your window.
+
+"DON'T TRUST THE DEALER! HE'S ONE OF THEM! HIS EYES—HAVE YOU SEEN HIS EYES?!"
+
+The window is fully up now. He keeps talking. You pretend to be asleep.
+
+
+
+Your thoughts are fracturing. The shadows are getting closer.
+
+
+
+Would you like to spend your day driving somewhere? 
+1. Doctor's Office
+2. Witch Doctor's Tower
+3. Trusty Tom's Trucks and Tires
+4. Oswald's Optimal Outoparts
+5. Convenience Store
+6. Marvin's Mystical Merchandise
+7. Grimy Gus's Pawn Emporium
+8. Vinnie's Back Alley Loans
+9. Car Workbench
+10. Stay Home
+Choose a number: [4]
+
+You get in your car and drive to Oswald's Optimal Outoparts. 
+
+"Oh my! A customer! A real, live, breathing customer!"
+
+A man in an impeccably clean suit practically bounces toward you. His smile is so wide it looks painful. Behind him, a hulking figure in overalls works silently on a car engine.
+
+"Welcome, welcome, welcome to Oswald's Optimal Outoparts! ""I'm Oswald, and that magnificent specimen of mechanical mastery is Stuart. Say hello, Stuart!"
+
+Stuart grunts without looking up.
+
+"Isn't he wonderful? Best mechanic this side of anywhere! ""Of course, he wouldn't be where he is today without my business acumen. My entrepreneurial spirit! My VISION!"
+
+Oswald gestures grandly around the shop.
+
+"You see, I'm not just a mechanic. I'm a businessman! An investor! ""I see opportunity where others see obstacles. ""Why, just last week I was thinking about expanding into the entertainment industry. ""Casinos! Gambling! There's SO much money to be made!"
+
+His eyes glitter with something between excitement and obsession.
+
+"But enough about my brilliant plans! What can we do for you today, my new friend?"
+
+Oswald glances at Stuart, then back at you.
+
+"Come back when we know each other a bit better, yes? Trust is built over time!"
+
+As the sun begins to set, and the stars light up in the night sky, you drive over to the casino, eager to play more Blackjack. 
+
+The neon signs blur together. For a moment, you can't remember why you came here.
+
+Welcome, welcome. Have a seat, and we can begin.
+
+The Dealer looks at you strangely. His jade eye narrows.
+He does NOT seem pleased to see you tonight.
+
+You have $330
+
+Your first card is a Two of Clubs
+The Dealer's first card is a Five of Clubs
+
+Your second card is an Ace of Diamonds
+The Dealer's second card is face down
+
+As of now, the Dealer's hand has a known value of 5
+Your hand has a value of 3, or 13 since you have an ace
+
+Your next card is an Eight of Diamonds
+Your hand has a value of 21
+
+Twenty-one on the nose. The cards love you today.
+You had $330, and with a bet of $52, you've tripled it!
+
+Your new balance is $330 + $104 = $434
+
+Your first card is a Ten of Diamonds
+The Dealer's first card is an Eight of Spades
+
+Your second card is a Ten of Clubs
+The Dealer's second card is face down
+
+As of now, the Dealer's hand has a known value of 8
+Your hand has a value of 20
+
+
+The Dealer's second card is a King of Spades
+The Dealer's hand has a value of 18
+
+The Dealer stands at 18
+
+Winner winner chicken dinner! Must be tasty.
+You had $434, and with a bet of $69, you've doubled it!
+
+Your new balance is $434 + $69 = $503
+
+Your first card is a Two of Diamonds
+The Dealer's first card is an Ace of Spades
+
+Your second card is an Ace of Clubs
+The Dealer's second card is a King of Hearts
+
+The Dealer's hand has a value of 21 ;)
+Your hand has a value of 3, or 13 since you have an ace
+
+You just witnessed greatness. You only wish you were this good.
+You had $503 and lost your bet of $80
+
+Your new balance is $503 - $80 = $423
+
+After playing a few rounds of Blackjack, the dealer points to the door. Without questioning his word, and with your winnings in hand, you scurry to the door, eager to get some sleep. You make it to your car and drive away from the casino, and you park in a little alcove on the side of the road. You lay down, and close your eyes. It's time to rest.
+
+══════════════════════════════════════════════════            ~ ~ ~ Day Summary ~ ~ ~══════════════════════════════════════════════════
+
+Fantastic! You've survived 23 days!
+
+Yesterday, at this time, you had $330. 
+Since then, you've accumulated $93. 
+That brings you to a grand total of $423! You're basically living paycheck to paycheck. Except there's no paycheck.
+
+For what it's worth, I think you're doing alright.
+This quote always gets me going: "Would you believe that my neighbor came ringing my doorbell at 2:00 this morning? Luckily for him, I was still up playing bagpipes."
+
+
+
+══════════════════════════════════════════════════Press a key to continue: ~ ~ ~ Morning, Day 24 ~ ~ ~  True══════════════════════════════════════════════════
+
+
+Your current sanity: 24%
+
+You had a dream about winning at Blackjack. Then you woke up. But you still feel great.
+
+The Dealer shuffles the deck. A card slips out — but it's not a playing card. It's a photograph. Old. Faded. Wallet-sized.
+
+The Dealer snatches it up fast, but you've already seen it: a woman and a little girl standing in front of a yellow house. The woman is laughing. The girl is blowing out candles on a birthday cake.
+
+The Dealer tucks the photo into his vest pocket without a word. His hands, always perfectly steady, have the faintest tremor.
+
+The Dealer stops shuffling. He looks at you with those dark eyes. For a moment, he's not the Dealer. He's just a man with a memory that hurts.
+
+"Some cards aren't meant to be played. Let's leave it at that."
+
+He resumes shuffling. The moment is over. But the tremor isn't.
+
+For the rest of the session, the Dealer plays differently. Quieter. Almost gentle with the cards.
+
+Would you like to spend your day driving somewhere? 
+1. Doctor's Office
+2. Witch Doctor's Tower
+3. Trusty Tom's Trucks and Tires
+4. Oswald's Optimal Outoparts
+5. Convenience Store
+6. Marvin's Mystical Merchandise
+7. Grimy Gus's Pawn Emporium
+8. Vinnie's Back Alley Loans
+9. Car Workbench
+10. Stay Home
+Choose a number: [5]
+
+You get in your car and drive to the Convenience Store. 
+
+"You look stressed. Like REALLY stressed. Take a breath. One-item limit. Manager's orders. Deep breaths."
+
+What do you want?
+1. Bungee Cords - $15
+2. Umbrella - $18
+3. Rope - $20
+4. Poncho - $12
+5. Pest Control - $25
+6. Turkey Sandwich - $15
+7. Beef Jerky - $10
+8. Thermostat - $30
+9. Cup Noodles - $7
+10. Pocket Knife - $35
+11. Gas Can - $25
+12. Deck of Cards - $9
+13. Cough Drops - $15
+14. WD-40 - $12
+15. Duct Tape - $12
+16. I'm not buying anything
+Choose a number: [6]
+
+You got a Turkey Sandwich!
+Eat it now, or save it for later?
+(eat/save): [save]
+You resist the urge to eat it right now. Willpower!
+
+
+Your new balance is $423 - $15 = $408
+
+
+
+You know what? Rules are made to be broken. I mean, screw em! I hate my manager anyways. You can have one more item, just don't tell anyone I let you do this.
+
+What else you want?
+1. Bungee Cords - $15
+2. Umbrella - $18
+3. Rope - $20
+4. Poncho - $12
+5. Pest Control - $25
+6. Beef Jerky - $10
+7. Thermostat - $30
+8. Cup Noodles - $7
+9. Pocket Knife - $35
+10. Gas Can - $25
+11. Deck of Cards - $9
+12. Cough Drops - $15
+13. WD-40 - $12
+14. Duct Tape - $12
+15. I'm not buying anything
+Choose a number: [14]
+
+You got Duct Tape!
+If you can't fix it with duct tape, you're not using enough duct tape.
+
+Your new balance is $408 - $12 = $396
+
+
+
+Welp. There you go. Two whole items. Wow. Now get lost. I've got a girl to text. She's super hot.
+
+As the sun begins to set, and the stars light up in the night sky, you drive over to the casino, eager to play more Blackjack. 
+
+The neon signs blur together. For a moment, you can't remember why you came here.
+
+Come, sit down, we have a game to play.
+
+The Dealer looks at you strangely. His jade eye narrows.
+He does NOT seem pleased to see you tonight.
+
+You have $396
+
+Your first card is a Six of Clubs
+The Dealer's first card is a Two of Clubs
+
+Your second card is a Three of Clubs
+The Dealer's second card is face down
+
+As of now, the Dealer's hand has a known value of 2
+Your hand has a value of 9
+
+Your next card is an Eight of Spades
+Your hand has a value of 17
+
+
+The Dealer's second card is an Eight of Clubs
+The Dealer's hand has a value of 10
+
+The Dealer's hand has a value under 17 so they hit
+The Dealer's next card is a Three of Spades
+The Dealer's hand has a value of 13
+
+The Dealer hits
+The Dealer's next card is a Ten of Hearts
+The Dealer's hand has a value of 23
+
+Dealer goes kaboom! Were they trying to bake a number cake?
+You had $396, and with a bet of $63, you've doubled it!
+
+Your new balance is $396 + $63 = $459
+
+Your first card is a Two of Diamonds
+The Dealer's first card is a Two of Spades
+
+Your second card is a Six of Diamonds
+The Dealer's second card is face down
+
+As of now, the Dealer's hand has a known value of 2
+Your hand has a value of 8
+
+Your next card is a Five of Hearts
+Your hand has a value of 13
+
+
+The Dealer's second card is a Seven of Diamonds
+The Dealer's hand has a value of 9
+
+The Dealer's hand has a value under 17 so they hit
+The Dealer's next card is a Four of Diamonds
+The Dealer's hand has a value of 13
+
+The Dealer hits. Mechanical. Practiced. He's done this a million times.
+The Dealer's next card is a Ten of Spades
+The Dealer's hand has a value of 23
+
+Bust! The Dealer slams the table. You pretend not to notice.
+You had $459, and with a bet of $73, you've doubled it!
+
+Your new balance is $459 + $73 = $532
+
+Your first card is a King of Clubs
+The Dealer's first card is a Seven of Spades
+
+Your second card is an Eight of Diamonds
+The Dealer's second card is face down
+
+As of now, the Dealer's hand has a known value of 7
+Your hand has a value of 18
+
+
+The Dealer's second card is a Two of Hearts
+The Dealer's hand has a value of 9
+
+The Dealer's hand has a value under 17 so they hit
+The Dealer's next card is a Three of Hearts
+The Dealer's hand has a value of 12
+
+The Dealer hits
+The Dealer's next card is an Ace of Hearts
+The Dealer's hand has a value of 13
+
+The Dealer hits
+The Dealer's next card is a Four of Hearts
+The Dealer's hand has a value of 17
+
+The Dealer stands at 17
+
+You win...this time.
+You had $532, and with a bet of $85, you've doubled it!
+
+Your new balance is $532 + $85 = $617
+
+After playing a few rounds of Blackjack, the dealer points to the door. Without questioning his word, and with your winnings in hand, you scurry to the door, eager to get some sleep. You make it to your car and drive away from the casino, and you park in a little alcove on the side of the road. You lay down, and close your eyes. It's time to rest.
+
+══════════════════════════════════════════════════            ~ ~ ~ Day Summary ~ ~ ~══════════════════════════════════════════════════
+
+Superb! You've survived 24 days!
+
+Yesterday, at this time, you had $423. 
+Since then, you've accumulated $194. 
+That brings you to a grand total of $617! Poor? Yes. Defeated? Not yet.
+
+Your unique approach to life's challenges is so...inspiring? Yeah, let's go with that.
+As my doctor was putting me under, he whispered into my ear: "If life knocks you down, stay there and take a nap. The floor is already familiar with your failures; let it be your comfort."
+
+
+
+══════════════════════════════════════════════════Press a key to continue: ~ ~ ~ Morning, Day 25 ~ ~ ~  True══════════════════════════════════════════════════
+
+
+Your current sanity: 25%
+
+You wake up with energy. Like, real energy. Not 'I didn't die in my sleep' energy.
+
+You put your key in the ignition. It won't turn. At all.
+
+You wiggle it, jiggle it, curse at it. Nothing.
+
+Ignition cylinder is worn. This is going to be an expensive fix.
+
+After an hour of trying, it finally turns. But this will happen again.
+
+
+
+You head straight to the casino, hoping for better luck at the tables than you had with your car.
+
+As the sun begins to set, and the stars light up in the night sky, you drive over to the casino, eager to play more Blackjack. 
+
+The neon signs blur together. For a moment, you can't remember why you came here.
+
+The cards have been waiting for you.
+
+The Dealer looks at you strangely. His jade eye narrows.
+He does NOT seem pleased to see you tonight.
+
+You have $617
+
+Your first card is a Three of Spades
+The Dealer's first card is a Five of Diamonds
+
+Your second card is an Ace of Spades
+The Dealer's second card is face down
+
+As of now, the Dealer's hand has a known value of 5
+Your hand has a value of 4, or 14 since you have an ace
+
+Your next card is a Six of Hearts
+Your hand has a value of 10, or 20 since you have an ace
+
+
+The Dealer's second card is a Queen of Clubs
+The Dealer's hand has a value of 15
+
+The Dealer's hand has a value under 17 so they hit
+The Dealer's next card is a Nine of Clubs
+The Dealer's hand has a value of 24
+
+Over 21. The Dealer exhales through his nose like a dragon who just lost a bet. Oh wait.
+You had $617, and with a bet of $172, you've doubled it!
+
+Your new balance is $617 + $172 = $789
+
+Your first card is a Queen of Diamonds
+The Dealer's first card is a Ten of Diamonds
+
+Your second card is a Jack of Clubs
+The Dealer's second card is face down
+
+As of now, the Dealer's hand has a known value of 10
+Your hand has a value of 20
+
+
+The Dealer's second card is a Six of Spades
+The Dealer's hand has a value of 16
+
+The Dealer's hand has a value under 17 so they hit
+The Dealer's next card is a King of Hearts
+The Dealer's hand has a value of 26
+
+Dealer's hand busts! Victory is yours!
+You had $789, and with a bet of $126, you've doubled it!
+
+Your new balance is $789 + $126 = $915
+
+Your first card is a Three of Clubs
+The Dealer's first card is a Two of Hearts
+
+Your second card is a Two of Spades
+The Dealer's second card is face down
+
+As of now, the Dealer's hand has a known value of 2
+Your hand has a value of 5
+
+Your next card is a Two of Clubs
+Your hand has a value of 7
+
+Your next card is a Nine of Hearts
+Your hand has a value of 16
+
+
+The Dealer's second card is an Ace of Hearts
+The Dealer's hand has a value of 3, or 13 since they have an ace
+
+The Dealer's hand has a value under 17 so they hit
+The Dealer's next card is a Five of Clubs
+The Dealer's hand has a value of 8, or 18 since they have an ace
+
+The Dealer stands at 18
+
+Close, but close only counts in horseshoes. And this ain't horseshoes.
+You had $915 and lost your bet of $146
+
+Your new balance is $915 - $146 = $769
+
+After playing a few rounds of Blackjack, the dealer points to the door. Without questioning his word, and with your winnings in hand, you scurry to the door, eager to get some sleep. You make it to your car and drive away from the casino, and you park in a little alcove on the side of the road. You lay down, and close your eyes. It's time to rest.
+
+══════════════════════════════════════════════════            ~ ~ ~ Day Summary ~ ~ ~══════════════════════════════════════════════════
+
+Great job! You've survived 25 days!
+
+Yesterday, at this time, you had $617. 
+Since then, you've accumulated $152. 
+That brings you to a grand total of $769! Poor? Yes. Defeated? Not yet.
+
+I mean, you could definitely make more money, but hey it's a good start.
+For those who enjoy a bit of bathroom philosophy: "If at first you don't succeed, redefine success. Because if success is waking up at noon on a Wednesday thinking it's a Saturday, then congratulations, you've made it."
+
+
+
+══════════════════════════════════════════════════Press a key to continue: ~ ~ ~ Morning, Day 26 ~ ~ ~  True══════════════════════════════════════════════════
+
+
+Your current sanity: 26%
+
+Your eyes pop open and you're ready to go. Did someone slip you a good dream? Because that was chef's kiss.
+
+You find yourself on a bridge. You don't remember leaving your car.
+
+You're standing at the railing. Looking down at the water. So far down.
+
+Your hands are on the cold metal. When did you get out of the car?
+
+The water looks peaceful. Dark and cold and peaceful. No more debt. No more hunger.
+
+No more losing. No more trying. Just... nothing.
+
+A voice in your head says: It would be so easy. Just let go.
+
+
+
+You stay at the railing. Minutes pass. Maybe hours.
+
+A car stops. Someone gets out. A woman's voice, soft and scared.
+
+"Hey. Hey there. Are you okay? Please step back from the edge."
+
+You look at her. She looks terrified. Terrified for YOU.
+
+When's the last time anyone was scared for you? When's the last time anyone cared?
+
+You step back. She holds you while you cry. A stranger. Holding you while you fall apart.
+
+Would you like to spend your day driving somewhere? 
+1. Doctor's Office
+2. Witch Doctor's Tower
+3. Trusty Tom's Trucks and Tires
+4. Oswald's Optimal Outoparts
+5. Convenience Store
+6. Marvin's Mystical Merchandise
+7. Grimy Gus's Pawn Emporium
+8. Vinnie's Back Alley Loans
+9. Car Workbench
+10. Stay Home
+Choose a number: [5]
+
+You get in your car and drive to the Convenience Store. 
+
+"Sup. Name's Kyle. Got a one-item limit. Manager's orders. I don't make the rules."
+
+What do you want?
+1. Bungee Cords - $15
+2. Umbrella - $18
+3. Rope - $20
+4. Poncho - $12
+5. Pest Control - $25
+6. Beef Jerky - $10
+7. Thermostat - $30
+8. Cup Noodles - $7
+9. Pocket Knife - $35
+10. Gas Can - $25
+11. Deck of Cards - $9
+12. Cough Drops - $15
+13. WD-40 - $12
+14. I'm not buying anything
+Choose a number: [12]
+
+You got Cough Drops!
+Mentholyptus flavor. Your throat thanks you in advance.
+
+Your new balance is $769 - $15 = $754
+
+
+
+You know what? Rules are made to be broken. I mean, screw em! I hate my manager anyways. You can have one more item, just don't tell anyone I let you do this.
+
+What else you want?
+1. Bungee Cords - $15
+2. Umbrella - $18
+3. Rope - $20
+4. Poncho - $12
+5. Pest Control - $25
+6. Beef Jerky - $10
+7. Thermostat - $30
+8. Cup Noodles - $7
+9. Pocket Knife - $35
+10. Gas Can - $25
+11. Deck of Cards - $9
+12. WD-40 - $12
+13. I'm not buying anything
+Choose a number: [3]
+
+You got Rope!
+50 feet of nylon rope. Useful for... many things.
+
+Your new balance is $754 - $20 = $734
+
+
+
+Welp. There you go. Two whole items. Wow. Now get lost. I've got a girl to text. She's super hot.
+
+As the sun begins to set, and the stars light up in the night sky, you drive over to the casino, eager to play more Blackjack. 
+
+The neon signs blur together. For a moment, you can't remember why you came here.
+
+Nightfall again, huh? Well, you know what's next.
+
+The Dealer looks at you strangely. His jade eye narrows.
+He does NOT seem pleased to see you tonight.
+
+You have $734
+
+Your first card is a Six of Diamonds
+The Dealer's first card is a Ten of Spades
+
+Your second card is a King of Diamonds
+The Dealer's second card is face down
+
+As of now, the Dealer's hand has a known value of 10
+Your hand has a value of 16
+
+Your next card is a Seven of Clubs
+Your hand has a value of 23
+
+Bust city! Did your cards get too excited?
+You had $734 and lost your bet of $110
+
+Your new balance is $734 - $110 = $624
+
+Your first card is a Seven of Spades
+The Dealer's first card is a Jack of Clubs
+
+Your second card is a Five of Clubs
+The Dealer's second card is face down
+
+As of now, the Dealer's hand has a known value of 10
+Your hand has a value of 12
+
+Your next card is a Three of Clubs
+Your hand has a value of 15
+
+Your next card is a Two of Spades
+Your hand has a value of 17
+
+
+The Dealer's second card is an Eight of Hearts
+The Dealer's hand has a value of 18
+
+The Dealer stands at 18
+
+You simply got outplayed on this one.
+You had $624 and lost your bet of $93
+
+Your new balance is $624 - $93 = $531
+
+Your first card is a Nine of Clubs
+The Dealer's first card is an Ace of Spades
+
+Your second card is a Two of Hearts
+The Dealer's second card is a Queen of Hearts
+
+The Dealer's hand has a value of 21 ;)
+Your hand has a value of 11
+
+Dealer Blackjack. He flips the cards like he's bored. He IS bored. You're entertainment.
+You had $531 and lost your bet of $53
+
+Your new balance is $531 - $53 = $478
+
+After playing a few rounds of Blackjack, the dealer points to the door. Without questioning his word, and with your winnings in hand, you scurry to the door, eager to get some sleep. You make it to your car and drive away from the casino, and you park in a little alcove on the side of the road. You lay down, and close your eyes. It's time to rest.
+
+══════════════════════════════════════════════════            ~ ~ ~ Day Summary ~ ~ ~══════════════════════════════════════════════════
+
+Amazing! You've survived 26 days!
+
+Yesterday, at this time, you had $769. 
+Since then, you've managed to lose $291. 
+That brings you to a grand total of $478! You're basically living paycheck to paycheck. Except there's no paycheck.
+
+Congrats on all the hard work so far. It's nice to know you're still alive.
+As I tried to parallel park for the 10th time, I remember a passerby that yelled: "I can't brain today. I have the dumb."
+
+
+
+══════════════════════════════════════════════════Press a key to continue: ~ ~ ~ Morning, Day 27 ~ ~ ~  True══════════════════════════════════════════════════
+
+
+Your current sanity: 46%
+
+You wake up feeling like a million bucks. Well, maybe a few thousand bucks. But still great.
+
+
+You can't remember if you slept last night. Or the night before.
+
+
+You feel unstable.
+
+A hissing sound wakes you up. It's not a snake-it's your tire, slowly deflating before your eyes.
+
+You watch helplessly as your wheel becomes a sad rubber puddle.
+
+Without a spare, you're going to have to walk to get this fixed. That'll cost time and money.
+
+Your new balance is $478 - $52 = $426
+
+
+
+A flat tire kills your plans for the afternoon.
+
+You lose the afternoon to car trouble and head straight to the casino at dusk.
+
+As the sun begins to set, and the stars light up in the night sky, you drive over to the casino, eager to play more Blackjack. 
+
+The neon signs blur together. For a moment, you can't remember why you came here.
+
+Sit. Let's see what fate has in store tonight.
+
+The Dealer looks at you strangely. His jade eye narrows.
+He does NOT seem pleased to see you tonight.
+
+You have $426
+
+Your first card is a Two of Hearts
+The Dealer's first card is a Six of Spades
+
+Your second card is a Three of Spades
+The Dealer's second card is face down
+
+As of now, the Dealer's hand has a known value of 6
+Your hand has a value of 5
+
+Your next card is an Ace of Hearts
+Your hand has a value of 6, or 16 since you have an ace
+
+Your next card is a Three of Diamonds
+Your hand has a value of 9, or 19 since you have an ace
+
+
+The Dealer's second card is a Ten of Diamonds
+The Dealer's hand has a value of 16
+
+The Dealer's hand has a value under 17 so they hit
+The Dealer's next card is a Three of Clubs
+The Dealer's hand has a value of 19
+
+The Dealer stands at 19
+
+Welp. Those numbers are the same. So much for that round.
+You had $426, and you win back your bet of $42
+
+Your balance is still $426
+
+Your first card is an Eight of Spades
+The Dealer's first card is a Nine of Clubs
+
+Your second card is a Six of Diamonds
+The Dealer's second card is face down
+
+As of now, the Dealer's hand has a known value of 9
+Your hand has a value of 14
+
+Your next card is a Ten of Hearts
+Your hand has a value of 24
+
+Bust city! Did your cards get too excited?
+You had $426 and lost your bet of $42
+
+Your new balance is $426 - $42 = $384
+
+Your first card is a Queen of Spades
+The Dealer's first card is a Queen of Diamonds
+
+Your second card is a Six of Clubs
+The Dealer's second card is face down
+
+As of now, the Dealer's hand has a known value of 10
+Your hand has a value of 16
+
+Your next card is a Jack of Hearts
+Your hand has a value of 26
+
+Bust! Should've stopped while you were ahead.
+You had $384 and lost your bet of $38
+
+Your new balance is $384 - $38 = $346
+
+After playing a few rounds of Blackjack, the dealer points to the door. Without questioning his word, and with your winnings in hand, you scurry to the door, eager to get some sleep. You make it to your car and drive away from the casino, and you park in a little alcove on the side of the road. You lay down, and close your eyes. It's time to rest.
+
+══════════════════════════════════════════════════            ~ ~ ~ Day Summary ~ ~ ~══════════════════════════════════════════════════
+
+Bravo! You've survived 27 days!
+
+Yesterday, at this time, you had $478. 
+Since then, you've managed to lose $132. 
+That brings you to a grand total of $346! Poor? Yes. Defeated? Not yet.
+
+Your efforts haven't gone unnoticed. They're just not always mentioned.
+If you ever feel lost, just remember: "You may have breathed the same air a dinosaur breathed 1000s of years ago. If you don't think that's the tightest shit then get out of my face."
+
+
+
+══════════════════════════════════════════════════Press a key to continue: ~ ~ ~ Morning, Day 28 ~ ~ ~  True══════════════════════════════════════════════════
+
+
+Your current sanity: 46%
+
+You wake up feeling like a million bucks. Well, maybe a few thousand bucks. But still great.
+
+Would you like to spend your day driving somewhere? 
+1. Doctor's Office
+2. Witch Doctor's Tower
+3. Trusty Tom's Trucks and Tires
+4. Oswald's Optimal Outoparts
+5. Convenience Store
+6. Marvin's Mystical Merchandise
+7. Grimy Gus's Pawn Emporium
+8. Vinnie's Back Alley Loans
+9. Car Workbench
+10. Stay Home
+Choose a number: [4]
+
+You get in your car and drive to Oswald's Optimal Outoparts. 
+
+"Oh my! A customer! A real, live, breathing customer!"
+
+A man in an impeccably clean suit practically bounces toward you. His smile is so wide it looks painful. Behind him, a hulking figure in overalls works silently on a car engine.
+
+"Welcome, welcome, welcome to Oswald's Optimal Outoparts! ""I'm Oswald, and that magnificent specimen of mechanical mastery is Stuart. Say hello, Stuart!"
+
+Stuart grunts without looking up.
+
+"Isn't he wonderful? Best mechanic this side of anywhere! ""Of course, he wouldn't be where he is today without my business acumen. My entrepreneurial spirit! My VISION!"
+
+Oswald gestures grandly around the shop.
+
+"You see, I'm not just a mechanic. I'm a businessman! An investor! ""I see opportunity where others see obstacles. ""Why, just last week I was thinking about expanding into the entertainment industry. ""Casinos! Gambling! There's SO much money to be made!"
+
+His eyes glitter with something between excitement and obsession.
+
+"But enough about my brilliant plans! What can we do for you today, my new friend?"
+
+Oswald glances at Stuart, then back at you.
+
+"Come back when we know each other a bit better, yes? Trust is built over time!"
+
+As the sun begins to set, and the stars light up in the night sky, you drive over to the casino, eager to play more Blackjack. 
+
+The neon signs blur together. For a moment, you can't remember why you came here.
+
+Night falls. The game begins.
+
+The Dealer looks at you strangely. His jade eye narrows.
+He does NOT seem pleased to see you tonight.
+
+You have $346
+
+Your first card is a Six of Clubs
+The Dealer's first card is a Jack of Diamonds
+
+Your second card is an Ace of Spades
+The Dealer's second card is face down
+
+As of now, the Dealer's hand has a known value of 10
+Your hand has a value of 7, or 17 since you have an ace
+
+Your next card is a Jack of Spades
+Your hand has a value of 17
+
+
+The Dealer's second card is an Eight of Spades
+The Dealer's hand has a value of 18
+
+The Dealer stands at 18
+
+Dealer's number is higher, so I guess you lost. Unfortunate.
+You had $346 and lost your bet of $34
+
+Your new balance is $346 - $34 = $312
+
+Your first card is a Two of Hearts
+The Dealer's first card is a Ten of Spades
+
+Your second card is a Five of Spades
+The Dealer's second card is face down
+
+As of now, the Dealer's hand has a known value of 10
+Your hand has a value of 7
+
+Your next card is an Ace of Clubs
+Your hand has a value of 8, or 18 since you have an ace
+
+Your next card is a King of Clubs
+Your hand has a value of 18
+
+
+The Dealer's second card is a Nine of Spades
+The Dealer's hand has a value of 19
+
+The Dealer stands at 19
+
+Dealer wins with the higher hand! Not your day, huh?
+You had $312 and lost your bet of $31
+
+Your new balance is $312 - $31 = $281
+
+Your first card is a Three of Spades
+The Dealer's first card is a Four of Hearts
+
+Your second card is a Two of Spades
+The Dealer's second card is face down
+
+As of now, the Dealer's hand has a known value of 4
+Your hand has a value of 5
+
+Your next card is an Ace of Hearts
+Your hand has a value of 6, or 16 since you have an ace
+
+Your next card is an Eight of Clubs
+Your hand has a value of 14
+
+
+The Dealer's second card is a Queen of Clubs
+The Dealer's hand has a value of 14
+
+The Dealer's hand has a value under 17 so they hit
+The Dealer's next card is a Three of Diamonds
+The Dealer's hand has a value of 17
+
+The Dealer stands at 17
+
+Close, but close only counts in horseshoes. And this ain't horseshoes.
+You had $281 and lost your bet of $28
+
+Your new balance is $281 - $28 = $253
+
+After playing a few rounds of Blackjack, the dealer points to the door. Without questioning his word, and with your winnings in hand, you scurry to the door, eager to get some sleep. You make it to your car and drive away from the casino, and you park in a little alcove on the side of the road. You lay down, and close your eyes. It's time to rest.
+
+══════════════════════════════════════════════════            ~ ~ ~ Day Summary ~ ~ ~══════════════════════════════════════════════════
+
+Hurray! You've survived 28 days!
+
+Yesterday, at this time, you had $346. 
+Since then, you've managed to lose $93. 
+That brings you to a grand total of $253! You're in the 'ramen noodle' tax bracket.
+
+Oh, look at you, making small changes like you're actually going to finish something. Adorable.
+I'll leave you with a quote: "Remember, if you ever get lost in the forest, turn left at the talking mushroom and wave hello to the sky. It's rude not to greet the blue, especially when it's wearing its fancy clouds."
+
+
+
+══════════════════════════════════════════════════Press a key to continue: ~ ~ ~ Morning, Day 29 ~ ~ ~  True══════════════════════════════════════════════════
+
+
+Your current sanity: 46%
+
+Best night's sleep in a long time. You even folded your blanket. Who are you?
+
+A man in a trench coat approaches your car. He flips a coin in his hand, over and over.
+
+"Call it."
+
+You don't know why, but you feel compelled to answer.
+
+He flips. It lands on tails.
+
+"Unlucky." He takes nothing, but you feel like you've lost something anyway.
+
+Would you like to spend your day driving somewhere? 
+1. Doctor's Office
+2. Witch Doctor's Tower
+3. Trusty Tom's Trucks and Tires
+4. Oswald's Optimal Outoparts
+5. Convenience Store
+6. Marvin's Mystical Merchandise
+7. Grimy Gus's Pawn Emporium
+8. Vinnie's Back Alley Loans
+9. Car Workbench
+10. Stay Home
+Choose a number: [4]
+
+You get in your car and drive to Oswald's Optimal Outoparts. 
+
+"Oh my! A customer! A real, live, breathing customer!"
+
+A man in an impeccably clean suit practically bounces toward you. His smile is so wide it looks painful. Behind him, a hulking figure in overalls works silently on a car engine.
+
+"Welcome, welcome, welcome to Oswald's Optimal Outoparts! ""I'm Oswald, and that magnificent specimen of mechanical mastery is Stuart. Say hello, Stuart!"
+
+Stuart grunts without looking up.
+
+"Isn't he wonderful? Best mechanic this side of anywhere! ""Of course, he wouldn't be where he is today without my business acumen. My entrepreneurial spirit! My VISION!"
+
+Oswald gestures grandly around the shop.
+
+"You see, I'm not just a mechanic. I'm a businessman! An investor! ""I see opportunity where others see obstacles. ""Why, just last week I was thinking about expanding into the entertainment industry. ""Casinos! Gambling! There's SO much money to be made!"
+
+His eyes glitter with something between excitement and obsession.
+
+"But enough about my brilliant plans! What can we do for you today, my new friend?"
+
+Oswald glances at Stuart, then back at you.
+
+"Come back when we know each other a bit better, yes? Trust is built over time!"
+
+As the sun begins to set, and the stars light up in the night sky, you drive over to the casino, eager to play more Blackjack. 
+
+The neon signs blur together. For a moment, you can't remember why you came here.
+
+Still alive? Good. The cards would be disappointed otherwise.
+
+The Dealer looks at you strangely. His jade eye narrows.
+He does NOT seem pleased to see you tonight.
+
+You have $253
+
+The Dealer's in a good mood. Here's a $26 hand, on the house!
+
+Your first card is a Jack of Clubs
+The Dealer's first card is a Ten of Clubs
+
+Your second card is a Five of Spades
+The Dealer's second card is face down
+
+As of now, the Dealer's hand has a known value of 10
+Your hand has a value of 15
+
+Your next card is a Four of Hearts
+Your hand has a value of 19
+
+
+The Dealer's second card is a Five of Hearts
+The Dealer's hand has a value of 15
+
+The Dealer's hand has a value under 17 so they hit
+The Dealer's next card is an Eight of Spades
+The Dealer's hand has a value of 23
+
+The Dealer's over 21, which means you are the winner! Dope.
+You had $253, and with a free bet of $26, you've doubled it!
+
+Your new balance is $253 + $26 = $279
+
+Your first card is a Four of Spades
+The Dealer's first card is an Eight of Diamonds
+
+Your second card is a Three of Clubs
+The Dealer's second card is face down
+
+As of now, the Dealer's hand has a known value of 8
+Your hand has a value of 7
+
+Your next card is a Seven of Spades
+Your hand has a value of 14
+
+Your next card is a Four of Diamonds
+Your hand has a value of 18
+
+
+The Dealer's second card is a Two of Clubs
+The Dealer's hand has a value of 10
+
+The Dealer's hand has a value under 17 so they hit
+The Dealer's next card is a Three of Diamonds
+The Dealer's hand has a value of 13
+
+The Dealer hits
+The Dealer's next card is a King of Hearts
+The Dealer's hand has a value of 23
+
+Dealer hand goes bust! You're one lucky lucy.
+You had $279, and with a bet of $27, you've doubled it!
+
+Your new balance is $279 + $27 = $306
+
+Your first card is a Nine of Hearts
+The Dealer's first card is a Ten of Spades
+
+Your second card is an Ace of Hearts
+The Dealer's second card is face down
+
+As of now, the Dealer's hand has a known value of 10
+Your hand has a value of 10, or 20 since you have an ace
+
+
+The Dealer's second card is a Three of Hearts
+The Dealer's hand has a value of 13
+
+The Dealer's hand has a value under 17 so they hit
+The Dealer's next card is a Six of Clubs
+The Dealer's hand has a value of 19
+
+The Dealer stands at 19
+
+You beat the house. For now. Enjoy it while it lasts.
+You had $306, and with a bet of $30, you've doubled it!
+
+Your new balance is $306 + $30 = $336
+
+After playing a few rounds of Blackjack, the dealer points to the door. Without questioning his word, and with your winnings in hand, you scurry to the door, eager to get some sleep. You make it to your car and drive away from the casino, and you park in a little alcove on the side of the road. You lay down, and close your eyes. It's time to rest.
+
+══════════════════════════════════════════════════            ~ ~ ~ Day Summary ~ ~ ~══════════════════════════════════════════════════
+
+Congrats! You've survived 29 days!
+
+Yesterday, at this time, you had $253. 
+Since then, you've accumulated $83. 
+That brings you to a grand total of $336! Hey, at least you can afford... some things. Not many things. But some.
+
+Keep pushing the boundaries, even if it's just by a little every day.
+Here's a little bit of inspiration for you: "If life gives you lemons, keep them, because hey, free lemons. But if life gives you melons, you might be dyslexic."
+
+
+
+══════════════════════════════════════════════════Press a key to continue: ~ ~ ~ Morning, Day 30 ~ ~ ~  True══════════════════════════════════════════════════
+
+
+Interest accrued on your loan: $240
+You now owe Vinnie $1,440.
+
+
+Your current sanity: 43%
+
+You slept like a baby. A big, grown baby in a car, but a baby nonetheless.
+
+You took a wrong turn. Or maybe the road took it for you.
+
+You end up at a cemetery. Old one. Iron fence, stone angels, headstones so weathered the names have worn to whispers.
+
+Your car dies at the gate. Engine just... stops. You turn the key. Nothing. You're stuck here until it decides to work again.
+
+The gate swings open with a groan that echoes. Inside, the graves stretch out in rows, ordered and patient, like they've been waiting.
+
+Some have fresh flowers. Most don't. You read names as you walk:
+
+"Harold Mercer, 1942-2019. Beloved husband.""Elaine Frye, 1955-2021. She sang every morning.""Baby James, 2008-2008. Too good for this world."
+
+That last one stops you. You stand there for a while.
+
+You hear digging. Somewhere deeper in the cemetery, someone is working.
+
+Would you like to spend your day driving somewhere? 
+1. Doctor's Office
+2. Witch Doctor's Tower
+3. Trusty Tom's Trucks and Tires
+4. Oswald's Optimal Outoparts
+5. Convenience Store
+6. Marvin's Mystical Merchandise
+7. Grimy Gus's Pawn Emporium
+8. Vinnie's Back Alley Loans
+9. Car Workbench
+10. Stay Home
+Choose a number: [4]
+
+You get in your car and drive to Oswald's Optimal Outoparts. 
+
+"Oh my! A customer! A real, live, breathing customer!"
+
+A man in an impeccably clean suit practically bounces toward you. His smile is so wide it looks painful. Behind him, a hulking figure in overalls works silently on a car engine.
+
+"Welcome, welcome, welcome to Oswald's Optimal Outoparts! ""I'm Oswald, and that magnificent specimen of mechanical mastery is Stuart. Say hello, Stuart!"
+
+Stuart grunts without looking up.
+
+"Isn't he wonderful? Best mechanic this side of anywhere! ""Of course, he wouldn't be where he is today without my business acumen. My entrepreneurial spirit! My VISION!"
+
+Oswald gestures grandly around the shop.
+
+"You see, I'm not just a mechanic. I'm a businessman! An investor! ""I see opportunity where others see obstacles. ""Why, just last week I was thinking about expanding into the entertainment industry. ""Casinos! Gambling! There's SO much money to be made!"
+
+His eyes glitter with something between excitement and obsession.
+
+"But enough about my brilliant plans! What can we do for you today, my new friend?"
+
+Oswald glances at Stuart, then back at you.
+
+"Come back when we know each other a bit better, yes? Trust is built over time!"
+
+As the sun begins to set, and the stars light up in the night sky, you drive over to the casino, eager to play more Blackjack. 
+
+The neon signs blur together. For a moment, you can't remember why you came here.
+
+Take your seat. The wheel of fortune turns for no one.
+
+The Dealer looks at you strangely. His jade eye narrows.
+He does NOT seem pleased to see you tonight.
+
+You have $336
+
+Your first card is a Queen of Spades
+The Dealer's first card is a Jack of Clubs
+
+Your second card is a Nine of Clubs
+The Dealer's second card is face down
+
+As of now, the Dealer's hand has a known value of 10
+Your hand has a value of 19
+
+
+The Dealer's second card is a Six of Hearts
+The Dealer's hand has a value of 16
+
+The Dealer's hand has a value under 17 so they hit
+The Dealer's next card is an Ace of Hearts
+The Dealer's hand has a value of 17
+
+The Dealer stands at 17
+
+Your hand wins! The Dealer collects the cards without looking at you.
+You had $336, and with a bet of $33, you've doubled it!
+
+Your new balance is $336 + $33 = $369
+
+The Dealer's in a good mood. Here's a $21 hand, on the house!
+
+Your first card is a Three of Diamonds
+The Dealer's first card is a Jack of Hearts
+
+Your second card is a Four of Hearts
+The Dealer's second card is face down
+
+As of now, the Dealer's hand has a known value of 10
+Your hand has a value of 7
+
+Your next card is a Ten of Hearts
+Your hand has a value of 17
+
+
+The Dealer's second card is a Nine of Hearts
+The Dealer's hand has a value of 19
+
+The Dealer stands at 19
+
+Your hand is inferior to the Dealer's. Which means you lose.
+You had $369 and lost your free bet of $21
+
+Your balance is still $369
+
+Your first card is a King of Spades
+The Dealer's first card is a Queen of Diamonds
+
+Your second card is a Jack of Spades
+The Dealer's second card is face down
+
+As of now, the Dealer's hand has a known value of 10
+Your hand has a value of 20
+
+
+The Dealer's second card is a Five of Clubs
+The Dealer's hand has a value of 15
+
+The Dealer's hand has a value under 17 so they hit
+The Dealer's next card is a Ten of Clubs
+The Dealer's hand has a value of 25
+
+Over 21. The Dealer exhales through his nose like a dragon who just lost a bet. Oh wait.
+You had $369, and with a bet of $36, you've doubled it!
+
+Your new balance is $369 + $36 = $405
+
+After playing a few rounds of Blackjack, the dealer points to the door. Without questioning his word, and with your winnings in hand, you scurry to the door, eager to get some sleep. You make it to your car and drive away from the casino, and you park in a little alcove on the side of the road. You lay down, and close your eyes. It's time to rest.
+
+══════════════════════════════════════════════════            ~ ~ ~ Day Summary ~ ~ ~══════════════════════════════════════════════════
+
+Woo-hoo! You've survived 30 days!
+
+Yesterday, at this time, you had $336. 
+Since then, you've accumulated $69. 
+That brings you to a grand total of $405! Hey, at least you can afford... some things. Not many things. But some.
+
+Life's a garden, dig it. You're doing just that, and it's admirable.
+You know what you need right now? A quote, from the heart: "If you don't want to be mistaken for a doormat, get off the damn floor."
+
+
+
+══════════════════════════════════════════════════Press a key to continue: ~ ~ ~ Morning, Day 31 ~ ~ ~  True══════════════════════════════════════════════════
+
+
+
+═══════════════════════════════════════
+         VINNIE WANTS HIS MONEY        
+═══════════════════════════════════════
+
+You're walking to the casino when a black sedan pulls up beside you.
+
+The window rolls down. Tony's face appears. He's not smiling.
+
+"Boss says you've been avoiding him. That's not smart."
+
+Before you can respond, he's out of the car. His fist connects with your stomach.
+
+You double over. He hits you again. And again.
+
+"That's a reminder. Next time, we take something you can't grow back."
+
+
+
+
+Your current sanity: 26%
+
+You yawn, stretch, and feel genuinely alive. Not just surviving. Actually alive.
+
+You do some stretches. Yoga-ish movements. Look like an idiot in a parking lot.
+
+But you know what? You feel better. Less like a rusty robot.
+
+Would you like to spend your day driving somewhere? 
+1. Doctor's Office
+2. Witch Doctor's Tower
+3. Trusty Tom's Trucks and Tires
+4. Oswald's Optimal Outoparts
+5. Convenience Store
+6. Marvin's Mystical Merchandise
+7. Grimy Gus's Pawn Emporium
+8. Vinnie's Back Alley Loans
+9. Car Workbench
+10. Stay Home
+Choose a number: [4]
+
+You get in your car and drive to Oswald's Optimal Outoparts. 
+
+"Oh my! A customer! A real, live, breathing customer!"
+
+A man in an impeccably clean suit practically bounces toward you. His smile is so wide it looks painful. Behind him, a hulking figure in overalls works silently on a car engine.
+
+"Welcome, welcome, welcome to Oswald's Optimal Outoparts! ""I'm Oswald, and that magnificent specimen of mechanical mastery is Stuart. Say hello, Stuart!"
+
+Stuart grunts without looking up.
+
+"Isn't he wonderful? Best mechanic this side of anywhere! ""Of course, he wouldn't be where he is today without my business acumen. My entrepreneurial spirit! My VISION!"
+
+Oswald gestures grandly around the shop.
+
+"You see, I'm not just a mechanic. I'm a businessman! An investor! ""I see opportunity where others see obstacles. ""Why, just last week I was thinking about expanding into the entertainment industry. ""Casinos! Gambling! There's SO much money to be made!"
+
+His eyes glitter with something between excitement and obsession.
+
+"But enough about my brilliant plans! What can we do for you today, my new friend?"
+
+Oswald glances at Stuart, then back at you.
+
+"Come back when we know each other a bit better, yes? Trust is built over time!"
+
+As the sun begins to set, and the stars light up in the night sky, you drive over to the casino, eager to play more Blackjack. 
+
+The neon signs blur together. For a moment, you can't remember why you came here.
+
+The casino never sleeps. Neither do you, it seems.
+
+The Dealer looks at you strangely. His jade eye narrows.
+He does NOT seem pleased to see you tonight.
+
+You have $405
+
+The Dealer's in a good mood. Here's a $21 hand, on the house!
+
+Your first card is a Five of Clubs
+The Dealer's first card is a Nine of Hearts
+
+Your second card is a Three of Clubs
+The Dealer's second card is face down
+
+As of now, the Dealer's hand has a known value of 9
+Your hand has a value of 8
+
+Your next card is a Nine of Spades
+Your hand has a value of 17
+
+
+The Dealer's second card is a King of Diamonds
+The Dealer's hand has a value of 19
+
+The Dealer stands at 19
+
+Dealer wins with the higher hand! Not your day, huh?
+You had $405 and lost your free bet of $21
+
+Your balance is still $405
+
+Your first card is an Eight of Diamonds
+The Dealer's first card is a Seven of Spades
+
+Your second card is a Six of Diamonds
+The Dealer's second card is face down
+
+As of now, the Dealer's hand has a known value of 7
+Your hand has a value of 14
+
+Your next card is a Two of Hearts
+Your hand has a value of 16
+
+Your next card is a Queen of Clubs
+Your hand has a value of 26
+
+You busted! How'd it feel?
+You had $405 and lost your bet of $40
+
+Your new balance is $405 - $40 = $365
+
+Your first card is a Four of Diamonds
+The Dealer's first card is a Seven of Diamonds
+
+Your second card is an Ace of Clubs
+The Dealer's second card is face down
+
+As of now, the Dealer's hand has a known value of 7
+Your hand has a value of 5, or 15 since you have an ace
+
+Your next card is an Eight of Spades
+Your hand has a value of 13
+
+Your next card is a Four of Hearts
+Your hand has a value of 17
+
+
+The Dealer's second card is a Two of Diamonds
+The Dealer's hand has a value of 9
+
+The Dealer's hand has a value under 17 so they hit
+The Dealer's next card is a Seven of Clubs
+The Dealer's hand has a value of 16
+
+The Dealer hits — a bold choice. He's pushing it.
+The Dealer's next card is a Five of Spades
+The Dealer's hand has a value of 21
+
+Dealer Blackjack. He flips the cards like he's bored. He IS bored. You're entertainment.
+You had $365 and lost your bet of $36
+
+Your new balance is $365 - $36 = $329
+
+After playing a few rounds of Blackjack, the dealer points to the door. Without questioning his word, and with your winnings in hand, you scurry to the door, eager to get some sleep. You make it to your car and drive away from the casino, and you park in a little alcove on the side of the road. You lay down, and close your eyes. It's time to rest.
+
+══════════════════════════════════════════════════            ~ ~ ~ Day Summary ~ ~ ~══════════════════════════════════════════════════
+
+Excellent! You've survived 31 days!
+
+Yesterday, at this time, you had $405. 
+Since then, you've managed to lose $76. 
+That brings you to a grand total of $329! Hey, at least you can afford... some things. Not many things. But some.
+
+Look at you, using your full potential - just kidding, but seriously, nice effort today.
+If aliens could talk, they'd probably say: "If the sky is the limit, then why is there footprints on the moon? Because sometimes cheese can fly, especially when clocks are melting and rabbits wear hats."
+
+
+
+══════════════════════════════════════════════════Press a key to continue: ~ ~ ~ Morning, Day 32 ~ ~ ~  True══════════════════════════════════════════════════
+
+
+Your current sanity: 31%
+
+You had a dream about winning at Blackjack. Then you woke up. But you still feel great.
+
+Your eyes open. At least, you think they do.
+
+Your eyes are open. You can see the ceiling of your car. The streetlight outside casting its orange glow. Everything is normal.
+
+Except you can't move.
+
+Not paralyzed-numb. Paralyzed-trapped. Your body is awake but it won't listen. Your arms are dead weight. Your legs won't respond. You can't even turn your head.
+
+Then you see it. In the corner of your vision. Something in the back seat.
+
+A shape. Darker than dark. It doesn't have edges — it has suggestions of edges. Like smoke that decided to sit down.
+
+It's watching you. You can feel it watching you even though it doesn't have eyes.
+
+Your breathing gets faster. Your heart is hammering. But you. Can't. Move.
+
+The shape leans forward. Closer. You can feel cold radiating off it like an open freezer.
+
+Then — snap — your body releases. You bolt upright, gasping. The back seat is empty. Nothing there. Just the dark.
+
+You don't sleep for the rest of the night. You sit with every light on and your eyes open, watching the back seat in the rearview mirror.
+
+Nothing comes. But the cold lingers.
+
+Would you like to spend your day driving somewhere? 
+1. Doctor's Office
+2. Witch Doctor's Tower
+3. Trusty Tom's Trucks and Tires
+4. Oswald's Optimal Outoparts
+5. Convenience Store
+6. Marvin's Mystical Merchandise
+7. Grimy Gus's Pawn Emporium
+8. Vinnie's Back Alley Loans
+9. Car Workbench
+10. Stay Home
+Choose a number: [4]
+
+You get in your car and drive to Oswald's Optimal Outoparts. 
+
+"Oh my! A customer! A real, live, breathing customer!"
+
+A man in an impeccably clean suit practically bounces toward you. His smile is so wide it looks painful. Behind him, a hulking figure in overalls works silently on a car engine.
+
+"Welcome, welcome, welcome to Oswald's Optimal Outoparts! ""I'm Oswald, and that magnificent specimen of mechanical mastery is Stuart. Say hello, Stuart!"
+
+Stuart grunts without looking up.
+
+"Isn't he wonderful? Best mechanic this side of anywhere! ""Of course, he wouldn't be where he is today without my business acumen. My entrepreneurial spirit! My VISION!"
+
+Oswald gestures grandly around the shop.
+
+"You see, I'm not just a mechanic. I'm a businessman! An investor! ""I see opportunity where others see obstacles. ""Why, just last week I was thinking about expanding into the entertainment industry. ""Casinos! Gambling! There's SO much money to be made!"
+
+His eyes glitter with something between excitement and obsession.
+
+"But enough about my brilliant plans! What can we do for you today, my new friend?"
+
+Oswald glances at Stuart, then back at you.
+
+"Come back when we know each other a bit better, yes? Trust is built over time!"
+
+As the sun begins to set, and the stars light up in the night sky, you drive over to the casino, eager to play more Blackjack. 
+
+The neon signs blur together. For a moment, you can't remember why you came here.
+
+You've got that look in your eye. Hope. Or madness. Sometimes they're the same.
+
+The Dealer looks at you strangely. His jade eye narrows.
+He does NOT seem pleased to see you tonight.
+
+You have $329
+
+Your first card is a King of Spades
+The Dealer's first card is a Three of Hearts
+
+Your second card is a King of Hearts
+The Dealer's second card is face down
+
+As of now, the Dealer's hand has a known value of 3
+Your hand has a value of 20
+
+
+The Dealer's second card is a Two of Spades
+The Dealer's hand has a value of 5
+
+The Dealer's hand has a value under 17 so they hit
+The Dealer's next card is a Six of Diamonds
+The Dealer's hand has a value of 11
+
+The Dealer hits
+The Dealer's next card is a Five of Hearts
+The Dealer's hand has a value of 16
+
+The Dealer hits — a bold choice. He's pushing it.
+The Dealer's next card is an Ace of Clubs
+The Dealer's hand has a value of 17
+
+The Dealer stands at 17
+
+You beat the house. For now. Enjoy it while it lasts.
+You had $329, and with a bet of $72, you've doubled it!
+
+Your new balance is $329 + $72 = $401
+
+Your first card is an Eight of Spades
+The Dealer's first card is a Six of Hearts
+
+Your second card is a Three of Spades
+The Dealer's second card is face down
+
+As of now, the Dealer's hand has a known value of 6
+Your hand has a value of 11
+
+Your next card is a Five of Spades
+Your hand has a value of 16
+
+
+The Dealer's second card is a Queen of Diamonds
+The Dealer's hand has a value of 16
+
+The Dealer's hand has a value under 17 so they hit
+The Dealer's next card is a Five of Clubs
+The Dealer's hand has a value of 21
+
+The Dealer gets a Blackjack and wins! Too bad! So sad! Get good, kiddo!
+You had $401 and lost your bet of $88
+
+Your new balance is $401 - $88 = $313
+
+Your thoughts are fracturing. The shadows are getting closer.
+
+
+
+Your first card is a Queen of Clubs
+The Dealer's first card is a Three of Diamonds
+
+Your second card is a Six of Clubs
+The Dealer's second card is face down
+
+As of now, the Dealer's hand has a known value of 3
+Your hand has a value of 16
+
+
+The Dealer's second card is a Queen of Hearts
+The Dealer's hand has a value of 13
+
+The Dealer's hand has a value under 17 so they hit
+The Dealer's next card is a Seven of Diamonds
+The Dealer's hand has a value of 20
+
+The Dealer stands at 20
+
+Dealer's number is higher, so I guess you lost. Unfortunate.
+You had $313 and lost your bet of $68
+
+Your new balance is $313 - $68 = $245
+
+After playing a few rounds of Blackjack, the dealer points to the door. Without questioning his word, and with your winnings in hand, you scurry to the door, eager to get some sleep. You make it to your car and drive away from the casino, and you park in a little alcove on the side of the road. You lay down, and close your eyes. It's time to rest.
+
+══════════════════════════════════════════════════            ~ ~ ~ Day Summary ~ ~ ~══════════════════════════════════════════════════
+
+Yessir! You've survived 32 days!
+
+Yesterday, at this time, you had $329. 
+Since then, you've managed to lose $84. 
+That brings you to a grand total of $245! Poor? Yes. Defeated? Not yet.
+
+You might not be winning the race, but at least you're in the running, right? Sort of?
+Take a moment to reflect on this: "Whisper to the rain and listen to the wind, for they tell tales of square watermelons and the secret life of shadows who are afraid of the dark."
+
+
+
+══════════════════════════════════════════════════Press a key to continue: ~ ~ ~ Morning, Day 33 ~ ~ ~  True══════════════════════════════════════════════════
+
+
+Your current sanity: 23%
+
+You slept like a baby. A big, grown baby in a car, but a baby nonetheless.
+
+
+You feel barely holding on.
+
+A scraggly stray cat jumps onto your hood and stares at you through the windshield.
+
+It meows. Loudly. Insistently. Like it's judging your entire existence.
+
+You share your meager rations. The cat purrs and curls up on your hood.
+
+It's still there when you wake up the next morning. You have a friend now.
+
+You decide to call it Whiskers.
+
+Would you like to spend your day driving somewhere? 
+1. Doctor's Office
+2. Witch Doctor's Tower
+3. Trusty Tom's Trucks and Tires
+4. Oswald's Optimal Outoparts
+5. Convenience Store
+6. Marvin's Mystical Merchandise
+7. Grimy Gus's Pawn Emporium
+8. Vinnie's Back Alley Loans
+9. Car Workbench
+10. Stay Home
+Choose a number: [4]
+
+You get in your car and drive to Oswald's Optimal Outoparts. 
+
+"Oh my! A customer! A real, live, breathing customer!"
+
+A man in an impeccably clean suit practically bounces toward you. His smile is so wide it looks painful. Behind him, a hulking figure in overalls works silently on a car engine.
+
+"Welcome, welcome, welcome to Oswald's Optimal Outoparts! ""I'm Oswald, and that magnificent specimen of mechanical mastery is Stuart. Say hello, Stuart!"
+
+Stuart grunts without looking up.
+
+"Isn't he wonderful? Best mechanic this side of anywhere! ""Of course, he wouldn't be where he is today without my business acumen. My entrepreneurial spirit! My VISION!"
+
+Oswald gestures grandly around the shop.
+
+"You see, I'm not just a mechanic. I'm a businessman! An investor! ""I see opportunity where others see obstacles. ""Why, just last week I was thinking about expanding into the entertainment industry. ""Casinos! Gambling! There's SO much money to be made!"
+
+His eyes glitter with something between excitement and obsession.
+
+"But enough about my brilliant plans! What can we do for you today, my new friend?"
+
+Oswald glances at Stuart, then back at you.
+
+"Come back when we know each other a bit better, yes? Trust is built over time!"
+
+As the sun begins to set, and the stars light up in the night sky, you drive over to the casino, eager to play more Blackjack. 
+
+The neon signs blur together. For a moment, you can't remember why you came here.
+
+Welcome, welcome. Have a seat, and we can begin.
+
+The Dealer looks at you strangely. His jade eye narrows.
+He does NOT seem pleased to see you tonight.
+
+You have $245
+
+Your first card is a Jack of Spades
+The Dealer's first card is a Jack of Diamonds
+
+Your second card is a King of Hearts
+The Dealer's second card is face down
+
+As of now, the Dealer's hand has a known value of 10
+Your hand has a value of 20
+
+
+The Dealer's second card is a Three of Hearts
+The Dealer's hand has a value of 13
+
+The Dealer's hand has a value under 17 so they hit
+The Dealer's next card is a Queen of Diamonds
+The Dealer's hand has a value of 23
+
+Dealer's hand busts! Victory is yours!
+You had $245, and with a bet of $53, you've doubled it!
+
+Your new balance is $245 + $53 = $298
+
+Your first card is a Seven of Diamonds
+The Dealer's first card is a Seven of Clubs
+
+Your second card is a Two of Hearts
+The Dealer's second card is face down
+
+As of now, the Dealer's hand has a known value of 7
+Your hand has a value of 9
+
+Your next card is a Three of Clubs
+Your hand has a value of 12
+
+Your next card is an Ace of Spades
+Your hand has a value of 13
+
+Your next card is a Five of Hearts
+Your hand has a value of 18
+
+
+The Dealer's second card is a Two of Spades
+The Dealer's hand has a value of 9
+
+The Dealer's hand has a value under 17 so they hit
+The Dealer's next card is a Jack of Clubs
+The Dealer's hand has a value of 19
+
+The Dealer stands at 19
+
+The Dealer wins! Too bad! So sad! Stay mad!
+You had $298 and lost your bet of $65
+
+Your new balance is $298 - $65 = $233
+
+The Dealer's in a good mood. Here's a $23 hand, on the house!
+
+Your first card is a King of Clubs
+The Dealer's first card is an Eight of Diamonds
+
+Your second card is a Six of Spades
+The Dealer's second card is face down
+
+As of now, the Dealer's hand has a known value of 8
+Your hand has a value of 16
+
+Your next card is a Four of Diamonds
+Your hand has a value of 20
+
+
+The Dealer's second card is a Nine of Diamonds
+The Dealer's hand has a value of 17
+
+The Dealer stands at 17
+
+You outplayed the Dealer to victory! Nice moves.
+You had $233, and with a free bet of $23, you've doubled it!
+
+Your new balance is $233 + $23 = $256
+
+After playing a few rounds of Blackjack, the dealer points to the door. Without questioning his word, and with your winnings in hand, you scurry to the door, eager to get some sleep. You make it to your car and drive away from the casino, and you park in a little alcove on the side of the road. You lay down, and close your eyes. It's time to rest.
+
+══════════════════════════════════════════════════            ~ ~ ~ Day Summary ~ ~ ~══════════════════════════════════════════════════
+
+You nailed it! You've survived 33 days!
+
+Yesterday, at this time, you had $245. 
+Since then, you've accumulated $11. 
+That brings you to a grand total of $256! Let's not get too far ahead of ourselves though, you're still quite poor.
+
+If there's one thing I've learned, it's that you must never back down, and never give up.
+Here's what my cat whispered to me last night: "The trash gets picked up tomorrow. Be ready."
+
+
+
+══════════════════════════════════════════════════Press a key to continue: ~ ~ ~ Morning, Day 34 ~ ~ ~  True══════════════════════════════════════════════════
+
+
+Your current sanity: 27%
+
+You wake up refreshed and optimistic. The optimism will probably wear off by noon, but for now, you bask in it.
+
+The Dealer stands up after a hand and his jacket catches on the chair. A folded piece of paper floats to the ground.
+
+He doesn't notice. You do.
+
+You pick it up. It's a page torn from a journal. The handwriting is careful, precise — the same precision as his card dealing.
+
+"Day 4,382. She would have been seventeen today. I counted the candles like I always do. Seventeen invisible candles on an invisible cake at a table with only one chair."
+
+"The road doesn't get shorter. You just learn to stop counting the miles."
+
+You fold the paper and slip it back onto the table where he'll find it. You don't mention it.
+
+The Dealer comes back, sees the paper, picks it up. Looks at you. You're studying your cards like nothing happened.
+
+He puts the paper in his pocket. Deals the next hand. Says nothing.
+
+Your thoughts are fracturing. The shadows are getting closer.
+
+
+
+Would you like to spend your day driving somewhere? 
+1. Doctor's Office
+2. Witch Doctor's Tower
+3. Trusty Tom's Trucks and Tires
+4. Oswald's Optimal Outoparts
+5. Convenience Store
+6. Marvin's Mystical Merchandise
+7. Grimy Gus's Pawn Emporium
+8. Vinnie's Back Alley Loans
+9. Car Workbench
+10. Stay Home
+Choose a number: [10]
+
+The nightmare is familiar. You're at the table. You bet everything. You bust.
+
+But this time, instead of just losing, the floor opens up. You fall. Through the chair, through the floor, into nothing.
+
+You keep falling. The Dealer's voice echoes from above: "Better luck next time."
+
+You hit the ground. Wake up. You're in your car. You're always in your car.
+
+As the sun begins to set, and the stars light up in the night sky, you drive over to the casino, eager to play more Blackjack. 
+
+The neon signs blur together. For a moment, you can't remember why you came here.
+
+Back again? Let's get this show on the road.
+
+The Dealer looks at you strangely. His jade eye narrows.
+He does NOT seem pleased to see you tonight.
+
+You have $256
+
+Your first card is a Ten of Spades
+The Dealer's first card is a Queen of Clubs
+
+Your second card is an Ace of Hearts
+The Dealer's second card is face down
+
+As of now, the Dealer's hand has a known value of 10
+Your hand has a value of 21
+
+Blackjack! The Dealer's eye twitches. Beautiful.
+You had $256, and with a bet of $35, you've tripled it!
+
+Your new balance is $256 + $70 = $326
+
+Your first card is a Jack of Spades
+The Dealer's first card is a Four of Clubs
+
+Your second card is a Seven of Spades
+The Dealer's second card is face down
+
+As of now, the Dealer's hand has a known value of 4
+Your hand has a value of 17
+
+
+The Dealer's second card is a Ten of Clubs
+The Dealer's hand has a value of 14
+
+The Dealer's hand has a value under 17 so they hit
+The Dealer's next card is a Jack of Hearts
+The Dealer's hand has a value of 24
+
+Bust! The Dealer slams the table. You pretend not to notice.
+You had $326, and with a bet of $45, you've doubled it!
+
+Your new balance is $326 + $45 = $371
+
+Your first card is a Five of Diamonds
+The Dealer's first card is a Jack of Diamonds
+
+Your second card is a Ten of Hearts
+The Dealer's second card is face down
+
+As of now, the Dealer's hand has a known value of 10
+Your hand has a value of 15
+
+Your next card is a Two of Hearts
+Your hand has a value of 17
+
+
+The Dealer's second card is a King of Clubs
+The Dealer's hand has a value of 20
+
+The Dealer stands at 20
+
+The house always wins. Today, you're the proof.
+You had $371 and lost your bet of $51
+
+Your new balance is $371 - $51 = $320
+
+After playing a few rounds of Blackjack, the dealer points to the door. Without questioning his word, and with your winnings in hand, you scurry to the door, eager to get some sleep. You make it to your car and drive away from the casino, and you park in a little alcove on the side of the road. You lay down, and close your eyes. It's time to rest.
+
+══════════════════════════════════════════════════            ~ ~ ~ Day Summary ~ ~ ~══════════════════════════════════════════════════
+
+Yippee! You've survived 34 days!
+
+Yesterday, at this time, you had $256. 
+Since then, you've accumulated $64. 
+That brings you to a grand total of $320! You're basically living paycheck to paycheck. Except there's no paycheck.
+
+Just so you know, your perseverance is more impressive than perfection.
+As I tried to parallel park for the 10th time, I remember a passerby that yelled: "Good Moms have sticky floors, messy kitchens, laundry piles, dirty ovens, and happy kids."
+
+
+
+══════════════════════════════════════════════════Press a key to continue: ~ ~ ~ Morning, Day 35 ~ ~ ~  True══════════════════════════════════════════════════
+
+
+Your current sanity: 20%
+
+Best night's sleep in a long time. You even folded your blanket. Who are you?
+
+
+You feel barely holding on.
+
+
+Your hands are shaking. When did they start shaking?
+
+You stayed at the shelter when you had nowhere else to go.
+
+The beds were close together. Too close. Someone was coughing all night.
+
+Within days, you're coughing too. Deep, rattling coughs. Fever. Night sweats.
+
+Pneumonia. Maybe something worse. The conditions were ripe for disease.As the sun begins to set, and the stars light up in the night sky, you drive over to the casino, eager to play more Blackjack. 
+
+The neon signs blur together. For a moment, you can't remember why you came here.
+
+Are you ready to play some Blackjack?
+
+Would you like to spend your day driving somewhere? 
+1. Doctor's Office
+2. Witch Doctor's Tower
+3. Trusty Tom's Trucks and Tires
+4. Oswald's Optimal Outoparts
+5. Convenience Store
+6. Marvin's Mystical Merchandise
+7. Grimy Gus's Pawn Emporium
+8. Vinnie's Back Alley Loans
+9. Car Workbench
+10. Stay Home
+Choose a number: [10]
+
+Sitting in your car, your mind drifts. You dream of water. Dark water. Deep water. Rising water.
+
+You're in a car—your car—and water is pouring in through every crack.
+
+You can't open the doors. The pressure is too much. The windows won't break.
+
+The water reaches your waist. Your chest. Your neck. Your mouth.
+
+You scream but water fills your lungs instead of air.
+
+...
+
+You wake up underwater.
+
+THIS ISN'T A DREAM. Your car is IN THE RIVER. You must have rolled down the embankment while sleeping.
+
+The water is at your waist. Rising fast. You fumble for the window crank.
+
+It's stuck. You slam your elbow against the glass. Again. Again. AGAIN.
+
+It cracks. Shatters. Water rushes in but you have an opening.
+
+You squeeze through, cutting yourself on the glass, and kick toward the surface.
+
+Air. Sweet, precious air. You drag yourself onto the bank and collapse.
+
+By morning, the wagon is a drowned wreck-half-sunk, flooded through, and useless as transportation.
+
+You can salvage your life, but not your ride. Most of what you kept inside is ruined or swept away. But you're alive.
+
+===============================================         YOUR SANITY HAS SHATTERED           ===============================================
+
+Everything goes dark. The world folds in on itself.
+
+You feel yourself slipping... falling... breaking...
+
+...
+
+Something inside you... snaps.
+
+But it doesn't kill you. Not physically, anyway.
+
+You open your eyes. The world looks... wrong. Colors are too bright. Sounds are too loud. Everything has edges that shouldn't be there.
+
+Your hands are shaking. They won't stop. You're not sure they ever will.
+
+You have become BROKEN.
+
+Your mind is shattered, but somehow you continue. The game goes on.
+
+But nothing will ever be the same.
+
+
+
+
+
+Your new balance is $320 - $96.0 = $224
+
+
+
+As the sun begins to set, and the stars light up in the night sky, you walk to the casino, eager to play more Blackjack. 
+
+The door opens before you touch it. It was expecting you.
+
+You smell like daylight and poor decisions. Sit.
+
+You sit down. Or did you? You're sitting. You think.
+
+The Dealer looks at you strangely. His jade eye narrows.
+He does NOT seem pleased to see you tonight.
+
+You have $224
+
+Your first card is a Six of Spades
+The Dealer's first card is a Six of Clubs
+
+Your second card is a Jack of Hearts
+The Dealer's second card is face down
+
+As of now, the Dealer's hand has a known value of 6
+Your hand has a value of 16
+
+
+The Dealer's second card is a Jack of Clubs
+The Dealer's hand has a value of 16
+
+The Dealer's hand has a value under 17 so they hit
+The Dealer's next card is a Two of Spades
+The Dealer's hand has a value of 18
+
+The Dealer stands at 18
+
+The house always wins. Today, you're the proof.
+You had $224 and lost your bet of $22
+
+Your new balance is $224 - $22 = $202
+
+The Dealer's in a good mood. Here's a $12 hand, on the house!
+
+Your first card is a Three of Hearts
+The Dealer's first card is a Two of Hearts
+
+Your second card is a Seven of Spades
+The Dealer's second card is face down
+
+As of now, the Dealer's hand has a known value of 2
+Your hand has a value of 10
+
+Your next card is a Nine of Spades
+Your hand has a value of 19
+
+
+The Dealer's second card is a Three of Diamonds
+The Dealer's hand has a value of 5
+
+The Dealer's hand has a value under 17 so they hit
+The Dealer's next card is a Six of Hearts
+The Dealer's hand has a value of 11
+
+The Dealer hits
+The Dealer's next card is a Four of Diamonds
+The Dealer's hand has a value of 15
+
+The Dealer hits
+The Dealer's next card is an Eight of Clubs
+The Dealer's hand has a value of 23
+
+Dealer goes kaboom! Were they trying to bake a number cake?
+You had $202, and with a free bet of $12, you've doubled it!
+
+Your new balance is $202 + $12 = $214
+
+Your first card is an Ace of Hearts
+The Dealer's first card is a Five of Diamonds
+
+Your second card is a Four of Spades
+The Dealer's second card is face down
+
+As of now, the Dealer's hand has a known value of 5
+Your hand has a value of 5, or 15 since you have an ace
+
+Your next card is a King of Spades
+Your hand has a value of 15
+
+
+The Dealer's second card is a Four of Hearts
+The Dealer's hand has a value of 9
+
+The Dealer's hand has a value under 17 so they hit
+The Dealer's next card is an Eight of Hearts
+The Dealer's hand has a value of 17
+
+The Dealer stands at 17
+
+Close, but close only counts in horseshoes. And this ain't horseshoes.
+You had $214 and lost your bet of $21
+
+Your new balance is $214 - $21 = $193
+
+After playing a few rounds of Blackjack, the dealer points to the door. Without questioning his word, and with your winnings in hand, you scurry to the door, eager to get some sleep. Making it back to your car, ditched on the side of the road, you lay down, and close your eyes. It's time to rest.
+
+══════════════════════════════════════════════════            ~ ~ ~ Day Summary ~ ~ ~══════════════════════════════════════════════════
+
+Yesss! You've survived 35 days!
+
+Yesterday, at this time, you had $320. 
+Since then, you've managed to lose $127. 
+That brings you to a grand total of $193! Hey, at least you can afford... some things. Not many things. But some.
+
+Do you think maybe you could be a bit better at Blackjack? Just think about it.
+For those who enjoy a bit of bathroom philosophy: "Life is short. Smile while you still have teeth."
+
+
+
+══════════════════════════════════════════════════Press a key to continue: ~ ~ ~ Morning, Day 36 ~ ~ ~  True══════════════════════════════════════════════════
+
+
+Your sanity: BROKEN
+
+You slept so well that you're suspicious. Something this good can't be free.
+
+You hear hooves on asphalt before you see him. Jameson comes riding in on Thunder, but something's wrong. The horse is moving slowly, head drooping.
+
+Jameson dismounts with effort. He looks ten years older than last time.
+
+"Thunder ain't right. Been off his feed for three days. Won't drink water. ""Keeps lying down when he shouldn't."
+
+The old cowboy's voice cracks. This horse is his whole world.
+
+"I can't afford a vet. Not a real one. Those highway robbery sons of—"
+
+He takes off his hat and holds it to his chest.
+
+"You know anything about horses? Or know anyone who does?"
+
+"A mechanic? For a horse?"
+
+"Well... Tom IS good with everything else. Maybe he knows someone."
+
+You give Jameson directions to Tom's garage. The cowboy tips his hat.
+
+"I owe you, friend. If Tom can help Thunder, I owe you everything."
+
+Jameson leads Thunder away on foot. The horse nuzzles against his shoulder. Even sick, they trust each other completely.
+
+You wish him luck. It's all you can afford right now.
+
+You can't sleep. You decide to take a walk.
+
+The city is different at night. Quieter. More honest, somehow. The neon signs hum a frequency only insomniacs can hear.
+
+You walk past closed shops and sleeping houses. Everyone behind those walls has a bed. A fridge. A door that locks from the inside.
+
+You walk until your legs get tired, then you walk some more. The rhythm helps. Step, step, step. Simple. Forward. One direction.
+
+When you get back to your car, you feel calmer. Tired in the right way.
+
+As the sun begins to set, and the stars light up in the night sky, you walk to the casino, eager to play more Blackjack. 
+
+The door opens before you touch it. It was expecting you.
+
+Back for more? The cards appreciate your persistence.
+
+Everything is fine. Everything is fine. Everything is fine. Is everything fine?
+
+The Dealer looks at you strangely. His jade eye narrows.
+He does NOT seem pleased to see you tonight.
+
+You have $193
+
+The Dealer's in a good mood. Here's a $9 hand, on the house!
+
+Your first card is a Five of Spades
+The Dealer's first card is a Five of Diamonds
+
+Your second card is a Two of Diamonds
+The Dealer's second card is face down
+
+As of now, the Dealer's hand has a known value of 5
+Your hand has a value of 7
+
+Your next card is a Queen of Spades
+Your hand has a value of 17
+
+
+The Dealer's second card is a Five of Hearts
+The Dealer's hand has a value of 10
+
+The Dealer's hand has a value under 17 so they hit
+The Dealer's next card is a Jack of Diamonds
+The Dealer's hand has a value of 20
+
+The Dealer stands at 20
+
+Your hand is inferior to the Dealer's. Which means you lose.
+You had $193 and lost your free bet of $9
+
+Your balance is still $193
+
+Your first card is a Four of Hearts
+The Dealer's first card is a Six of Spades
+
+Your second card is a Five of Clubs
+The Dealer's second card is face down
+
+As of now, the Dealer's hand has a known value of 6
+Your hand has a value of 9
+
+Your next card is a Nine of Clubs
+Your hand has a value of 18
+
+
+The Dealer's second card is a Ten of Hearts
+The Dealer's hand has a value of 16
+
+The Dealer's hand has a value under 17 so they hit
+The Dealer's next card is a Two of Clubs
+The Dealer's hand has a value of 18
+
+The Dealer stands at 18
+
+Welp. Those numbers are the same. So much for that round.
+You had $193, and you win back your bet of $19
+
+Your balance is still $193
+
+Your first card is a Jack of Spades
+The Dealer's first card is an Ace of Diamonds
+
+Your second card is a Ten of Clubs
+The Dealer's second card is a Ten of Spades
+
+The Dealer's hand has a value of 21 ;)
+Your hand has a value of 20
+
+Dealer Blackjack. He flips the cards like he's bored. He IS bored. You're entertainment.
+You had $193 and lost your bet of $19
+
+Your new balance is $193 - $19 = $174
+
+After playing a few rounds of Blackjack, the dealer points to the door. Without questioning his word, and with your winnings in hand, you scurry to the door, eager to get some sleep. Making it back to your car, ditched on the side of the road, you lay down, and close your eyes. It's time to rest.
+
+══════════════════════════════════════════════════            ~ ~ ~ Day Summary ~ ~ ~══════════════════════════════════════════════════
+
+Well done! You've survived 36 days!
+
+Yesterday, at this time, you had $193. 
+Since then, you've managed to lose $19. 
+That brings you to a grand total of $174! Hey, at least you can afford... some things. Not many things. But some.
+
+I would probably wipe that smile off that face if I were you. Just kidding, you're awesome.
+Here's a little bit of inspiration for you: "Don't be afraid to fail. Be afraid to get emotionally invested and then fail."
+
+
+
+══════════════════════════════════════════════════Press a key to continue: ~ ~ ~ Morning, Day 37 ~ ~ ~  True══════════════════════════════════════════════════
+
+
+Interest accrued on your loan: $288
+You now owe Vinnie $1,728.
+
+
+
+═══════════════════════════════════════
+         VINNIE WANTS HIS MONEY        
+═══════════════════════════════════════
+
+You're getting into your car when a van screeches up behind you.
+
+Men in dark suits pile out. You recognize Tony—Vinnie's enforcer.
+
+He's carrying a baseball bat. The others have worse.
+
+"Vinnie's done waiting. You owe him "$1,728". Today."
+
+You empty your pockets. $174. It's not enough.
+
+You pay $174. You still owe $1,554.
+
+"This covers the interest. But you still owe us. We'll be back."You have succumbed to your wounds.
+
+You have died!
+You lasted 37 days!
+You met your fate with a final balance of $0
+
+══════════════════════════════════════════════════              ACHIEVEMENTS UNLOCKED══════════════════════════════════════════════════
+★ Stubborn [RARE]  Survive 30 days.
+★ Card Shark [RARE]  Play 100 hands of blackjack.
+★ Blackjack Master [RARE]  Hit 10 blackjacks.
+★ Hot Streak [RARE]  Win 5 hands in a row.
+★ Social Butterfly [RARE]  Meet 20 different people.
+★ Still Kicking [UNCOMMON]  Survive 7 days.
+★ First Friend [UNCOMMON]  Befriend your first companion.
+★ Broken But Breathing [UNCOMMON]  Survive the broken state.
+★ Baby Steps [COMMON]  Reach $1,000 for the first time.
+★ The Third Day [COMMON]  Survive 3 days.
+★ Twenty-One! [COMMON]  Hit your first blackjack.
+★ Getting the Hang of It [COMMON]  Play 10 hands of blackjack.
+★ Beginner's Luck [COMMON]  Win your first hand.
+★ Fortnight Fighter [COMMON]  Survive 14 days.
+★ Card Counter [COMMON]  Play 50 hands of blackjack.
+★ Triple Threat [COMMON]  Win 3 hands in a row.
+★ High Roller Moment [COMMON]  Win a hand worth $1,000+.
+★ Packrat Begins [COMMON]  Acquire your first item.
+★ Starting Collection [COMMON]  Collect 5 different items.
+
+Total: 19/243 (7.8%)
+The police were able to recover your body, but nobody cared enough to show up to your funeral.

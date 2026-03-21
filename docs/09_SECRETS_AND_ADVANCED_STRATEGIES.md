@@ -1,420 +1,242 @@
-# 🔮 SECRETS & ADVANCED STRATEGIES
-
-*Hidden triggers, optimal strategies, and everything the game doesn't tell you.*
+# Secrets & Advanced Strategies
 
 ---
 
-## TABLE OF CONTENTS
+## Hidden Balance Triggers
 
-1. [Secret Balance Triggers](#secret-balance-triggers)
-2. [Condition-Based Secret Events](#condition-based-secret-events)
-3. [Hidden Day Triggers](#hidden-day-triggers)
-4. [Secret Ending Requirements](#secret-ending-requirements)
-5. [The Dealer — Lore & Secrets](#the-dealer--lore--secrets)
-6. [Optimal Strategies](#optimal-strategies)
-7. [Death Avoidance Guide](#death-avoidance-guide)
-8. [Money-Making Tips](#money-making-tips)
-9. [Sanity Management](#sanity-management)
-10. [Advanced Companion Strategy](#advanced-companion-strategy)
-11. [Storyline Manipulation](#storyline-manipulation)
-12. [Item Upgrade Priority](#item-upgrade-priority)
-13. [Loan Shark Strategy](#loan-shark-strategy)
+| Balance | Event |
+|---------|-------|
+| **$1,111** | Make a wish — heal 50 HP, gain $100–300, find Lucky |
+| **$777,777** | Lucky sevens — find Lucky companion, +30 HP |
+| **$999,999** | Wind blows exactly $1 away |
+| **$50,000+** | Victoria rival unlocks |
+| **$150,000+** | Tax Man events begin |
+| **$1,000,000** | Morning visitor → ending sequence |
 
 ---
 
-## SECRET BALANCE TRIGGERS
+## Day Number Secrets
 
-These events only fire when your balance is at an **exact dollar amount**. If the condition isn't met when the event is drawn, a normal day event plays instead.
-
-| Exact Balance | Event Name | Effect |
-|---|---|---|
-| **$13** | Unlucky Number | Black cat hisses, mirror cracks. **-5 Sanity**, gain "Cursed" status |
-| **$21** | Blackjack Number | Special blackjack-themed event |
-| **$100** | Benjamin's Blessing | Ben Franklin "winks" at you. **+5 Sanity**, gain "Benjamin's Blessing" status |
-| **$420** | Nice | Everyone says "Nice." **+4 Sanity, +20 Health**. The universe approves. |
-| **$666** | Devil's Number | Dark, ominous event with occult overtones |
-| **$1,111** | Angel Numbers | Repeating ones trigger a spiritual moment |
-| **$1,234** | Sequential Luck | Perfect 1-2-3-4 sequence. **+5 Sanity**, gain "Sequential Luck" status |
-| **$7,777** | Lucky Sevens | Slot machines hit jackpot, four-leaf clover appears. **+7 Sanity, +20 Health**, gain "Lucky" status |
-| **$69,420** | Maximum Nice | The ultimate meme number. Angels sing "nice" in harmony. **+69 Health(!), +10 Sanity**, gain "Maximum Nice" status |
-
-> **Tip**: You can deliberately reach these balances by carefully betting specific amounts. The $69,420 event is one of the best healing events in the game.
+| Trigger | Effect |
+|---------|--------|
+| Palindrome day (e.g., day 33, 44) | Special event |
+| Prime number day | Unique encounter |
+| Day 100+ | Rare endgame events |
+| Every 7th day | Vinnie interest compounds |
 
 ---
 
-## CONDITION-BASED SECRET EVENTS
+## The Dealer's Identity
 
-These events trigger based on your current game state rather than balance:
-
-### Balance = Health
-- **Trigger**: Your dollar balance exactly equals your current health
-- **Effect**: +5 Sanity
-- *"Are you worth exactly one dollar per hit point?"*
-
-### Perfect Health (100 HP)
-- **Trigger**: Exactly 100 health
-- **Effect**: +10 Sanity, gain "Perfect Condition" status
-- *"No aches. No pains. No stiffness. Nothing hurts. You feel PERFECT."*
-
-### Rock Bottom
-- **Trigger**: Both Health AND Sanity below 20
-- **Effect**: +5 Sanity
-- *"If this is the bottom, then there's only one way to go: up."*
-
-### The Veteran Gambler
-- **Trigger**: Day 100+ (played for 100+ days)
-- **Effect**: Receive "Veteran's Lucky Chip" item, +15 Sanity, meet The Old Timer
-- *An old man recognizes a kindred spirit. Gives you his worn poker chip.*
+Jade-eyed cowboy. Former teacher. Wife Maria and daughter Sofia died. The casino is his purgatory. Tom, Frank, and Oswald's dream chains reveal pieces of his story. Frank's chain reveals the Dealer's anger and scarred face. The Joker card is the final clue. He was once like you.
 
 ---
 
-## HIDDEN DAY TRIGGERS
+## Casino Secrets
 
-### Palindrome Days
-- **Trigger**: Day is a multiple of 11 (Day 11, 22, 33, 44...)
-- **Effect**: +5 Sanity, +11 Health
-- *"A palindrome. The same forwards and backwards. Everything feels balanced."*
-
-### Prime Number Days
-- **Trigger**: Day is a prime number (2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31...)
-- **Effect**: +3 Sanity
-- *"Day [X]. A prime number. Indivisible. Unique. Like you."*
-
-### Full Moon Madness
-- **Trigger**: Every 28th day (Day 28, 56, 84, 112...)
-- **Effect**: +10 Sanity, gain "Lunar Frenzy" status
-- *"Something inside you howls for action."*
-- **Note**: Only available in higher wealth rank pools (Rich+)
-
-### Weekly Events
-- **Trigger**: Day is a multiple of 7
-- **Effect**: Special weekly event with varied outcomes
+- **Grandfather Clock** — Hidden event trigger in the casino
+- **VIP Lounge** — Requires High Roller Keycard (earned at high ranks)
+- **Dealer Happiness** — Giving gifts and blending cash affects the Dealer's behavior
+- **Low Sanity** — Casino environment warps and distorts
+- **Insurance** — Only available with Dealer's Whispers flask from Witch Doctor
 
 ---
 
-## SECRET ENDING REQUIREMENTS
+## Strategy Guide by Phase
 
-| Ending | Requirements |
-|---|---|
-| **Sanctuary** | $1,000,000 + 5 companions + Animal Whistle + choose airport + charter option |
-| **Eternity** | $1,000,000 + ALL 17 items upgraded + visit Oswald |
-| **Retribution** | $1,000,000 + visit Frank + refuse jacket OR accept + shoot Frank |
-| **Destruction** | $1,000,000 + visit Frank + shoot the Dealer |
-| **Transcendence** | $1,000,000 + visit Oswald + accept casino offer |
-| **Madness** | Sanity reaches 0 (40% chance) OR fail the shadow's 3 questions |
-| **Survive Madness** | Score 5+/9 on shadow's questions (answer honestly/introspectively) |
-| **Broken** | Sanity reaches 0 (60% chance) — not an ending, gameplay continues |
+### Early Game (Days 1–10)
 
-### Shadow Question Optimal Answers
-When confronting the shadow (madness event), these answers give the most sanity points:
+**Priority:** Survive, build bankroll, find Map.
 
-1. **"Why do you gamble?"** → *"I don't know anymore."* (+3 points)
-2. **"What do you see when you look at the Dealer?"** → *"Nothing. He's just a man doing a job."* (+3 points)
-3. **"Would you walk away?"** → *"Yes, I would walk away."* OR *"I can't imagine any other life now."* (+2 points each)
+| Action | Why |
+|--------|-----|
+| Conservative bets ($25–50) | Preserve capital |
+| Visit Convenience Store | Buy Cough Drops, Sunscreen |
+| Find Map | Unlocks Marvin's + Witch Doctor |
+| Get companion | Sanity buffer |
+| Visit Doctor early | Treat illnesses before they chain |
 
-Score 5+ to survive. Maximum possible: 9 points.
+**Trap Avoidance:**
+- Don't take Vinnie's loans unless desperate
+- Don't sell companions
+- Don't ignore illness (chains to worse conditions)
 
----
+### Mid Game (Days 10–30)
 
-## THE DEALER — LORE & SECRETS
+**Priority:** Reach Rank 2, acquire Marvin items, build edge score.
 
-Pieced together from storylines, dreams, and endings:
+| Action | Why |
+|--------|-----|
+| Buy Marvin items | Edge score = bigger bets |
+| Start storylines | Unlock endings |
+| Get Tool Kit | Crafting access |
+| Adventures (Rank 2+) | Extra income + items |
+| Manage fatigue | Don't skip rest |
 
-- **Real Name**: Mortimer (revealed in the Retribution ending)
-- **Appearance**: Jade green glass eye (left side), terrible scar on left face, thick fingers, carries a revolver
-- **Age**: Ancient — possibly centuries old. References Vienna, 1938. Has dealt cards "in Berlin, in Buenos Aires, in basements and bunkers"
-- **Origin**: Survived the Holocaust. A man in Vienna hid him for three months. That man gave him a jade chip. Mortimer carried it for 85 years waiting for someone worthy.
-- **Dog Story**: Had a dog named Scrappy who bit his face off during fetch. He drove Scrappy to the woods and shot him. This story is told in the Resurrection ending.
-- **Nature**: Possibly immortal or supernatural. Moves "like shadow and smoke." His jade eye "catches the light like something never meant to be human." He stopped aging. He's "been doing it for centuries."
-- **Combat**: His revolver drops six armed bikers in six shots without hesitation
-- **Happiness**: 0–100 scale. If it reaches 0, **he kills you**. Manage it carefully via gifts and behavior.
-- **Role**: Both antagonist and protector depending on the path you choose
+**Key Marvin Items (Priority Order):**
 
----
+| Item | Cost | Edge | Why First |
+|------|------|------|-----------|
+| Marked Deck | $3,000 | +5 | Cheap, reliable |
+| Card Counter | $5,000 | +8 | Best value |
+| Loaded Dice | $3,500 | +3 | Cheap boost |
+| Rigged Shoe | $8,000 | +10 | Powerful |
+| Crystal Ball | $12,000 | +12 | High value |
+| Dealer's Tell | $15,000 | +15 | Premium |
 
-## OPTIMAL STRATEGIES
+### Late Game (Days 30+)
 
-### Early Game (Days 1–10, Poor Rank)
-1. **Bet conservatively** — Start with $5–$10 bets until you build a cushion
-2. **Don't risk more than 25%** of your balance on any hand
-3. **Buy food early** — The food system depletes health when hungry
-4. **Avoid dangerous events** — Back alleys and shortcuts kill early characters
-5. **Save for the Doctor** — Untreated illnesses spiral fast
+**Priority:** Reach $1M, set up ending.
 
-### Mid Game (Days 10–30, Modest–Well-Off)
-1. **Visit Kyle's store regularly** — Unlock the gift system after 3–5 purchases
-2. **Gift items to the Dealer** — Keep Dealer Happiness above 30 at all times
-3. **Invest in items at the casino** — Any item is better than no item
-4. **Start companion collecting** — Feed them daily, never let happiness drop below 20
-5. **Visit mechanics** — 3+ visits unlocks the upgrade system at Oswald's
-
-### Late Game (Days 30+, Rich–Nearly There)
-1. **Scale bets with rank** — Higher ranks allow bigger bets, but the Dealer is harder
-2. **Manage fraudulent cash** — Blend it through gambling before the Dealer notices
-3. **Complete storylines** — Many give permanent bonuses or unlock endings
-4. **Prepare for the million** — Decide your ending path before hitting $1M
-5. **Keep companions alive** — Need 5+ for the Sanctuary ending
+| Action | Why |
+|--------|-----|
+| Max edge score | Larger bets, better odds |
+| Complete Tanya 5+ visits | Best ending |
+| Meet Tom | Required for Salvation |
+| Maintain sanity > 50 | Avoid depression ending |
+| Stockpile health items | Survival insurance |
 
 ---
 
-## DEATH AVOIDANCE GUIDE
+## Ending Unlock Guides
 
-### Top Causes of Death (and How to Avoid Them)
+### Salvation (Healed) — The Best
 
-| Cause | Prevention |
-|---|---|
-| **Dealer's Wrath** (Happiness = 0) | Gift items regularly. Don't peek/cheat excessively. Don't annoy him. |
-| **Untreated Injuries** | Visit the Doctor or Witch Doctor. Don't ignore health drops. |
-| **Loan Shark (Tony)** | Repay loans before 21 days. Avoid borrowing if possible. |
-| **Carbon Monoxide** | Random event — health items and healing companions help survive |
-| **Back Alley Events** | Don't take shortcuts when low health |
-| **Sanity = 0 → Madness** | Companions restore sanity. Answer shadow's questions wisely. |
-| **Food Poisoning / Bad Events** | Keep health above 30 as a safety buffer |
+1. Find Tanya's Number (5% after day 12)
+2. Visit Tanya 5+ times
+3. Meet Tom (any mechanic visit)
+4. Reach $1,000,000
+5. Morning visitor → phone → automatic answer
 
-### Emergency Healing
-- **Flask of Restoration** (Witch Doctor): Immediate large health restore
-- **Echo the Dolphin**: +10 health per interaction
-- **Group companion time**: +15 health from "spend time with all"
-- **$420 balance**: Free +20 health (if you can hit exact balance)
-- **$69,420 balance**: Free +69 health (the best hidden heal in the game)
+### Sanctuary — Secret
 
----
+1. Collect 5+ companions
+2. Find Animal Whistle (adventures)
+3. Reach $1,000,000
+4. Hidden airfield appears
 
-## MONEY-MAKING TIPS
+### Bliss — Simplest
 
-### Gambling Strategy
-- **Basic Strategy**: Hit on 16 or below, Stand on 17+. This is fundamental.
-- **Double Down**: Best on 10 or 11 when the Dealer shows a low card (2–6)
-- **Split**: Always split Aces and 8s. Never split 10s or 5s.
-- **Surrender**: Use on 16 vs Dealer's 9, 10, or Ace to save half your bet
-- **Insurance**: Generally a bad bet. Only consider if you have Sneaky Peeky Shades/Goggles.
-
-### Non-Gambling Income
-| Source | Amount | How |
-|---|---|---|
-| **Mr. Pecks** | $1–$20/day | 5% chance, companion happiness ≥40 |
-| **Rusty** | $2–$15/day | 3% chance, companion happiness ≥50 |
-| **Hopper/Squirrelly** | $5–$25/day | 1–3% chance via luck bonus |
-| **Seat Cash** | Small finds | Random Poor-tier event |
-| **Found $20** | $20 | Random event |
-| **Pawn Shop** | Varies | Sell items/collectibles at Gus's |
-| **Lucky Penny** | $1 | Random event |
-
-### Fraudulent Cash (Loan Shark)
-- Vinnie's loans give **fake money** that feels "too smooth"
-- Use it for gambling — it blends into real cash through bets
-- **Warning**: If the Dealer accumulates too much fake cash, he notices
-- Thresholds decrease at higher ranks (Poor: $50k tolerance → Nearly There: $500 tolerance)
-- Getting caught stops Dealer happiness gains
+1. Own a working car
+2. Reach $1,000,000
+3. Choose Airport
 
 ---
 
-## SANITY MANAGEMENT
+## Event Chain Guides
 
-### Sanity Drain Sources
-| Source | Sanity Lost |
-|---|---|
-| Losing 50%+ of balance in one hand | 2–4 |
-| Losing 25%+ of balance in one hand | 1–2 |
-| Small losses (random 10% chance) | 1 |
-| Companion runs away | 10 |
-| Companion dies | 20 |
-| Various dark events | Varies |
+### Hermit Trail (5 stages)
+Find Map → Journal entry → Walking Stick → Strange location → Hollow Oak treasure
 
-### Sanity Restoration Sources
-| Source | Sanity Gained |
-|---|---|
-| Winning a hand (20% chance) | 1 |
-| Companion sanity bonuses (daily, 33% chance) | 1–10 (varies by companion) |
-| Group companion time | 10 |
-| Echo the Dolphin interaction | 10 |
-| Full Moon Madness event | 10 |
-| Veteran Gambler event | 15 |
-| Various positive events | Varies |
+### Midnight Radio (5 stages)
+Pick up Signal Booster → Strange broadcast → Frequency Dial → Hidden station → Record
 
-### Best Sanity Companions
-1. **Echo** (Dolphin) — +10 Sanity per interaction
-2. **Kraken** — +8 Sanity per interaction
-3. **Moonwhisker** (Magical Rabbit) — +7 Sanity per interaction
-4. **Shellbert** (Ancient Tortoise) — +6 Sanity
-5. **Don** (Raccoon Boss) — +6 Sanity
-6. **Lucky** (Dog) — +5 passive daily restore
-7. **Grace** (Deer) — +5 Sanity per interaction
+### Junkyard Artisan (5 stages)
+Find Goggles → Discover Metal Rose → Get Toolkit → Gideon's story → Junkyard Crown
 
-### Broken State
-If sanity hits 0, there's a 60% chance you become **Broken** instead of getting the Madness ending. Broken state means:
-- Sanity is permanently 0
-- Random gameplay effects each day (money loss/gain, self-harm, hallucinations)
-- 15 different hallucination text effects cycle through
-- You can still play and win, but the experience is... different
+### Lost Dog Flyers (5 stages)
+Find Flyers → Investigate → Whistle → Find culprit → Neighborhood party
+
+**Tip:** Completing 2+ chains triggers crossover events.
 
 ---
 
-## ADVANCED COMPANION STRATEGY
+## Trap Avoidance
 
-### Optimal Companion Squad
-For the **Sanctuary ending**, you need 5+ companions. Ideal targets:
+### Items That Hurt
 
-1. **Lucky** (Dog) — Easy to find, highest sanity restore, storyline integration
-2. **Whiskers** (Cat) — Danger warning, good sanity restore, storyline
-3. **Hopper** (Rabbit) — Best luck bonus, solid sanity
-4. **Mr. Pecks** (Crow) — Passive money generation
-5. **Patches** (Opossum) — Night bonuses are unique and valuable
+| Item | Danger |
+|------|--------|
+| Necronomicon | −sanity drain |
+| Cursed items | Various penalties |
+| Expired medicine | Worsens illness |
 
-### Companion Maintenance Schedule
-- **Morning**: Companions get daily update (hunger check, bonding check, runaway check)
-- **Afternoon**: Interact → "Spend time with all" (feeds everyone, pets everyone, +10 sanity, +15 health)
-- **Night**: Patches provides passive night bonus
+### Situations to Avoid
 
-### Preventing Runaway
-- Feed **every single day** — unfed companions lose 5 happiness
-- If you miss a day, immediately interact and feed the next day
-- Keep all companions above 20 happiness at minimum
-- At 10 or below, there's a 33% daily chance they leave
-
-### Bonding Checklist
-1. Keep happiness at 80+
-2. Own companion for 7+ days
-3. Bond triggers automatically — "Your friendship is unbreakable"
-4. Bonded companions have unique dialogue and deeper story integration
+| Situation | Consequence |
+|-----------|------------|
+| Ignoring illness | Chains to lethal conditions |
+| Max debt with Vinnie | Tony violence → death |
+| Selling 3+ companions | Dark path, no Sanctuary |
+| Sanity < 30 | Shadow entity → Madness ending |
+| No car, no money | Trapped — can't visit locations |
 
 ---
 
-## STORYLINE MANIPULATION
+## Companion Optimization
 
-### How to Trigger Specific Storylines Faster
+### Budget Run
+**Patches** (free food) + **Mr. Pecks** (money finding) = sustained income with zero food costs.
 
-Storylines use escalating probability. You can influence what fires by:
+### Sanity Run
+**Lucky** (+5/day) + **Whiskers** (+3/day) = +8 sanity/day, danger warnings.
 
-1. **Meeting conditions**: Each storyline has start conditions. Get injured for Dr. Feelgood, reach $100k for The Collector, etc.
-2. **Waiting**: The escalation system guarantees eventual triggers. Be patient.
-3. **Only one per day**: If multiple storylines are eligible, the game picks randomly. Fewer active storylines = more predictable firing.
+### Luck Run
+**Hopper** (+3 luck) + **Squirrelly** (+1 luck) = +4 total luck bonus.
 
-### Fastest Storylines
-| Storyline | Why It's Fast |
-|---|---|
-| **The Carnival** | Base 40%, +25%/day escalation. Min gap: 1 day. Fires almost immediately. |
-| **Painkiller** | Base 20%, +12%/day. Min gap: 2 days. Fast but requires injury. |
-| **Dr. Feelgood** | Base 20%, +12%/day. Min gap: 2 days. Requires severe injury. |
-
-### Slowest Storylines
-| Storyline | Why It's Slow |
-|---|---|
-| **The Dealer's Past** | Base 10%, +6%/day. Min gap: 5 days. Lowest escalation in the game. |
-| **The Collector** | Base 10%, +8%/day. Min gap: 5 days. Needs $100k+. |
-| **The Graveyard** | Base 10%, +8%/day. Min gap: 5 days. |
+### Sanctuary Setup
+Get 5+ companions early. Keep all happy. Find Animal Whistle in adventures. Don't sell any.
 
 ---
 
-## ITEM UPGRADE PRIORITY
+## Money-Making Secrets
 
-All 17 items can be upgraded at Oswald's (after 3+ mechanic visits). Here's the optimal upgrade order:
-
-### Tier 1 — Upgrade First
-| Base Item | Upgraded | Why |
-|---|---|---|
-| **Health Indicator** | Health Manipulator | Health management is survival |
-| **Sneaky Peeky Shades** | Sneaky Peeky Goggles | Seeing the Dealer's card is enormous |
-| **Lucky Coin** | Lucky Medallion | Direct luck improvement |
-| **Faulty Insurance** | Real Insurance | Prevents catastrophic losses |
-
-### Tier 2 — Upgrade Next
-| Base Item | Upgraded | Why |
-|---|---|---|
-| **Delight Indicator** | Delight Manipulator | Dealer happiness management |
-| **Golden Watch** | Sapphire Watch | Time/action bonuses |
-| **Gambler's Grimoire** | Oracle's Tome | Better stat tracking + predictions |
-| **White Feather** | Phoenix Feather | Survives death once |
-
-### Tier 3 — Upgrade When Possible
-| Base Item | Upgraded | Why |
-|---|---|---|
-| **Worn Gloves** | Velvet Gloves | Card handling bonuses |
-| **Tattered Cloak** | Invisible Cloak | Stealth/avoidance |
-| **Quiet Sneakers** | Quiet Bunny Slippers | Stealth improvement |
-| **Rusty Compass** | Golden Compass | Navigation/exploration |
-
-### Tier 4 — Upgrade Last
-| Base Item | Upgraded | Why |
-|---|---|---|
-| **Dirty Old Hat** | Unwashed Hair | Cosmetic/minor bonus |
-| **Pocket Watch** | Grandfather Clock | Time-based bonus |
-| **Gambler's Chalice** | Overflowing Goblet | Flask capacity |
-| **Twin's Locket** | Mirror of Duality | Split bonuses |
-| **Dealer's Grudge** | Dealer's Mercy | Dealer interaction |
-
-> **Ultimate Goal**: Upgrading ALL 17 items unlocks the **Eternity ending** — a secret postgame path where you transcend humanity.
+| Method | Expected Value |
+|--------|---------------|
+| High edge score blackjack | Best sustained income |
+| Mr. Pecks money finding | Passive 5% bonus |
+| Adventure rewards | Variable, some very high |
+| Crafting + selling | Tool Kit profit loop |
+| Sun visor 5% rare ($800–2k) | Lucky windfall |
+| Wind event 3% rare ($300–800) | Lucky windfall |
 
 ---
 
-## LOAN SHARK STRATEGY
+## Advanced Blackjack Strategy
 
-### When to Borrow
-- **Emergency only** — When health is critical and you need Doctor money
-- **Never borrow more than you can repay within 7 days** (before first interest hit)
-- Interest is **20% per week**, compounding
+### Edge Score Priorities
+1. Buy cheapest Marvin items first (Marked Deck, Loaded Dice)
+2. Scale up to Card Counter, Rigged Shoe
+3. Premium items (Crystal Ball, Dealer's Tell) for endgame
+4. Max edge score = max bet sizing
 
-### Repayment Priority
-| Days Overdue | Warning Level | Consequence |
-|---|---|---|
-| 0–2 | None | Safe |
-| 3–6 | Level 1 (Warning) | 10% chance of Vinnie event |
-| 7–13 | Level 2 (Threat) | 14% chance, **+20% interest applied** |
-| 14–20 | Level 3 (Violence) | 20% chance, escalating threats |
-| 21+ | Level 4 (Death) | **33% chance Tony collects** — can kill you |
+### Bet Sizing Rules
+- Never bet more than 10% of bankroll
+- Increase bets proportionally to edge score
+- Conservative early, aggressive late
+- Don't chase losses
 
-### Fraudulent Cash Management
-- Loan money is **fake** — blend it through gambling quickly
-- Dealer has fake cash detection thresholds by rank:
-  - Poor: $50,000 (very lenient)
-  - Modest: $30,000
-  - Well-Off: $15,000
-  - Rich: $5,000
-  - Very Rich: $2,000
-  - Nearly There: **$500** (extremely strict)
-- Exceeding the threshold **blocks Dealer happiness gains**
-
-### Best Practice
-1. Borrow the minimum you need
-2. Gamble with fake cash immediately to blend it
-3. Repay before Day 7 to avoid interest
-4. Never borrow at high ranks — the fake cash threshold is too low
+### Insurance
+- Only if you have Dealer's Whispers flask
+- Without it: always decline
 
 ---
 
-## MISCELLANEOUS SECRETS
+## Run Checklist
 
-### The Dealer's Gift System
-- Unlock at Kyle's store after 3–5 purchases AND Rank ≥1 (Modest)
-- Wrap any item as a gift ($10 wrapping fee)
-- Deliver to the Dealer at the casino
-- Each item has a unique Dealer reaction and happiness change
-- **Warning**: Some gifts **make the Dealer kill you** (kills_you flag)
-
-### Gambling Stats (Gambler's Grimoire / Oracle's Tome)
-- Tracks: Total hands, wins, losses, ties, blackjacks, busts
-- Tracks: Total won/lost, net profit, biggest win/loss, best/worst streaks
-- Announces record-breaking moments with snarky commentary
-- Oracle's Tome adds **snarky predictions** based on your win rate:
-  - \>60%: Backhanded compliments about your luck
-  - 40–60%: Commentary on your mediocrity
-  - <40%: Suggestions to try knitting instead
-
-### Hidden Durability Mechanics
-- Items have hidden durability counters
-- Each use/day reduces durability by 1–5 (varies by item)
-- When durability hits 0, the item **breaks** with a dramatic message
-- Durability resets to base value (lower for base items, higher for upgrades)
-- Oracle's Tome: 100 durability (vs Grimoire's 60)
-- Overflowing Goblet: 30 (vs Chalice's 20)
-
-### The Dealer's Happiness Scaling
-- Dealer Happiness affects his behavior at the table
-- At very low happiness (10–20), he becomes aggressive and hostile
-- At 0, **he kills you** — this is a hard game over
-- Gift-giving is the primary way to raise happiness
-- Annoying behavior (excessive peeking, cheating, wasting time) lowers it
+```
+□ Day 1-3: Buy Cough Drops, Sunscreen at store
+□ Day 1-5: Find first companion
+□ Day 3-8: Find Map (unlocks Marvin + Witch Doctor)
+□ Day 5-10: First Marvin item purchase
+□ Day 8-12: Get Tool Kit for crafting
+□ Day 10-15: Reach Rank 2 (adventures unlock)
+□ Day 12+: Watch for Tanya's Number (5% daily)
+□ Day 15-25: Build edge score with Marvin items
+□ Day 20-30: Visit Tanya 3+ times
+□ Day 25+: Push toward $1M
+□ Day 30+: Complete Tanya 5th visit
+□ At $1M: Morning visitor → ending
+```
 
 ---
 
-*← Back to [08 — Endings & Achievements](08_ENDINGS_AND_ACHIEVEMENTS.md) | Return to [01 — Overview & Quick Start](01_OVERVIEW_AND_QUICK_START.md) →*
+## Fun Facts
+
+- The Dealer's name is never spoken
+- Tom's dream chain reveals the player's name is **Johnathan (John)**
+- Frank's dream chain reveals the Dealer lost everything to gambling
+- The Witch Doctor speaks in riddles but every flask does exactly what it says
+- Patches the opossum literally eats garbage and loves it
+- The $999,999 wind event can only happen once
+- Bruno the bodyguard costs $50/day but prevents all mugging events

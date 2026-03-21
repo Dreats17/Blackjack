@@ -6,9 +6,6 @@
           "bet": 96,
           "goal": "survive_emergency",
           "trace_metadata": {
-            "catalog_push_spend": 0,
-            "catalog_push_window": false,
-            "healthy_pre_shop_escape_window": false,
             "max_ratio": 0.2,
             "mechanic_gap": 0,
             "mechanic_threshold_push_window": false,
@@ -23,8 +20,6 @@
               }
             },
             "pressure_bet": 200,
-            "purchase_push_shortfall": 0,
-            "purchase_push_window": false,
             "ratio": 0.12,
             "store_budget": 0
           },
@@ -39,9 +34,6 @@
           "bet": 20,
           "goal": "acquire_car",
           "trace_metadata": {
-            "catalog_push_spend": 0,
-            "catalog_push_window": false,
-            "healthy_pre_shop_escape_window": false,
             "max_ratio": 0.16,
             "mechanic_gap": 0,
             "mechanic_threshold_push_window": false,
@@ -56,8 +48,6 @@
               }
             },
             "pressure_bet": 0,
-            "purchase_push_shortfall": 0,
-            "purchase_push_window": false,
             "ratio": 0.12,
             "store_budget": 0
           },
@@ -72,10 +62,7 @@
           "bet": 22,
           "goal": "acquire_car",
           "trace_metadata": {
-            "catalog_push_spend": 0,
-            "catalog_push_window": false,
-            "healthy_pre_shop_escape_window": false,
-            "max_ratio": 0.34,
+            "max_ratio": 0.16,
             "mechanic_gap": 59,
             "mechanic_threshold_push_window": false,
             "pending_marvin_active": false,
@@ -88,9 +75,7 @@
               }
             },
             "pressure_bet": 0,
-            "purchase_push_shortfall": 0,
-            "purchase_push_window": false,
-            "ratio": 0.24,
+            "ratio": 0.16,
             "store_budget": 8
           },
           "trace_reason": "goal=acquire_car blackjack_bet phase=car_rush survival=True edge=0"
@@ -104,10 +89,7 @@
           "bet": 15,
           "goal": "acquire_car",
           "trace_metadata": {
-            "catalog_push_spend": 0,
-            "catalog_push_window": false,
-            "healthy_pre_shop_escape_window": true,
-            "max_ratio": 0.44,
+            "max_ratio": 0.66,
             "mechanic_gap": 150,
             "mechanic_threshold_push_window": false,
             "pending_marvin_active": false,
@@ -120,9 +102,7 @@
               }
             },
             "pressure_bet": 0,
-            "purchase_push_shortfall": 0,
-            "purchase_push_window": false,
-            "ratio": 0.34,
+            "ratio": 0.52,
             "store_budget": 0
           },
           "trace_reason": "goal=acquire_car blackjack_bet phase=car_rush survival=False edge=3"
@@ -133,13 +113,10 @@
       },
       {
         "details": {
-          "bet": 24,
+          "bet": 31,
           "goal": "acquire_car",
           "trace_metadata": {
-            "catalog_push_spend": 0,
-            "catalog_push_window": false,
-            "healthy_pre_shop_escape_window": false,
-            "max_ratio": 0.22,
+            "max_ratio": 0.18,
             "mechanic_gap": 26,
             "mechanic_threshold_push_window": false,
             "pending_marvin_active": false,
@@ -152,8 +129,6 @@
               }
             },
             "pressure_bet": 0,
-            "purchase_push_shortfall": 0,
-            "purchase_push_window": false,
             "ratio": 0.18,
             "store_budget": 0
           },
@@ -161,17 +136,14 @@
         },
         "passed": true,
         "scenario_id": "pre_tom_doctor_window_preserves_cash",
-        "summary": "bet=24 max_bet=31"
+        "summary": "bet=31 max_bet=31"
       },
       {
         "details": {
-          "bet": 40,
+          "bet": 56,
           "goal": "acquire_car",
           "trace_metadata": {
-            "catalog_push_spend": 0,
-            "catalog_push_window": false,
-            "healthy_pre_shop_escape_window": false,
-            "max_ratio": 0.28,
+            "max_ratio": 0.46,
             "mechanic_gap": 40,
             "mechanic_threshold_push_window": true,
             "pending_marvin_active": false,
@@ -184,45 +156,38 @@
               }
             },
             "pressure_bet": 40,
-            "purchase_push_shortfall": 0,
-            "purchase_push_window": false,
-            "ratio": 0.22,
+            "ratio": 0.35,
             "store_budget": 0
           },
           "trace_reason": "goal=acquire_car blackjack_bet phase=car_rush survival=False edge=0"
         },
         "passed": true,
         "scenario_id": "first_mechanic_threshold_pushes_for_one_hand_cross",
-        "summary": "bet=40 min_bet=40"
+        "summary": "bet=56 min_bet=40"
       },
       {
         "details": {
           "bet": 5000,
-          "goal": "blend_fraudulent_cash_safely",
+          "goal": "push_next_rank",
           "trace_metadata": {
-            "catalog_push_spend": 0,
-            "catalog_push_window": false,
-            "healthy_pre_shop_escape_window": false,
             "max_ratio": 0.36,
             "mechanic_gap": 0,
             "mechanic_threshold_push_window": false,
             "pending_marvin_active": false,
             "pending_marvin_shortfall": 0,
             "plan": {
-              "goal": "blend_fraudulent_cash_safely",
-              "reason": "highest scored goal blend_fraudulent_cash_safely=47.0",
+              "goal": "push_next_rank",
+              "reason": "highest scored goal push_next_rank=78.0",
               "scores": {
                 "blend_fraudulent_cash_safely": 47.0,
-                "push_next_rank": 42.0
+                "push_next_rank": 78.0
               }
             },
             "pressure_bet": 0,
-            "purchase_push_shortfall": 0,
-            "purchase_push_window": false,
             "ratio": 0.24,
             "store_budget": 0
           },
-          "trace_reason": "goal=blend_fraudulent_cash_safely blackjack_bet phase=car_ready survival=False edge=6"
+          "trace_reason": "goal=push_next_rank blackjack_bet phase=car_ready survival=False edge=6"
         },
         "passed": true,
         "scenario_id": "fraudulent_cash_blend_case",
@@ -233,9 +198,6 @@
           "bet": 1080,
           "goal": "push_next_rank",
           "trace_metadata": {
-            "catalog_push_spend": 0,
-            "catalog_push_window": false,
-            "healthy_pre_shop_escape_window": false,
             "max_ratio": 0.1,
             "mechanic_gap": 0,
             "mechanic_threshold_push_window": false,
@@ -243,15 +205,13 @@
             "pending_marvin_shortfall": 0,
             "plan": {
               "goal": "push_next_rank",
-              "reason": "highest scored goal push_next_rank=30.0",
+              "reason": "highest scored goal push_next_rank=64.0",
               "scores": {
                 "exploit_marvin": 0.0,
-                "push_next_rank": 30.0
+                "push_next_rank": 64.0
               }
             },
             "pressure_bet": 0,
-            "purchase_push_shortfall": 0,
-            "purchase_push_window": false,
             "ratio": 0.06,
             "store_budget": 0
           },
@@ -263,45 +223,37 @@
       },
       {
         "details": {
-          "bet": 2024,
+          "bet": 920,
           "goal": "push_next_rank",
           "trace_metadata": {
-            "catalog_push_spend": 0,
-            "catalog_push_window": false,
-            "healthy_pre_shop_escape_window": false,
-            "max_ratio": 0.36,
+            "max_ratio": 0.1,
             "mechanic_gap": 0,
             "mechanic_threshold_push_window": false,
             "pending_marvin_active": true,
             "pending_marvin_shortfall": 0,
             "plan": {
               "goal": "push_next_rank",
-              "reason": "highest scored goal push_next_rank=42.0",
+              "reason": "highest scored goal push_next_rank=88.0",
               "scores": {
                 "exploit_marvin": 0.0,
-                "push_next_rank": 42.0
+                "push_next_rank": 88.0
               }
             },
-            "pressure_bet": 765,
-            "purchase_push_shortfall": 900,
-            "purchase_push_window": true,
-            "ratio": 0.2,
+            "pressure_bet": 576,
+            "ratio": 0.06,
             "store_budget": 0
           },
           "trace_reason": "goal=push_next_rank blackjack_bet phase=rank_two_rush survival=False edge=5"
         },
-        "passed": true,
+        "passed": false,
         "scenario_id": "marvin_purchase_push_window_bets_for_margin",
-        "summary": "bet=2024 min_bet=1600"
+        "summary": "bet=920 min_bet=1600"
       },
       {
         "details": {
           "bet": 540,
           "goal": "push_next_rank",
           "trace_metadata": {
-            "catalog_push_spend": 0,
-            "catalog_push_window": false,
-            "healthy_pre_shop_escape_window": false,
             "max_ratio": 0.36,
             "mechanic_gap": 0,
             "mechanic_threshold_push_window": false,
@@ -309,15 +261,13 @@
             "pending_marvin_shortfall": 0,
             "plan": {
               "goal": "push_next_rank",
-              "reason": "highest scored goal push_next_rank=42.0",
+              "reason": "highest scored goal push_next_rank=88.0",
               "scores": {
                 "exploit_marvin": 0.0,
-                "push_next_rank": 42.0
+                "push_next_rank": 88.0
               }
             },
             "pressure_bet": 0,
-            "purchase_push_shortfall": 0,
-            "purchase_push_window": false,
             "ratio": 0.24,
             "store_budget": 0
           },
@@ -329,79 +279,66 @@
       },
       {
         "details": {
-          "bet": 2232,
+          "bet": 930,
           "goal": "push_next_rank",
           "trace_metadata": {
-            "catalog_push_spend": 0,
-            "catalog_push_window": false,
-            "healthy_pre_shop_escape_window": false,
-            "max_ratio": 0.36,
+            "max_ratio": 0.15,
             "mechanic_gap": 0,
             "mechanic_threshold_push_window": false,
             "pending_marvin_active": true,
             "pending_marvin_shortfall": 1800,
             "plan": {
               "goal": "push_next_rank",
-              "reason": "highest scored goal push_next_rank=42.0",
+              "reason": "highest scored goal push_next_rank=88.0",
               "scores": {
                 "exploit_marvin": 0.0,
-                "push_next_rank": 42.0
+                "push_next_rank": 88.0
               }
             },
             "pressure_bet": 2736,
-            "purchase_push_shortfall": 0,
-            "purchase_push_window": false,
-            "ratio": 0.22,
+            "ratio": 0.1,
             "store_budget": 0
           },
           "trace_reason": "goal=push_next_rank blackjack_bet phase=rank_two_rush survival=False edge=4"
         },
-        "passed": true,
+        "passed": false,
         "scenario_id": "near_marvin_shortfall_growth_window_stays_aggressive",
-        "summary": "bet=2232 min_bet=1100"
+        "summary": "bet=930 min_bet=1100"
       },
       {
         "details": {
-          "bet": 1872,
+          "bet": 780,
           "goal": "push_next_rank",
           "trace_metadata": {
-            "catalog_push_spend": 0,
-            "catalog_push_window": false,
-            "healthy_pre_shop_escape_window": false,
-            "max_ratio": 0.36,
+            "max_ratio": 0.15,
             "mechanic_gap": 0,
             "mechanic_threshold_push_window": false,
             "pending_marvin_active": true,
             "pending_marvin_shortfall": 5800,
             "plan": {
               "goal": "push_next_rank",
-              "reason": "highest scored goal push_next_rank=42.0",
+              "reason": "highest scored goal push_next_rank=88.0",
               "scores": {
                 "exploit_marvin": 0.0,
-                "push_next_rank": 42.0
+                "push_next_rank": 88.0
               }
             },
             "pressure_bet": 0,
-            "purchase_push_shortfall": 0,
-            "purchase_push_window": false,
-            "ratio": 0.22,
+            "ratio": 0.1,
             "store_budget": 0
           },
           "trace_reason": "goal=push_next_rank blackjack_bet phase=rank_two_rush survival=False edge=4"
         },
-        "passed": true,
+        "passed": false,
         "scenario_id": "rank_one_core_marvin_unlock_bets_harder",
-        "summary": "bet=1872 min_bet=1450"
+        "summary": "bet=780 min_bet=1450"
       },
       {
         "details": {
-          "bet": 1500,
+          "bet": 920,
           "goal": "push_next_rank",
           "trace_metadata": {
-            "catalog_push_spend": 0,
-            "catalog_push_window": false,
-            "healthy_pre_shop_escape_window": false,
-            "max_ratio": 0.4,
+            "max_ratio": 0.12,
             "mechanic_gap": 0,
             "mechanic_threshold_push_window": false,
             "pending_marvin_active": true,
@@ -415,25 +352,20 @@
               }
             },
             "pressure_bet": 0,
-            "purchase_push_shortfall": 0,
-            "purchase_push_window": false,
-            "ratio": 0.24,
+            "ratio": 0.08,
             "store_budget": 0
           },
           "trace_reason": "goal=push_next_rank blackjack_bet phase=million_rush survival=False edge=5"
         },
-        "passed": true,
+        "passed": false,
         "scenario_id": "rank_two_marvin_upgrade_window_uses_surplus",
-        "summary": "bet=1500 min_bet=1400"
+        "summary": "bet=920 min_bet=1400"
       },
       {
         "details": {
           "bet": 3348,
           "goal": "push_next_rank",
           "trace_metadata": {
-            "catalog_push_spend": 15000,
-            "catalog_push_window": true,
-            "healthy_pre_shop_escape_window": false,
             "max_ratio": 0.58,
             "mechanic_gap": 0,
             "mechanic_threshold_push_window": false,
@@ -441,16 +373,14 @@
             "pending_marvin_shortfall": 0,
             "plan": {
               "goal": "push_next_rank",
-              "reason": "highest scored goal push_next_rank=42.0",
+              "reason": "highest scored goal push_next_rank=88.0",
               "scores": {
                 "exploit_marvin": 0.0,
-                "push_next_rank": 42.0
+                "push_next_rank": 88.0
               }
             },
-            "pressure_bet": 2700,
-            "purchase_push_shortfall": 0,
-            "purchase_push_window": false,
-            "ratio": 0.3,
+            "pressure_bet": 2016,
+            "ratio": 0.24,
             "store_budget": 0
           },
           "trace_reason": "goal=push_next_rank blackjack_bet phase=rank_two_rush survival=False edge=4"
@@ -461,12 +391,9 @@
       },
       {
         "details": {
-          "bet": 200,
+          "bet": 3468,
           "goal": "push_next_rank",
           "trace_metadata": {
-            "catalog_push_spend": 0,
-            "catalog_push_window": false,
-            "healthy_pre_shop_escape_window": false,
             "max_ratio": 0.34,
             "mechanic_gap": 0,
             "mechanic_threshold_push_window": false,
@@ -474,23 +401,21 @@
             "pending_marvin_shortfall": 0,
             "plan": {
               "goal": "push_next_rank",
-              "reason": "highest scored goal push_next_rank=30.0",
+              "reason": "highest scored goal push_next_rank=66.0",
               "scores": {
                 "advance_mechanic_arc": 0.0,
-                "push_next_rank": 30.0
+                "push_next_rank": 66.0
               }
             },
             "pressure_bet": 0,
-            "purchase_push_shortfall": 0,
-            "purchase_push_window": false,
-            "ratio": 0.12,
+            "ratio": 0.22,
             "store_budget": 0
           },
           "trace_reason": "goal=push_next_rank blackjack_bet phase=car_ready survival=False edge=4"
         },
-        "passed": true,
+        "passed": false,
         "scenario_id": "mechanic_dream_reserve_preserves_threshold",
-        "summary": "bet=200 max_bet=200"
+        "summary": "bet=3468 max_bet=200"
       }
     ],
     "companion_menu": [
@@ -570,7 +495,7 @@
           "choice": "health",
           "expected": "health",
           "goal": "push_next_rank",
-          "trace_reason": "wish_inline_choice:health"
+          "trace_reason": "fairy_wish_health_simple"
         },
         "passed": true,
         "scenario_id": "inline_wish_prefers_health",
@@ -681,14 +606,14 @@
       },
       {
         "details": {
-          "answer": "no",
+          "answer": "yes",
           "expected": "no",
           "goal": "push_next_rank",
-          "trace_reason": "loyalty_bonus_money_refusal"
+          "trace_reason": "event_yes:take the money?"
         },
-        "passed": true,
+        "passed": false,
         "scenario_id": "loyalty_bonus_money_refusal",
-        "summary": "answer=no expected=no"
+        "summary": "answer=yes expected=no"
       },
       {
         "details": {
@@ -860,6 +785,26 @@
         "passed": true,
         "scenario_id": "marvin_unlock_loan_prefers_large_borrow",
         "summary": "choice=Borrow $5,000 expected=Borrow $5,000"
+      },
+      {
+        "details": {
+          "balance": 1400,
+          "choice": "Borrow $5,000",
+          "day": 22,
+          "expected": "Borrow $5,000",
+          "health": 82,
+          "inventory": [
+            "Car",
+            "Worn Map"
+          ],
+          "met": [
+            "Vinnie"
+          ],
+          "sanity": 68
+        },
+        "passed": true,
+        "scenario_id": "future_marvin_unlock_prefers_max_borrow",
+        "summary": "choice=Borrow $5,000 expected=Borrow $5,000"
       }
     ],
     "route": [
@@ -876,25 +821,36 @@
       },
       {
         "details": {
-          "goal": "restock_supplies",
-          "goal_reason": "highest scored goal restock_supplies=61.5",
+          "goal": "push_next_rank",
+          "goal_reason": "highest scored goal push_next_rank=62.0",
           "route": "Convenience Store",
-          "trace_reason": "goal=restock_supplies selected Convenience Store score=285.0 margin=267.0"
+          "trace_reason": "goal=push_next_rank selected Convenience Store score=185.0 margin=193.0"
         },
-        "passed": true,
+        "passed": false,
         "scenario_id": "catalog_push_store_buyout_prefers_store_route",
-        "summary": "goal=restock_supplies route=Convenience Store expected_goal=restock_supplies expected_route=Convenience Store"
+        "summary": "goal=push_next_rank route=Convenience Store expected_goal=restock_supplies expected_route=Convenience Store"
       },
       {
         "details": {
           "goal": "exploit_marvin",
-          "goal_reason": "highest scored goal exploit_marvin=58.0",
+          "goal_reason": "highest scored goal exploit_marvin=76.0",
           "route": "Marvin",
-          "trace_reason": "goal=exploit_marvin selected Marvin score=188.0 margin=188.0"
+          "trace_reason": "goal=exploit_marvin selected Marvin score=195.0 margin=195.0"
         },
         "passed": true,
         "scenario_id": "marvin_access_but_no_visit",
         "summary": "goal=exploit_marvin route=Marvin expected_goal=exploit_marvin expected_route=Marvin"
+      },
+      {
+        "details": {
+          "goal": "exploit_marvin",
+          "goal_reason": "highest scored goal exploit_marvin=198.0",
+          "route": "Loan Shark",
+          "trace_reason": "goal=exploit_marvin selected Loan Shark score=198.0 margin=26.0"
+        },
+        "passed": true,
+        "scenario_id": "future_only_marvin_push_prefers_loan_route",
+        "summary": "goal=exploit_marvin route=Loan Shark expected_goal=exploit_marvin expected_route=Loan Shark"
       },
       {
         "details": {
@@ -912,7 +868,7 @@
           "goal": "contain_debt_escalation",
           "goal_reason": "highest scored goal contain_debt_escalation=89.0",
           "route": "Loan Shark",
-          "trace_reason": "goal=contain_debt_escalation selected Loan Shark score=189.0 margin=88.6"
+          "trace_reason": "goal=contain_debt_escalation selected Loan Shark score=209.0 margin=108.6"
         },
         "passed": true,
         "scenario_id": "debt_pressure_case",
@@ -1164,13 +1120,13 @@
           "expected": "Filthy Frank's Flawless Fixtures",
           "health": 82,
           "injuries": [],
-          "route": "Filthy Frank's Flawless Fixtures",
+          "route": "Oswald's Optimal Outoparts",
           "sanity": 68,
           "statuses": []
         },
-        "passed": true,
+        "passed": false,
         "scenario_id": "mechanic_route_prefers_dream_leader",
-        "summary": "route=Filthy Frank's Flawless Fixtures expected=Filthy Frank's Flawless Fixtures"
+        "summary": "route=Oswald's Optimal Outoparts expected=Filthy Frank's Flawless Fixtures"
       },
       {
         "details": {
@@ -1308,6 +1264,38 @@
       },
       {
         "details": {
+          "available_routes": [
+            "Marvin's Mystical Merchandise",
+            "Vinnie's Back Alley Loans",
+            "Convenience Store"
+          ],
+          "expected": "exploit_marvin",
+          "goal": "exploit_marvin",
+          "opportunity_flags": {
+            "can_advance_mechanic_arc": false,
+            "can_adventure_safely": false,
+            "can_borrow_to_bootstrap": false,
+            "can_cashout_pawn_inventory": false,
+            "can_contain_debt_escalation": false,
+            "can_convert_millionaire_to_ending": false,
+            "can_preserve_companions": false,
+            "can_recover_from_car_trouble": false,
+            "can_reduce_debt_risk": false,
+            "can_reduce_fatigue_pressure": false,
+            "can_repair_or_upgrade": false,
+            "can_restock_supplies": false,
+            "can_restore_blackjack_edge": false,
+            "can_unlock_car": false,
+            "can_visit_marvin": true,
+            "can_visit_witch": false
+          }
+        },
+        "passed": true,
+        "scenario_id": "loan_backed_marvin_window_prefers_marvin_goal",
+        "summary": "goal=exploit_marvin expected=exploit_marvin"
+      },
+      {
+        "details": {
           "available_routes": [],
           "expected": "push_next_rank",
           "goal": "push_next_rank",
@@ -1337,8 +1325,8 @@
     ]
   },
   "summary": {
-    "failed": 0,
-    "passed": 72,
-    "total": 72
+    "failed": 8,
+    "passed": 67,
+    "total": 75
   }
 }

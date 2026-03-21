@@ -1797,8 +1797,9 @@ def _distribution_lines(results: list[RunResult]) -> list[str]:
         ("20k-49k", sum(1 for result in results if 20000 <= peak_of(result) < 50000)),
         ("50k-99k", sum(1 for result in results if 50000 <= peak_of(result) < 100000)),
         ("100k-249k", sum(1 for result in results if 100000 <= peak_of(result) < 250000)),
-        ("250k-499k", sum(1 for result in results if 250000 <= peak_of(result) < 500000)),
-        ("500k-999k", sum(1 for result in results if 500000 <= peak_of(result) < 1000000)),
+        ("250k-399k", sum(1 for result in results if 250000 <= peak_of(result) < 400000)),
+        ("400k-749k", sum(1 for result in results if 400000 <= peak_of(result) < 750000)),
+        ("750k-999k", sum(1 for result in results if 750000 <= peak_of(result) < 1000000)),
         ("1m+", sum(1 for result in results if peak_of(result) >= 1000000)),
     ]
     day_buckets = [
@@ -3750,7 +3751,7 @@ def _mechanic_dream_progress_lines(results: list[RunResult]) -> list[str]:
         if int(result.mechanic_dreams.get("tom", 0) or 0) >= 2
         and int(result.mechanic_dreams.get("frank", 0) or 0) >= 2
         and int(result.mechanic_dreams.get("oswald", 0) or 0) >= 2
-        and (result.peak_balance or result.balance or 0) >= 900000
+        and (result.peak_balance or result.balance or 0) >= 750000
     )
 
     lines = ["Mechanic Dream Progress"]

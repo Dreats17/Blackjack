@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from ..config import STORE_MUST_HAVE_ITEMS
 from ..interfaces import DecisionOption, DecisionRequest
 from ..planner import StrategicPlan
 from ..trace import DecisionTrace
@@ -16,6 +17,11 @@ def _score_purchase_option(option: DecisionOption, plan: StrategicPlan, request:
     category = str(option_meta.get("category", "generic"))
     item_name = str(option_meta.get("item_name", option.label))
     price = float(option_meta.get("price", 0.0) or 0.0)
+    balance = int(request_meta.get("balance", request.game_state.get("balance", 0)) or 0)
+    rank = int(request.game_state.get("rank", 0) or 0)
+    has_car = bool(request.game_state.get("has_car", False))
+    health = int(request.game_state.get("health", 0) or 0)
+    sanity = int(request.game_state.get("sanity", 0) or 0)
 
     if request.stable_context_id == "convenience_store_menu":
         if plan.goal in {"preserve_companion_roster", "reduce_fatigue_pressure"} and category == "food":
@@ -35,6 +41,23 @@ def _score_purchase_option(option: DecisionOption, plan: StrategicPlan, request:
             score += 10.0
         if request_meta.get("needs_recovery_day") and category not in {"medical", "food"}:
             score -= 10.0
+        if has_car and rank == 0 and balance < 500:
+            if category == "progression":
+                score -= 42.0
+            if category == "blackjack":
+                score -= 18.0
+            if category == "car" and item_name not in STORE_MUST_HAVE_ITEMS:
+                score -= 20.0
+            if item_name not in STORE_MUST_HAVE_ITEMS and category not in {"medical", "food"}:
+                score -= 16.0
+            if health < 85 or sanity < 70:
+                if category in {"medical", "food"} or item_name in {"Road Flares", "Bug Spray"}:
+                    score += 14.0
+        if has_car and rank == 0 and balance < 250:
+            if item_name not in STORE_MUST_HAVE_ITEMS and category not in {"medical", "food"}:
+                score -= 32.0
+            if category == "progression":
+                score -= 18.0
 
     if request.stable_context_id == "witch_flask_menu":
         if plan.goal in {"survive_emergency", "stabilize_health", "stabilize_sanity"} and category == "defensive_flask":
@@ -46,7 +69,7 @@ def _score_purchase_option(option: DecisionOption, plan: StrategicPlan, request:
 
     if option_meta.get("is_exit") and score < 0.0:
         score += 12.0
-    if price > 0 and request_meta.get("balance", 0) and price > float(request_meta.get("balance", 0)):
+    if price > 0 and balance and price > float(balance):
         score -= 50.0
     if item_name in {"LifeAlert", "First Aid Kit", "Faulty Insurance", "No Bust", "Second Chance"}:
         score += 6.0

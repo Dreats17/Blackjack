@@ -1165,16 +1165,21 @@ class SystemsMixin:
     
     def update_companions_daily(self):
         """Called each day to update companion states"""
+        upset_companions = 0
         for name, companion in self._companions.items():
             if companion["status"] == "alive":
                 companion["days_owned"] += 1
-                
+
                 # Reset daily feeding
                 if not companion["fed_today"]:
                     # Hunger penalty
                     companion["happiness"] = max(0, companion["happiness"] - 5)
                 companion["fed_today"] = False
-                
+
+                # Count low-happiness companions for afternoon social behavior.
+                if companion["happiness"] <= 20:
+                    upset_companions += 1
+
                 # Check for bonding (high happiness for extended time)
                 if companion["happiness"] >= 80 and companion["days_owned"] >= 7:
                     if not companion["bonded"]:
@@ -1182,7 +1187,7 @@ class SystemsMixin:
                         print()
                         type.type(bright(magenta(name)) + " has bonded with you! Your friendship is unbreakable.")
                         print("\n")
-                
+
                 # Check for running away (very low happiness)
                 if companion["happiness"] <= 10:
                     if random.randrange(3) == 0:
@@ -1191,6 +1196,12 @@ class SystemsMixin:
                         type.slow(red(name + " has run away. They were too unhappy to stay."))
                         print("\n")
                         self.lose_sanity(10)
+
+        # If companions are upset, they may keep their distance this afternoon.
+        if upset_companions > 0 and not self.has_travel_restriction("Skip Companion Dialogue"):
+            skip_chance = min(75, 20 * upset_companions)
+            if random.randrange(100) < skip_chance:
+                self.add_travel_restriction("Skip Companion Dialogue")
     
     def companion_dies(self, name, cause="unknown"):
         """Mark a companion as dead"""

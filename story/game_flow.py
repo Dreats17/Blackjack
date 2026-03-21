@@ -52,6 +52,9 @@ class GameFlowMixin:
     """Game flow: start_day, pest control, car trouble checks, day marking, status updates, adventure areas"""
 
     def start_day(self):
+        # Record how much was won since the previous morning (casino + any balance events)
+        self._today_winnings = max(0, self.get_balance() - self._balance_at_day_start)
+        self._balance_at_day_start = self.get_balance()
         print("\n")
         type.slow(bright(yellow("═" * 50)))
         type.typeover("Press a key to continue:", bright(yellow("~ ~ ~ Morning, Day " + str(self._day) + " ~ ~ ~ ")), True)
@@ -502,6 +505,61 @@ class GameFlowMixin:
                 else:
                     damage += random.choice([5, 10, 15, 20, 25, 30])
 
+        # Life-threatening conditions - heavy damage, no self-cure without doctor
+        for status in ["Sepsis", "Gangrene", "Appendicitis", "Anaphylaxis", "Pancreatitis", "DVT"]:
+            if self.has_status(status):
+                if self._clear_status:
+                    self.remove_status(status)
+                else:
+                    damage += random.choice([8, 12, 15, 18, 22, 25])
+
+        # Serious conditions - moderate damage, small self-cure chance
+        for status in ["Pneumonia", "Staph Infection", "Tetanus", "Mushroom Poisoning",
+                        "Blood Pressure Crisis", "Kidney Stones", "Gallbladder Attack",
+                        "Seizure Disorder", "Uncontrolled Diabetes", "Second Degree Burns",
+                        "Heat Stroke", "Hypothermia", "Severe Dehydration", "Malnutrition",
+                        "Lead Poisoning", "Mercury Poisoning", "Asbestos Damage", "Mold Toxicity",
+                        "Needle Exposure"]:
+            if self.has_status(status):
+                if self._clear_status:
+                    self.remove_status(status)
+                elif random.randrange(8) == 0:
+                    self.remove_status(status)
+                else:
+                    damage += random.choice([4, 6, 8, 10, 12])
+
+        # Moderate conditions - light damage, moderate self-cure chance
+        for status in ["Flu", "Bronchitis", "Severe Asthma", "Strep Throat", "Ear Infection",
+                        "Sinus Infection", "UTI", "Pink Eye", "Lyme Disease", "Shingles",
+                        "Mononucleosis", "Measles", "Stomach Flu", "Shellfish Poisoning",
+                        "Waterborne Illness", "Rat Bite Fever", "Ringworm", "Scabies",
+                        "Severe Migraine", "Vertigo", "Tooth Abscess", "Possible Rabies"]:
+            if self.has_status(status):
+                if self._clear_status:
+                    self.remove_status(status)
+                elif random.randrange(4) == 0:
+                    self.remove_status(status)
+                else:
+                    damage += random.choice([2, 3, 4, 5, 6])
+
+        # Minor conditions - very light damage, fast self-cure
+        if self.has_status("Ant Bites"):
+            if self._clear_status:
+                self.remove_status("Ant Bites")
+            elif random.randrange(3) == 0:
+                self.remove_status("Ant Bites")
+            else:
+                damage += random.choice([1, 2])
+
+        # Mental health conditions - sanity drain instead of HP damage
+        for status in ["Anxiety Disorder", "Severe Depression", "Chronic Insomnia", "PTSD"]:
+            if self.has_status(status):
+                if self._clear_status:
+                    self.remove_status(status)
+                else:
+                    self.lose_sanity(random.choice([3, 4, 5, 6]))
+                    if random.randrange(6) == 0:
+                        self.remove_status(status)
 
         # Sets is_sick to False if you don't have any sicknesses, an prints a health update
         if (self._is_sick) and not (self.has_status("Hepatitis") and not self.has_status("Sore Throat") or self.has_status("Cold")):
@@ -565,7 +623,7 @@ class GameFlowMixin:
         # Gives Squirrely Status Update
         if self.has_item("Squirrely"):
             days_elapsed = self.get_days_elapsed("Squirrely Fed")
-            if self.has_travel_restriction("rain") or self.has_travel_restriction("Wind"):
+            if self.has_travel_restriction("Rain") or self.has_travel_restriction("Wind"):
                 type.type(self._lists.get_worried_squirrely_update())
             if days_elapsed == 0:
                 type.type("Squirrely is well-fed, and happy as can be.")
