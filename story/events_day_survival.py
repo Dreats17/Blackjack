@@ -124,7 +124,7 @@ class DaySurvivalMixin:
     def spider_bite(self):
         # EVENT: A spider that got into the car bites the player
         # CONDITION: Requires "Spider" danger to exist, and no existing "Spider Bite"
-        # EFFECTS: Pest Control kills spider; otherwise lose 1-2 sanity
+        # EFFECTS: Pest Control kills spider; Flask of Anti-Venom neutralizes venom; otherwise lose 1-2 sanity
         # Always adds "Spider Bite" status
         if not self.has_danger("Spider") or self.has_status("Spider Bite"):
             self.day_event()
@@ -138,6 +138,15 @@ class DaySurvivalMixin:
             type.type("You grab your " + magenta(bright("Pest Control")) + " and spray in the direction of the spider. ")
             type.type("A cloud of white liquid covers the spider, and you watch as it slows, and dies. ")
             type.type("Hopefully, that's the end of your spider problems.")
+            print("\n")
+        elif self.has_item("Flask of Anti-Venom"):
+            self.use_item("Flask of Anti-Venom")
+            type.type("The bite stings. You reach for the " + cyan(bright("Flask of Anti-Venom")) + " and uncork it.")
+            print("\n")
+            type.type("A quick sip. The burning in your arm stops almost instantly. The venom loses its grip.")
+            print("\n")
+            type.type("The spider disappears into a vent. But it doesn't matter. Its venom is already beaten.")
+            self.heal(5)
             print("\n")
         else:
             type.type("You attempt to swat it with your hand, but it sneaks into your heater. ")
@@ -417,6 +426,13 @@ class DaySurvivalMixin:
         type.type("That's another " + green(bright("$" + str(bill))) + " dollars.")
         print("\n")
         self.change_balance(bill)
+        if self.has_item("Flask of Fortunate Day"):
+            bonus = random.randint(20, 80)
+            print("\n")
+            type.type("The " + cyan(bright("Flask of Fortunate Day")) + " hums warm in your pocket. Fate tips its hat.")
+            print("\n")
+            type.type("You check one more time and find a few extra bills tucked behind a receipt. Another " + green(bright("$" + str(bonus))) + ".")
+            self.change_balance(bonus)
         print("\n")
 
     def strong_winds(self):
@@ -994,7 +1010,7 @@ class DaySurvivalMixin:
     def another_spider_bite(self):
         # EVENT: Spider bites you again on the neck
         # CONDITION: Requires "Spider" danger, not already having "Spider Bite"
-        # EFFECTS: Pest Control kills spider; adds "Spider Bite" status
+        # EFFECTS: Pest Control kills spider; Flask of Anti-Venom neutralizes venom; adds "Spider Bite" status
         if not self.has_danger("Spider") or self.has_status("Spider Bite"):
             self.day_event()
             return
@@ -1006,6 +1022,15 @@ class DaySurvivalMixin:
             type.type("You grab your " + magenta(bright("Pest Control")) + " and spray in the direction of the spider. ")
             type.type("A cloud of white liquid covers the spider, and you watch as it slows, and dies. ")
             type.type("Hopefully, that's the end of your spider problems.")
+        elif self.has_item("Flask of Anti-Venom"):
+            self.use_item("Flask of Anti-Venom")
+            print("\n")
+            type.type("You reach for the " + cyan(bright("Flask of Anti-Venom")) + " before the venom can spread.")
+            print("\n")
+            type.type("The burning stops. You feel it working — neutralizing whatever that spider injected into you.")
+            print("\n")
+            type.type("The spider disappears under the seat. But you've already won this one.")
+            self.heal(5)
         else:
             type.type("The spider, now out of reach, crawls off the seat and onto the floor. ")
             type.type("You stick your head out back, but you aren't sure where the spider went, or if it has a family nearby. This is unfortunate.")

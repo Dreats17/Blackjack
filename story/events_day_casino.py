@@ -121,6 +121,11 @@ class DayCasinoMixin:
             type.type("Your phone gets a notification: 'Someone tried to access your location.' You don't remember giving anyone permission.")
             print("\n")
             type.type("You turn off location services. Paranoid? Maybe. But you didn't get this far by being careless.")
+        if self.has_item("Flask of Pocket Aces"):
+            print("\n")
+            type.type("The " + cyan(bright("Flask of Pocket Aces")) + " pulses with twin heartbeats against your chest. Two aces, waiting.")
+            print("\n")
+            type.type("Whatever they're planning, you've got something they can't see coming.")
         print("\n")
 
     def even_further_interrogation(self):

@@ -135,6 +135,17 @@ class IllnessMixin:
         self.start_night()
 
     def contract_flu(self):
+        if self.has_item("Flask of Anti-Virus"):
+            self.use_item("Flask of Anti-Virus")
+            type.type("You feel the familiar warning signs: fatigue, a creeping fever, the heavy ache behind your eyes.")
+            print("\n")
+            type.type("You reach for the " + cyan(bright("Flask of Anti-Virus")) + " before the symptoms can fully take hold.")
+            print("\n")
+            type.type("The flask fights the infection before it sets in. You feel it working — a warm resistance spreading through your blood.")
+            print("\n")
+            type.type(green("The flu never gets its grip on you. Crisis averted."))
+            self.start_night()
+            return
         type.type("It hits you like a truck. One moment you're fine, the next you can barely move.")
         print("\n")
         type.type("Fever. Chills. Body aches so severe you can't get comfortable in any position.")

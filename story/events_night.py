@@ -60,7 +60,7 @@ class NightEventsMixin:
     # Everytime
     def ditched_wallet(self):
         # EVENT: Find an abandoned wallet on the side of the road during a night walk
-        # EFFECTS: Gain $65-120 (50%) or $7-50 (50%)
+        # EFFECTS: Gain $65-120 (50%) or $7-50 (50%); Flask of Fortunate Night gives 5% chance bonus
         type.type("Bored out of your mind, you decide to wander along the side of the road, just to get a change of scenery from the dusty leather seats of your wagon. ")
         type.type("As you take step after step over the asphalt, you notice a ditched wallet, just laying there. I guess it's yours now. ")
         print("\n")
@@ -71,6 +71,13 @@ class NightEventsMixin:
             worth = random.randint(7, 50)
         type.type("Inside the wallet, you find " + green(bright("$" + str(worth))) + " dollars.")
         self.change_balance(worth)
+        if self.has_item("Flask of Fortunate Night") and random.randrange(20) == 0:
+            bonus = random.randint(50, 100)
+            print("\n")
+            type.type("The " + cyan(bright("Flask of Fortunate Night")) + " hums warm in your pocket. Fate tips its hat tonight.")
+            print("\n")
+            type.type("You check again — there's a folded bill tucked behind the ID. Another " + green(bright("$" + str(bonus))) + ".")
+            self.change_balance(bonus)
 
     def went_jogging(self):
         # EVENT: Go jogging to pass the time and get exercise

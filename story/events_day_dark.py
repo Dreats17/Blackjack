@@ -1005,6 +1005,17 @@ class DayDarkMixin:
                     self.use_item(feather)
                     self.hurt(35)
                     self.lose_sanity(20)
+                elif self.has_item("Flask of No Bust"):
+                    self.use_item("Flask of No Bust")
+                    type.type("Then — something shifts. A cold clarity cuts through the pain.")
+                    print("\n")
+                    type.type("The " + cyan(bright("Flask of No Bust")) + " disagrees with death on your behalf.")
+                    print("\n")
+                    type.type("Your body refuses to fail. The bleeding slows. Not enough to kill you. Not today.")
+                    print("\n")
+                    type.type("You drag yourself to the street. Someone calls an ambulance.")
+                    self.hurt(50)
+                    self.lose_sanity(25)
                 else:
                     self.kill("Bled out in an alley. The muggers split your cash three ways.")
                 return
