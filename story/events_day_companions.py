@@ -209,6 +209,12 @@ class DayCompanionsMixin:
                 self.restore_sanity(5)
         
         self.pet_companion("Mr. Pecks")
+        if self.has_item("Disposable Camera"):
+            print("\n")
+            type.type("You grab your " + cyan(bright("Disposable Camera")) + " and catch Mr. Pecks mid-strut, beak up, completely self-satisfied.")
+            print("\n")
+            type.type("Click. That's a perfect photograph. A crow with a treasure and a man who needed one. Both very pleased.")
+            self.restore_sanity(4)
         print("\n")
 
     def rusty_midnight_heist(self):
@@ -1430,6 +1436,14 @@ class DayCompanionsMixin:
         self.restore_sanity(15)
         self.heal(10)
         self.pet_companion(name)
+        if self.has_item("Deck of Cards"):
+            print("\n")
+            type.type("You shuffle the " + cyan(bright("Deck of Cards")) + " absently. " + bright(name) + " watches the cards with total animal focus.")
+            print("\n")
+            type.type("You fan them out, flip them over, riffle them back together. Their eyes track every card like it's the most important thing in the world.")
+            print("\n")
+            type.type("Maybe it is. Maybe you both needed something simple to look at.")
+            self.restore_sanity(4)
         print("\n")
 
     def companion_learns_trick(self):
@@ -1449,6 +1463,19 @@ class DayCompanionsMixin:
         type.type(bright(name) + " has been with you long enough to pick up some new tricks.")
         print("\n")
         
+        if self.has_item("Dog Whistle") and "Dog" in comp_type:
+            type.type("You pull out the " + cyan(bright("Dog Whistle")) + " and blow a short, clean note. " + bright(name) + " snaps to attention.")
+            print("\n")
+            type.type("You run through the motions once. Sit. Stay. Come. The whistle cuts through every distraction.")
+            print("\n")
+            type.type(bright(name) + " nails every command on the first try. You didn't know they had that in them.")
+            print("\n")
+            type.type("Turns out, neither did they.")
+            self.restore_sanity(10)
+            self.pet_companion(name)
+            print("\n")
+            return
+
         if "Dog" in comp_type:
             roll = random.randrange(3)
             if roll == 0:

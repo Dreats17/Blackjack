@@ -67,6 +67,25 @@ class DayDarkMixin:
         print(PAR)
         type.type(quote("$50,000. Plus interest. That's $75,000 now. You got two days.") + " He doesn't raise his voice. He doesn't need to. " + quote("Or we start taking fingers."))
         print(PAR)
+        if self.has_item("Gold Chain"):
+            type.type("Their eyes drift to your neck. Your " + cyan(bright("Gold Chain")) + " catches the light from the streetlamp.")
+            print(PAR)
+            type.type(quote("That's real gold. Custom links. Maybe fourteen hundred, fifteen hundred worth.") + " He tilts his head. " + quote("That buys you goodwill. Not time. Goodwill."))
+            print(PAR)
+            chain_answer = ask.yes_or_no("Hand over the Gold Chain to ease the tension? ")
+            if chain_answer == "yes":
+                type.type("You unclasp it and hold it out. He takes it without reaching — you have to step forward and place it in his palm.")
+                print(PAR)
+                type.type(quote("Smart. You've got two days. Same as before. But now I believe you intend to pay."))
+                print(PAR)
+                type.type("The bolt cutters go back in the trunk. They leave without touching you.")
+                print(PAR)
+                type.type("You stand in the empty lot, collarless, poorer, intact. That last part is the one that matters.")
+                self.use_item("Gold Chain")
+                self.lose_sanity(10)
+                self.add_danger("Loan Shark Deadline")
+                print(PAR)
+                return
         answer = ask.option("What do you do? ", ["pay now", "beg for time", "refuse"])
         if answer == "pay now":
             if self.get_balance() >= 75000:
@@ -887,7 +906,20 @@ class DayDarkMixin:
             self.restore_sanity(10)
             print("\n")
             return
-        
+
+        # ITEM: Running Shoes - outrun the ambush entirely
+        if self.has_item("Running Shoes"):
+            type.type("You start down the alley. Halfway through, you clock them — three figures peeling from the shadows. Hoodies. A knife.")
+            print("\n")
+            type.type("Your " + cyan(bright("Running Shoes")) + " grip the pavement before your brain finishes the thought.")
+            print("\n")
+            type.type("You are already gone. Full sprint. The walls blur. They shout. They don't even get close.")
+            print("\n")
+            type.type("You burst onto the street, lungs burning, still counting your fingers. All present. All correct.")
+            self.restore_sanity(6)
+            print("\n")
+            return
+
         type.type("You step out of your car and decide to take a shortcut through a dark alley. Faster than going around.")
         print("\n")
         type.type("Halfway through, you hear footsteps behind you. Heavy. Fast. Getting closer.")

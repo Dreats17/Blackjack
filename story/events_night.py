@@ -2269,6 +2269,16 @@ class NightEventsMixin:
             self.restore_sanity(6)
             print(PAR)
             return
+        elif self.has_item("Deck of Cards"):
+            print(PAR)
+            type.type("You reach for the " + cyan(bright("Deck of Cards")) + " and deal yourself a hand of solitaire.")
+            print(PAR)
+            type.type("The cards are familiar. The ritual is familiar. Shuffle, deal, turn over. Shuffle, deal, turn over. Your brain math dissolves into something simpler — red on black, black on red.")
+            print(PAR)
+            type.type("Sleep comes eventually. Not quickly. But eventually.")
+            self.restore_sanity(4)
+            print(PAR)
+            return
         self.lose_sanity(3)
         self.hurt(5)
         print(PAR)
@@ -2301,6 +2311,14 @@ class NightEventsMixin:
             item_name = "Fire Starter Kit" if self.has_item("Fire Starter Kit") else "Survival Bivouac"
             print("\n")
             type.type("The " + cyan(bright(item_name)) + " is doing its job. A small fire burns at the car's perimeter. The warmth is extraordinary. The stars are extraordinary. Everything is fine.")
+            self.restore_sanity(5)
+            self.heal(5)
+        if self.has_item("Vintage Wine") or self.has_item("Silver Flask"):
+            wine = "Vintage Wine" if self.has_item("Vintage Wine") else "Silver Flask"
+            print("\n")
+            type.type("You pour a glass from the " + cyan(bright(wine)) + ". The stars come out. For a while, everything is quiet and expensive.")
+            print("\n")
+            type.type("You didn't earn this night. Nobody earns a night like this. You just got lucky enough to be awake for it.")
             self.restore_sanity(5)
             self.heal(5)
         print("\n")
@@ -2336,6 +2354,12 @@ class NightEventsMixin:
         print(PAR)
         type.type("When you get back to your car, you're tired in the right way for once. The kind of tired that actually leads to sleep.")
         self.restore_sanity(random.choice([5, 7, 10]))
+        if self.has_item("Binoculars"):
+            print(PAR)
+            type.type("You stop at the edge of a parking garage and pull out your " + cyan(bright("Binoculars")) + ". Scan the skyline.")
+            print(PAR)
+            type.type("The city looks different at distance. Smaller. More manageable. All those lit windows — every one of them a problem someone thinks is unique. From here, they're just lights.")
+            self.restore_sanity(4)
         print(PAR)
 
     def raccoon_invasion(self):
