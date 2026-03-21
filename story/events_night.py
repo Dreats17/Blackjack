@@ -2202,6 +2202,8 @@ class NightEventsMixin:
         self.lose_sanity(3)
         self.hurt(5)
         print("\n")
+
+    def peaceful_night(self):
         variant = random.randrange(3)
         if variant == 0:
             type.type("For once, you sleep peacefully. No dreams. No nightmares. Just rest.")
