@@ -908,6 +908,19 @@ class DayDarkMixin:
             print("\n")
             return
 
+        # ITEM: Necronomicon - dark entities give you safe passage
+        if self.has_item("Necronomicon"):
+            type.type("You step into the alley clutching the " + cyan(bright("Necronomicon")) + ".")
+            print("\n")
+            type.type("The muggers emerge from the shadows — and stop. Something about you. Something wrong. Something they can't name.")
+            print("\n")
+            type.type("They back away from the book like it's a loaded gun aimed at their souls.")
+            print("\n")
+            type.type("You walk through the alley alone. The book is warm in your hands.")
+            self.restore_sanity(2)
+            print("\n")
+            return
+
         # ITEM: Running Shoes - outrun the ambush entirely
         if self.has_item("Running Shoes"):
             type.type("You start down the alley. Halfway through, you clock them — three figures peeling from the shadows. Hoodies. A knife.")
@@ -1719,6 +1732,18 @@ class DayDarkMixin:
         print("\n")
         type.type("It's staring at you. Hackles raised. Drool dripping from its jaws.")
         print("\n")
+
+        # ITEM: Dog Whistle - sonic authority over the pack
+        if self.has_item("Dog Whistle"):
+            type.type("You blow the " + cyan(bright("Dog Whistle")) + ". The frequency is too high for human hearing but perfect for canine authority.")
+            print("\n")
+            type.type("The dog freezes. Then sits. You walk past it calmly.")
+            print("\n")
+            type.type("It watches you go with confused, respectful eyes. You are the alpha now, apparently.")
+            self.restore_sanity(5)
+            print("\n")
+            return
+
         type.type("You freeze. Don't run. Don't make eye contact. You remember reading that somewhere.")
         print("\n")
         chance = random.randrange(10)

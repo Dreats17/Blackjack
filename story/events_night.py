@@ -2492,6 +2492,19 @@ class NightEventsMixin:
             print("\n")
             return
 
+        if self.has_item("Necronomicon") and not self.has_item("Dream Catcher"):
+            type.type("The " + cyan(bright("Necronomicon")) + " rustles at 3 AM. The nightmare gets... educational.")
+            print("\n")
+            type.type("Something in the dark uses your sleeping mind as a classroom. You don't choose to attend. You don't get a say.")
+            print("\n")
+            type.type("You learn something. You don't have words for it yet. It costs you, but you learn it.")
+            print("\n")
+            type.type(italic("You understand something you didn't before. Whether that's good is a separate question."))
+            self.add_status("Dark Knowledge")
+            self.lose_sanity(5)
+            print("\n")
+            return
+
         variant = random.randrange(4)
         if variant == 0:
             type.type("Nightmares again. The usual. Losing everything. Dying alone in a parking lot that nobody remembers the name of.")

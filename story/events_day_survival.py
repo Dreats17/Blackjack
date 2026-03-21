@@ -677,6 +677,18 @@ class DaySurvivalMixin:
         # EFFECTS: Umbrella or Plastic Poncho prevents damage/cold;
         #          otherwise 10 damage and adds "Cold" status
         # Umbrella or Plastic Poncho prevents damage/getting sick
+        
+        # ITEM: Binoculars - spotted the storm coming early
+        if self.has_item("Binoculars"):
+            type.type("Through the " + cyan(bright("Binoculars")) + ", you saw the weather front building twenty minutes ago.")
+            print("\n")
+            type.type("You're already parked under a bridge. Dry. Comfortable. A little smug.")
+            print("\n")
+            type.type("The rain hammers the road twenty feet away. Doesn't touch you.")
+            self.restore_sanity(3)
+            print("\n")
+            return
+
         type.type("The sky opens up without warning. Rain hammers down so hard you can barely hear yourself think.")
         print("\n")
         

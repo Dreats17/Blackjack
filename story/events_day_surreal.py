@@ -377,6 +377,23 @@ class DaySurrealMixin:
             self.restore_sanity(15)
             print("\n")
             return
+        if self.has_item("Necronomicon"):
+            type.type("The " + cyan(bright("Necronomicon")) + " opens itself. The blood moon's light reflects off the pages.")
+            print("\n")
+            type.type("Whatever entity is making the offer sees the book and recalibrates. The shadows go very quiet for a moment.")
+            print("\n")
+            type.type(cyan(quote("...YOU CARRY THAT BOOK. THE DEAL... CHANGES.")))
+            print("\n")
+            type.type("The contract burns itself into the air — revised. Better terms. Much better terms.")
+            print("\n")
+            type.type("One night of perfect luck. No years burned. Just a debt you'll feel in your bones someday.")
+            print("\n")
+            type.type("You take it. The book snaps shut, satisfied.")
+            self.add_status("Blood Moon Luck")
+            self.restore_sanity(25)
+            self.change_balance(500)
+            print("\n")
+            return
         answer = ask.yes_or_no("Accept the blood moon bargain? ")
         if answer == "yes":
             type.type("You speak into the darkness. " + quote("I accept."))

@@ -70,6 +70,11 @@ class DayCasinoMixin:
         print("\n")
         type.type("On the back of the card, someone has written: " + quote("The universe deals you a winner."))
         print("\n")
+        if self.has_item("Flask of Imminent Blackjack"):
+            type.type("The " + cyan(bright("Flask of Imminent Blackjack")) + " is already open. You felt it before it happened. You always do.")
+            print("\n")
+            type.type("The flask is warm. The card is warm. The twenty-one dollars feel inevitable, like they were always going to be exactly this.")
+            print("\n")
         type.type(yellow(bright("You feel inexplicably lucky today.")))
         self.add_status("Lucky")
         self.add_item("Ace of Spades")
@@ -98,10 +103,15 @@ class DayCasinoMixin:
             type.type("The morning light catches your pile of cash and it almost glows. All those hours at the tables. All those wins. All those near-misses.")
             print("\n")
             type.type("This is what it's all been building to.")
-        else:
+        elif variant == 3:
             type.type("You feel like you're in the final act of a movie. The climax is coming. You can feel it in your bones.")
             print("\n")
             type.type("Whether it's a happy ending or a tragedy... well. That's up to you.")
+        if self.has_item("Flask of Second Chance"):
+            print("\n")
+            type.type("The " + cyan(bright("Flask of Second Chance")) + " shifts in your pocket. Time hiccups, just slightly.")
+            print("\n")
+            type.type("Whatever today deals you — you'll get one more shot at it. That's not nothing.")
         print("\n")
 
     def casino_security(self):
@@ -194,8 +204,16 @@ class DayCasinoMixin:
             print("\n")
             type.type(quote("One last game? For old times' sake?"))
             print("\n")
-            type.type("You play. Slowly. The cards feel heavy. Important.")
-            print("\n")
+            if self.has_item("Flask of Dealer's Whispers"):
+                type.type("You uncap the " + cyan(bright("Flask of Dealer's Whispers")) + ". A voice, barely a breath: " + italic("Hit."))
+                print("\n")
+                type.type("You hit. It's perfect. He looks at your hand and laughs — a real laugh, the first one in weeks, the nurses say later.")
+                print("\n")
+                type.type(quote("How did you know?") + " You don't answer. You smile.")
+                print("\n")
+            else:
+                type.type("You play. Slowly. The cards feel heavy. Important.")
+                print("\n")
             type.type("He wins, of course. He was always the best.")
             print("\n")
             type.type(quote("Take these.") + " He presses his lucky chips into your hand. " + quote("You'll need them more than I will."))

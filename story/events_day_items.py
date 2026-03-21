@@ -2431,7 +2431,20 @@ class DayItemsMixin:
         print("\n")
         type.type("The host sees you approaching and starts formulating a polite rejection.")
         print("\n")
-        if self.has_item("Gentleman's Charm"):
+        if self.has_item("Flask of Pocket Aces") and self.has_item("Gentleman's Charm"):
+            type.type("The " + cyan(bright("Flask of Pocket Aces")) + " pulses against your ribs. Two aces, burning in your pocket.")
+            print("\n")
+            type.type("The " + cyan(bright("Gentleman's Charm")) + " does the rest. The host's polite rejection dies before it starts.")
+            print("\n")
+            type.type(quote("Sir. We've been expecting you. Your usual table?"))
+            print("\n")
+            type.type("You don't have a usual table. You do now. Whatever you're about to do — you feel winning.")
+            bonus = random.randint(100, 200)
+            type.type(" Someone at the bar insists on picking up the tab. Presses " + green(bright("$" + str(bonus))) + " into your hand on the way out.")
+            self.heal(15)
+            self.restore_sanity(12)
+            self.change_balance(bonus)
+        elif self.has_item("Gentleman's Charm"):
             type.type("Then the " + cyan(bright("Gentleman's Charm")) + " hits. The cologne, the silk — the host's rejection dies on their lips.")
             print("\n")
             type.type(quote("Right this way, sir. We have a lovely table by the window."))
