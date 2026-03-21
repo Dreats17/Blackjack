@@ -58,6 +58,18 @@ class CarEventsMixin:
     def random_car_trouble(self):
         """Pick a rank-appropriate car problem at random and trigger it."""
         rank = self.get_rank()
+        if self.has_item("Auto Mechanic") and random.randrange(5) == 0:
+            type.type("You run your daily check with the " + magenta(bright("Auto Mechanic")) + " kit before anything can go wrong.")
+            print("\n")
+            type.type("A loose connection — caught and re-tightened before the car even noticed. Car trouble averted.")
+            self.restore_sanity(3)
+            print("\n")
+            return
+        if self.has_item("Roadside Shield") and random.randrange(3) == 0:
+            type.type("The " + magenta(bright("Roadside Shield")) + "'s pre-wired systems flag an issue before it becomes a problem. Minor adjustment. No event needed.")
+            self.restore_sanity(2)
+            print("\n")
+            return
 
         cheap = [
             self.corroded_battery_terminals, self.fuse_blown, self.abs_light_on,
@@ -226,6 +238,20 @@ class CarEventsMixin:
             type.type("The engine makes concerning noises, but holds.")
             self.use_item("Water Bottles")
             self.add_danger("Cooling System Damage")
+        elif self.has_item("Cool Down Kit"):
+            type.type("You crack open the " + magenta(bright("Cool Down Kit")) + " and dump it on the engine block.")
+            print("\n")
+            type.type("Steam erupts like a geyser. The temperature gauge drops from red to somewhere reasonable.")
+            print("\n")
+            type.type("There's always a risk with rapid cooling — could crack a gasket, or could actually seal better under pressure.")
+            self.use_item("Cool Down Kit")
+            if random.randrange(4) == 0:
+                type.type("A deep tick from the engine. You cracked a gasket. It still runs, but worse than before.")
+                self.add_danger("Gasket Damage")
+                self.lose_sanity(5)
+            else:
+                type.type("The rapid cooldown actually tightened the pressure seals. The engine runs cleaner than before.")
+                self.restore_sanity(5)
         else:
             type.type("You have nothing to cool it down. You sit and wait.")
             print("\n")
@@ -268,6 +294,14 @@ class CarEventsMixin:
             else:
                 type.type("That's a big problem. Expensive to fix.")
                 self.add_danger("Serious Engine Issue")
+        elif self.has_item("Fortune Cards"):
+            type.type("You lay the " + magenta(bright("Fortune Cards")) + " on the dashboard.")
+            print("\n")
+            type.type("THE TOWER on the brake pedal. DEATH near the exhaust. Then a card labeled THE JOURNEY slides under the seat.")
+            print("\n")
+            type.type("Your car hums something that sounds almost like approval. The cards say: the next car problem will be minor. Consider this your warning.")
+            self.add_status("Car Prediction")
+            self.restore_sanity(4)
         else:
             type.type("You have no way to read the code. You just have to hope it's nothing serious.")
             print("\n")
@@ -590,6 +624,15 @@ class CarEventsMixin:
             type.type("Silence. Sweet silence. But now you need to figure out the real problem.")
             self.restore_sanity(8)
             self.add_travel_restriction("Wasted Afternoon")
+        elif self.has_item("EMP Device"):
+            type.type("You aim the " + magenta(bright("EMP Device")) + " at the alarm box. One pulse.")
+            print("\n")
+            type.type("Silence. The car alarm is dead. The radio is also dead. Your phone needs a reboot.")
+            print("\n")
+            type.type("Worth it.")
+            self.use_item("EMP Device")
+            self.add_danger("EMP Side Effects")
+            self.restore_sanity(10)
         else:
             type.type("You have no way to disable it. The alarm runs until the battery dies.")
             print("\n")
@@ -903,6 +946,15 @@ class CarEventsMixin:
         print("\n")
 
     def catalytic_converter_stolen(self):
+        if self.has_item("Rolling Fortress"):
+            type.type("You check under the car. Someone tried to get at your catalytic converter.")
+            print("\n")
+            type.type("The " + magenta(bright("Rolling Fortress")) + "'s layered underbody defenses triggered. They got a screwdriver stuck in the shield plating and fled.")
+            print("\n")
+            type.type("One less repair bill. The fortress earns its name.")
+            self.restore_sanity(5)
+            print("\n")
+            return
         type.type("You start your car and it sounds like a dragster. Way too loud.")
         print("\n")
         type.type("You look under the car. Your catalytic converter is GONE. Someone stole it.")
@@ -913,6 +965,12 @@ class CarEventsMixin:
         self.add_danger("Missing Catalytic Converter")
         self.lose_sanity(20)
         type.type(" You feel violated. Someone was under your car while you slept.")
+        if self.has_item("Security Bypass"):
+            print("\n")
+            type.type("You use the " + magenta(bright("Security Bypass")) + " to trace the thief's route. You find their car parked a block away — and their radio is far nicer than yours.")
+            print("\n")
+            type.type("Poetic justice. You pocket their stereo and call it even.")
+            self.change_balance(50)
         print("\n")
 
     # === WEATHER DAMAGE ===
@@ -1007,6 +1065,17 @@ class CarEventsMixin:
 
     # === RANDOM BREAKDOWNS ===
     def mystery_breakdown(self):
+        if self.has_item("Vermin Bomb"):
+            self.use_item("Vermin Bomb")
+            type.type("Your car just... stops. You pop the hood. Mice. Mice have chewed through half your wiring harness.")
+            print("\n")
+            type.type("You detonate the " + magenta(bright("Vermin Bomb")) + " in the back seat. The fumigation is immediate, total, and almost certainly illegal.")
+            print("\n")
+            type.type("The smell will last three days. But the car is CLEAN. And mice, unlike electrical gremlins, don't come back twice.")
+            self.restore_sanity(5)
+            self.add_danger("Chewed Wiring")
+            print("\n")
+            return
         type.type("Your car just... stops. No warning. No sound. Just dead.")
         print("\n")
         type.type("You try everything. Key. Lights. Radio. Nothing responds.")
