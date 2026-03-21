@@ -75,6 +75,12 @@ class DayCasinoMixin:
             print("\n")
             type.type("The flask is warm. The card is warm. The twenty-one dollars feel inevitable, like they were always going to be exactly this.")
             print("\n")
+        if self.has_item("Eldritch Candle"):
+            type.type("The " + cyan(bright("Eldritch Candle")) + " flickers green in your pocket. The cards translucent. You could see through the deck if you looked hard enough.")
+            print("\n")
+            type.type("You don't. Some advantages feel like cheating even when they're not.")
+            self.restore_sanity(3)
+            print("\n")
         type.type(yellow(bright("You feel inexplicably lucky today.")))
         self.add_status("Lucky")
         self.add_item("Ace of Spades")
@@ -112,6 +118,14 @@ class DayCasinoMixin:
             type.type("The " + cyan(bright("Flask of Second Chance")) + " shifts in your pocket. Time hiccups, just slightly.")
             print("\n")
             type.type("Whatever today deals you — you'll get one more shot at it. That's not nothing.")
+        if self.has_item("Flask of No Bust"):
+            print("\n")
+            type.type("The " + cyan(bright("Flask of No Bust")) + " sits heavy in your jacket. Whatever hand you're dealt today — it won't break you. It literally cannot.")
+            self.restore_sanity(3)
+        if self.has_item("Cheater's Insurance"):
+            print("\n")
+            type.type("The " + cyan(bright("Cheater's Insurance")) + " rests under the seat. You're not going to use it. Probably not going to use it.")
+            self.restore_sanity(2)
         print("\n")
 
     def casino_security(self):
@@ -136,6 +150,19 @@ class DayCasinoMixin:
             type.type("The " + cyan(bright("Flask of Pocket Aces")) + " pulses with twin heartbeats against your chest. Two aces, waiting.")
             print("\n")
             type.type("Whatever they're planning, you've got something they can't see coming.")
+        if self.has_item("Radio Jammer"):
+            print("\n")
+            type.type("You flip the " + cyan(bright("Radio Jammer")) + " in your pocket. The surveillance van's radio dies. Backup never arrives.")
+            print("\n")
+            type.type("The security car circles once more, then gives up. No comms, no case.")
+            self.restore_sanity(3)
+        if self.has_item("EMP Device"):
+            self.use_item("EMP Device")
+            print("\n")
+            type.type("The " + cyan(bright("EMP Device")) + " pulses. The electronic shuffler dies in a shower of sparks.")
+            print("\n")
+            type.type("Every camera in a fifty-foot radius goes dark. The guards stare at their dead screens, bewildered.")
+            self.restore_sanity(4)
         print("\n")
 
     def even_further_interrogation(self):
@@ -214,6 +241,10 @@ class DayCasinoMixin:
             else:
                 type.type("You play. Slowly. The cards feel heavy. Important.")
                 print("\n")
+            if self.has_item("Deck of Cards"):
+                type.type("You deal from your own " + cyan(bright("Deck of Cards")) + " for him — familiar cards, worn at the edges. He smiles. " + quote("These are good cards."))
+                print("\n")
+                self.restore_sanity(3)
             type.type("He wins, of course. He was always the best.")
             print("\n")
             type.type(quote("Take these.") + " He presses his lucky chips into your hand. " + quote("You'll need them more than I will."))
