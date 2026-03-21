@@ -294,7 +294,7 @@ class CarEventsMixin:
         if self.has_item("Mobile Workshop"):
             type.type("You pop the trunk and open the " + magenta(bright("Mobile Workshop")) + " case.")
             print("\n")
-            type.type("It has exactly what you need. Five minutes later, the engine roars to life.")
+            type.type("It has exactly what you need for a failing " + problem + ". Five minutes later, the engine roars to life.")
             print("\n")
             type.type("You didn't even get your hands that dirty.")
             self.restore_sanity(8)
