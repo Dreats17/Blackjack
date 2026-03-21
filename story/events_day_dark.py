@@ -81,6 +81,7 @@ class DayDarkMixin:
                 type.type("The bolt cutters go back in the trunk. They leave without touching you.")
                 print(PAR)
                 type.type("You stand in the empty lot, collarless, poorer, intact. That last part is the one that matters.")
+                # Alternative resolution: debt deferred, not erased. Danger still added.
                 self.use_item("Gold Chain")
                 self.lose_sanity(10)
                 self.add_danger("Loan Shark Deadline")
