@@ -714,6 +714,8 @@ class DaySurvivalMixin:
         type.type("The temperature plummets. Frost forms on your windshield, and you can see your breath inside the car.")
         print("\n")
 
+        # Sacred Flame combo checked first: it consumes Fire Starter Kit, so it must precede
+        # the Emergency Blanket + Fire Starter Kit combo below.
         if self.has_item("Phoenix Feather") and self.has_item("Fire Starter Kit"):
             self.use_item("Phoenix Feather")
             self.use_item("Fire Starter Kit")
