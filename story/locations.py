@@ -2527,6 +2527,37 @@ class LocationsMixin:
             print()
             type.type("Crafted items: " + cyan(str(crafted_count)) + "/" + cyan(str(len(all_recipes))))
             print()
+
+            # Recipe hint system — scales with crafting experience
+            uncrafted = [name for name, recipe in all_recipes.items() if not self.has_item(name)]
+            if uncrafted:
+                hint_recipe_name = random.choice(uncrafted)
+                hint_recipe = all_recipes[hint_recipe_name]
+                hint_tier = hint_recipe.get("tier", 1)
+                if crafted_count <= 2:
+                    # Vague hints — cryptic, no item names
+                    hint_text = hint_recipe.get("hint_vague", "Something useful can be made here...")
+                elif crafted_count <= 9:
+                    # Suggestive hints — category + partial ingredient
+                    hint_text = hint_recipe.get("hint_suggestive", "Something in the " + hint_recipe.get("category", "unknown") + " family...")
+                elif crafted_count <= 19:
+                    # Clear hints — full ingredients, no result name
+                    hint_text = " + ".join(hint_recipe["ingredients"]) + " = ???"
+                elif crafted_count <= 39:
+                    # Expert hints — full recipe revealed
+                    hint_text = " + ".join(hint_recipe["ingredients"]) + " = " + hint_recipe_name
+                else:
+                    # Master hints — reveal higher tier recipes
+                    tier2_uncrafted = [n for n in uncrafted if all_recipes[n].get("tier", 1) >= 2]
+                    if tier2_uncrafted:
+                        hint_recipe_name = random.choice(tier2_uncrafted)
+                        hint_recipe = all_recipes[hint_recipe_name]
+                    hint_text = " + ".join(hint_recipe["ingredients"]) + " = " + hint_recipe_name + " — " + hint_recipe.get("description", "a masterwork")
+                type.type(yellow("💡 ") + italic(hint_text))
+                print()
+            else:
+                type.type(italic("You've mastered every recipe known. Legend status."))
+                print()
             print()
 
             type.type("1. " + bright("Craft Something") + " (" + green(str(len(available))) + " recipes available)")
@@ -2662,6 +2693,21 @@ class LocationsMixin:
                 elif crafted_total == 15:
                     type.type(yellow("Fifteen items crafted. You could teach a survival course. From your car."))
                     print("\n")
+                elif crafted_total == 25:
+                    type.type(yellow("Twenty-five items. You've built more things than most people own."))
+                    print("\n")
+                elif crafted_total == 40:
+                    type.type(yellow("Forty crafted items. You're not surviving anymore. You're THRIVING."))
+                    print("\n")
+                elif crafted_total == 60:
+                    type.type(yellow("Sixty items! The workbench bows to you. The car trunk is a temple of innovation."))
+                    print("\n")
+                elif crafted_total == 80:
+                    type.type(yellow("Eighty crafted items. You've transcended crafting. You're an ARTISAN."))
+                    print("\n")
+                elif crafted_total == 100:
+                    type.type(yellow("ONE HUNDRED crafted items. The universe nods in quiet respect."))
+                    print("\n")
                 elif crafted_total == len(all_recipes):
                     type.type(bright(yellow("★★★ MASTER CRAFTSMAN ★★★")))
                     print()
@@ -2688,6 +2734,13 @@ class LocationsMixin:
             "charm": "✨ Charms",
             "survival": "🏕️  Survival",
             "companion": "🐾 Companion",
+            "gadget": "📡 Gadgets",
+            "disguise": "🎭 Disguises",
+            "tonic": "🧪 Tonics & Consumables",
+            "dark_arts": "🕯️  Dark Arts",
+            "luxury": "💎 Luxury",
+            "vehicle": "🚗 Vehicle Upgrades",
+            "legendary": "👑 Legendary",
         }
 
         for cat in categories:
@@ -4258,6 +4311,112 @@ class LocationsMixin:
             # Secret
             "Dealer's Joker": "This... this came from HIM? The Dealer? I've heard stories. This card shouldn't exist.",
             "Ace of Spades": "The death card. The money card. The Gus-wants-it card.",
+
+            # ═══════ CRAFTED ITEMS — TIER 1 GADGETS ═══════
+            "Headlamp": "A flashlight taped to your FACE? That's not a gadget, that's a cry for help. But I know a guy who mines at night. He'd pay for this.",
+            "Spotlight": "Flashlight binoculars? You built a... light cannon? I don't know what to call this but it WORKS and that means it SELLS.",
+            "Evidence Kit": "A camera that transmits? To WHERE? You know what, don't tell me. The less I know the less I testify.",
+            "Radio Jammer": "This thing kills ALL signals? As in phones? Police scanners? Ankle monitors? I'm asking for a friend.",
+            "EMP Device": "You built an EMP in a GAS STATION? How are you not in jail? How is the gas station not on FIRE?",
+            "Distress Beacon": "Three-county range? The GOVERNMENT doesn't have three-county range. Who ARE you?",
+            "Security Bypass": "Picks any lock? Any lock at all? ...How much did you say you wanted for this again?",
+
+            # ═══════ CRAFTED ITEMS — TIER 1 DISGUISES ═══════
+            "Low-Profile Outfit": "Sunglasses under a poncho. You look like nobody. I LOVE nobody. Nobody never gets caught.",
+            "Beach Bum Disguise": "Tourist camouflage. Smart. Nobody robs a tourist — too much paperwork for the cops.",
+            "Gas Mask": "Custom filtration! Made from... air freshener? It smells like a rental car but it'll save your lungs.",
+            "Storm Suit": "An umbrella SUIT? You look like a tent with legs. But rain bounces right off. Engineering!",
+            "Brass Knuckles": "A padlock in a glove. Elegant. Brutal. Elegantly brutal. My three favorite words.",
+            "Gentleman's Charm": "You smell like a department store and look like you own one. This cologne trick is GOOD.",
+            "Forged Documents": "Fake papers? There's a BALLPOINT PEN government seal on this? You know what, it's close enough. Government seals all look fake anyway.",
+
+            # ═══════ CRAFTED ITEMS — TIER 1 TONICS ═══════
+            "Antacid Brew": "Baking soda water? My grandmother made this! Cured everything. Gas, heartburn, existential dread.",
+            "Trail Mix Bomb": "Seeds and matches? A birdseed BOMB? What kind of chaotic genius... Actually, I know a guy. He'll buy six.",
+            "Animal Bait": "This ziplock bag just attracted THREE squirrels through the WALL. Whatever you mixed in there, it's working.",
+            "Stink Bomb": "I can smell it through the JAR. My eyes are watering through the JAR. I'll take it. From a distance.",
+            "Voice Soother": "Your voice dropped two octaves while explaining this. The product IS the demonstration.",
+            "Outdoor Shield": "Bug proof AND sun proof? In ONE bottle? Congratulations, you just replaced two industries.",
+            "Cool Down Kit": "Cold sunscreen water. Simple. Effective. Sometimes the best inventions are the dumbest ones.",
+            "Smoke Flare": "Thick smoke in a bag? You could signal a rescue. Or commit a heist. I'm not judging either way.",
+            "Vermin Bomb": "Nuclear pest control? In a CUP? My exterminator charges $200 an hour. You just put him out of business.",
+
+            # ═══════ CRAFTED ITEMS — TIER 1 DARK ARTS ═══════
+            "Eldritch Candle": "Why is the flame GREEN? Why does it RELIGHT ITSELF? Why is my shop suddenly COLD? Get this thing OUT. ...Wait. How much?",
+            "Binding Portrait": "The photograph just BLINKED. I saw that. IT BLINKED. I'm charging extra for the nightmares I'm about to have.",
+            "Blackmail Letter": "Beautiful penmanship for a threat letter. Very classy. Very terrifying. Very sellable to the right buyer.",
+            "Devil's Deck": "The face cards are LOOKING AT ME. The jokers are GRINNING. I'll buy it but I'm not touching it with my bare hands.",
+            "Fortune Cards": "The cards just shuffled BY THEMSELVES on my counter. I'm putting these in the back. The very far back.",
+
+            # ═══════ CRAFTED ITEMS — TIER 1 LUXURY ═══════
+            "Kingpin Look": "Gold chain and cigars? You look like you own this parking lot. Hell, you look like you own THIS BLOCK.",
+            "Enchanted Vintage": "Wine in a silver flask that gets BETTER? I took one sip and I saw God. Then I saw the price tag. Then I saw God again.",
+            "Heirloom Set": "A watch and pen with fake family initials? I'm not crying. I'm APPRAISING. These look like real generational wealth.",
+            "Aristocrat's Touch": "Silk pocket square, leather gloves. You look like you've never worked a day in your life. The HIGHEST compliment.",
+            "Power Move Kit": "The lighter snap, the cigar lean — you practiced, didn't you? Don't tell me. The mystique is the VALUE.",
+            "Animal Magnetism": "Cologne on leather gloves? I just shook your hand and almost AGREED to a lower price. This stuff is DANGEROUS.",
+            "Luck Totem": "Two lucky charms fused? This thing just SWUNG toward my safe. I'm taking that as a VERY good sign.",
+
+            # ═══════ CRAFTED ITEMS — TIER 1 VEHICLE ═══════
+            "Tire Ready Kit": "Pre-assembled roadside rescue? My mechanic charges $150 for this. You built it for what, eight bucks?",
+            "Power Grid": "It says 'NOT A BOMB' in Sharpie. That's either very reassuring or very concerning. But the jumpstart works.",
+            "Miracle Lube": "The color of this liquid does NOT exist in nature. But the hinge on my door hasn't squeaked since you showed me. I'll take twelve.",
+            "Mobile Workshop": "Tools organized by 'panic frequency'? That's not engineering, that's SURVIVAL INSTINCT. I respect it deeply.",
+            "Pursuit Package": "Dog whistle and running shoes? Either you're chasing something or running from something. Either way, you need both.",
+
+            # ═══════ CRAFTED ITEMS — TIER 2 ═══════
+            "Assassin's Kit": "Shiv AND spray in one grip? This is a felony I can HOLD. I know buyers. Dangerous buyers. The best kind.",
+            "Fire Launcher": "A slingshot that launches FIRE? You set a DUMPSTER on fire from HOW far? I want three.",
+            "Tear Gas": "You made a CHEMICAL WEAPON in a SANDWICH BAG? My eyes are watering from HERE. Geneva would like a WORD.",
+            "Street Fighter Set": "Blade and knuckles? Full melee loadout? You don't fight — you PRESENT OPTIONS.",
+            "Survival Bivouac": "Better shelter than my APARTMENT? Made from a blanket? I need to rethink my life choices.",
+            "Hydration Station": "Clean water, forever? You just solved a problem that governments can't. From a tarp.",
+            "Provider's Kit": "Land AND sea food? You're basically a supermarket with legs. A one-man grocery chain.",
+            "Fortified Perimeter": "Fifty-foot kill zone around your CAR? The military should be STUDYING you.",
+            "All-Weather Armor": "HAZMAT beach vacation? You're immune to EVERYTHING and you look RIDICULOUS and I LOVE IT.",
+            "Master Key": "Opens ANYTHING in under five seconds? Please stop demonstrating on MY locks.",
+            "Night Scope": "You can see a raccoon's FACE at 100 yards in the DARK? What are you, a government satellite?",
+            "SOS Kit": "Eleven-minute rescue time? You're better than 911 and you built this from a MIRROR.",
+            "Intelligence Dossier": "A dossier that could fool the CIA. Made from a camera and a ballpoint pen. The CIA should be embarrassed.",
+            "Surveillance Suite": "See everything, hear nothing. Counter-intelligence from a SPOTLIGHT. The spies are crying.",
+            "Mind Shield": "Anxiety behind a wall? Sleep with no nightmares? Are you selling PEACE? Name your price.",
+            "Fortune's Favor": "Stacked luck? Every coin lands heads? I just flipped one. Heads. Again. HEADS. Take my money.",
+            "Fate Reader": "Cards that read the FUTURE? The Past card showed my first marriage. I don't want to see the Future card.",
+            "Lucid Dreaming Kit": "CONTROL your dreams? The dream asks YOUR permission? That's not a kit, that's a SUPERPOWER.",
+            "Old Money Identity": "You look like PREP SCHOOL? You came in here in a PONCHO yesterday! How? HOW?",
+            "New Identity": "Complete fresh start? New name, new face, new everything? I know people who'd KILL for this. Literally.",
+            "Beast Tamer Kit": "Every animal LINES UP and SITS? You're not a person anymore, you're a DISNEY MOVIE.",
+            "Cheater's Insurance": "Cheat AND document it as FAIR PLAY? This is the most evil thing I've ever loved.",
+            "Roadside Shield": "Flat tire AND dead battery? Fixed in FIVE MINUTES? My mechanic would weep.",
+            "Auto Mechanic": "Your car PURRS now? It hasn't purred since the DEALERSHIP? You scratched the dashboard? ...Adorable.",
+            "Rolling Fortress": "Car bunker. Sixty MPH. Alarms on every door. Mad Max would take NOTES.",
+
+            # ═══════ CRAFTED ITEMS — TIER 3 MASTERWORKS ═══════
+            "Road Warrior Armor": "Three weapons in a HARNESS? You're not a person, you're a WEAPONS PLATFORM. I'm scared to haggle.",
+            "Third Eye": "You can see the FUTURE? Before it HAPPENS? I'm not selling this. I'm USING it. ...Okay fine, name a price.",
+            "Nomad's Camp": "Self-sufficient camp? Food, water, shelter, forever? You don't need civilization anymore. That's beautiful and terrifying.",
+            "All-Access Pass": "Every lock opens? Every secret revealed? You're not a thief, you're a GOD with a key ring.",
+            "Master of Games": "Casino PERFECTION? You could buy a casino with a SMILE? Don't tell me more. I'll just take the money.",
+            "Immortal Vehicle": "Self-diagnosing, self-defending? It starts BEFORE you turn the key? Your car is ALIVE and I'm not okay with that.",
+            "Gambler's Aura": "Plus fifteen PERCENT? The universe owes you? I dropped a coin and it landed ON ITS EDGE. Twice.",
+            "Ark Master's Horn": "Animals ATTEND when you call? Fish jump INTO your hands? You're Noah. You're actual NOAH.",
+            "Guardian Angel": "CANNOT DIE? Triple redundancy? Eight-minute rescue? You're not protected, you're IMMORTAL ADJACENT.",
+            "Hazmat Suit": "Immune to weather, gas, acid, AND social interaction? That last one might be the biggest perk.",
+            "Ghost Protocol": "Nobody can SEE you? Cameras don't FOCUS? You're not invisible, you're IRRELEVANT. That's somehow scarier.",
+            "Dark Pact Reliquary": "It WHISPERS. It knows your NAME. The temperature just dropped. I'll give you whatever you want. TAKE IT AWAY.",
+
+            # ═══════ CRAFTED ITEMS — TIER 4 LEGENDARY ═══════
+            "Beastslayer Mantle": "You're telling me you're PHYSICALLY INVINCIBLE? That you killed a GATOR to make this? I'm not even haggling. Name your price. I'll pay it. I'll pay DOUBLE. And I'll throw in a hug.",
+            "Seer's Chronicle": "A book that WRITES ITSELF? That knows the FUTURE? The pages went blank when I tried to read ahead. It told me I wasn't READY. A BOOK told ME I wasn't ready. I need to sit down.",
+            "Wanderer's Rest": "The walking stick GREW ROOTS? And then it grew a TOMATO? One perfect tomato? This isn't crafting, this is CREATION.",
+            "Skeleton Key": "The door's lock EXPLAINS ITSELF to you? Why it was locked? What it's PROTECTING? That's not a key, that's UNDERSTANDING. I can't put a price on understanding. But I will.",
+            "King of the Road": "Every NPC DEFERS? Every game FAVORS you? A THOUSAND dollars a DAY? You don't need my shop. I need YOUR shop.",
+            "War Wagon": "Your car is AWAKE? It ADJUSTS to your hands? The engine BREATHES? I'm not buying a car. I'm adopting a CREATURE.",
+            "Moonlit Fortune": "The MATH changed? Permanent twenty percent? Luck became PHYSICS? I'm canceling my retirement fund and following you to a casino.",
+            "Leviathan's Call": "Something answered from the DEEP? The fish ATTENDED? Like a COURT? You're king of the OCEAN and you're in my pawn shop?",
+            "Last Breath Locket": "TRUE IMMORTALITY? HP cannot reach ZERO? Death goes through the LOCKET? I'm not worthy of touching this. But I'll buy it.",
+            "Phantom Rose": "A metal flower that BLOOMS? A mirror to a hallway between SEEN and UNSEEN? You're a LEGEND and legends don't sell at pawn shops. ...But if you're going to, sell to GUS.",
+            "Soul Forge": "REWRITE HISTORY? Change ANY past event? One-time use? This is the most powerful thing that has ever been on my counter. I need a moment.",
         }
         
         for item, price in sellable_items:

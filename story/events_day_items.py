@@ -2246,3 +2246,826 @@ class DayItemsMixin:
             self.lose_sanity(5)
             self.restore_sanity(3)  # Net loss of 2
         print("\n")
+
+    # ══════════════════════════════════════════════════════════════════════
+    # NEW CRAFTED ITEM EVENTS — GADGETS
+    # ══════════════════════════════════════════════════════════════════════
+
+    def headlamp_night_walk(self):
+        """Headlamp reveals threats during dark encounters"""
+        type.type("The road ahead is pitch black. Your headlights flicker — the battery's getting weak.")
+        print("\n")
+        type.type("Something moves in the ditch. A shape. Too big for a dog.")
+        print("\n")
+        if self.has_item("Headlamp"):
+            type.type("You click on your " + cyan(bright("Headlamp")) + ". The beam cuts through the dark like a spotlight.")
+            print("\n")
+            type.type("It's a deer. Just a deer, frozen in the light, staring at you with those big stupid eyes.")
+            print("\n")
+            type.type("You breathe out. The headlamp just saved you from a panic attack and a possible ditch dive.")
+            self.restore_sanity(3)
+        elif self.has_item("Flashlight"):
+            type.type("You fumble for your flashlight, holding it in one hand while steering with the other.")
+            print("\n")
+            type.type("The beam wobbles everywhere. You catch a glimpse of antlers before the shape bolts into the trees.")
+            type.type(" Deer. Probably. Your hands are shaking.")
+            self.lose_sanity(1)
+        else:
+            type.type("You white-knuckle the steering wheel and pray. The shape doesn't move. You swerve around it.")
+            print("\n")
+            type.type("Your heart doesn't recover for twenty minutes. You never find out what it was.")
+            self.lose_sanity(4)
+        print("\n")
+
+    def spotlight_hidden_path(self):
+        """Spotlight reveals hidden paths during exploration"""
+        type.type("A fork in the road. The sign is rusted beyond reading. Left or right.")
+        print("\n")
+        if self.has_item("Spotlight"):
+            type.type("You pull out the " + cyan(bright("Spotlight")) + " and aim it down both paths.")
+            print("\n")
+            type.type("Left: roadblock, collapsed bridge, dead end. Right: clear road, and — wait. There's a THIRD path. Overgrown, almost invisible, but the spotlight catches tire tracks.")
+            print("\n")
+            type.type("You take the hidden path. It leads to an abandoned rest stop with untouched supplies.")
+            loot = random.randint(30, 80)
+            self.change_balance(loot)
+            type.type(" You find " + green("${:,}".format(loot)) + " in the register and supplies in the back.")
+            self.restore_sanity(3)
+        else:
+            choice = random.randrange(2)
+            if choice == 0:
+                type.type("You go left. Dead end. Collapsed bridge. You spend forty minutes turning around.")
+                self.lose_sanity(2)
+            else:
+                type.type("You go right. Clear road, but nothing interesting. Just miles of nothing. The sign is still unreadable in your mind.")
+                self.lose_sanity(1)
+        print("\n")
+
+    def evidence_kit_crime(self):
+        """Evidence Kit changes a crime witness event"""
+        type.type("Someone's breaking into a car across the parking lot. Broad daylight. Bold.")
+        print("\n")
+        type.type("They see you watching but don't care. You're one person. What are you going to do?")
+        print("\n")
+        if self.has_item("Evidence Kit"):
+            type.type("You pull out the " + cyan(bright("Evidence Kit")) + " and start documenting. Click. Click. Click.")
+            print("\n")
+            type.type("The camera flashes. The signal booster transmits. The thief's face drains of color.")
+            print("\n")
+            type.type(quote("Delete that! DELETE THAT!"))
+            print("\n")
+            type.type("They sprint. Gone in ten seconds. Twenty minutes later, a cop shows up, takes your photos, and hands you a reward for the tip.")
+            reward = random.randint(50, 150)
+            self.change_balance(reward)
+            type.type(" " + green("${:,}".format(reward)) + " for civic duty.")
+            self.restore_sanity(5)
+        else:
+            type.type("You pull out your phone. The screen glare makes it impossible to get a clear photo.")
+            print("\n")
+            type.type("The thief flips you off and drives away. Nobody comes. Nobody cares. Welcome to society.")
+            self.lose_sanity(3)
+        print("\n")
+
+    def radio_jammer_checkpoint(self):
+        """Radio Jammer disrupts a police checkpoint"""
+        type.type("Red and blue lights ahead. Checkpoint. Three cruisers parked sideways across the road.")
+        print("\n")
+        type.type("You're not doing anything wrong. Probably. But checkpoints make everyone nervous.")
+        print("\n")
+        if self.has_item("Radio Jammer"):
+            type.type("You flip the " + cyan(bright("Radio Jammer")) + " under your seat. The police radios squawk and die.")
+            print("\n")
+            type.type("Officers look at each other, confused. Tap their earpieces. One walks to his car to check the radio. Then another.")
+            print("\n")
+            type.type("In the chaos of dead comms, you idle through the gap. Nobody flags you. They're too busy troubleshooting.")
+            self.restore_sanity(5)
+        elif self.has_item("Forged Documents"):
+            type.type("You hand over your " + cyan(bright("Forged Documents")) + " with the confidence of someone who has nothing to hide.")
+            print("\n")
+            type.type("The officer squints. Checks the seal. Checks the photo. Nods.")
+            print("\n")
+            type.type(quote("Have a good evening, Mr. Torres."))
+            self.restore_sanity(2)
+        else:
+            type.type("License and registration. You hand them over.")
+            print("\n")
+            if random.randrange(3) == 0:
+                type.type("Everything checks out. The officer waves you through after a long, uncomfortable stare.")
+            else:
+                fine = random.randint(25, 75)
+                type.type("Expired registration. He writes you a ticket for " + red("${:,}".format(fine)) + ".")
+                self.change_balance(-fine)
+            self.lose_sanity(2)
+        print("\n")
+
+    def emp_device_pursuit(self):
+        """EMP Device ends a vehicle pursuit (consumed)"""
+        type.type("The car behind you is gaining. Fast. They've been following since the last intersection.")
+        print("\n")
+        type.type("This isn't road rage. This is deliberate. Your rearview shows two people, driver and passenger, and the passenger is pointing at you.")
+        print("\n")
+        if self.has_item("EMP Device"):
+            type.type("You grab the " + cyan(bright("EMP Device")) + " and toss it out the window.")
+            print("\n")
+            type.type("POP. A silent pulse. Every electronic in a 50-foot radius dies — their headlights, their engine, their power steering. The car coasts to a stop like a toy running out of battery.")
+            print("\n")
+            type.type("You drive away. In the rearview, they're standing in the road, staring at their dead car. Problem solved.")
+            self.use_item("EMP Device")
+            self.restore_sanity(8)
+        elif self.has_item("Pursuit Package"):
+            type.type("You lace up the " + cyan(bright("Pursuit Package")) + " shoes and blow the dog whistle out the window.")
+            print("\n")
+            type.type("Three neighborhood dogs go BALLISTIC, chasing the pursuing car. Their driver swerves to avoid a golden retriever and clips a mailbox. You disappear around the corner.")
+            self.restore_sanity(5)
+        else:
+            type.type("You floor it. Red lights, stop signs, a one-way street the wrong direction — you run them all.")
+            print("\n")
+            type.type("They give up after four blocks. Or you lost them. Or they're taking a different route. You don't stop to find out.")
+            self.lose_sanity(5)
+            self.hurt(random.choice([0, 0, 5]))
+        print("\n")
+
+    def security_bypass_locked_room(self):
+        """Security Bypass opens a locked building"""
+        type.type("An abandoned building. Door locked. Windows boarded. But you can hear a generator humming inside.")
+        print("\n")
+        type.type("Someone left this place powered. That means there's something worth powering.")
+        print("\n")
+        if self.has_item("Security Bypass"):
+            type.type("The " + cyan(bright("Security Bypass")) + " makes quick work of the lock. Four seconds, clean entry.")
+            print("\n")
+            type.type("Inside: a survival cache. Water, canned food, batteries, and a safe. You work the safe next.")
+            loot = random.randint(50, 200)
+            self.change_balance(loot)
+            type.type(" " + green("${:,}".format(loot)) + " in the safe, plus supplies you can actually use.")
+            self.restore_sanity(5)
+            self.heal(5)
+        elif self.has_item("Master Key"):
+            type.type("Your " + cyan(bright("Master Key")) + " handles the door AND the safe inside. Two seconds each.")
+            loot = random.randint(100, 300)
+            self.change_balance(loot)
+            type.type(" " + green("${:,}".format(loot)) + " and a feeling of professional satisfaction.")
+            self.restore_sanity(5)
+            self.heal(5)
+        elif self.has_item("Lockpick Set"):
+            type.type("Your " + cyan(bright("Lockpick Set")) + " gets the door open, but the safe inside defeats you.")
+            loot = random.randint(10, 40)
+            self.change_balance(loot)
+            type.type(" You find " + green("${:,}".format(loot)) + " in a drawer. The safe haunts your dreams.")
+            self.restore_sanity(2)
+        else:
+            type.type("You try the door. Locked. You try the windows. Boarded. You kick the door. It laughs at you.")
+            print("\n")
+            type.type("Whatever's inside stays inside. You walk away, generator still humming behind you.")
+            self.lose_sanity(2)
+        print("\n")
+
+    # ══════════════════════════════════════════════════════════════════════
+    # NEW CRAFTED ITEM EVENTS — DISGUISES
+    # ══════════════════════════════════════════════════════════════════════
+
+    def gentleman_charm_dinner(self):
+        """Gentleman's Charm wins over a fancy establishment"""
+        type.type("A restaurant. Real tablecloths. Real candles. Real pretension. You're in a parking lot.")
+        print("\n")
+        type.type("The host sees you approaching and starts formulating a polite rejection.")
+        print("\n")
+        if self.has_item("Gentleman's Charm"):
+            type.type("Then the " + cyan(bright("Gentleman's Charm")) + " hits. The cologne, the silk — the host's rejection dies on their lips.")
+            print("\n")
+            type.type(quote("Right this way, sir. We have a lovely table by the window."))
+            print("\n")
+            type.type("You sit. They bring bread. REAL bread. With butter. Someone else pays for your meal because they assume you're someone important.")
+            self.heal(10)
+            self.restore_sanity(8)
+        elif self.has_item("Old Money Identity"):
+            type.type("The " + cyan(bright("Old Money Identity")) + " opens doors that were never closed to begin with.")
+            print("\n")
+            type.type("The host bows. The chef comes to your table. They comp the entire meal. You leave a $5 tip because old money is notoriously cheap. Nobody questions it.")
+            self.heal(15)
+            self.restore_sanity(10)
+        else:
+            type.type("The host looks you up and down. " + quote("Perhaps you'd be more comfortable at the diner across the street?"))
+            print("\n")
+            type.type("You go to the diner. The coffee's better anyway. Probably.")
+            self.lose_sanity(3)
+        print("\n")
+
+    def forged_documents_police(self):
+        """Forged Documents avoid a police encounter"""
+        type.type("Two cops. Walking toward you. Making eye contact. That purposeful walk that says you're the destination.")
+        print("\n")
+        type.type(quote("Excuse me. Can we see some identification?"))
+        print("\n")
+        if self.has_item("Forged Documents"):
+            type.type("You produce the " + cyan(bright("Forged Documents")) + " with steady hands and a bored expression.")
+            print("\n")
+            type.type("Officer squints at the ID. Looks at you. Looks at the ID. The ballpoint government seal gleams with false authority.")
+            print("\n")
+            type.type(quote("Alright, Mr. Torres. Sorry to bother you."))
+            print("\n")
+            type.type("They walk away. You breathe. Michael Torres strikes again.")
+            self.restore_sanity(5)
+        elif self.has_item("New Identity"):
+            type.type("The " + cyan(bright("New Identity")) + " is flawless. They don't just accept it — they apologize for stopping you.")
+            self.restore_sanity(8)
+        else:
+            type.type("You hand over your real ID. They run it. You wait. The radio crackles.")
+            print("\n")
+            if random.randrange(4) == 0:
+                fine = random.randint(50, 150)
+                type.type("Outstanding warrant. Unpaid parking tickets. They write you up for " + red("${:,}".format(fine)) + ".")
+                self.change_balance(-fine)
+                self.lose_sanity(5)
+            else:
+                type.type("Clean. They hand it back and walk off. Your blood pressure takes twenty minutes to normalize.")
+                self.lose_sanity(2)
+        print("\n")
+
+    def brass_knuckles_brawl(self):
+        """Brass Knuckles end a bar fight quickly"""
+        type.type("The bar is loud. Someone bumps your shoulder. Doesn't apologize. Bumps it again. Makes eye contact.")
+        print("\n")
+        type.type(quote("You got a problem, buddy?"))
+        print("\n")
+        if self.has_item("Brass Knuckles"):
+            type.type("You flex your hand inside the glove. The " + cyan(bright("Brass Knuckles")) + " shift into position.")
+            print("\n")
+            type.type("One punch. Center mass. He folds like a lawn chair in a hurricane.")
+            print("\n")
+            type.type("The bar goes silent. His friends look at him. Look at you. Decide they're not his friends tonight.")
+            type.type(" You finish your drink in peace.")
+            self.restore_sanity(5)
+        elif self.has_item("Street Fighter Set"):
+            type.type("The " + cyan(bright("Street Fighter Set")) + " comes out. Shiv in one hand, knuckles in the other.")
+            print("\n")
+            type.type("He looks at both. Reconsiders EVERYTHING. " + quote("Hey man, my bad. Let me buy you a drink."))
+            self.restore_sanity(8)
+            loot = random.randint(5, 15)
+            self.change_balance(loot)
+        else:
+            type.type("It's a bar fight. No weapons, just fists and bad decisions.")
+            print("\n")
+            if random.randrange(2) == 0:
+                type.type("You land a lucky shot. He lands three. You leave with a black eye and a story.")
+                self.hurt(8)
+                self.lose_sanity(2)
+            else:
+                type.type("He's bigger. He's angrier. You end up on the floor. The bartender calls it.")
+                self.hurt(12)
+                self.lose_sanity(4)
+        print("\n")
+
+    def gas_mask_chemical(self):
+        """Gas Mask protects against chemical hazards"""
+        type.type("The smell hits before you see the source. Acrid. Chemical. The kind of smell that makes your eyes water from thirty feet away.")
+        print("\n")
+        type.type("Some kind of spill on the road ahead. Green liquid pooling. Cars are turning around.")
+        print("\n")
+        if self.has_item("Gas Mask") or self.has_item("Hazmat Suit"):
+            used = "Hazmat Suit" if self.has_item("Hazmat Suit") else "Gas Mask"
+            type.type("You strap on the " + cyan(bright(used)) + " and drive straight through.")
+            print("\n")
+            type.type("Inside the mask, it smells like a car dealership. Outside, it smells like the apocalypse. You smell the car dealership.")
+            print("\n")
+            type.type("On the other side, a police officer stares at you in disbelief. " + quote("How did you... You know what, just go."))
+            self.restore_sanity(3)
+        else:
+            type.type("You turn around with everyone else. The detour adds forty minutes to your drive.")
+            print("\n")
+            type.type("Your eyes are still watering an hour later. Whatever that stuff was, it's not leaving your sinuses soon.")
+            self.hurt(5)
+            self.lose_sanity(2)
+        print("\n")
+
+    # ══════════════════════════════════════════════════════════════════════
+    # NEW CRAFTED ITEM EVENTS — TONICS & CONSUMABLES
+    # ══════════════════════════════════════════════════════════════════════
+
+    def stink_bomb_escape(self):
+        """Stink Bomb clears out hostiles"""
+        type.type("Three men. Corner of the alley. Looking at you with the kind of interest that precedes a very bad evening.")
+        print("\n")
+        type.type("They start walking toward you. Casual. Confident. Organized.")
+        print("\n")
+        if self.has_item("Stink Bomb"):
+            type.type("You crack the " + cyan(bright("Stink Bomb")) + " and roll it between them.")
+            print("\n")
+            type.type("The reaction is INSTANT. Gagging. Retching. One man drops to his knees. Another covers his face and runs into a wall. The smell is so aggressive it has a PERSONALITY.")
+            print("\n")
+            type.type("You walk past them while they're incapacitated. One of them is crying. You almost feel bad. Almost.")
+            self.use_item("Stink Bomb")
+            self.restore_sanity(5)
+        elif self.has_item("Tear Gas"):
+            type.type("The " + cyan(bright("Tear Gas")) + " hits them mid-stride. All three go down. Pepper spray AND stink chemistry.")
+            print("\n")
+            type.type("The Geneva Convention wasn't designed for alley encounters but it SHOULD have been.")
+            self.use_item("Tear Gas")
+            self.restore_sanity(8)
+        else:
+            type.type("You run. They follow. You're faster — barely. But the adrenaline costs you sleep tonight.")
+            self.lose_sanity(4)
+            self.hurt(random.choice([0, 3, 5]))
+        print("\n")
+
+    def animal_bait_companion(self):
+        """Animal Bait attracts a potential companion"""
+        type.type("The roadside is quiet. Too quiet for a place with this much underbrush.")
+        print("\n")
+        type.type("You can feel it — something is watching you from the bushes.")
+        print("\n")
+        if self.has_item("Animal Bait") or self.has_item("Beast Tamer Kit"):
+            used = "Beast Tamer Kit" if self.has_item("Beast Tamer Kit") else "Animal Bait"
+            type.type("You set out the " + cyan(bright(used)) + " and wait.")
+            print("\n")
+            type.type("One minute. Two. Then a nose pushes through the leaves. A stray — thin, cautious, hungry.")
+            print("\n")
+            type.type("It eats. Looks at you. Eats more. Looks at you with different eyes. The kind of look that says " + quote("Okay. You'll do."))
+            print("\n")
+            if used == "Animal Bait":
+                self.use_item("Animal Bait")
+            if len(self.get_all_companions()) == 0:
+                dog_name = random.choice(["Scraps", "Bones", "Nomad", "Drifter"])
+                type.type("The stray follows you back to the car and hops in like it owns the place. " + bright("You have a companion."))
+                self.add_companion(dog_name, "Stray Dog")
+            else:
+                type.type("It trails behind your car for a while, then finds a better offer in someone else's trash. Fair enough.")
+            self.restore_sanity(5)
+        else:
+            type.type("Whatever's in the bushes decides you're not worth the risk. The rustling fades. You're alone again.")
+            self.lose_sanity(1)
+        print("\n")
+
+    def trail_mix_bomb_distraction(self):
+        """Trail Mix Bomb creates a diversion"""
+        type.type("The gas station attendant is LOSING it. Screaming at you about something you didn't do. His finger is way too close to your face.")
+        print("\n")
+        type.type("Behind him, his buddy is circling around. This is an ambush with extra steps.")
+        print("\n")
+        if self.has_item("Trail Mix Bomb"):
+            type.type("You light the " + cyan(bright("Trail Mix Bomb")) + " and toss it into the parking lot.")
+            print("\n")
+            type.type("FWOOM! Seeds EVERYWHERE. Matches flash. A flock of pigeons materializes from the fabric of reality. The attendant's friend trips over a pigeon. The attendant looks away for one second.")
+            print("\n")
+            type.type("One second is all you need. You're in the car and gone before the pigeons finish their buffet.")
+            self.use_item("Trail Mix Bomb")
+            self.restore_sanity(5)
+        else:
+            type.type("You back up slowly. The attendant follows. His buddy blocks the car.")
+            print("\n")
+            lost = min(random.randint(20, 50), self._balance)
+            if lost > 0:
+                type.type("They take " + red("${:,}".format(lost)) + " for \"damages.\" You don't argue. You leave.")
+                self.change_balance(-lost)
+            self.lose_sanity(4)
+        print("\n")
+
+    def voice_soother_persuasion(self):
+        """Voice Soother helps in a negotiation"""
+        type.type("The mechanic slides a quote across the counter. You look at the number. Then look again. Then a third time, because surely there's a decimal point you missed.")
+        print("\n")
+        type.type("There isn't. It's that much.")
+        print("\n")
+        if self.has_item("Voice Soother"):
+            type.type("You sip the " + cyan(bright("Voice Soother")) + ". Your voice drops an octave, smooth as midnight radio.")
+            print("\n")
+            type.type(quote("I appreciate the work. But I think we can find a number that works for both of us."))
+            print("\n")
+            type.type("The mechanic blinks. Reconsiders. Crosses out the number and writes a new one — 40% lower.")
+            type.type(" Something about your voice made him WANT to be reasonable.")
+            self.use_item("Voice Soother")
+            self.restore_sanity(3)
+        else:
+            type.type("You try to negotiate. Your voice cracks mid-sentence. The mechanic doesn't budge.")
+            print("\n")
+            type.type("You pay full price. Your wallet weeps.")
+            cost = random.randint(30, 80)
+            self.change_balance(-cost)
+            self.lose_sanity(2)
+        print("\n")
+
+    # ══════════════════════════════════════════════════════════════════════
+    # NEW CRAFTED ITEM EVENTS — DARK ARTS
+    # ══════════════════════════════════════════════════════════════════════
+
+    def eldritch_candle_entity(self):
+        """Eldritch Candle commands dark entities"""
+        type.type("The shadows in the corner of the parking lot aren't regular shadows. They're too DARK. Too... present.")
+        print("\n")
+        type.type("Something is watching you from inside the darkness. You can feel its attention like weight on your shoulders.")
+        print("\n")
+        if self.has_item("Eldritch Candle"):
+            type.type("You light the " + cyan(bright("Eldritch Candle")) + ". The green flame catches immediately. It always does.")
+            print("\n")
+            type.type("The shadow FLINCHES. It recognizes the flame. It recognizes the authority the flame carries.")
+            print("\n")
+            type.type(quote("Leave.") + " One word. The shadow obeys. The darkness retreats to regular darkness.")
+            print("\n")
+            type.type("Your hands are still cold. The candle relights itself in your pocket.")
+            self.lose_sanity(2)
+            self.restore_sanity(5)  # Net +3
+        elif self.has_item("Dark Pact Reliquary"):
+            type.type("The " + cyan(bright("Dark Pact Reliquary")) + " hums. The shadow doesn't flinch — it BOWS.")
+            print("\n")
+            type.type("The reliquary whispers something. The shadow retreats, but gently, like a servant exiting a room.")
+            self.restore_sanity(2)
+        else:
+            type.type("The shadow reaches. Cold floods your body. Every instinct screams to run. You run.")
+            print("\n")
+            type.type("You make it to the car. The shadow stays where it was. Watching. Patient.")
+            self.lose_sanity(8)
+            self.hurt(3)
+        print("\n")
+
+    def devils_deck_gambling(self):
+        """Devil's Deck cheats at a card game"""
+        type.type("A man outside the bar is running a three-card monte. His hands are fast, but his eyes are smug.")
+        print("\n")
+        type.type(quote("Find the queen, win fifty bucks. Easy money. Unless your eyes aren't fast enough."))
+        print("\n")
+        if self.has_item("Devil's Deck") or self.has_item("Cheater's Insurance"):
+            used = "Cheater's Insurance" if self.has_item("Cheater's Insurance") else "Devil's Deck"
+            type.type("You touch the " + cyan(bright(used)) + " in your pocket. The cards on the table SHIFT. Not visibly — but you FEEL which one is the queen.")
+            print("\n")
+            type.type("You point. He flips. Queen. His smile dies.")
+            print("\n")
+            type.type("You point again. Queen again. His hands start shaking.")
+            print("\n")
+            type.type(quote("Best of three?") + " you ask. He packs up and leaves. You already won $100.")
+            self.change_balance(100)
+            self.restore_sanity(5)
+        else:
+            type.type("You play. You lose $20. His hands are faster than they looked.")
+            self.change_balance(-20)
+            self.lose_sanity(2)
+        print("\n")
+
+    def fortune_cards_warning(self):
+        """Fortune Cards predict danger"""
+        type.type("Nothing special about this morning. Coffee. Road. Silence.")
+        print("\n")
+        if self.has_item("Fortune Cards") or self.has_item("Fate Reader"):
+            used = "Fate Reader" if self.has_item("Fate Reader") else "Fortune Cards"
+            type.type("The " + cyan(bright(used)) + " deals itself. Three cards. Past. Present. Future.")
+            print("\n")
+            type.type("The Future card shows a red highway and a jackknifed truck. The image is clear. Unmistakable.")
+            print("\n")
+            type.type("You take the next exit. Twenty minutes later, you hear sirens. A truck jackknifed on the highway you left. The card goes blank.")
+            self.restore_sanity(8)
+        else:
+            type.type("You drive the highway. Traffic stops. A truck jackknifed ahead. You sit for two hours.")
+            self.lose_sanity(3)
+        print("\n")
+
+    def blackmail_letter_extortion(self):
+        """Blackmail Letter extracts money from a wealthy NPC"""
+        type.type("The businessman at the diner is sweating. His tie is loose, his phone won't stop buzzing, and he's muttering about a 'situation.'")
+        print("\n")
+        type.type("You overhear enough. He's in trouble. Big trouble. The kind with consequences.")
+        print("\n")
+        if self.has_item("Blackmail Letter"):
+            type.type("You slide the " + cyan(bright("Blackmail Letter")) + " across his table. Unsigned. Elegant. Terrifying.")
+            print("\n")
+            type.type("He reads it. Goes white. Reads it again.")
+            print("\n")
+            type.type(quote("How much?") + " he whispers.")
+            print("\n")
+            payout = random.randint(200, 500)
+            type.type("You name a number. " + green("${:,}".format(payout)) + ". He pays without blinking. Slides the cash across like it burns.")
+            self.change_balance(payout)
+            self.use_item("Blackmail Letter")
+            self.lose_sanity(3)  # You feel dirty
+        else:
+            type.type("You mind your own business. The businessman makes a call, throws cash on the table, and leaves in a hurry.")
+            print("\n")
+            type.type("Whatever his 'situation' was, it wasn't yours. That's probably for the best.")
+            self.restore_sanity(1)
+        print("\n")
+
+    # ══════════════════════════════════════════════════════════════════════
+    # NEW CRAFTED ITEM EVENTS — LUXURY
+    # ══════════════════════════════════════════════════════════════════════
+
+    def kingpin_look_respect(self):
+        """Kingpin Look commands criminal respect"""
+        type.type("The alley shortcut you usually take is occupied. Three men in leather, watching the entrance like bouncers.")
+        print("\n")
+        type.type("They see you. One straightens up. Time to see if they charge admission.")
+        print("\n")
+        if self.has_item("Kingpin Look"):
+            type.type("The " + cyan(bright("Kingpin Look")) + " does the talking. Gold chain catches the streetlight. Cigar smoke drifts.")
+            print("\n")
+            type.type("The lead man's posture changes. His chin drops slightly. Involuntary. Respect.")
+            print("\n")
+            type.type(quote("Boss.") + " He nods. Steps aside. The other two follow. You walk through like you own the alley.")
+            print("\n")
+            type.type("You don't own the alley. You own a " + cyan(bright("Kingpin Look")) + ". Close enough.")
+            self.restore_sanity(5)
+        elif self.has_item("Brass Knuckles"):
+            type.type("Your gloved hand flexes. The metal shines. They notice.")
+            print("\n")
+            type.type("Minimal nod. They let you pass. Respect earned through implied violence.")
+            self.restore_sanity(3)
+        else:
+            type.type("They block the path. " + quote("Toll's twenty bucks."))
+            print("\n")
+            answer = ask.yes_or_no("Pay $20? ")
+            if answer == "yes":
+                self.change_balance(-20)
+                type.type("They step aside. You feel like a sucker.")
+                self.lose_sanity(2)
+            else:
+                type.type("You turn around. The long way it is. Twenty extra minutes and a bruised ego.")
+                self.lose_sanity(3)
+        print("\n")
+
+    def heirloom_set_recognition(self):
+        """Heirloom Set grants old money treatment"""
+        type.type("An antique store. The kind with a doorbell that actually chimes and a proprietor who actually looks over their glasses at you.")
+        print("\n")
+        type.type("The proprietor is already formulating a polite " + quote("Can I help you find the door?"))
+        print("\n")
+        if self.has_item("Heirloom Set"):
+            type.type("Then they spot the " + cyan(bright("Heirloom Set")) + ". The watch on your wrist. The pen in your pocket.")
+            print("\n")
+            type.type("Their entire demeanor shifts. The glasses come OFF. " + quote("Oh. My. That watch. Is that a...?"))
+            print("\n")
+            type.type("You say nothing. You've learned that saying nothing with expensive accessories says everything.")
+            print("\n")
+            type.type("They offer you tea. REAL tea. They show you the back room. The stuff that isn't for sale. Except to you, apparently.")
+            payout = random.randint(50, 150)
+            self.change_balance(payout)
+            type.type(" You buy low and sell high. " + green("+${:,}".format(payout)) + " profit from knowing which fork is for fish.")
+            self.restore_sanity(5)
+        else:
+            type.type("The proprietor watches you touch things you can't afford and silently wills you to leave.")
+            print("\n")
+            type.type("You leave. The doorbell chimes again. It sounded judgmental.")
+            self.lose_sanity(2)
+        print("\n")
+
+    def luck_totem_windfall(self):
+        """Luck Totem creates passive luck effects"""
+        type.type("Walking across the parking lot. Nothing special. Same cracks in the asphalt.")
+        print("\n")
+        if self.has_item("Luck Totem") or self.has_item("Fortune's Favor") or self.has_item("Gambler's Aura"):
+            if self.has_item("Gambler's Aura"):
+                used = "Gambler's Aura"
+            elif self.has_item("Fortune's Favor"):
+                used = "Fortune's Favor"
+            else:
+                used = "Luck Totem"
+            type.type("The " + cyan(bright(used)) + " vibrates in your pocket. Then you look down.")
+            print("\n")
+            loot = random.choice([20, 20, 50, 50, 100])
+            type.type("A " + green("${:,}".format(loot)) + " bill. On the ground. Just sitting there.")
+            print("\n")
+            type.type("You pick it up. Then you see the scratch ticket under it. You scratch it. " + green("$" + str(random.randint(5, 50))) + ". Winner.")
+            print("\n")
+            type.type("The totem is warm. The universe is paying its tab.")
+            self.change_balance(loot)
+            self.restore_sanity(5)
+        else:
+            type.type("You step on a piece of gum. It sticks to your shoe. It's the expensive kind that never comes off.")
+            self.lose_sanity(1)
+        print("\n")
+
+    # ══════════════════════════════════════════════════════════════════════
+    # NEW CRAFTED ITEM EVENTS — VEHICLE
+    # ══════════════════════════════════════════════════════════════════════
+
+    def tire_ready_flat(self):
+        """Tire Ready Kit handles a flat tire"""
+        type.type("BANG. The car lurches right. You grip the wheel. Flat tire. Of course.")
+        print("\n")
+        if self.has_item("Tire Ready Kit") or self.has_item("Roadside Shield"):
+            used = "Roadside Shield" if self.has_item("Roadside Shield") else "Tire Ready Kit"
+            type.type("The " + cyan(bright(used)) + " is pre-assembled. Jack mounted, spare ready, bolts checked.")
+            print("\n")
+            type.type("Four minutes. Changed. Done. You're back on the road before the sweat dries.")
+            self.restore_sanity(5)
+        elif self.has_item("Mobile Workshop"):
+            type.type("The " + cyan(bright("Mobile Workshop")) + " has everything you need. It takes ten minutes but the tire holds.")
+            self.restore_sanity(3)
+        else:
+            type.type("No jack. No spare. No plan.")
+            print("\n")
+            type.type("You call for help. It takes two hours. The sun bakes you the entire time.")
+            cost = random.randint(40, 100)
+            self.change_balance(-cost)
+            type.type(" The tow costs " + red("${:,}".format(cost)) + ".")
+            self.lose_sanity(4)
+            self.hurt(3)
+        print("\n")
+
+    def miracle_lube_breakdown(self):
+        """Miracle Lube prevents or fixes a mechanical failure"""
+        type.type("The engine makes a noise it has never made before. A grinding, metallic complaint from deep in the block.")
+        print("\n")
+        type.type("This is the noise that precedes expensive repair bills and long walks.")
+        print("\n")
+        if self.has_item("Miracle Lube") or self.has_item("Auto Mechanic"):
+            used = "Auto Mechanic" if self.has_item("Auto Mechanic") else "Miracle Lube"
+            type.type("You pop the hood and apply " + cyan(bright(used)) + " to every moving part you can find.")
+            print("\n")
+            type.type("The grinding stops. The engine smooths out. That color-that-doesn't-exist-in-nature just saved you a mechanic visit.")
+            self.restore_sanity(5)
+        elif self.has_item("Mobile Workshop"):
+            type.type("Your " + cyan(bright("Mobile Workshop")) + " has the tools. You tighten, adjust, and pray.")
+            print("\n")
+            type.type("The noise fades to a whisper. Good enough to keep driving. Barely.")
+            self.restore_sanity(2)
+        else:
+            type.type("You drive on it anyway. The noise gets worse. Much worse. Then it gets QUIET.")
+            print("\n")
+            type.type("That's worse. That's the noise of something that gave up.")
+            cost = random.randint(80, 200)
+            self.change_balance(-cost)
+            type.type(" Mechanic charges " + red("${:,}".format(cost)) + ".")
+            self.lose_sanity(5)
+        print("\n")
+
+    # ══════════════════════════════════════════════════════════════════════
+    # NEW CRAFTED ITEM EVENTS — TIER 2+ MASTERWORKS
+    # ══════════════════════════════════════════════════════════════════════
+
+    def road_warrior_ambush(self):
+        """Road Warrior Armor makes you untouchable in combat"""
+        type.type("An ambush. Two men with bats. They step out from behind a dumpster like this is a movie and they've rehearsed.")
+        print("\n")
+        type.type(quote("Wrong place, wrong time, friend."))
+        print("\n")
+        if self.has_item("Road Warrior Armor") or self.has_item("Beastslayer Mantle"):
+            used = "Beastslayer Mantle" if self.has_item("Beastslayer Mantle") else "Road Warrior Armor"
+            type.type("You turn to face them. The " + cyan(bright(used)) + " catches the light. Three weapons. Metal and fire and edges.")
+            print("\n")
+            type.type("They see the armor. They see what's attached to it. They look at each other.")
+            print("\n")
+            type.type("The bats lower. Then drop. " + quote("Wrong... we got the wrong guy. Sorry. Sorry, man."))
+            print("\n")
+            type.type("They leave faster than they arrived. You didn't even speak.")
+            self.restore_sanity(10)
+        elif self.has_item("Assassin's Kit"):
+            type.type("The " + cyan(bright("Assassin's Kit")) + " comes out. Shiv and spray. They hesitate. You don't.")
+            print("\n")
+            type.type("Thirty seconds later, one is pepper-sprayed and the other is reconsidering his career. You walk away untouched.")
+            self.restore_sanity(5)
+        else:
+            type.type("First bat catches your shoulder. Second gets your ribs. You go down, they take what they want, and you lie there.")
+            print("\n")
+            lost = min(random.randint(30, 80), self._balance)
+            if lost > 0:
+                self.change_balance(-lost)
+                type.type("They got " + red("${:,}".format(lost)) + ".")
+            self.hurt(15)
+            self.lose_sanity(8)
+        print("\n")
+
+    def third_eye_foresight(self):
+        """Third Eye shows outcomes before choosing"""
+        type.type("Two strangers approach. One offers directions to a shortcut. The other says the shortcut is a trap.")
+        print("\n")
+        type.type("Both are convincing. Both could be lying.")
+        print("\n")
+        if self.has_item("Third Eye") or self.has_item("Seer's Chronicle"):
+            used = "Seer's Chronicle" if self.has_item("Seer's Chronicle") else "Third Eye"
+            type.type("The " + cyan(bright(used)) + " hums. The shimmer appears around both strangers.")
+            print("\n")
+            type.type("The first stranger shimmers red. Danger. The second shimmers green. Truth.")
+            print("\n")
+            type.type("You follow the second stranger's advice. The shortcut IS a trap — and you just avoided it.")
+            type.type(" The true path leads to a rest stop with supplies and cash.")
+            loot = random.randint(40, 120)
+            self.change_balance(loot)
+            self.restore_sanity(8)
+        elif self.has_item("Fortune Cards"):
+            type.type("The " + cyan(bright("Fortune Cards")) + " deal themselves. The first stranger's card shows a skull.")
+            type.type(" That's... clear enough.")
+            loot = random.randint(20, 60)
+            self.change_balance(loot)
+            self.restore_sanity(4)
+        else:
+            choice = random.randrange(2)
+            if choice == 0:
+                type.type("You pick wrong. The shortcut leads to a dead end where two more strangers are waiting. This was a setup.")
+                lost = min(random.randint(20, 60), self._balance)
+                if lost > 0:
+                    self.change_balance(-lost)
+                self.hurt(8)
+                self.lose_sanity(5)
+            else:
+                type.type("You pick right. Lucky guess. The shortcut saves you an hour and you find a rest stop.")
+                loot = random.randint(10, 40)
+                self.change_balance(loot)
+                self.restore_sanity(2)
+        print("\n")
+
+    def ghost_protocol_invisible(self):
+        """Ghost Protocol makes you invisible to tracking"""
+        type.type("Someone's asking about you. The gas station attendant, the motel clerk, the diner waitress — they've all been approached.")
+        print("\n")
+        type.type(quote("Tall guy? Drives a station wagon? Seen him?"))
+        print("\n")
+        if self.has_item("Ghost Protocol") or self.has_item("Phantom Rose"):
+            used = "Phantom Rose" if self.has_item("Phantom Rose") else "Ghost Protocol"
+            type.type("The " + cyan(bright(used)) + " is active. The attendant looks right at you. Through you.")
+            print("\n")
+            type.type(quote("Nah. Haven't seen nobody like that.") + " He means it. He's LOOKING at you and doesn't recognize you.")
+            print("\n")
+            type.type("The men asking leave. They drove right past your car in the parking lot. Something about you is just... irrelevant. Forgettable. Safe.")
+            self.restore_sanity(10)
+        elif self.has_item("New Identity"):
+            type.type("The " + cyan(bright("New Identity")) + " holds. " + quote("Nope, just Michael Torres here. He's a tourist."))
+            print("\n")
+            type.type("They leave. Michael Torres lives another day.")
+            self.restore_sanity(5)
+        else:
+            type.type("The attendant points at your car. The men walk toward it. You see them from the bathroom window.")
+            print("\n")
+            type.type("You slip out the back. Take a different route. Sleep somewhere else tonight.")
+            self.lose_sanity(6)
+        print("\n")
+
+    def immortal_vehicle_breakdown(self):
+        """Immortal Vehicle prevents all car trouble"""
+        type.type("The dashboard lights up like a Christmas tree. Engine light. Oil light. Battery light. Temperature light. All at once.")
+        print("\n")
+        type.type("This is the moment every driver fears. The simultaneous system failure.")
+        print("\n")
+        if self.has_item("Immortal Vehicle") or self.has_item("War Wagon"):
+            used = "War Wagon" if self.has_item("War Wagon") else "Immortal Vehicle"
+            type.type("The " + cyan(bright(used)) + " hums. The dashboard lights flicker... and go out. One by one.")
+            print("\n")
+            type.type("The car diagnosed itself. The car FIXED itself. The engine smooths. The temperature drops. The battery stabilizes.")
+            print("\n")
+            type.type("The dashboard blinks twice. You'd swear it was winking at you.")
+            self.restore_sanity(8)
+        elif self.has_item("Auto Mechanic"):
+            type.type("Your " + cyan(bright("Auto Mechanic")) + " setup handles three of the four. The fourth requires prayer. The prayer works.")
+            self.restore_sanity(4)
+        else:
+            type.type("You pull over. Pop the hood. Stare at an engine you don't understand making noises you can't diagnose.")
+            print("\n")
+            cost = random.randint(100, 300)
+            type.type("The tow truck takes two hours. The mechanic charges " + red("${:,}".format(cost)) + ". The day is ruined.")
+            self.change_balance(-cost)
+            self.lose_sanity(6)
+        print("\n")
+
+    def gamblers_aura_blackjack(self):
+        """Gambler's Aura affects a random gambling opportunity"""
+        type.type("A man at the gas station is shuffling cards. " + quote("Quick game? Five-card draw, twenty bucks buy-in."))
+        print("\n")
+        if self.has_item("Gambler's Aura") or self.has_item("Moonlit Fortune"):
+            used = "Moonlit Fortune" if self.has_item("Moonlit Fortune") else "Gambler's Aura"
+            type.type("The " + cyan(bright(used)) + " warms against your chest. Luck isn't a feeling anymore. It's physics.")
+            print("\n")
+            type.type("You sit. He deals. Your hand is perfect. His hand is pathetic. He didn't know the game was decided before the shuffle.")
+            loot = random.randint(50, 200)
+            self.change_balance(loot)
+            type.type("\nYou walk away " + green("+${:,}".format(loot)) + " richer. The universe settling its debt.")
+            self.restore_sanity(5)
+        elif self.has_item("Devil's Deck"):
+            type.type("The " + cyan(bright("Devil's Deck")) + " in your pocket whispers. You know which cards he's holding.")
+            loot = random.randint(30, 100)
+            self.change_balance(loot)
+            type.type("\nYou win " + green("+${:,}".format(loot)) + ". The face cards grin.")
+            self.restore_sanity(3)
+        else:
+            type.type("You play an honest hand. It's a coin flip.")
+            if random.randrange(2) == 0:
+                loot = random.randint(15, 40)
+                self.change_balance(loot)
+                type.type(" You win " + green("${:,}".format(loot)) + ". Not bad.")
+                self.restore_sanity(2)
+            else:
+                self.change_balance(-20)
+                type.type(" You lose $20. Bad cards, bad luck.")
+                self.lose_sanity(1)
+        print("\n")
+
+    def guardian_angel_lethal(self):
+        """Guardian Angel prevents death"""
+        type.type("Everything goes wrong at once. The car spins. The world rotates. Glass breaks. Metal screams.")
+        print("\n")
+        type.type("Silence. Then pain. Then the realization that this might be the end.")
+        print("\n")
+        if self.has_item("Guardian Angel") or self.has_item("Last Breath Locket"):
+            used = "Last Breath Locket" if self.has_item("Last Breath Locket") else "Guardian Angel"
+            type.type("The " + cyan(bright(used)) + " activates. Three signals fire simultaneously. The locket burns warm against your chest.")
+            print("\n")
+            type.type("First responders arrive in eight minutes. You should be dead. You're not. The paramedic can't explain it.")
+            print("\n")
+            type.type(quote("I've never seen someone walk away from that.") + " You didn't walk. You were CARRIED. But you're alive.")
+            self.heal(999)  # Full heal
+            self.restore_sanity(15)
+        else:
+            type.type("You crawl from the wreck. Everything hurts. Your vision swims. But you're breathing.")
+            print("\n")
+            type.type("It takes forty minutes for someone to stop. The hospital takes what's left of your money.")
+            self.hurt(30)
+            self.lose_sanity(10)
+            cost = min(random.randint(100, 300), self._balance)
+            if cost > 0:
+                self.change_balance(-cost)
+        print("\n")
