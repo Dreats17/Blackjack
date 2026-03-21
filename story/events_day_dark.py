@@ -849,6 +849,44 @@ class DayDarkMixin:
             self.restore_sanity(8)
             print("\n")
             return
+
+        # ITEM: Gentleman's Charm - defuse the situation with impossible charisma
+        if self.has_item("Gentleman's Charm"):
+            type.type("You step into the alley. Three men materialize from the darkness. Knives. Hoodies. The full package.")
+            print("\n")
+            type.type("You straighten your collar and walk toward them.")
+            print("\n")
+            type.type(quote("Gentlemen. Rough night?"))
+            print("\n")
+            type.type("There's a long silence. The lead mugger opens his mouth. Closes it.")
+            print("\n")
+            type.type("You smile. Something about the smile — the cufflinks, the bearing, the sheer absurd confidence — short-circuits their entire plan.")
+            print("\n")
+            type.type(quote("We, uh... thought you were someone else."))
+            print("\n")
+            type.type("They step aside. You walk through.")
+            print("\n")
+            type.type("You're almost at the far end when you hear one of them mutter: " + quote("Who WAS that?"))
+            self.restore_sanity(6)
+            print("\n")
+            return
+
+        # ITEM: Assassin's Kit - total threat nullification
+        if self.has_item("Assassin's Kit"):
+            type.type("You step into the alley. Three shapes close in from the shadows.")
+            print("\n")
+            type.type("Your hand moves once. Barely.")
+            print("\n")
+            type.type("The lead mugger freezes mid-step, staring at the thing you're holding. His friends see it too.")
+            print("\n")
+            type.type("Nobody says a word. Nobody has to.")
+            print("\n")
+            type.type("They back away slowly. Then they turn and walk very quickly in the other direction.")
+            print("\n")
+            type.type("You pocket the " + cyan(bright("Assassin's Kit")) + " and continue through. Thirty seconds, start to finish.")
+            self.restore_sanity(10)
+            print("\n")
+            return
         
         type.type("You step out of your car and decide to take a shortcut through a dark alley. Faster than going around.")
         print("\n")
@@ -938,6 +976,18 @@ class DayDarkMixin:
             else:
                 type.type("Something snaps inside you. You're tired. Tired of being afraid. Tired of being nothing.")
             print("\n")
+            # ITEM: Brass Knuckles - instant deterrence, no fight needed
+            if self.has_item("Brass Knuckles"):
+                type.type("You raise your fist. The brass knuckles catch the streetlight at exactly the right angle.")
+                print("\n")
+                type.type("The mugger looks at your hand, then at your face, then makes a quiet decision about his life goals.")
+                print("\n")
+                type.type("He leaves. Fast. His friends follow.")
+                print("\n")
+                type.type("You stand alone in the alley. Your fist is still raised.")
+                self.restore_sanity(8)
+                print("\n")
+                return
             type.type("You charge at them, screaming. Pure animal rage.")
             print("\n")
             chance = random.randrange(10)
@@ -1046,6 +1096,24 @@ class DayDarkMixin:
         print("\n")
         answer = ask.option("What do you do? ", ["comply", "hide", "hero"])
         print("\n")
+        # ITEM: Forged Documents - flash fake credentials, walk out clean
+        if self.has_item("Forged Documents"):
+            type.type("You reach slowly into your pocket. The robber spins.")
+            print("\n")
+            type.type(quote("HANDS WHERE I CAN SEE THEM!"))
+            print("\n")
+            type.type("You hold up the " + cyan(bright("Forged Documents")) + ". Badge. Federal credentials. Everything laminated.")
+            print("\n")
+            type.type(quote("Sir, I'm going to need you to lower the weapon. Quietly. Right now."))
+            print("\n")
+            type.type("The robber stares. His hand shakes. Then he drops the gun, turns, and sprints out the back.")
+            print("\n")
+            type.type("The cashier stares at you. The mother stares at you. The old man picks up his coffee.")
+            print("\n")
+            type.type("You pocket the documents, nod once, and walk out before anyone starts asking questions.")
+            self.restore_sanity(10)
+            print("\n")
+            return
         if answer == "comply":
             type.type("You drop to the floor. Face down. Hands visible. Make yourself small.")
             print("\n")

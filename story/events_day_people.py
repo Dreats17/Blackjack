@@ -488,6 +488,15 @@ class DayPeopleMixin:
             print("\n")
             type.type("Close call. The padlock saved you.")
             self.restore_sanity(6)
+        elif self.has_item("Brass Knuckles"):
+            type.type("You spin around and face the thief, fist raised.")
+            print("\n")
+            type.type("The brass knuckles catch the afternoon light. The thief gets a very clear look at them.")
+            print("\n")
+            type.type("He reassesses his life choices in real time and takes off running.")
+            print("\n")
+            type.type("Your stuff is safe. Your hand barely even moved.")
+            self.restore_sanity(5)
         elif self.has_item("Pocket Knife"):
             type.type("You grab your " + magenta(bright("Pocket Knife")) + " and brandish it!")
             print("\n")
@@ -538,10 +547,37 @@ class DayPeopleMixin:
         print("\n")
         
         has_class = (self.has_item("Leather Gloves") or self.has_item("Silk Handkerchief") or 
-                     self.has_item("Gold Chain") or self.has_item("Antique Pocket Watch"))
+                     self.has_item("Gold Chain") or self.has_item("Antique Pocket Watch") or
+                     self.has_item("Gentleman's Charm") or self.has_item("Aristocrat's Touch"))
         
         if has_class:
-            if self.has_item("Silk Handkerchief"):
+            if self.has_item("Aristocrat's Touch"):
+                type.type("You lean slightly toward them. Old money. They can tell.")
+                print("\n")
+                type.type("The way you hold yourself. The way you don't explain yourself. The quiet certainty that everything is, and always has been, under control.")
+                print("\n")
+                type.type(quote("Good lord. I'm sorry to have troubled you."))
+                print("\n")
+                tip = random.randint(400, 800)
+                type.type("They hand you " + green(bright("${:,}".format(tip))) + " as if they owe you something. They drive off without another word.")
+                self.change_balance(tip)
+                self.restore_sanity(12)
+                print("\n")
+                return
+            elif self.has_item("Gentleman's Charm"):
+                type.type("You give them your full attention. The cufflinks catch the light at exactly the right moment.")
+                print("\n")
+                type.type("Their eyes flick down, then back up. Something shifts.")
+                print("\n")
+                type.type(quote("You know, I think I'm going to get your card. In case I'm ever in the area again."))
+                print("\n")
+                tip = random.randint(200, 500)
+                type.type("They hand you " + green(bright("${:,}".format(tip))) + " and drive off looking slightly dazed.")
+                self.change_balance(tip)
+                self.restore_sanity(10)
+                print("\n")
+                return
+            elif self.has_item("Silk Handkerchief"):
                 type.type("You dab your brow with your " + magenta(bright("Silk Handkerchief")) + " in a refined manner.")
             elif self.has_item("Antique Pocket Watch"):
                 type.type("You casually check your " + magenta(bright("Antique Pocket Watch")) + ".")

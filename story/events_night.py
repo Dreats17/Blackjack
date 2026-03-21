@@ -141,6 +141,20 @@ class NightEventsMixin:
             type.type("As you walk along the path, you notice someone leaning against a tree in front of you. ")
             type.type("As you get closer, you notice that the person's face is blue, their eyes are bloodshot, and they don't appear to be breathing.")
             print("\n")
+            # ITEM: Headlamp - spot danger before it becomes a threat
+            if self.has_item("Headlamp"):
+                type.type("The " + magenta(bright("Headlamp")) + " cuts through the dark undergrowth ahead.")
+                print("\n")
+                type.type("The beam sweeps left, right, and then lands on the figure against the tree.")
+                print("\n")
+                type.type("You see it from fifteen feet away instead of three. Something glints near the body. Something moved.")
+                print("\n")
+                type.type("You stop. You back up slowly. You take the long way around.")
+                print("\n")
+                type.type("You make it back to the road. Shaken, but safe. Some things are better left in the dark.")
+                self.restore_sanity(5)
+                print("\n")
+                return
             type.type("You begin to panic, before thinking through the situation. ")
             type.type("They're already dead, so there's nothing you can do to help them. ")
             type.type("Maybe they had some money on them? I mean, they're not gonna use it. Why shouldn't you?")
@@ -565,6 +579,20 @@ class NightEventsMixin:
         type.type("The air is heavy with the scent of decay and blooming lilies. ")
         type.type("Fireflies blink in the darkness like tiny green stars.")
         print("\n")
+        # ITEM: Storm Suit - swamp weather immunity, wade through unharmed
+        if self.has_item("Storm Suit"):
+            type.type("The " + magenta(bright("Storm Suit")) + " seals around you perfectly. Nothing gets in. Not the water, not the chill, not the leeches.")
+            print("\n")
+            type.type("You wade through the swamp like it's a shopping mall. Confident. Dry. Mildly overdressed.")
+            print("\n")
+            type.type("On the far bank you find a waterlogged bag that some unlucky soul must have dropped. You open it.")
+            print("\n")
+            found = random.randint(80, 200)
+            type.type("Inside: " + green(bright("$" + str(found))) + " in damp but spendable bills, and a sense of supreme competence.")
+            self.change_balance(found)
+            self.restore_sanity(6)
+            print("\n")
+            return
         event = random.choice(["leech", "nectar", "witch", "rowboat", "none"])
         if event == "leech":
             type.type("Something latches onto your leg. Then another. And another. LEECHES.")
@@ -1680,8 +1708,19 @@ class NightEventsMixin:
                 action = input("(fight/talk/comply/run): ").strip().lower()
                 
                 if action == "fight":
+                    # Brass Knuckles - instant deterrence before the fight even starts
+                    if self.has_item("Brass Knuckles"):
+                        type.type("You raise your fist. The brass knuckles catch the streetlight at exactly the right angle.")
+                        print("\n")
+                        type.type("The mugger looks at your hand, then at your face, then makes a decision about his life goals.")
+                        print("\n")
+                        type.type("He leaves. Fast.")
+                        print("\n")
+                        type.type("His friends follow without a word.")
+                        self.restore_sanity(8)
+                        print("\n")
                     # Pocket Knife gives you a real edge (consumed)
-                    if self.has_item("Pocket Knife"):
+                    elif self.has_item("Pocket Knife"):
                         self.use_item("Pocket Knife")
                         type.type("You pull out your pocket knife. The blade catches the streetlight.")
                         print("\n")
@@ -2182,7 +2221,20 @@ class NightEventsMixin:
             type.type("You lie there, eyes open, listening to your own breathing and the distant hum of a highway that exists for people going somewhere. Somewhere out there, people are sleeping in actual beds, in actual houses, with mortgages that embarrass them and futures they take for granted.")
             print(PAR)
             type.type("You wonder if they know. How lucky the ordinary is. How you'd give everything you're chasing just to feel that ordinary again. Probably not. Nobody ever knows until it's already gone and they're lying in a car in the dark making deals with the ceiling.")
-        if self.has_item("Gambler's Chalice") or self.has_item("Overflowing Goblet"):
+        if self.has_item("Survival Bivouac"):
+            print(PAR)
+            type.type("You unroll the " + magenta(bright("Survival Bivouac")) + " across the back seat.")
+            print(PAR)
+            type.type("It's rated for negative forty degrees. In a casino parking lot in June, it is perhaps slightly overkill.")
+            print(PAR)
+            type.type("You are asleep in four minutes. You sleep like a rock. You sleep like someone who has solved the problem of sleep completely and will never think about it again.")
+            print(PAR)
+            type.type("You wake up rested. Genuinely, embarrassingly rested. The brain math can wait.")
+            self.restore_sanity(8)
+            self.heal(10)
+            print(PAR)
+            return
+        elif self.has_item("Gambler's Chalice") or self.has_item("Overflowing Goblet"):
             goblet = "Gambler's Chalice" if self.has_item("Gambler's Chalice") else "Overflowing Goblet"
             print(PAR)
             type.type("You reach for the " + cyan(bright(goblet)) + " and pour one drink, then another. The goblet never empties. The night is still sleepless, but something about the silver light on the rim makes it bearable — like the dark has agreed to be a little less dark, just for you, just for tonight.")
