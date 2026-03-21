@@ -590,7 +590,29 @@ class DayCompanionsMixin:
         
         type.type("Your companion is sick. What do you do?")
         print("\n")
-        
+
+        if self.has_item("Flask of Anti-Virus"):
+            type.type("You uncork the " + cyan(bright("Flask of Anti-Virus")) + " and place a drop on " + bright(name) + "'s tongue.")
+            print("\n")
+            type.type("The flask fights the infection before it can take hold. Within an hour, " + bright(name) + " is eating again.")
+            print("\n")
+            type.type("The flask still has plenty left.")
+            self.pet_companion(name)
+            self.restore_sanity(8)
+            print("\n")
+            return
+
+        if self.has_item("Flask of Anti-Venom"):
+            type.type("You apply the " + cyan(bright("Flask of Anti-Venom")) + " carefully. Whatever got into " + bright(name) + " doesn't stand a chance.")
+            print("\n")
+            type.type("The recovery is faster than you expected. " + bright(name) + " shakes it off by nightfall.")
+            print("\n")
+            type.type("The flask still has plenty left.")
+            self.pet_companion(name)
+            self.restore_sanity(8)
+            print("\n")
+            return
+
         if self.has_item("Cough Drops"):
             type.type("1. Use your " + magenta(bright("Cough Drops")) + " to help")
         else:
@@ -1436,6 +1458,13 @@ class DayCompanionsMixin:
         self.restore_sanity(15)
         self.heal(10)
         self.pet_companion(name)
+        if self.has_item("Beast Tamer Kit"):
+            print("\n")
+            type.type("The " + cyan(bright("Beast Tamer Kit")) + " hasn't left your bag. " + bright(name) + " senses it — the bait, the toy, the whole philosophy of 'patience and treats.'")
+            print("\n")
+            type.type("They look at you with new respect.")
+            self._companions[name]["happiness"] = min(100, self._companions[name].get("happiness", 50) + 10)
+            self.restore_sanity(4)
         if self.has_item("Deck of Cards"):
             print("\n")
             type.type("You shuffle the " + cyan(bright("Deck of Cards")) + " absently. " + bright(name) + " watches the cards with total animal focus.")
@@ -1552,9 +1581,20 @@ class DayCompanionsMixin:
             self.restore_sanity(5)
         
         self.pet_companion(name)
+        if self.has_item("Devil's Deck"):
+            print("\n")
+            type.type("You produce the " + cyan(bright("Devil's Deck")) + ". The cards float and shuffle themselves in front of " + bright(name) + ".")
+            print("\n")
+            type.type("They are transfixed. Not scared. Just absolutely riveted.")
+            self._companions[name]["happiness"] = min(100, self._companions[name].get("happiness", 50) + 10)
+            self.restore_sanity(5)
+        elif self.has_item("Fortune Cards"):
+            print("\n")
+            type.type("You deal the " + cyan(bright("Fortune Cards")) + " for " + bright(name) + ". Their card comes up: " + italic("THE FAITHFUL") + ".")
+            print("\n")
+            type.type("It's accurate. Uncomfortably accurate.")
+            self.restore_sanity(4)
         print("\n")
-
-    def companion_nightmare(self):
         # EVENT: A companion has a nightmare and you comfort them
         # CONDITION: Must have at least one companion
         living = self.get_all_companions()
@@ -1611,6 +1651,13 @@ class DayCompanionsMixin:
         self.pet_companion(name)
         self.restore_sanity(8)
         self.add_fatigue(2)
+        if self.has_item("Night Scope") or self.has_item("Flashlight") or self.has_item("Headlamp"):
+            light_name = "Night Scope" if self.has_item("Night Scope") else ("Flashlight" if self.has_item("Flashlight") else "Headlamp")
+            print("\n")
+            type.type("You sweep the " + cyan(bright(light_name)) + " around your sleeping companion. Nothing threatening within 100 yards.")
+            print("\n")
+            type.type("You go back to sleep.")
+            self.restore_sanity(3)
         print("\n")
 
     # ==========================================

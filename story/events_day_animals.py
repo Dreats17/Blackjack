@@ -169,6 +169,19 @@ class DayAnimalsMixin:
             type.type("It stole " + green(bright("$" + str(loss))) + " from you!")
             print("\n")
             self.change_balance(-loss)
+
+        if self.has_item("Vermin Bomb"):
+            print("\n")
+            type.type("You've had enough. Nuclear option: the " + cyan(bright("Vermin Bomb")) + ".")
+            print("\n")
+            type.type("Every pest within fifty feet makes a decision to be somewhere else. The smell is indescribable. But effective.")
+            self.use_item("Vermin Bomb")
+            self.restore_sanity(4)
+        elif self.has_item("Stink Bomb"):
+            print("\n")
+            type.type("You crack the " + cyan(bright("Stink Bomb")) + ". The raccoons scatter instantly. Nobody wants to stick around for that.")
+            self.use_item("Stink Bomb")
+            self.restore_sanity(2)
         print("\n")
 
     def lucky_rabbit_encounter(self):
@@ -388,7 +401,29 @@ class DayAnimalsMixin:
             self.lose_sanity(1)
             print("\n")
             return
-        
+
+        if self.has_item("Vermin Bomb"):
+            type.type("Nuclear option. You deploy the " + cyan(bright("Vermin Bomb")) + ".")
+            print("\n")
+            type.type("Every pest within fifty feet makes a decision to be somewhere else. The smell is indescribable. But effective.")
+            print("\n")
+            self.use_item("Vermin Bomb")
+            self.lose_danger("Rat")
+            self.restore_sanity(3)
+            print("\n")
+            return
+
+        if self.has_item("Stink Bomb"):
+            type.type("You crack the " + cyan(bright("Stink Bomb")) + " open. The rat takes one sniff and abandons its laughing routine immediately.")
+            print("\n")
+            type.type("It bolts out of the car so fast you barely see it go. You can't really blame it.")
+            print("\n")
+            self.use_item("Stink Bomb")
+            self.lose_danger("Rat")
+            self.lose_sanity(1)
+            print("\n")
+            return
+
         self.lose_sanity(random.choice([1, 2, 3]))  # A laughing rat? That's unsettling
         if self.has_item("Pest Control"):
             self.kill_pests()
@@ -618,6 +653,26 @@ class DayAnimalsMixin:
             print("\n")
             return
 
+        if self.has_item("Beast Tamer Kit"):
+            type.type(" — then stalls mid-dive.")
+            print("\n")
+            type.type("You open the " + cyan(bright("Beast Tamer Kit")) + " — animal bait in one hand, pet toy in the other. The seagull freezes.")
+            print("\n")
+            type.type("Then sits on your hood. You did not train for this. But it works.")
+            print("\n")
+            self.restore_sanity(5)
+            return
+
+        if self.has_item("Animal Magnetism"):
+            type.type(" — then pulls up short.")
+            print("\n")
+            type.type("The " + cyan(bright("Animal Magnetism")) + " cologne cuts through the seagull's aggression. It lifts its head. Confused. Interested.")
+            print("\n")
+            type.type("The threat evaporates into curiosity. It circles once and flaps away.")
+            print("\n")
+            self.restore_sanity(3)
+            return
+
         if self.has_item("Slingshot"):
             type.type(" — but you're ready.")
             print("\n")
@@ -766,10 +821,18 @@ class DayAnimalsMixin:
                 type.type("You ignore the crow. It lets out an indignant CAW and flies away with its quarter.")
                 print("\n")
         else:
-            type.type("You don't have any food to offer. The crow waits a moment longer, then flies away.")
-            print("\n")
-            type.type("You pocket the quarter though. Every bit helps.")
-            self.change_balance(1)
+            if self.has_item("Disposable Camera"):
+                type.type("You snap a photo with the " + cyan(bright("Disposable Camera")) + ". Whatever just happened with this crow — it's documented now.")
+                print("\n")
+                type.type("The photo comes out perfect. The bird holds the pose.")
+                print("\n")
+                self.restore_sanity(4)
+                self.change_balance(1)
+            else:
+                type.type("You don't have any food to offer. The crow waits a moment longer, then flies away.")
+                print("\n")
+                type.type("You pocket the quarter though. Every bit helps.")
+                self.change_balance(1)
         print("\n")
     
     def opossum_in_trash(self):
@@ -871,8 +934,10 @@ class DayAnimalsMixin:
         print("\n")
         type.type("Most rats run away. This one stays, twitching its whiskers.")
         print("\n")
-        if self.has_item("Cheese") or self.has_item("Sandwich") or self.has_item("Turkey Sandwich"):
-            if self.has_item("Cheese"):
+        if self.has_item("Cheese") or self.has_item("Sandwich") or self.has_item("Turkey Sandwich") or self.has_item("Animal Bait"):
+            if self.has_item("Animal Bait"):
+                item = "Animal Bait"
+            elif self.has_item("Cheese"):
                 item = "Cheese"
             elif self.has_item("Turkey Sandwich"):
                 item = "Turkey Sandwich"
@@ -880,14 +945,21 @@ class DayAnimalsMixin:
                 item = "Sandwich"
             answer = ask.yes_or_no("Offer it some food? ")
             if answer == "yes":
-                type.type("You toss a bit of " + item + " near the drain. The rat grabs it and disappears.")
-                print("\n")
-                type.type("But the next day, you find a small pile of coins near your car. And the rat, sitting nearby, watching.")
-                print("\n")
-                type.type("This continues for a week. You feed the rat, it brings you coins.")
-                print("\n")
+                if item == "Animal Bait":
+                    type.type("The " + cyan(bright("Animal Bait")) + " does the heavy lifting. The rat's nose goes wild. Every animal in range is suddenly very interested in you.")
+                    print("\n")
+                    type.type("The rat doesn't wait a week. It follows you back to the car in under ten minutes.")
+                    print("\n")
+                    self.use_item("Animal Bait")
+                else:
+                    type.type("You toss a bit of " + item + " near the drain. The rat grabs it and disappears.")
+                    print("\n")
+                    type.type("But the next day, you find a small pile of coins near your car. And the rat, sitting nearby, watching.")
+                    print("\n")
+                    type.type("This continues for a week. You feed the rat, it brings you coins.")
+                    print("\n")
+                    self.use_item(item)
                 type.type("Eventually, the rat just... moves in. You call it " + cyan(bright("Slick")) + ". It's very good at finding money.")
-                self.use_item(item)
                 self.change_balance(random.randint(5, 15))
                 self.restore_sanity(8)
                 self.add_companion("Slick")
@@ -916,11 +988,26 @@ class DayAnimalsMixin:
         print("\n")
         answer = ask.yes_or_no("Take the rabbit with you? ")
         if answer == "yes":
-            type.type("You gently pick up the rabbit. It doesn't struggle, just nestles into your arms.")
-            print("\n")
+            if self.has_item("Animal Bait"):
+                type.type("The " + cyan(bright("Animal Bait")) + " does the heavy lifting. The rabbit hops directly into your arms before you even finish thinking about it.")
+                print("\n")
+                type.type("Every animal in range is suddenly very interested in you. You gently redirect their attention and focus on the rabbit.")
+                print("\n")
+                self.use_item("Animal Bait")
+            else:
+                type.type("You gently pick up the rabbit. It doesn't struggle, just nestles into your arms.")
+                print("\n")
             type.type("Something about its calm presence makes you feel... luckier.")
             print("\n")
             type.type("You name it " + cyan(bright("Hopper")) + ". Because of course you do.")
+            if self.has_item("Luck Totem"):
+                print("\n")
+                type.type("The " + cyan(bright("Luck Totem")) + "'s energy draws animals like a magnet. " + cyan(bright("Hopper")) + " immediately gravitates toward it, ears perked, practically glowing.")
+                print("\n")
+                living = self.get_all_companions()
+                for n in living:
+                    self._companions[n]["happiness"] = min(100, self._companions[n].get("happiness", 50) + 5)
+                self.restore_sanity(5)
             self.restore_sanity(8)
             self.add_companion("Hopper")
             self.increment_statistic("companions_befriended")
@@ -974,6 +1061,14 @@ class DayAnimalsMixin:
                 self.change_balance(amount)
             else:
                 type.type("Before you can grab any coins, a security guard chases you off. The ducks scatter, laughing in quacks.")
+            if self.has_item("Luck Totem"):
+                print("\n")
+                type.type("The " + cyan(bright("Luck Totem")) + "'s energy draws animals like a magnet. The ducks cluster around you, wild and domestic alike, sensing the luck field.")
+                print("\n")
+                living = self.get_all_companions()
+                for n in living:
+                    self._companions[n]["happiness"] = min(100, self._companions[n].get("happiness", 50) + 5)
+                self.restore_sanity(4)
             self.restore_sanity(3)
         else:
             type.type("You wave goodbye to the duck parade. The top hat duck gives you a disapproving quack.")
@@ -1189,6 +1284,22 @@ class DayAnimalsMixin:
         print("\n")
         type.type("Not scurrying past. Not fleeing. " + italic("At you.") + " On purpose.")
         print("\n")
+
+        if self.has_item("Beast Tamer Kit"):
+            type.type("You open the " + cyan(bright("Beast Tamer Kit")) + " — animal bait in one hand, pet toy in the other. The rat freezes.")
+            print("\n")
+            type.type("Then sits. You didn't train for this. But it works.")
+            print("\n")
+            self.restore_sanity(5)
+            return
+
+        if self.has_item("Animal Magnetism"):
+            type.type("The " + cyan(bright("Animal Magnetism")) + " cologne cuts through the rat's aggression. It lifts its head. Confused. Interested.")
+            print("\n")
+            type.type("The threat evaporates into curiosity. The rat sniffs the air once, then retreats under the dumpster.")
+            print("\n")
+            self.restore_sanity(3)
+            return
 
         if self.has_item("Running Shoes") or self.has_item("Pursuit Package"):
             item_name = "Running Shoes" if self.has_item("Running Shoes") else "Pursuit Package"

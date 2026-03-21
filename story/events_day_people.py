@@ -544,6 +544,19 @@ class DayPeopleMixin:
             print("\n")
             type.type("Close call. The padlock saved you.")
             self.restore_sanity(6)
+        elif self.has_item("Brass Knuckles") and self.has_item("Gentleman's Charm"):
+            type.type("You dab the " + cyan(bright("Gentleman's Charm")) + " cologne onto your " + cyan(bright("Brass Knuckles")) + ".")
+            print("\n")
+            type.type(quote("I'm terribly sorry about this,") + " you say with genuine politeness.")
+            print("\n")
+            type.type("You punch him once. He goes down elegantly. The crowd applauds.")
+            print("\n")
+            type.type("It was the classiest beatdown anyone has ever witnessed.")
+            print("\n")
+            self.change_balance(50)
+            self.add_status("The Gentleman")
+            type.type(green("You win the confrontation. +$50 from impressed bystanders."))
+            self.restore_sanity(5)
         elif self.has_item("Brass Knuckles"):
             type.type("You spin around and face the thief, fist raised.")
             print("\n")
@@ -872,6 +885,19 @@ class DayPeopleMixin:
             print("\n")
             type.type("He beats you three games straight. He has the satisfied smile of someone who is still very good at something.")
             self.restore_sanity(6)
+        if self.has_item("Outdoor Shield"):
+            print("\n")
+            type.type("You hand over your spare " + cyan(bright("Outdoor Shield")) + " supplies.")
+            print("\n")
+            type.type("The man takes them with genuine gratitude. " + quote("This'll make a real difference tonight. Thank you."))
+            self.restore_sanity(4)
+        elif self.has_item("Cool Down Kit"):
+            print("\n")
+            type.type("The summer heat is brutal. You pass him the " + cyan(bright("Cool Down Kit")) + ".")
+            print("\n")
+            type.type(quote("You didn't have to do that,") + " he says, eyes wide. You shrug.")
+            self.use_item("Cool Down Kit")
+            self.restore_sanity(4)
         print("\n")
 
     # ==========================================
@@ -1248,6 +1274,39 @@ class DayPeopleMixin:
         print("\n")
         type.type("He spots you and his eyes go wide.")
         print("\n")
+
+        if self.has_item("Eldritch Candle"):
+            type.type("His gaze drops to the " + cyan(bright("Eldritch Candle")) + " poking out of your bag. His eyes go very wide.")
+            print("\n")
+            type.type(quote("You need to leave. Right now. Do not ask questions."))
+            print("\n")
+            type.type("You leave. Outside, on the steps where he was standing, you find $100.")
+            print("\n")
+            type.type("You don't ask questions.")
+            self.change_balance(100)
+            self.restore_sanity(5)
+            print("\n")
+            return
+
+        if self.has_item("Binding Portrait"):
+            type.type("He starts his pitch. Then he sees the " + cyan(bright("Binding Portrait")) + " under your arm.")
+            print("\n")
+            type.type("He stares into it for a long time. Long enough that it gets uncomfortable.")
+            print("\n")
+            type.type("Finally, he shakes himself and waves you closer. " + quote("No charge. Consider this... professional courtesy."))
+            print("\n")
+            type.type("He gives you the full reading for free. Whatever he saw in that portrait, it changed his pricing policy.")
+            print("\n")
+            prophecies_free = [
+                quote("I see... a great victory! But beware the fifth hand after sunset. The Dealer's smile will mean danger."),
+                quote("You will face a choice between wealth and wisdom. Choose wisely, for you cannot have both."),
+                quote("The numbers 7, 11, and 21 will guide you. Or destroy you. Same difference, really."),
+            ]
+            type.type(random.choice(prophecies_free))
+            self.restore_sanity(6)
+            print("\n")
+            return
+
         type.type(quote("YOU! Yes, YOU! I have foreseen your coming!"))
         print("\n")
         type.type("Great. A crazy person who's noticed you specifically.")
