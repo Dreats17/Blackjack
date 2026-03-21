@@ -713,7 +713,24 @@ class DaySurvivalMixin:
         # Hand Warmers can help survive
         type.type("The temperature plummets. Frost forms on your windshield, and you can see your breath inside the car.")
         print("\n")
-        
+
+        if self.has_item("Phoenix Feather") and self.has_item("Fire Starter Kit"):
+            self.use_item("Phoenix Feather")
+            self.use_item("Fire Starter Kit")
+            type.type("The " + cyan(bright("Fire Starter Kit")) + " sparks.")
+            print("\n")
+            type.type("The " + cyan(bright("Phoenix Feather")) + " ignites.")
+            print("\n")
+            type.type("Sacred amber fire fills the air around you. Not cold fire. Not cruel fire. The other kind.")
+            print("\n")
+            type.type("Every wound seals. Every pain ceases. The frostbite, the bruises, the exhaustion — gone.")
+            print("\n")
+            type.type("Both items are ash. But you are whole.")
+            self.heal(100)
+            self.restore_sanity(50)
+            print("\n")
+            return
+
         if self.has_item("Emergency Blanket") and self.has_item("Fire Starter Kit"):
             type.type("You wrap yourself in the " + cyan(bright("Emergency Blanket")) + " and get the " + cyan(bright("Fire Starter Kit")) + " going outside.")
             print("\n")

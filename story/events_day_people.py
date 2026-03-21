@@ -379,6 +379,25 @@ class DayPeopleMixin:
         # EFFECTS: Breath Mints = $50 (consumed); Expensive Cologne = $100 (consumed);
         #          otherwise lose 3 sanity from humiliation
         # Breath Mints or Expensive Cologne help with social situations
+
+        if self.has_item("Vintage Wine") and (self.has_item("Gambler's Chalice") or self.has_item("Overflowing Goblet")):
+            chalice = "Overflowing Goblet" if self.has_item("Overflowing Goblet") else "Gambler's Chalice"
+            self.use_item("Vintage Wine")
+            type.type("You pour from the " + cyan(bright("Vintage Wine")) + " into the " + cyan(bright(chalice)) + ".")
+            print("\n")
+            type.type("The ritual is absurd and perfect. The wine catches the light like something holy.")
+            print("\n")
+            type.type("Whoever you meet today will give you something. They always do, when you look like someone who has everything.")
+            print("\n")
+            type.type("The important-looking stranger stops. Stares. Then reaches into their coat.")
+            print("\n")
+            gift = random.randint(200, 500)
+            type.type(quote("I don't know why, but... take this.") + " They hand you " + green(bright("${:,}".format(gift))) + " and walk away looking lighter somehow.")
+            self.change_balance(gift)
+            self.restore_sanity(12)
+            print("\n")
+            return
+
         type.type("Someone important-looking approaches your car. They seem friendly, but you're suddenly aware of... yourself.")
         print("\n")
         type.type("When's the last time you showered? How's your breath?")

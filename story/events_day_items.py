@@ -412,6 +412,25 @@ class DayItemsMixin:
 
     def worry_stone_moment(self):
         """Worry stone provides a brief sanity moment"""
+        if (self.has_item("Worry Stone") and self.has_item("Dream Catcher")
+                and self.has_item("Lucky Charm Bracelet")):
+            self.use_item("Worry Stone")
+            self.use_item("Dream Catcher")
+            self.use_item("Lucky Charm Bracelet")
+            type.type("You hold the " + cyan(bright("Worry Stone")) + " while the " + cyan(bright("Dream Catcher")) + " sways on your mirror and the " + cyan(bright("Lucky Charm Bracelet")) + " glints on your wrist.")
+            print("\n")
+            type.type("All three artifacts resonate. Something shifts, deep and irreversible.")
+            print("\n")
+            type.type("The anxiety. The nightmares. The bad luck. All three dissolve at once.")
+            print("\n")
+            type.type("You feel genuinely, completely peaceful. Not numb — peaceful. There's a difference.")
+            print("\n")
+            type.type("All three items turn to warm dust in your hand. You breathe. You're okay.")
+            self.restore_sanity(100)
+            self._sanity = min(self._sanity + 5, 100)
+            print("\n")
+            return
+
         if self.has_item("Worry Stone"):
             moments = [
                 "Your thumb finds the " + cyan(bright("Worry Stone")) + " in your pocket without thinking. Smooth. Warm. The anxiety retreats, just a little.",

@@ -575,7 +575,30 @@ class DayAnimalsMixin:
 
     def seagull_attack(self):
         type.type("A seagull dive-bombs your car")
-        
+
+        # Pack Call: both whistles together speak every animal's language at once
+        if self.has_item("Animal Whistle") and self.has_item("Dog Whistle"):
+            type.type(" — then freezes mid-dive.")
+            print("\n")
+            type.type("You blow both the " + cyan(bright("Animal Whistle")) + " and the " + cyan(bright("Dog Whistle")) + " at the same time.")
+            print("\n")
+            type.type("A sound no animal has ever heard before.")
+            print("\n")
+            type.type("Every creature within earshot looks up. The seagull stalls in the air. The pigeons on the roof go still. A dog three blocks away sits.")
+            print("\n")
+            type.type("The seagull lands on your hood slowly, carefully, and looks at you with something like cautious respect.")
+            print("\n")
+            type.type("You just spoke every animal's language at once. They heard you. All of them.")
+            living = self.get_all_companions()
+            if len(living) > 0:
+                for name in living:
+                    self._companions[name]["happiness"] = 100
+                type.type("Your companion" + ("s" if len(living) > 1 else "") + " feel" + ("" if len(living) > 1 else "s") + " the resonance too. A wave of warmth passes through them.")
+                print("\n")
+            self.restore_sanity(8)
+            print("\n")
+            return
+
         # Animal Whistle turns an attack into friendship
         if self.has_item("Animal Whistle") and not self.has_companion("Squawk"):
             type.type(" - but the " + magenta(bright("Animal Whistle")) + " hums and the bird pulls up at the last second!")

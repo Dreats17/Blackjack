@@ -152,7 +152,13 @@ class Blackjack:
             type.fast("Your " + bright(magenta("Tattered Cloak")) + " rustles quietly. The Dealer barely notices you.")
             print("\n")
 
-        if self.__player.has_item("Lucky Medallion"):
+        if (self.__player.has_item("Lucky Penny") and self.__player.has_item("Lucky Coin")
+                and self.__player.has_item("Lucky Charm Bracelet")):
+            type.fast(yellow(bright("Three lucky charms in your pocket simultaneously.")))
+            print("\n")
+            type.fast("You feel it before the cards are dealt. The table tilts. Imperceptibly. In your favor.")
+            print("\n")
+        elif self.__player.has_item("Lucky Medallion"):
             type.fast("Your " + bright(cyan("Lucky Medallion")) + " pulses with ancient fortune. Luck bends around you.")
             print("\n")
         elif self.__player.has_item("Lucky Coin"):
@@ -1038,10 +1044,20 @@ class Blackjack:
         # Lucky Coin effect: occasionally turn a loss into a push/tie
         has_lucky_coin = self.__player.has_item("Lucky Coin")
         has_lucky_medallion = self.__player.has_item("Lucky Medallion")
-        if (has_lucky_coin or has_lucky_medallion) and status in ["Dealer Wins", "Dealer Blackjack", "Player Bust"]:
-            # Lucky Medallion always works, Lucky Coin has 20% chance
-            if has_lucky_medallion or random.randrange(5) < 1:
-                if has_lucky_medallion:
+        has_triple_luck = (self.__player.has_item("Lucky Penny") and has_lucky_coin
+                           and self.__player.has_item("Lucky Charm Bracelet"))
+        if (has_lucky_coin or has_lucky_medallion or has_triple_luck) and status in ["Dealer Wins", "Dealer Blackjack", "Player Bust"]:
+            # Lucky Medallion always works; Triple Luck has 35% chance; Lucky Coin has 20% chance
+            if has_lucky_medallion:
+                triggered = True
+            elif has_triple_luck:
+                triggered = random.randrange(100) < 35
+            else:
+                triggered = random.randrange(5) < 1
+            if triggered:
+                if has_triple_luck and not has_lucky_medallion:
+                    type.fast(yellow(bright("Three charms resonate at once — the loss bends to your will!")))
+                elif has_lucky_medallion:
                     type.fast(cyan(bright("Your Lucky Medallion blazes with power! The loss turns into a push!")))
                 else:
                     type.fast(magenta(bright("Your Lucky Coin glows! The loss turns into a push!")))

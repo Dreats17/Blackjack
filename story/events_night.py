@@ -2480,6 +2480,18 @@ class NightEventsMixin:
         print("\n")
 
     def nightmare(self):
+        if self.has_item("Necronomicon") and self.has_item("Dream Catcher"):
+            type.type("The " + cyan(bright("Necronomicon")) + " and the " + cyan(bright("Dream Catcher")) + " create a feedback loop.")
+            print("\n")
+            type.type("The nightmare becomes a stage set. The monsters become furniture. You direct. You control.")
+            print("\n")
+            type.type("You rewrite the ending. The drowning car fills with light. The faceless Dealer bows and leaves. The teeth fall out and become pearls.")
+            print("\n")
+            type.type("You wake up refreshed. You learned something from that dream. You're not sure what yet. But it feels important.")
+            self.restore_sanity(15)
+            print("\n")
+            return
+
         variant = random.randrange(4)
         if variant == 0:
             type.type("Nightmares again. The usual. Losing everything. Dying alone in a parking lot that nobody remembers the name of.")
