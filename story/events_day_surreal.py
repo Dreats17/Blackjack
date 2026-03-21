@@ -90,6 +90,26 @@ class DaySurrealMixin:
     def time_loop(self):
         # EVENT: Experience the same morning 3 times, must break the loop
         # EFFECTS: Save bird = +$50, meet "Time Bird"; Ignore phone = +5 sanity; Scream = -5 sanity
+        if self.has_item("Pocket Watch") or self.has_item("Grandfather Clock"):
+            watch = "Pocket Watch" if self.has_item("Pocket Watch") else "Grandfather Clock"
+            type.type("The clock on your car dashboard says 8:47 AM.")
+            print("\n")
+            type.type("You go to brush your teeth. A bird hits the window. Your phone buzzes.")
+            print("\n")
+            type.type("You wake up. The clock says 8:47 AM.")
+            print("\n")
+            type.type("You pull out the " + cyan(bright(watch)) + ". Its hands are spinning backwards.")
+            print("\n")
+            type.type("You remember this. All of it. You've been here before — every loop, every iteration.")
+            print("\n")
+            type.type("You step outside at 8:46, open the window. The bird flies safely through. The loop shatters. First try.")
+            print("\n")
+            type.type("The watch ticks forward again. You pocket it. Some problems only need the right tool.")
+            self.change_balance(50)
+            self.meet("Time Bird")
+            self.restore_sanity(8)
+            print("\n")
+            return
         type.type("The clock on your car dashboard says 8:47 AM.")
         print("\n")
         type.type("You go to brush your teeth. A bird hits the window. Your phone buzzes.")
@@ -142,6 +162,18 @@ class DaySurrealMixin:
         print("\n")
         type.type("You blink. The reflection is normal again. Just you, looking terrified.")
         print("\n")
+        if self.has_item("Twin's Locket") or self.has_item("Mirror of Duality"):
+            locket = "Twin's Locket" if self.has_item("Twin's Locket") else "Mirror of Duality"
+            type.type("You reach for the " + cyan(bright(locket)) + " around your neck. It falls open on its own.")
+            print("\n")
+            type.type("Inside: two tiny portraits facing each other. And in both portraits, the reflection is also looking back.")
+            print("\n")
+            type.type("Your reflection in the mirror tilts its head, studying the locket. It points. Seems satisfied. It puts the sign down.")
+            print("\n")
+            type.type("The sign is gone. Whatever it wanted from you, it found it in the locket instead.")
+            self.restore_sanity(8)
+            print("\n")
+            return
         if random.random() < 0.3:
             type.type("In the back seat, you notice something that wasn't there before.")
             type.type(" A note, in your own handwriting: 'You're doing fine. Keep going.'")
@@ -353,6 +385,31 @@ class DaySurrealMixin:
         print("\n")
         type.type(cyan(quote("IN EXCHANGE... ONE YEAR OF YOUR LIFE. BURNED FROM THE END. GONE FOREVER.")))
         print("\n")
+        if self.has_item("Oracle's Tome") or self.has_item("Gambler's Grimoire"):
+            tome = "Oracle's Tome" if self.has_item("Oracle's Tome") else "Gambler's Grimoire"
+            type.type("Your " + cyan(bright(tome)) + " thrashes in your bag, pages turning in a violent frenzy.")
+            print("\n")
+            type.type("Every page reads the same thing: " + italic("DO NOT ACCEPT. DO NOT ACCEPT. DO NOT ACCEPT."))
+            print("\n")
+            type.type("You close it. It falls open again. Your hands won't stop shaking.")
+            self.restore_sanity(5)
+            print("\n")
+        if self.has_item("Dealer's Grudge") or self.has_item("Dealer's Mercy"):
+            item_name = "Dealer's Grudge" if self.has_item("Dealer's Grudge") else "Dealer's Mercy"
+            type.type("The " + cyan(bright(item_name)) + " burns white-hot against your leg.")
+            print("\n")
+            type.type("From somewhere behind the red light, another voice cuts through — familiar, cold, and possessive.")
+            print("\n")
+            type.type(quote("Not this one. They're mine."))
+            print("\n")
+            type.type("The shadows recoil. The entity that made the offer goes very quiet.")
+            print("\n")
+            type.type(cyan(quote("...ANOTHER TIME, THEN.")))
+            print("\n")
+            type.type("The red moon fades before you can accept or refuse. The Dealer's claim supersedes even blood moon bargains.")
+            self.restore_sanity(15)
+            print("\n")
+            return
         answer = ask.yes_or_no("Accept the blood moon bargain? ")
         if answer == "yes":
             type.type("You speak into the darkness. " + quote("I accept."))

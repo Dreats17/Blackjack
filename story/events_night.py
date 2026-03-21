@@ -1640,6 +1640,30 @@ class NightEventsMixin:
                 type.type(" Bruno nods at you. " + quote("Stay safe out there."))
                 print("\n")
                 self.restore_sanity(12)
+            elif self.has_item("Tattered Cloak") or self.has_item("Invisible Cloak"):
+                cloak = "Tattered Cloak" if self.has_item("Tattered Cloak") else "Invisible Cloak"
+                type.type("A figure emerges from an alley. Then another. Then a third.")
+                print("\n")
+                type.type("You pull the " + cyan(bright(cloak)) + " tight. The nearest mugger squints directly at you.")
+                print("\n")
+                type.type(quote("The hell — where'd he go?"))
+                print("\n")
+                type.type("Their eyes slide right past you. You walk out the far end of the alley without breathing.")
+                print("\n")
+                type.type("You don't stop until you're two blocks away, hands shaking, invisible, alive.")
+                self.restore_sanity(10)
+            elif self.has_item("Lucky Medallion") or self.has_item("Lucky Coin"):
+                coin = "Lucky Medallion" if self.has_item("Lucky Medallion") else "Lucky Coin"
+                type.type("A figure emerges from an alley. Then another. Then a third. One has a knife that catches the streetlight.")
+                print("\n")
+                type.type("You reach into your pocket. The " + cyan(bright(coin)) + " is warm in your hand.")
+                print("\n")
+                type.type("You flip it without thinking. Heads.")
+                print("\n")
+                type.type("The coin bounces off the pavement and rolls perfectly under the lead mugger's foot. He stumbles.")
+                print("\n")
+                type.type("You vault the nearby fence. A heartbeat later, the alley is behind you. The coin is gone, but you're not.")
+                self.restore_sanity(8)
             else:
                 type.type("A figure emerges from an alley. Then another. Then a third. They fan out, blocking your path. One has a knife.")
                 print("\n")
@@ -2167,11 +2191,17 @@ class NightEventsMixin:
             type.type("Somewhere out there, normal people are sleeping in beds. In houses. With futures.")
             print("\n")
             type.type("You wonder if they know how lucky they are. Probably not. Nobody does until it's gone.")
+        if self.has_item("Gambler's Chalice") or self.has_item("Overflowing Goblet"):
+            goblet = "Gambler's Chalice" if self.has_item("Gambler's Chalice") else "Overflowing Goblet"
+            type.type("You reach for the " + cyan(bright(goblet)) + ". Pour one drink. Then another. The goblet never empties.")
+            print("\n")
+            type.type("The night is still sleepless, but somehow it's bearable. Silver light dances on the rim.")
+            self.restore_sanity(6)
+            print("\n")
+            return
         self.lose_sanity(3)
         self.hurt(5)
         print("\n")
-
-    def peaceful_night(self):
         variant = random.randrange(3)
         if variant == 0:
             type.type("For once, you sleep peacefully. No dreams. No nightmares. Just rest.")

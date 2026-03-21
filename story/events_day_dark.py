@@ -568,7 +568,17 @@ class DayDarkMixin:
                     print("\n")
                     type.type("The bar goes silent. You're on the floor. Blood pooling beneath you.")
                     print("\n")
-                    if random.random() < 0.4:
+                    if self.has_item("Phoenix Feather") or self.has_item("White Feather"):
+                        feather = "Phoenix Feather" if self.has_item("Phoenix Feather") else "White Feather"
+                        type.type("Something in your pocket blazes with sudden heat. The " + cyan(bright(feather)) + " ignites.")
+                        print("\n")
+                        type.type("Amber light floods through your chest. The bullet wounds seal themselves. The feather disintegrates into ash.")
+                        print("\n")
+                        type.type("The hitman is already walking away. He thinks you're dead. You give yourself thirty seconds on the floor, then you run.")
+                        self.use_item(feather)
+                        self.hurt(20)
+                        self.lose_sanity(20)
+                    elif random.random() < 0.4:
                         type.type("The last thing you hear is screaming. It might be yours.")
                         self.kill("Shot by casino enforcement. The house always wins.")
                         return
@@ -840,6 +850,20 @@ class DayDarkMixin:
             print("\n")
             return
         
+        # ITEM: Tattered Cloak / Invisible Cloak - slip through unseen
+        if self.has_item("Tattered Cloak") or self.has_item("Invisible Cloak"):
+            cloak = "Tattered Cloak" if self.has_item("Tattered Cloak") else "Invisible Cloak"
+            type.type("You step into the alley and pull the " + cyan(bright(cloak)) + " tight.")
+            print("\n")
+            type.type("Halfway through, three shapes materialize from the shadows. Hoodies. A knife. They're scanning the darkness for a target.")
+            print("\n")
+            type.type("Their eyes slide right past you. " + quote("Where'd he go?") + " one mutters.")
+            print("\n")
+            type.type("You walk out the far end without making a sound. They never saw you. You exist in a frequency they can't tune to.")
+            self.restore_sanity(8)
+            print("\n")
+            return
+        
         type.type("You step out of your car and decide to take a shortcut through a dark alley. Faster than going around.")
         print("\n")
         type.type("Halfway through, you hear footsteps behind you. Heavy. Fast. Getting closer.")
@@ -954,6 +978,12 @@ class DayDarkMixin:
                 self.hurt(60)
                 self.lose_sanity(20)
                 self.add_danger("Gut Wound")
+                if self.has_item("Health Indicator") or self.has_item("Health Manipulator"):
+                    indicator = "Health Indicator" if self.has_item("Health Indicator") else "Health Manipulator"
+                    type.type("The " + cyan(bright(indicator)) + " pulses at your wrist, flooding adrenaline into the wound site. The damage is real, but your body's response is extraordinary.")
+                    print("\n")
+                    type.type("You'll live.")
+                    self.heal(25)
             else:
                 type.type("The knife goes into your throat before you can even swing.")
                 print("\n")
@@ -963,7 +993,20 @@ class DayDarkMixin:
                 print("\n")
                 type.type("Your last thought is that you never got to make your million.")
                 print("\n")
-                self.kill("Bled out in an alley. The muggers split your cash three ways.")
+                if self.has_item("Phoenix Feather") or self.has_item("White Feather"):
+                    feather = "Phoenix Feather" if self.has_item("Phoenix Feather") else "White Feather"
+                    type.type("Then — warmth. A burst of amber light erupts from your pocket.")
+                    print("\n")
+                    type.type("The " + cyan(bright(feather)) + " ignites. Heat floods through you like sunrise. The wound seals with a hiss.")
+                    print("\n")
+                    type.type("You gasp and roll over. The muggers have fled — they saw the light and ran.")
+                    print("\n")
+                    type.type("The feather is ash. But you are not.")
+                    self.use_item(feather)
+                    self.hurt(35)
+                    self.lose_sanity(20)
+                else:
+                    self.kill("Bled out in an alley. The muggers split your cash three ways.")
                 return
         print("\n")
 

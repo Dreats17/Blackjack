@@ -188,6 +188,16 @@ class CarEventsMixin:
 
     # === ENGINE PROBLEMS ===
     def engine_overheating(self):
+        if self.has_item("Oracle's Tome") or self.has_item("Gambler's Grimoire"):
+            tome = "Oracle's Tome" if self.has_item("Oracle's Tome") else "Gambler's Grimoire"
+            type.type("This morning, your " + cyan(bright(tome)) + " fell open to a dog-eared page. Two words underlined in red: " + italic("'CHECK COOLANT.'"))
+            print("\n")
+            type.type("So you did. You topped off the reservoir before you left. The engine runs smooth. No steam. No crisis. No lost afternoon.")
+            print("\n")
+            type.type("It's not magic. It's just reading.")
+            self.restore_sanity(5)
+            print("\n")
+            return
         type.type("Steam billows from under your hood. Your temperature gauge is in the red.")
         print("\n")
         type.type("The engine is overheating. You pull over immediately.")
@@ -299,6 +309,18 @@ class CarEventsMixin:
         print("\n")
 
     def strange_engine_noise(self):
+        if self.has_item("Lucky Medallion") or self.has_item("Lucky Coin"):
+            coin = "Lucky Medallion" if self.has_item("Lucky Medallion") else "Lucky Coin"
+            type.type("Your engine is making a noise. A bad noise. Grinding? Clicking? Whining?")
+            print("\n")
+            type.type("You reach into your pocket and close your hand around the " + cyan(bright(coin)) + ".")
+            print("\n")
+            type.type("The noise changes pitch. Then fades. Then stops.")
+            print("\n")
+            type.type("You sit in puzzled silence. The engine purrs like nothing happened. You stop asking questions.")
+            self.restore_sanity(5)
+            print("\n")
+            return
         type.type("Your engine is making a noise. A bad noise. Grinding? Clicking? Whining?")
         print("\n")
         noise = random.choice(["grinding", "clicking", "whining", "knocking", "squealing"])
