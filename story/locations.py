@@ -602,6 +602,22 @@ class LocationsMixin:
         type.type("You walk back to the front desk to checkout.")
         print("\n")
         cost = int((random.randint(30, 50)/100)*self._balance)
+        if self.has_item("Flask of Anti-Virus"):
+            type.type("You hand over the " + cyan(bright("Flask of Anti-Virus")) + ". The doctor holds it to the light.")
+            print("\n")
+            type.type(quote("This is... more advanced than anything we have here. I'd like to keep this for study."))
+            print("\n")
+            type.type("He scribbles something on your bill. Twenty percent off. You'll take it.")
+            print("\n")
+            cost = int(cost * 0.8)
+        if self.has_item("First Aid Kit"):
+            type.type("You set your " + cyan(bright("First Aid Kit")) + " on the examination table. The doctor raises an eyebrow.")
+            print("\n")
+            type.type(quote("You came prepared. Let's use what you've got — save the good stuff for someone who needs it."))
+            print("\n")
+            type.type("He patches you up with both kits. You leave feeling a little better than usual.")
+            self.heal(10)
+            print("\n")
         type.type("That will be " + bright(green("${:,}".format(cost))))
         if self.has_item("Real Insurance"):
             print("\n")
@@ -3494,6 +3510,16 @@ class LocationsMixin:
             print("\n")
             type.type("While I won't get bogged down in the details of how I got my hands on it, I think you'll wanna check these out:")
             print("\n")
+            if self.has_item("Old Money Identity") or self.has_item("Aristocrat's Touch"):
+                luxury_item = "Old Money Identity" if self.has_item("Old Money Identity") else "Aristocrat's Touch"
+                type.type("Marvin looks you up and down. A slow, appraising sweep.")
+                print("\n")
+                type.type(quote("Well, well. Someone's come up in the world.") + " He straightens. Reaches for a shelf you've never noticed before.")
+                print("\n")
+                type.type("He opens a drawer below the counter, behind a velvet curtain.")
+                print("\n")
+                type.type(quote("Perhaps you'd be interested in something... premium? Not everything I carry goes on the regular shelf.") + " He slides two extra items into the display with a knowing nod.")
+                print("\n")
 
         for item_number in range(len(inventory)):
             item = inventory[item_number]
@@ -4101,6 +4127,24 @@ class LocationsMixin:
         all_collectibles = self.get_all_collectibles_list()
         total_collectibles = len(all_collectibles)
         items_sold = self.get_gus_items_sold()
+        
+        if self.has_item("Kingpin Look"):
+            type.type("Gus looks up. His eyes track the gold chain, the cigar, the way you fill the doorframe.")
+            print("\n")
+            type.type(quote("Oh. OH. Sir, I — I didn't realize. Please.") + " Gus's hands are trembling as he straightens up behind the counter. " + quote("Premium prices for you. Whatever you need."))
+            print("\n")
+            type.type("You notice the shaking doesn't quite stop. Criminal heat has a way of preceding you now.")
+            self.add_status("Kingpin Reputation")
+            print("\n")
+        
+        if self.has_item("Binding Portrait"):
+            type.type("You set the " + cyan(bright("Binding Portrait")) + " on the counter while digging through your bag. Gus glances at it.")
+            print("\n")
+            type.type("His pupils dilate. His voice drops to a register that isn't entirely his.")
+            print("\n")
+            type.type(quote("I'll give you whatever you want,") + " he says, flatly. Then he blinks hard and shakes his head, pretending that didn't happen.")
+            self.lose_sanity(1)
+            print("\n")
         
         # Gus's hints about collecting everything
         if items_sold >= 5 and items_sold < total_collectibles - 10:

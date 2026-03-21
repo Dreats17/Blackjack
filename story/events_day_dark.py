@@ -934,6 +934,17 @@ class DayDarkMixin:
             print("\n")
             return
 
+        # ITEM: Miracle Lube - silence every hinge, ghost through unseen
+        if self.has_item("Miracle Lube"):
+            type.type("You step into the alley and pause at the old chain-link gate halfway through. It would screech loud enough to wake the block.")
+            print("\n")
+            type.type("A drop of " + cyan(bright("Miracle Lube")) + " on each hinge. You open the gate in absolute silence. You open a door at the far end in absolute silence.")
+            print("\n")
+            type.type("Three figures materialize from the shadows behind you. They heard nothing. They see nothing. You exit the alley in perfect silence, a ghost in a city that never knew you passed through.")
+            self.restore_sanity(7)
+            print("\n")
+            return
+
         type.type("You step out of your car and decide to take a shortcut through a dark alley. Faster than going around.")
         print("\n")
         type.type("Halfway through, you hear footsteps behind you. Heavy. Fast. Getting closer.")
@@ -1470,6 +1481,20 @@ class DayDarkMixin:
         print("\n")
         type.type("You haven't been asking around. This is a case of mistaken identity.")
         print("\n")
+        if self.has_item("Enchanted Vintage"):
+            type.type("Before you can open your mouth to explain, you reach into your bag. Your hand finds the " + cyan(bright("Enchanted Vintage")) + " before your brain does.")
+            print("\n")
+            type.type("You offer it through the window. Against all reason, he takes it. Takes a sip.")
+            print("\n")
+            type.type("A long pause. His expression shifts — the cold anger dissolving into something genuinely confused and peaceful.")
+            print("\n")
+            type.type(quote("I don't... I don't know why I was upset.") + " He hands the bottle back. " + quote("Drive safe, man."))
+            print("\n")
+            type.type("The window rolls up. The car pulls away. The Enchanted Vintage is gone but you're alive and intact.")
+            self.use_item("Enchanted Vintage")
+            self.restore_sanity(5)
+            print("\n")
+            return
         answer = ask.option("What do you say? ", ["wrong person", "play along", "run"])
         print("\n")
         if answer == "wrong person":
@@ -1539,6 +1564,17 @@ class DayDarkMixin:
             print("\n")
             type.type("Behind you, car doors open. Footsteps. Shouting.")
             print("\n")
+            if self.has_item("Tire Ready Kit"):
+                type.type("They get back in the car. Tires squeal. They're coming for you.")
+                print("\n")
+                type.type("You grab the spare tire from your " + cyan(bright("Tire Ready Kit")) + " and hurl it at the windshield mid-stride.")
+                print("\n")
+                type.type("It bounces off the pavement, clips the hood, smashes through the glass. The car swerves hard and buries itself in a ditch.")
+                print("\n")
+                type.type("You don't stop running for six blocks. But you make it. Every part of you makes it.")
+                self.restore_sanity(4)
+                print("\n")
+                return
             chance = random.randrange(10)
             if chance < 4:
                 type.type("You're faster than you thought. Or they're lazier than expected.")
@@ -2107,6 +2143,33 @@ class DayDarkMixin:
     def fuel_leak_fire(self):
         if not self.has_danger("Fuel Leak"):
             self.day_event()
+            return
+        if self.has_item("Gas Mask"):
+            type.type("You smell the gas. Strong this time. You see the spark a half-second before it catches.")
+            print("\n")
+            type.type("You pull on the " + cyan(bright("Gas Mask")) + " and walk toward the burning car while everyone else runs the other direction.")
+            print("\n")
+            type.type("Through the smoke and flame, you spot a small safe bolted under the back seat. Didn't know it was there.")
+            print("\n")
+            answer = ask.option("What do you do? ", ["grab the safe", "save the cat"])
+            print("\n")
+            if answer == "grab the safe":
+                type.type("You haul it out. The metal is hot through your gloves. You drag it clear before the tank goes.")
+                print("\n")
+                type.type("BOOM. The car becomes a fireball behind you. The safe pops open on impact with the asphalt. " + green(bright("+$400")))
+                self.change_balance(400)
+                self.remove_danger("Fuel Leak")
+                self.add_status("Cold Operator")
+            else:
+                type.type("A cat is trapped inside, screaming. You pull open the door and it bolts into your arms.")
+                print("\n")
+                type.type("You stumble clear. The car explodes behind you. The building manager saw the whole thing. Gives you a key.")
+                print("\n")
+                type.type(green("The building manager owes you one."))
+                self.remove_danger("Fuel Leak")
+                self.add_status("Cat Hero")
+                self.add_item("Building Manager Key")
+            print("\n")
             return
         type.type("You smell gas again. Stronger this time. Much stronger.")
         print("\n")

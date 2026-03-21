@@ -96,6 +96,30 @@ class DaySurrealMixin:
             self.restore_sanity(8)
             print(PAR)
             return
+        if self.has_item("Oracle's Tome"):
+            type.type("The " + cyan(bright("Oracle's Tome")) + " has been writing this paragraph for six days. You're finally catching up to it.")
+            print(PAR)
+            type.type("The handwriting — yours, somehow — fills the margins: " + italic("'8:47. Bird. Phone. Third time. You'll know what to do.'"))
+            print(PAR)
+            type.type("You step outside at 8:46 and open the window. The bird glides safely through. The loop shatters without drama. The Tome closes with a satisfied thud.")
+            self.restore_sanity(5)
+            self.change_balance(50)
+            self.meet("Time Bird")
+            print(PAR)
+            return
+        if self.has_item("Fortune Cards"):
+            type.type("You lay the " + cyan(bright("Fortune Cards")) + " on the dashboard. They spread themselves.")
+            print(PAR)
+            type.type("THE LOOP card faces up. It says: " + italic("'...you've done this before.'"))
+            print(PAR)
+            type.type("Not in metaphor. Not as a warning. As a statement of fact delivered by a card that has been here every loop, watching.")
+            print(PAR)
+            type.type("You pocket the cards. The loop breaks. But the cards remember, and now you know they do.")
+            self.lose_sanity(3)
+            self.meet("Time Bird")
+            self.add_status("Remembered the Loop")
+            print(PAR)
+            return
         type.type("The clock on your car dashboard says 8:47 AM. You go to brush your teeth. A bird hits the window. Your phone buzzes.")
         print(PAR)
         type.type("You wake up. The clock says 8:47 AM.")
@@ -142,6 +166,26 @@ class DaySurrealMixin:
             self.restore_sanity(8)
             print(PAR)
             return
+        if self.has_item("Marvin's Monocle"):
+            type.type("You raise the " + cyan(bright("Marvin's Monocle")) + " to your eye. Through its smoky lens, the mirror shows something different — not a sign, not a threat.")
+            print(PAR)
+            type.type("Your reflection is sitting down. Having coffee. Completely at peace with existence in a way you are not.")
+            print(PAR)
+            type.type("It raises its mug in a small toast. You lower the monocle. The SOON sign is gone. The monocle sees things the mirror doesn't, and apparently that was enough.")
+            self.restore_sanity(6)
+            print(PAR)
+            return
+        if self.has_item("Gambler's Grimoire"):
+            type.type("The " + cyan(bright("Gambler's Grimoire")) + " flips open in your bag. You pick it up. It's running a calculation you didn't ask for.")
+            print(PAR)
+            type.type(italic("PROBABILITY OF REFLECTION BEING YOU: 73%"))
+            print(PAR)
+            type.type("You stare at your reflection. It stares back. 73%. That leaves 27% unaccounted for. The Grimoire does not explain what the other 27% is.")
+            print(PAR)
+            type.type("The number haunts you for the rest of the day. You keep doing the math. It keeps coming out wrong.")
+            self.lose_sanity(1)
+            self.add_status("Probability Haunted")
+            print(PAR)
         if random.random() < 0.3:
             type.type("In the back seat, you notice something that wasn't there before — a note, in your own handwriting: 'You're doing fine. Keep going.'")
             print(PAR)
@@ -394,6 +438,22 @@ class DaySurrealMixin:
             self.change_balance(500)
             print("\n")
             return
+        if self.has_item("Eldritch Candle") and self.has_item("Fortune Cards"):
+            type.type("The " + cyan(bright("Eldritch Candle")) + " lights on its own. You didn't touch it. The flame is green.")
+            print("\n")
+            type.type("Your " + cyan(bright("Fortune Cards")) + " spread themselves across the car seat. The red light catches them at an angle that reveals cards that aren't in any normal deck.")
+            print("\n")
+            type.type(italic("THE PLAYER. THE ENGINE. THE SAVE FILE."))
+            print("\n")
+            type.type("One card shows tomorrow. Not in metaphor. Literally — there you are, standing somewhere you haven't been yet, doing something you haven't decided to do yet. The image is clear and terrible.")
+            print("\n")
+            type.type("The blood moon dims, unsettled. Even the entity that made the bargain has gone quiet. This is above its pay grade.")
+            print("\n")
+            type.type("The green flame goes out. The cards are face-down. You already know what tomorrow looks like. You wish you didn't.")
+            self.lose_sanity(5)
+            self.add_status("Saw Tomorrow")
+            print("\n")
+            return
         answer = ask.yes_or_no("Accept the blood moon bargain? ")
         if answer == "yes":
             type.type("You speak into the darkness. " + quote("I accept."))
@@ -433,6 +493,29 @@ class DaySurrealMixin:
         print("\n")
         type.type("But there's a new mark on your arm: a tiny UFO tattoo that wasn't there before.")
         print("\n")
+        if self.has_item("Mobile Workshop") and random.randrange(5) == 0:
+            type.type("You look around. Something is different. Outside your car, partially unfolded on the asphalt, is a structure you have no memory of building.")
+            print("\n")
+            type.type("It looks like a satellite dish. Made entirely of spoons. Hundreds of spoons, welded and bent and somehow perfectly functional.")
+            print("\n")
+            type.type("Your " + cyan(bright("Mobile Workshop")) + " is folded back beside it, its tools warm to the touch. Whatever happened, the workshop was involved.")
+            print("\n")
+            type.type("You put your ear near the dish. It's receiving a signal. A weather forecast for a city whose name you don't recognize and can't quite pronounce.")
+            print("\n")
+            type.type(italic("'...mostly cloudy over Vorthenne, with a 40% chance of lateral rain. Current temperature: seventeen degrees in the wrong direction.'"))
+            print("\n")
+            self.add_item("Spoon Satellite")
+            type.type("You got a " + cyan(bright("Spoon Satellite")) + "!")
+            print("\n")
+            self.add_status("Builds Things")
+            if random.randrange(2) == 0:
+                type.type(green("Something about this feels right. In a deeply wrong way."))
+                self.restore_sanity(1)
+            else:
+                type.type(red("You will never be able to explain this. Not to anyone."))
+                self.lose_sanity(1)
+            print("\n")
+            return
         effect = random.choice(["money", "health", "item", "nothing"])
         if effect == "money":
             amount = random.randint(50, 200)
