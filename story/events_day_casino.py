@@ -113,6 +113,14 @@ class DayCasinoMixin:
         # EVENT: Internal monologue about the weight and thrill of having $500k+
         # EFFECTS: Atmospheric only - builds tension as you approach the million dollar goal
         # Everytime - internal monologue
+        if self.has_item("Flask of Dealer's Hesitation"):
+            type.type("The " + cyan(bright("Flask of Dealer's Hesitation")) + " pulses against your chest.")
+            print("\n")
+            type.type("You can feel the Dealer's doubt from here. Every decision he makes, the flask makes him reconsider.")
+            print("\n")
+            type.type("The air at the table feels thick with hesitation. Like time is moving through honey.")
+            self.restore_sanity(3)
+            print("\n")
         variant = random.randrange(4)
         if variant == 0:
             type.type("You sit up in your car and feel it immediately: today is going to be big. Good or bad, you're not sure. But BIG.")
@@ -171,6 +179,14 @@ class DayCasinoMixin:
             type.type("The security team apologizes.")
             self.restore_sanity(5)
             return
+        if self.has_item("Flask of Split Serum"):
+            type.type("The " + cyan(bright("Flask of Split Serum")) + " vibrates at the card table.")
+            print("\n")
+            type.type("Your hand splits like a living thing. Two hands, twice the power. The Serum knows when the cards want to divide.")
+            print("\n")
+            type.type("The other players stare. " + quote("How does he always know when to split?"))
+            self.restore_sanity(3)
+            print("\n")
         variant = random.randrange(3)
         if variant == 0:
             type.type("A security car does a slow drive-by. The guard makes eye contact with you, holds it for a beat too long, then drives on.")

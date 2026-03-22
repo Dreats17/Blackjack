@@ -96,6 +96,18 @@ class DayWealthMixin:
             self.day_event()
             return
         
+        if self.has_item("Flask of Bonus Fortune"):
+            type.type("The " + cyan(bright("Flask of Bonus Fortune")) + " overflows with golden light against your hip.")
+            print("\n")
+            type.type("Your winnings feel heavier today. Every dollar earned multiplies in your pocket.")
+            print("\n")
+            type.type("The flask hums with warmth. Fortune isn't just smiling — it's laughing.")
+            bonus = random.randint(100, 400)
+            self.change_balance(bonus)
+            type.type(" " + green(bright("+${:,}".format(bonus))) + " bonus fortune!")
+            self.restore_sanity(5)
+            print("\n")
+
         type.type("Fifty thousand dollars. " + green(bright("$50,000")) + ". Halfway to the Rich tier.")
         print("\n")
         type.type("You never thought you'd see this much money in your life, let alone in the passenger seat of your car.")
