@@ -908,6 +908,13 @@ class AdventuresMixin:
         print("\n")
         type.type(yellow(bright("=== WOODLANDS ADVENTURE ===")))
         print("\n")
+        if self.has_item("Rusty Compass") or self.has_item("Golden Compass"):
+            compass = "Golden Compass" if self.has_item("Golden Compass") else "Rusty Compass"
+            type.type("The " + cyan(bright(compass)) + " needle spins wildly, then points east with sudden certainty.")
+            print("\n")
+            type.type("Something valuable lies in that direction. The compass knows things you don't.")
+            self.restore_sanity(3)
+            print("\n")
         event = random.choice([
             "hunting_competition", "gigantic_bear", "fountain_of_youth", "hermit_cabin", "casual_day"
         ])

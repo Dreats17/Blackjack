@@ -896,6 +896,15 @@ class DayDarkMixin:
             print("\n")
             return
 
+        if self.has_item("Worn Gloves") or self.has_item("Velvet Gloves"):
+            gloves = "Velvet Gloves" if self.has_item("Velvet Gloves") else "Worn Gloves"
+            type.type("Gloved fingers leave no prints. The " + cyan(bright(gloves)) + " ensure your touch is invisible.")
+            print("\n")
+            type.type(quote("Nothing here links you to anything,") + " the detective admits.")
+            self.restore_sanity(5)
+            print("\n")
+            return
+
         # COMPANION: Danger warning check (Whiskers, Slick)
         warner = self._lists.has_companion_with_bonus(self, "danger_warning")
         if warner and self.get_companion(warner)["status"] == "alive":

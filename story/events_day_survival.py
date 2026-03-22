@@ -553,6 +553,14 @@ class DaySurvivalMixin:
         # EVENT: Dense fog blankets the area
         # EFFECTS: Usually atmospheric; one variant deals 5 damage (walk into mirror)
         # Everytime - atmospheric with variants
+        if self.has_item("Rusty Compass") or self.has_item("Golden Compass"):
+            compass = "Golden Compass" if self.has_item("Golden Compass") else "Rusty Compass"
+            type.type("The " + cyan(bright(compass)) + " hums warmly in your pocket. You were never truly lost.")
+            print("\n")
+            type.type("It guides you through the trees to a shortcut you wouldn't have found alone.")
+            self.restore_sanity(5)
+            print("\n")
+            return
         variant = random.randrange(4)
         if variant == 0:
             type.type("Fog so thick you can barely see your hood has swallowed the world in white.")
@@ -770,6 +778,15 @@ class DaySurvivalMixin:
         # Hand Warmers can help survive
         type.type("The temperature plummets. Frost forms on your windshield, and you can see your breath inside the car.")
         print("\n")
+
+        if self.has_item("Worn Gloves") or self.has_item("Velvet Gloves"):
+            gloves = "Velvet Gloves" if self.has_item("Velvet Gloves") else "Worn Gloves"
+            type.type("The enchanted " + cyan(bright(gloves)) + " keep your fingers nimble in the cold.")
+            print("\n")
+            type.type("Where others fumble, you work with precision. The cold can't reach your hands.")
+            self.restore_sanity(3)
+            print("\n")
+            return
 
         # Survival Bivouac checked first (full protection, no items consumed).
         # Sacred Flame combo (Phoenix Feather + Fire Starter Kit) is checked next: it consumes Fire Starter Kit, so it must precede

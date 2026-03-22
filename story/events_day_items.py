@@ -2035,6 +2035,16 @@ class DayItemsMixin:
             map_name = "Treasure Map"
             type.type("You unfold the " + cyan(bright("Treasure Map")) + " and follow the dotted line until it ends.")
         print("\n")
+        if self.has_item("Rusty Compass") or self.has_item("Golden Compass"):
+            compass = "Golden Compass" if self.has_item("Golden Compass") else "Rusty Compass"
+            type.type("The " + cyan(bright(compass)) + " pulls toward something buried nearby.")
+            print("\n")
+            type.type("You dig where it points and find more than expected.")
+            bonus = random.randint(50, 200)
+            self.change_balance(bonus)
+            print("\n")
+            type.type(green(bright("+${:,}".format(bonus))))
+            print("\n")
         answer = ask.yes_or_no("Follow it now? ")
         if answer == "yes":
             type.type("You drive the route. Then walk. Then dig.")

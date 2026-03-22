@@ -433,6 +433,15 @@ class DayPeopleMixin:
             print("\n")
             return
 
+        if self.has_item("Worn Gloves") or self.has_item("Velvet Gloves"):
+            gloves = "Velvet Gloves" if self.has_item("Velvet Gloves") else "Worn Gloves"
+            type.type("Your handshake, firm through " + cyan(bright(gloves)) + ", seals the deal before you speak.")
+            print("\n")
+            type.type("Something about a gloved hand makes people trust you. And sign faster.")
+            self.change_balance(random.randint(50, 150))
+            print("\n")
+            return
+
         type.type("Someone important-looking approaches your car. They seem friendly, but you're suddenly aware of... yourself.")
         print("\n")
         type.type("When's the last time you showered? How's your breath?")
@@ -671,7 +680,8 @@ class DayPeopleMixin:
         has_class = (self.has_item("Leather Gloves") or self.has_item("Silk Handkerchief") or 
                      self.has_item("Gold Chain") or self.has_item("Antique Pocket Watch") or
                      self.has_item("Gentleman's Charm") or self.has_item("Aristocrat's Touch") or
-                     self.has_item("Fancy Cigars") or self.has_item("Vintage Wine"))
+                     self.has_item("Fancy Cigars") or self.has_item("Vintage Wine") or
+                     self.has_item("Worn Gloves") or self.has_item("Velvet Gloves"))
         
         if has_class:
             if self.has_item("Aristocrat's Touch"):
