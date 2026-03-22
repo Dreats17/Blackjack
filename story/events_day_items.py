@@ -3726,3 +3726,253 @@ class DayItemsMixin:
             type.type("You sit in traffic like everyone else. By the time you pass the scene, it's cleared. You'll never know.")
             self.lose_sanity(1)
         print("\n")
+
+    # ══════════════════════════════════════════════════════════════════════
+    # SECTION 44A — WILD ITEM INTERACTIONS (OFF-LABEL USES)
+    # ══════════════════════════════════════════════════════════════════════
+
+    def wild_headlamp_poker(self):
+        """Headlamp accidentally reveals cards at a poker game"""
+        type.type("Late night poker at a back-room table. Low stakes, high tension.")
+        print("\n")
+        if self.has_item("Headlamp"):
+            type.type("You forgot to take off the " + cyan(bright("Headlamp")) + ". The beam catches the dealer's cards at an angle.")
+            print("\n")
+            type.type("For a split second, the light penetrates the card coating. You see EVERYTHING. Not cheating. Not REALLY.")
+            print("\n")
+            if random.randrange(5) == 0:
+                type.type("The pit boss notices the glare. " + quote("What's on your head?") + " You're asked to leave. Politely. Firmly.")
+                self.lose_sanity(3)
+            else:
+                winnings = random.randint(100, 400)
+                type.type("You play the hand perfectly. " + green("${:,}".format(winnings)) + ". Nobody suspects a thing. The headlamp is your secret weapon.")
+                self.change_balance(winnings)
+                self.restore_sanity(3)
+        else:
+            type.type("You squint at your cards. Bad hand. Worse poker face. You fold and watch everyone else play.")
+            self.lose_sanity(2)
+        print("\n")
+
+    def wild_emp_casino(self):
+        """EMP Device kills electronic shuffler at casino"""
+        type.type("The blackjack table hums with electronic precision. Automatic shuffler. Perfect randomness.")
+        print("\n")
+        if self.has_item("EMP Device"):
+            type.type("The " + cyan(bright("EMP Device")) + " pulses in your pocket. The shuffler DIES. Sparks. Silence.")
+            print("\n")
+            type.type("The dealer blinks, then reaches for a manual shuffler. The old kind. The imperfect kind.")
+            print("\n")
+            type.type("Your odds just changed. Three hands before security traces the electronics failure.")
+            winnings = random.randint(200, 800)
+            type.type(" You win " + green("${:,}".format(winnings)) + " in three perfect hands.")
+            self.change_balance(winnings)
+            self.use_item("EMP Device")
+            self.lose_sanity(2)
+        else:
+            type.type("The electronic shuffler is flawless. Predictable only to mathematics. You play normally.")
+            self.lose_sanity(1)
+        print("\n")
+
+    def wild_radio_jammer_police(self):
+        """Radio Jammer kills police backup during an encounter"""
+        type.type("A cop car. Lights flashing. You're being pulled over. His partner is on the radio calling for backup.")
+        print("\n")
+        if self.has_item("Radio Jammer") or self.has_item("Surveillance Suite"):
+            jammer = "Surveillance Suite" if self.has_item("Surveillance Suite") else "Radio Jammer"
+            type.type("You flip the " + cyan(bright(jammer)) + ". The cop's radio dies mid-sentence. Static fills the cruiser.")
+            print("\n")
+            type.type("Dispatch hears nothing. Backup never comes. The officer alone realizes he's outgunned by silence.")
+            print("\n")
+            type.type("He lets you off with a warning. A very confused, very nervous warning.")
+            self.restore_sanity(5)
+        else:
+            type.type("Backup arrives in four minutes. Two cruisers. Six officers. This is now an ordeal.")
+            print("\n")
+            fine = random.randint(50, 200)
+            type.type("Fine: " + red("${:,}".format(fine)) + ". The whole thing takes an hour.")
+            self.change_balance(-fine)
+            self.lose_sanity(4)
+        print("\n")
+
+    def wild_evidence_kit_wedding(self):
+        """Evidence Kit catches theft at a wedding"""
+        type.type("A wedding. Beautiful. Open bar. You're photographing everything out of boredom.")
+        print("\n")
+        if self.has_item("Evidence Kit") or self.has_item("Intelligence Dossier"):
+            kit = "Intelligence Dossier" if self.has_item("Intelligence Dossier") else "Evidence Kit"
+            type.type("The " + cyan(bright(kit)) + " catches something the eye missed — the best man pocketing the ring box.")
+            print("\n")
+            type.type("The bride would pay $200 for that photo. The best man would pay $300 to delete it.")
+            print("\n")
+            if random.randrange(2) == 0:
+                type.type("You show the bride. She pays " + green("$200") + " and has the best man removed. Justice served.")
+                self.change_balance(200)
+                self.restore_sanity(5)
+            else:
+                type.type("You show the best man. He pays " + green("$300") + " without a word. Silence is golden.")
+                self.change_balance(300)
+                self.lose_sanity(2)
+        else:
+            type.type("Beautiful ceremony. Decent cake. You eat three slices and leave. Nothing happened.")
+            self.heal(3)
+        print("\n")
+
+    def wild_distress_beacon_casino(self):
+        """Distress Beacon triggers evacuation at casino"""
+        type.type("The casino floor. You're down. Way down. The cards hate you tonight.")
+        print("\n")
+        if self.has_item("Distress Beacon"):
+            type.type("Under the table, you trigger the " + cyan(bright("Distress Beacon")) + ".")
+            print("\n")
+            type.type("Sixty seconds later: ambulance. Fire truck. Two cop cars. The casino evacuates in CHAOS.")
+            print("\n")
+            type.type("In the stampede, you pocket " + green("$500") + " in chips off the floor. Nobody's counting. Nobody CAN count.")
+            self.change_balance(500)
+            self.use_item("Distress Beacon")
+            self.lose_sanity(5)
+        else:
+            type.type("You leave the table with nothing but regret and an empty wallet.")
+            self.lose_sanity(4)
+        print("\n")
+
+    def wild_stink_bomb_casino_vault(self):
+        """Stink Bomb triggers fire safety protocols at casino"""
+        type.type("The casino floor. Packed. Loud. The perfect environment for chaos.")
+        print("\n")
+        if self.has_item("Stink Bomb"):
+            type.type("The " + cyan(bright("Stink Bomb")) + " cracks under the table. The stench fills the floor in seconds.")
+            print("\n")
+            type.type("Fire alarms trigger. Sprinklers deploy. People SCATTER. In the chaos, abandoned chips litter every table.")
+            print("\n")
+            if random.randrange(3) == 0:
+                loot = random.randint(800, 2000)
+                type.type("You have exactly 90 seconds. You grab " + green("${:,}".format(loot)) + " in abandoned chips. Nobody's looking at YOU.")
+                self.change_balance(loot)
+                self.lose_sanity(8)
+            else:
+                loot = random.randint(200, 400)
+                type.type("You flee with the crowd, scooping " + green("${:,}".format(loot)) + " in chips off tables as you pass.")
+                self.change_balance(loot)
+                self.lose_sanity(3)
+            self.use_item("Stink Bomb")
+        else:
+            type.type("The casino takes your money with surgical precision. The house always wins. You always lose.")
+            self.lose_sanity(3)
+        print("\n")
+
+    def wild_gas_mask_funeral(self):
+        """Gas Mask at a funeral causes panic"""
+        type.type("A funeral. Somber. Gray suits. A priest is speaking. Everything is appropriately sad.")
+        print("\n")
+        if self.has_item("Gas Mask") or self.has_item("Hazmat Suit"):
+            mask = "Hazmat Suit" if self.has_item("Hazmat Suit") else "Gas Mask"
+            type.type("You forgot you're wearing the " + cyan(bright(mask)) + ". You walk in breathing pine-scented air.")
+            print("\n")
+            type.type("Someone whispers: " + quote("He must know something we don't.") + " Panic spreads. People start RUNNING.")
+            print("\n")
+            type.type("The reception table is unguarded. Free food, " + green("$40") + " in the donation box, and an antique brooch someone left.")
+            self.change_balance(40)
+            self.heal(5)
+            self.lose_sanity(3)
+        else:
+            type.type("The service is brief. The food is institutional. You eat a sandwich and feel nothing. Standard funeral.")
+            self.lose_sanity(1)
+        print("\n")
+
+    def wild_eldritch_candle_gambling(self):
+        """Eldritch Candle makes cards translucent at gambling table"""
+        type.type("A card game. The stakes are real. The tension is thick.")
+        print("\n")
+        if self.has_item("Eldritch Candle") or self.has_item("Dark Pact Reliquary"):
+            candle = "Dark Pact Reliquary" if self.has_item("Dark Pact Reliquary") else "Eldritch Candle"
+            type.type("You set the " + cyan(bright(candle)) + " on the table. The green flame makes the cards TRANSLUCENT.")
+            print("\n")
+            type.type("You can see face values through the backs. The dealer stares at the flame, hypnotized.")
+            print("\n")
+            type.type("Other players leave. It's just you and perfect information.")
+            winnings = random.randint(300, 800)
+            type.type(" " + green("${:,}".format(winnings)) + " in five hands. Then the candle goes out. It won't relight for days.")
+            self.change_balance(winnings)
+            self.lose_sanity(5)
+        else:
+            type.type("You play by intuition. Intuition says fold. You fold. Correct decision, zero excitement.")
+            self.lose_sanity(1)
+        print("\n")
+
+    def wild_devil_deck_children(self):
+        """Devil's Deck does card tricks for children — cards move on their own"""
+        type.type("A park. Kids playing. One runs up to you. " + quote("Do you know any card tricks?"))
+        print("\n")
+        if self.has_item("Devil's Deck") or self.has_item("Dark Pact Reliquary"):
+            deck = "Dark Pact Reliquary" if self.has_item("Dark Pact Reliquary") else "Devil's Deck"
+            type.type("You pull out the " + cyan(bright(deck)) + ". The cards move on their own — floating, reshuffling, changing suits.")
+            print("\n")
+            type.type("The kids are AMAZED. Their parents are TERRIFIED. One mother drags her child away.")
+            print("\n")
+            tip = random.randint(30, 80)
+            type.type("Another parent hands you " + green("${:,}".format(tip)) + ". " + quote("That was incredible. What's your secret?"))
+            print("\n")
+            type.type(quote("Ancient Sumerian conjuration,") + " you say. They laugh. You don't.")
+            self.change_balance(tip)
+            self.restore_sanity(5)
+            self.lose_sanity(1)
+        else:
+            type.type(quote("Sorry, kid. No tricks today.") + " The kid's face falls. You feel like a monster.")
+            self.lose_sanity(2)
+        print("\n")
+
+    def wild_binding_portrait_shopkeeper(self):
+        """Binding Portrait hypnotizes a shopkeeper for discounts"""
+        type.type("The shopkeeper quotes a price. It's too high. WAY too high. He knows it. You know it.")
+        print("\n")
+        if self.has_item("Binding Portrait"):
+            type.type("You show the " + cyan(bright("Binding Portrait")) + " to the shopkeeper. Their pupils dilate.")
+            print("\n")
+            type.type(quote("I'll give you whatever you want,") + " they say in a voice that isn't entirely theirs.")
+            print("\n")
+            discount = random.randint(100, 300)
+            type.type("Everything is half price. You save " + green("${:,}".format(discount)) + ". The shopkeeper seems fine. Mostly.")
+            self.change_balance(discount)
+            self.lose_sanity(4)
+        else:
+            type.type("You haggle. He's better at it. You pay full price and feel defeated.")
+            self.lose_sanity(1)
+        print("\n")
+
+    def wild_fortune_cards_car(self):
+        """Fortune Cards predict car trouble"""
+        type.type("Idling in a parking lot. The car is making a noise. A new noise. The kind of noise that costs money.")
+        print("\n")
+        if self.has_item("Fortune Cards") or self.has_item("Fate Reader"):
+            cards = "Fate Reader" if self.has_item("Fate Reader") else "Fortune Cards"
+            type.type("You lay " + cyan(bright(cards)) + " on the dashboard. The car vibrates. The cards arrange themselves.")
+            print("\n")
+            type.type("THE TOWER on the brake pedal. DEATH on the exhaust pipe. A card you've never seen slides under the seat: THE JOURNEY.")
+            print("\n")
+            type.type("The car hums. Approval? You pat the dashboard. The noise stops. Whatever the cards did, it worked.")
+            self.restore_sanity(5)
+        else:
+            type.type("The noise continues. You turn up the radio. The noise gets louder. This is a tomorrow problem.")
+            self.lose_sanity(2)
+        print("\n")
+
+    def wild_blackmail_letter_companion(self):
+        """Blackmail Letter used on your companion — dark choice"""
+        type.type("Your companion has been... distant. Unreliable. They're thinking about leaving.")
+        print("\n")
+        if self.has_item("Blackmail Letter"):
+            type.type("You show the " + cyan(bright("Blackmail Letter")) + " to your companion. It's blank.")
+            print("\n")
+            type.type("The blackmail isn't on paper — it's in the implication. Your companion freezes.")
+            print("\n")
+            type.type(quote("You wouldn't.") + " You would. They know it.")
+            print("\n")
+            type.type(quote("Fine. I'll stay. I'll do whatever you want.") + " The obedience in their voice is... unsettling.")
+            print("\n")
+            type.type("Your companion stays. Mechanically. Perfectly. Something in their eyes dies.")
+            self.restore_sanity(3)
+            self.lose_sanity(8)
+        else:
+            type.type("You can't make them stay. If they want to go, they'll go. That's what freedom means.")
+            self.lose_sanity(3)
+        print("\n")
