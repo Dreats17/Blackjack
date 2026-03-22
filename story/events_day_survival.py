@@ -500,7 +500,24 @@ class DaySurvivalMixin:
         if self.has_status("Cold"):
             self.day_event()
             return
-        
+        if self.has_item("Hydration Station"):
+            type.type("The " + cyan(bright("Hydration Station")) + " flushes the virus before it sets. Clean water, constant stream.")
+            print("\n")
+            type.type("No cold. Just a brief, concerned sneeze.")
+            self.heal(5)
+            return
+        if self.has_item("Voice Soother"):
+            self.use_item("Voice Soother")
+            type.type("The " + cyan(bright("Voice Soother")) + " coats the throat in relief. The cold doesn't stand a chance.")
+            print("\n")
+            self.heal(10)
+            return
+        if self.has_item("Home Remedy"):
+            self.use_item("Home Remedy")
+            type.type("The " + cyan(bright("Home Remedy")) + " fights the cold with old chemistry.")
+            print("\n")
+            self.heal(8)
+            return
         variant = random.randrange(3)
         if variant == 0:
             type.type("A sneeze rips through you in your car seat, followed by your nose running, droplets falling down from your chin and onto your shirt. Damn, must be a cold.")
@@ -942,6 +959,20 @@ class DaySurvivalMixin:
             self.restore_sanity(5)
             self.add_danger("PETA List")
             print("\n")
+            return
+
+        if self.has_item("Nomad's Camp"):
+            type.type("The " + cyan(bright("Nomad's Camp")) + " provides. You will never go hungry. Not anymore.")
+            print("\n")
+            self.heal(30)
+            self.restore_sanity(10)
+            return
+        if self.has_item("Provider's Kit"):
+            type.type("The " + cyan(bright("Provider's Kit")) + " has you covered. Trap on land, rod in water.")
+            print("\n")
+            type.type("You eat like a king in the apocalypse.")
+            self.heal(25)
+            self.restore_sanity(8)
             return
 
         if self.has_item("Monogrammed Lighter"):
@@ -1500,6 +1531,18 @@ class DaySurvivalMixin:
         print("\n")
 
     def nice_weather(self):
+        if self.has_item("Wanderer's Rest"):
+            type.type("Perfect weather at the " + cyan(bright("Wanderer's Rest")) + ". The tree has grown another branch overnight. An apple falls into your hand.")
+            print("\n")
+            self.heal(15)
+            self.restore_sanity(20)
+            return
+        if self.has_item("Nomad's Camp"):
+            type.type("The " + cyan(bright("Nomad's Camp")) + " thrives in perfect weather. You're more at home here than anywhere with walls.")
+            print("\n")
+            self.heal(10)
+            self.restore_sanity(15)
+            return
         type.type("Perfect weather today. Not too hot. Not too cold. Just right.")
         print("\n")
         type.type("You sit outside your car and just... breathe. It's nice.")

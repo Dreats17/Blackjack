@@ -114,6 +114,24 @@ class DayNumbersMixin:
         if self.get_balance() != 7777:
             self.day_event()
             return
+        if self.has_item("Moonlit Fortune"):
+            type.type("The " + cyan(bright("Moonlit Fortune")) + " bends probability. You knew the numbers before you scratched.")
+            print("\n")
+            self.change_balance(random.randint(500, 2000))
+            self.restore_sanity(10)
+            return
+        if self.has_item("Gambler's Aura"):
+            type.type(cyan(bright("Gambler's Aura")) + " — the universe bends. The numbers align.")
+            print("\n")
+            self.change_balance(random.randint(200, 800))
+            self.restore_sanity(5)
+            return
+        if self.has_item("Fortune's Favor"):
+            type.type("The " + cyan(bright("Fortune's Favor")) + " puts your luck into high gear.")
+            print("\n")
+            self.change_balance(random.randint(100, 400))
+            self.restore_sanity(3)
+            return
         type.type("You count your money. " + green(bright("$7,777")) + ". Four sevens.")
         print("\n")
         type.type("In the distance, a slot machine hits jackpot. You hear the bells.")
@@ -143,6 +161,16 @@ class DayNumbersMixin:
         # SECRET: Have exactly $13 - unlucky number
         if self.get_balance() != 13:
             self.day_event()
+            return
+        if self.has_item("Third Eye"):
+            type.type("The " + cyan(bright("Third Eye")) + " saw this coming. You sidestepped before the bad luck landed.")
+            print("\n")
+            self.restore_sanity(5)
+            return
+        if self.has_item("Mind Shield"):
+            type.type("The " + cyan(bright("Mind Shield")) + " blocks the psychic weight of the bad luck. Numbers are just numbers.")
+            print("\n")
+            self.restore_sanity(3)
             return
         type.type("You count your money. " + red(bright("$13")) + ". The unlucky number.")
         print("\n")

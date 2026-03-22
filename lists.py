@@ -4834,6 +4834,21 @@ class Lists:
             # Animal Whistle: +30% animal events at night
             if player.has_item("Animal Whistle"):
                 additions += [e for e in pool if e in self._ANIMAL_EVENTS] * 2
+
+            # Nomad's Camp: +30% camp events at night
+            if player.has_item("Nomad's Camp"):
+                additions += [e for e in pool if e in self._CAMP_EVENTS] * 3
+
+            # Gambler's Aura: +15% positive night events
+            if player.has_item("Gambler's Aura"):
+                additions += [e for e in pool if e in self._POSITIVE_NIGHT_EVENTS]
+
+            # Ghost Protocol: -100% combat night events
+            if player.has_item("Ghost Protocol"):
+                for event in self._COMBAT_EVENTS:
+                    if event in pool:
+                        pool.remove(event)
+
         else:
             # Necronomicon: +25% dark event weight
             if player.has_item("Necronomicon"):
@@ -4861,6 +4876,34 @@ class Lists:
 
             # Scrap Armor: –20% combat/mugging event weight
             if player.has_item("Scrap Armor"):
+                for event in self._COMBAT_EVENTS:
+                    if event in pool:
+                        pool.remove(event)
+
+            # Gambler's Aura: +20% positive events (stronger than Lucky Charm)
+            if player.has_item("Gambler's Aura"):
+                additions += [e for e in pool if e in self._POSITIVE_DAY_EVENTS] * 2
+
+            # Fortune's Favor: +10% positive events (stacks with Lucky Charm, Luck Totem)
+            if player.has_item("Fortune's Favor"):
+                additions += [e for e in pool if e in self._POSITIVE_DAY_EVENTS]
+
+            # Beast Tamer Kit: +25% animal event weight (stronger than Animal Whistle)
+            if player.has_item("Beast Tamer Kit"):
+                additions += [e for e in pool if e in self._ANIMAL_EVENTS] * 2
+
+            # Nomad's Camp: +30% survival/camp events
+            if player.has_item("Nomad's Camp"):
+                additions += [e for e in pool if e in self._CAMP_EVENTS] * 3
+
+            # Ghost Protocol: -100% combat events (you're invisible to threats)
+            if player.has_item("Ghost Protocol"):
+                for event in self._COMBAT_EVENTS:
+                    if event in pool:
+                        pool.remove(event)
+
+            # Road Warrior Armor: -30% combat events (thugs see the armor and leave)
+            if player.has_item("Road Warrior Armor"):
                 for event in self._COMBAT_EVENTS:
                     if event in pool:
                         pool.remove(event)

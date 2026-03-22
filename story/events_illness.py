@@ -221,6 +221,16 @@ class IllnessMixin:
     def contract_stomach_flu(self):
         # EVENT: Contract stomach flu - violent gastrointestinal distress
         # EFFECTS: Adds "Stomach Flu" status, 12 damage, 1 sanity loss
+        if self.has_item("Hydration Station"):
+            type.type("The " + cyan(bright("Hydration Station")) + " purifies everything that enters. Waterborne illness doesn't reach you.")
+            print("\n")
+            self.heal(5)
+            return
+        if self.has_item("Water Purifier"):
+            type.type("The " + cyan(bright("Water Purifier")) + " ensures every sip is clean.")
+            print("\n")
+            type.type("The illness never begins.")
+            return
         type.type("It started with nausea. Then came the vomiting. Then the other end started.")
         print("\n")
         type.type("You've spent the last several hours in the bathroom, alternating between the toilet and the cold floor.")
@@ -541,6 +551,17 @@ class IllnessMixin:
         self.start_night()
 
     def migraine_severe(self):
+        if self.has_item("Mind Shield"):
+            type.type("The " + cyan(bright("Mind Shield")) + " keeps the migraine behind the wall where it can't touch you.")
+            print("\n")
+            self.restore_sanity(5)
+            return
+        if self.has_item("Smelling Salts"):
+            self.use_item("Smelling Salts")
+            type.type("The " + cyan(bright("Smelling Salts")) + " hit like a freight train. The migraine retreats from a more alarming sensation.")
+            print("\n")
+            self.heal(5)
+            return
         type.type("The aura started an hour ago. Zigzag lines dancing across your vision.")
         print("\n")
         type.type("Now the pain has arrived. A sledgehammer behind your left eye. Light is agony. Sound is torture.")
