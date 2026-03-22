@@ -2120,6 +2120,10 @@ class NightEventsMixin:
             type.type("But it doesn't matter. The names don't matter. What matters is that something enormous and ancient is looking back at you.")
             print("\n")
             type.type("And it doesn't care about your problems. Somehow, that's comforting.")
+        if self.has_item("Flask of Fortunate Night"):
+            print("\n")
+            type.type("The " + cyan(bright("Flask of Fortunate Night")) + " glows silver in the moonlight. The darkness feels less threatening. Almost welcoming.")
+            self.restore_sanity(2)
         print("\n")
         if self.has_item("Binoculars"):
             type.type("You pull out your " + magenta(bright("Binoculars")) + " and point them up. The moon's craters snap into focus. You can see the rings of... wait, is that Saturn?")
@@ -2159,6 +2163,12 @@ class NightEventsMixin:
         type.type("It costs " + green(bright("$" + str(cost))) + ". Highway robbery, but you're desperate.")
         self.change_balance(-cost)
         print("\n")
+        if self.has_item("Road Flare Torch"):
+            print("\n")
+            type.type("You light the " + cyan(bright("Road Flare Torch")) + ". The red glow pushes back the darkness. Nothing approaches.")
+            print("\n")
+            type.type("Fire has always been humanity's answer to the dark.")
+            self.restore_sanity(3)
         chance = random.randrange(3)
         if chance == 0:
             type.type("The hot dog fights back. You spend the next hour regretting everything.")
@@ -2177,6 +2187,10 @@ class NightEventsMixin:
         type.type("You watch them dance across the stars for what feels like hours. Then, suddenly, they're gone.")
         print("\n")
         type.type("You don't tell anyone about this. Who would believe you?")
+        if self.has_item("Rain Collector"):
+            print("\n")
+            type.type("Your " + cyan(bright("Rain Collector")) + " catches the overnight moisture. By morning, you have clean water without lifting a finger.")
+            self.heal(3)
         self.lose_sanity(random.choice([1, 2, 3]))
         print("\n")
 

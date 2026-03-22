@@ -637,6 +637,10 @@ class DaySurvivalMixin:
             print("\n")
             type.type("It's beautiful enough to make you forget, just for a moment, that you live in a car.")
             print("\n")
+        if self.has_item("Flask of Fortunate Day"):
+            print("\n")
+            type.type("The " + cyan(bright("Flask of Fortunate Day")) + " pulses with golden light. The sun feels warmer. The road feels shorter. Everything feels... manageable.")
+            self.restore_sanity(2)
         self.heal(random.choice([5, 10, 15]))
         self.restore_sanity(random.choice([1, 2, 3]))  # Restores sanity
         print("\n")
@@ -1372,6 +1376,12 @@ class DaySurvivalMixin:
             print("\n")
             type.type("You spend twenty minutes on your hands and knees searching the car, the pavement, the bushes. You find a quarter. Not helpful.")
         print("\n")
+        if self.has_item("Signal Mirror"):
+            print("\n")
+            type.type("You catch the sun with your " + cyan(bright("Signal Mirror")) + ". The reflected beam flashes across the horizon like a lighthouse on land.")
+            print("\n")
+            type.type("Someone, somewhere, sees the light. Help is closer than you think.")
+            self.restore_sanity(3)
         lost = min(self.get_balance(), random.randint(50, 200))
         type.type("You lost " + red(bright("${:,}".format(int(lost)))) + ".")
         self.change_balance(-lost)
@@ -1419,6 +1429,10 @@ class DaySurvivalMixin:
             type.type("You wake up and immediately know something is wrong. Your neck is on fire. Not metaphorically.")
             print("\n")
             type.type("Sunburn. The kind that hurts when you think about it. The kind where shirts become your enemy.")
+        if self.has_item("Splint"):
+            print("\n")
+            type.type("The " + cyan(bright("Splint")) + " braces your aching joints. Crude, but effective. You can keep moving.")
+            self.heal(5)
         self.hurt(15)
         print("\n")
 

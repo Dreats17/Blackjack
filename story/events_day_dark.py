@@ -434,6 +434,11 @@ class DayDarkMixin:
         print("\n")
         type.type("No more...")
         print("\n")
+        if self.has_item("Flask of Second Chance"):
+            print("\n")
+            type.type("The " + cyan(bright("Flask of Second Chance")) + " burns hot against your chest. A reminder: you've been given another shot. Don't waste it.")
+            self.restore_sanity(3)
+            print("\n")
         answer = ask.option("", ["climb the railing", "call someone", "walk away"])
         if answer == "climb the railing":
             type.type("You climb over the railing. The metal is cold. The wind pushes at you.")
@@ -585,6 +590,11 @@ class DayDarkMixin:
         print("\n")
         type.type("He doesn't finish the sentence. He doesn't have to.")
         print("\n")
+        if self.has_item("Shiv"):
+            print("\n")
+            type.type("Your hand finds the " + cyan(bright("Shiv")) + " in your pocket. The blade is small but the message is clear: you're not defenseless.")
+            self.restore_sanity(3)
+            print("\n")
         answer = ask.option("What do you do? ", ["agree to leave", "offer money", "fight back"])
         if answer == "agree to leave":
             type.type(quote("Smart. I like smart people. They live longer."))

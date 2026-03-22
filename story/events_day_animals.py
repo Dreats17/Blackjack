@@ -98,6 +98,12 @@ class DayAnimalsMixin:
             type.type("You're woken by excited yipping. A small corgi is doing zoomies around your car, clearly having the time of its life. ")
             type.type("When you open the door, it immediately jumps into your lap and starts covering your face in kisses.")
         print("\n")
+        if self.has_item("Trail Mix Bomb"):
+            print("\n")
+            type.type("You toss a handful of " + cyan(bright("Trail Mix Bomb")) + " as a distraction. The animal's nose twitches, attention instantly diverted.")
+            print("\n")
+            type.type("While it investigates the trail mix, you quietly slip away.")
+            self.restore_sanity(3)
         
         # Animal Whistle auto-befriend
         if self.has_item("Animal Whistle") and not self.has_companion("Buddy"):

@@ -142,6 +142,10 @@ class DayCasinoMixin:
             type.type("You feel like you're in the final act of a movie. The climax is coming. You can feel it in your bones.")
             print("\n")
             type.type("Whether it's a happy ending or a tragedy... well. That's up to you.")
+        if self.has_item("Flask of Imminent Blackjack"):
+            print("\n")
+            type.type("The " + cyan(bright("Flask of Imminent Blackjack")) + " hums in your pocket. The cards feel warmer. Closer. Like they WANT to come to you.")
+            self.restore_sanity(2)
         if self.has_item("Flask of Second Chance"):
             print("\n")
             type.type("The " + cyan(bright("Flask of Second Chance")) + " shifts in your pocket. Time hiccups, just slightly.")
@@ -205,6 +209,10 @@ class DayCasinoMixin:
             type.type("The " + cyan(bright("Flask of Pocket Aces")) + " pulses with twin heartbeats against your chest. Two aces, waiting.")
             print("\n")
             type.type("Whatever they're planning, you've got something they can't see coming.")
+        if self.has_item("Flask of Dealer's Whispers"):
+            print("\n")
+            type.type("The " + cyan(bright("Flask of Dealer's Whispers")) + " vibrates against your hip. You swear you can hear the Dealer's voice, faint but clear: " + quote("Eighteen."))
+            self.restore_sanity(2)
         if self.has_item("Radio Jammer"):
             print("\n")
             type.type("You flip the " + cyan(bright("Radio Jammer")) + " in your pocket. The surveillance van's radio dies. Backup never arrives.")
@@ -276,6 +284,11 @@ class DayCasinoMixin:
         print("\n")
         type.type("But he asked about you. Left an address. A request.")
         print("\n")
+        if self.has_item("Flask of Dealer's Hesitation"):
+            print("\n")
+            type.type("The " + cyan(bright("Flask of Dealer's Hesitation")) + " trembles. Somewhere, the Dealer paused mid-deal. Something about you makes even him uncertain.")
+            self.restore_sanity(2)
+            print("\n")
         answer = ask.yes_or_no("Visit him? ")
         if answer == "yes":
             type.type("He's at home. Hospice care. He looks so small in the hospital bed.")

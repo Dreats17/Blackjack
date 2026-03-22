@@ -171,6 +171,13 @@ class DaySurrealMixin:
         print(PAR)
         type.type("You blink. The reflection is normal again — just you, looking the way a person looks when they've seen something they cannot explain.")
         print(PAR)
+        if self.has_item("Flask of Split Serum"):
+            print("\n")
+            type.type("The " + cyan(bright("Flask of Split Serum")) + " fizzes in your pocket. For a moment you see TWO of everything — two roads, two choices, two versions of yourself.")
+            print("\n")
+            type.type("Both of them are you. Neither of them is sure which is real.")
+            self.restore_sanity(1)
+            print(PAR)
         if self.has_item("Twin's Locket") or self.has_item("Mirror of Duality"):
             locket = "Twin's Locket" if self.has_item("Twin's Locket") else "Mirror of Duality"
             type.type("You reach for the " + cyan(bright(locket)) + " around your neck. It falls open on its own. Inside: two tiny portraits facing each other, and in both portraits, the reflection is also looking back at you.")

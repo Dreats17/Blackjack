@@ -266,6 +266,11 @@ class DayWealthMixin:
             self.change_balance(amount)
             print("\n")
             return
+        if self.has_item("Flask of Bonus Fortune"):
+            print("\n")
+            type.type("The " + cyan(bright("Flask of Bonus Fortune")) + " radiates warmth. Money seems to flow toward you today — loose change on the ground, a forgotten bill in your old jacket.")
+            self.change_balance(random.randint(5, 25))
+            print("\n")
         variant = random.randrange(3)
         if variant == 0:
             type.type("A man in a cheap suit approaches your car, waving a stack of papers.")
