@@ -2203,3 +2203,40 @@ class DayPeopleMixin:
             self.lose_sanity(5)
         print("\n")
 
+    # ==========================================
+    # WRONG ITEM COMEDY EVENTS
+    # ==========================================
+
+    def wrong_item_pest_control_romance(self):
+        if not self.has_item("Pest Control"):
+            self.day_event()
+            return
+        type.type("You're having a genuinely nice conversation when a cockroach scuttles across the table.")
+        print("\n")
+        type.type("Without thinking, you whip out the " + cyan(bright("Pest Control")) + " and blast the table.")
+        print("\n")
+        type.type("The cockroach dies. So does the mood. And possibly the tablecloth.")
+        print("\n")
+        type.type("Your companion stares at you. " + quote("Why do you carry that?"))
+        print("\n")
+        self.lose_sanity(15)
+        type.type("You pocket the can. " + quote("No reason,") + " you say, too quickly.")
+        print("\n")
+
+    def wrong_item_dirty_hat_dinner(self):
+        if not self.has_item("Dirty Old Hat") and not self.has_item("Unwashed Hair"):
+            self.day_event()
+            return
+        offending_item = "Unwashed Hair" if self.has_item("Unwashed Hair") else "Dirty Old Hat"
+        type.type("You arrive at the formal dinner wearing the " + cyan(bright(offending_item)) + ".")
+        print("\n")
+        type.type("The ma\u00eetre d' physically recoils. " + quote("Sir, we have a dress code."))
+        print("\n")
+        type.type("You adjust it. " + quote("This IS my dress code."))
+        print("\n")
+        type.type("You're escorted out before the appetizers arrive.")
+        print("\n")
+        self.lose_sanity(10)
+        type.type("On the way out, a busboy slips you a bread roll. Solidarity.")
+        print("\n")
+

@@ -1981,6 +1981,25 @@ class DaySurvivalMixin:
         return
     
     # ==========================================
+    # WRONG ITEM COMEDY EVENTS
+    # ==========================================
+
+    def wrong_item_bug_spray_campfire(self):
+        if not self.has_item("Bug Spray"):
+            self.day_event()
+            return
+        type.type("You're sitting by the campfire when a mosquito buzzes past. You grab the " + cyan(bright("Bug Spray")) + " and give a quick spritz.")
+        print("\n")
+        type.type("The spray hits the flames. WHOOOMP. A fireball erupts.")
+        print("\n")
+        type.type("Your eyebrows are gone. Both of them.")
+        print("\n")
+        self.hurt(20)
+        self.use_item("Bug Spray")
+        type.type("On the bright side, no more mosquitoes.")
+        print("\n")
+
+    # ==========================================
     # NEW DOUGHMAN DAY EVENTS - Everytime
     # ==========================================
     

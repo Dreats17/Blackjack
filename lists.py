@@ -2755,6 +2755,10 @@ class Lists:
         # CAR TROUBLE FOLLOW-UPS - Poor Tier
         a_list.append("nail_in_tire_blows")
         a_list.append("failing_starter_dies")
+        # WRONG ITEM COMEDY EVENTS - Poor Tier
+        a_list.append("wrong_item_bug_spray_campfire")
+        a_list.append("wrong_item_road_flares_stealth")
+        a_list.append("wrong_item_dog_whistle_bear")
         random.shuffle(a_list)
         return a_list
     
@@ -3109,6 +3113,11 @@ class Lists:
         a_list.append("bald_tires_hydroplane")
         a_list.append("nail_in_tire_blows")
         a_list.append("failing_starter_dies")
+        # WRONG ITEM COMEDY EVENTS - Cheap Tier
+        a_list.append("wrong_item_bug_spray_campfire")
+        a_list.append("wrong_item_road_flares_stealth")
+        a_list.append("wrong_item_pest_control_romance")
+        a_list.append("wrong_item_dog_whistle_bear")
         random.shuffle(a_list)
         return a_list
     
@@ -3485,6 +3494,13 @@ class Lists:
         a_list.append("failing_fuel_pump_dies")
         a_list.append("broken_ball_joint_breaks")
         a_list.append("failing_starter_dies")
+        # WRONG ITEM COMEDY EVENTS - Modest Tier
+        a_list.append("wrong_item_bug_spray_campfire")
+        a_list.append("wrong_item_road_flares_stealth")
+        a_list.append("wrong_item_pest_control_romance")
+        a_list.append("wrong_item_dirty_hat_dinner")
+        a_list.append("wrong_item_dog_whistle_bear")
+        a_list.append("wrong_item_necronomicon_loan_shark")
         random.shuffle(a_list)
         return a_list
     
@@ -3795,6 +3811,10 @@ class Lists:
         a_list.append("bald_tires_hydroplane")
         a_list.append("failing_fuel_pump_dies")
         a_list.append("broken_ball_joint_breaks")
+        # WRONG ITEM COMEDY EVENTS - Rich Tier
+        a_list.append("wrong_item_pest_control_romance")
+        a_list.append("wrong_item_dirty_hat_dinner")
+        a_list.append("wrong_item_necronomicon_loan_shark")
         random.shuffle(a_list)
         return a_list
     
@@ -4109,6 +4129,9 @@ class Lists:
         a_list.append("failing_fuel_pump_dies")
         a_list.append("broken_ball_joint_breaks")
         a_list.append("bald_tires_hydroplane")
+        # WRONG ITEM COMEDY EVENTS - Doughman Tier
+        a_list.append("wrong_item_dirty_hat_dinner")
+        a_list.append("wrong_item_necronomicon_loan_shark")
         random.shuffle(a_list)
         return a_list
     
@@ -4762,6 +4785,15 @@ class Lists:
         "immortal_vehicle_breakdown": [0, 0, 0, 1, 2, 3],
         "gamblers_aura_blackjack": [0, 0, 1, 2, 2, 2],
         "guardian_angel_lethal":   [0, 0, 0, 0, 2, 3],
+
+        # ── WRONG ITEM COMEDY ──────────────────────────────────────────────────
+        # Comedy-of-errors events: using an item in the wrong context.
+        "wrong_item_bug_spray_campfire":      [1, 1, 1, 0, 0, 0],
+        "wrong_item_road_flares_stealth":     [1, 1, 1, 0, 0, 0],
+        "wrong_item_pest_control_romance":    [0, 1, 1, 1, 0, 0],
+        "wrong_item_dirty_hat_dinner":        [0, 0, 1, 1, 1, 0],
+        "wrong_item_dog_whistle_bear":        [1, 1, 1, 0, 0, 0],
+        "wrong_item_necronomicon_loan_shark": [0, 0, 1, 1, 1, 0],
     }
 
     # ── INVENTORY-AWARE POOL EVENTS ─────────────────────────────────────────────

@@ -1391,5 +1391,27 @@ class DayAnimalsMixin:
             self.lose_sanity(1)
         print("\n")
 
+    # ==========================================
+    # WRONG ITEM COMEDY EVENTS
+    # ==========================================
+
+    def wrong_item_dog_whistle_bear(self):
+        if not self.has_item("Dog Whistle"):
+            self.day_event()
+            return
+        type.type("A bear appears on the trail ahead. Fight or flight? You choose Option C: " + cyan(bright("Dog Whistle")) + ".")
+        print("\n")
+        type.type("You blow the whistle. Nothing happens. Bears aren't dogs.")
+        print("\n")
+        type.type("The bear tilts its head. You blow again. The bear sits. Not because of the whistle — because it's confused.")
+        print("\n")
+        type.type("A dog appears from the treeline. The dog sees the bear. The bear sees the dog.")
+        print("\n")
+        type.type("They stare at each other. You slowly back away during the standoff.")
+        print("\n")
+        self.restore_sanity(5)
+        type.type("Free escape. You'll take it.")
+        print("\n")
+
     # === BRIDGE ANGEL CHAIN ===
 

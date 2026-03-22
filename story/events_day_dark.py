@@ -2762,6 +2762,43 @@ class DayDarkMixin:
             self.lose_sanity(3)
         print("\n")
 
+    # ==========================================
+    # WRONG ITEM COMEDY EVENTS
+    # ==========================================
+
+    def wrong_item_road_flares_stealth(self):
+        if not self.has_item("Road Flares"):
+            self.day_event()
+            return
+        type.type("You're sneaking through a dark area when you realize you can't see. Naturally, you light a " + cyan(bright("Road Flare")) + ".")
+        print("\n")
+        type.type("Every creature, person, and possibly satellite in a one-mile radius turns toward the bright red glow.")
+        print("\n")
+        type.type("So much for stealth.")
+        print("\n")
+        self.lose_sanity(10)
+        type.type("A raccoon stares at you from ten feet away, completely unafraid. You've ruined the concept of darkness.")
+        print("\n")
+
+    def wrong_item_necronomicon_loan_shark(self):
+        if not self.has_item("Necronomicon"):
+            self.day_event()
+            return
+        type.type("The loan shark demands payment. You reach into your bag for collateral.")
+        print("\n")
+        type.type("You pull out the " + cyan(bright("Necronomicon")) + ".")
+        print("\n")
+        type.type("The loan shark's eyes go white. His mouth hangs open.")
+        print("\n")
+        type.type("The book opens by itself. A page turns. The loan shark reads the first line.")
+        print("\n")
+        type.type("He tears up the contract. " + quote("We're even,") + " he whispers. " + quote("Please leave."))
+        print("\n")
+        self.change_balance(200)
+        self.lose_sanity(15)
+        type.type("You close the book. Something inside it chuckles. That can't be right.")
+        print("\n")
+
     # === HIGH ROLLER KEYCARD CHAIN ===
 
 
