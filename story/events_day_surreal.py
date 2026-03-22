@@ -150,6 +150,21 @@ class DaySurrealMixin:
     def mirror_stranger(self):
         # EVENT: Your reflection acts independently and holds up a sign saying "SOON"
         # EFFECTS: 30% find encouraging note from reflection (+5 sanity); 70% avoid mirrors all day (-8 sanity)
+        if self.has_item("Seer's Chronicle"):
+            type.type("The " + cyan(bright("Seer's Chronicle")) + "'s pages turn to this moment. The stranger in the mirror — you've already read this part.")
+            print("\n")
+            type.type("You wave. They wave. You know exactly what they are: a future self. A warning.")
+            type.type(" You heed it.")
+            self.restore_sanity(10)
+            self.heal(10)
+            return
+        if self.has_item("Third Eye"):
+            type.type("The " + cyan(bright("Third Eye")) + " opens. You see what's really happening.")
+            print("\n")
+            type.type("The stranger isn't a stranger. It's a probability wave — one version of you that took a different turn.")
+            type.type(" You acknowledge it, and it disperses.")
+            self.restore_sanity(8)
+            return
         type.type("You catch your reflection in the car mirror. It smiles. You are not smiling. The reflection waves. You don't move your hand.")
         print(PAR)
         type.type("It holds up a sign. Written in what might be blood: 'SOON.'")
@@ -244,6 +259,18 @@ class DaySurrealMixin:
     def wrong_universe(self):
         # EVENT: Slip into alternate dimension with purple sky and floating cars
         # EFFECTS: Meet alternate rich self, get Dimensional Coin item (50%) or $100-300 (50%), -10 sanity
+        if self.has_item("Third Eye"):
+            type.type("The " + cyan(bright("Third Eye")) + " sees through the illusion. The wrong universe is just a probability fold — a glitch in local reality.")
+            print("\n")
+            type.type("You step back into the right one with the grace of someone who does this regularly.")
+            self.restore_sanity(8)
+            return
+        if self.has_item("Fate Reader"):
+            type.type("The " + cyan(bright("Fate Reader")) + " showed this in the cards. You recognized the fold the moment it started.")
+            print("\n")
+            type.type("The universe corrects itself. You barely notice.")
+            self.restore_sanity(5)
+            return
         type.type("You step out of your car and around a corner. The world changes.")
         print("\n")
         type.type("The sky is purple. The buildings are organic, pulsing like living things.")
@@ -384,6 +411,31 @@ class DaySurrealMixin:
     def blood_moon_bargain(self):
         # EVENT: On a blood red moon, dark forces offer one night of perfect luck for one year of life
         # EFFECTS: Accept = "Blood Moon Luck" + "Year Shorter" status, -20 sanity; Reject = +5 sanity
+        if self.has_item("Soul Forge"):
+            type.type("The " + cyan(bright("Soul Forge")) + " glows in the blood-moon light. The entity recognizes it.")
+            print("\n")
+            type.type(quote("You've brought the rewriting tool,") + " it whispers. " + quote("The pact is unnecessary. Name what you want changed."))
+            print("\n")
+            if not self.has_met("Soul Forge Used"):
+                self.mark_met("Soul Forge Used")
+                type.type("You name it. Whatever it was. The past rewrites. The blood moon fades.")
+                self.heal(50)
+                self.restore_sanity(25)
+                self.change_balance(5000)
+            else:
+                type.type("You've already used the Forge. The entity nods. " + quote("The price was paid."))
+                self.restore_sanity(10)
+            return
+        if self.has_item("Dark Pact Reliquary"):
+            type.type("The " + cyan(bright("Dark Pact Reliquary")) + " glows. The entity recognizes the toolkit.")
+            print("\n")
+            type.type(quote("You've done your homework,") + " it says. The terms shift heavily in your favor.")
+            print("\n")
+            type.type("You walk away with more than you asked for. Somehow, you feel like you still lost something small.")
+            self.heal(20)
+            self.restore_sanity(10)
+            self.change_balance(1000)
+            return
         type.type("Through your windshield, the sky is wrong. The light filtering in is red. Blood red. The color of things that shouldn't be.")
         print("\n")
         type.type("You hear a voice inside your car. It comes from nowhere and everywhere.")

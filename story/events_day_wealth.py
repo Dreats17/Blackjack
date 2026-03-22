@@ -180,6 +180,24 @@ class DayWealthMixin:
         # EFFECTS: Purely atmospheric - player wisely ignores all scam attempts
         # Everytime - risky event
 
+        if self.has_item("Phantom Rose"):
+            type.type("The " + cyan(bright("Phantom Rose")) + " marks you as legend. Financial doors open by reputation alone.")
+            print("\n")
+            type.type("Whatever opportunity this was — it's maximum yield now.")
+            self.change_balance(random.randint(800, 2000))
+            return
+        if self.has_item("Ghost Protocol"):
+            type.type(cyan(bright("Ghost Protocol")) + " erases your financial footprint. The IRS, the casino, the bank — none of them can find you.")
+            print("\n")
+            type.type("This transaction is invisible.")
+            self.change_balance(random.randint(300, 700))
+            return
+        if self.has_item("Old Money Identity"):
+            type.type("The " + cyan(bright("Old Money Identity")) + " commands institutional trust. They defer to the name.")
+            print("\n")
+            type.type("Whatever rate you were getting, you get better.")
+            self.change_balance(random.randint(200, 500))
+            return
         # COMBO: Blackmail Letter + Old Money Identity = The Hostile Takeover
         if self.has_item("Blackmail Letter") and self.has_item("Old Money Identity"):
             type.type("You arrive as old money. You present the " + cyan(bright("Blackmail Letter")) + " at the board meeting.")
@@ -341,6 +359,18 @@ class DayWealthMixin:
             return
         
         self.meet("Tax Man Visit")
+        if self.has_item("Ghost Protocol"):
+            type.type(cyan(bright("Ghost Protocol")) + " erases your casino footprint. No camera sees you. No record has your name.")
+            print("\n")
+            type.type("You are invisible to the house.")
+            self.restore_sanity(5)
+            return
+        if self.has_item("New Identity"):
+            type.type("The " + cyan(bright("New Identity")) + " deflects the recognition. That was someone else.")
+            print("\n")
+            type.type(quote("Are you sure that's them?") + " " + quote("No... no, you're right, different person.") + " You walk free.")
+            self.restore_sanity(5)
+            return
         type.type("A sedan with government plates pulls up. A man in a gray suit steps out, holding a clipboard.")
         print("\n")
         type.type(quote("Excuse me. I'm from the IRS. We've noticed some... unusual financial activity in this area."))

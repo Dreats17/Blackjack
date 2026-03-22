@@ -380,6 +380,27 @@ class DayPeopleMixin:
         #          otherwise lose 3 sanity from humiliation
         # Breath Mints or Expensive Cologne help with social situations
 
+        if self.has_item("King of the Road"):
+            type.type(cyan(bright("King of the Road")) + " enters. Conversations stop. Every person in the vicinity wants to be you or know you.")
+            print("\n")
+            type.type("The interaction goes perfectly. It always does, now.")
+            self.restore_sanity(10)
+            self.change_balance(random.randint(100, 300))
+            return
+        if self.has_item("Master of Games"):
+            type.type("The " + cyan(bright("Master of Games")) + " is at work. Charming, wealthy, impossible to refuse.")
+            print("\n")
+            type.type("Every social vector closes in your favor.")
+            self.restore_sanity(8)
+            self.change_balance(random.randint(50, 200))
+            return
+        if self.has_item("Intelligence Dossier"):
+            type.type("The " + cyan(bright("Intelligence Dossier")) + " has them in it. You know three things about this person they've never told anyone.")
+            print("\n")
+            type.type("The conversation cuts straight to trust.")
+            self.restore_sanity(5)
+            self.change_balance(100)
+            return
         # COMBO: Gas Mask + Voice Soother = The Voice of God
         if self.has_item("Gas Mask") and self.has_item("Voice Soother"):
             type.type("The " + cyan(bright("Gas Mask")) + " distorts your " + cyan(bright("Voice Soother")) + "-enhanced voice into something deep, resonant, and inhuman.")
@@ -535,6 +556,24 @@ class DayPeopleMixin:
         type.type("There's someone trying to break into your car!")
         print("\n")
         
+        if self.has_item("Road Warrior Armor"):
+            type.type("The robber looks at the " + cyan(bright("Road Warrior Armor")) + ", at the weapon components visible on the harness, then back at you.")
+            print("\n")
+            type.type("They leave. Without a word. Wisely.")
+            self.restore_sanity(8)
+            return
+        if self.has_item("Ghost Protocol"):
+            type.type("The robber approaches. " + cyan(bright("Ghost Protocol")) + " makes you... unfocusable. They can't remember why they walked over.")
+            print("\n")
+            type.type("They drift away, confused. You wave.")
+            self.restore_sanity(5)
+            return
+        if self.has_item("Assassin's Kit"):
+            type.type("You hold up the " + cyan(bright("Assassin's Kit")) + " — both components visible. Blade. Spray.")
+            print("\n")
+            type.type("The math is immediate. They run.")
+            self.restore_sanity(5)
+            return
         # COMPANION: Protection check first
         protector = self._lists.has_companion_with_bonus(self, "protection")
         if protector and self.get_companion(protector)["status"] == "alive":

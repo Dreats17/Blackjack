@@ -62,6 +62,27 @@ class DayCasinoMixin:
             self.day_event()
             return
         
+        if self.has_item("Moonlit Fortune"):
+            type.type("The " + cyan(bright("Moonlit Fortune")) + " glows beneath your shirt. You feel the next card before it's dealt. Ace of spades.")
+            print("\n")
+            type.type("Blackjack. The dealer can't explain it. Neither can physics.")
+            self.change_balance(random.randint(500, 1500))
+            self.restore_sanity(10)
+            return
+        if self.has_item("Master of Games"):
+            type.type(cyan(bright("Master of Games")) + " at the table. The identity real, the insurance loaded. The dealer watches their own hands like they're betraying them.")
+            print("\n")
+            type.type("You own this table in every sense.")
+            self.change_balance(random.randint(300, 800))
+            self.restore_sanity(8)
+            return
+        if self.has_item("Gambler's Aura"):
+            type.type("The " + cyan(bright("Gambler's Aura")) + " radiates. Triple luck. The dealer looks sick.")
+            print("\n")
+            type.type("Every card falls right. The house edge is your edge now.")
+            self.change_balance(random.randint(200, 600))
+            self.restore_sanity(5)
+            return
         type.type("You count your money this morning and realize you have exactly " + green(bright("$21")) + ". Blackjack.")
         print("\n")
         type.type("As if on cue, a single playing card flutters down from nowhere and lands in your lap. The Ace of Spades.")
@@ -132,6 +153,24 @@ class DayCasinoMixin:
         # EVENT: Security cars and surveillance suggest you're being watched
         # EFFECTS: Atmospheric paranoia - hints that the casino is tracking your wins
         # Everytime - paranoia event
+        if self.has_item("Ghost Protocol"):
+            type.type(cyan(bright("Ghost Protocol")) + " active. No camera catches your face. No pit boss remembers your name.")
+            print("\n")
+            type.type("You play and vanish. The security team watches the feed three times. Nothing.")
+            self.restore_sanity(5)
+            return
+        if self.has_item("Cheater's Insurance"):
+            type.type("The " + cyan(bright("Cheater's Insurance")) + " documents everything as legitimate play.")
+            print("\n")
+            type.type("Security reviews it. All clean. Provably clean. Embarrassingly clean.")
+            self.restore_sanity(8)
+            return
+        if self.has_item("New Identity"):
+            type.type("The " + cyan(bright("New Identity")) + " — they've got the wrong person. Different name, different face.")
+            print("\n")
+            type.type("The security team apologizes.")
+            self.restore_sanity(5)
+            return
         variant = random.randrange(3)
         if variant == 0:
             type.type("A security car does a slow drive-by. The guard makes eye contact with you, holds it for a beat too long, then drives on.")

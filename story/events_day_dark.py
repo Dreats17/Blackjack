@@ -59,6 +59,18 @@ class DayDarkMixin:
         if self.get_balance() < 100000:
             self.day_event()
             return
+        if self.has_item("King of the Road"):
+            type.type(cyan(bright("King of the Road")) + " enters the room. The loan shark straightens up. Someone of this... stature? Owing them money? It doesn't compute.")
+            print("\n")
+            type.type(quote("Forget it,") + " he says. " + quote("Consider it a gift."))
+            self.restore_sanity(10)
+            return
+        if self.has_item("Master of Games"):
+            type.type("The " + cyan(bright("Master of Games")) + " aura fills the room. Wine in hand, heirloom watch on wrist, every con in the book loaded.")
+            print("\n")
+            type.type("You negotiate the debt into a profitable arrangement. They owe YOU by the end.")
+            self.change_balance(500)
+            return
         type.type("A black SUV pulls up beside your car. Two men get out, unhurried, and you recognize the tattoos before you recognize the faces — the kind of tattoos that tell a story you don't want to hear. Before you can process what's happening, they're dragging you out of your car by your collar and setting you against the hood like luggage.")
         print(PAR)
         type.type(quote("Remember us? Remember the money you borrowed to start this little gambling hobby of yours?"))
@@ -239,6 +251,18 @@ class DayDarkMixin:
         # DARK: Selling body parts for gambling money
         if self.get_balance() >= 1000 and self.get_health() >= 30:
             self.day_event()
+            return
+        if self.has_item("Third Eye"):
+            type.type("The " + cyan(bright("Third Eye")) + " pulses a warning. Danger here. Five seconds. You step left. You cross the street.")
+            print("\n")
+            type.type("Three men exit the building. They look right where you were standing.")
+            self.restore_sanity(10)
+            return
+        if self.has_item("Ghost Protocol"):
+            type.type(cyan(bright("Ghost Protocol")) + " makes you invisible to targeting. They can't focus on you.")
+            print("\n")
+            type.type("They walk past you three times. Eventually give up.")
+            self.restore_sanity(5)
             return
         type.type("A clean-looking van pulls up. A man in scrubs steps out. He's smiling.")
         print("\n")
@@ -525,6 +549,26 @@ class DayDarkMixin:
         # VIOLENCE: Professional intimidation/assassination
         if self.get_balance() < 800000:
             self.day_event()
+            return
+        if self.has_item("Last Breath Locket"):
+            type.type("The hitman takes the shot. The " + cyan(bright("Last Breath Locket")) + " ignites. White fire.")
+            print("\n")
+            type.type("Your body knits back together. You stand up. The hitman runs.")
+            print("\n")
+            type.type("Death looked at you, confused, and walked away.")
+            self.restore_sanity(10)
+            return
+        if self.has_item("Ghost Protocol"):
+            type.type(cyan(bright("Ghost Protocol")) + " — you don't exist. The hitman found the right address but the wrong person.")
+            print("\n")
+            type.type("They stand there, confused. You watch from two blocks away.")
+            self.restore_sanity(8)
+            return
+        if self.has_item("Road Warrior Armor"):
+            type.type("The hitman unloads. Every impact registers. None penetrate the " + cyan(bright("Road Warrior Armor")) + ".")
+            print("\n")
+            type.type("They empty their weapon. You walk toward them. They run.")
+            self.restore_sanity(5)
             return
         type.type("You're at the casino bar when a man sits down next to you. You didn't hear him approach.")
         print("\n")
@@ -1141,6 +1185,25 @@ class DayDarkMixin:
         # DEATH POSSIBLE - Wrong place, wrong time
         
         # COMPANION: Danger warning check - avoid the situation entirely
+        if self.has_item("Ghost Protocol"):
+            type.type(cyan(bright("Ghost Protocol")) + " active. Cameras see nothing, records say nothing. You walk through the robbery scene as an invisible presence.")
+            print("\n")
+            type.type("You're not here. You were never here. The robbers flee from... nothing.")
+            self.restore_sanity(5)
+            return
+        if self.has_item("Road Warrior Armor"):
+            type.type("The robbers look at the " + cyan(bright("Road Warrior Armor")) + ". They look at each other.")
+            print("\n")
+            type.type("They leave. All of them. Without saying a word.")
+            self.restore_sanity(8)
+            return
+        if self.has_item("All-Access Pass"):
+            type.type("The " + cyan(bright("All-Access Pass")) + " identifies you as something official. The robbers scatter.")
+            print("\n")
+            type.type("You're not a victim here — you're an authority.")
+            self.restore_sanity(5)
+            self.change_balance(200)
+            return
         warner = self._lists.has_companion_with_bonus(self, "danger_warning")
         if warner and self.get_companion(warner)["status"] == "alive" and random.randrange(3) == 0:
             type.type("You're about to walk into the gas station when " + bright(warner) + " starts acting strange.")
