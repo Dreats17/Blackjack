@@ -3510,7 +3510,8 @@ class DayItemsMixin:
             type.type("Thick, angry smoke billows. You can't see. THEY can't see. Nobody can see. Three cars behind you brake hard.")
             print("\n")
             type.type("By the time the smoke clears, you've turned twice and parked in an alley. Gone.")
-            self.use_item("Smoke Flare") if self.has_item("Smoke Flare") else None
+            if self.has_item("Smoke Flare"):
+                self.use_item("Smoke Flare")
             self.restore_sanity(8)
         else:
             type.type("You speed up. They speed up. You turn. They turn. This goes on for twenty minutes.")
