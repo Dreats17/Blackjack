@@ -2419,7 +2419,10 @@ class NightEventsMixin:
     def midnight_walk(self):
         if self.has_item("Rusty Compass") or self.has_item("Golden Compass"):
             compass = "Golden Compass" if self.has_item("Golden Compass") else "Rusty Compass"
-            type.type("A faint golden glow from the " + cyan(bright(compass)) + " leads you back to your car.") if self.has_item("Golden Compass") else type.type("The " + cyan(bright(compass)) + " tugs gently in your pocket, pulling you back toward your car.")
+            if self.has_item("Golden Compass"):
+                type.type("A faint golden glow from the " + cyan(bright(compass)) + " leads you back to your car.")
+            else:
+                type.type("The " + cyan(bright(compass)) + " tugs gently in your pocket, pulling you back toward your car.")
             print("\n")
             type.type("The needle always knows where home is. Even in total darkness.")
             self.restore_sanity(5)

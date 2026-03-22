@@ -1100,7 +1100,14 @@ class AdventuresMixin:
                         type.type(cyan(bright(self.get_evolution_text(evolved[0], evolved[1]))))
                     print("\n")
                 if self.has_item("Scrap Armor") or self.has_item("Road Warrior Armor") or self.has_item("Plated Vest") or self.has_item("Road Warrior Plate"):
-                    armor_name = "Road Warrior Armor" if self.has_item("Road Warrior Armor") else ("Road Warrior Plate" if self.has_item("Road Warrior Plate") else ("Plated Vest" if self.has_item("Plated Vest") else "Scrap Armor"))
+                    if self.has_item("Road Warrior Armor"):
+                        armor_name = "Road Warrior Armor"
+                    elif self.has_item("Road Warrior Plate"):
+                        armor_name = "Road Warrior Plate"
+                    elif self.has_item("Plated Vest"):
+                        armor_name = "Plated Vest"
+                    else:
+                        armor_name = "Scrap Armor"
                     type.type("The " + cyan(bright(armor_name)) + " absorbs the first swipe. It saves your ribs.")
                     evolved = self.track_item_use(armor_name)
                     if evolved:
