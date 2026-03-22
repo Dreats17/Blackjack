@@ -68,6 +68,20 @@ class DayAnimalsMixin:
             type.type("It comes to you like you've been friends for years.")
             self.restore_sanity(5)
             return
+        # COMBO: Fancy Cigars + Dog Whistle = Old Man's Trick
+        if self.has_item("Fancy Cigars") and self.has_item("Dog Whistle"):
+            type.type("You light a " + cyan(bright("Fancy Cigar")) + " and blow the " + cyan(bright("Dog Whistle")) + " through the smoke.")
+            print("\n")
+            type.type("Old Man's Trick. The smoke carries the whistle's frequency further. You look like a wise old man on a porch, calling in the evening.")
+            print("\n")
+            type.type("A stray dog trots over, sits down in front of you, and stares with absolute devotion. It has chosen you.")
+            print("\n")
+            type.type("No Animal Whistle needed. No treats. Just a cigar, a whistle, and whatever ancient magic that combination unlocks.")
+            self.use_item("Fancy Cigars")
+            self.add_companion("Scout", "Dog")
+            self.restore_sanity(15)
+            print("\n")
+            return
         rare_chance = random.randrange(100)
         
         if rare_chance < 5:  # 5% RARE VARIANT - The Ghost Dog
@@ -98,6 +112,12 @@ class DayAnimalsMixin:
             type.type("You're woken by excited yipping. A small corgi is doing zoomies around your car, clearly having the time of its life. ")
             type.type("When you open the door, it immediately jumps into your lap and starts covering your face in kisses.")
         print("\n")
+        if self.has_item("Trail Mix Bomb"):
+            print("\n")
+            type.type("You toss a handful of " + cyan(bright("Trail Mix Bomb")) + " as a distraction. The animal's nose twitches, attention instantly diverted.")
+            print("\n")
+            type.type("While it investigates the trail mix, you quietly slip away.")
+            self.restore_sanity(3)
         
         # Animal Whistle auto-befriend
         if self.has_item("Animal Whistle") and not self.has_companion("Buddy"):
@@ -1389,6 +1409,28 @@ class DayAnimalsMixin:
             type.type("Slowly, the rat retreats. You win. But your hands are shaking.")
             self.lose_hp(random.choice([5, 8, 10]))
             self.lose_sanity(1)
+        print("\n")
+
+    # ==========================================
+    # WRONG ITEM COMEDY EVENTS
+    # ==========================================
+
+    def wrong_item_dog_whistle_bear(self):
+        if not self.has_item("Dog Whistle"):
+            self.day_event()
+            return
+        type.type("A bear appears on the trail ahead. Fight or flight? You choose Option C: " + cyan(bright("Dog Whistle")) + ".")
+        print("\n")
+        type.type("You blow the whistle. Nothing happens. Bears aren't dogs.")
+        print("\n")
+        type.type("The bear tilts its head. You blow again. The bear sits. Not because of the whistle — because it's confused.")
+        print("\n")
+        type.type("A dog appears from the treeline. The dog sees the bear. The bear sees the dog.")
+        print("\n")
+        type.type("They stare at each other. You slowly back away during the standoff.")
+        print("\n")
+        self.restore_sanity(5)
+        type.type("Free escape. You'll take it.")
         print("\n")
 
     # === BRIDGE ANGEL CHAIN ===

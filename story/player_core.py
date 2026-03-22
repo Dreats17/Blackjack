@@ -135,6 +135,7 @@ class Player(
         self._clear_status = False
         self._clear_all_status = False
         self._inventory = set()
+        self._item_use_counts = {}
         self._broken_inventory = set()
         self._repairing_inventory = set()
         self._dangers = set()
@@ -486,6 +487,45 @@ class Player(
     
     def use_item(self, item):
         self._inventory.discard(item)
+
+    def track_item_use(self, item_name):
+        """Track item usage for evolution chains. Returns (old, new) tuple if evolved, else None."""
+        if item_name not in self._inventory:
+            return None
+        self._item_use_counts[item_name] = self._item_use_counts.get(item_name, 0) + 1
+        return self._check_item_evolution(item_name)
+
+    def _check_item_evolution(self, item_name):
+        """Check if an item should evolve based on use count."""
+        count = self._item_use_counts.get(item_name, 0)
+        evolutions = {
+            "Pocket Knife": (10, "Utility Blade"),
+            "Utility Blade": (15, "Master Knife"),
+            "Flashlight": (10, "Lantern"),
+            "Lantern": (15, "Eternal Light"),
+            "Scrap Armor": (5, "Plated Vest"),
+            "Plated Vest": (10, "Road Warrior Plate"),
+        }
+        if item_name in evolutions:
+            threshold, evolved_name = evolutions[item_name]
+            if count >= threshold:
+                self._inventory.discard(item_name)
+                self._inventory.add(evolved_name)
+                del self._item_use_counts[item_name]
+                return (item_name, evolved_name)
+        return None
+
+    def get_evolution_text(self, old_name, new_name):
+        """Get narrative text for item evolution."""
+        texts = {
+            ("Pocket Knife", "Utility Blade"): "Your POCKET KNIFE has been through enough to earn a promotion. The blade is sharper, the handle fits your palm perfectly. It's become a UTILITY BLADE.",
+            ("Utility Blade", "Master Knife"): "The UTILITY BLADE transcends its origins. Every edge honed by use. Every scratch a lesson. This is a MASTER KNIFE.",
+            ("Flashlight", "Lantern"): "Your FLASHLIGHT has been your eyes in the dark so many times it's grown stronger. The beam is wider, warmer. It's become a LANTERN.",
+            ("Lantern", "Eternal Light"): "The LANTERN burns with a light that won't die. You've carried it through so much darkness that it refused to go out. This is ETERNAL LIGHT.",
+            ("Scrap Armor", "Plated Vest"): "Your SCRAP ARMOR has taken so many hits it's molded to your body. The dents have become reinforcement. It's now a PLATED VEST.",
+            ("Plated Vest", "Road Warrior Plate"): "The PLATED VEST is barely recognizable. Layered, scarred, unbreakable. This is ROAD WARRIOR PLATE.",
+        }
+        return texts.get((old_name, new_name), old_name + " has evolved into " + new_name + "!")
 
     def remove_item(self, item):
         self._inventory.discard(item)

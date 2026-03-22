@@ -95,6 +95,28 @@ class EventDispatchMixin:
         # COMPANION PASSIVE BONUSES - Applied each day
         self.apply_companion_day_bonuses()
         
+        # HOARDING CONSEQUENCES - Too many items weigh you down
+        item_count = len(self._inventory)
+        if item_count >= 50:
+            if random.randrange(3) == 0:
+                type.type(yellow("Your car is bursting at the seams. Your companion can barely fit. Everything takes longer."))
+                print("\n")
+                self.lose_sanity(5)
+        elif item_count >= 40:
+            if random.randrange(4) == 0:
+                type.type(yellow("People stare at your overloaded car. You look like a hoarder on wheels."))
+                print("\n")
+                self.lose_sanity(3)
+        elif item_count >= 30:
+            if random.randrange(5) == 0:
+                type.type(yellow("The weight of your possessions slows you down. Finding anything takes time."))
+                print("\n")
+                self.lose_sanity(2)
+        elif item_count >= 20:
+            if random.randrange(8) == 0:
+                type.type(yellow("Your car is packed. You spend five minutes looking for your keys under all the stuff."))
+                print("\n")
+        
         dayEvent = getattr(self, self._lists.get_day_event(), None)
         if dayEvent is None:
             type.type("The day passes uneventfully.")

@@ -96,6 +96,18 @@ class DayWealthMixin:
             self.day_event()
             return
         
+        if self.has_item("Flask of Bonus Fortune"):
+            type.type("The " + cyan(bright("Flask of Bonus Fortune")) + " overflows with golden light against your hip.")
+            print("\n")
+            type.type("Your winnings feel heavier today. Every dollar earned multiplies in your pocket.")
+            print("\n")
+            type.type("The flask hums with warmth. Fortune isn't just smiling — it's laughing.")
+            bonus = random.randint(100, 400)
+            self.change_balance(bonus)
+            type.type(" " + green(bright("+${:,}".format(bonus))) + " bonus fortune!")
+            self.restore_sanity(5)
+            print("\n")
+
         type.type("Fifty thousand dollars. " + green(bright("$50,000")) + ". Halfway to the Rich tier.")
         print("\n")
         type.type("You never thought you'd see this much money in your life, let alone in the passenger seat of your car.")
@@ -254,6 +266,11 @@ class DayWealthMixin:
             self.change_balance(amount)
             print("\n")
             return
+        if self.has_item("Flask of Bonus Fortune"):
+            print("\n")
+            type.type("The " + cyan(bright("Flask of Bonus Fortune")) + " radiates warmth. Money seems to flow toward you today — loose change on the ground, a forgotten bill in your old jacket.")
+            self.change_balance(random.randint(5, 25))
+            print("\n")
         variant = random.randrange(3)
         if variant == 0:
             type.type("A man in a cheap suit approaches your car, waving a stack of papers.")
@@ -337,6 +354,13 @@ class DayWealthMixin:
         type.type("The anxiety gnaws at you all morning. ")
         self.lose_sanity(random.choice([1, 2]))  # Money anxiety chips away at sanity
         print("\n")
+        if self.has_item("Delight Manipulator") or self.has_item("Delight Indicator"):
+            gauge = "Delight Manipulator" if self.has_item("Delight Manipulator") else "Delight Indicator"
+            print("\n")
+            type.type("You glance at the " + cyan(bright(gauge)) + ". The needle swings wildly — euphoric, terrified, euphoric, terrified.")
+            print("\n")
+            type.type("You could adjust it. Dial down the fear. But would that be living, or just lying to yourself?")
+            self.restore_sanity(2)
         if random.randrange(2) == 0:
             type.type("You spend the day paranoid, jumping at every sound. It's exhausting.")
             self.hurt(10)
@@ -934,6 +958,16 @@ class DayWealthMixin:
             print("\n")
             type.type("They lose you entirely. You're a ghost in their system.")
             self.restore_sanity(8)
+            print("\n")
+            return
+        if self.has_item("Sneaky Peeky Goggles") or self.has_item("Sneaky Peeky Shades"):
+            lenses = "Sneaky Peeky Goggles" if self.has_item("Sneaky Peeky Goggles") else "Sneaky Peeky Shades"
+            type.type("Through your " + cyan(bright(lenses)) + ", you see what others can't — the hidden cameras, the undercover security, the one-way mirrors.")
+            print("\n")
+            type.type("You map every blind spot in the casino's surveillance. Every angle they can't cover. Every safe route.")
+            print("\n")
+            type.type("They're watching everyone. But you're watching them watching.")
+            self.restore_sanity(6)
             print("\n")
             return
         variant = random.randrange(3)

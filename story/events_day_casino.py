@@ -113,6 +113,31 @@ class DayCasinoMixin:
         # EVENT: Internal monologue about the weight and thrill of having $500k+
         # EFFECTS: Atmospheric only - builds tension as you approach the million dollar goal
         # Everytime - internal monologue
+
+        # COMBO: Gold Chain + Velvet Gloves + Sapphire Watch = High Roller
+        if self.has_item("Gold Chain") and (self.has_item("Velvet Gloves") or self.has_item("Worn Gloves")) and (self.has_item("Sapphire Watch") or self.has_item("Golden Watch")):
+            gloves = "Velvet Gloves" if self.has_item("Velvet Gloves") else "Worn Gloves"
+            watch = "Sapphire Watch" if self.has_item("Sapphire Watch") else "Golden Watch"
+            type.type("High Roller mode. The " + cyan(bright("Gold Chain")) + " catches the casino light. The " + cyan(bright(gloves)) + " grip the chips like they were born to. The " + cyan(bright(watch)) + " says you have all the time in the world.")
+            print("\n")
+            type.type("The pit boss nods at you. The waitress brings your drink before you ask. The other gamblers make room at the table.")
+            print("\n")
+            type.type("You sit down like you own the place. Tonight, maybe you do.")
+            self.restore_sanity(10)
+            bonus = random.randint(100, 500)
+            self.change_balance(bonus)
+            type.type(" " + green(bright("VIP comps: ${:,}".format(bonus))))
+            print("\n")
+            return
+
+        if self.has_item("Flask of Dealer's Hesitation"):
+            type.type("The " + cyan(bright("Flask of Dealer's Hesitation")) + " pulses against your chest.")
+            print("\n")
+            type.type("You can feel the Dealer's doubt from here. Every decision he makes, the flask makes him reconsider.")
+            print("\n")
+            type.type("The air at the table feels thick with hesitation. Like time is moving through honey.")
+            self.restore_sanity(3)
+            print("\n")
         variant = random.randrange(4)
         if variant == 0:
             type.type("You sit up in your car and feel it immediately: today is going to be big. Good or bad, you're not sure. But BIG.")
@@ -134,6 +159,10 @@ class DayCasinoMixin:
             type.type("You feel like you're in the final act of a movie. The climax is coming. You can feel it in your bones.")
             print("\n")
             type.type("Whether it's a happy ending or a tragedy... well. That's up to you.")
+        if self.has_item("Flask of Imminent Blackjack"):
+            print("\n")
+            type.type("The " + cyan(bright("Flask of Imminent Blackjack")) + " hums in your pocket. The cards feel warmer. Closer. Like they WANT to come to you.")
+            self.restore_sanity(2)
         if self.has_item("Flask of Second Chance"):
             print("\n")
             type.type("The " + cyan(bright("Flask of Second Chance")) + " shifts in your pocket. Time hiccups, just slightly.")
@@ -171,6 +200,14 @@ class DayCasinoMixin:
             type.type("The security team apologizes.")
             self.restore_sanity(5)
             return
+        if self.has_item("Flask of Split Serum"):
+            type.type("The " + cyan(bright("Flask of Split Serum")) + " vibrates at the card table.")
+            print("\n")
+            type.type("Your hand splits like a living thing. Two hands, twice the power. The Serum knows when the cards want to divide.")
+            print("\n")
+            type.type("The other players stare. " + quote("How does he always know when to split?"))
+            self.restore_sanity(3)
+            print("\n")
         variant = random.randrange(3)
         if variant == 0:
             type.type("A security car does a slow drive-by. The guard makes eye contact with you, holds it for a beat too long, then drives on.")
@@ -189,6 +226,10 @@ class DayCasinoMixin:
             type.type("The " + cyan(bright("Flask of Pocket Aces")) + " pulses with twin heartbeats against your chest. Two aces, waiting.")
             print("\n")
             type.type("Whatever they're planning, you've got something they can't see coming.")
+        if self.has_item("Flask of Dealer's Whispers"):
+            print("\n")
+            type.type("The " + cyan(bright("Flask of Dealer's Whispers")) + " vibrates against your hip. You swear you can hear the Dealer's voice, faint but clear: " + quote("Eighteen."))
+            self.restore_sanity(2)
         if self.has_item("Radio Jammer"):
             print("\n")
             type.type("You flip the " + cyan(bright("Radio Jammer")) + " in your pocket. The surveillance van's radio dies. Backup never arrives.")
@@ -260,6 +301,11 @@ class DayCasinoMixin:
         print("\n")
         type.type("But he asked about you. Left an address. A request.")
         print("\n")
+        if self.has_item("Flask of Dealer's Hesitation"):
+            print("\n")
+            type.type("The " + cyan(bright("Flask of Dealer's Hesitation")) + " trembles. Somewhere, the Dealer paused mid-deal. Something about you makes even him uncertain.")
+            self.restore_sanity(2)
+            print("\n")
         answer = ask.yes_or_no("Visit him? ")
         if answer == "yes":
             type.type("He's at home. Hospice care. He looks so small in the hospital bed.")

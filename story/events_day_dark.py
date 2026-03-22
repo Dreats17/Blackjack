@@ -434,6 +434,11 @@ class DayDarkMixin:
         print("\n")
         type.type("No more...")
         print("\n")
+        if self.has_item("Flask of Second Chance"):
+            print("\n")
+            type.type("The " + cyan(bright("Flask of Second Chance")) + " burns hot against your chest. A reminder: you've been given another shot. Don't waste it.")
+            self.restore_sanity(3)
+            print("\n")
         answer = ask.option("", ["climb the railing", "call someone", "walk away"])
         if answer == "climb the railing":
             type.type("You climb over the railing. The metal is cold. The wind pushes at you.")
@@ -585,6 +590,11 @@ class DayDarkMixin:
         print("\n")
         type.type("He doesn't finish the sentence. He doesn't have to.")
         print("\n")
+        if self.has_item("Shiv"):
+            print("\n")
+            type.type("Your hand finds the " + cyan(bright("Shiv")) + " in your pocket. The blade is small but the message is clear: you're not defenseless.")
+            self.restore_sanity(3)
+            print("\n")
         answer = ask.option("What do you do? ", ["agree to leave", "offer money", "fight back"])
         if answer == "agree to leave":
             type.type(quote("Smart. I like smart people. They live longer."))
@@ -836,6 +846,14 @@ class DayDarkMixin:
         type.type("Morning comes. You're exhausted but alive. Was anyone ever really after you?")
         print("\n")
         type.type("Does it matter? The fear was real.")
+        if self.has_item("Worry Stone"):
+            print("\n")
+            type.type("You grip the " + cyan(bright("Worry Stone")) + " in your pocket. Thumb finds the groove. Round and round.")
+            print("\n")
+            type.type("The panic doesn't vanish — but it shrinks. Manageable. You breathe.")
+            self.lose_sanity(3)
+            print("\n")
+            return
         self.lose_sanity(10)
         print("\n")
 
@@ -893,6 +911,38 @@ class DayDarkMixin:
             else:
                 self.change_balance(300)
                 type.type("You pocket $300 in confiscated 'evidence' and walk away clean.")
+            print("\n")
+            return
+
+        # COMBO: Scrap Armor + Road Flare Torch = Blazing Knight
+        if self.has_item("Scrap Armor") and self.has_item("Road Flare Torch"):
+            type.type("You light the " + cyan(bright("Road Flare Torch")) + " and hold it high. The " + cyan(bright("Scrap Armor")) + " catches the flickering red glow.")
+            print("\n")
+            type.type("You look like a knight who crawled out of a junkyard bonfire. The muggers take one look and decide they have somewhere else to be.")
+            print("\n")
+            type.type("Nobody fights the burning man in homemade plate mail. Nobody.")
+            self.use_item("Road Flare Torch")
+            self.restore_sanity(10)
+            print("\n")
+            return
+
+        # COMBO: Shiv + Scrap Armor = Armed and Armored
+        if self.has_item("Shiv") and self.has_item("Scrap Armor"):
+            type.type("Blade in one hand. " + cyan(bright("Scrap Armor")) + " covering your vitals. The " + cyan(bright("Shiv")) + " catches the streetlight.")
+            print("\n")
+            type.type("The three men reassess the situation. You're armed. You're armored. You're not afraid.")
+            print("\n")
+            type.type(quote("Not worth it,") + " the leader mutters. They melt back into the darkness.")
+            self.restore_sanity(8)
+            print("\n")
+            return
+
+        if self.has_item("Worn Gloves") or self.has_item("Velvet Gloves"):
+            gloves = "Velvet Gloves" if self.has_item("Velvet Gloves") else "Worn Gloves"
+            type.type("Gloved fingers leave no prints. The " + cyan(bright(gloves)) + " ensure your touch is invisible.")
+            print("\n")
+            type.type(quote("Nothing here links you to anything,") + " the detective admits.")
+            self.restore_sanity(5)
             print("\n")
             return
 
@@ -1006,6 +1056,21 @@ class DayDarkMixin:
             print("\n")
             type.type("Three figures materialize from the shadows behind you. They heard nothing. They see nothing. You exit the alley in perfect silence, a ghost in a city that never knew you passed through.")
             self.restore_sanity(7)
+            print("\n")
+            return
+
+        if self.has_item("Smelling Salts"):
+            type.type("You step into the alley. Halfway through, three shapes materialize. Hoodies. A knife.")
+            print("\n")
+            type.type("One of them cracks you in the back of the head. Your vision goes dark. You start to fall.")
+            print("\n")
+            type.type("But the " + cyan(bright("Smelling Salts")) + " in your pocket crack on impact. The ammonia jolt hits your brain like lightning.")
+            print("\n")
+            type.type("Your eyes snap open. You're on the ground but AWAKE. You roll, scramble, sprint.")
+            print("\n")
+            type.type("They didn't expect you to get up. By the time they react, you're gone.")
+            self.hurt(8)
+            self.restore_sanity(3)
             print("\n")
             return
 
@@ -1203,6 +1268,14 @@ class DayDarkMixin:
             type.type("You're not a victim here — you're an authority.")
             self.restore_sanity(5)
             self.change_balance(200)
+            return
+        if self.has_item("Sneaky Peeky Goggles") or self.has_item("Sneaky Peeky Shades"):
+            lenses = "Sneaky Peeky Goggles" if self.has_item("Sneaky Peeky Goggles") else "Sneaky Peeky Shades"
+            type.type("Your " + cyan(bright(lenses)) + " catch a reflection — someone's crouching behind the counter with a weapon.")
+            print("\n")
+            type.type("You quietly back out of the gas station before the situation unfolds. Crisis averted.")
+            self.restore_sanity(5)
+            print("\n")
             return
         warner = self._lists.has_companion_with_bonus(self, "danger_warning")
         if warner and self.get_companion(warner)["status"] == "alive" and random.randrange(3) == 0:
@@ -1899,9 +1972,14 @@ class DayDarkMixin:
             type.type("Someone runs over with a stick. Beats the dog off you. It finally lets go and runs.")
             print("\n")
             type.type("Your arm is a mess of blood and torn muscle. You can see bone.")
-            if self.has_item("Scrap Armor"):
+            if self.has_item("Scrap Armor") or self.has_item("Plated Vest") or self.has_item("Road Warrior Plate"):
+                armor_name = "Scrap Armor" if self.has_item("Scrap Armor") else ("Plated Vest" if self.has_item("Plated Vest") else "Road Warrior Plate")
                 type.type(" The makeshift padding took the worst of it.")
                 self.hurt(20)
+                evolved = self.track_item_use(armor_name)
+                if evolved:
+                    print("\n")
+                    type.type(cyan(bright(self.get_evolution_text(evolved[0], evolved[1]))))
             else:
                 self.hurt(40)
             self.lose_sanity(15)
@@ -1939,9 +2017,14 @@ class DayDarkMixin:
             type.type("You jump back, heart pounding. That could have killed you.")
             print("\n")
             type.type("You report the hazard to the shop owner. They seem unimpressed.")
-            if self.has_item("Scrap Armor"):
+            if self.has_item("Scrap Armor") or self.has_item("Plated Vest") or self.has_item("Road Warrior Plate"):
+                armor_name = "Scrap Armor" if self.has_item("Scrap Armor") else ("Plated Vest" if self.has_item("Plated Vest") else "Road Warrior Plate")
                 type.type(" Your jury-rigged gear absorbed some of the shock.")
                 self.hurt(4)
+                evolved = self.track_item_use(armor_name)
+                if evolved:
+                    print("\n")
+                    type.type(cyan(bright(self.get_evolution_text(evolved[0], evolved[1]))))
             else:
                 self.hurt(10)
             self.lose_sanity(8)
@@ -2055,6 +2138,17 @@ class DayDarkMixin:
         # CONDITIONAL DEATH - Consequence of earlier event
         if not self.has_danger("Knife Wound"):
             self.day_event()
+            return
+        if self.has_item("Wound Salve"):
+            type.type("You check the knife wound in the car mirror. It's angry. Red. But you have the " + cyan(bright("Wound Salve")) + ".")
+            print("\n")
+            type.type("You slather it on thick. It stings — then soothes. The swelling fades within the hour.")
+            print("\n")
+            type.type("Not a hospital. But maybe you don't need one.")
+            self.use_item("Wound Salve")
+            self.hurt(10)
+            self.remove_danger("Knife Wound")
+            print("\n")
             return
         type.type("You check yourself in the car mirror. That knife wound from the mugging isn't healing right.")
         print("\n")
@@ -2751,6 +2845,43 @@ class DayDarkMixin:
             print("\n")
             type.type("But it's warmer now than when you picked it up. Like it noticed you almost went through with it.")
             self.lose_sanity(3)
+        print("\n")
+
+    # ==========================================
+    # WRONG ITEM COMEDY EVENTS
+    # ==========================================
+
+    def wrong_item_road_flares_stealth(self):
+        if not self.has_item("Road Flares"):
+            self.day_event()
+            return
+        type.type("You're sneaking through a dark area when you realize you can't see. Naturally, you light a " + cyan(bright("Road Flare")) + ".")
+        print("\n")
+        type.type("Every creature, person, and possibly satellite in a one-mile radius turns toward the bright red glow.")
+        print("\n")
+        type.type("So much for stealth.")
+        print("\n")
+        self.lose_sanity(10)
+        type.type("A raccoon stares at you from ten feet away, completely unafraid. You've ruined the concept of darkness.")
+        print("\n")
+
+    def wrong_item_necronomicon_loan_shark(self):
+        if not self.has_item("Necronomicon"):
+            self.day_event()
+            return
+        type.type("The loan shark demands payment. You reach into your bag for collateral.")
+        print("\n")
+        type.type("You pull out the " + cyan(bright("Necronomicon")) + ".")
+        print("\n")
+        type.type("The loan shark's eyes go white. His mouth hangs open.")
+        print("\n")
+        type.type("The book opens by itself. A page turns. The loan shark reads the first line.")
+        print("\n")
+        type.type("He tears up the contract. " + quote("We're even,") + " he whispers. " + quote("Please leave."))
+        print("\n")
+        self.change_balance(200)
+        self.lose_sanity(15)
+        type.type("You close the book. Something inside it chuckles. That can't be right.")
         print("\n")
 
     # === HIGH ROLLER KEYCARD CHAIN ===

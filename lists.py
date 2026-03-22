@@ -2755,6 +2755,21 @@ class Lists:
         # CAR TROUBLE FOLLOW-UPS - Poor Tier
         a_list.append("nail_in_tire_blows")
         a_list.append("failing_starter_dies")
+        # SECTION 45 — REWRITTEN ITEM EVENTS - Poor Tier
+        a_list.append("low_profile_shelter_meal")
+        a_list.append("beach_bum_heatwave")
+        a_list.append("beach_bum_tribe")
+        a_list.append("outdoor_shield_farmer")
+        a_list.append("cool_down_car_overheat")
+        a_list.append("vermin_bomb_car")
+        # SECTION 44A — WILD ITEM INTERACTIONS - Poor Tier
+        a_list.append("wild_headlamp_poker")
+        a_list.append("wild_fortune_cards_car")
+        a_list.append("lottery_ticket_check")
+        # WRONG ITEM COMEDY EVENTS - Poor Tier
+        a_list.append("wrong_item_bug_spray_campfire")
+        a_list.append("wrong_item_road_flares_stealth")
+        a_list.append("wrong_item_dog_whistle_bear")
         random.shuffle(a_list)
         return a_list
     
@@ -3109,6 +3124,34 @@ class Lists:
         a_list.append("bald_tires_hydroplane")
         a_list.append("nail_in_tire_blows")
         a_list.append("failing_starter_dies")
+        # SECTION 45 — REWRITTEN ITEM EVENTS - Cheap Tier
+        a_list.append("low_profile_casino_blend")
+        a_list.append("low_profile_police_encounter")
+        a_list.append("low_profile_mugging_marcus")
+        a_list.append("low_profile_shelter_meal")
+        a_list.append("beach_bum_heatwave")
+        a_list.append("beach_bum_tribe")
+        a_list.append("gas_mask_fire_rescue")
+        a_list.append("storm_suit_hurricane")
+        a_list.append("storm_suit_flood")
+        a_list.append("storm_suit_night_bear")
+        a_list.append("antacid_business_dinner")
+        a_list.append("outdoor_shield_farmer")
+        a_list.append("cool_down_car_overheat")
+        a_list.append("smoke_flare_pursuit")
+        a_list.append("vermin_bomb_car")
+        # SECTION 44A — WILD ITEM INTERACTIONS - Cheap Tier
+        a_list.append("wild_headlamp_poker")
+        a_list.append("wild_evidence_kit_wedding")
+        a_list.append("wild_gas_mask_funeral")
+        a_list.append("wild_devil_deck_children")
+        a_list.append("wild_fortune_cards_car")
+        a_list.append("lottery_ticket_check")
+        # WRONG ITEM COMEDY EVENTS - Cheap Tier
+        a_list.append("wrong_item_bug_spray_campfire")
+        a_list.append("wrong_item_road_flares_stealth")
+        a_list.append("wrong_item_pest_control_romance")
+        a_list.append("wrong_item_dog_whistle_bear")
         random.shuffle(a_list)
         return a_list
     
@@ -3485,6 +3528,53 @@ class Lists:
         a_list.append("failing_fuel_pump_dies")
         a_list.append("broken_ball_joint_breaks")
         a_list.append("failing_starter_dies")
+        # SECTION 45 — REWRITTEN ITEM EVENTS - Modest Tier
+        a_list.append("low_profile_casino_blend")
+        a_list.append("low_profile_police_encounter")
+        a_list.append("low_profile_mugging_marcus")
+        a_list.append("low_profile_shelter_meal")
+        a_list.append("beach_bum_yacht_party")
+        a_list.append("beach_bum_heatwave")
+        a_list.append("beach_bum_tribe")
+        a_list.append("gas_mask_toxic_spill")
+        a_list.append("gas_mask_fire_rescue")
+        a_list.append("storm_suit_hurricane")
+        a_list.append("storm_suit_flood")
+        a_list.append("storm_suit_night_bear")
+        a_list.append("antacid_business_dinner")
+        a_list.append("outdoor_shield_farmer")
+        a_list.append("cool_down_car_overheat")
+        a_list.append("smoke_flare_pursuit")
+        a_list.append("vermin_bomb_car")
+        a_list.append("enchanted_vintage_party")
+        a_list.append("power_move_intimidation")
+        a_list.append("animal_magnetism_recruit")
+        a_list.append("animal_magnetism_predator")
+        a_list.append("power_grid_dead_battery")
+        a_list.append("mobile_workshop_stranger")
+        a_list.append("pursuit_package_chase")
+        a_list.append("pursuit_package_witness")
+        # SECTION 44A — WILD ITEM INTERACTIONS - Modest Tier
+        a_list.append("wild_headlamp_poker")
+        a_list.append("wild_emp_casino")
+        a_list.append("wild_radio_jammer_police")
+        a_list.append("wild_evidence_kit_wedding")
+        a_list.append("wild_distress_beacon_casino")
+        a_list.append("wild_stink_bomb_casino_vault")
+        a_list.append("wild_gas_mask_funeral")
+        a_list.append("wild_eldritch_candle_gambling")
+        a_list.append("wild_devil_deck_children")
+        a_list.append("wild_binding_portrait_shopkeeper")
+        a_list.append("wild_fortune_cards_car")
+        a_list.append("wild_blackmail_letter_companion")
+        a_list.append("lottery_ticket_check")
+        # WRONG ITEM COMEDY EVENTS - Modest Tier
+        a_list.append("wrong_item_bug_spray_campfire")
+        a_list.append("wrong_item_road_flares_stealth")
+        a_list.append("wrong_item_pest_control_romance")
+        a_list.append("wrong_item_dirty_hat_dinner")
+        a_list.append("wrong_item_dog_whistle_bear")
+        a_list.append("wrong_item_necronomicon_loan_shark")
         random.shuffle(a_list)
         return a_list
     
@@ -3795,6 +3885,51 @@ class Lists:
         a_list.append("bald_tires_hydroplane")
         a_list.append("failing_fuel_pump_dies")
         a_list.append("broken_ball_joint_breaks")
+        # SECTION 45 — REWRITTEN ITEM EVENTS - Rich Tier
+        a_list.append("low_profile_casino_blend")
+        a_list.append("low_profile_police_encounter")
+        a_list.append("low_profile_mugging_marcus")
+        a_list.append("low_profile_shelter_meal")
+        a_list.append("beach_bum_yacht_party")
+        a_list.append("beach_bum_heatwave")
+        a_list.append("beach_bum_tribe")
+        a_list.append("gas_mask_toxic_spill")
+        a_list.append("gas_mask_fire_rescue")
+        a_list.append("storm_suit_hurricane")
+        a_list.append("storm_suit_flood")
+        a_list.append("storm_suit_night_bear")
+        a_list.append("antacid_business_dinner")
+        a_list.append("outdoor_shield_farmer")
+        a_list.append("cool_down_car_overheat")
+        a_list.append("smoke_flare_pursuit")
+        a_list.append("vermin_bomb_car")
+        a_list.append("enchanted_vintage_party")
+        a_list.append("aristocrat_cold_elegance")
+        a_list.append("power_move_intimidation")
+        a_list.append("animal_magnetism_recruit")
+        a_list.append("animal_magnetism_predator")
+        a_list.append("power_grid_dead_battery")
+        a_list.append("mobile_workshop_stranger")
+        a_list.append("pursuit_package_chase")
+        a_list.append("pursuit_package_witness")
+        # SECTION 44A — WILD ITEM INTERACTIONS - Rich Tier
+        a_list.append("wild_headlamp_poker")
+        a_list.append("wild_emp_casino")
+        a_list.append("wild_radio_jammer_police")
+        a_list.append("wild_evidence_kit_wedding")
+        a_list.append("wild_distress_beacon_casino")
+        a_list.append("wild_stink_bomb_casino_vault")
+        a_list.append("wild_gas_mask_funeral")
+        a_list.append("wild_eldritch_candle_gambling")
+        a_list.append("wild_devil_deck_children")
+        a_list.append("wild_binding_portrait_shopkeeper")
+        a_list.append("wild_fortune_cards_car")
+        a_list.append("wild_blackmail_letter_companion")
+        a_list.append("lottery_ticket_check")
+        # WRONG ITEM COMEDY EVENTS - Rich Tier
+        a_list.append("wrong_item_pest_control_romance")
+        a_list.append("wrong_item_dirty_hat_dinner")
+        a_list.append("wrong_item_necronomicon_loan_shark")
         random.shuffle(a_list)
         return a_list
     
@@ -4109,6 +4244,50 @@ class Lists:
         a_list.append("failing_fuel_pump_dies")
         a_list.append("broken_ball_joint_breaks")
         a_list.append("bald_tires_hydroplane")
+        # SECTION 45 — REWRITTEN ITEM EVENTS - Doughman Tier
+        a_list.append("low_profile_casino_blend")
+        a_list.append("low_profile_police_encounter")
+        a_list.append("low_profile_mugging_marcus")
+        a_list.append("low_profile_shelter_meal")
+        a_list.append("beach_bum_yacht_party")
+        a_list.append("beach_bum_heatwave")
+        a_list.append("beach_bum_tribe")
+        a_list.append("gas_mask_toxic_spill")
+        a_list.append("gas_mask_fire_rescue")
+        a_list.append("storm_suit_hurricane")
+        a_list.append("storm_suit_flood")
+        a_list.append("storm_suit_night_bear")
+        a_list.append("antacid_business_dinner")
+        a_list.append("outdoor_shield_farmer")
+        a_list.append("cool_down_car_overheat")
+        a_list.append("smoke_flare_pursuit")
+        a_list.append("vermin_bomb_car")
+        a_list.append("enchanted_vintage_party")
+        a_list.append("aristocrat_cold_elegance")
+        a_list.append("power_move_intimidation")
+        a_list.append("animal_magnetism_recruit")
+        a_list.append("animal_magnetism_predator")
+        a_list.append("power_grid_dead_battery")
+        a_list.append("mobile_workshop_stranger")
+        a_list.append("pursuit_package_chase")
+        a_list.append("pursuit_package_witness")
+        # SECTION 44A — WILD ITEM INTERACTIONS - Doughman Tier
+        a_list.append("wild_headlamp_poker")
+        a_list.append("wild_emp_casino")
+        a_list.append("wild_radio_jammer_police")
+        a_list.append("wild_evidence_kit_wedding")
+        a_list.append("wild_distress_beacon_casino")
+        a_list.append("wild_stink_bomb_casino_vault")
+        a_list.append("wild_gas_mask_funeral")
+        a_list.append("wild_eldritch_candle_gambling")
+        a_list.append("wild_devil_deck_children")
+        a_list.append("wild_binding_portrait_shopkeeper")
+        a_list.append("wild_fortune_cards_car")
+        a_list.append("wild_blackmail_letter_companion")
+        a_list.append("lottery_ticket_check")
+        # WRONG ITEM COMEDY EVENTS - Doughman Tier
+        a_list.append("wrong_item_dirty_hat_dinner")
+        a_list.append("wrong_item_necronomicon_loan_shark")
         random.shuffle(a_list)
         return a_list
     
@@ -4392,6 +4571,47 @@ class Lists:
         a_list.append("broken_ball_joint_breaks")
         a_list.append("failing_fuel_pump_dies")
         a_list.append("bald_tires_hydroplane")
+        # SECTION 45 — REWRITTEN ITEM EVENTS - Nearly There Tier
+        a_list.append("low_profile_casino_blend")
+        a_list.append("low_profile_police_encounter")
+        a_list.append("low_profile_mugging_marcus")
+        a_list.append("low_profile_shelter_meal")
+        a_list.append("beach_bum_yacht_party")
+        a_list.append("beach_bum_heatwave")
+        a_list.append("beach_bum_tribe")
+        a_list.append("gas_mask_toxic_spill")
+        a_list.append("gas_mask_fire_rescue")
+        a_list.append("storm_suit_hurricane")
+        a_list.append("storm_suit_flood")
+        a_list.append("storm_suit_night_bear")
+        a_list.append("antacid_business_dinner")
+        a_list.append("outdoor_shield_farmer")
+        a_list.append("cool_down_car_overheat")
+        a_list.append("smoke_flare_pursuit")
+        a_list.append("vermin_bomb_car")
+        a_list.append("enchanted_vintage_party")
+        a_list.append("aristocrat_cold_elegance")
+        a_list.append("power_move_intimidation")
+        a_list.append("animal_magnetism_recruit")
+        a_list.append("animal_magnetism_predator")
+        a_list.append("power_grid_dead_battery")
+        a_list.append("mobile_workshop_stranger")
+        a_list.append("pursuit_package_chase")
+        a_list.append("pursuit_package_witness")
+        # SECTION 44A — WILD ITEM INTERACTIONS - Nearly There Tier
+        a_list.append("wild_headlamp_poker")
+        a_list.append("wild_emp_casino")
+        a_list.append("wild_radio_jammer_police")
+        a_list.append("wild_evidence_kit_wedding")
+        a_list.append("wild_distress_beacon_casino")
+        a_list.append("wild_stink_bomb_casino_vault")
+        a_list.append("wild_gas_mask_funeral")
+        a_list.append("wild_eldritch_candle_gambling")
+        a_list.append("wild_devil_deck_children")
+        a_list.append("wild_binding_portrait_shopkeeper")
+        a_list.append("wild_fortune_cards_car")
+        a_list.append("wild_blackmail_letter_companion")
+        a_list.append("lottery_ticket_check")
         random.shuffle(a_list)
         return a_list
     
@@ -4762,6 +4982,57 @@ class Lists:
         "immortal_vehicle_breakdown": [0, 0, 0, 1, 2, 3],
         "gamblers_aura_blackjack": [0, 0, 1, 2, 2, 2],
         "guardian_angel_lethal":   [0, 0, 0, 0, 2, 3],
+
+        # ── SECTION 45 — REWRITTEN ITEM EVENTS ────────────────────────────────
+        "low_profile_casino_blend":       [0, 1, 2, 2, 1, 1],
+        "low_profile_police_encounter":   [0, 1, 2, 2, 1, 1],
+        "low_profile_mugging_marcus":     [0, 1, 2, 2, 1, 1],
+        "low_profile_shelter_meal":       [1, 1, 2, 1, 0, 0],
+        "beach_bum_yacht_party":          [0, 0, 1, 2, 2, 1],
+        "beach_bum_heatwave":             [1, 1, 2, 1, 1, 1],
+        "beach_bum_tribe":                [1, 1, 2, 1, 1, 1],
+        "gas_mask_toxic_spill":           [0, 0, 1, 2, 2, 1],
+        "gas_mask_fire_rescue":           [0, 0, 1, 2, 2, 1],
+        "storm_suit_hurricane":           [0, 1, 2, 2, 1, 1],
+        "storm_suit_flood":               [0, 1, 2, 2, 1, 1],
+        "storm_suit_night_bear":          [0, 1, 2, 2, 1, 1],
+        "antacid_business_dinner":        [0, 1, 2, 2, 1, 1],
+        "outdoor_shield_farmer":          [1, 1, 2, 2, 1, 1],
+        "cool_down_car_overheat":         [1, 1, 2, 2, 1, 1],
+        "smoke_flare_pursuit":            [0, 1, 2, 2, 1, 1],
+        "vermin_bomb_car":                [1, 1, 2, 1, 1, 1],
+        "enchanted_vintage_party":        [0, 0, 1, 2, 2, 2],
+        "aristocrat_cold_elegance":       [0, 0, 0, 2, 2, 2],
+        "power_move_intimidation":        [0, 0, 1, 2, 2, 1],
+        "animal_magnetism_recruit":       [0, 0, 1, 2, 2, 1],
+        "animal_magnetism_predator":      [0, 0, 1, 2, 2, 1],
+        "power_grid_dead_battery":        [0, 0, 1, 2, 2, 1],
+        "mobile_workshop_stranger":       [0, 0, 1, 2, 2, 1],
+        "pursuit_package_chase":          [0, 0, 1, 2, 2, 1],
+        "pursuit_package_witness":        [0, 0, 1, 2, 2, 1],
+        # ── SECTION 44A — WILD ITEM INTERACTIONS ─────────────────────────────
+        "wild_headlamp_poker":            [1, 2, 2, 1, 1, 1],
+        "wild_emp_casino":                [0, 0, 1, 2, 2, 1],
+        "wild_radio_jammer_police":       [0, 0, 1, 2, 2, 1],
+        "wild_evidence_kit_wedding":      [0, 1, 2, 2, 1, 1],
+        "wild_distress_beacon_casino":    [0, 0, 1, 2, 2, 1],
+        "wild_stink_bomb_casino_vault":   [0, 0, 1, 2, 2, 1],
+        "wild_gas_mask_funeral":          [0, 1, 2, 2, 1, 1],
+        "wild_eldritch_candle_gambling":  [0, 0, 1, 2, 2, 1],
+        "wild_devil_deck_children":       [0, 1, 2, 2, 1, 1],
+        "wild_binding_portrait_shopkeeper":[0, 0, 1, 2, 2, 1],
+        "wild_fortune_cards_car":         [1, 1, 2, 2, 1, 1],
+        "wild_blackmail_letter_companion":[0, 0, 1, 2, 2, 1],
+        "lottery_ticket_check":           [2, 2, 1, 1, 1, 1],
+
+        # ── WRONG ITEM COMEDY ──────────────────────────────────────────────────
+        # Comedy-of-errors events: using an item in the wrong context.
+        "wrong_item_bug_spray_campfire":      [1, 1, 1, 0, 0, 0],
+        "wrong_item_road_flares_stealth":     [1, 1, 1, 0, 0, 0],
+        "wrong_item_pest_control_romance":    [0, 1, 1, 1, 0, 0],
+        "wrong_item_dirty_hat_dinner":        [0, 0, 1, 1, 1, 0],
+        "wrong_item_dog_whistle_bear":        [1, 1, 1, 0, 0, 0],
+        "wrong_item_necronomicon_loan_shark": [0, 0, 1, 1, 1, 0],
     }
 
     # ── INVENTORY-AWARE POOL EVENTS ─────────────────────────────────────────────

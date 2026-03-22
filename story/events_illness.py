@@ -1261,6 +1261,13 @@ class IllnessMixin:
             type.type(green("Clean water. No illness today."))
             self.start_night()
             return
+        if self.has_item("Rain Collector"):
+            print("\n")
+            type.type("But wait — you've been drinking from your " + cyan(bright("Rain Collector")) + " all day. Purified rainwater, not that contaminated swill.")
+            print("\n")
+            type.type(green("Your gut is fine. The Rain Collector saved you from a miserable night."))
+            self.start_night()
+            return
         self.add_status("Waterborne Illness")
         self.hurt(18)
         self.start_night()

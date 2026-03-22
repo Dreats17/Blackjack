@@ -415,6 +415,28 @@ class DayPeopleMixin:
             print("\n")
             return
 
+        # COMBO: Deck of Cards + Dealer's Mercy = Dealer's Game
+        if self.has_item("Deck of Cards") and (self.has_item("Dealer's Mercy") or self.has_item("Dealer's Grudge")):
+            mercy = "Dealer's Mercy" if self.has_item("Dealer's Mercy") else "Dealer's Grudge"
+            type.type("You pull out your " + cyan(bright("Deck of Cards")) + ". The " + cyan(bright(mercy)) + " pulses in your pocket.")
+            print("\n")
+            type.type(quote("Care for a game?") + " you ask. The stranger looks at the cards. Something in your eyes makes them say yes.")
+            print("\n")
+            type.type("Dealer's Game. You deal with the confidence of someone backed by supernatural authority. The cards obey.")
+            print("\n")
+            if random.randrange(3) != 0:
+                reward = random.randint(100, 500)
+                type.type("You win. Of course you win. The stranger pays up — " + green(bright("${:,}".format(reward))) + " — and walks away shaking their head.")
+                self.change_balance(reward)
+                self.restore_sanity(8)
+            else:
+                type.type("The stranger wins. Impossible — but it happened. They tip their hat and vanish into the crowd.")
+                print("\n")
+                type.type("You check your pocket. The " + cyan(bright(mercy)) + " is cold. Even the Dealer loses sometimes.")
+                self.lose_sanity(3)
+            print("\n")
+            return
+
         if self.has_item("Vintage Wine") and (self.has_item("Gambler's Chalice") or self.has_item("Overflowing Goblet")):
             chalice = "Overflowing Goblet" if self.has_item("Overflowing Goblet") else "Gambler's Chalice"
             self.use_item("Vintage Wine")
@@ -430,6 +452,15 @@ class DayPeopleMixin:
             type.type(quote("I don't know why, but... take this.") + " They hand you " + green(bright("${:,}".format(gift))) + " and walk away looking lighter somehow.")
             self.change_balance(gift)
             self.restore_sanity(12)
+            print("\n")
+            return
+
+        if self.has_item("Worn Gloves") or self.has_item("Velvet Gloves"):
+            gloves = "Velvet Gloves" if self.has_item("Velvet Gloves") else "Worn Gloves"
+            type.type("Your handshake, firm through " + cyan(bright(gloves)) + ", seals the deal before you speak.")
+            print("\n")
+            type.type("Something about a gloved hand makes people trust you. And sign faster.")
+            self.change_balance(random.randint(50, 150))
             print("\n")
             return
 
@@ -574,6 +605,14 @@ class DayPeopleMixin:
             type.type("The math is immediate. They run.")
             self.restore_sanity(5)
             return
+        if self.has_item("Sneaky Peeky Goggles") or self.has_item("Sneaky Peeky Shades"):
+            lenses = "Sneaky Peeky Goggles" if self.has_item("Sneaky Peeky Goggles") else "Sneaky Peeky Shades"
+            type.type("Through your " + cyan(bright(lenses)) + ", you spot the thief before they spot you. The lenses reveal their approach angle, their weapon hand, everything.")
+            print("\n")
+            type.type("You calmly walk to the car from the other side. The thief never knew you were there.")
+            self.restore_sanity(4)
+            print("\n")
+            return
         # COMPANION: Protection check first
         protector = self._lists.has_companion_with_bonus(self, "protection")
         if protector and self.get_companion(protector)["status"] == "alive":
@@ -671,7 +710,8 @@ class DayPeopleMixin:
         has_class = (self.has_item("Leather Gloves") or self.has_item("Silk Handkerchief") or 
                      self.has_item("Gold Chain") or self.has_item("Antique Pocket Watch") or
                      self.has_item("Gentleman's Charm") or self.has_item("Aristocrat's Touch") or
-                     self.has_item("Fancy Cigars") or self.has_item("Vintage Wine"))
+                     self.has_item("Fancy Cigars") or self.has_item("Vintage Wine") or
+                     self.has_item("Worn Gloves") or self.has_item("Velvet Gloves"))
         
         if has_class:
             if self.has_item("Aristocrat's Touch"):
@@ -2191,5 +2231,42 @@ class DayPeopleMixin:
         else:
             type.type("It's been a hard year. But you're still fighting. That counts for something.")
             self.lose_sanity(5)
+        print("\n")
+
+    # ==========================================
+    # WRONG ITEM COMEDY EVENTS
+    # ==========================================
+
+    def wrong_item_pest_control_romance(self):
+        if not self.has_item("Pest Control"):
+            self.day_event()
+            return
+        type.type("You're having a genuinely nice conversation when a cockroach scuttles across the table.")
+        print("\n")
+        type.type("Without thinking, you whip out the " + cyan(bright("Pest Control")) + " and blast the table.")
+        print("\n")
+        type.type("The cockroach dies. So does the mood. And possibly the tablecloth.")
+        print("\n")
+        type.type("Your companion stares at you. " + quote("Why do you carry that?"))
+        print("\n")
+        self.lose_sanity(15)
+        type.type("You pocket the can. " + quote("No reason,") + " you say, too quickly.")
+        print("\n")
+
+    def wrong_item_dirty_hat_dinner(self):
+        if not self.has_item("Dirty Old Hat") and not self.has_item("Unwashed Hair"):
+            self.day_event()
+            return
+        offending_item = "Unwashed Hair" if self.has_item("Unwashed Hair") else "Dirty Old Hat"
+        type.type("You arrive at the formal dinner wearing the " + cyan(bright(offending_item)) + ".")
+        print("\n")
+        type.type("The ma\u00eetre d' physically recoils. " + quote("Sir, we have a dress code."))
+        print("\n")
+        type.type("You adjust it. " + quote("This IS my dress code."))
+        print("\n")
+        type.type("You're escorted out before the appetizers arrive.")
+        print("\n")
+        self.lose_sanity(10)
+        type.type("On the way out, a busboy slips you a bread roll. Solidarity.")
         print("\n")
 

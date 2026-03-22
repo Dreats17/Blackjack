@@ -613,6 +613,19 @@ class DayCompanionsMixin:
             print("\n")
             return
 
+        if self.has_item("Splint"):
+            type.type("You notice " + bright(name) + " favoring one leg. Not sick — injured.")
+            print("\n")
+            type.type("You grab your " + cyan(bright("Splint")) + " and carefully brace the limb. Duct tape and care.")
+            print("\n")
+            type.type(bright(name) + " tests the leg. Gingerly. Then again. It holds.")
+            print("\n")
+            type.type("Not a vet. But good enough for the road.")
+            self.pet_companion(name)
+            self.restore_sanity(5)
+            print("\n")
+            return
+
         if self.has_item("Cough Drops"):
             type.type("1. Use your " + magenta(bright("Cough Drops")) + " to help")
         else:
@@ -1417,6 +1430,21 @@ class DayCompanionsMixin:
         companion = living[name]
         comp_type = companion.get("type", "companion")
         days = companion.get("days_owned", 0)
+
+        # COMBO: Pet Toy + Companion Bed + Feeding Station = Perfect Home
+        if self.has_item("Pet Toy") and self.has_item("Companion Bed") and self.has_item("Feeding Station"):
+            type.type(cyan(bright("Perfect Home.")) + " The " + cyan(bright("Companion Bed")) + " is soft. The " + cyan(bright("Feeding Station")) + " is full. The " + cyan(bright("Pet Toy")) + " is within reach.")
+            print("\n")
+            type.type(bright(name) + " is living their absolute best life. Better than most humans, honestly.")
+            print("\n")
+            type.type("They eat, they play, they sleep in a bed that smells like you. Their tail hasn't stopped wagging in days.")
+            print("\n")
+            type.type("Happiness doesn't decay when you've built a home this good. " + bright(name) + " is content. Permanently.")
+            self._companions[name]["happiness"] = 100
+            self.restore_sanity(20)
+            self.pet_companion(name)
+            print("\n")
+            return
         
         type.type("Late afternoon. The sun is going down. It's quiet.")
         print("\n")
@@ -1458,6 +1486,12 @@ class DayCompanionsMixin:
         self.restore_sanity(15)
         self.heal(10)
         self.pet_companion(name)
+        if self.has_item("Delight Indicator") or self.has_item("Delight Manipulator"):
+            gauge = "Delight Manipulator" if self.has_item("Delight Manipulator") else "Delight Indicator"
+            print("\n")
+            type.type("The " + cyan(bright(gauge)) + " reads " + green("'Content'") + " for the first time in weeks.")
+            print("\n")
+            type.type("Maybe that's enough. Maybe that's everything.")
         if self.has_item("Beast Tamer Kit"):
             print("\n")
             type.type("The " + cyan(bright("Beast Tamer Kit")) + " hasn't left your bag. " + bright(name) + " senses it — the bait, the toy, the whole philosophy of 'patience and treats.'")

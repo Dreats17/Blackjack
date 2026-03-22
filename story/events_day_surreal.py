@@ -84,6 +84,26 @@ class DaySurrealMixin:
     def time_loop(self):
         # EVENT: Experience the same morning 3 times, must break the loop
         # EFFECTS: Save bird = +$50, meet "Time Bird"; Ignore phone = +5 sanity; Scream = -5 sanity
+
+        # COMBO: Oracle's Tome + Deck of Cards = Fortune Reading
+        if (self.has_item("Oracle's Tome") or self.has_item("Gambler's Grimoire")) and self.has_item("Deck of Cards"):
+            tome = "Oracle's Tome" if self.has_item("Oracle's Tome") else "Gambler's Grimoire"
+            type.type("You open the " + cyan(bright(tome)) + " and lay three cards from your " + cyan(bright("Deck of Cards")) + " on top of it.")
+            print(PAR)
+            type.type("Fortune Reading. The pages drink the card faces and replace them with prophecy:")
+            print(PAR)
+            type.type("Card one: " + italic("'A friend in trouble. Help them.'"))
+            print(PAR)
+            type.type("Card two: " + italic("'Money on the ground. Take it.'"))
+            print(PAR)
+            type.type("Card three: " + italic("'The Dealer watches. He always watches.'"))
+            print(PAR)
+            type.type("The cards go blank. The book snaps shut. You don't know if the future changed or if it was always going to happen this way.")
+            self.restore_sanity(12)
+            self.change_balance(random.randint(50, 200))
+            print(PAR)
+            return
+
         if self.has_item("Pocket Watch") or self.has_item("Grandfather Clock"):
             watch = "Pocket Watch" if self.has_item("Pocket Watch") else "Grandfather Clock"
             type.type("The clock on your car dashboard says 8:47 AM. You go to brush your teeth. A bird hits the window. Your phone buzzes. You wake up. The clock says 8:47 AM.")
@@ -171,6 +191,13 @@ class DaySurrealMixin:
         print(PAR)
         type.type("You blink. The reflection is normal again — just you, looking the way a person looks when they've seen something they cannot explain.")
         print(PAR)
+        if self.has_item("Flask of Split Serum"):
+            print("\n")
+            type.type("The " + cyan(bright("Flask of Split Serum")) + " fizzes in your pocket. For a moment you see TWO of everything — two roads, two choices, two versions of yourself.")
+            print("\n")
+            type.type("Both of them are you. Neither of them is sure which is real.")
+            self.restore_sanity(1)
+            print(PAR)
         if self.has_item("Twin's Locket") or self.has_item("Mirror of Duality"):
             locket = "Twin's Locket" if self.has_item("Twin's Locket") else "Mirror of Duality"
             type.type("You reach for the " + cyan(bright(locket)) + " around your neck. It falls open on its own. Inside: two tiny portraits facing each other, and in both portraits, the reflection is also looking back at you.")
@@ -217,6 +244,15 @@ class DaySurrealMixin:
         # EFFECTS: Random - money change (-$100 to +$200), health (-15 to +25), time skip, or identity confusion (-10 sanity)
         if self.get_sanity() >= 50:
             self.day_event()
+            return
+        if self.has_item("Smelling Salts"):
+            type.type("Reality stutters. Colors shift. Your vision swims.")
+            print("\n")
+            type.type("You crack the " + cyan(bright("Smelling Salts")) + " under your nose. One whiff and reality snaps back into focus.")
+            print("\n")
+            type.type("The glitch dissolves. Your brain reboots. Whatever that was, it's over.")
+            self.restore_sanity(3)
+            print("\n")
             return
         type.type("Sitting in your car, reality... stutters.")
         print("\n")
@@ -404,6 +440,12 @@ class DaySurrealMixin:
         type.type("When you turn around, the door is gone. The wall is smooth. Like the door never existed.")
         print("\n")
         type.type("But you can still hear scratching from inside the wall.")
+        if self.has_item("Delight Indicator") or self.has_item("Delight Manipulator"):
+            gauge = "Delight Manipulator" if self.has_item("Delight Manipulator") else "Delight Indicator"
+            print("\n")
+            type.type("Your " + cyan(bright(gauge)) + " displays a reading you've never seen before: " + yellow("'UNDEFINED.'"))
+            print("\n")
+            type.type("Some feelings don't have names. The device wasn't built for this.")
         self.lose_sanity(20)
         self.add_status("Glimpsed the Void")
         print("\n")

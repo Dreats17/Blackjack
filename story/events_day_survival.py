@@ -553,6 +553,14 @@ class DaySurvivalMixin:
         # EVENT: Dense fog blankets the area
         # EFFECTS: Usually atmospheric; one variant deals 5 damage (walk into mirror)
         # Everytime - atmospheric with variants
+        if self.has_item("Rusty Compass") or self.has_item("Golden Compass"):
+            compass = "Golden Compass" if self.has_item("Golden Compass") else "Rusty Compass"
+            type.type("The " + cyan(bright(compass)) + " hums warmly in your pocket. You were never truly lost.")
+            print("\n")
+            type.type("It guides you through the trees to a shortcut you wouldn't have found alone.")
+            self.restore_sanity(5)
+            print("\n")
+            return
         variant = random.randrange(4)
         if variant == 0:
             type.type("Fog so thick you can barely see your hood has swallowed the world in white.")
@@ -629,6 +637,10 @@ class DaySurvivalMixin:
             print("\n")
             type.type("It's beautiful enough to make you forget, just for a moment, that you live in a car.")
             print("\n")
+        if self.has_item("Flask of Fortunate Day"):
+            print("\n")
+            type.type("The " + cyan(bright("Flask of Fortunate Day")) + " pulses with golden light. The sun feels warmer. The road feels shorter. Everything feels... manageable.")
+            self.restore_sanity(2)
         self.heal(random.choice([5, 10, 15]))
         self.restore_sanity(random.choice([1, 2, 3]))  # Restores sanity
         print("\n")
@@ -771,6 +783,15 @@ class DaySurvivalMixin:
         type.type("The temperature plummets. Frost forms on your windshield, and you can see your breath inside the car.")
         print("\n")
 
+        if self.has_item("Worn Gloves") or self.has_item("Velvet Gloves"):
+            gloves = "Velvet Gloves" if self.has_item("Velvet Gloves") else "Worn Gloves"
+            type.type("The enchanted " + cyan(bright(gloves)) + " keep your fingers nimble in the cold.")
+            print("\n")
+            type.type("Where others fumble, you work with precision. The cold can't reach your hands.")
+            self.restore_sanity(3)
+            print("\n")
+            return
+
         # Survival Bivouac checked first (full protection, no items consumed).
         # Sacred Flame combo (Phoenix Feather + Fire Starter Kit) is checked next: it consumes Fire Starter Kit, so it must precede
         # the Emergency Blanket + Fire Starter Kit combo below.
@@ -870,11 +891,21 @@ class DaySurvivalMixin:
             print("\n")
             type.type("The trucker helps you get the car started again. The flares are spent, but crisis averted.")
             self.use_item("Road Flares")
-        elif self.has_item("Flashlight"):
-            type.type("You wave your " + magenta(bright("Flashlight")) + " at passing cars. After an hour, someone finally stops.")
+        elif self.has_item("Flashlight") or self.has_item("Lantern") or self.has_item("Eternal Light"):
+            if self.has_item("Eternal Light"):
+                light_name = "Eternal Light"
+            elif self.has_item("Lantern"):
+                light_name = "Lantern"
+            else:
+                light_name = "Flashlight"
+            type.type("You wave your " + magenta(bright(light_name)) + " at passing cars. After an hour, someone finally stops.")
             print("\n")
             type.type("They help jumpstart your car. It could have been worse.")
             self.add_travel_restriction("Car Trouble")
+            evolved = self.track_item_use(light_name)
+            if evolved:
+                print("\n")
+                type.type(cyan(bright(self.get_evolution_text(evolved[0], evolved[1]))))
         else:
             type.type("You sit there for hours, trying to flag down help. Most cars just speed past.")
             print("\n")
@@ -1345,6 +1376,12 @@ class DaySurvivalMixin:
             print("\n")
             type.type("You spend twenty minutes on your hands and knees searching the car, the pavement, the bushes. You find a quarter. Not helpful.")
         print("\n")
+        if self.has_item("Signal Mirror"):
+            print("\n")
+            type.type("You catch the sun with your " + cyan(bright("Signal Mirror")) + ". The reflected beam flashes across the horizon like a lighthouse on land.")
+            print("\n")
+            type.type("Someone, somewhere, sees the light. Help is closer than you think.")
+            self.restore_sanity(3)
         lost = min(self.get_balance(), random.randint(50, 200))
         type.type("You lost " + red(bright("${:,}".format(int(lost)))) + ".")
         self.change_balance(-lost)
@@ -1392,6 +1429,10 @@ class DaySurvivalMixin:
             type.type("You wake up and immediately know something is wrong. Your neck is on fire. Not metaphorically.")
             print("\n")
             type.type("Sunburn. The kind that hurts when you think about it. The kind where shirts become your enemy.")
+        if self.has_item("Splint"):
+            print("\n")
+            type.type("The " + cyan(bright("Splint")) + " braces your aching joints. Crude, but effective. You can keep moving.")
+            self.heal(5)
         self.hurt(15)
         print("\n")
 
@@ -1410,6 +1451,14 @@ class DaySurvivalMixin:
             print("\n")
             type.type("Well, it left you a gift. An angry, infected, weeping gift. On your elbow. Right where the seat rubs.")
         print("\n")
+        if self.has_item("Wound Salve"):
+            type.type("You dig out the " + cyan(bright("Wound Salve")) + " and smear it over the bite. The sting fades almost instantly.")
+            print("\n")
+            type.type("By morning, the swelling is gone. That homemade gunk actually works.")
+            self.hurt(2)
+            self.restore_sanity(2)
+            print("\n")
+            return
         if self.has_item("First Aid Kit"):
             type.type("Good thing you have that " + magenta(bright("First Aid Kit")) + ". You clean it, disinfect it, bandage it. Almost like a real adult.")
             self.hurt(3)
@@ -1963,6 +2012,25 @@ class DaySurvivalMixin:
         self.add_travel_restriction("Rain")
         return
     
+    # ==========================================
+    # WRONG ITEM COMEDY EVENTS
+    # ==========================================
+
+    def wrong_item_bug_spray_campfire(self):
+        if not self.has_item("Bug Spray"):
+            self.day_event()
+            return
+        type.type("You're sitting by the campfire when a mosquito buzzes past. You grab the " + cyan(bright("Bug Spray")) + " and give a quick spritz.")
+        print("\n")
+        type.type("The spray hits the flames. WHOOOMP. A fireball erupts.")
+        print("\n")
+        type.type("Your eyebrows are gone. Both of them.")
+        print("\n")
+        self.hurt(20)
+        self.use_item("Bug Spray")
+        type.type("On the bright side, no more mosquitoes.")
+        print("\n")
+
     # ==========================================
     # NEW DOUGHMAN DAY EVENTS - Everytime
     # ==========================================

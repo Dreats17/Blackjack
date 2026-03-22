@@ -908,6 +908,13 @@ class AdventuresMixin:
         print("\n")
         type.type(yellow(bright("=== WOODLANDS ADVENTURE ===")))
         print("\n")
+        if self.has_item("Rusty Compass") or self.has_item("Golden Compass"):
+            compass = "Golden Compass" if self.has_item("Golden Compass") else "Rusty Compass"
+            type.type("The " + cyan(bright(compass)) + " needle spins wildly, then points east with sudden certainty.")
+            print("\n")
+            type.type("Something valuable lies in that direction. The compass knows things you don't.")
+            self.restore_sanity(3)
+            print("\n")
         event = random.choice([
             "hunting_competition", "gigantic_bear", "fountain_of_youth", "hermit_cabin", "casual_day"
         ])
@@ -1082,14 +1089,30 @@ class AdventuresMixin:
                     print("\n")
                     type.type("Fighting from above changes the equation. The bear can't use its full size against you.")
                     print("\n")
-                if self.has_item("Pocket Knife"):
-                    type.type("The " + cyan(bright("Pocket Knife")) + " finds a gap in the bear's thick hide — a nick behind the ear that draws blood.")
+                if self.has_item("Pocket Knife") or self.has_item("Utility Blade") or self.has_item("Master Knife"):
+                    knife_name = "Pocket Knife" if self.has_item("Pocket Knife") else ("Utility Blade" if self.has_item("Utility Blade") else "Master Knife")
+                    type.type("The " + cyan(bright(knife_name)) + " finds a gap in the bear's thick hide — a nick behind the ear that draws blood.")
                     print("\n")
                     type.type("It roars. You've hurt it. Not enough — but enough to make it hesitate.")
+                    evolved = self.track_item_use(knife_name)
+                    if evolved:
+                        print("\n")
+                        type.type(cyan(bright(self.get_evolution_text(evolved[0], evolved[1]))))
                     print("\n")
-                if self.has_item("Scrap Armor") or self.has_item("Road Warrior Armor"):
-                    armor_name = "Road Warrior Armor" if self.has_item("Road Warrior Armor") else "Scrap Armor"
+                if self.has_item("Scrap Armor") or self.has_item("Road Warrior Armor") or self.has_item("Plated Vest") or self.has_item("Road Warrior Plate"):
+                    if self.has_item("Road Warrior Armor"):
+                        armor_name = "Road Warrior Armor"
+                    elif self.has_item("Road Warrior Plate"):
+                        armor_name = "Road Warrior Plate"
+                    elif self.has_item("Plated Vest"):
+                        armor_name = "Plated Vest"
+                    else:
+                        armor_name = "Scrap Armor"
                     type.type("The " + cyan(bright(armor_name)) + " absorbs the first swipe. It saves your ribs.")
+                    evolved = self.track_item_use(armor_name)
+                    if evolved:
+                        print("\n")
+                        type.type(cyan(bright(self.get_evolution_text(evolved[0], evolved[1]))))
                     print("\n")
                 type.type(yellow("=== BATTLE ==="))
                 type.type("The bear charges. You have one chance.")
@@ -1334,7 +1357,18 @@ class AdventuresMixin:
             type.type("The forest is quiet tonight. No adventures find you - or perhaps you weren't ready for them.")
             print("\n")
             type.type("You rest beneath an ancient oak, listening to the wind in the leaves. Sometimes the greatest adventure is simply being still.")
-            if self.has_item("Binoculars") or self.has_item("Binocular Scope"):
+            # COMBO: Binocular Scope + Night Vision Scope = All-Seeing Eye
+            if self.has_item("Binocular Scope") and self.has_item("Night Vision Scope"):
+                print("\n")
+                type.type("You combine the " + cyan(bright("Binocular Scope")) + " and the " + cyan(bright("Night Vision Scope")) + ". All-Seeing Eye.")
+                print("\n")
+                type.type("Day and night collapse into one field of vision. You see EVERYTHING — hidden trails, buried caches, animal dens full of shiny objects, a forgotten backpack in a hollow tree.")
+                print("\n")
+                found = random.randint(100, 500)
+                type.type("The haul is absurd: " + green(bright("${:,}".format(found))) + " in scattered cash, dropped wallets, and sellable trinkets.")
+                self.earn_money(found)
+                self.restore_sanity(10)
+            elif self.has_item("Binoculars") or self.has_item("Binocular Scope"):
                 item_name = "Binocular Scope" if self.has_item("Binocular Scope") else "Binoculars"
                 print("\n")
                 type.type("You pull out your " + cyan(bright(item_name)) + " and scan the treeline. A hidden deer path runs along the ridge — and at the end of it, something glints.")
@@ -1344,6 +1378,17 @@ class AdventuresMixin:
                 type.type(" " + green(bright("$" + str(found))) + " well-spotted.")
                 self.earn_money(found)
                 self.restore_sanity(4)
+            if self.has_item("Signal Mirror"):
+                print("\n")
+                type.type("You angle your " + cyan(bright("Signal Mirror")) + " toward a gap in the canopy. The flash catches the sun and bounces across the treetops.")
+                print("\n")
+                type.type("Minutes later, a park ranger appears on the trail. " + quote("Saw your signal from the fire tower. You lost?"))
+                print("\n")
+                type.type("Not lost — just lucky. The ranger points you to a shortcut and a forgotten picnic area with a cash box someone left behind.")
+                found = random.randint(20, 60)
+                type.type(" " + green(bright("$" + str(found))) + " found.")
+                self.earn_money(found)
+                self.restore_sanity(5)
             if self.has_item("Provider's Kit") or self.has_item("Fishing Rod"):
                 fish_item = "Provider's Kit" if self.has_item("Provider's Kit") else "Fishing Rod"
                 print("\n")
@@ -4296,9 +4341,14 @@ class AdventuresMixin:
                 print("\n")
                 type.type("You navigate confidently. No stumbles, no surprises.")
                 self.restore_sanity(3)
-            elif self.has_item("Flashlight"):
-                type.type("Your " + cyan(bright("Flashlight")) + " helps, though holding it limits your hands.")
+            elif self.has_item("Flashlight") or self.has_item("Lantern") or self.has_item("Eternal Light"):
+                light_name = "Flashlight" if self.has_item("Flashlight") else ("Lantern" if self.has_item("Lantern") else "Eternal Light")
+                type.type("Your " + cyan(bright(light_name)) + " helps, though holding it limits your hands.")
                 self.restore_sanity(2)
+                evolved = self.track_item_use(light_name)
+                if evolved:
+                    print("\n")
+                    type.type(cyan(bright(self.get_evolution_text(evolved[0], evolved[1]))))
 
             outcome = random.randrange(10)
             
