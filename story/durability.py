@@ -55,9 +55,10 @@ class DurabilityMixin:
         if (self.has_flask_effect("No Bust")):
             if invincible:
                 self._flask_durability[0] = -1
-                
+            
             if (self._flask_durability[0] > 0):
-                self._flask_durability[0] -= random.choice([1, 2])
+                if not (self.has_item("Frank's Flask") and random.randrange(3) == 0):
+                    self._flask_durability[0] -= random.choice([1, 2])
                 if self._flask_durability[0] <= 0:
                     self._flask_durability[0] = 0
                     self.remove_flask_effect("No Bust")
@@ -375,7 +376,8 @@ class DurabilityMixin:
                 self._flask_durability[8] = -1
                 
             if (self._flask_durability[8] > 0):
-                self._flask_durability[8] -= random.choice([1, 2])
+                if not (self.has_item("Frank's Flask") and random.randrange(3) == 0):
+                    self._flask_durability[8] -= random.choice([1, 2])
                 if self._flask_durability[8] <= 0:
                     self._flask_durability[8] = 0
                     self.remove_flask_effect("Second Chance")
@@ -393,7 +395,8 @@ class DurabilityMixin:
                 self._flask_durability[9] = -1
                 
             if (self._flask_durability[9] > 0):
-                self._flask_durability[9] -= random.choice([1, 2])
+                if not (self.has_item("Frank's Flask") and random.randrange(3) == 0):
+                    self._flask_durability[9] -= random.choice([1, 2])
                 if self._flask_durability[9] <= 0:
                     self._flask_durability[9] = 0
                     self.remove_flask_effect("Split Serum")
@@ -411,7 +414,8 @@ class DurabilityMixin:
                 self._flask_durability[10] = -1
                 
             if (self._flask_durability[10] > 0):
-                self._flask_durability[10] -= random.choice([1, 2])
+                if not (self.has_item("Frank's Flask") and random.randrange(3) == 0):
+                    self._flask_durability[10] -= random.choice([1, 2])
                 if self._flask_durability[10] <= 0:
                     self._flask_durability[10] = 0
                     self.remove_flask_effect("Dealer's Hesitation")

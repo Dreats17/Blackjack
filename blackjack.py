@@ -1046,8 +1046,9 @@ class Blackjack:
         has_lucky_medallion = self.__player.has_item("Lucky Medallion")
         has_triple_luck = (self.__player.has_item("Lucky Penny") and has_lucky_coin
                            and self.__player.has_item("Lucky Charm Bracelet"))
-        if (has_lucky_coin or has_lucky_medallion or has_triple_luck) and status in ["Dealer Wins", "Dealer Blackjack", "Player Bust"]:
-            # Lucky Medallion always works; Triple Luck has 35% chance; Lucky Coin has 20% chance
+        has_oswalds_luck = self.__player.has_status("Oswald's Luck")
+        if (has_lucky_coin or has_lucky_medallion or has_triple_luck or has_oswalds_luck) and status in ["Dealer Wins", "Dealer Blackjack", "Player Bust"]:
+            # Lucky Medallion always works; Triple Luck has 35% chance; Lucky Coin / Oswald's Luck has 20% chance
             if has_lucky_medallion:
                 triggered = True
             elif has_triple_luck:
@@ -1059,6 +1060,8 @@ class Blackjack:
                     type.fast(yellow(bright("Three charms resonate at once — the loss bends to your will!")))
                 elif has_lucky_medallion:
                     type.fast(cyan(bright("Your Lucky Medallion blazes with power! The loss turns into a push!")))
+                elif has_oswalds_luck and not has_lucky_coin:
+                    type.fast(yellow(bright("Oswald's weighted dice tip the scales — the loss becomes a push!")))
                 else:
                     type.fast(magenta(bright("Your Lucky Coin glows! The loss turns into a push!")))
                 print("\n")

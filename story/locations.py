@@ -1219,6 +1219,14 @@ class LocationsMixin:
 
                 print()
 
+                if self.has_item("Tom's Wrench") and not self.has_met("Tom Wrench Discount"):
+                    self.mark_met("Tom Wrench Discount")
+                    type.type("Tom glances over at the " + magenta(bright("Tom's Wrench")) + " sitting in your bag. He does a slow double-take.")
+                    print("\n")
+                    type.type(quote("Hey... that's mine. Well — it was. How'd you end up with that?") + " He waves a hand before you can answer. " + quote("Nevermind. Keep it. 50% off today, just for bringin' her home."))
+                    print("\n")
+                    price = price // 2
+
                 type.type("It'll take me a couple days, but I can do that for ya for " + green(bright("${:,}".format(price))) + ". Whaddya say? ")
                 
                 while True:
@@ -1436,6 +1444,20 @@ class LocationsMixin:
         print("\n")
         self.frank_dialogue()
         print("\n")
+        if self.has_item("Frank's Flask") and not self.has_met("Frank Flask Bonus"):
+            self.mark_met("Frank Flask Bonus")
+            type.type("Frank's eyes drop to the " + magenta(bright("Frank's Flask")) + " on your belt. His jaw tightens.")
+            print("\n")
+            type.type(quote("Is that — ") + " He stops himself. Stares for a long beat. " + quote("Where'd you get that?"))
+            print("\n")
+            type.type("He clears his throat and looks away, like he didn't almost just have a moment.")
+            print("\n")
+            type.type(quote("Nevermind. Forget I said anything. ") + " He slides some folded bills across the counter without another word. " + quote("Call it a finder's fee."))
+            print("\n")
+            self.change_balance(100)
+            self.restore_sanity(3)
+            type.type(green("Frank gives you $100. ") + "Something about that flask mattered to him.")
+            print("\n")
         repairing_items_len = len(self._repairing_inventory)
         if(repairing_items_len>0):
             if days_elapsed == 2:
@@ -1869,6 +1891,18 @@ class LocationsMixin:
         print("\n")
         self.oswald_dialogue()
         print("\n")
+        if self.has_item("Oswald's Dice") and not self.has_met("Oswald Dice Bonus"):
+            self.mark_met("Oswald Dice Bonus")
+            type.type("Oswald's gaze drops to the " + magenta(bright("Oswald's Dice")) + " in your pocket. He goes very still.")
+            print("\n")
+            type.type(quote("You know those are weighted, right? I used them for testing.") + " He winks slowly. " + quote("Don't tell anyone."))
+            print("\n")
+            type.type("You feel luckier just knowing the truth.")
+            print("\n")
+            self.add_status("Oswald's Luck")
+            self.restore_sanity(5)
+            type.type(green("You feel a subtle shift in fortune. ") + yellow("Oswald's Luck") + " is with you.")
+            print("\n")
 
         storyline_event = self._storyline_system.check_for_location_storyline_event("oswald")
         if storyline_event is not None:
@@ -3546,6 +3580,21 @@ class LocationsMixin:
                 print("\n")
                 type.type(quote("Perhaps you'd be interested in something... premium? Not everything I carry goes on the regular shelf.") + " He slides two extra items into the display with a knowing nod.")
                 print("\n")
+            if self.has_item("Silver Flask") and not self.has_met("Gave Marvin Flask"):
+                type.type("Marvin's eyes land on the " + magenta(bright("Silver Flask")) + " in your pack. He leans forward.")
+                print("\n")
+                type.type(quote("That's a fine flask. Real silver. I'd take it off your hands — twenty percent off your next purchase, what do you say?"))
+                print("\n")
+                answer = ask.yes_or_no("Give Marvin the Silver Flask? ")
+                if answer == "yes":
+                    self.use_item("Silver Flask")
+                    self.mark_met("Gave Marvin Flask")
+                    self.add_status("Marvin Discount")
+                    type.type(quote("Pleasure doing business. The discount is yours."))
+                    print("\n")
+                else:
+                    type.type(quote("Another time, then."))
+                    print("\n")
 
         for item_number in range(len(inventory)):
             item = inventory[item_number]
@@ -3650,6 +3699,12 @@ class LocationsMixin:
 
             print()
 
+            if self.has_status("Marvin Discount"):
+                discounted_price = int(price * 0.8)
+                type.type("Marvin glances at you with a small nod — remembering the flask. " + quote("Twenty percent off, as promised."))
+                print("\n")
+                price = discounted_price
+
             type.type("For " + green(bright("${:,}".format(price))) + ", it can be all yours. You buying? ")
             while True:
                 yes_or_no = input("").lower()
@@ -3662,6 +3717,8 @@ class LocationsMixin:
                     print()
                     type.type("Great! It's all yours.")
                     self.change_balance(-price)
+                    if self.has_status("Marvin Discount"):
+                        self.remove_status("Marvin Discount")
                     self.add_item(item)
                     type.type("You got the " + magenta(bright(item)) + "!")
                     print()
@@ -4161,6 +4218,7 @@ class LocationsMixin:
             print("\n")
             type.type("You notice the shaking doesn't quite stop. Criminal heat has a way of preceding you now.")
             self.add_status("Kingpin Reputation")
+            collectible_prices = {item: int(price * 1.25) for item, price in collectible_prices.items()}
             print("\n")
         
         if self.has_item("Binding Portrait"):
