@@ -1128,6 +1128,26 @@ class AdventuresMixin:
                     else:
                         type.type("The bear isn't fooled. It bats you around like a cat toy before getting bored and leaving. You're alive, but barely.")
                         self.hurt(random.randint(50, 80))
+                if self.has_item("Nomad's Camp"):
+                    type.type("The " + cyan(bright("Nomad's Camp")) + " provides everything — shelter, food, water.")
+                    print("\n")
+                    type.type("You rest mid-adventure. Full restoration.")
+                    self.heal(100)
+                    self.restore_sanity(15)
+                    return
+                if self.has_item("Wanderer's Rest"):
+                    type.type("The " + cyan(bright("Wanderer's Rest")) + "'s roots are deep now. Even here, it sustains you.")
+                    print("\n")
+                    type.type("You will never want for anything again. Energy fully restored.")
+                    self.heal(80)
+                    self.restore_sanity(10)
+                    return
+                if self.has_item("Survival Bivouac"):
+                    type.type("The " + cyan(bright("Survival Bivouac")) + " turns any rest into full recovery.")
+                    print("\n")
+                    self.heal(40)
+                    self.restore_sanity(8)
+                    return
                 if self.has_item("First Aid Kit") and self.get_health() < 70:
                     self.use_item("First Aid Kit")
                     type.type("You dig out the " + cyan(bright("First Aid Kit")) + " and patch yourself up. Not pretty, but functional.")
@@ -1358,6 +1378,13 @@ class AdventuresMixin:
         print("\n")
         type.type(yellow(bright("=== SWAMP ADVENTURE ===")))
         print("\n")
+        if self.has_item("Hazmat Suit"):
+            type.type("The " + cyan(bright("Hazmat Suit")) + " walks through the toxic zone like it's a spring morning.")
+            print("\n")
+            type.type("You access areas no one else can reach. The treasure is unguarded — no one else can get here.")
+            self.change_balance(random.randint(200, 500))
+            self.restore_sanity(5)
+            return
         if self.has_item("Gas Mask"):
             type.type("Through the " + cyan(bright("Gas Mask")) + ", the toxic swamp air becomes just air. You breathe freely where others would be coughing.")
             print("\n")
@@ -1593,6 +1620,26 @@ class AdventuresMixin:
                     else:
                         type.type("It swings wildly - and connects. Blind luck, literally.")
                         self.hurt(random.randint(35, 60))
+                if self.has_item("Nomad's Camp"):
+                    type.type("The " + cyan(bright("Nomad's Camp")) + " provides everything — shelter, food, water.")
+                    print("\n")
+                    type.type("You rest mid-adventure. Full restoration.")
+                    self.heal(100)
+                    self.restore_sanity(15)
+                    return
+                if self.has_item("Wanderer's Rest"):
+                    type.type("The " + cyan(bright("Wanderer's Rest")) + "'s roots are deep now. Even here, it sustains you.")
+                    print("\n")
+                    type.type("You will never want for anything again. Energy fully restored.")
+                    self.heal(80)
+                    self.restore_sanity(10)
+                    return
+                if self.has_item("Survival Bivouac"):
+                    type.type("The " + cyan(bright("Survival Bivouac")) + " turns any rest into full recovery.")
+                    print("\n")
+                    self.heal(40)
+                    self.restore_sanity(8)
+                    return
                 if self.has_item("First Aid Kit") and self.get_health() < 70:
                     self.use_item("First Aid Kit")
                     type.type("You dig out the " + cyan(bright("First Aid Kit")) + " and patch yourself up mid-swamp. It helps.")
@@ -2825,7 +2872,21 @@ class AdventuresMixin:
                     type.type("One still clutches a lockbox. Do you take it?")
                     take = ask.yes_or_no()
                     if take == "yes":
-                        if self.has_item("Master Key"):
+                        if self.has_item("Skeleton Key"):
+                            type.type("The " + cyan(bright("Skeleton Key")) + " doesn't just open the lock — it opens the concept of locked.")
+                            print("\n")
+                            type.type("The door's lock explains why it was locked, what it's protecting, and thanks you for understanding.")
+                            self.change_balance(random.randint(300, 800))
+                            self.restore_sanity(5)
+                            return
+                        elif self.has_item("All-Access Pass"):
+                            type.type("The " + cyan(bright("All-Access Pass")) + " reveals doors that don't exist on any map.")
+                            print("\n")
+                            type.type("Behind this one: legendary loot that no one else has reached.")
+                            self.change_balance(random.randint(200, 600))
+                            self.restore_sanity(3)
+                            return
+                        elif self.has_item("Master Key"):
                             type.type("You hold the " + cyan(bright("Master Key")) + " to the rusted lock. It opens in two seconds.")
                             print("\n")
                             type.type("Inside: gold doubloons and a gemstone that catches the light even down here.")
@@ -4223,7 +4284,22 @@ class AdventuresMixin:
             print("\n")
             type.type("You stumble deeper and deeper, guided only by sound. The air grows cold. The walls seem to close in.")
             print("\n")
-            
+
+            if self.has_item("Night Scope"):
+                type.type("The " + cyan(bright("Night Scope")) + " makes darkness transparent. You see every passage, every threat, every loot cache.")
+                print("\n")
+                type.type("Nothing is hidden. You take the optimal route.")
+                self.change_balance(random.randint(100, 300))
+                self.restore_sanity(5)
+            elif self.has_item("Headlamp"):
+                type.type("The " + cyan(bright("Headlamp")) + " cuts through the dark, hands free.")
+                print("\n")
+                type.type("You navigate confidently. No stumbles, no surprises.")
+                self.restore_sanity(3)
+            elif self.has_item("Flashlight"):
+                type.type("Your " + cyan(bright("Flashlight")) + " helps, though holding it limits your hands.")
+                self.restore_sanity(2)
+
             outcome = random.randrange(10)
             
             if outcome < 3:  # 30% - Great reward

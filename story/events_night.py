@@ -1688,6 +1688,11 @@ class NightEventsMixin:
                 type.type("The " + cyan(bright("Fortified Perimeter")) + "'s trip-wires trigger. An alarm sounds. The night goes quiet.")
                 print("\n")
                 self.restore_sanity(5)
+            elif self.has_item("Road Warrior Armor"):
+                type.type("They came with intent. The " + cyan(bright("Road Warrior Armor")) + "'s harness glints under the streetlamp.")
+                print("\n")
+                type.type("The intent evaporates.")
+                self.restore_sanity(5)
             elif self.has_item("Guardian Angel"):
                 type.type("A figure emerges from an alley. Then another. Then a third. They fan out, blocking your path.")
                 print("\n")
@@ -2328,6 +2333,13 @@ class NightEventsMixin:
         print(PAR)
 
     def peaceful_night(self):
+        if self.has_item("Nomad's Camp"):
+            type.type("The " + cyan(bright("Nomad's Camp")) + " at night: fire crackles, traps set, feast prepared.")
+            print("\n")
+            type.type("The wilderness is your home. You sleep like a king and wake fully restored.")
+            self.heal(50)
+            self.restore_sanity(20)
+            return
         # COMBO: Lucid Dreaming Kit + Fortune Cards = Dream Gambling
         if self.has_item("Lucid Dreaming Kit") and self.has_item("Fortune Cards"):
             if not self.has_met("Dream Gambling"):

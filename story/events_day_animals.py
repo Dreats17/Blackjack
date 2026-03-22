@@ -56,6 +56,18 @@ class DayAnimalsMixin:
         # EFFECTS: Heal 5-10 HP normally, 15-20 with Dog Treat item
         # RARE (5%): Ghost dog variant heals 50 HP
         # Alt dialogue for repeated event + rare special variant
+        if self.has_item("Beastslayer Mantle"):
+            type.type("The dog picks up the scent of the " + cyan(bright("Beastslayer Mantle")) + " and sits. Instantly.")
+            print("\n")
+            type.type("It was never estranged from you. It just hadn't met its alpha yet.")
+            self.restore_sanity(8)
+            return
+        if self.has_item("Leviathan's Call"):
+            type.type("The " + cyan(bright("Leviathan's Call")) + " hums at a frequency the dog understands perfectly.")
+            print("\n")
+            type.type("It comes to you like you've been friends for years.")
+            self.restore_sanity(5)
+            return
         rare_chance = random.randrange(100)
         
         if rare_chance < 5:  # 5% RARE VARIANT - The Ghost Dog
@@ -116,6 +128,26 @@ class DayAnimalsMixin:
         # EFFECTS: Normally may lose $20-80
         # RARE (5%): Raccoon Mafia demands $100-300 tribute
         # Everytime - creature event with variants
+        if self.has_item("Beastslayer Mantle"):
+            type.type("The " + cyan(bright("Beastslayer Mantle")) + " radiates primal dominion. The raccoon gang stops.")
+            print("\n")
+            type.type("Every one of them — all seven — bows its head. Then they disperse, unhurried, unafraid.")
+            print("\n")
+            type.type("They recognize the alpha. You walk through untouched.")
+            self.restore_sanity(8)
+            return
+        if self.has_item("Ark Master's Horn"):
+            type.type("You sound the " + cyan(bright("Ark Master's Horn")) + ". The raccoons freeze.")
+            print("\n")
+            type.type("They sit. All of them. In a neat row. Waiting for instruction.")
+            self.restore_sanity(5)
+            return
+        if self.has_item("Beast Tamer Kit"):
+            type.type("You open the " + cyan(bright("Beast Tamer Kit")) + ". The bait hits the ground before the toys.")
+            print("\n")
+            type.type("Seven raccoons become seven devoted followers. They follow you to your car.")
+            self.restore_sanity(5)
+            return
         rare_chance = random.randrange(100)
         
         if rare_chance < 5:  # 5% RARE VARIANT - Raccoon Gang
@@ -370,6 +402,13 @@ class DayAnimalsMixin:
             self.day_event()
             return
 
+        if self.has_item("Beastslayer Mantle"):
+            type.type("The rat looks at you. Looks at the " + cyan(bright("Beastslayer Mantle")) + ". Looks at you again.")
+            print("\n")
+            type.type("It leaves. Rats are pragmatic.")
+            self.restore_sanity(3)
+            return
+
         type.type("A sharp pain shoots through your ankle! ")
         type.type("You look down to see a skinny gray rat nibbling your foot. You kick at it, but the little rodent runs under the seat. ")
         print("\n")
@@ -610,6 +649,19 @@ class DayAnimalsMixin:
 
     def seagull_attack(self):
         type.type("A seagull dive-bombs your car")
+
+        if self.has_item("Beastslayer Mantle"):
+            type.type("The seagulls bank hard left mid-dive. The " + cyan(bright("Beastslayer Mantle")) + "'s aura reaches them.")
+            print("\n")
+            type.type("They land around you in a circle and wait. For something. Anything you want.")
+            self.restore_sanity(5)
+            return
+        if self.has_item("Ark Master's Horn"):
+            type.type("One note from the " + cyan(bright("Ark Master's Horn")) + " and the seagulls scatter.")
+            print("\n")
+            type.type("They reform at a safe distance and watch you. Respectfully.")
+            self.restore_sanity(3)
+            return
 
         # Pack Call: both whistles together speak every animal's language at once
         if self.has_item("Animal Whistle") and self.has_item("Dog Whistle"):

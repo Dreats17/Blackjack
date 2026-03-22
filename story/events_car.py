@@ -57,6 +57,18 @@ class CarEventsMixin:
 
     def random_car_trouble(self):
         """Pick a rank-appropriate car problem at random and trigger it."""
+        if self.has_item("War Wagon"):
+            type.type("The " + cyan(bright("War Wagon")) + "'s engine is alive — really alive. It diagnosed the problem before you even started the car.")
+            print("\n")
+            type.type("Self-repair complete. The car rumbles contentedly. Not a scratch. Not a squeak.")
+            self.restore_sanity(5)
+            return
+        if self.has_item("Immortal Vehicle"):
+            type.type("The " + cyan(bright("Immortal Vehicle")) + " self-diagnoses. Self-repairs. Your car is more reliable than gravity.")
+            print("\n")
+            type.type("Problem solved before it was a problem.")
+            self.restore_sanity(3)
+            return
         rank = self.get_rank()
         if self.has_item("Auto Mechanic") and random.randrange(5) == 0:
             type.type("You run your daily check with the " + magenta(bright("Auto Mechanic")) + " kit before anything can go wrong.")
@@ -207,6 +219,22 @@ class CarEventsMixin:
 
     # === ENGINE PROBLEMS ===
     def engine_overheating(self):
+        if self.has_item("War Wagon"):
+            type.type("The " + cyan(bright("War Wagon")) + "'s thermal management kicks in. Engine temp drops instantly.")
+            print("\n")
+            type.type("Your car has opinions about its own maintenance. They are correct opinions.")
+            self.restore_sanity(5)
+            return
+        if self.has_item("Immortal Vehicle"):
+            type.type("The " + cyan(bright("Immortal Vehicle")) + " has redundant cooling. This problem was solved in the design phase.")
+            print("\n")
+            self.restore_sanity(3)
+            return
+        if self.has_item("Roadside Shield"):
+            type.type("The " + cyan(bright("Roadside Shield")) + " kit includes coolant. Crisis averted in minutes.")
+            print("\n")
+            self.restore_sanity(3)
+            return
         if self.has_item("Oracle's Tome") or self.has_item("Gambler's Grimoire"):
             tome = "Oracle's Tome" if self.has_item("Oracle's Tome") else "Gambler's Grimoire"
             type.type("This morning, your " + cyan(bright(tome)) + " fell open to a dog-eared page. Two words underlined in red: " + italic("'CHECK COOLANT.'"))
@@ -955,6 +983,11 @@ class CarEventsMixin:
             self.restore_sanity(5)
             print("\n")
             return
+        if self.has_item("Fortified Perimeter"):
+            type.type("The " + cyan(bright("Fortified Perimeter")) + "'s trip-sensors activated. Thief ran.")
+            print("\n")
+            self.restore_sanity(3)
+            return
         type.type("You start your car and it sounds like a dragster. Way too loud.")
         print("\n")
         type.type("You look under the car. Your catalytic converter is GONE. Someone stole it.")
@@ -1065,6 +1098,23 @@ class CarEventsMixin:
 
     # === RANDOM BREAKDOWNS ===
     def mystery_breakdown(self):
+        if self.has_item("War Wagon"):
+            type.type("The " + cyan(bright("War Wagon")) + " predicts potholes and avoids them. It self-diagnoses. The 'breakdown' resolves before it becomes one.")
+            print("\n")
+            type.type("The car rumbles. Satisfied.")
+            self.restore_sanity(8)
+            return
+        if self.has_item("Immortal Vehicle"):
+            type.type(cyan(bright("Immortal Vehicle")) + " — self-repairing, self-defending. Whatever was about to break fixed itself.")
+            print("\n")
+            self.restore_sanity(5)
+            return
+        if self.has_item("Auto Mechanic"):
+            type.type("The " + cyan(bright("Auto Mechanic")) + " kit has the part. Of course it does.")
+            print("\n")
+            type.type("Fifteen minutes. Good as new.")
+            self.restore_sanity(3)
+            return
         if self.has_item("Vermin Bomb"):
             self.use_item("Vermin Bomb")
             type.type("Your car just... stops. You pop the hood. Mice. Mice have chewed through half your wiring harness.")
