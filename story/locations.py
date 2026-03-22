@@ -2701,36 +2701,62 @@ class LocationsMixin:
                     type.type(yellow("First craft! You're handy with a tool kit. Who knew?"))
                     print("\n")
                 elif crafted_total == 5:
-                    type.type(yellow("Five crafted items. You're basically a blacksmith now. A car-trunk blacksmith."))
+                    type.type(yellow("Five crafted items. You're basically a blacksmith now..."))
                     print("\n")
                 elif crafted_total == 10:
                     type.type(yellow("Ten crafted items! Your car looks like a mad scientist's laboratory."))
                     print("\n")
                 elif crafted_total == 15:
-                    type.type(yellow("Fifteen items crafted. You could teach a survival course. From your car."))
+                    type.type(yellow("Fifteen items. You could teach a survival course."))
+                    print("\n")
+                elif crafted_total == 20:
+                    type.type(yellow("Twenty items. The workbench groans under the weight of your ambition."))
                     print("\n")
                 elif crafted_total == 25:
-                    type.type(yellow("Twenty-five items. You've built more things than most people own."))
+                    type.type(yellow("Twenty-five. You've crafted more than most people own."))
                     print("\n")
+                    self.restore_sanity(3)
+                elif crafted_total == 30:
+                    type.type(yellow("Thirty! Your car is a mobile workshop, pharmacy, and armory combined."))
+                    print("\n")
+                    self.check_achievement("craftsman")
                 elif crafted_total == 40:
-                    type.type(yellow("Forty crafted items. You're not surviving anymore. You're THRIVING."))
+                    type.type(yellow("Forty items... When did you become an engineer?"))
                     print("\n")
-                elif crafted_total == 60:
-                    type.type(yellow("Sixty items! The workbench bows to you. The car trunk is a temple of innovation."))
+                    self.check_achievement("master_craftsman")
+                elif crafted_total == 50:
+                    type.type(yellow("Fifty. Half the things in your car didn't exist yesterday."))
+                    print("\n")
+                    self.check_achievement("inventor")
+                elif crafted_total == 67:
+                    type.type(yellow("Every Tier 1 recipe mastered. The workbench hums with potential."))
                     print("\n")
                 elif crafted_total == 80:
-                    type.type(yellow("Eighty crafted items. You've transcended crafting. You're an ARTISAN."))
+                    type.type(yellow("Eighty items. Your car is worth more than the casino."))
                     print("\n")
+                    self.change_balance(5000)
+                    type.type(yellow("You find $5,000 in a loose dashboard compartment you never noticed before."))
+                    print("\n")
+                elif crafted_total == 92:
+                    type.type(yellow("Every Tier 2 recipe complete. You see combinations in everything."))
+                    print("\n")
+                    self.check_achievement("expert")
                 elif crafted_total == 100:
-                    type.type(yellow("ONE HUNDRED crafted items. The universe nods in quiet respect."))
+                    type.type(yellow("One hundred crafted items. You started with nothing. Look at you now."))
                     print("\n")
+                    self.check_achievement("centurion")
+                    self.restore_sanity(15)
+                    self.heal(20)
+                elif crafted_total == 104:
+                    type.type(yellow("Every Tier 3 masterwork forged. You've bent the world to your will."))
+                    print("\n")
+                    self.check_achievement("artificer")
                 elif crafted_total == len(all_recipes):
                     type.type(bright(yellow("★★★ MASTER CRAFTSMAN ★★★")))
                     print()
-                    type.type(yellow("You've crafted every single item. Your wagon is a mobile workshop. "))
-                    type.type(yellow("People would pay good money for this kind of ingenuity. They don't. But they could."))
-                    self.check_achievement("master_craftsman")
+                    type.type(yellow("Every recipe. Every combination. Every possibility."))
                     print("\n")
+                    self.check_achievement("grand_artificer")
             else:
                 type.type("You set the ingredients back down. Not today.")
                 print("\n")

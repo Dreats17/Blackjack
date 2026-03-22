@@ -1040,6 +1040,10 @@ class Lists:
             "Night Vision Scope": 45,
             "Signal Booster": 30,
             "Scrap Armor": 55,
+            # Mechanic Loyalty Items
+            "Tom's Wrench": 75,
+            "Frank's Flask": 85,
+            "Oswald's Dice": 95,
         }
     
     def get_pawn_price(self, item_name):
@@ -1065,6 +1069,8 @@ class Lists:
                 "pawn_value": 35,
                 "category": "weapon",
                 "craft_text": "You wrap duct tape around the handle of your pocket knife until it feels right in your palm — the weight, the grip, the way the blade sits. It's ugly. The handle is lumpy. It looks like something made by someone who needed something made. It'll absolutely work.",
+                "hint_vague": "Tape and a blade — the most honest tool in the world.",
+                "hint_suggestive": "A weapon from tape and something sharp.",
             },
             "Slingshot": {
                 "ingredients": ["Rubber Bands", "Bungee Cords"],
@@ -1072,6 +1078,8 @@ class Lists:
                 "pawn_value": 20,
                 "category": "weapon",
                 "craft_text": "You find a forked stick outside, stretch the rubber bands between the prongs, and suddenly you're ten years old again. Except now you're armed.",
+                "hint_vague": "Elastic tension — kinetic energy waiting to be released.",
+                "hint_suggestive": "A weapon from rubber and cord.",
             },
             "Road Flare Torch": {
                 "ingredients": ["Road Flares", "Duct Tape"],
@@ -1079,6 +1087,8 @@ class Lists:
                 "pawn_value": 40,
                 "category": "weapon",
                 "craft_text": "You duct-tape a road flare to an old car antenna. It's a torch. It's ridiculous. It's incredibly effective.",
+                "hint_vague": "Fire that moves with you.",
+                "hint_suggestive": "A weapon from emergency light and adhesive.",
             },
             "Pepper Spray": {
                 "ingredients": ["Bug Spray", "Lighter"],
@@ -1086,6 +1096,8 @@ class Lists:
                 "pawn_value": 30,
                 "category": "weapon",
                 "craft_text": "You hold the lighter in front of the bug spray can. A quick test spray sends a fireball three feet out. You grin. This'll keep the creeps away.",
+                "hint_vague": "Something chemical, something flammable. Don't mix indoors.",
+                "hint_suggestive": "A weapon from bug deterrent and fire.",
             },
 
             # === TRAPS ===
@@ -1095,6 +1107,8 @@ class Lists:
                 "pawn_value": 25,
                 "category": "trap",
                 "craft_text": "You string fishing line between the car's side mirrors, attach some cans, and set it at ankle height. Anyone who gets close, you'll hear them.",
+                "hint_vague": "The patient hunter waits. So does the trap.",
+                "hint_suggestive": "A trap built from rope and sharp points.",
             },
             "Car Alarm Rigging": {
                 "ingredients": ["Bungee Cords", "Spare Fuses"],
@@ -1102,6 +1116,8 @@ class Lists:
                 "pawn_value": 30,
                 "category": "trap",
                 "craft_text": "You wire the spare fuses into a loop with the bungee cords on the door handle. Open the door, circuit breaks, horn blasts. Genius or insanity. Same thing.",
+                "hint_vague": "Wires, motion, and consequence.",
+                "hint_suggestive": "A trap made from electronics and fishing line.",
             },
             "Snare Trap": {
                 "ingredients": ["Rope", "Fishing Line"],
@@ -1109,6 +1125,8 @@ class Lists:
                 "pawn_value": 20,
                 "category": "trap",
                 "craft_text": "You tie a loop in the rope, thread the fishing line through, and set it in the grass near a trail where something small has been running. Primitive. Effective. You're crouching in a parking lot setting animal traps. At some point between leaving your old life and now, you became a completely different kind of person.",
+                "hint_vague": "Loop, stake, and patience.",
+                "hint_suggestive": "A trap from rope and something sharp.",
             },
 
             # === REMEDIES ===
@@ -1118,6 +1136,8 @@ class Lists:
                 "pawn_value": 20,
                 "category": "remedy",
                 "craft_text": "You crush the cough drops into a gritty paste, work it into the clean bandage material, and wrap everything into something that looks like a prop from a survivalist nightmare. It's cold. It smells like a candy cane had a fight with a hospital. You press it to your throat. Fifteen minutes later, you feel better. Medicine was doing this for centuries before it got complicated.",
+                "hint_vague": "Old knowledge, new mixture.",
+                "hint_suggestive": "A remedy from medicinal herbs and something soothing.",
             },
             "Wound Salve": {
                 "ingredients": ["First Aid Kit", "Super Glue"],
@@ -1125,6 +1145,8 @@ class Lists:
                 "pawn_value": 25,
                 "category": "remedy",
                 "craft_text": "Fun fact: super glue was originally designed for field surgery. You squeeze it along a clean bandage strip. Instant butterfly closure. You feel like a doctor. Sort of.",
+                "hint_vague": "Pain-reducing chemistry — two things that shouldn't work, but do.",
+                "hint_suggestive": "A remedy from antibiotics and herbal medicine.",
             },
             "Splint": {
                 "ingredients": ["Duct Tape", "Rope"],
@@ -1132,6 +1154,8 @@ class Lists:
                 "pawn_value": 15,
                 "category": "remedy",
                 "craft_text": "You wrap rope around two straight sticks, reinforce with duct tape, and create a splint that a field medic would nod approvingly at. Probably.",
+                "hint_vague": "Rigid support for broken things.",
+                "hint_suggestive": "A remedy from rigid structure and adhesive.",
             },
             "Smelling Salts": {
                 "ingredients": ["Hand Warmers", "Breath Mints"],
@@ -1139,6 +1163,8 @@ class Lists:
                 "pawn_value": 18,
                 "category": "remedy",
                 "craft_text": "You crush the mints to dust, pour them into a hand warmer pouch, and seal it. Crack it open near your nose. WHOOSH. You can see through time. Almost.",
+                "hint_vague": "Sharp and chemical — the olfactory sledgehammer.",
+                "hint_suggestive": "A remedy that wakes. Ammonia and herbs.",
             },
 
             # === TOOLS ===
@@ -1148,6 +1174,8 @@ class Lists:
                 "pawn_value": 30,
                 "category": "tool",
                 "craft_text": "You heat the tip of the pocket knife blade with a lighter and bend it into a hook. Thread the fishing line through for tension. Your first lockpick set. Criminal? Maybe. Useful? Absolutely.",
+                "hint_vague": "A bit of plastic and a bit of metal. Every door reconsiders.",
+                "hint_suggestive": "A tool from a credit card and something straight.",
             },
             "Fishing Rod": {
                 "ingredients": ["Fishing Line", "Rope"],
@@ -1155,6 +1183,8 @@ class Lists:
                 "pawn_value": 25,
                 "category": "tool",
                 "craft_text": "You snap the car antenna off (sorry, wagon), tie the fishing line to the tip, and braid the rope for a handle grip. Cast it into any body of water and hope for the best.",
+                "hint_vague": "Line, tension, patience, reward.",
+                "hint_suggestive": "A tool from cord and a pointed thing.",
             },
             "Binocular Scope": {
                 "ingredients": ["Binoculars", "Duct Tape"],
@@ -1162,6 +1192,8 @@ class Lists:
                 "pawn_value": 45,
                 "category": "tool",
                 "craft_text": "You duct-tape the binoculars to the sun visor at an angle. Now you can scan the horizon without even holding them. Surveillance state: population you.",
+                "hint_vague": "Distance becomes irrelevant.",
+                "hint_suggestive": "A tool from optics and barrel.",
             },
             "Signal Mirror": {
                 "ingredients": ["Broken Compass", "Super Glue"],
@@ -1169,6 +1201,8 @@ class Lists:
                 "pawn_value": 15,
                 "category": "tool",
                 "craft_text": "You crack the compass open, extract the glass face, polish it on your jeans, and glue it to a flat piece of cardboard. It catches the light perfectly. SOS, baby.",
+                "hint_vague": "Light as a language.",
+                "hint_suggestive": "A tool from reflective surface and a broken compass.",
             },
 
             # === CHARMS / LUCKY ITEMS ===
@@ -1178,6 +1212,8 @@ class Lists:
                 "pawn_value": 10,
                 "category": "charm",
                 "craft_text": "You punch a hole in the lucky penny, thread the fishing line through, and tie it around your wrist. It's not magic. But also, it kind of is.",
+                "hint_vague": "Small things that carry weight.",
+                "hint_suggestive": "A charm from two lucky tokens.",
             },
             "Dream Catcher": {
                 "ingredients": ["Fishing Line", "Rubber Bands"],
@@ -1185,6 +1221,8 @@ class Lists:
                 "pawn_value": 15,
                 "category": "charm",
                 "craft_text": "You bend a coat hanger into a circle, weave the fishing line through it, stretch rubber bands across in a web pattern, and hang it from the rearview mirror. It sways gently. Your dreams get softer.",
+                "hint_vague": "Webs that catch what you don't want to hold.",
+                "hint_suggestive": "A charm woven from cord and something circular.",
             },
             "Worry Stone": {
                 "ingredients": ["Lucky Penny", "Hand Warmers"],
@@ -1192,6 +1230,8 @@ class Lists:
                 "pawn_value": 8,
                 "category": "charm",
                 "craft_text": "You press the lucky penny into a hand warmer, let it heat up, and hold it in your palm. Rub it with your thumb. Smooth. Warm. The anxiety doesn't vanish, but it gets quieter.",
+                "hint_vague": "Friction and smoothness — opposites finding peace.",
+                "hint_suggestive": "A charm from minerals and something rough.",
             },
 
             # === SURVIVAL ===
@@ -1201,6 +1241,8 @@ class Lists:
                 "pawn_value": 10,
                 "category": "survival",
                 "craft_text": "You stretch the plastic wrap over the mouth of a cut garbage bag, creating a funnel. Set it on the roof. When it rains, clean water drips right into your bottle. Survivalist mode: engaged.",
+                "hint_vague": "Catch what falls from the sky.",
+                "hint_suggestive": "Survival gear from plastic and cordage.",
             },
             "Emergency Blanket": {
                 "ingredients": ["Garbage Bag", "Duct Tape"],
@@ -1208,6 +1250,8 @@ class Lists:
                 "pawn_value": 12,
                 "category": "survival",
                 "craft_text": "You split the garbage bag open, layer duct tape across the inside for insulation, and fold it into a blanket. It looks like modern art. It keeps you alive.",
+                "hint_vague": "Reflect warmth, retain life.",
+                "hint_suggestive": "Survival gear from foil and something warm.",
             },
             "Smoke Signal Kit": {
                 "ingredients": ["Road Flares", "Garbage Bag"],
@@ -1215,6 +1259,8 @@ class Lists:
                 "pawn_value": 20,
                 "category": "survival",
                 "craft_text": "You shred the garbage bag into strips, wrap them around the road flare tip, and test it. Thick black smoke billows up. You could signal a helicopter. Or ruin someone's laundry day.",
+                "hint_vague": "Visibility through obscurity.",
+                "hint_suggestive": "Survival gear from signal flare and optics.",
             },
             "Fire Starter Kit": {
                 "ingredients": ["Lighter", "Hand Warmers"],
@@ -1222,6 +1268,8 @@ class Lists:
                 "pawn_value": 15,
                 "category": "survival",
                 "craft_text": "You crack open the hand warmers, pour the iron filings into a zip bag with the lighter, and seal it tight. Instant fire kit. You could survive in the wilderness. Probably. For a day.",
+                "hint_vague": "The ancient skill, modernized.",
+                "hint_suggestive": "Survival gear from matches and fuel.",
             },
             "Water Purifier": {
                 "ingredients": ["Plastic Wrap", "Lighter"],
@@ -1229,6 +1277,8 @@ class Lists:
                 "pawn_value": 18,
                 "category": "survival",
                 "craft_text": "You set dirty water in a bowl, cover it with plastic wrap pulled taut, and set a small weight in the center so it sags into a point. An hour in the sun and clean condensation drips into your cup. You drink it. You made that. With your hands. From garbage. You sit with that fact for a while and it feels a little bit like dignity.",
+                "hint_vague": "Clean the undrinkable.",
+                "hint_suggestive": "Survival gear from chemicals and filtration.",
             },
 
             # === COMPANION ITEMS ===
@@ -1238,6 +1288,8 @@ class Lists:
                 "pawn_value": 15,
                 "category": "companion",
                 "craft_text": "You fold the blanket into a donut shape, tape the bottom so it stays put, and set it in the corner of the car. Your companion sniffs it. Circles three times. Lies down. Home.",
+                "hint_vague": "Even the wild need rest.",
+                "hint_suggestive": "Companion gear from soft material and fencing.",
             },
             "Pet Toy": {
                 "ingredients": ["Rope", "Rubber Bands"],
@@ -1245,6 +1297,8 @@ class Lists:
                 "pawn_value": 8,
                 "category": "companion",
                 "craft_text": "You braid the rope into a thick knot, weave rubber bands through it so it makes a satisfying SNAP when squeezed. Your companion goes absolutely feral. Best toy ever.",
+                "hint_vague": "Simple joy for simple creatures.",
+                "hint_suggestive": "Companion gear from rubber and cord.",
             },
             "Feeding Station": {
                 "ingredients": ["Plastic Wrap", "Duct Tape"],
@@ -1252,6 +1306,8 @@ class Lists:
                 "pawn_value": 10,
                 "category": "companion",
                 "craft_text": "You mold the plastic wrap into a bowl shape, reinforce it with duct tape, and stick it to the car floor. It's not pretty. But the food stays in the bowl. Revolutionary.",
+                "hint_vague": "Never let them go hungry.",
+                "hint_suggestive": "Companion gear from a bowl and something stable.",
             },
 
             # ══════════════════════════════════════════════════════════════════════
@@ -2277,6 +2333,11 @@ class Lists:
             "Last Breath Locket": "Guardian angel + phoenix feather. The flame LIVES inside, circling like a caged sun. TRUE immortality: HP cannot reach 0. Your heartbeat synced with the flame. Death has to go through the locket now. The locket doesn't open for anyone.",
             "Phantom Rose": "Ghost protocol + scrap metal rose. The metal flower blooms. Inside: a mirror showing a hallway between seen and unseen. Legend status: +$500/day, zero negative recognition. You're a story. A whisper that walks through walls.",
             "Soul Forge": "Dark pact reliquary + ritual token. 'What would you change?' it asks. One moment. One choice. Rewrite ANY past event. One-time use. 'Choose carefully. This is the only one you get.'",
+
+            # Mechanic Loyalty Items
+            "Tom's Wrench": "A heavy wrench with Tom's initials scratched in. Car repairs at Tom's cost 50% less.",
+            "Frank's Flask": "An engraved flask from Frank. All flasks last +1 use before breaking.",
+            "Oswald's Dice": "Oswald's lucky weighted dice. +5% blackjack luck passive.",
         }
 
     def get_crafted_item_description(self, item_name):
