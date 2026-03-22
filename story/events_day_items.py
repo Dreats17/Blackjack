@@ -142,8 +142,9 @@ class DayItemsMixin:
                 self.change_balance(fallback)
             self.restore_sanity(2)
             print("\n")
-        elif self.has_item("Pocket Knife"):
-            type.type("You try to pry the lock with your " + magenta(bright("Pocket Knife")) + ".")
+        elif self.has_item("Pocket Knife") or self.has_item("Utility Blade") or self.has_item("Master Knife"):
+            knife_name = "Pocket Knife" if self.has_item("Pocket Knife") else ("Utility Blade" if self.has_item("Utility Blade") else "Master Knife")
+            type.type("You try to pry the lock with your " + magenta(bright(knife_name)) + ".")
             print("\n")
             if random.randrange(3) == 0:
                 fallback = random.randint(5, 20)
@@ -151,6 +152,10 @@ class DayItemsMixin:
                 self.change_balance(fallback)
             else:
                 type.type("The blade bends. The lock holds. You almost broke your knife for nothing.")
+            evolved = self.track_item_use(knife_name)
+            if evolved:
+                print("\n")
+                type.type(cyan(bright(self.get_evolution_text(evolved[0], evolved[1]))))
             print("\n")
         else:
             type.type("You don't have anything to open it with. You kick it once. Nothing happens. ")
@@ -671,13 +676,18 @@ class DayItemsMixin:
             type.type("You hold the torch high until the sounds disappear. Your heart hammers. But you're safe.")
             self.restore_sanity(2)
             print("\n")
-        elif self.has_item("Flashlight"):
-            type.type("You click on your " + magenta(bright("Flashlight")) + " and sweep the beam around.")
+        elif self.has_item("Flashlight") or self.has_item("Lantern") or self.has_item("Eternal Light"):
+            light_name = "Flashlight" if self.has_item("Flashlight") else ("Lantern" if self.has_item("Lantern") else "Eternal Light")
+            type.type("You click on your " + magenta(bright(light_name)) + " and sweep the beam around.")
             print("\n")
             type.type("Two eyes reflect back at you from the treeline. Then they blink and vanish.")
             print("\n")
             type.type("You don't sleep great after that.")
             self.lose_sanity(1)
+            evolved = self.track_item_use(light_name)
+            if evolved:
+                print("\n")
+                type.type(cyan(bright(self.get_evolution_text(evolved[0], evolved[1]))))
             print("\n")
         else:
             type.type("You freeze. Every sound is amplified. Every shadow is alive.")
@@ -1396,8 +1406,13 @@ class DayItemsMixin:
             print("\n")
             type.type("Five minutes of careful work. A click. The lid opens.")
             print("\n")
-        elif self.has_item("Pocket Knife"):
-            type.type("You wedge your " + cyan(bright("Pocket Knife")) + " into the seam and work it until the lock gives.")
+        elif self.has_item("Pocket Knife") or self.has_item("Utility Blade") or self.has_item("Master Knife"):
+            knife_name = "Pocket Knife" if self.has_item("Pocket Knife") else ("Utility Blade" if self.has_item("Utility Blade") else "Master Knife")
+            type.type("You wedge your " + cyan(bright(knife_name)) + " into the seam and work it until the lock gives.")
+            evolved = self.track_item_use(knife_name)
+            if evolved:
+                print("\n")
+                type.type(cyan(bright(self.get_evolution_text(evolved[0], evolved[1]))))
             print("\n")
         else:
             type.type("You try every key you have. Nothing. You drive it to a locksmith.")

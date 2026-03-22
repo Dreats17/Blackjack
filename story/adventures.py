@@ -1089,14 +1089,23 @@ class AdventuresMixin:
                     print("\n")
                     type.type("Fighting from above changes the equation. The bear can't use its full size against you.")
                     print("\n")
-                if self.has_item("Pocket Knife"):
-                    type.type("The " + cyan(bright("Pocket Knife")) + " finds a gap in the bear's thick hide — a nick behind the ear that draws blood.")
+                if self.has_item("Pocket Knife") or self.has_item("Utility Blade") or self.has_item("Master Knife"):
+                    knife_name = "Pocket Knife" if self.has_item("Pocket Knife") else ("Utility Blade" if self.has_item("Utility Blade") else "Master Knife")
+                    type.type("The " + cyan(bright(knife_name)) + " finds a gap in the bear's thick hide — a nick behind the ear that draws blood.")
                     print("\n")
                     type.type("It roars. You've hurt it. Not enough — but enough to make it hesitate.")
+                    evolved = self.track_item_use(knife_name)
+                    if evolved:
+                        print("\n")
+                        type.type(cyan(bright(self.get_evolution_text(evolved[0], evolved[1]))))
                     print("\n")
-                if self.has_item("Scrap Armor") or self.has_item("Road Warrior Armor"):
-                    armor_name = "Road Warrior Armor" if self.has_item("Road Warrior Armor") else "Scrap Armor"
+                if self.has_item("Scrap Armor") or self.has_item("Road Warrior Armor") or self.has_item("Plated Vest") or self.has_item("Road Warrior Plate"):
+                    armor_name = "Road Warrior Armor" if self.has_item("Road Warrior Armor") else ("Road Warrior Plate" if self.has_item("Road Warrior Plate") else ("Plated Vest" if self.has_item("Plated Vest") else "Scrap Armor"))
                     type.type("The " + cyan(bright(armor_name)) + " absorbs the first swipe. It saves your ribs.")
+                    evolved = self.track_item_use(armor_name)
+                    if evolved:
+                        print("\n")
+                        type.type(cyan(bright(self.get_evolution_text(evolved[0], evolved[1]))))
                     print("\n")
                 type.type(yellow("=== BATTLE ==="))
                 type.type("The bear charges. You have one chance.")
@@ -4303,9 +4312,14 @@ class AdventuresMixin:
                 print("\n")
                 type.type("You navigate confidently. No stumbles, no surprises.")
                 self.restore_sanity(3)
-            elif self.has_item("Flashlight"):
-                type.type("Your " + cyan(bright("Flashlight")) + " helps, though holding it limits your hands.")
+            elif self.has_item("Flashlight") or self.has_item("Lantern") or self.has_item("Eternal Light"):
+                light_name = "Flashlight" if self.has_item("Flashlight") else ("Lantern" if self.has_item("Lantern") else "Eternal Light")
+                type.type("Your " + cyan(bright(light_name)) + " helps, though holding it limits your hands.")
                 self.restore_sanity(2)
+                evolved = self.track_item_use(light_name)
+                if evolved:
+                    print("\n")
+                    type.type(cyan(bright(self.get_evolution_text(evolved[0], evolved[1]))))
 
             outcome = random.randrange(10)
             

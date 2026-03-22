@@ -1908,9 +1908,14 @@ class DayDarkMixin:
             type.type("Someone runs over with a stick. Beats the dog off you. It finally lets go and runs.")
             print("\n")
             type.type("Your arm is a mess of blood and torn muscle. You can see bone.")
-            if self.has_item("Scrap Armor"):
+            if self.has_item("Scrap Armor") or self.has_item("Plated Vest") or self.has_item("Road Warrior Plate"):
+                armor_name = "Scrap Armor" if self.has_item("Scrap Armor") else ("Plated Vest" if self.has_item("Plated Vest") else "Road Warrior Plate")
                 type.type(" The makeshift padding took the worst of it.")
                 self.hurt(20)
+                evolved = self.track_item_use(armor_name)
+                if evolved:
+                    print("\n")
+                    type.type(cyan(bright(self.get_evolution_text(evolved[0], evolved[1]))))
             else:
                 self.hurt(40)
             self.lose_sanity(15)
@@ -1948,9 +1953,14 @@ class DayDarkMixin:
             type.type("You jump back, heart pounding. That could have killed you.")
             print("\n")
             type.type("You report the hazard to the shop owner. They seem unimpressed.")
-            if self.has_item("Scrap Armor"):
+            if self.has_item("Scrap Armor") or self.has_item("Plated Vest") or self.has_item("Road Warrior Plate"):
+                armor_name = "Scrap Armor" if self.has_item("Scrap Armor") else ("Plated Vest" if self.has_item("Plated Vest") else "Road Warrior Plate")
                 type.type(" Your jury-rigged gear absorbed some of the shock.")
                 self.hurt(4)
+                evolved = self.track_item_use(armor_name)
+                if evolved:
+                    print("\n")
+                    type.type(cyan(bright(self.get_evolution_text(evolved[0], evolved[1]))))
             else:
                 self.hurt(10)
             self.lose_sanity(8)

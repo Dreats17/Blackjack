@@ -887,11 +887,16 @@ class DaySurvivalMixin:
             print("\n")
             type.type("The trucker helps you get the car started again. The flares are spent, but crisis averted.")
             self.use_item("Road Flares")
-        elif self.has_item("Flashlight"):
-            type.type("You wave your " + magenta(bright("Flashlight")) + " at passing cars. After an hour, someone finally stops.")
+        elif self.has_item("Flashlight") or self.has_item("Lantern") or self.has_item("Eternal Light"):
+            light_name = "Flashlight" if self.has_item("Flashlight") else ("Lantern" if self.has_item("Lantern") else "Eternal Light")
+            type.type("You wave your " + magenta(bright(light_name)) + " at passing cars. After an hour, someone finally stops.")
             print("\n")
             type.type("They help jumpstart your car. It could have been worse.")
             self.add_travel_restriction("Car Trouble")
+            evolved = self.track_item_use(light_name)
+            if evolved:
+                print("\n")
+                type.type(cyan(bright(self.get_evolution_text(evolved[0], evolved[1]))))
         else:
             type.type("You sit there for hours, trying to flag down help. Most cars just speed past.")
             print("\n")
