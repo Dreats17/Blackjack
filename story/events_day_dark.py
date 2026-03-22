@@ -906,6 +906,29 @@ class DayDarkMixin:
             print("\n")
             return
 
+        # COMBO: Scrap Armor + Road Flare Torch = Blazing Knight
+        if self.has_item("Scrap Armor") and self.has_item("Road Flare Torch"):
+            type.type("You light the " + cyan(bright("Road Flare Torch")) + " and hold it high. The " + cyan(bright("Scrap Armor")) + " catches the flickering red glow.")
+            print("\n")
+            type.type("You look like a knight who crawled out of a junkyard bonfire. The muggers take one look and decide they have somewhere else to be.")
+            print("\n")
+            type.type("Nobody fights the burning man in homemade plate mail. Nobody.")
+            self.use_item("Road Flare Torch")
+            self.restore_sanity(10)
+            print("\n")
+            return
+
+        # COMBO: Shiv + Scrap Armor = Armed and Armored
+        if self.has_item("Shiv") and self.has_item("Scrap Armor"):
+            type.type("Blade in one hand. " + cyan(bright("Scrap Armor")) + " covering your vitals. The " + cyan(bright("Shiv")) + " catches the streetlight.")
+            print("\n")
+            type.type("The three men reassess the situation. You're armed. You're armored. You're not afraid.")
+            print("\n")
+            type.type(quote("Not worth it,") + " the leader mutters. They melt back into the darkness.")
+            self.restore_sanity(8)
+            print("\n")
+            return
+
         if self.has_item("Worn Gloves") or self.has_item("Velvet Gloves"):
             gloves = "Velvet Gloves" if self.has_item("Velvet Gloves") else "Worn Gloves"
             type.type("Gloved fingers leave no prints. The " + cyan(bright(gloves)) + " ensure your touch is invisible.")

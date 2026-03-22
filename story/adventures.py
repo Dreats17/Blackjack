@@ -1357,7 +1357,18 @@ class AdventuresMixin:
             type.type("The forest is quiet tonight. No adventures find you - or perhaps you weren't ready for them.")
             print("\n")
             type.type("You rest beneath an ancient oak, listening to the wind in the leaves. Sometimes the greatest adventure is simply being still.")
-            if self.has_item("Binoculars") or self.has_item("Binocular Scope"):
+            # COMBO: Binocular Scope + Night Vision Scope = All-Seeing Eye
+            if self.has_item("Binocular Scope") and self.has_item("Night Vision Scope"):
+                print("\n")
+                type.type("You combine the " + cyan(bright("Binocular Scope")) + " and the " + cyan(bright("Night Vision Scope")) + ". All-Seeing Eye.")
+                print("\n")
+                type.type("Day and night collapse into one field of vision. You see EVERYTHING — hidden trails, buried caches, animal dens full of shiny objects, a forgotten backpack in a hollow tree.")
+                print("\n")
+                found = random.randint(100, 500)
+                type.type("The haul is absurd: " + green(bright("${:,}".format(found))) + " in scattered cash, dropped wallets, and sellable trinkets.")
+                self.earn_money(found)
+                self.restore_sanity(10)
+            elif self.has_item("Binoculars") or self.has_item("Binocular Scope"):
                 item_name = "Binocular Scope" if self.has_item("Binocular Scope") else "Binoculars"
                 print("\n")
                 type.type("You pull out your " + cyan(bright(item_name)) + " and scan the treeline. A hidden deer path runs along the ridge — and at the end of it, something glints.")

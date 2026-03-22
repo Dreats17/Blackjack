@@ -68,6 +68,20 @@ class DayAnimalsMixin:
             type.type("It comes to you like you've been friends for years.")
             self.restore_sanity(5)
             return
+        # COMBO: Fancy Cigars + Dog Whistle = Old Man's Trick
+        if self.has_item("Fancy Cigars") and self.has_item("Dog Whistle"):
+            type.type("You light a " + cyan(bright("Fancy Cigar")) + " and blow the " + cyan(bright("Dog Whistle")) + " through the smoke.")
+            print("\n")
+            type.type("Old Man's Trick. The smoke carries the whistle's frequency further. You look like a wise old man on a porch, calling in the evening.")
+            print("\n")
+            type.type("A stray dog trots over, sits down in front of you, and stares with absolute devotion. It has chosen you.")
+            print("\n")
+            type.type("No Animal Whistle needed. No treats. Just a cigar, a whistle, and whatever ancient magic that combination unlocks.")
+            self.use_item("Fancy Cigars")
+            self.add_companion("Scout", "Dog")
+            self.restore_sanity(15)
+            print("\n")
+            return
         rare_chance = random.randrange(100)
         
         if rare_chance < 5:  # 5% RARE VARIANT - The Ghost Dog

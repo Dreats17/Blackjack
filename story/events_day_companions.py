@@ -1417,6 +1417,21 @@ class DayCompanionsMixin:
         companion = living[name]
         comp_type = companion.get("type", "companion")
         days = companion.get("days_owned", 0)
+
+        # COMBO: Pet Toy + Companion Bed + Feeding Station = Perfect Home
+        if self.has_item("Pet Toy") and self.has_item("Companion Bed") and self.has_item("Feeding Station"):
+            type.type(cyan(bright("Perfect Home.")) + " The " + cyan(bright("Companion Bed")) + " is soft. The " + cyan(bright("Feeding Station")) + " is full. The " + cyan(bright("Pet Toy")) + " is within reach.")
+            print("\n")
+            type.type(bright(name) + " is living their absolute best life. Better than most humans, honestly.")
+            print("\n")
+            type.type("They eat, they play, they sleep in a bed that smells like you. Their tail hasn't stopped wagging in days.")
+            print("\n")
+            type.type("Happiness doesn't decay when you've built a home this good. " + bright(name) + " is content. Permanently.")
+            self._companions[name]["happiness"] = 100
+            self.restore_sanity(20)
+            self.pet_companion(name)
+            print("\n")
+            return
         
         type.type("Late afternoon. The sun is going down. It's quiet.")
         print("\n")

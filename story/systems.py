@@ -281,6 +281,20 @@ class SystemsMixin:
         if not (self.has_item("Gambler's Grimoire") or self.has_item("Oracle's Tome")):
             return
         
+        # COMBO: Gambler's Grimoire + Hermit's Journal = Scholar's Insight
+        if (self.has_item("Gambler's Grimoire") or self.has_item("Oracle's Tome")) and self.has_item("Hermit's Journal"):
+            if not self.has_met("Scholar's Insight"):
+                self.meet("Scholar's Insight")
+                tome = "Oracle's Tome" if self.has_item("Oracle's Tome") else "Gambler's Grimoire"
+                print("\n")
+                type.type("The " + cyan(bright(tome)) + " and the " + cyan(bright("Hermit's Journal")) + " are open side by side. The handwriting starts to match.")
+                print("\n")
+                type.type("Scholar's Insight. Knowledge combines. Recipes reveal themselves — combinations you never would have guessed. The Journal provides ingredients; the Grimoire provides purpose.")
+                print("\n")
+                type.type("You feel like you could craft anything. The workbench is no longer a mystery.")
+                self.restore_sanity(15)
+                print("\n")
+        
         stats = self._gambling_stats
         records_broken = []
         

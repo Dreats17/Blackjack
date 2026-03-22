@@ -84,6 +84,26 @@ class DaySurrealMixin:
     def time_loop(self):
         # EVENT: Experience the same morning 3 times, must break the loop
         # EFFECTS: Save bird = +$50, meet "Time Bird"; Ignore phone = +5 sanity; Scream = -5 sanity
+
+        # COMBO: Oracle's Tome + Deck of Cards = Fortune Reading
+        if (self.has_item("Oracle's Tome") or self.has_item("Gambler's Grimoire")) and self.has_item("Deck of Cards"):
+            tome = "Oracle's Tome" if self.has_item("Oracle's Tome") else "Gambler's Grimoire"
+            type.type("You open the " + cyan(bright(tome)) + " and lay three cards from your " + cyan(bright("Deck of Cards")) + " on top of it.")
+            print(PAR)
+            type.type("Fortune Reading. The pages drink the card faces and replace them with prophecy:")
+            print(PAR)
+            type.type("Card one: " + italic("'A friend in trouble. Help them.'"))
+            print(PAR)
+            type.type("Card two: " + italic("'Money on the ground. Take it.'"))
+            print(PAR)
+            type.type("Card three: " + italic("'The Dealer watches. He always watches.'"))
+            print(PAR)
+            type.type("The cards go blank. The book snaps shut. You don't know if the future changed or if it was always going to happen this way.")
+            self.restore_sanity(12)
+            self.change_balance(random.randint(50, 200))
+            print(PAR)
+            return
+
         if self.has_item("Pocket Watch") or self.has_item("Grandfather Clock"):
             watch = "Pocket Watch" if self.has_item("Pocket Watch") else "Grandfather Clock"
             type.type("The clock on your car dashboard says 8:47 AM. You go to brush your teeth. A bird hits the window. Your phone buzzes. You wake up. The clock says 8:47 AM.")

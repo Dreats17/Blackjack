@@ -2101,6 +2101,18 @@ class NightEventsMixin:
     # NIGHT EVENTS - Various Tiers
     def stargazing(self):
         # Poor/Cheap night event
+        # COMBO: Moon Shard + Lucky Medallion = Lunar Fortune
+        if self.has_item("Moon Shard") and (self.has_item("Lucky Medallion") or self.has_item("Lucky Coin")):
+            medallion = "Lucky Medallion" if self.has_item("Lucky Medallion") else "Lucky Coin"
+            type.type("The " + cyan(bright("Moon Shard")) + " catches the moonlight and splits it into silver fire. The " + cyan(bright(medallion)) + " around your neck resonates.")
+            print("\n")
+            type.type("Lunar Fortune. The night bends in your favor. You can feel it — every shadow is a friend, every star a wink from the universe.")
+            print("\n")
+            type.type("A $50 bill drifts across the parking lot and sticks to your shoe. An owl drops a dead mouse at your feet — which is apparently good luck. The night is yours.")
+            self.change_balance(50)
+            self.restore_sanity(15)
+            print("\n")
+            return
         variant = random.randrange(3)
         if variant == 0:
             type.type("You step out of your car to look at the stars. It's a clear night.")
@@ -2447,6 +2459,21 @@ class NightEventsMixin:
         print("\n")
 
     def midnight_walk(self):
+        # COMBO: Quiet Sneakers + Tattered Cloak = Ghost Mode
+        if (self.has_item("Quiet Sneakers") or self.has_item("Quiet Bunny Slippers")) and (self.has_item("Tattered Cloak") or self.has_item("Invisible Cloak")):
+            cloak = "Invisible Cloak" if self.has_item("Invisible Cloak") else "Tattered Cloak"
+            shoes = "Quiet Bunny Slippers" if self.has_item("Quiet Bunny Slippers") else "Quiet Sneakers"
+            type.type("You pull the " + cyan(bright(cloak)) + " tight and lace up the " + cyan(bright(shoes)) + ". Ghost Mode.")
+            print("\n")
+            type.type("You walk through the city like a rumor. No footsteps. No shadow. A police cruiser rolls past — you're standing right there — and the officer doesn't even turn his head.")
+            print("\n")
+            type.type("A group of muggers works the corner. You walk between them. BETWEEN them. One shivers and mutters about a draft.")
+            print("\n")
+            type.type("You are invisible. For tonight, you don't exist. It's the safest you've felt in weeks.")
+            self.restore_sanity(15)
+            print("\n")
+            return
+
         if self.has_item("Rusty Compass") or self.has_item("Golden Compass"):
             compass = "Golden Compass" if self.has_item("Golden Compass") else "Rusty Compass"
             if self.has_item("Golden Compass"):
@@ -2572,6 +2599,26 @@ class NightEventsMixin:
         print("\n")
 
     def nice_dream(self):
+        # COMBO: Mirror of Duality + Marvin's Monocle = True Sight
+        if (self.has_item("Mirror of Duality") or self.has_item("Twin's Locket")) and self.has_item("Marvin's Monocle"):
+            mirror = "Mirror of Duality" if self.has_item("Mirror of Duality") else "Twin's Locket"
+            type.type("The dream starts normally. Casino. Cards. The Dealer across from you, jade eye glinting.")
+            print("\n")
+            type.type("But then you raise the " + cyan(bright("Marvin's Monocle")) + " and open the " + cyan(bright(mirror)) + ".")
+            print("\n")
+            type.type("True Sight. You see the Dealer as he really is.")
+            print("\n")
+            type.type("Not a man. Not a monster. Something older. A figure made of shuffled cards and spent wishes, dealing hands in an infinite game. His face is every face that ever sat across a table and said " + quote("Hit me."))
+            print("\n")
+            type.type("He notices you seeing. The jade eye widens. For the first time in the dream, the Dealer looks... surprised.")
+            print("\n")
+            type.type(quote("So. You can see me now. Really see me.") + " He almost smiles. " + quote("That changes things."))
+            print("\n")
+            type.type("You wake up. The dream fades but the knowledge stays: the Dealer is not your enemy. He's the game itself.")
+            self.restore_sanity(20)
+            self.heal(10)
+            print("\n")
+            return
         variant = random.randrange(4)
         if variant == 0:
             type.type("You have a nice dream for once. About the life you used to have.")

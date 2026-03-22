@@ -1009,6 +1009,26 @@ class DayItemsMixin:
 
     def silver_horseshoe_luck(self):
         """Silver Horseshoe gives a lucky break"""
+        # COMBO: Lucky Penny + Lucky Coin + Lucky Charm Bracelet = Triple Luck
+        if self.has_item("Lucky Penny") and (self.has_item("Lucky Coin") or self.has_item("Lucky Medallion")) and self.has_item("Lucky Charm Bracelet"):
+            coin = "Lucky Medallion" if self.has_item("Lucky Medallion") else "Lucky Coin"
+            type.type("The " + cyan(bright("Lucky Penny")) + " in your pocket. The " + cyan(bright(coin)) + " around your neck. The " + cyan(bright("Lucky Charm Bracelet")) + " on your wrist.")
+            print("\n")
+            type.type("Triple Luck. All three artifacts pulse in unison. The air shimmers gold.")
+            print("\n")
+            type.type("For the next few moments, you can't lose. Literally cannot. The universe has temporarily decided you're its favorite child.")
+            print("\n")
+            type.type("A stranger hands you a winning scratch-off. You find $100 in a jacket you don't remember owning. A bird drops a gold ring at your feet.")
+            print("\n")
+            self.use_item("Lucky Penny")
+            self.use_item("Lucky Charm Bracelet")
+            bonus = random.randint(200, 800)
+            type.type("Total windfall: " + green(bright("${:,}".format(bonus))) + ". The penny and bracelet crumble to lucky dust.")
+            self.change_balance(bonus)
+            self.restore_sanity(20)
+            print("\n")
+            return
+
         if not self.has_item("Silver Horseshoe"):
             self.day_event()
             return

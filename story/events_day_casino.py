@@ -113,6 +113,23 @@ class DayCasinoMixin:
         # EVENT: Internal monologue about the weight and thrill of having $500k+
         # EFFECTS: Atmospheric only - builds tension as you approach the million dollar goal
         # Everytime - internal monologue
+
+        # COMBO: Gold Chain + Velvet Gloves + Sapphire Watch = High Roller
+        if self.has_item("Gold Chain") and (self.has_item("Velvet Gloves") or self.has_item("Worn Gloves")) and (self.has_item("Sapphire Watch") or self.has_item("Golden Watch")):
+            gloves = "Velvet Gloves" if self.has_item("Velvet Gloves") else "Worn Gloves"
+            watch = "Sapphire Watch" if self.has_item("Sapphire Watch") else "Golden Watch"
+            type.type("High Roller mode. The " + cyan(bright("Gold Chain")) + " catches the casino light. The " + cyan(bright(gloves)) + " grip the chips like they were born to. The " + cyan(bright(watch)) + " says you have all the time in the world.")
+            print("\n")
+            type.type("The pit boss nods at you. The waitress brings your drink before you ask. The other gamblers make room at the table.")
+            print("\n")
+            type.type("You sit down like you own the place. Tonight, maybe you do.")
+            self.restore_sanity(10)
+            bonus = random.randint(100, 500)
+            self.change_balance(bonus)
+            type.type(" " + green(bright("VIP comps: ${:,}".format(bonus))))
+            print("\n")
+            return
+
         if self.has_item("Flask of Dealer's Hesitation"):
             type.type("The " + cyan(bright("Flask of Dealer's Hesitation")) + " pulses against your chest.")
             print("\n")

@@ -415,6 +415,28 @@ class DayPeopleMixin:
             print("\n")
             return
 
+        # COMBO: Deck of Cards + Dealer's Mercy = Dealer's Game
+        if self.has_item("Deck of Cards") and (self.has_item("Dealer's Mercy") or self.has_item("Dealer's Grudge")):
+            mercy = "Dealer's Mercy" if self.has_item("Dealer's Mercy") else "Dealer's Grudge"
+            type.type("You pull out your " + cyan(bright("Deck of Cards")) + ". The " + cyan(bright(mercy)) + " pulses in your pocket.")
+            print("\n")
+            type.type(quote("Care for a game?") + " you ask. The stranger looks at the cards. Something in your eyes makes them say yes.")
+            print("\n")
+            type.type("Dealer's Game. You deal with the confidence of someone backed by supernatural authority. The cards obey.")
+            print("\n")
+            if random.randrange(3) != 0:
+                reward = random.randint(100, 500)
+                type.type("You win. Of course you win. The stranger pays up — " + green(bright("${:,}".format(reward))) + " — and walks away shaking their head.")
+                self.change_balance(reward)
+                self.restore_sanity(8)
+            else:
+                type.type("The stranger wins. Impossible — but it happened. They tip their hat and vanish into the crowd.")
+                print("\n")
+                type.type("You check your pocket. The " + cyan(bright(mercy)) + " is cold. Even the Dealer loses sometimes.")
+                self.lose_sanity(3)
+            print("\n")
+            return
+
         if self.has_item("Vintage Wine") and (self.has_item("Gambler's Chalice") or self.has_item("Overflowing Goblet")):
             chalice = "Overflowing Goblet" if self.has_item("Overflowing Goblet") else "Gambler's Chalice"
             self.use_item("Vintage Wine")
