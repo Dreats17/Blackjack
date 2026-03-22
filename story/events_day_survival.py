@@ -929,7 +929,21 @@ class DaySurvivalMixin:
         # Lighter or Monogrammed Lighter or Road Flares starts fire
         type.type("You're shivering in your car. You need fire. Desperately. Maybe to warm up, maybe to cook, maybe just to see.")
         print("\n")
-        
+
+        # COMBO: Fire Launcher + Animal Bait = The BBQ Trap
+        if self.has_item("Fire Launcher") and self.has_item("Animal Bait"):
+            self.use_item("Animal Bait")
+            type.type("Set the " + cyan(bright("Animal Bait")) + ". Wait. Light the " + cyan(bright("Fire Launcher")) + ".")
+            print("\n")
+            type.type("What follows is technically hunting, technically cooking, and technically a war crime against the local squirrel population.")
+            print("\n")
+            type.type("But you eat like a king tonight.")
+            self.heal(50)
+            self.restore_sanity(5)
+            self.add_danger("PETA List")
+            print("\n")
+            return
+
         if self.has_item("Monogrammed Lighter"):
             type.type("You pull out your " + magenta(bright("Monogrammed Lighter")) + " and flick it open.")
             print("\n")

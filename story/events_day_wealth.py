@@ -179,6 +179,22 @@ class DayWealthMixin:
         # EVENT: Scammers try to sell you fake investment opportunities
         # EFFECTS: Purely atmospheric - player wisely ignores all scam attempts
         # Everytime - risky event
+
+        # COMBO: Blackmail Letter + Old Money Identity = The Hostile Takeover
+        if self.has_item("Blackmail Letter") and self.has_item("Old Money Identity"):
+            type.type("You arrive as old money. You present the " + cyan(bright("Blackmail Letter")) + " at the board meeting.")
+            print("\n")
+            type.type(quote("Resign,") + " you say. They do. You sit in the chair. For one day, you own this business.")
+            print("\n")
+            amount = random.randint(500, 1500)
+            self.change_balance(amount)
+            type.type("You extract " + green("${:,}".format(amount)) + " before things get complicated.")
+            print("\n")
+            type.type("The business was money laundering for someone. They'll come looking.")
+            self.add_danger("Hostile Takeover Blowback")
+            print("\n")
+            return
+
         if self.has_item("Oracle's Tome") or self.has_item("Gambler's Grimoire"):
             tome = "Oracle's Tome" if self.has_item("Oracle's Tome") else "Gambler's Grimoire"
             type.type("A man in a cheap suit approaches your car, waving a stack of papers. Same as always.")

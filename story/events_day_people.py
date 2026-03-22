@@ -380,6 +380,20 @@ class DayPeopleMixin:
         #          otherwise lose 3 sanity from humiliation
         # Breath Mints or Expensive Cologne help with social situations
 
+        # COMBO: Gas Mask + Voice Soother = The Voice of God
+        if self.has_item("Gas Mask") and self.has_item("Voice Soother"):
+            type.type("The " + cyan(bright("Gas Mask")) + " distorts your " + cyan(bright("Voice Soother")) + "-enhanced voice into something deep, resonant, and inhuman.")
+            print("\n")
+            type.type("You say " + quote("Excuse me.") + " People freeze. One person kneels. They heard a commandment from another dimension.")
+            print("\n")
+            type.type("The crowd parts. Everything auto-succeeds.")
+            print("\n")
+            self.restore_sanity(8)
+            self.add_status("Voice of God")
+            self.change_balance(random.randint(50, 150))
+            print("\n")
+            return
+
         if self.has_item("Vintage Wine") and (self.has_item("Gambler's Chalice") or self.has_item("Overflowing Goblet")):
             chalice = "Overflowing Goblet" if self.has_item("Overflowing Goblet") else "Gambler's Chalice"
             self.use_item("Vintage Wine")

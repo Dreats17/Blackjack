@@ -831,7 +831,27 @@ class DayDarkMixin:
         # EFFECTS: Comply = lose $100-500 + 15 damage + 10 sanity; Run = escape or die; Fight = win or die
         # COMPANION INTEGRATION: danger_warning companions detect the ambush, protection companions fight
         # DEATH POSSIBLE - Mugging gone wrong
-        
+
+        # COMBO: Forged Documents + Kingpin Look = The Federal Agent
+        if self.has_item("Forged Documents") and self.has_item("Kingpin Look"):
+            type.type("FORGED DOCUMENTS that say FBI. " + cyan(bright("Kingpin Look")) + " that says 'believe me.' You flash the badge. " + quote("Federal investigation. Everyone out."))
+            print("\n")
+            type.type("The criminals run. For ten minutes, you ARE the law.")
+            print("\n")
+            if random.randrange(5) == 0:
+                type.type("A real federal agent double-takes at your badge.")
+                print("\n")
+                type.type(quote("Sir, that's a crayon drawing on a napkin."))
+                print("\n")
+                self.add_danger("Impersonating Fed")
+                type.type("You run. You run hard.")
+                self.change_balance(-100)
+            else:
+                self.change_balance(300)
+                type.type("You pocket $300 in confiscated 'evidence' and walk away clean.")
+            print("\n")
+            return
+
         # COMPANION: Danger warning check (Whiskers, Slick)
         warner = self._lists.has_companion_with_bonus(self, "danger_warning")
         if warner and self.get_companion(warner)["status"] == "alive":
@@ -1473,6 +1493,22 @@ class DayDarkMixin:
         # EFFECTS: Various - can buy cocaine ($500), get beaten (15-45 damage), or shot and killed
         # BRUTAL: Running has high death chance; can acquire "Bag of Cocaine" item
         # DEATH POSSIBLE - Wrong crowd
+
+        # COMBO: New Identity + Blackmail Letter = The Disappearing Act
+        if self.has_item("New Identity") and self.has_item("Blackmail Letter"):
+            type.type("Step one: the " + cyan(bright("New Identity")) + " erases who you were.")
+            print("\n")
+            type.type("Step two: the " + cyan(bright("Blackmail Letter")) + " ensures anyone who remembers stays quiet.")
+            print("\n")
+            type.type("You don't just disappear — you disappear retroactively. The wanted poster comes down.")
+            print("\n")
+            for danger_name in ["Casino Heat", "Police Heat", "Criminal Heat", "Impersonating Fed"]:
+                if self.has_danger(danger_name):
+                    self.lose_danger(danger_name)
+            self.add_status("Ghost")
+            self.restore_sanity(10)
+            return
+
         type.type("A car pulls up next to you. Windows tinted black. Engine rumbling.")
         print("\n")
         type.type("The window rolls down. A face stares out. Cold eyes. Gold teeth.")

@@ -2328,6 +2328,29 @@ class NightEventsMixin:
         print(PAR)
 
     def peaceful_night(self):
+        # COMBO: Lucid Dreaming Kit + Fortune Cards = Dream Gambling
+        if self.has_item("Lucid Dreaming Kit") and self.has_item("Fortune Cards"):
+            if not self.has_met("Dream Gambling"):
+                self.mark_met("Dream Gambling")
+                type.type("In the dream, the " + cyan(bright("Fortune Cards")) + " become a full casino. You gamble in your sleep.")
+                print("\n")
+                type.type("The dream dealer looks like you, but older. " + quote("High card wins,") + " they say.")
+                print("\n")
+                player_card = random.randint(1, 13)
+                dealer_card = random.randint(1, 13)
+                if player_card > dealer_card:
+                    type.type("Your card is higher. Tomorrow comes with a gift.")
+                    self.add_status("Dream Win")
+                    self.restore_sanity(8)
+                elif player_card < dealer_card:
+                    type.type("The dealer's card is higher. Tomorrow will be harder.")
+                    self.add_danger("Dream Loss")
+                    self.lose_sanity(3)
+                else:
+                    type.type("A push. The older you leans forward. " + italic(quote("The event after next — take the second option.")))
+                    self.restore_sanity(5)
+                print("\n")
+
         variant = random.randrange(3)
         if variant == 0:
             type.type("For once, you sleep peacefully. No dreams. No nightmares. Just rest.")
@@ -2524,6 +2547,18 @@ class NightEventsMixin:
         print("\n")
 
     def nightmare(self):
+        # COMBO: Devil's Deck + Binding Portrait = The Soul Game
+        if self.has_item("Devil's Deck") and self.has_item("Binding Portrait"):
+            type.type("You deal from the " + cyan(bright("Devil's Deck")) + ". You wager the " + cyan(bright("Binding Portrait")) + ".")
+            print("\n")
+            type.type("Your opponent wagers a memory. When you win — and you do — their memory enters the portrait.")
+            print("\n")
+            type.type("They forget meeting you. You keep the memory. It's not yours, but you can watch it whenever you want.")
+            self.add_item("Stolen Memory")
+            self.restore_sanity(3)
+            print("\n")
+            return
+
         if self.has_item("Necronomicon") and self.has_item("Dream Catcher"):
             type.type("The " + cyan(bright("Necronomicon")) + " and the " + cyan(bright("Dream Catcher")) + " create a feedback loop.")
             print("\n")
