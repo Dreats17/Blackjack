@@ -2765,6 +2765,7 @@ class Lists:
         # SECTION 44A — WILD ITEM INTERACTIONS - Poor Tier
         a_list.append("wild_headlamp_poker")
         a_list.append("wild_fortune_cards_car")
+        a_list.append("lottery_ticket_check")
         # WRONG ITEM COMEDY EVENTS - Poor Tier
         a_list.append("wrong_item_bug_spray_campfire")
         a_list.append("wrong_item_road_flares_stealth")
@@ -3145,6 +3146,7 @@ class Lists:
         a_list.append("wild_gas_mask_funeral")
         a_list.append("wild_devil_deck_children")
         a_list.append("wild_fortune_cards_car")
+        a_list.append("lottery_ticket_check")
         # WRONG ITEM COMEDY EVENTS - Cheap Tier
         a_list.append("wrong_item_bug_spray_campfire")
         a_list.append("wrong_item_road_flares_stealth")
@@ -3565,6 +3567,7 @@ class Lists:
         a_list.append("wild_binding_portrait_shopkeeper")
         a_list.append("wild_fortune_cards_car")
         a_list.append("wild_blackmail_letter_companion")
+        a_list.append("lottery_ticket_check")
         # WRONG ITEM COMEDY EVENTS - Modest Tier
         a_list.append("wrong_item_bug_spray_campfire")
         a_list.append("wrong_item_road_flares_stealth")
@@ -3922,6 +3925,7 @@ class Lists:
         a_list.append("wild_binding_portrait_shopkeeper")
         a_list.append("wild_fortune_cards_car")
         a_list.append("wild_blackmail_letter_companion")
+        a_list.append("lottery_ticket_check")
         # WRONG ITEM COMEDY EVENTS - Rich Tier
         a_list.append("wrong_item_pest_control_romance")
         a_list.append("wrong_item_dirty_hat_dinner")
@@ -4280,6 +4284,7 @@ class Lists:
         a_list.append("wild_binding_portrait_shopkeeper")
         a_list.append("wild_fortune_cards_car")
         a_list.append("wild_blackmail_letter_companion")
+        a_list.append("lottery_ticket_check")
         # WRONG ITEM COMEDY EVENTS - Doughman Tier
         a_list.append("wrong_item_dirty_hat_dinner")
         a_list.append("wrong_item_necronomicon_loan_shark")
@@ -4606,6 +4611,7 @@ class Lists:
         a_list.append("wild_binding_portrait_shopkeeper")
         a_list.append("wild_fortune_cards_car")
         a_list.append("wild_blackmail_letter_companion")
+        a_list.append("lottery_ticket_check")
         random.shuffle(a_list)
         return a_list
     
@@ -5017,6 +5023,7 @@ class Lists:
         "wild_binding_portrait_shopkeeper":[0, 0, 1, 2, 2, 1],
         "wild_fortune_cards_car":         [1, 1, 2, 2, 1, 1],
         "wild_blackmail_letter_companion":[0, 0, 1, 2, 2, 1],
+        "lottery_ticket_check":           [2, 2, 1, 1, 1, 1],
 
         # ── WRONG ITEM COMEDY ──────────────────────────────────────────────────
         # Comedy-of-errors events: using an item in the wrong context.
