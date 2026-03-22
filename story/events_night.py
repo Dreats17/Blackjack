@@ -60,7 +60,7 @@ class NightEventsMixin:
     # Everytime
     def ditched_wallet(self):
         # EVENT: Find an abandoned wallet on the side of the road during a night walk
-        # EFFECTS: Gain $65-120 (50%) or $7-50 (50%)
+        # EFFECTS: Gain $65-120 (50%) or $7-50 (50%); Flask of Fortunate Night gives 5% chance bonus
         type.type("Bored out of your mind, you decide to wander along the side of the road, just to get a change of scenery from the dusty leather seats of your wagon. ")
         type.type("As you take step after step over the asphalt, you notice a ditched wallet, just laying there. I guess it's yours now. ")
         print("\n")
@@ -71,6 +71,13 @@ class NightEventsMixin:
             worth = random.randint(7, 50)
         type.type("Inside the wallet, you find " + green(bright("$" + str(worth))) + " dollars.")
         self.change_balance(worth)
+        if self.has_item("Flask of Fortunate Night") and random.randrange(20) == 0:
+            bonus = random.randint(50, 100)
+            print("\n")
+            type.type("The " + cyan(bright("Flask of Fortunate Night")) + " hums warm in your pocket. Fate tips its hat tonight.")
+            print("\n")
+            type.type("You check again — there's a folded bill tucked behind the ID. Another " + green(bright("$" + str(bonus))) + ".")
+            self.change_balance(bonus)
 
     def went_jogging(self):
         # EVENT: Go jogging to pass the time and get exercise
@@ -134,6 +141,20 @@ class NightEventsMixin:
             type.type("As you walk along the path, you notice someone leaning against a tree in front of you. ")
             type.type("As you get closer, you notice that the person's face is blue, their eyes are bloodshot, and they don't appear to be breathing.")
             print("\n")
+            # ITEM: Headlamp - spot danger before it becomes a threat
+            if self.has_item("Headlamp"):
+                type.type("The " + magenta(bright("Headlamp")) + " cuts through the dark undergrowth ahead.")
+                print("\n")
+                type.type("The beam sweeps left, right, and then lands on the figure against the tree.")
+                print("\n")
+                type.type("You see it from fifteen feet away instead of three. Something glints near the body. Something moved.")
+                print("\n")
+                type.type("You stop. You back up slowly. You take the long way around.")
+                print("\n")
+                type.type("You make it back to the road. Shaken, but safe. Some things are better left in the dark.")
+                self.restore_sanity(5)
+                print("\n")
+                return
             type.type("You begin to panic, before thinking through the situation. ")
             type.type("They're already dead, so there's nothing you can do to help them. ")
             type.type("Maybe they had some money on them? I mean, they're not gonna use it. Why shouldn't you?")
@@ -292,6 +313,19 @@ class NightEventsMixin:
             self.add_item("Map")
             type.type("You got the " + magenta(bright("Map")) + "! You can now drive to Marvin's Mystical Merchandise!")
             type.type("Without a second thought, you pocket the map, and turn back, following the riverbank home.")
+            print("\n")
+            return
+        elif self.has_item("Fishing Rod"):
+            type.type("You drop a line into the river. Something big takes it almost immediately.")
+            print("\n")
+            type.type("The rod bends hard. You brace your feet and pull. Whatever this is, it is fighting.")
+            print("\n")
+            type.type("Twenty minutes later, you haul out an enormous catfish and stare at each other in mutual disbelief.")
+            print("\n")
+            earnings = random.randint(30, 60)
+            type.type("You sell it at the first roadside stand you find. " + green(bright("$" + str(earnings))) + ". Not bad for a night at the river.")
+            self.earn_money(earnings)
+            self.restore_sanity(random.choice([5, 7, 8]))
             print("\n")
             return
         else:
@@ -558,6 +592,20 @@ class NightEventsMixin:
         type.type("The air is heavy with the scent of decay and blooming lilies. ")
         type.type("Fireflies blink in the darkness like tiny green stars.")
         print("\n")
+        # ITEM: Storm Suit - swamp weather immunity, wade through unharmed
+        if self.has_item("Storm Suit"):
+            type.type("The " + magenta(bright("Storm Suit")) + " seals around you perfectly. Nothing gets in. Not the water, not the chill, not the leeches.")
+            print("\n")
+            type.type("You wade through the swamp like it's a shopping mall. Confident. Dry. Mildly overdressed.")
+            print("\n")
+            type.type("On the far bank you find a waterlogged bag that some unlucky soul must have dropped. You open it.")
+            print("\n")
+            found = random.randint(80, 200)
+            type.type("Inside: " + green(bright("$" + str(found))) + " in damp but spendable bills, and a sense of supreme competence.")
+            self.change_balance(found)
+            self.restore_sanity(6)
+            print("\n")
+            return
         event = random.choice(["leech", "nectar", "witch", "rowboat", "none"])
         if event == "leech":
             type.type("Something latches onto your leg. Then another. And another. LEECHES.")
@@ -1628,8 +1676,38 @@ class NightEventsMixin:
                 type.type("You sidestep like a matador. The dogs rocket past you. The walker chases after them, screaming names. You feel like you missed out on something special.")
             print("\n")
         elif event == "mugging":
+            if self.has_item("Rolling Fortress"):
+                type.type("A figure emerges from an alley. Then another. Then a third. They move toward your car.")
+                print("\n")
+                type.type("The " + cyan(bright("Rolling Fortress")) + "'s defense layers trigger. Would-be thieves approach, assess, and retreat. Nobody is taking anything tonight.")
+                print("\n")
+                self.restore_sanity(8)
+            elif self.has_item("Fortified Perimeter"):
+                type.type("A figure moves in from the shadows. Another follows.")
+                print("\n")
+                type.type("The " + cyan(bright("Fortified Perimeter")) + "'s trip-wires trigger. An alarm sounds. The night goes quiet.")
+                print("\n")
+                self.restore_sanity(5)
+            elif self.has_item("Road Warrior Armor"):
+                type.type("They came with intent. The " + cyan(bright("Road Warrior Armor")) + "'s harness glints under the streetlamp.")
+                print("\n")
+                type.type("The intent evaporates.")
+                self.restore_sanity(5)
+            elif self.has_item("Guardian Angel"):
+                type.type("A figure emerges from an alley. Then another. Then a third. They fan out, blocking your path.")
+                print("\n")
+                type.type("The " + cyan(bright("Guardian Angel")) + "'s layered signal-to-perimeter system was already tracking this threat. It ends before it starts.")
+                print("\n")
+                self.restore_sanity(10)
+            elif self.has_item("Distress Beacon"):
+                type.type("A figure emerges from an alley. Then another. Then a third. They fan out, blocking your path.")
+                print("\n")
+                type.type("You trigger the " + cyan(bright("Distress Beacon")) + ". In the confusion of arriving vehicles, your threat disappears.")
+                print("\n")
+                self.use_item("Distress Beacon")
+                self.restore_sanity(7)
             # Check for Bodyguard Bruno - complete protection
-            if self.has_item("Bodyguard Bruno"):
+            elif self.has_item("Bodyguard Bruno"):
                 type.type("A figure emerges from an alley. Then another. Then a third. They fan out, blocking your path.")
                 print("\n")
                 type.type("Before they can speak, Bruno steps out of the shadows behind them.")
@@ -1640,6 +1718,30 @@ class NightEventsMixin:
                 type.type(" Bruno nods at you. " + quote("Stay safe out there."))
                 print("\n")
                 self.restore_sanity(12)
+            elif self.has_item("Tattered Cloak") or self.has_item("Invisible Cloak"):
+                cloak = "Tattered Cloak" if self.has_item("Tattered Cloak") else "Invisible Cloak"
+                type.type("A figure emerges from an alley. Then another. Then a third.")
+                print("\n")
+                type.type("You pull the " + cyan(bright(cloak)) + " tight. The nearest mugger squints directly at you.")
+                print("\n")
+                type.type(quote("The hell — where'd he go?"))
+                print("\n")
+                type.type("Their eyes slide right past you. You walk out the far end of the alley without breathing.")
+                print("\n")
+                type.type("You don't stop until you're two blocks away, hands shaking, invisible, alive.")
+                self.restore_sanity(10)
+            elif self.has_item("Lucky Medallion") or self.has_item("Lucky Coin"):
+                coin = "Lucky Medallion" if self.has_item("Lucky Medallion") else "Lucky Coin"
+                type.type("A figure emerges from an alley. Then another. Then a third. One has a knife that catches the streetlight.")
+                print("\n")
+                type.type("You reach into your pocket. The " + cyan(bright(coin)) + " is warm in your hand.")
+                print("\n")
+                type.type("You flip it without thinking. Heads.")
+                print("\n")
+                type.type("The coin bounces off the pavement and rolls perfectly under the lead mugger's foot. He stumbles.")
+                print("\n")
+                type.type("You vault the nearby fence. A heartbeat later, the alley is behind you. The coin is gone, but you're not.")
+                self.restore_sanity(8)
             else:
                 type.type("A figure emerges from an alley. Then another. Then a third. They fan out, blocking your path. One has a knife.")
                 print("\n")
@@ -1649,8 +1751,19 @@ class NightEventsMixin:
                 action = input("(fight/talk/comply/run): ").strip().lower()
                 
                 if action == "fight":
+                    # Brass Knuckles - instant deterrence before the fight even starts
+                    if self.has_item("Brass Knuckles"):
+                        type.type("You raise your fist. The brass knuckles catch the streetlight at exactly the right angle.")
+                        print("\n")
+                        type.type("The mugger looks at your hand, then at your face, then makes a decision about his life goals.")
+                        print("\n")
+                        type.type("He leaves. Fast.")
+                        print("\n")
+                        type.type("His friends follow without a word.")
+                        self.restore_sanity(8)
+                        print("\n")
                     # Pocket Knife gives you a real edge (consumed)
-                    if self.has_item("Pocket Knife"):
+                    elif self.has_item("Pocket Knife"):
                         self.use_item("Pocket Knife")
                         type.type("You pull out your pocket knife. The blade catches the streetlight.")
                         print("\n")
@@ -2013,9 +2126,25 @@ class NightEventsMixin:
             print("\n")
             type.type("You spend an hour mapping constellations. For a guy living in a car, you've never felt richer.")
             self.restore_sanity(random.choice([8, 10, 12]))
+            if self.has_item("Lucky Charm Bracelet"):
+                print("\n")
+                type.type("The " + cyan(bright("Lucky Charm Bracelet")) + " tingles on your wrist. You see something falling from the sky — a shooting star.")
+                print("\n")
+                type.type("You make a wish that feels exactly right. Not desperate. Not greedy. Just... right.")
+                self.restore_sanity(5)
         else:
             type.type("Still, it's beautiful. You feel small, but in a comforting way.")
             self.restore_sanity(random.choice([3, 4, 5]))
+            if self.has_item("Night Scope"):
+                print("\n")
+                type.type("Through the " + cyan(bright("Night Scope")) + ", the darkness becomes transparent. You watch a raccoon carry a hotdog from three blocks away. You feel omniscient.")
+                print("\n")
+                self.restore_sanity(6)
+            if self.has_item("Spotlight"):
+                print("\n")
+                type.type("You sweep the " + cyan(bright("Spotlight")) + " in a wide arc. Everything in range is illuminated. A deer freezes. The deer is extremely visible.")
+                print("\n")
+                self.restore_sanity(4)
         print("\n")
 
     def midnight_snack_run(self):
@@ -2109,69 +2238,131 @@ class NightEventsMixin:
         print("\n")
 
     def nightmare_of_losing(self):
+        if self.has_item("Dream Catcher"):
+            type.type("The " + cyan(bright("Dream Catcher")) + " glows faintly on the rearview mirror.")
+            print(PAR)
+            type.type("The nightmare can't take hold. Whatever was waiting for you in the dark dissolves before it can form. You sleep clean through to morning.")
+            print(PAR)
+            type.type("You wake up rested. Unsettled in a vague way — like you know something tried and failed — but rested.")
+            self.restore_sanity(4)
+            print(PAR)
+            return
         variant = random.randrange(4)
         if variant == 0:
-            type.type("You dream of losing everything. Your balance hits zero. Then goes negative.")
-            print("\n")
-            type.type("The Dealer laughs. Everyone laughs. You're dragged out of the casino by your collar.")
-            print("\n")
-            type.type("You wake up drenched in sweat, gasping for air.")
-            print("\n")
-            type.type("Just a dream. Just a dream. Just a dream.")
+            type.type("You dream of losing everything. Not slowly — all at once, in a single hand, the balance hitting zero and then going negative like the game has decided to start billing you for the privilege of losing. The Dealer laughs. Then everyone laughs. Then you're being dragged out by your collar while the chips scatter across the floor.")
+            print(PAR)
+            type.type("You wake up drenched in sweat, gasping like you surfaced from deep water. You check your balance. It's still there. It's fine. It's fine. It's fine.")
         elif variant == 1:
-            type.type("In the nightmare, the cards are blank. Every single one. You flip them over and they're just... white.")
-            print("\n")
-            type.type("The Dealer keeps dealing blank cards. You keep losing anyway. " + quote("Hit or stand?") + " he asks.")
-            print("\n")
-            type.type("You scream. No sound comes out. The Dealer deals another blank card. You bust.")
-            print("\n")
-            type.type("You jolt awake. Your mouth tastes like copper. Your heart is trying to leave your chest.")
+            type.type("In the nightmare, the cards are blank. Every single one — you flip them over and they're just white, featureless, like the deck was printed wrong or maybe the meaning has been removed from things.")
+            print(PAR)
+            type.type("The Dealer keeps dealing blank cards. You keep losing anyway. " + quote("Hit or stand?") + " he asks, and you scream, but no sound comes out, and he deals another blank card and you bust on nothing.")
+            print(PAR)
+            type.type("You jolt awake. Your mouth tastes like copper. Your heart is trying to exit your chest via the fastest route available.")
         elif variant == 2:
-            type.type("The nightmare is familiar. You're at the table. You bet everything. You bust.")
-            print("\n")
-            type.type("But this time, instead of just losing, the floor opens up. You fall. Through the chair, through the floor, into nothing.")
-            print("\n")
-            type.type("You keep falling. The Dealer's voice echoes from above: " + quote("Better luck next time."))
-            print("\n")
-            type.type("You hit the ground. Wake up. You're in your car. You're always in your car.")
+            type.type("The nightmare is familiar. You're at the table. You bet everything. You bust. But this time the floor opens under your chair and you fall — through the floor, through the building, into absolute nothing.")
+            print(PAR)
+            type.type("You keep falling. The Dealer's voice echoes down from somewhere above, warm and professional: " + quote("Better luck next time.") + " You hit the ground. You wake up. You're in your car. You're always in your car.")
         else:
-            type.type("You dream that you've been playing for a hundred years. Your beard drags on the ground. Your clothes are dust.")
-            print("\n")
-            type.type("The Dealer hasn't aged at all. He still smiles that smile. He'll be here forever.")
-            print("\n")
-            type.type(quote("One more hand?") + " he asks. You nod. What else would you do?")
-            print("\n")
-            type.type("You wake up. Check the mirror. No beard. But your eyes look a hundred years old.")
-        self.lose_sanity(5)
-        print("\n")
+            type.type("You dream that you've been playing for a hundred years. Your clothes are dust. Your beard drags on the casino floor. The other patrons are all skeletons in evening wear, betting chips made of bone.")
+            print(PAR)
+            type.type("The Dealer hasn't aged at all. He still has that smile — the one that says he has all the time in the world because time doesn't apply to him.")
+            print(PAR)
+            type.type(quote("One more hand?") + " he asks. You nod. What else would you do? What else have you ever done?")
+            print(PAR)
+            type.type("You wake up and check the mirror. No beard. But your eyes look a hundred years old.")
+        if self.has_item("Third Eye"):
+            type.type("The " + cyan(bright("Third Eye")) + " sees the nightmare for what it is — probability, not prophecy. You wake knowing the difference.")
+            print(PAR)
+            self.restore_sanity(5)
+        elif self.has_item("Mind Shield"):
+            type.type("The " + cyan(bright("Mind Shield")) + " filters the nightmare. It still reaches you, but muted. Distant.")
+            print(PAR)
+            self.lose_sanity(2)
+        else:
+            self.lose_sanity(5)
+        print(PAR)
 
     def insomnia_night(self):
         variant = random.randrange(3)
         if variant == 0:
-            type.type("You can't sleep. Your brain won't stop calculating odds.")
-            print("\n")
-            type.type("If I bet X and win Y, then I could... no wait, that's not right...")
-            print("\n")
-            type.type("You stare at the ceiling until dawn. Thinking. Always thinking. The math never adds up to freedom.")
+            type.type("You can't sleep. Your brain won't stop running the math — if I bet X and win Y, and then double down on Z, carry the loss from Tuesday, factor in the streak pattern, account for the Dealer's tell when he pauses... no, wait, that's not right. Start over.")
+            print(PAR)
+            type.type("You stare at the ceiling until the sky goes gray. Thinking. Always thinking. The math never adds up to freedom, but that never stopped you from trying.")
         elif variant == 1:
-            type.type("Three AM. Four AM. Five AM. You've watched every hour tick by on the dashboard clock.")
-            print("\n")
-            type.type("Your body is exhausted. Your brain is throwing a party. An awful party where every thought is about what you did wrong today.")
-            print("\n")
-            type.type("At 5:47 AM, you finally drift off. Your alarm goes off at 6:00.")
+            type.type("Three AM. Four AM. Five AM. You've watched every hour tick over on the dashboard clock like you're being paid to witness it. Your body is doing that thing where it's so tired it stopped knowing how to sleep.")
+            print(PAR)
+            type.type("Your brain is throwing a party. An awful, private party where every guest is a decision you made wrong and the music is the specific silence of a car park at 4 AM. At 5:47 you finally drift off. Your alarm goes off at 6:00.")
         else:
-            type.type("Sleep won't come. You try counting sheep. The sheep turn into cards. The cards turn into debts. The debts turn into a spiral.")
-            print("\n")
-            type.type("You lie there, eyes wide open, listening to your own breathing and the distant hum of the highway.")
-            print("\n")
-            type.type("Somewhere out there, normal people are sleeping in beds. In houses. With futures.")
-            print("\n")
-            type.type("You wonder if they know how lucky they are. Probably not. Nobody does until it's gone.")
+            type.type("Sleep won't come. You try counting sheep. The sheep turn into cards. The cards turn into debts. The debts turn into a math problem you already know the answer to but keep solving anyway, hoping the answer changes.")
+            print(PAR)
+            type.type("You lie there, eyes open, listening to your own breathing and the distant hum of a highway that exists for people going somewhere. Somewhere out there, people are sleeping in actual beds, in actual houses, with mortgages that embarrass them and futures they take for granted.")
+            print(PAR)
+            type.type("You wonder if they know. How lucky the ordinary is. How you'd give everything you're chasing just to feel that ordinary again. Probably not. Nobody ever knows until it's already gone and they're lying in a car in the dark making deals with the ceiling.")
+        if self.has_item("Survival Bivouac"):
+            print(PAR)
+            type.type("You unroll the " + magenta(bright("Survival Bivouac")) + " across the back seat.")
+            print(PAR)
+            type.type("It's rated for negative forty degrees. In a casino parking lot in June, it is perhaps slightly overkill.")
+            print(PAR)
+            type.type("You are asleep in four minutes. You sleep like a rock. You sleep like someone who has solved the problem of sleep completely and will never think about it again.")
+            print(PAR)
+            type.type("You wake up rested. Genuinely, embarrassingly rested. The brain math can wait.")
+            self.restore_sanity(8)
+            self.heal(10)
+            print(PAR)
+            return
+        elif self.has_item("Gambler's Chalice") or self.has_item("Overflowing Goblet"):
+            goblet = "Gambler's Chalice" if self.has_item("Gambler's Chalice") else "Overflowing Goblet"
+            print(PAR)
+            type.type("You reach for the " + cyan(bright(goblet)) + " and pour one drink, then another. The goblet never empties. The night is still sleepless, but something about the silver light on the rim makes it bearable — like the dark has agreed to be a little less dark, just for you, just for tonight.")
+            self.restore_sanity(6)
+            print(PAR)
+            return
+        elif self.has_item("Deck of Cards"):
+            print(PAR)
+            type.type("You reach for the " + cyan(bright("Deck of Cards")) + " and deal yourself a hand of solitaire.")
+            print(PAR)
+            type.type("The cards are familiar. The ritual is familiar. Shuffle, deal, turn over. Shuffle, deal, turn over. Your brain math dissolves into something simpler — red on black, black on red.")
+            print(PAR)
+            type.type("Sleep comes eventually. Not quickly. But eventually.")
+            self.restore_sanity(4)
+            print(PAR)
+            return
         self.lose_sanity(3)
         self.hurt(5)
-        print("\n")
+        print(PAR)
 
     def peaceful_night(self):
+        if self.has_item("Nomad's Camp"):
+            type.type("The " + cyan(bright("Nomad's Camp")) + " at night: fire crackles, traps set, feast prepared.")
+            print("\n")
+            type.type("The wilderness is your home. You sleep like a king and wake fully restored.")
+            self.heal(50)
+            self.restore_sanity(20)
+            return
+        # COMBO: Lucid Dreaming Kit + Fortune Cards = Dream Gambling
+        if self.has_item("Lucid Dreaming Kit") and self.has_item("Fortune Cards"):
+            if not self.has_met("Dream Gambling"):
+                self.mark_met("Dream Gambling")
+                type.type("In the dream, the " + cyan(bright("Fortune Cards")) + " become a full casino. You gamble in your sleep.")
+                print("\n")
+                type.type("The dream dealer looks like you, but older. " + quote("High card wins,") + " they say.")
+                print("\n")
+                player_card = random.randint(1, 13)
+                dealer_card = random.randint(1, 13)
+                if player_card > dealer_card:
+                    type.type("Your card is higher. Tomorrow comes with a gift.")
+                    self.add_status("Dream Win")
+                    self.restore_sanity(8)
+                elif player_card < dealer_card:
+                    type.type("The dealer's card is higher. Tomorrow will be harder.")
+                    self.add_danger("Dream Loss")
+                    self.lose_sanity(3)
+                else:
+                    type.type("A push. The older you leans forward. " + italic(quote("The event after next — take the second option.")))
+                    self.restore_sanity(5)
+                print("\n")
+
         variant = random.randrange(3)
         if variant == 0:
             type.type("For once, you sleep peacefully. No dreams. No nightmares. Just rest.")
@@ -2195,6 +2386,20 @@ class NightEventsMixin:
             type.type("You sleep like a baby. A baby who lives in a car, but a well-rested baby nonetheless.")
         self.restore_sanity(10)
         self.heal(15)
+        if self.has_item("Fire Starter Kit") or self.has_item("Survival Bivouac"):
+            item_name = "Fire Starter Kit" if self.has_item("Fire Starter Kit") else "Survival Bivouac"
+            print("\n")
+            type.type("The " + cyan(bright(item_name)) + " is doing its job. A small fire burns at the car's perimeter. The warmth is extraordinary. The stars are extraordinary. Everything is fine.")
+            self.restore_sanity(5)
+            self.heal(5)
+        if self.has_item("Vintage Wine") or self.has_item("Silver Flask"):
+            wine = "Vintage Wine" if self.has_item("Vintage Wine") else "Silver Flask"
+            print("\n")
+            type.type("You pour a glass from the " + cyan(bright(wine)) + ". The stars come out. For a while, everything is quiet and expensive.")
+            print("\n")
+            type.type("You didn't earn this night. Nobody earns a night like this. You just got lucky enough to be awake for it.")
+            self.restore_sanity(5)
+            self.heal(5)
         print("\n")
 
     def stray_cat_returns(self):
@@ -2214,31 +2419,27 @@ class NightEventsMixin:
     def midnight_walk(self):
         variant = random.randrange(3)
         if variant == 0:
-            type.type("You can't sleep. You decide to take a walk.")
-            print("\n")
-            type.type("The city is different at night. Quieter. More honest, somehow. The neon signs hum a frequency only insomniacs can hear.")
-            print("\n")
-            type.type("You walk past closed shops and sleeping houses. Everyone behind those walls has a bed. A fridge. A door that locks from the inside.")
-            print("\n")
-            type.type("You walk until your legs get tired, then you walk some more. The rhythm helps. Step, step, step. Simple. Forward. One direction.")
+            type.type("You can't sleep, so you walk. The city is different at this hour — quieter, more honest, the neon signs humming a frequency that only works on insomniacs and people with nothing left to protect.")
+            print(PAR)
+            type.type("You pass closed shops and sleeping houses. Everyone behind those walls has a bed. A fridge. A door that locks from the inside. You walk past all of it without slowing down, because the rhythm is the only thing that works — step, step, step, forward, one direction, don't stop.")
         elif variant == 1:
-            type.type("Midnight. You lace up your shoes and walk into the dark.")
-            print("\n")
-            type.type("A cat crosses your path. It doesn't run. Just sits and watches you, like it's been expecting you.")
-            print("\n")
-            type.type("You nod at the cat. It blinks. You keep walking. Some conversations don't need words.")
-            print("\n")
-            type.type("You walk three miles in a loop. Past the casino, past the gas station, past the diner, back to the wagon. A familiar orbit.")
+            type.type("Midnight. You lace your shoes and walk into the dark. A cat crosses your path, sits down, and watches you approach with the calm of something that has never worried about anything in its life.")
+            print(PAR)
+            type.type("You nod at the cat. It blinks once, slow and deliberate. You keep walking. Three miles in a familiar loop — past the casino, past the gas station, past the diner that smells like breakfast even at midnight, back to the wagon. The same orbit, every time.")
         else:
-            type.type("You step out of the car and into the cool night air. Your joints pop. All of them. In sequence. Like a xylophone of decay.")
-            print("\n")
-            type.type("You walk along the shoulder of the highway. Headlights sweep over you like searchlights. Nobody stops. Nobody cares.")
-            print("\n")
-            type.type("It's nice, actually. Being nobody. Being invisible. Just a silhouette on the roadside that exists for two seconds in someone's headlights and then doesn't.")
-        print("\n")
-        type.type("When you get back to your car, you feel calmer. Tired in the right way.")
+            type.type("You step out of the car and into the cool night air. Every joint in your body pops in sequence, like a xylophone built from bad decisions.")
+            print(PAR)
+            type.type("You walk along the shoulder of the highway. Headlights sweep over you at intervals — two seconds of being visible, then darkness again. Nobody slows. Nobody cares, which tonight feels like a gift. Just a silhouette on the roadside that exists briefly in someone's headlights and then doesn't. It's nice, being no one.")
+        print(PAR)
+        type.type("When you get back to your car, you're tired in the right way for once. The kind of tired that actually leads to sleep.")
         self.restore_sanity(random.choice([5, 7, 10]))
-        print("\n")
+        if self.has_item("Binoculars"):
+            print(PAR)
+            type.type("You stop at the edge of a parking garage and pull out your " + cyan(bright("Binoculars")) + ". Scan the skyline.")
+            print(PAR)
+            type.type("The city looks different at distance. Smaller. More manageable. All those lit windows — every one of them a problem someone thinks is unique. From here, they're just lights.")
+            self.restore_sanity(4)
+        print(PAR)
 
     def raccoon_invasion(self):
         type.type("You wake up to scratching noises. Something is ON your car.")
@@ -2263,12 +2464,30 @@ class NightEventsMixin:
             self.restore_sanity(3)
             print("\n")
             return
+        if self.has_item("Snare Trap"):
+            type.type("You set the " + cyan(bright("Snare Trap")) + " around the food before bed. Classic precaution.")
+            print("\n")
+            type.type("In the morning, you've caught one very surprised raccoon. It stares at you. You stare at it.")
+            print("\n")
+            type.type("You relocate it to a field two miles down the road. It seems personally offended by this, but it's fine.")
+            self.restore_sanity(4)
+            print("\n")
+            return
         if self.has_item("Pest Control"):
             type.type("You grab your " + magenta(bright("Pest Control")) + " and crack the window. One spritz. The raccoons look personally offended.")
             print("\n")
             type.type("They leave, but slowly. Deliberately. As if to say: " + quote("We'll be back."))
             print("\n")
             self.restore_sanity(4)
+            return
+        if self.has_item("Slingshot"):
+            type.type("You step outside with your " + cyan(bright("Slingshot")) + ".")
+            print("\n")
+            type.type("Twelve seconds of chaos. Three panicked raccoons departing at full speed for safer territories.")
+            print("\n")
+            type.type("The babies fall off the roof, land safely in the grass, and scurry after their parents. No harm done. Just a lesson in property rights.")
+            self.restore_sanity(5)
+            print("\n")
             return
         variant = random.randrange(2)
         if variant == 0:
@@ -2340,6 +2559,43 @@ class NightEventsMixin:
         print("\n")
 
     def nightmare(self):
+        # COMBO: Devil's Deck + Binding Portrait = The Soul Game
+        if self.has_item("Devil's Deck") and self.has_item("Binding Portrait"):
+            type.type("You deal from the " + cyan(bright("Devil's Deck")) + ". You wager the " + cyan(bright("Binding Portrait")) + ".")
+            print("\n")
+            type.type("Your opponent wagers a memory. When you win — and you do — their memory enters the portrait.")
+            print("\n")
+            type.type("They forget meeting you. You keep the memory. It's not yours, but you can watch it whenever you want.")
+            self.add_item("Stolen Memory")
+            self.restore_sanity(3)
+            print("\n")
+            return
+
+        if self.has_item("Necronomicon") and self.has_item("Dream Catcher"):
+            type.type("The " + cyan(bright("Necronomicon")) + " and the " + cyan(bright("Dream Catcher")) + " create a feedback loop.")
+            print("\n")
+            type.type("The nightmare becomes a stage set. The monsters become furniture. You direct. You control.")
+            print("\n")
+            type.type("You rewrite the ending. The drowning car fills with light. The faceless Dealer bows and leaves. The teeth fall out and become pearls.")
+            print("\n")
+            type.type("You wake up refreshed. You learned something from that dream. You're not sure what yet. But it feels important.")
+            self.restore_sanity(15)
+            print("\n")
+            return
+
+        if self.has_item("Necronomicon") and not self.has_item("Dream Catcher"):
+            type.type("The " + cyan(bright("Necronomicon")) + " rustles at 3 AM. The nightmare gets... educational.")
+            print("\n")
+            type.type("Something in the dark uses your sleeping mind as a classroom. You don't choose to attend. You don't get a say.")
+            print("\n")
+            type.type("You learn something. You don't have words for it yet. It costs you, but you learn it.")
+            print("\n")
+            type.type(italic("You understand something you didn't before. Whether that's good is a separate question."))
+            self.add_status("Dark Knowledge")
+            self.lose_sanity(5)
+            print("\n")
+            return
+
         variant = random.randrange(4)
         if variant == 0:
             type.type("Nightmares again. The usual. Losing everything. Dying alone in a parking lot that nobody remembers the name of.")
@@ -2363,7 +2619,16 @@ class NightEventsMixin:
             type.type("You try to put them back. They don't fit anymore. Like the dream is telling you: some things can't be undone.")
             print("\n")
             type.type("You wake up and run your tongue along your teeth. All there. But the dream leaves a residue that takes hours to shake.")
-        self.lose_sanity(8)
+        if self.has_item("Third Eye"):
+            type.type("The " + cyan(bright("Third Eye")) + " sees the nightmare for what it is — probability, not prophecy. You wake knowing the difference.")
+            print("\n")
+            self.restore_sanity(5)
+        elif self.has_item("Mind Shield"):
+            type.type("The " + cyan(bright("Mind Shield")) + " filters the nightmare. It still reaches you, but muted. Distant.")
+            print("\n")
+            self.lose_sanity(4)
+        else:
+            self.lose_sanity(8)
         print("\n")
 
     def giant_oyster_opening(self):

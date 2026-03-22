@@ -1077,6 +1077,20 @@ class AdventuresMixin:
             if action == "fight":
                 type.type("You've lost your mind. But here goes nothing.")
                 print("\n")
+                if self.has_item("Rope"):
+                    type.type("You use the " + cyan(bright("Rope")) + " to lasso a branch and swing to higher ground before the bear reaches you.")
+                    print("\n")
+                    type.type("Fighting from above changes the equation. The bear can't use its full size against you.")
+                    print("\n")
+                if self.has_item("Pocket Knife"):
+                    type.type("The " + cyan(bright("Pocket Knife")) + " finds a gap in the bear's thick hide — a nick behind the ear that draws blood.")
+                    print("\n")
+                    type.type("It roars. You've hurt it. Not enough — but enough to make it hesitate.")
+                    print("\n")
+                if self.has_item("Scrap Armor") or self.has_item("Road Warrior Armor"):
+                    armor_name = "Road Warrior Armor" if self.has_item("Road Warrior Armor") else "Scrap Armor"
+                    type.type("The " + cyan(bright(armor_name)) + " absorbs the first swipe. It saves your ribs.")
+                    print("\n")
                 type.type(yellow("=== BATTLE ==="))
                 type.type("The bear charges. You have one chance.")
                 print("\n")
@@ -1114,6 +1128,31 @@ class AdventuresMixin:
                     else:
                         type.type("The bear isn't fooled. It bats you around like a cat toy before getting bored and leaving. You're alive, but barely.")
                         self.hurt(random.randint(50, 80))
+                if self.has_item("Nomad's Camp"):
+                    type.type("The " + cyan(bright("Nomad's Camp")) + " provides everything — shelter, food, water.")
+                    print("\n")
+                    type.type("You rest mid-adventure. Full restoration.")
+                    self.heal(100)
+                    self.restore_sanity(15)
+                    return
+                if self.has_item("Wanderer's Rest"):
+                    type.type("The " + cyan(bright("Wanderer's Rest")) + "'s roots are deep now. Even here, it sustains you.")
+                    print("\n")
+                    type.type("You will never want for anything again. Energy fully restored.")
+                    self.heal(80)
+                    self.restore_sanity(10)
+                    return
+                if self.has_item("Survival Bivouac"):
+                    type.type("The " + cyan(bright("Survival Bivouac")) + " turns any rest into full recovery.")
+                    print("\n")
+                    self.heal(40)
+                    self.restore_sanity(8)
+                    return
+                if self.has_item("First Aid Kit") and self.get_health() < 70:
+                    self.use_item("First Aid Kit")
+                    type.type("You dig out the " + cyan(bright("First Aid Kit")) + " and patch yourself up. Not pretty, but functional.")
+                    self.heal(20)
+                    print("\n")
                 print("\n")
             
             elif action == "flee":
@@ -1295,6 +1334,30 @@ class AdventuresMixin:
             type.type("The forest is quiet tonight. No adventures find you - or perhaps you weren't ready for them.")
             print("\n")
             type.type("You rest beneath an ancient oak, listening to the wind in the leaves. Sometimes the greatest adventure is simply being still.")
+            if self.has_item("Binoculars") or self.has_item("Binocular Scope"):
+                item_name = "Binocular Scope" if self.has_item("Binocular Scope") else "Binoculars"
+                print("\n")
+                type.type("You pull out your " + cyan(bright(item_name)) + " and scan the treeline. A hidden deer path runs along the ridge — and at the end of it, something glints.")
+                print("\n")
+                type.type("You follow it. Tucked under a root: an old tin with a handful of coins and a folded bill. Someone's forgotten stash.")
+                found = random.randint(15, 45)
+                type.type(" " + green(bright("$" + str(found))) + " well-spotted.")
+                self.earn_money(found)
+                self.restore_sanity(4)
+            if self.has_item("Provider's Kit") or self.has_item("Fishing Rod"):
+                fish_item = "Provider's Kit" if self.has_item("Provider's Kit") else "Fishing Rod"
+                print("\n")
+                type.type("You find a forest river and cast in your " + cyan(bright(fish_item)) + ".")
+                print("\n")
+                if self.has_item("Provider's Kit"):
+                    type.type("The dual trap-and-rod setup turns the forest into a buffet. Within an hour you have more fish than you can carry.")
+                    amount = random.randint(40, 100)
+                else:
+                    type.type("An hour later: two fish and a sense of calm that the casino never gives you.")
+                    amount = random.randint(20, 60)
+                type.type(" " + green(bright("$" + str(amount))) + " worth of fresh catch.")
+                self.change_balance(amount)
+                self.restore_sanity(5)
             self.heal(random.randint(15, 30))
             print("\n")
 
@@ -1315,6 +1378,23 @@ class AdventuresMixin:
         print("\n")
         type.type(yellow(bright("=== SWAMP ADVENTURE ===")))
         print("\n")
+        if self.has_item("Hazmat Suit"):
+            type.type("The " + cyan(bright("Hazmat Suit")) + " walks through the toxic zone like it's a spring morning.")
+            print("\n")
+            type.type("You access areas no one else can reach. The treasure is unguarded — no one else can get here.")
+            self.change_balance(random.randint(200, 500))
+            self.restore_sanity(5)
+            return
+        if self.has_item("Gas Mask"):
+            type.type("Through the " + cyan(bright("Gas Mask")) + ", the toxic swamp air becomes just air. You breathe freely where others would be coughing.")
+            print("\n")
+        else:
+            type.type("The rotten air settles in your lungs like a personal insult. You'll be tasting swamp for a week.")
+            self.hurt(5)
+            print("\n")
+        if self.has_item("Water Purifier"):
+            type.type("Your " + cyan(bright("Water Purifier")) + " sits ready to filter whatever questionable water you encounter. No swamp belly today.")
+            print("\n")
         event = random.choice([
             "tortoise_racing", "ogre", "fairy_bottle", "disgusting_mermaid", "gator_wrestling", "casual_day"
         ])
@@ -1494,6 +1574,20 @@ class AdventuresMixin:
                 type.type(yellow("=== BATTLE: YOU VS. OGRE ==="))
                 type.type("This is either very brave or very stupid. The ogre swings its club.")
                 print("\n")
+                if self.has_item("Rope"):
+                    type.type("You use the " + cyan(bright("Rope")) + " to lasso the ogre's ankles before it can wind up a full swing.")
+                    print("\n")
+                    type.type("It stumbles. You've bought yourself a window.")
+                    print("\n")
+                if self.has_item("Pocket Knife"):
+                    type.type("The " + cyan(bright("Pocket Knife")) + " finds a crack in the ogre's mossy hide — a thin line behind the knee that makes it flinch.")
+                    print("\n")
+                    type.type("It's not enough to stop it. But it's enough to slow it down.")
+                    print("\n")
+                if self.has_item("Scrap Armor") or self.has_item("Road Warrior Armor"):
+                    armor_name = "Road Warrior Armor" if self.has_item("Road Warrior Armor") else "Scrap Armor"
+                    type.type("The " + cyan(bright(armor_name)) + " takes the first glancing blow. You feel the impact but not the damage.")
+                    print("\n")
                 type.type("How do you attack?")
                 attack = input("(kneecaps/climb/distract): ").strip().lower()
                 
@@ -1526,6 +1620,31 @@ class AdventuresMixin:
                     else:
                         type.type("It swings wildly - and connects. Blind luck, literally.")
                         self.hurt(random.randint(35, 60))
+                if self.has_item("Nomad's Camp"):
+                    type.type("The " + cyan(bright("Nomad's Camp")) + " provides everything — shelter, food, water.")
+                    print("\n")
+                    type.type("You rest mid-adventure. Full restoration.")
+                    self.heal(100)
+                    self.restore_sanity(15)
+                    return
+                if self.has_item("Wanderer's Rest"):
+                    type.type("The " + cyan(bright("Wanderer's Rest")) + "'s roots are deep now. Even here, it sustains you.")
+                    print("\n")
+                    type.type("You will never want for anything again. Energy fully restored.")
+                    self.heal(80)
+                    self.restore_sanity(10)
+                    return
+                if self.has_item("Survival Bivouac"):
+                    type.type("The " + cyan(bright("Survival Bivouac")) + " turns any rest into full recovery.")
+                    print("\n")
+                    self.heal(40)
+                    self.restore_sanity(8)
+                    return
+                if self.has_item("First Aid Kit") and self.get_health() < 70:
+                    self.use_item("First Aid Kit")
+                    type.type("You dig out the " + cyan(bright("First Aid Kit")) + " and patch yourself up mid-swamp. It helps.")
+                    self.heal(20)
+                    print("\n")
                 print("\n")
             
             elif action == "bribe":
@@ -2753,8 +2872,38 @@ class AdventuresMixin:
                     type.type("One still clutches a lockbox. Do you take it?")
                     take = ask.yes_or_no()
                     if take == "yes":
-                        type.type("You pry it from skeletal fingers. The lock is rusted shut.")
-                        self.add_item("Sailor's Lockbox")
+                        if self.has_item("Skeleton Key"):
+                            type.type("The " + cyan(bright("Skeleton Key")) + " doesn't just open the lock — it opens the concept of locked.")
+                            print("\n")
+                            type.type("The door's lock explains why it was locked, what it's protecting, and thanks you for understanding.")
+                            self.change_balance(random.randint(300, 800))
+                            self.restore_sanity(5)
+                            return
+                        elif self.has_item("All-Access Pass"):
+                            type.type("The " + cyan(bright("All-Access Pass")) + " reveals doors that don't exist on any map.")
+                            print("\n")
+                            type.type("Behind this one: legendary loot that no one else has reached.")
+                            self.change_balance(random.randint(200, 600))
+                            self.restore_sanity(3)
+                            return
+                        elif self.has_item("Master Key"):
+                            type.type("You hold the " + cyan(bright("Master Key")) + " to the rusted lock. It opens in two seconds.")
+                            print("\n")
+                            type.type("Inside: gold doubloons and a gemstone that catches the light even down here.")
+                            self.change_balance(random.randint(3000, 8000))
+                        elif self.has_item("Lockpick Set"):
+                            type.type("You work the " + cyan(bright("Lockpick Set")) + " on the rusted lock, careful and methodical even underwater.")
+                            print("\n")
+                            type.type("It opens. Inside: a handful of coins and a sealed letter in a language you don't recognize. Still valuable.")
+                            self.change_balance(random.randint(1500, 4000))
+                        elif self.has_item("Security Bypass"):
+                            type.type("The lock has a corroded electronic mechanism — old ship tech. The " + cyan(bright("Security Bypass")) + " interfaces with it somehow.")
+                            print("\n")
+                            type.type("Access granted. Inside: navigational instruments in near-perfect condition. Rare finds.")
+                            self.change_balance(random.randint(2000, 6000))
+                        else:
+                            type.type("You pry it from skeletal fingers. The lock is rusted shut.")
+                            self.add_item("Sailor's Lockbox")
                     else:
                         type.type("You leave the dead in peace.")
                 print("\n")
@@ -3381,11 +3530,19 @@ class AdventuresMixin:
             print("\n")
             type.type(yellow("=== CRACK ALLEY ==="))
             print("\n")
-            type.type("A man approaches. His teeth are rotted. His hands shake. But his eyes are calculating.")
-            print("\n")
-            type.type(quote("You buying, selling, or lost?"))
-            print("\n")
-            action = input("(lost/curious/buy/run): ").strip().lower()
+            if self.has_item("Intelligence Dossier"):
+                type.type("The " + cyan(bright("Intelligence Dossier")) + " has a full section on this block. You know who controls it and exactly how to avoid them.")
+                print("\n")
+                type.type("You take the long way around. No confrontation. No drama. Just the right route at the right time.")
+                self.restore_sanity(5)
+                print("\n")
+                action = "skip_alley"
+            else:
+                type.type("A man approaches. His teeth are rotted. His hands shake. But his eyes are calculating.")
+                print("\n")
+                type.type(quote("You buying, selling, or lost?"))
+                print("\n")
+                action = input("(lost/curious/buy/run): ").strip().lower()
             
             if action == "lost":
                 type.type(quote("Just lost. Wrong turn."))
@@ -3431,14 +3588,23 @@ class AdventuresMixin:
                 self.hurt(random.randint(10, 20))  # Comedown
                 print("\n")
             
-            else:
-                type.type("You run. Someone shouts behind you but you don't look back.")
-                print("\n")
-                type.type("You run until your lungs burn. Until the alley is far behind you.")
-                print("\n")
-                type.type("You tell yourself you'll never go back there.")
-                print("\n")
-                type.type("You're probably lying.")
+            elif action == "run":
+                if self.has_item("Pepper Spray"):
+                    type.type("You aim the " + cyan(bright("Pepper Spray")) + " directly at the man's face and sprint.")
+                    print("\n")
+                    type.type("He stumbles back, hands over his eyes. " + quote("WHAT THE—"))
+                    print("\n")
+                    type.type("Spray and sprint. The alley is yours. You're a block away before anyone reacts.")
+                    self.use_item("Pepper Spray")
+                    self.restore_sanity(5)
+                else:
+                    type.type("You run. Someone shouts behind you but you don't look back.")
+                    print("\n")
+                    type.type("You run until your lungs burn. Until the alley is far behind you.")
+                    print("\n")
+                    type.type("You tell yourself you'll never go back there.")
+                    print("\n")
+                    type.type("You're probably lying.")
                 print("\n")
         
         elif event == "penthouse_party":
@@ -4118,7 +4284,22 @@ class AdventuresMixin:
             print("\n")
             type.type("You stumble deeper and deeper, guided only by sound. The air grows cold. The walls seem to close in.")
             print("\n")
-            
+
+            if self.has_item("Night Scope"):
+                type.type("The " + cyan(bright("Night Scope")) + " makes darkness transparent. You see every passage, every threat, every loot cache.")
+                print("\n")
+                type.type("Nothing is hidden. You take the optimal route.")
+                self.change_balance(random.randint(100, 300))
+                self.restore_sanity(5)
+            elif self.has_item("Headlamp"):
+                type.type("The " + cyan(bright("Headlamp")) + " cuts through the dark, hands free.")
+                print("\n")
+                type.type("You navigate confidently. No stumbles, no surprises.")
+                self.restore_sanity(3)
+            elif self.has_item("Flashlight"):
+                type.type("Your " + cyan(bright("Flashlight")) + " helps, though holding it limits your hands.")
+                self.restore_sanity(2)
+
             outcome = random.randrange(10)
             
             if outcome < 3:  # 30% - Great reward

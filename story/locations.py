@@ -602,6 +602,22 @@ class LocationsMixin:
         type.type("You walk back to the front desk to checkout.")
         print("\n")
         cost = int((random.randint(30, 50)/100)*self._balance)
+        if self.has_item("Flask of Anti-Virus"):
+            type.type("You hand over the " + cyan(bright("Flask of Anti-Virus")) + ". The doctor holds it to the light.")
+            print("\n")
+            type.type(quote("This is... more advanced than anything we have here. I'd like to keep this for study."))
+            print("\n")
+            type.type("He scribbles something on your bill. Twenty percent off. You'll take it.")
+            print("\n")
+            cost = int(cost * 0.8)
+        if self.has_item("First Aid Kit"):
+            type.type("You set your " + cyan(bright("First Aid Kit")) + " on the examination table. The doctor raises an eyebrow.")
+            print("\n")
+            type.type(quote("You came prepared. Let's use what you've got — save the good stuff for someone who needs it."))
+            print("\n")
+            type.type("He patches you up with both kits. You leave feeling a little better than usual.")
+            self.heal(10)
+            print("\n")
         type.type("That will be " + bright(green("${:,}".format(cost))))
         if self.has_item("Real Insurance"):
             print("\n")
@@ -1203,6 +1219,14 @@ class LocationsMixin:
 
                 print()
 
+                if self.has_item("Tom's Wrench") and not self.has_met("Tom Wrench Discount"):
+                    self.mark_met("Tom Wrench Discount")
+                    type.type("Tom glances over at the " + magenta(bright("Tom's Wrench")) + " sitting in your bag. He does a slow double-take.")
+                    print("\n")
+                    type.type(quote("Hey... that's mine. Well — it was. How'd you end up with that?") + " He waves a hand before you can answer. " + quote("Nevermind. Keep it. 50% off today, just for bringin' her home."))
+                    print("\n")
+                    price = price // 2
+
                 type.type("It'll take me a couple days, but I can do that for ya for " + green(bright("${:,}".format(price))) + ". Whaddya say? ")
                 
                 while True:
@@ -1420,6 +1444,20 @@ class LocationsMixin:
         print("\n")
         self.frank_dialogue()
         print("\n")
+        if self.has_item("Frank's Flask") and not self.has_met("Frank Flask Bonus"):
+            self.mark_met("Frank Flask Bonus")
+            type.type("Frank's eyes drop to the " + magenta(bright("Frank's Flask")) + " on your belt. His jaw tightens.")
+            print("\n")
+            type.type(quote("Is that — ") + " He stops himself. Stares for a long beat. " + quote("Where'd you get that?"))
+            print("\n")
+            type.type("He clears his throat and looks away, like he didn't almost just have a moment.")
+            print("\n")
+            type.type(quote("Nevermind. Forget I said anything. ") + " He slides some folded bills across the counter without another word. " + quote("Call it a finder's fee."))
+            print("\n")
+            self.change_balance(100)
+            self.restore_sanity(3)
+            type.type(green("Frank gives you $100. ") + "Something about that flask mattered to him.")
+            print("\n")
         repairing_items_len = len(self._repairing_inventory)
         if(repairing_items_len>0):
             if days_elapsed == 2:
@@ -1853,6 +1891,18 @@ class LocationsMixin:
         print("\n")
         self.oswald_dialogue()
         print("\n")
+        if self.has_item("Oswald's Dice") and not self.has_met("Oswald Dice Bonus"):
+            self.mark_met("Oswald Dice Bonus")
+            type.type("Oswald's gaze drops to the " + magenta(bright("Oswald's Dice")) + " in your pocket. He goes very still.")
+            print("\n")
+            type.type(quote("You know those are weighted, right? I used them for testing.") + " He winks slowly. " + quote("Don't tell anyone."))
+            print("\n")
+            type.type("You feel luckier just knowing the truth.")
+            print("\n")
+            self.add_status("Oswald's Luck")
+            self.restore_sanity(5)
+            type.type(green("You feel a subtle shift in fortune. ") + yellow("Oswald's Luck") + " is with you.")
+            print("\n")
 
         storyline_event = self._storyline_system.check_for_location_storyline_event("oswald")
         if storyline_event is not None:
@@ -2685,36 +2735,62 @@ class LocationsMixin:
                     type.type(yellow("First craft! You're handy with a tool kit. Who knew?"))
                     print("\n")
                 elif crafted_total == 5:
-                    type.type(yellow("Five crafted items. You're basically a blacksmith now. A car-trunk blacksmith."))
+                    type.type(yellow("Five crafted items. You're basically a blacksmith now..."))
                     print("\n")
                 elif crafted_total == 10:
                     type.type(yellow("Ten crafted items! Your car looks like a mad scientist's laboratory."))
                     print("\n")
                 elif crafted_total == 15:
-                    type.type(yellow("Fifteen items crafted. You could teach a survival course. From your car."))
+                    type.type(yellow("Fifteen items. You could teach a survival course."))
+                    print("\n")
+                elif crafted_total == 20:
+                    type.type(yellow("Twenty items. The workbench groans under the weight of your ambition."))
                     print("\n")
                 elif crafted_total == 25:
-                    type.type(yellow("Twenty-five items. You've built more things than most people own."))
+                    type.type(yellow("Twenty-five. You've crafted more than most people own."))
                     print("\n")
+                    self.restore_sanity(3)
+                elif crafted_total == 30:
+                    type.type(yellow("Thirty! Your car is a mobile workshop, pharmacy, and armory combined."))
+                    print("\n")
+                    self.check_achievement("craftsman")
                 elif crafted_total == 40:
-                    type.type(yellow("Forty crafted items. You're not surviving anymore. You're THRIVING."))
+                    type.type(yellow("Forty items... When did you become an engineer?"))
                     print("\n")
-                elif crafted_total == 60:
-                    type.type(yellow("Sixty items! The workbench bows to you. The car trunk is a temple of innovation."))
+                    self.check_achievement("master_craftsman")
+                elif crafted_total == 50:
+                    type.type(yellow("Fifty. Half the things in your car didn't exist yesterday."))
+                    print("\n")
+                    self.check_achievement("inventor")
+                elif crafted_total == 67:
+                    type.type(yellow("Every Tier 1 recipe mastered. The workbench hums with potential."))
                     print("\n")
                 elif crafted_total == 80:
-                    type.type(yellow("Eighty crafted items. You've transcended crafting. You're an ARTISAN."))
+                    type.type(yellow("Eighty items. Your car is worth more than the casino."))
                     print("\n")
+                    self.change_balance(5000)
+                    type.type(yellow("You find $5,000 in a loose dashboard compartment you never noticed before."))
+                    print("\n")
+                elif crafted_total == 92:
+                    type.type(yellow("Every Tier 2 recipe complete. You see combinations in everything."))
+                    print("\n")
+                    self.check_achievement("expert")
                 elif crafted_total == 100:
-                    type.type(yellow("ONE HUNDRED crafted items. The universe nods in quiet respect."))
+                    type.type(yellow("One hundred crafted items. You started with nothing. Look at you now."))
                     print("\n")
+                    self.check_achievement("centurion")
+                    self.restore_sanity(15)
+                    self.heal(20)
+                elif crafted_total == 104:
+                    type.type(yellow("Every Tier 3 masterwork forged. You've bent the world to your will."))
+                    print("\n")
+                    self.check_achievement("artificer")
                 elif crafted_total == len(all_recipes):
                     type.type(bright(yellow("★★★ MASTER CRAFTSMAN ★★★")))
                     print()
-                    type.type(yellow("You've crafted every single item. Your wagon is a mobile workshop. "))
-                    type.type(yellow("People would pay good money for this kind of ingenuity. They don't. But they could."))
-                    self.check_achievement("master_craftsman")
+                    type.type(yellow("Every recipe. Every combination. Every possibility."))
                     print("\n")
+                    self.check_achievement("grand_artificer")
             else:
                 type.type("You set the ingredients back down. Not today.")
                 print("\n")
@@ -3494,6 +3570,31 @@ class LocationsMixin:
             print("\n")
             type.type("While I won't get bogged down in the details of how I got my hands on it, I think you'll wanna check these out:")
             print("\n")
+            if self.has_item("Old Money Identity") or self.has_item("Aristocrat's Touch"):
+                luxury_item = "Old Money Identity" if self.has_item("Old Money Identity") else "Aristocrat's Touch"
+                type.type("Marvin looks you up and down. A slow, appraising sweep.")
+                print("\n")
+                type.type(quote("Well, well. Someone's come up in the world.") + " He straightens. Reaches for a shelf you've never noticed before.")
+                print("\n")
+                type.type("He opens a drawer below the counter, behind a velvet curtain.")
+                print("\n")
+                type.type(quote("Perhaps you'd be interested in something... premium? Not everything I carry goes on the regular shelf.") + " He slides two extra items into the display with a knowing nod.")
+                print("\n")
+            if self.has_item("Silver Flask") and not self.has_met("Gave Marvin Flask"):
+                type.type("Marvin's eyes land on the " + magenta(bright("Silver Flask")) + " in your pack. He leans forward.")
+                print("\n")
+                type.type(quote("That's a fine flask. Real silver. I'd take it off your hands — twenty percent off your next purchase, what do you say?"))
+                print("\n")
+                answer = ask.yes_or_no("Give Marvin the Silver Flask? ")
+                if answer == "yes":
+                    self.use_item("Silver Flask")
+                    self.mark_met("Gave Marvin Flask")
+                    self.add_status("Marvin Discount")
+                    type.type(quote("Pleasure doing business. The discount is yours."))
+                    print("\n")
+                else:
+                    type.type(quote("Another time, then."))
+                    print("\n")
 
         for item_number in range(len(inventory)):
             item = inventory[item_number]
@@ -3598,6 +3699,12 @@ class LocationsMixin:
 
             print()
 
+            if self.has_status("Marvin Discount"):
+                discounted_price = int(price * 0.8)
+                type.type("Marvin glances at you with a small nod — remembering the flask. " + quote("Twenty percent off, as promised."))
+                print("\n")
+                price = discounted_price
+
             type.type("For " + green(bright("${:,}".format(price))) + ", it can be all yours. You buying? ")
             while True:
                 yes_or_no = input("").lower()
@@ -3610,6 +3717,8 @@ class LocationsMixin:
                     print()
                     type.type("Great! It's all yours.")
                     self.change_balance(-price)
+                    if self.has_status("Marvin Discount"):
+                        self.remove_status("Marvin Discount")
                     self.add_item(item)
                     type.type("You got the " + magenta(bright(item)) + "!")
                     print()
@@ -4101,6 +4210,25 @@ class LocationsMixin:
         all_collectibles = self.get_all_collectibles_list()
         total_collectibles = len(all_collectibles)
         items_sold = self.get_gus_items_sold()
+        
+        if self.has_item("Kingpin Look"):
+            type.type("Gus looks up. His eyes track the gold chain, the cigar, the way you fill the doorframe.")
+            print("\n")
+            type.type(quote("Oh. OH. Sir, I — I didn't realize. Please.") + " Gus's hands are trembling as he straightens up behind the counter. " + quote("Premium prices for you. Whatever you need."))
+            print("\n")
+            type.type("You notice the shaking doesn't quite stop. Criminal heat has a way of preceding you now.")
+            self.add_status("Kingpin Reputation")
+            collectible_prices = {item: int(price * 1.25) for item, price in collectible_prices.items()}
+            print("\n")
+        
+        if self.has_item("Binding Portrait"):
+            type.type("You set the " + cyan(bright("Binding Portrait")) + " on the counter while digging through your bag. Gus glances at it.")
+            print("\n")
+            type.type("His pupils dilate. His voice drops to a register that isn't entirely his.")
+            print("\n")
+            type.type(quote("I'll give you whatever you want,") + " he says, flatly. Then he blinks hard and shakes his head, pretending that didn't happen.")
+            self.lose_sanity(1)
+            print("\n")
         
         # Gus's hints about collecting everything
         if items_sold >= 5 and items_sold < total_collectibles - 10:

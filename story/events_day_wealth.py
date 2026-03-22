@@ -179,6 +179,81 @@ class DayWealthMixin:
         # EVENT: Scammers try to sell you fake investment opportunities
         # EFFECTS: Purely atmospheric - player wisely ignores all scam attempts
         # Everytime - risky event
+
+        if self.has_item("Phantom Rose"):
+            type.type("The " + cyan(bright("Phantom Rose")) + " marks you as legend. Financial doors open by reputation alone.")
+            print("\n")
+            type.type("Whatever opportunity this was — it's maximum yield now.")
+            self.change_balance(random.randint(800, 2000))
+            return
+        if self.has_item("Ghost Protocol"):
+            type.type(cyan(bright("Ghost Protocol")) + " erases your financial footprint. The IRS, the casino, the bank — none of them can find you.")
+            print("\n")
+            type.type("This transaction is invisible.")
+            self.change_balance(random.randint(300, 700))
+            return
+        if self.has_item("Old Money Identity"):
+            type.type("The " + cyan(bright("Old Money Identity")) + " commands institutional trust. They defer to the name.")
+            print("\n")
+            type.type("Whatever rate you were getting, you get better.")
+            self.change_balance(random.randint(200, 500))
+            return
+        # COMBO: Blackmail Letter + Old Money Identity = The Hostile Takeover
+        if self.has_item("Blackmail Letter") and self.has_item("Old Money Identity"):
+            type.type("You arrive as old money. You present the " + cyan(bright("Blackmail Letter")) + " at the board meeting.")
+            print("\n")
+            type.type(quote("Resign,") + " you say. They do. You sit in the chair. For one day, you own this business.")
+            print("\n")
+            amount = random.randint(500, 1500)
+            self.change_balance(amount)
+            type.type("You extract " + green("${:,}".format(amount)) + " before things get complicated.")
+            print("\n")
+            type.type("The business was money laundering for someone. They'll come looking.")
+            self.add_danger("Hostile Takeover Blowback")
+            print("\n")
+            return
+
+        if self.has_item("Oracle's Tome") or self.has_item("Gambler's Grimoire"):
+            tome = "Oracle's Tome" if self.has_item("Oracle's Tome") else "Gambler's Grimoire"
+            type.type("A man in a cheap suit approaches your car, waving a stack of papers. Same as always.")
+            print("\n")
+            type.type("But your " + cyan(bright(tome)) + " falls open in your lap, to a page dense with margin notes in tiny, urgent handwriting.")
+            print("\n")
+            type.type("A cramped footnote reads: " + italic("'This one's real.'"))
+            print("\n")
+            type.type("You squint through the window at the man. His shoes are worn down at the heels — honest work, not performance.")
+            print("\n")
+            type.type("You roll down the window. Three days later, " + green(bright("+$200")) + " lands in your account.")
+            print("\n")
+            type.type("The book always knows.")
+            self.change_balance(200)
+            print("\n")
+            return
+        if self.has_item("Gentleman's Charm"):
+            type.type("The man in the cheap suit approaches, but stops when he notices the " + cyan(bright("Gentleman's Charm")) + ".")
+            print("\n")
+            type.type("His whole pitch shifts. The desperation fades. He trusts you before you say a word.")
+            print("\n")
+            type.type("You listen. Halfway through, you realize — this one's actually legitimate.")
+            print("\n")
+            amount = random.randint(200, 500)
+            type.type("Three weeks later: " + green(bright("$" + str(amount))) + " in returns. The Charm reads people so you don't have to.")
+            self.change_balance(amount)
+            print("\n")
+            return
+        if self.has_item("Voice Soother") or self.has_item("Enchanted Vintage"):
+            item_name = "Voice Soother" if self.has_item("Voice Soother") else "Enchanted Vintage"
+            type.type("The usual scammer approaches — but before he can spiral into his pitch, you speak first.")
+            print("\n")
+            type.type("The " + cyan(bright(item_name)) + " has done something to your voice. It's smooth. Authoritative. The man stops mid-breath.")
+            print("\n")
+            type.type("You negotiate him down to something reasonable. Turns out there was a real deal buried under the desperation.")
+            print("\n")
+            amount = random.randint(100, 250)
+            type.type("A modest return — " + green(bright("$" + str(amount))) + " — but honestly earned.")
+            self.change_balance(amount)
+            print("\n")
+            return
         variant = random.randrange(3)
         if variant == 0:
             type.type("A man in a cheap suit approaches your car, waving a stack of papers.")
@@ -284,6 +359,18 @@ class DayWealthMixin:
             return
         
         self.meet("Tax Man Visit")
+        if self.has_item("Ghost Protocol"):
+            type.type(cyan(bright("Ghost Protocol")) + " erases your casino footprint. No camera sees you. No record has your name.")
+            print("\n")
+            type.type("You are invisible to the house.")
+            self.restore_sanity(5)
+            return
+        if self.has_item("New Identity"):
+            type.type("The " + cyan(bright("New Identity")) + " deflects the recognition. That was someone else.")
+            print("\n")
+            type.type(quote("Are you sure that's them?") + " " + quote("No... no, you're right, different person.") + " You walk free.")
+            self.restore_sanity(5)
+            return
         type.type("A sedan with government plates pulls up. A man in a gray suit steps out, holding a clipboard.")
         print("\n")
         type.type(quote("Excuse me. I'm from the IRS. We've noticed some... unusual financial activity in this area."))
@@ -800,6 +887,55 @@ class DayWealthMixin:
         # EVENT: Signs that the casino is watching/tracking your winning streak
         # EFFECTS: Atmospheric ominous tension; black SUVs, mysterious calls, security guards
         # Everytime - ominous event
+        if self.has_item("Tattered Cloak") or self.has_item("Invisible Cloak"):
+            cloak = "Tattered Cloak" if self.has_item("Tattered Cloak") else "Invisible Cloak"
+            type.type("You pull the " + cyan(bright(cloak)) + " tight around your shoulders as you approach the casino.")
+            print("\n")
+            type.type("The security camera pans right past you. The pit boss looks right through you. The black SUV at the curb watches nobody.")
+            print("\n")
+            type.type("You are no one. You are nothing. You are invisible.")
+            self.restore_sanity(5)
+            print("\n")
+            return
+        if self.has_item("Dirty Old Hat") or self.has_item("Unwashed Hair"):
+            hat = "Dirty Old Hat" if self.has_item("Dirty Old Hat") else "Unwashed Hair"
+            type.type("The casino surveillance team is good. But the man in the " + cyan(bright(hat)) + " doesn't look like anyone worth watching.")
+            print("\n")
+            type.type("No one expects a millionaire to wear that hat. The pit boss's eyes slide right past you.")
+            print("\n")
+            type.type("Being unremarkable is the best disguise there is.")
+            self.restore_sanity(3)
+            print("\n")
+            return
+        if self.has_item("Low-Profile Outfit"):
+            self.use_item("Low-Profile Outfit")
+            type.type("You pull on the " + cyan(bright("Low-Profile Outfit")) + " before stepping out. Unremarkable. Forgettable. Perfect.")
+            print("\n")
+            type.type("The security cameras pan right past you. The pit boss looks right through you. The black SUV at the curb watches nobody.")
+            print("\n")
+            type.type("You are exactly who they're looking for, dressed as nobody they'd ever notice.")
+            self.restore_sanity(5)
+            print("\n")
+            return
+        if self.has_item("Forged Documents"):
+            type.type("Security approaches with a photo. You produce your " + cyan(bright("Forged Documents")) + " before they say a word.")
+            print("\n")
+            type.type(quote("That's not you, sir.") + " The guard frowns, checks the photo again, checks your ID, and waves you through.")
+            print("\n")
+            type.type("Whoever that high-rolling gambler is, he's definitely not the mild-mannered name on these papers.")
+            self.restore_sanity(5)
+            print("\n")
+            return
+        if self.has_item("Radio Jammer") or self.has_item("Surveillance Suite"):
+            item_name = "Radio Jammer" if self.has_item("Radio Jammer") else "Surveillance Suite"
+            type.type("You activate the " + cyan(bright(item_name)) + " before entering the casino's range.")
+            print("\n")
+            type.type("The jammer kills the signal. Their cameras start buffering. The black SUV's radio goes dead.")
+            print("\n")
+            type.type("They lose you entirely. You're a ghost in their system.")
+            self.restore_sanity(8)
+            print("\n")
+            return
         variant = random.randrange(3)
         if variant == 0:
             type.type("You notice a black SUV drive past your wagon. Slowly. Too slowly.")
@@ -813,6 +949,13 @@ class DayWealthMixin:
             type.type("Silence. Then, a click. They hung up.")
             print("\n")
             type.type("Wrong number? Or something else?")
+            if self.has_item("Golden Watch") or self.has_item("Sapphire Watch"):
+                watch = "Golden Watch" if self.has_item("Golden Watch") else "Sapphire Watch"
+                print("\n")
+                type.type("You glance at your " + cyan(bright(watch)) + ". If they're watching, let them see someone who belongs at the top.")
+                print("\n")
+                type.type("The calls stop after that. Elegance is its own form of intimidation.")
+                self.restore_sanity(5)
         else:
             type.type("There's a new security guard at the casino entrance. He watches you enter. Watches you leave. Takes notes on a clipboard.")
             print("\n")
@@ -1571,6 +1714,49 @@ class DayWealthMixin:
         print("\n")
 
     def reporters_found_you(self):
+        if self.has_item("Tattered Cloak") or self.has_item("Invisible Cloak"):
+            cloak = "Tattered Cloak" if self.has_item("Tattered Cloak") else "Invisible Cloak"
+            type.type("A reporter has tracked you down to your parking spot. Camera crew and everything.")
+            print("\n")
+            type.type("You pull the " + cyan(bright(cloak)) + " over your shoulders and step out of the car.")
+            print("\n")
+            type.type("The reporter blinks. Scans the lot. Checks her phone. Looks back up.")
+            print("\n")
+            type.type(quote("I... I could have sworn he was just here."))
+            print("\n")
+            type.type("You slip past them, invisible as a shadow at noon. Nobody films a nobody.")
+            print("\n")
+            return
+        if self.has_item("Dirty Old Hat") or self.has_item("Unwashed Hair"):
+            hat = "Dirty Old Hat" if self.has_item("Dirty Old Hat") else "Unwashed Hair"
+            type.type("A reporter sweeps the parking lot with her camera crew, hunting for the mystery gambler.")
+            print("\n")
+            type.type("She walks right past you. The man in the " + cyan(bright(hat)) + " doesn't look like anyone worth filming.")
+            print("\n")
+            type.type("She drives away unsatisfied. Being unremarkable is a superpower.")
+            print("\n")
+            return
+        if self.has_item("Low-Profile Outfit"):
+            self.use_item("Low-Profile Outfit")
+            type.type("A reporter sweeps the parking lot with a camera crew, hunting for the mystery gambler.")
+            print("\n")
+            type.type("You pull on the " + cyan(bright("Low-Profile Outfit")) + " and step outside. She walks right past you without a flicker of recognition.")
+            print("\n")
+            type.type("Being completely forgettable turns out to be the most useful skill you have.")
+            self.restore_sanity(5)
+            print("\n")
+            return
+        if self.has_item("Forged Documents"):
+            type.type("A reporter thrusts a photo in your face. " + quote("Excuse me — is this you?"))
+            print("\n")
+            type.type("You hold up the " + cyan(bright("Forged Documents")) + ". She frowns, compares photos, sighs.")
+            print("\n")
+            type.type(quote("Sorry. Wrong person."))
+            print("\n")
+            type.type("They pack up and leave. The name on those documents will never appear in a headline.")
+            self.restore_sanity(3)
+            print("\n")
+            return
         type.type("A reporter has tracked you down to your car. Camera crew and everything.")
         print("\n")
         type.type(quote("Local Gambler Attempts Million Dollar Challenge! How do you feel about your chances?"))
@@ -1615,7 +1801,27 @@ class DayWealthMixin:
         type.type("He smiles, but it doesn't reach his eyes.")
         print("\n")
         type.type(quote("Come back anytime. We'll be waiting."))
-        self.lose_sanity(10)
+        if self.has_item("Blackmail Letter"):
+            print("\n")
+            type.type("You reach into your pocket and produce the " + cyan(bright("Blackmail Letter")) + ". His shark eyes flicker.")
+            print("\n")
+            type.type(quote("Where did you get that?"))
+            print("\n")
+            type.type("Suddenly you're the one with leverage. You name a number. He pays it — quietly, quickly, without a word.")
+            amount = random.randint(500, 1000)
+            print("\n")
+            type.type("The meeting ends with " + green(bright("$" + str(amount))) + " changing hands. Old money isn't so untouchable after all.")
+            self.change_balance(amount)
+            self.restore_sanity(5)
+        elif self.has_item("Evidence Kit"):
+            print("\n")
+            type.type("As he talks, the " + cyan(bright("Evidence Kit")) + " has you cataloging everything. The cigar brand. The photos on the wall. The ledger just visible in his desk drawer.")
+            print("\n")
+            type.type("Information is currency. You've just filled your pockets.")
+            self.restore_sanity(3)
+            self.add_status("Evidence Collected")
+        else:
+            self.lose_sanity(10)
         print("\n")
 
     # ==========================================
@@ -1663,8 +1869,23 @@ class DayWealthMixin:
                       self.has_item("VIP Invitation") or
                       self.has_item("Casino VIP Card"))
         if not has_access:
-            self.day_event()
-            return
+            if self.has_item("Old Money Identity"):
+                type.type("You approach the High Roller entrance. No keycard — but you carry the " + cyan(bright("Old Money Identity")) + ".")
+                print("\n")
+                type.type("Old money always carries weight in rooms like this. The bouncer nods and waves you through without a word.")
+                print("\n")
+                has_access = True
+            elif self.has_item("Heirloom Set"):
+                type.type("The bouncer eyes you skeptically. Then he notices the " + cyan(bright("Heirloom Set")) + " — the pen, the watch, the cufflinks.")
+                print("\n")
+                type.type("He straightens up. People who own things like that belong everywhere they choose to be.")
+                print("\n")
+                type.type(quote("Right this way, sir."))
+                print("\n")
+                has_access = True
+            if not has_access:
+                self.day_event()
+                return
         if self.has_item("VIP Invitation"):
             type.type("You pull out your " + magenta(bright("VIP Invitation")) + " at the door. The bouncer looks it over, nods, and waves you through.")
         elif self.has_item("Casino VIP Card"):
@@ -1677,6 +1898,19 @@ class DayWealthMixin:
         type.type("The other high rollers barely glance at you. You don't belong here. They know it.")
         print("\n")
         type.type("But for one night, you pretend.")
+        if self.has_item("Storm Suit"):
+            print("\n")
+            type.type("Except you're wearing a full " + cyan(bright("Storm Suit")) + ". Someone assumes you're the DJ and hands you a USB drive.")
+            print("\n")
+            type.type("Inside, a man in a tailored suit offers you a sponsorship deal. You decline. But the room is YOURS tonight.")
+            self.restore_sanity(5)
+            self.change_balance(random.randint(100, 300))
+        elif self.has_item("Beach Bum Disguise"):
+            print("\n")
+            type.type("The " + cyan(bright("Beach Bum Disguise")) + " has the staff convinced you're hired entertainment.")
+            print("\n")
+            type.type("They set you up at the best table with free drinks. Whatever the bit is, it's working.")
+            self.restore_sanity(5)
         self.restore_sanity(10)
         self.heal(10)
         print("\n")

@@ -124,7 +124,7 @@ class DaySurvivalMixin:
     def spider_bite(self):
         # EVENT: A spider that got into the car bites the player
         # CONDITION: Requires "Spider" danger to exist, and no existing "Spider Bite"
-        # EFFECTS: Pest Control kills spider; otherwise lose 1-2 sanity
+        # EFFECTS: Pest Control kills spider; Flask of Anti-Venom neutralizes venom; otherwise lose 1-2 sanity
         # Always adds "Spider Bite" status
         if not self.has_danger("Spider") or self.has_status("Spider Bite"):
             self.day_event()
@@ -138,6 +138,15 @@ class DaySurvivalMixin:
             type.type("You grab your " + magenta(bright("Pest Control")) + " and spray in the direction of the spider. ")
             type.type("A cloud of white liquid covers the spider, and you watch as it slows, and dies. ")
             type.type("Hopefully, that's the end of your spider problems.")
+            print("\n")
+        elif self.has_item("Flask of Anti-Venom"):
+            self.use_item("Flask of Anti-Venom")
+            type.type("The bite stings. You reach for the " + cyan(bright("Flask of Anti-Venom")) + " and uncork it.")
+            print("\n")
+            type.type("A quick sip. The burning in your arm stops almost instantly. The venom loses its grip.")
+            print("\n")
+            type.type("The spider disappears into a vent. But it doesn't matter. Its venom is already beaten.")
+            self.heal(5)
             print("\n")
         else:
             type.type("You attempt to swat it with your hand, but it sneaks into your heater. ")
@@ -200,6 +209,12 @@ class DaySurvivalMixin:
             type.type("The old man laps you twice before you give up, but hey, you tried.")
         print("\n")
         self.heal(random.choice([3, 5, 8]))
+        if self.has_item("Running Shoes") or self.has_item("Pursuit Package"):
+            item_name = "Running Shoes" if self.has_item("Running Shoes") else "Pursuit Package"
+            print("\n")
+            type.type("The " + cyan(bright(item_name)) + " grip the pavement perfectly. You actually break into a real run. Five good minutes. Your lungs open up. You feel good.")
+            self.heal(5)
+            self.restore_sanity(3)
 
     def ant_invasion(self):
         # EVENT: Ants invade your car while you sleep
@@ -417,6 +432,13 @@ class DaySurvivalMixin:
         type.type("That's another " + green(bright("$" + str(bill))) + " dollars.")
         print("\n")
         self.change_balance(bill)
+        if self.has_item("Flask of Fortunate Day"):
+            bonus = random.randint(20, 80)
+            print("\n")
+            type.type("The " + cyan(bright("Flask of Fortunate Day")) + " hums warm in your pocket. Fate tips its hat.")
+            print("\n")
+            type.type("You check one more time and find a few extra bills tucked behind a receipt. Another " + green(bright("$" + str(bonus))) + ".")
+            self.change_balance(bonus)
         print("\n")
 
     def strong_winds(self):
@@ -478,7 +500,24 @@ class DaySurvivalMixin:
         if self.has_status("Cold"):
             self.day_event()
             return
-        
+        if self.has_item("Hydration Station"):
+            type.type("The " + cyan(bright("Hydration Station")) + " flushes the virus before it sets. Clean water, constant stream.")
+            print("\n")
+            type.type("No cold. Just a brief, concerned sneeze.")
+            self.heal(5)
+            return
+        if self.has_item("Voice Soother"):
+            self.use_item("Voice Soother")
+            type.type("The " + cyan(bright("Voice Soother")) + " coats the throat in relief. The cold doesn't stand a chance.")
+            print("\n")
+            self.heal(10)
+            return
+        if self.has_item("Home Remedy"):
+            self.use_item("Home Remedy")
+            type.type("The " + cyan(bright("Home Remedy")) + " fights the cold with old chemistry.")
+            print("\n")
+            self.heal(8)
+            return
         variant = random.randrange(3)
         if variant == 0:
             type.type("A sneeze rips through you in your car seat, followed by your nose running, droplets falling down from your chin and onto your shirt. Damn, must be a cold.")
@@ -630,7 +669,25 @@ class DaySurvivalMixin:
         type.type("It's hot. Really hot. The sun beats down mercilessly, and your car becomes an oven.")
         print("\n")
         
-        if self.has_item("Cheap Sunscreen"):
+        if self.has_item("All-Weather Armor") or self.has_item("Hazmat Suit"):
+            item_name = "All-Weather Armor" if self.has_item("All-Weather Armor") else "Hazmat Suit"
+            type.type("The " + cyan(bright(item_name)) + " handles the heat without breaking a sweat. You barely notice the sun.")
+            print("\n")
+            self.restore_sanity(3)
+        elif self.has_item("Cool Down Kit"):
+            self.use_item("Cool Down Kit")
+            type.type("The " + cyan(bright("Cool Down Kit")) + " keeps you perfectly cool. The heat is someone else's problem today.")
+            print("\n")
+            self.restore_sanity(5)
+        elif self.has_item("Outdoor Shield"):
+            type.type("The " + cyan(bright("Outdoor Shield")) + "'s sun protection does its job. You're warm but undamaged.")
+            print("\n")
+            self.heal(3)
+        elif self.has_item("Premium Sunscreen"):
+            type.type("The " + cyan(bright("Premium Sunscreen")) + " blocks the worst of it.")
+            print("\n")
+            self.hurt(3)
+        elif self.has_item("Cheap Sunscreen"):
             type.type("Good thing you have " + magenta(bright("Cheap Sunscreen")) + "!")
             print("\n")
             type.type("You slather it on and step outside. It's still hot, but at least you won't turn into a lobster.")
@@ -655,6 +712,28 @@ class DaySurvivalMixin:
         # EFFECTS: Umbrella or Plastic Poncho prevents damage/cold;
         #          otherwise 10 damage and adds "Cold" status
         # Umbrella or Plastic Poncho prevents damage/getting sick
+        
+        # ITEM: Binoculars - spotted the storm coming early
+        if self.has_item("Binoculars"):
+            type.type("Through the " + cyan(bright("Binoculars")) + ", you saw the weather front building twenty minutes ago.")
+            print("\n")
+            type.type("You're already parked under a bridge. Dry. Comfortable. A little smug.")
+            print("\n")
+            type.type("The rain hammers the road twenty feet away. Doesn't touch you.")
+            self.restore_sanity(3)
+            print("\n")
+            return
+
+        if self.has_item("All-Weather Armor"):
+            type.type("The " + cyan(bright("All-Weather Armor")) + " laughs at rain. You step out, completely dry, into a biblical downpour.")
+            print("\n")
+            self.restore_sanity(5)
+            return
+        if self.has_item("Storm Suit"):
+            type.type("The " + cyan(bright("Storm Suit")) + " was built for exactly this. You walk through the deluge untouched.")
+            print("\n")
+            self.restore_sanity(3)
+            return
         type.type("The sky opens up without warning. Rain hammers down so hard you can barely hear yourself think.")
         print("\n")
         
@@ -677,6 +756,11 @@ class DaySurvivalMixin:
                 type.type("You feel a cold coming on...")
                 self.add_status("Cold")
                 self.mark_day("Cold")
+        if self.has_item("Water Purifier"):
+            print("\n")
+            type.type("At least the downpour let you fill up with your " + cyan(bright("Water Purifier")) + ". Clean drinking water — a silver lining to a miserable day.")
+            self.restore_sanity(2)
+            self.heal(3)
         print("\n")
 
     def freezing_night(self):
@@ -686,7 +770,42 @@ class DaySurvivalMixin:
         # Hand Warmers can help survive
         type.type("The temperature plummets. Frost forms on your windshield, and you can see your breath inside the car.")
         print("\n")
-        
+
+        # Survival Bivouac checked first (full protection, no items consumed).
+        # Sacred Flame combo (Phoenix Feather + Fire Starter Kit) is checked next: it consumes Fire Starter Kit, so it must precede
+        # the Emergency Blanket + Fire Starter Kit combo below.
+        if self.has_item("Survival Bivouac"):
+            type.type("The " + cyan(bright("Survival Bivouac")) + " turns your car into a warm cocoon. You sleep through the cold front without a shiver.")
+            print("\n")
+            self.restore_sanity(5)
+            return
+        if self.has_item("Phoenix Feather") and self.has_item("Fire Starter Kit"):
+            self.use_item("Phoenix Feather")
+            self.use_item("Fire Starter Kit")
+            type.type("The " + cyan(bright("Fire Starter Kit")) + " sparks.")
+            print("\n")
+            type.type("The " + cyan(bright("Phoenix Feather")) + " ignites.")
+            print("\n")
+            type.type("Sacred amber fire fills the air around you. Not cold fire. Not cruel fire. The other kind.")
+            print("\n")
+            type.type("Every wound seals. Every pain ceases. The frostbite, the bruises, the exhaustion — gone.")
+            print("\n")
+            type.type("Both items are ash. But you are whole.")
+            self.heal(100)
+            self.restore_sanity(50)
+            print("\n")
+            return
+
+        if self.has_item("Emergency Blanket") and self.has_item("Fire Starter Kit"):
+            type.type("You wrap yourself in the " + cyan(bright("Emergency Blanket")) + " and get the " + cyan(bright("Fire Starter Kit")) + " going outside.")
+            print("\n")
+            type.type("The reflective foil bounces the fire's heat right back at you. You're in a warm cocoon. Fortress mode.")
+            print("\n")
+            type.type("The cold never had a chance. You sleep well. Genuinely, impressively well.")
+            self.heal(10)
+            self.restore_sanity(5)
+            print("\n")
+            return
         if self.has_item("Hand Warmers"):
             type.type("You crack open your " + magenta(bright("Hand Warmers")) + " and hold them close.")
             print("\n")
@@ -827,7 +946,35 @@ class DaySurvivalMixin:
         # Lighter or Monogrammed Lighter or Road Flares starts fire
         type.type("You're shivering in your car. You need fire. Desperately. Maybe to warm up, maybe to cook, maybe just to see.")
         print("\n")
-        
+
+        # COMBO: Fire Launcher + Animal Bait = The BBQ Trap
+        if self.has_item("Fire Launcher") and self.has_item("Animal Bait"):
+            self.use_item("Animal Bait")
+            type.type("Set the " + cyan(bright("Animal Bait")) + ". Wait. Light the " + cyan(bright("Fire Launcher")) + ".")
+            print("\n")
+            type.type("What follows is technically hunting, technically cooking, and technically a war crime against the local squirrel population.")
+            print("\n")
+            type.type("But you eat like a king tonight.")
+            self.heal(50)
+            self.restore_sanity(5)
+            self.add_danger("PETA List")
+            print("\n")
+            return
+
+        if self.has_item("Nomad's Camp"):
+            type.type("The " + cyan(bright("Nomad's Camp")) + " provides. You will never go hungry. Not anymore.")
+            print("\n")
+            self.heal(30)
+            self.restore_sanity(10)
+            return
+        if self.has_item("Provider's Kit"):
+            type.type("The " + cyan(bright("Provider's Kit")) + " has you covered. Trap on land, rod in water.")
+            print("\n")
+            type.type("You eat like a king in the apocalypse.")
+            self.heal(25)
+            self.restore_sanity(8)
+            return
+
         if self.has_item("Monogrammed Lighter"):
             type.type("You pull out your " + magenta(bright("Monogrammed Lighter")) + " and flick it open.")
             print("\n")
@@ -994,7 +1141,7 @@ class DaySurvivalMixin:
     def another_spider_bite(self):
         # EVENT: Spider bites you again on the neck
         # CONDITION: Requires "Spider" danger, not already having "Spider Bite"
-        # EFFECTS: Pest Control kills spider; adds "Spider Bite" status
+        # EFFECTS: Pest Control kills spider; Flask of Anti-Venom neutralizes venom; adds "Spider Bite" status
         if not self.has_danger("Spider") or self.has_status("Spider Bite"):
             self.day_event()
             return
@@ -1006,6 +1153,15 @@ class DaySurvivalMixin:
             type.type("You grab your " + magenta(bright("Pest Control")) + " and spray in the direction of the spider. ")
             type.type("A cloud of white liquid covers the spider, and you watch as it slows, and dies. ")
             type.type("Hopefully, that's the end of your spider problems.")
+        elif self.has_item("Flask of Anti-Venom"):
+            self.use_item("Flask of Anti-Venom")
+            print("\n")
+            type.type("You reach for the " + cyan(bright("Flask of Anti-Venom")) + " before the venom can spread.")
+            print("\n")
+            type.type("The burning stops. You feel it working — neutralizing whatever that spider injected into you.")
+            print("\n")
+            type.type("The spider disappears under the seat. But you've already won this one.")
+            self.heal(5)
         else:
             type.type("The spider, now out of reach, crawls off the seat and onto the floor. ")
             type.type("You stick your head out back, but you aren't sure where the spider went, or if it has a family nearby. This is unfortunate.")
@@ -1375,6 +1531,18 @@ class DaySurvivalMixin:
         print("\n")
 
     def nice_weather(self):
+        if self.has_item("Wanderer's Rest"):
+            type.type("Perfect weather at the " + cyan(bright("Wanderer's Rest")) + ". The tree has grown another branch overnight. An apple falls into your hand.")
+            print("\n")
+            self.heal(15)
+            self.restore_sanity(20)
+            return
+        if self.has_item("Nomad's Camp"):
+            type.type("The " + cyan(bright("Nomad's Camp")) + " thrives in perfect weather. You're more at home here than anywhere with walls.")
+            print("\n")
+            self.heal(10)
+            self.restore_sanity(15)
+            return
         type.type("Perfect weather today. Not too hot. Not too cold. Just right.")
         print("\n")
         type.type("You sit outside your car and just... breathe. It's nice.")
@@ -1385,6 +1553,18 @@ class DaySurvivalMixin:
         type.type("The weather is miserable. Rain sideways. Wind shaking your car.")
         print("\n")
         type.type("You huddle in your seat and wait for it to pass. For hours.")
+        if self.has_item("Storm Suit") or self.has_item("All-Weather Armor"):
+            item_name = "All-Weather Armor" if self.has_item("All-Weather Armor") else "Storm Suit"
+            type.type("The " + cyan(bright(item_name)) + " shrugs at terrible weather like it's a light mist.")
+            print("\n")
+            self.restore_sanity(3)
+            return
+        elif self.has_item("Umbrella") or self.has_item("Poncho"):
+            gear = "Umbrella" if self.has_item("Umbrella") else "Poncho"
+            type.type("Your " + cyan(bright(gear)) + " makes the terrible weather merely annoying instead of miserable.")
+            print("\n")
+            self.lose_sanity(2)
+            return
         self.lose_sanity(5)
         print("\n")
 
@@ -1755,6 +1935,16 @@ class DaySurvivalMixin:
             print("\n")
             type.type("You watch a trash can blow down the street like a tumbleweed. Nature is angry today.")
         print("\n")
+        if self.has_item("All-Weather Armor"):
+            type.type("The " + cyan(bright("All-Weather Armor")) + " was designed for apocalyptic weather. The storm is aesthetically unpleasant and functionally irrelevant.")
+            print("\n")
+            self.restore_sanity(5)
+            return
+        if self.has_item("Storm Suit"):
+            type.type("The " + cyan(bright("Storm Suit")) + " is exactly for this. You step out into the storm. You don't get wet. You arrive at the casino like a weathered professional.")
+            print("\n")
+            self.restore_sanity(3)
+            return
         if self.has_item("Umbrella") or self.has_item("Poncho") or self.has_item("Plastic Poncho"):
             if self.has_item("Poncho"):
                 gear = "Poncho"

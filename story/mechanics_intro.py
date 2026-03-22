@@ -322,6 +322,10 @@ class MechanicsStorylineMixin:
         type.type("You wake up with tears on your cheeks that you don't remember crying.")
         print("\n")
         type.type(yellow("The name 'Nathan' feels like a wound that never healed."))
+        if not self.has_item("Tom's Wrench"):
+            type.type(yellow("A heavy wrench appears on the passenger seat when you wake. Tom's initials scratched into the handle."))
+            print("\n")
+            self.add_item("Tom's Wrench")
         self.advance_tom_dreams()
         print("\n")
 
@@ -400,6 +404,10 @@ class MechanicsStorylineMixin:
         type.type("His voice is mocking, bitter. You try to look away, but you can't. The glass eye holds you frozen until you wake, gasping for air.")
         print("\n")
         type.type(yellow("You can still feel that glass eye watching you."))
+        if not self.has_item("Frank's Flask"):
+            type.type(yellow("A battered flask rolls out from under your seat as you wake. Engraved: 'F.H.' Smells like bourbon. Frank's."))
+            print("\n")
+            self.add_item("Frank's Flask")
         self.advance_frank_dreams()
         self.lose_sanity(random.choice([2, 3]))
         print("\n")
@@ -521,6 +529,10 @@ class MechanicsStorylineMixin:
         type.type("and you play in silence, the only sound being the shuffle of cards and the clink of chips.")
         print("\n")
         type.type("You wake up, unsure which one of you was the real one.")
+        if not self.has_item("Oswald's Dice"):
+            type.type(yellow("Two weighted dice sit in your palm when you wake. A sticker on the bottom: 'O.O.' Oswald's lucky pair."))
+            print("\n")
+            self.add_item("Oswald's Dice")
         self.lose_sanity(random.choice([3, 4]))
         print("\n")
         type.type(yellow("The line between player and dealer feels blurrier than before."))

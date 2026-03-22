@@ -73,46 +73,39 @@ class DayItemsMixin:
 
     def shiv_confrontation(self):
         """Having the Shiv changes a mugging encounter"""
-        type.type("A man steps out from behind a dumpster, blocking your path.")
-        print("\n")
+        type.type("A man steps out from behind a dumpster, blocking your path like he's been rehearsing this moment for hours. He probably has.")
+        print(PAR)
         type.type(quote("Give me your wallet. Now."))
-        print("\n")
+        print(PAR)
         if self.has_item("Shiv"):
-            type.type("Your hand drops to your side where the " + cyan(bright("Shiv")) + " is tucked into your belt.")
-            print("\n")
-            type.type("You pull it out slowly. The duct tape handle catches the light. The blade gleams.")
-            print("\n")
-            type.type("The mugger's eyes go wide. He takes one step back. Then another.")
-            print("\n")
+            type.type("Your hand drops to your side, finds the " + cyan(bright("Shiv")) + " tucked in your belt. You pull it out slowly. The duct tape handle catches the orange glow of a streetlight. The blade is modest, ugly, and unconditional.")
+            print(PAR)
+            type.type("The mugger's eyes track the blade. He takes one step back. Then another. His rehearsed speech evaporates.")
+            print(PAR)
             type.type(quote("Whoa, whoa, easy. I don't want any trouble, man."))
-            print("\n")
-            type.type("He turns and bolts into the alley. You never even said a word.")
-            print("\n")
-            type.type("Your hands are shaking, but the " + cyan(bright("Shiv")) + " did its job.")
+            print(PAR)
+            type.type("He turns and bolts into the alley. You never said a single word. Your hands are shaking — from adrenaline, mostly — but the " + cyan(bright("Shiv")) + " did exactly what it was made to do.")
             self.restore_sanity(2)
-            print("\n")
+            print(PAR)
         elif self.has_item("Pepper Spray"):
-            type.type("You whip out the " + cyan(bright("Pepper Spray")) + " and aim it at his face.")
-            print("\n")
+            type.type("You whip out the " + cyan(bright("Pepper Spray")) + " and aim it at his face with the conviction of someone who has thought about this moment.")
+            print(PAR)
             type.type("PSSSHHHHH!")
-            print("\n")
-            type.type("The man screams, clawing at his eyes, stumbling blindly into the alley. ")
-            type.type("You don't stick around to see if he's okay. Spoiler: he's not.")
-            print("\n")
-            type.type("The " + cyan(bright("Pepper Spray")) + " worked perfectly. One use, one save.")
+            print(PAR)
+            type.type("The man screams, both hands clawing at his eyes, stumbling blindly into the wall and then the alley beyond it. You don't stick around to see how it resolves. One use, one save. The " + cyan(bright("Pepper Spray")) + " is spent, but so is he.")
             self.use_item("Pepper Spray")
             self.restore_sanity(3)
-            print("\n")
+            print(PAR)
         else:
-            type.type("You don't have anything to defend yourself with. ")
-            type.type("He shoves you, takes everything in your pockets, and disappears.")
+            type.type("You've got nothing — no shiv, no spray, no bluff good enough to sell in the dark. He shoves you hard into the dumpster and takes everything in your pockets with the brisk efficiency of a man on a schedule.")
+            print(PAR)
             lost = min(random.randint(15, 50), self._balance)
             if lost > 0:
                 self.change_balance(-lost)
-                type.type(" He got " + red("${:,}".format(lost)) + " off you.")
+                type.type("He got " + red("${:,}".format(lost)) + " off you. You stand there in the alley for a minute, listening to his footsteps fade, deciding what to feel.")
             self.lose_sanity(random.choice([3, 4, 5]))
             self.hurt(random.choice([5, 8, 10]))
-            print("\n")
+            print(PAR)
 
     def lockpick_opportunity(self):
         """Finding a locked container — lockpick set changes outcome"""
@@ -167,46 +160,35 @@ class DayItemsMixin:
 
     def fishing_day(self):
         """Fishing rod lets you catch food at water sources"""
-        type.type("You come across a quiet pond tucked behind an abandoned gas station. ")
-        type.type("The water is clear. Something's moving under the surface.")
-        print("\n")
+        type.type("You come across a quiet pond tucked behind an abandoned gas station, like nature reclaiming something that didn't deserve to exist. The water is clear enough that you can see shapes moving through it.")
+        print(PAR)
         if self.has_item("Fishing Rod"):
-            type.type("You grab your " + cyan(bright("Fishing Rod")) + " from the car and cast a line.")
-            print("\n")
-            type.type("You sit on the bank, watching the line sway gently in the water. ")
-            type.type("The world is quiet. Just you, the pond, and the sky.")
-            print("\n")
+            type.type("You grab your " + cyan(bright("Fishing Rod")) + " from the car and cast a line, then sit on the bank and let the world do whatever it's going to do. The water moves. The clouds move. You, for once, don't have to.")
+            print(PAR)
             self.restore_sanity(5)
             catch = random.randrange(5)
             if catch == 0:
-                type.type("A tug! You reel it in — a decent-sized bass. Not bad!")
-                print("\n")
-                type.type("You wrap it up and put it on ice in the cooler. Fresh fish — good for eating or bartering.")
-                self.add_item("Fish")  # Used in adventures.py for Deathclaw race and Kraken encounter
-                print("\n")
+                type.type("A tug — a real one, not just the current — and you reel in a decent-sized bass. You hold it up and stare at each other for a moment before you wrap it up and put it on ice. Fresh fish. Actual food that came from the actual world.")
+                print(PAR)
+                self.add_item("Fish")
             elif catch == 1:
-                type.type("You reel in... an old boot. Classic. At least the casting was relaxing.")
-                print("\n")
+                type.type("You reel in an old boot. Classic. The fishing gods have a sense of humor that never gets old, apparently. At least the casting was nice.")
+                print(PAR)
             elif catch == 2:
-                type.type("After an hour, you hook something heavy. You pull and pull and — ")
-                type.type("it's a waterlogged wallet. Inside: " + green("${:,}".format(random.randint(5, 25))) + ". ")
-                type.type("The fishing gods provide.")
-                self.change_balance(random.randint(5, 25))
-                print("\n")
+                bonus = random.randint(5, 25)
+                type.type("After an hour, you hook something heavy. You pull and pull and — it's a waterlogged wallet, fat with what turns out to be " + green("${:,}".format(bonus)) + " in mostly intact bills. The fishing gods provide, in their own way.")
+                self.change_balance(bonus)
+                print(PAR)
             elif catch == 3:
-                type.type("You catch a catfish as long as your forearm. You stare at it. It stares at you. ")
-                type.type("You throw it back. Some creatures deserve their freedom. You feel... good about that.")
+                type.type("You catch a catfish as long as your forearm. You hold it over the water and it looks at you with a face that has no opinions and no regrets, and you decide that's something to admire. You throw it back. You feel genuinely good about that.")
                 self.restore_sanity(3)
-                print("\n")
+                print(PAR)
             else:
-                type.type("Nothing bites. But honestly? The quiet was worth it. ")
-                type.type("Sometimes doing nothing is the most productive thing you can do.")
-                print("\n")
+                type.type("Nothing bites. You sit there for two hours watching the line drift and the clouds change shape, and when you finally reel in, you feel better than you have all week. Doing nothing on purpose is not the same as having nothing to do.")
+                print(PAR)
         else:
-            type.type("You stare at the water. Fish are literally jumping. ")
-            type.type("If only you had a fishing rod... You pick up a stick and try to fashion one. ")
-            type.type("It doesn't work. Of course it doesn't. You're not that resourceful. Yet.")
-            print("\n")
+            type.type("You stare at the water. Fish are literally jumping — breaking the surface in lazy arcs, completely unbothered. You find a stick and try to fashion a makeshift rod. It doesn't work. You're not that kind of resourceful. You stand there for twenty minutes holding a stick before walking back to the car.")
+            print(PAR)
 
     def trap_night_thief(self):
         """Improvised Trap or Car Alarm Rigging prevents theft"""
@@ -430,6 +412,25 @@ class DayItemsMixin:
 
     def worry_stone_moment(self):
         """Worry stone provides a brief sanity moment"""
+        if (self.has_item("Worry Stone") and self.has_item("Dream Catcher")
+                and self.has_item("Lucky Charm Bracelet")):
+            self.use_item("Worry Stone")
+            self.use_item("Dream Catcher")
+            self.use_item("Lucky Charm Bracelet")
+            type.type("You hold the " + cyan(bright("Worry Stone")) + " while the " + cyan(bright("Dream Catcher")) + " sways on your mirror and the " + cyan(bright("Lucky Charm Bracelet")) + " glints on your wrist.")
+            print("\n")
+            type.type("All three artifacts resonate. Something shifts, deep and irreversible.")
+            print("\n")
+            type.type("The anxiety. The nightmares. The bad luck. All three dissolve at once.")
+            print("\n")
+            type.type("You feel genuinely, completely peaceful. Not numb — peaceful. There's a difference.")
+            print("\n")
+            type.type("All three items turn to warm dust in your hand. You breathe. You're okay.")
+            self.restore_sanity(100)
+            self._sanity = min(self._sanity + 5, 100)
+            print("\n")
+            return
+
         if self.has_item("Worry Stone"):
             moments = [
                 "Your thumb finds the " + cyan(bright("Worry Stone")) + " in your pocket without thinking. Smooth. Warm. The anxiety retreats, just a little.",
@@ -2430,7 +2431,20 @@ class DayItemsMixin:
         print("\n")
         type.type("The host sees you approaching and starts formulating a polite rejection.")
         print("\n")
-        if self.has_item("Gentleman's Charm"):
+        if self.has_item("Flask of Pocket Aces") and self.has_item("Gentleman's Charm"):
+            type.type("The " + cyan(bright("Flask of Pocket Aces")) + " pulses against your ribs. Two aces, burning in your pocket.")
+            print("\n")
+            type.type("The " + cyan(bright("Gentleman's Charm")) + " does the rest. The host's polite rejection dies before it starts.")
+            print("\n")
+            type.type(quote("Sir. We've been expecting you. Your usual table?"))
+            print("\n")
+            type.type("You don't have a usual table. You do now. Whatever you're about to do — you feel winning.")
+            bonus = random.randint(100, 200)
+            type.type(" Someone at the bar insists on picking up the tab. Presses " + green(bright("$" + str(bonus))) + " into your hand on the way out.")
+            self.heal(15)
+            self.restore_sanity(12)
+            self.change_balance(bonus)
+        elif self.has_item("Gentleman's Charm"):
             type.type("Then the " + cyan(bright("Gentleman's Charm")) + " hits. The cologne, the silk — the host's rejection dies on their lips.")
             print("\n")
             type.type(quote("Right this way, sir. We have a lovely table by the window."))

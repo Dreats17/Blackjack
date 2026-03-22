@@ -132,9 +132,29 @@ class IllnessMixin:
         type.type("Just a common " + red("cold") + ". Nothing serious, but you feel miserable.")
         self.add_status("Cold")
         self.hurt(5)
+        if self.has_item("Voice Soother"):
+            print("\n")
+            type.type("You sip the " + cyan(bright("Voice Soother")) + ". The throat irritation dissolves. The cold still lingers but you can at least TALK.")
+            self.heal(3)
+        if self.has_item("Home Remedy"):
+            print("\n")
+            type.type("You reach for the " + cyan(bright("Home Remedy")) + ". The warm liquid cuts through the congestion like a small, domestic miracle.")
+            self.heal(2)
+            self.restore_sanity(1)
         self.start_night()
 
     def contract_flu(self):
+        if self.has_item("Flask of Anti-Virus"):
+            self.use_item("Flask of Anti-Virus")
+            type.type("You feel the familiar warning signs: fatigue, a creeping fever, the heavy ache behind your eyes.")
+            print("\n")
+            type.type("You reach for the " + cyan(bright("Flask of Anti-Virus")) + " before the symptoms can fully take hold.")
+            print("\n")
+            type.type("The flask fights the infection before it sets in. You feel it working — a warm resistance spreading through your blood.")
+            print("\n")
+            type.type(green("The flu never gets its grip on you. Crisis averted."))
+            self.start_night()
+            return
         type.type("It hits you like a truck. One moment you're fine, the next you can barely move.")
         print("\n")
         type.type("Fever. Chills. Body aches so severe you can't get comfortable in any position.")
@@ -156,8 +176,17 @@ class IllnessMixin:
         type.type("This isn't just a cold. This is " + red("pneumonia") + ".")
         print("\n")
         type.type("You need a doctor. Soon.")
+        pneumonia_damage = 15
+        if self.has_item("First Aid Kit"):
+            print("\n")
+            type.type("The " + cyan(bright("First Aid Kit")) + " has a respiratory mask. You strap it on. The pneumonia is real, but the breathing helps.")
+            pneumonia_damage -= 5
+        if self.has_item("Hydration Station"):
+            print("\n")
+            type.type("The " + cyan(bright("Hydration Station")) + " keeps you from dehydrating during the worst of it. Water fights infection.")
+            pneumonia_damage -= 5
         self.add_status("Pneumonia")
-        self.hurt(15)
+        self.hurt(pneumonia_damage)
         self.lose_sanity(2)
         self.start_night()
 
@@ -192,6 +221,16 @@ class IllnessMixin:
     def contract_stomach_flu(self):
         # EVENT: Contract stomach flu - violent gastrointestinal distress
         # EFFECTS: Adds "Stomach Flu" status, 12 damage, 1 sanity loss
+        if self.has_item("Hydration Station"):
+            type.type("The " + cyan(bright("Hydration Station")) + " purifies everything that enters. Waterborne illness doesn't reach you.")
+            print("\n")
+            self.heal(5)
+            return
+        if self.has_item("Water Purifier"):
+            type.type("The " + cyan(bright("Water Purifier")) + " ensures every sip is clean.")
+            print("\n")
+            type.type("The illness never begins.")
+            return
         type.type("It started with nausea. Then came the vomiting. Then the other end started.")
         print("\n")
         type.type("You've spent the last several hours in the bathroom, alternating between the toilet and the cold floor.")
@@ -199,6 +238,15 @@ class IllnessMixin:
         type.type("Your body is expelling everything. You're getting dehydrated fast.")
         print("\n")
         type.type(red("Stomach flu") + " has you in its grip.")
+        if self.has_item("Antacid Brew"):
+            self.use_item("Antacid Brew")
+            print("\n")
+            type.type("Before the stomach flu can fully set in, you chug the " + cyan(bright("Antacid Brew")) + ". The neutralization is immediate and impressive.")
+            print("\n")
+            type.type(green("The worst of it never arrives."))
+            self.hurt(3)
+            self.start_night()
+            return
         self.add_status("Stomach Flu")
         self.hurt(12)
         self.lose_sanity(1)
@@ -503,6 +551,17 @@ class IllnessMixin:
         self.start_night()
 
     def migraine_severe(self):
+        if self.has_item("Mind Shield"):
+            type.type("The " + cyan(bright("Mind Shield")) + " keeps the migraine behind the wall where it can't touch you.")
+            print("\n")
+            self.restore_sanity(5)
+            return
+        if self.has_item("Smelling Salts"):
+            self.use_item("Smelling Salts")
+            type.type("The " + cyan(bright("Smelling Salts")) + " hit like a freight train. The migraine retreats from a more alarming sensation.")
+            print("\n")
+            self.heal(5)
+            return
         type.type("The aura started an hour ago. Zigzag lines dancing across your vision.")
         print("\n")
         type.type("Now the pain has arrived. A sledgehammer behind your left eye. Light is agony. Sound is torture.")
@@ -734,9 +793,23 @@ class IllnessMixin:
         type.type("You're confused, disoriented. Your heart is racing. Muscles cramping.")
         print("\n")
         type.type(red("Heat stroke") + ". Your body can't cool itself. You're cooking from the inside.")
-        self.add_status("Heat Stroke")
-        self.hurt(25)
-        self.lose_sanity(4)
+        if self.has_item("Cool Down Kit"):
+            self.use_item("Cool Down Kit")
+            type.type("The " + cyan(bright("Cool Down Kit")) + "'s rapid cooling prevents the heat stroke from fully setting in.")
+            print("\n")
+            self.hurt(8)
+            self.lose_sanity(2)
+        elif self.has_item("All-Weather Armor") or self.has_item("Outdoor Shield"):
+            item_name = "All-Weather Armor" if self.has_item("All-Weather Armor") else "Outdoor Shield"
+            type.type("Your " + cyan(bright(item_name)) + " keeps body temperature managed. The heat stroke is less severe.")
+            print("\n")
+            self.add_status("Heat Stroke")
+            self.hurt(12)
+            self.lose_sanity(2)
+        else:
+            self.add_status("Heat Stroke")
+            self.hurt(25)
+            self.lose_sanity(4)
         self.start_night()
 
     def hypothermia(self):
@@ -747,9 +820,27 @@ class IllnessMixin:
         type.type("You're so tired. Just want to lie down. Just for a minute...")
         print("\n")
         type.type(red("Hypothermia") + ". Your core temperature is dropping. You're dying of cold.")
-        self.add_status("Hypothermia")
-        self.hurt(25)
-        self.lose_sanity(5)
+        if self.has_item("Survival Bivouac"):
+            type.type("The " + cyan(bright("Survival Bivouac")) + " wraps you in warmth. The hypothermia retreats.")
+            print("\n")
+            self.hurt(5)
+            self.lose_sanity(1)
+        elif self.has_item("Emergency Blanket") and self.has_item("Fire Starter Kit"):
+            type.type("Together, the " + cyan(bright("Emergency Blanket")) + " and " + cyan(bright("Fire Starter Kit")) + " create real warmth. The cold loses its grip.")
+            print("\n")
+            self.add_status("Hypothermia")
+            self.hurt(8)
+            self.lose_sanity(2)
+        elif self.has_item("Emergency Blanket"):
+            type.type("The " + cyan(bright("Emergency Blanket")) + " slows the heat loss. The hypothermia sets in, but milder.")
+            print("\n")
+            self.add_status("Hypothermia")
+            self.hurt(12)
+            self.lose_sanity(3)
+        else:
+            self.add_status("Hypothermia")
+            self.hurt(25)
+            self.lose_sanity(5)
         self.start_night()
 
     def crush_injury(self):
@@ -1154,6 +1245,22 @@ class IllnessMixin:
         type.type("The cramping is severe. The diarrhea is watery, foul. You're getting dehydrated fast.")
         print("\n")
         type.type(red("Waterborne illness") + ". You need treatment before you lose too many fluids.")
+        if self.has_item("Flask of Anti-Virus"):
+            self.use_item("Flask of Anti-Virus")
+            print("\n")
+            type.type("A drop of " + cyan(bright("Flask of Anti-Virus")) + " in the water. The contamination dissolves before it can take hold.")
+            print("\n")
+            type.type(green("The infection never gets its foothold. Your gut is fine."))
+            self.start_night()
+            return
+        if self.has_item("Water Purifier") or self.has_item("Hydration Station"):
+            purifier = "Water Purifier" if self.has_item("Water Purifier") else "Hydration Station"
+            print("\n")
+            type.type("You run the water through your " + cyan(bright(purifier)) + " before drinking. The contamination is filtered out before it reaches you.")
+            print("\n")
+            type.type(green("Clean water. No illness today."))
+            self.start_night()
+            return
         self.add_status("Waterborne Illness")
         self.hurt(18)
         self.start_night()
@@ -1183,6 +1290,15 @@ class IllnessMixin:
         type.type("You're going into anaphylactic shock. Without an EpiPen, you have minutes.")
         print("\n")
         type.type(red("Severe bee allergy") + ". You need epinephrine NOW.")
+        if self.has_item("Flask of Anti-Venom"):
+            self.use_item("Flask of Anti-Venom")
+            print("\n")
+            type.type("You slam the " + cyan(bright("Flask of Anti-Venom")) + " before the anaphylaxis can close your throat.")
+            print("\n")
+            type.type(green("The anti-venom works fast. Your throat stays open. The swelling retreats."))
+            self.hurt(5)
+            self.start_night()
+            return
         self.add_status("Anaphylaxis")
         self.hurt(30)
         self.lose_sanity(3)
@@ -1547,6 +1663,16 @@ class IllnessMixin:
         type.type("They nicked an artery. They left something inside. Something went septic.")
         print("\n")
         type.type(red("Surgical complications") + ". Now you're fighting for your life instead of recovering.")
+        if self.has_item("Forged Documents"):
+            print("\n")
+            type.type("The " + cyan(bright("Forged Documents")) + " identify you as Dr. Robert Chen, MD. The nurse doesn't question it.")
+            print("\n")
+            type.type("You supervise your own surgery. The nurses follow your instructions. The artery gets patched. Nothing gets left inside.")
+            print("\n")
+            type.type(green("Free treatment. Successful surgery. The papers work perfectly."))
+            self.restore_sanity(3)
+            self.start_night()
+            return
         self.add_status("Sepsis")
         self.add_injury("Puncture Wound")
         self.hurt(40)
@@ -1632,6 +1758,15 @@ class IllnessMixin:
         type.type("By the time you escape, you've been stung dozens of times. Your throat is tightening...")
         print("\n")
         type.type(red("Multiple wasp stings") + ". Possible " + red("anaphylaxis") + ".")
+        if self.has_item("Flask of Anti-Venom"):
+            self.use_item("Flask of Anti-Venom")
+            print("\n")
+            type.type("You down the " + cyan(bright("Flask of Anti-Venom")) + " before your throat can close. The swelling recedes. You breathe.")
+            print("\n")
+            type.type(green("The venom doesn't win today."))
+            self.hurt(5)
+            self.start_night()
+            return
         self.add_status("Anaphylaxis")
         self.hurt(30)
         self.lose_sanity(4)

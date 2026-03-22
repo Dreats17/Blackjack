@@ -209,6 +209,12 @@ class DayCompanionsMixin:
                 self.restore_sanity(5)
         
         self.pet_companion("Mr. Pecks")
+        if self.has_item("Disposable Camera"):
+            print("\n")
+            type.type("You grab your " + cyan(bright("Disposable Camera")) + " and catch Mr. Pecks mid-strut, beak up, completely self-satisfied.")
+            print("\n")
+            type.type("Click. That's a perfect photograph. A crow with a treasure and a man who needed one. Both very pleased.")
+            self.restore_sanity(4)
         print("\n")
 
     def rusty_midnight_heist(self):
@@ -584,7 +590,29 @@ class DayCompanionsMixin:
         
         type.type("Your companion is sick. What do you do?")
         print("\n")
-        
+
+        if self.has_item("Flask of Anti-Virus"):
+            type.type("You uncork the " + cyan(bright("Flask of Anti-Virus")) + " and place a drop on " + bright(name) + "'s tongue.")
+            print("\n")
+            type.type("The flask fights the infection before it can take hold. Within an hour, " + bright(name) + " is eating again.")
+            print("\n")
+            type.type("The flask still has plenty left.")
+            self.pet_companion(name)
+            self.restore_sanity(8)
+            print("\n")
+            return
+
+        if self.has_item("Flask of Anti-Venom"):
+            type.type("You apply the " + cyan(bright("Flask of Anti-Venom")) + " carefully. Whatever got into " + bright(name) + " doesn't stand a chance.")
+            print("\n")
+            type.type("The recovery is faster than you expected. " + bright(name) + " shakes it off by nightfall.")
+            print("\n")
+            type.type("The flask still has plenty left.")
+            self.pet_companion(name)
+            self.restore_sanity(8)
+            print("\n")
+            return
+
         if self.has_item("Cough Drops"):
             type.type("1. Use your " + magenta(bright("Cough Drops")) + " to help")
         else:
@@ -1430,6 +1458,21 @@ class DayCompanionsMixin:
         self.restore_sanity(15)
         self.heal(10)
         self.pet_companion(name)
+        if self.has_item("Beast Tamer Kit"):
+            print("\n")
+            type.type("The " + cyan(bright("Beast Tamer Kit")) + " hasn't left your bag. " + bright(name) + " senses it — the bait, the toy, the whole philosophy of 'patience and treats.'")
+            print("\n")
+            type.type("They look at you with new respect.")
+            self._companions[name]["happiness"] = min(100, self._companions[name].get("happiness", 50) + 10)
+            self.restore_sanity(4)
+        if self.has_item("Deck of Cards"):
+            print("\n")
+            type.type("You shuffle the " + cyan(bright("Deck of Cards")) + " absently. " + bright(name) + " watches the cards with total animal focus.")
+            print("\n")
+            type.type("You fan them out, flip them over, riffle them back together. Their eyes track every card like it's the most important thing in the world.")
+            print("\n")
+            type.type("Maybe it is. Maybe you both needed something simple to look at.")
+            self.restore_sanity(4)
         print("\n")
 
     def companion_learns_trick(self):
@@ -1449,6 +1492,19 @@ class DayCompanionsMixin:
         type.type(bright(name) + " has been with you long enough to pick up some new tricks.")
         print("\n")
         
+        if self.has_item("Dog Whistle") and "Dog" in comp_type:
+            type.type("You pull out the " + cyan(bright("Dog Whistle")) + " and blow a short, clean note. " + bright(name) + " snaps to attention.")
+            print("\n")
+            type.type("You run through the motions once. Sit. Stay. Come. The whistle cuts through every distraction.")
+            print("\n")
+            type.type(bright(name) + " nails every command on the first try. You didn't know they had that in them.")
+            print("\n")
+            type.type("Turns out, neither did they.")
+            self.restore_sanity(10)
+            self.pet_companion(name)
+            print("\n")
+            return
+
         if "Dog" in comp_type:
             roll = random.randrange(3)
             if roll == 0:
@@ -1525,9 +1581,20 @@ class DayCompanionsMixin:
             self.restore_sanity(5)
         
         self.pet_companion(name)
+        if self.has_item("Devil's Deck"):
+            print("\n")
+            type.type("You produce the " + cyan(bright("Devil's Deck")) + ". The cards float and shuffle themselves in front of " + bright(name) + ".")
+            print("\n")
+            type.type("They are transfixed. Not scared. Just absolutely riveted.")
+            self._companions[name]["happiness"] = min(100, self._companions[name].get("happiness", 50) + 10)
+            self.restore_sanity(5)
+        elif self.has_item("Fortune Cards"):
+            print("\n")
+            type.type("You deal the " + cyan(bright("Fortune Cards")) + " for " + bright(name) + ". Their card comes up: " + italic("THE FAITHFUL") + ".")
+            print("\n")
+            type.type("It's accurate. Uncomfortably accurate.")
+            self.restore_sanity(4)
         print("\n")
-
-    def companion_nightmare(self):
         # EVENT: A companion has a nightmare and you comfort them
         # CONDITION: Must have at least one companion
         living = self.get_all_companions()
@@ -1584,6 +1651,13 @@ class DayCompanionsMixin:
         self.pet_companion(name)
         self.restore_sanity(8)
         self.add_fatigue(2)
+        if self.has_item("Night Scope") or self.has_item("Flashlight") or self.has_item("Headlamp"):
+            light_name = "Night Scope" if self.has_item("Night Scope") else ("Flashlight" if self.has_item("Flashlight") else "Headlamp")
+            print("\n")
+            type.type("You sweep the " + cyan(bright(light_name)) + " around your sleeping companion. Nothing threatening within 100 yards.")
+            print("\n")
+            type.type("You go back to sleep.")
+            self.restore_sanity(3)
         print("\n")
 
     # ==========================================
@@ -1665,4 +1739,120 @@ class DayCompanionsMixin:
             type.type("You tear off a piece of whatever you have and set it on the floor for " + cyan(bright(name)) + ". ")
             type.type("They eat it off the ground. You feel a pang of guilt. They deserve better.")
             print("\n")
+
+    def buddy_dog_whistle_synergy(self):
+        """Buddy (Dog) + Dog Whistle synergy event"""
+        if not self.has_companion("Buddy") or not self.has_item("Dog Whistle"):
+            self.day_event()
+            return
+        type.type("You pull out the " + cyan(bright("Dog Whistle")) + " without thinking.")
+        print(PAR)
+        type.type(cyan(bright("Buddy")) + " goes absolutely berserk. Spinning. Leaping. Barking at nothing. At everything.")
+        print(PAR)
+        type.type("When he finally stops spinning, he shoves his nose under a bush and digs furiously.")
+        print(PAR)
+        reward = random.randint(20, 50)
+        roll = random.randrange(3)
+        if roll == 0:
+            type.type("He emerges with a crumpled " + green(bright("$" + str(reward))) + " in his mouth. Tail wagging. Very proud.")
+            self.change_balance(reward)
+        elif roll == 1:
+            type.type("He emerges with a " + cyan(bright("Granola Bar")) + ". Slightly slobbery. Still sealed.")
+            self.add_item("Granola Bar")
+        else:
+            type.type("He emerges with a " + cyan(bright("Bandage")) + " still in the wrapper. You'll take it.")
+            self.add_item("Bandage")
+        print(PAR)
+        type.type("Good boy.")
+        self._companions["Buddy"]["happiness"] = min(100, self._companions["Buddy"]["happiness"] + 10)
+        print("\n")
+
+    def thunder_running_shoes_synergy(self):
+        """Thunder (Horse) + Running Shoes synergy event"""
+        if not self.has_companion("Thunder") or not self.has_item("Running Shoes"):
+            self.day_event()
+            return
+        type.type("You lace up your " + cyan(bright("Running Shoes")) + " and start down the road at a jog.")
+        print(PAR)
+        type.type(cyan(bright("Thunder")) + " falls in beside you without being asked.")
+        print(PAR)
+        type.type("Matching your pace exactly. Glancing sideways at you. Hooves on asphalt, shoes on asphalt.")
+        print(PAR)
+        type.type("You've never felt this fast. This light. Like the road belongs to both of you.")
+        print(PAR)
+        type.type("You run until your lungs burn. " + cyan(bright("Thunder")) + " could go forever.")
+        self._companions["Thunder"]["happiness"] = min(100, self._companions["Thunder"]["happiness"] + 10)
+        self.restore_sanity(8)
+        print("\n")
+
+    def grace_dream_catcher_synergy(self):
+        """Grace (Deer) + Dream Catcher synergy event"""
+        if not self.has_companion("Grace") or not self.has_item("Dream Catcher"):
+            self.day_event()
+            return
+        type.type(cyan(bright("Grace")) + " noses the " + cyan(bright("Dream Catcher")) + " hanging from your mirror.")
+        print(PAR)
+        type.type("She turns it slowly with her muzzle. Studies it. Seems satisfied.")
+        print(PAR)
+        type.type("She settles beside your car with her eyes closed. Still. Peaceful.")
+        print(PAR)
+        type.type("No nightmares tonight. You're sure of it.")
+        self._companions["Grace"]["happiness"] = min(100, self._companions["Grace"]["happiness"] + 10)
+        self.restore_sanity(10)
+        print("\n")
+
+    def echo_camera_synergy(self):
+        """Echo (Cat) + Disposable Camera synergy event"""
+        if not self.has_companion("Echo") or not self.has_item("Disposable Camera"):
+            self.day_event()
+            return
+        type.type(cyan(bright("Echo")) + " notices the " + cyan(bright("Disposable Camera")) + ".")
+        print(PAR)
+        type.type("She poses on the hood. Paw extended. Chin lifted. Then the trunk. Then the tire.")
+        print(PAR)
+        type.type("She KNOWS the camera is there. She has always known.")
+        print(PAR)
+        type.type("You take every shot. You don't regret a single one.")
+        self._companions["Echo"]["happiness"] = min(100, self._companions["Echo"]["happiness"] + 10)
+        self.restore_sanity(8)
+        print("\n")
+
+    def shellbert_worry_stone_synergy(self):
+        """Shellbert (Turtle) + Worry Stone synergy event"""
+        if not self.has_companion("Shellbert") or not self.has_item("Worry Stone"):
+            self.day_event()
+            return
+        type.type("You're turning the " + cyan(bright("Worry Stone")) + " over in your hand when " + cyan(bright("Shellbert")) + " climbs onto your lap.")
+        print(PAR)
+        type.type("He presses against it. Still. Patient. The patience of something that has outlived entire civilizations.")
+        print(PAR)
+        type.type("Both of you just... sit. The stone warm between you.")
+        print(PAR)
+        type.type("The worry doesn't disappear. It just gets smaller.")
+        self._companions["Shellbert"]["happiness"] = min(100, self._companions["Shellbert"]["happiness"] + 10)
+        self.restore_sanity(12)
+        print("\n")
+
+    def bear_scrap_armor_synergy(self):
+        """Ursus/Bruno (Bear) + Scrap Armor synergy event"""
+        bear_name = None
+        if self.has_companion("Ursus"):
+            bear_name = "Ursus"
+        elif self.has_companion("Bruno"):
+            bear_name = "Bruno"
+        if not bear_name or not self.has_item("Scrap Armor"):
+            self.day_event()
+            return
+        type.type("You leave the " + cyan(bright("Scrap Armor")) + " out by the car.")
+        print(PAR)
+        type.type(cyan(bright(bear_name)) + " investigates it. Sniffs it. Then drapes it across his shoulders like a cape.")
+        print(PAR)
+        type.type("He walks around the parking lot wearing it. The other animals notice.")
+        print(PAR)
+        type.type("A crow lands on a dumpster and stares. A stray dog crosses the street to avoid him.")
+        print(PAR)
+        type.type("Nobody is starting anything tonight.")
+        self._companions[bear_name]["happiness"] = min(100, self._companions[bear_name]["happiness"] + 15)
+        self._skip_animal_threat = True
+        print("\n")
 
