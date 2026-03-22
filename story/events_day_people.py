@@ -583,6 +583,14 @@ class DayPeopleMixin:
             type.type("The math is immediate. They run.")
             self.restore_sanity(5)
             return
+        if self.has_item("Sneaky Peeky Goggles") or self.has_item("Sneaky Peeky Shades"):
+            lenses = "Sneaky Peeky Goggles" if self.has_item("Sneaky Peeky Goggles") else "Sneaky Peeky Shades"
+            type.type("Through your " + cyan(bright(lenses)) + ", you spot the thief before they spot you. The lenses reveal their approach angle, their weapon hand, everything.")
+            print("\n")
+            type.type("You calmly walk to the car from the other side. The thief never knew you were there.")
+            self.restore_sanity(4)
+            print("\n")
+            return
         # COMPANION: Protection check first
         protector = self._lists.has_companion_with_bonus(self, "protection")
         if protector and self.get_companion(protector)["status"] == "alive":

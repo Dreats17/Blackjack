@@ -349,6 +349,13 @@ class DayWealthMixin:
         type.type("The anxiety gnaws at you all morning. ")
         self.lose_sanity(random.choice([1, 2]))  # Money anxiety chips away at sanity
         print("\n")
+        if self.has_item("Delight Manipulator") or self.has_item("Delight Indicator"):
+            gauge = "Delight Manipulator" if self.has_item("Delight Manipulator") else "Delight Indicator"
+            print("\n")
+            type.type("You glance at the " + cyan(bright(gauge)) + ". The needle swings wildly — euphoric, terrified, euphoric, terrified.")
+            print("\n")
+            type.type("You could adjust it. Dial down the fear. But would that be living, or just lying to yourself?")
+            self.restore_sanity(2)
         if random.randrange(2) == 0:
             type.type("You spend the day paranoid, jumping at every sound. It's exhausting.")
             self.hurt(10)
@@ -946,6 +953,16 @@ class DayWealthMixin:
             print("\n")
             type.type("They lose you entirely. You're a ghost in their system.")
             self.restore_sanity(8)
+            print("\n")
+            return
+        if self.has_item("Sneaky Peeky Goggles") or self.has_item("Sneaky Peeky Shades"):
+            lenses = "Sneaky Peeky Goggles" if self.has_item("Sneaky Peeky Goggles") else "Sneaky Peeky Shades"
+            type.type("Through your " + cyan(bright(lenses)) + ", you see what others can't — the hidden cameras, the undercover security, the one-way mirrors.")
+            print("\n")
+            type.type("You map every blind spot in the casino's surveillance. Every angle they can't cover. Every safe route.")
+            print("\n")
+            type.type("They're watching everyone. But you're watching them watching.")
+            self.restore_sanity(6)
             print("\n")
             return
         variant = random.randrange(3)

@@ -404,6 +404,12 @@ class DaySurrealMixin:
         type.type("When you turn around, the door is gone. The wall is smooth. Like the door never existed.")
         print("\n")
         type.type("But you can still hear scratching from inside the wall.")
+        if self.has_item("Delight Indicator") or self.has_item("Delight Manipulator"):
+            gauge = "Delight Manipulator" if self.has_item("Delight Manipulator") else "Delight Indicator"
+            print("\n")
+            type.type("Your " + cyan(bright(gauge)) + " displays a reading you've never seen before: " + yellow("'UNDEFINED.'"))
+            print("\n")
+            type.type("Some feelings don't have names. The device wasn't built for this.")
         self.lose_sanity(20)
         self.add_status("Glimpsed the Void")
         print("\n")

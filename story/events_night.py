@@ -2298,6 +2298,13 @@ class NightEventsMixin:
             type.type("You lie there, eyes open, listening to your own breathing and the distant hum of a highway that exists for people going somewhere. Somewhere out there, people are sleeping in actual beds, in actual houses, with mortgages that embarrass them and futures they take for granted.")
             print(PAR)
             type.type("You wonder if they know. How lucky the ordinary is. How you'd give everything you're chasing just to feel that ordinary again. Probably not. Nobody ever knows until it's already gone and they're lying in a car in the dark making deals with the ceiling.")
+        if self.has_item("Delight Manipulator") or self.has_item("Delight Indicator"):
+            gauge = "Delight Manipulator" if self.has_item("Delight Manipulator") else "Delight Indicator"
+            print("\n")
+            type.type("The " + cyan(bright(gauge)) + " on your wrist glows faintly in the dark. The needle points to zero.")
+            print("\n")
+            type.type("It's been a long time since it moved. You're not sure what happiness feels like anymore.")
+            self.lose_sanity(1)
         if self.has_item("Survival Bivouac"):
             print(PAR)
             type.type("You unroll the " + magenta(bright("Survival Bivouac")) + " across the back seat.")
@@ -2400,6 +2407,15 @@ class NightEventsMixin:
             type.type("You didn't earn this night. Nobody earns a night like this. You just got lucky enough to be awake for it.")
             self.restore_sanity(5)
             self.heal(5)
+        if self.has_item("Sneaky Peeky Goggles") or self.has_item("Sneaky Peeky Shades"):
+            lenses = "Sneaky Peeky Goggles" if self.has_item("Sneaky Peeky Goggles") else "Sneaky Peeky Shades"
+            print("\n")
+            type.type("You put on the " + cyan(bright(lenses)) + " and look up at the stars.")
+            print("\n")
+            type.type("The enchanted lenses show you things the naked eye can't see — satellites drifting, shooting stars too faint for normal eyes, the Milky Way in impossible detail.")
+            print("\n")
+            type.type("For a moment, you understand why people look up.")
+            self.restore_sanity(3)
         print("\n")
 
     def stray_cat_returns(self):

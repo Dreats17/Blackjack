@@ -3976,3 +3976,36 @@ class DayItemsMixin:
             type.type("You can't make them stay. If they want to go, they'll go. That's what freedom means.")
             self.lose_sanity(3)
         print("\n")
+
+    def lottery_ticket_check(self):
+        """Lottery Ticket — scratch-off moment of hope"""
+        if not self.has_item("Lottery Ticket"):
+            self.day_event()
+            return
+        type.type("You find the " + cyan(bright("Lottery Ticket")) + " in your pocket. Crumpled. Forgotten. A $5 dream.")
+        print("\n")
+        type.type("You scratch it with your thumbnail. Silver flakes dust your lap.")
+        print("\n")
+        # Odds: 5% jackpot ($500-$5000), 20% small win ($10-$50), 75% loss
+        result = random.randrange(20)
+        if result == 0:
+            winnings = random.choice([500, 1000, 2000, 5000])
+            type.type("Three sevens. " + green("${:,}".format(winnings)) + ".")
+            print("\n")
+            type.type("You stare at the ticket. Then at the sky. Then at the ticket again.")
+            print("\n")
+            type.type("Your hands are shaking. This changes things. This changes everything.")
+            self.change_balance(winnings)
+            self.restore_sanity(15)
+        elif result < 5:
+            winnings = random.choice([10, 20, 50])
+            type.type("A small winner. " + green("${:,}".format(winnings)) + ". Enough for a meal. Enough for hope.")
+            self.change_balance(winnings)
+            self.restore_sanity(3)
+        else:
+            type.type("Nothing. Three different symbols. Not even close.")
+            print("\n")
+            type.type("You crumple the ticket and let it fall. Five dollars, gone. The lottery giveth not.")
+            self.lose_sanity(1)
+        self.use_item("Lottery Ticket")
+        print("\n")

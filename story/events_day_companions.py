@@ -1458,6 +1458,12 @@ class DayCompanionsMixin:
         self.restore_sanity(15)
         self.heal(10)
         self.pet_companion(name)
+        if self.has_item("Delight Indicator") or self.has_item("Delight Manipulator"):
+            gauge = "Delight Manipulator" if self.has_item("Delight Manipulator") else "Delight Indicator"
+            print("\n")
+            type.type("The " + cyan(bright(gauge)) + " reads " + green("'Content'") + " for the first time in weeks.")
+            print("\n")
+            type.type("Maybe that's enough. Maybe that's everything.")
         if self.has_item("Beast Tamer Kit"):
             print("\n")
             type.type("The " + cyan(bright("Beast Tamer Kit")) + " hasn't left your bag. " + bright(name) + " senses it — the bait, the toy, the whole philosophy of 'patience and treats.'")

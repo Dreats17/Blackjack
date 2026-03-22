@@ -1213,6 +1213,14 @@ class DayDarkMixin:
             self.restore_sanity(5)
             self.change_balance(200)
             return
+        if self.has_item("Sneaky Peeky Goggles") or self.has_item("Sneaky Peeky Shades"):
+            lenses = "Sneaky Peeky Goggles" if self.has_item("Sneaky Peeky Goggles") else "Sneaky Peeky Shades"
+            type.type("Your " + cyan(bright(lenses)) + " catch a reflection — someone's crouching behind the counter with a weapon.")
+            print("\n")
+            type.type("You quietly back out of the gas station before the situation unfolds. Crisis averted.")
+            self.restore_sanity(5)
+            print("\n")
+            return
         warner = self._lists.has_companion_with_bonus(self, "danger_warning")
         if warner and self.get_companion(warner)["status"] == "alive" and random.randrange(3) == 0:
             type.type("You're about to walk into the gas station when " + bright(warner) + " starts acting strange.")
