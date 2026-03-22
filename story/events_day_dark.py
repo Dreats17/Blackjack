@@ -846,6 +846,14 @@ class DayDarkMixin:
         type.type("Morning comes. You're exhausted but alive. Was anyone ever really after you?")
         print("\n")
         type.type("Does it matter? The fear was real.")
+        if self.has_item("Worry Stone"):
+            print("\n")
+            type.type("You grip the " + cyan(bright("Worry Stone")) + " in your pocket. Thumb finds the groove. Round and round.")
+            print("\n")
+            type.type("The panic doesn't vanish — but it shrinks. Manageable. You breathe.")
+            self.lose_sanity(3)
+            print("\n")
+            return
         self.lose_sanity(10)
         print("\n")
 
@@ -1048,6 +1056,21 @@ class DayDarkMixin:
             print("\n")
             type.type("Three figures materialize from the shadows behind you. They heard nothing. They see nothing. You exit the alley in perfect silence, a ghost in a city that never knew you passed through.")
             self.restore_sanity(7)
+            print("\n")
+            return
+
+        if self.has_item("Smelling Salts"):
+            type.type("You step into the alley. Halfway through, three shapes materialize. Hoodies. A knife.")
+            print("\n")
+            type.type("One of them cracks you in the back of the head. Your vision goes dark. You start to fall.")
+            print("\n")
+            type.type("But the " + cyan(bright("Smelling Salts")) + " in your pocket crack on impact. The ammonia jolt hits your brain like lightning.")
+            print("\n")
+            type.type("Your eyes snap open. You're on the ground but AWAKE. You roll, scramble, sprint.")
+            print("\n")
+            type.type("They didn't expect you to get up. By the time they react, you're gone.")
+            self.hurt(8)
+            self.restore_sanity(3)
             print("\n")
             return
 
@@ -2115,6 +2138,17 @@ class DayDarkMixin:
         # CONDITIONAL DEATH - Consequence of earlier event
         if not self.has_danger("Knife Wound"):
             self.day_event()
+            return
+        if self.has_item("Wound Salve"):
+            type.type("You check the knife wound in the car mirror. It's angry. Red. But you have the " + cyan(bright("Wound Salve")) + ".")
+            print("\n")
+            type.type("You slather it on thick. It stings — then soothes. The swelling fades within the hour.")
+            print("\n")
+            type.type("Not a hospital. But maybe you don't need one.")
+            self.use_item("Wound Salve")
+            self.hurt(10)
+            self.remove_danger("Knife Wound")
+            print("\n")
             return
         type.type("You check yourself in the car mirror. That knife wound from the mugging isn't healing right.")
         print("\n")

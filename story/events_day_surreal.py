@@ -245,6 +245,15 @@ class DaySurrealMixin:
         if self.get_sanity() >= 50:
             self.day_event()
             return
+        if self.has_item("Smelling Salts"):
+            type.type("Reality stutters. Colors shift. Your vision swims.")
+            print("\n")
+            type.type("You crack the " + cyan(bright("Smelling Salts")) + " under your nose. One whiff and reality snaps back into focus.")
+            print("\n")
+            type.type("The glitch dissolves. Your brain reboots. Whatever that was, it's over.")
+            self.restore_sanity(3)
+            print("\n")
+            return
         type.type("Sitting in your car, reality... stutters.")
         print("\n")
         type.type("The colors around you shift. Blue becomes green. Green becomes screaming.")

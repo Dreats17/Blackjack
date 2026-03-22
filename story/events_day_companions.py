@@ -613,6 +613,19 @@ class DayCompanionsMixin:
             print("\n")
             return
 
+        if self.has_item("Splint"):
+            type.type("You notice " + bright(name) + " favoring one leg. Not sick — injured.")
+            print("\n")
+            type.type("You grab your " + cyan(bright("Splint")) + " and carefully brace the limb. Duct tape and care.")
+            print("\n")
+            type.type(bright(name) + " tests the leg. Gingerly. Then again. It holds.")
+            print("\n")
+            type.type("Not a vet. But good enough for the road.")
+            self.pet_companion(name)
+            self.restore_sanity(5)
+            print("\n")
+            return
+
         if self.has_item("Cough Drops"):
             type.type("1. Use your " + magenta(bright("Cough Drops")) + " to help")
         else:

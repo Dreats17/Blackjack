@@ -90,6 +90,14 @@ class NightEventsMixin:
         if random_chance == 0:
             type.type("But, right as you get to your car, you trip over a stone on the ground, and scrape your knee hard. Blood begins to drip down your leg. That's a bummer.")
             print("\n")
+            if self.has_item("Wound Salve"):
+                type.type("You limp back to the car and reach for your " + cyan(bright("Wound Salve")) + ". A thick smear on the scrape — stings, then soothes.")
+                print("\n")
+                type.type("The bleeding stops fast. Not bad for homemade medicine.")
+                self.hurt(2)
+                self.add_injury("Scraped Knee")
+                print("\n")
+                return
             self.hurt(random.choice([5, 10, 15]))
             self.add_injury("Scraped Knee")
             return
@@ -2199,6 +2207,12 @@ class NightEventsMixin:
         type.type("You watch them dance across the stars for what feels like hours. Then, suddenly, they're gone.")
         print("\n")
         type.type("You don't tell anyone about this. Who would believe you?")
+        if self.has_item("Worry Stone"):
+            print("\n")
+            type.type("You rub the " + cyan(bright("Worry Stone")) + " between your fingers. The anxiety fades. Whatever you saw, it can't touch you.")
+            self.restore_sanity(2)
+            print("\n")
+            return
         if self.has_item("Rain Collector"):
             print("\n")
             type.type("Your " + cyan(bright("Rain Collector")) + " catches the overnight moisture. By morning, you have clean water without lifting a finger.")
@@ -2271,6 +2285,15 @@ class NightEventsMixin:
             print(PAR)
             type.type("You wake up rested. Unsettled in a vague way — like you know something tried and failed — but rested.")
             self.restore_sanity(4)
+            print(PAR)
+            return
+        if self.has_item("Worry Stone"):
+            type.type("The nightmare reaches for you — but your hand finds the " + cyan(bright("Worry Stone")) + " under your pillow.")
+            print(PAR)
+            type.type("You rub the smooth surface. The worry melts. The nightmare loses its grip, fading to a dull murmur.")
+            print(PAR)
+            type.type("You don't sleep great. But you sleep. And the stone is warm in your palm when you wake.")
+            self.restore_sanity(3)
             print(PAR)
             return
         variant = random.randrange(4)

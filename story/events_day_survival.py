@@ -1451,6 +1451,14 @@ class DaySurvivalMixin:
             print("\n")
             type.type("Well, it left you a gift. An angry, infected, weeping gift. On your elbow. Right where the seat rubs.")
         print("\n")
+        if self.has_item("Wound Salve"):
+            type.type("You dig out the " + cyan(bright("Wound Salve")) + " and smear it over the bite. The sting fades almost instantly.")
+            print("\n")
+            type.type("By morning, the swelling is gone. That homemade gunk actually works.")
+            self.hurt(2)
+            self.restore_sanity(2)
+            print("\n")
+            return
         if self.has_item("First Aid Kit"):
             type.type("Good thing you have that " + magenta(bright("First Aid Kit")) + ". You clean it, disinfect it, bandage it. Almost like a real adult.")
             self.hurt(3)

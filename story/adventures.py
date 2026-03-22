@@ -1378,6 +1378,17 @@ class AdventuresMixin:
                 type.type(" " + green(bright("$" + str(found))) + " well-spotted.")
                 self.earn_money(found)
                 self.restore_sanity(4)
+            if self.has_item("Signal Mirror"):
+                print("\n")
+                type.type("You angle your " + cyan(bright("Signal Mirror")) + " toward a gap in the canopy. The flash catches the sun and bounces across the treetops.")
+                print("\n")
+                type.type("Minutes later, a park ranger appears on the trail. " + quote("Saw your signal from the fire tower. You lost?"))
+                print("\n")
+                type.type("Not lost — just lucky. The ranger points you to a shortcut and a forgotten picnic area with a cash box someone left behind.")
+                found = random.randint(20, 60)
+                type.type(" " + green(bright("$" + str(found))) + " found.")
+                self.earn_money(found)
+                self.restore_sanity(5)
             if self.has_item("Provider's Kit") or self.has_item("Fishing Rod"):
                 fish_item = "Provider's Kit" if self.has_item("Provider's Kit") else "Fishing Rod"
                 print("\n")
