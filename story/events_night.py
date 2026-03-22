@@ -1676,8 +1676,33 @@ class NightEventsMixin:
                 type.type("You sidestep like a matador. The dogs rocket past you. The walker chases after them, screaming names. You feel like you missed out on something special.")
             print("\n")
         elif event == "mugging":
+            if self.has_item("Rolling Fortress"):
+                type.type("A figure emerges from an alley. Then another. Then a third. They move toward your car.")
+                print("\n")
+                type.type("The " + cyan(bright("Rolling Fortress")) + "'s defense layers trigger. Would-be thieves approach, assess, and retreat. Nobody is taking anything tonight.")
+                print("\n")
+                self.restore_sanity(8)
+            elif self.has_item("Fortified Perimeter"):
+                type.type("A figure moves in from the shadows. Another follows.")
+                print("\n")
+                type.type("The " + cyan(bright("Fortified Perimeter")) + "'s trip-wires trigger. An alarm sounds. The night goes quiet.")
+                print("\n")
+                self.restore_sanity(5)
+            elif self.has_item("Guardian Angel"):
+                type.type("A figure emerges from an alley. Then another. Then a third. They fan out, blocking your path.")
+                print("\n")
+                type.type("The " + cyan(bright("Guardian Angel")) + "'s layered signal-to-perimeter system was already tracking this threat. It ends before it starts.")
+                print("\n")
+                self.restore_sanity(10)
+            elif self.has_item("Distress Beacon"):
+                type.type("A figure emerges from an alley. Then another. Then a third. They fan out, blocking your path.")
+                print("\n")
+                type.type("You trigger the " + cyan(bright("Distress Beacon")) + ". In the confusion of arriving vehicles, your threat disappears.")
+                print("\n")
+                self.use_item("Distress Beacon")
+                self.restore_sanity(7)
             # Check for Bodyguard Bruno - complete protection
-            if self.has_item("Bodyguard Bruno"):
+            elif self.has_item("Bodyguard Bruno"):
                 type.type("A figure emerges from an alley. Then another. Then a third. They fan out, blocking your path.")
                 print("\n")
                 type.type("Before they can speak, Bruno steps out of the shadows behind them.")
@@ -2105,6 +2130,16 @@ class NightEventsMixin:
         else:
             type.type("Still, it's beautiful. You feel small, but in a comforting way.")
             self.restore_sanity(random.choice([3, 4, 5]))
+            if self.has_item("Night Scope"):
+                print("\n")
+                type.type("Through the " + cyan(bright("Night Scope")) + ", the darkness becomes transparent. You watch a raccoon carry a hotdog from three blocks away. You feel omniscient.")
+                print("\n")
+                self.restore_sanity(6)
+            if self.has_item("Spotlight"):
+                print("\n")
+                type.type("You sweep the " + cyan(bright("Spotlight")) + " in a wide arc. Everything in range is illuminated. A deer freezes. The deer is extremely visible.")
+                print("\n")
+                self.restore_sanity(4)
         print("\n")
 
     def midnight_snack_run(self):
@@ -2230,7 +2265,16 @@ class NightEventsMixin:
             type.type(quote("One more hand?") + " he asks. You nod. What else would you do? What else have you ever done?")
             print(PAR)
             type.type("You wake up and check the mirror. No beard. But your eyes look a hundred years old.")
-        self.lose_sanity(5)
+        if self.has_item("Third Eye"):
+            type.type("The " + cyan(bright("Third Eye")) + " sees the nightmare for what it is — probability, not prophecy. You wake knowing the difference.")
+            print(PAR)
+            self.restore_sanity(5)
+        elif self.has_item("Mind Shield"):
+            type.type("The " + cyan(bright("Mind Shield")) + " filters the nightmare. It still reaches you, but muted. Distant.")
+            print(PAR)
+            self.lose_sanity(2)
+        else:
+            self.lose_sanity(5)
         print(PAR)
 
     def insomnia_night(self):
@@ -2528,7 +2572,16 @@ class NightEventsMixin:
             type.type("You try to put them back. They don't fit anymore. Like the dream is telling you: some things can't be undone.")
             print("\n")
             type.type("You wake up and run your tongue along your teeth. All there. But the dream leaves a residue that takes hours to shake.")
-        self.lose_sanity(8)
+        if self.has_item("Third Eye"):
+            type.type("The " + cyan(bright("Third Eye")) + " sees the nightmare for what it is — probability, not prophecy. You wake knowing the difference.")
+            print("\n")
+            self.restore_sanity(5)
+        elif self.has_item("Mind Shield"):
+            type.type("The " + cyan(bright("Mind Shield")) + " filters the nightmare. It still reaches you, but muted. Distant.")
+            print("\n")
+            self.lose_sanity(4)
+        else:
+            self.lose_sanity(8)
         print("\n")
 
     def giant_oyster_opening(self):

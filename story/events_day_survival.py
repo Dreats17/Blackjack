@@ -652,7 +652,25 @@ class DaySurvivalMixin:
         type.type("It's hot. Really hot. The sun beats down mercilessly, and your car becomes an oven.")
         print("\n")
         
-        if self.has_item("Cheap Sunscreen"):
+        if self.has_item("All-Weather Armor") or self.has_item("Hazmat Suit"):
+            item_name = "All-Weather Armor" if self.has_item("All-Weather Armor") else "Hazmat Suit"
+            type.type("The " + cyan(bright(item_name)) + " handles the heat without breaking a sweat. You barely notice the sun.")
+            print("\n")
+            self.restore_sanity(3)
+        elif self.has_item("Cool Down Kit"):
+            self.use_item("Cool Down Kit")
+            type.type("The " + cyan(bright("Cool Down Kit")) + " keeps you perfectly cool. The heat is someone else's problem today.")
+            print("\n")
+            self.restore_sanity(5)
+        elif self.has_item("Outdoor Shield"):
+            type.type("The " + cyan(bright("Outdoor Shield")) + "'s sun protection does its job. You're warm but undamaged.")
+            print("\n")
+            self.heal(3)
+        elif self.has_item("Premium Sunscreen"):
+            type.type("The " + cyan(bright("Premium Sunscreen")) + " blocks the worst of it.")
+            print("\n")
+            self.hurt(3)
+        elif self.has_item("Cheap Sunscreen"):
             type.type("Good thing you have " + magenta(bright("Cheap Sunscreen")) + "!")
             print("\n")
             type.type("You slather it on and step outside. It's still hot, but at least you won't turn into a lobster.")
@@ -689,6 +707,16 @@ class DaySurvivalMixin:
             print("\n")
             return
 
+        if self.has_item("All-Weather Armor"):
+            type.type("The " + cyan(bright("All-Weather Armor")) + " laughs at rain. You step out, completely dry, into a biblical downpour.")
+            print("\n")
+            self.restore_sanity(5)
+            return
+        if self.has_item("Storm Suit"):
+            type.type("The " + cyan(bright("Storm Suit")) + " was built for exactly this. You walk through the deluge untouched.")
+            print("\n")
+            self.restore_sanity(3)
+            return
         type.type("The sky opens up without warning. Rain hammers down so hard you can barely hear yourself think.")
         print("\n")
         
@@ -726,8 +754,14 @@ class DaySurvivalMixin:
         type.type("The temperature plummets. Frost forms on your windshield, and you can see your breath inside the car.")
         print("\n")
 
-        # Sacred Flame combo checked first: it consumes Fire Starter Kit, so it must precede
+        # Survival Bivouac checked first (full protection, no items consumed).
+        # Sacred Flame combo (Phoenix Feather + Fire Starter Kit) is checked next: it consumes Fire Starter Kit, so it must precede
         # the Emergency Blanket + Fire Starter Kit combo below.
+        if self.has_item("Survival Bivouac"):
+            type.type("The " + cyan(bright("Survival Bivouac")) + " turns your car into a warm cocoon. You sleep through the cold front without a shiver.")
+            print("\n")
+            self.restore_sanity(5)
+            return
         if self.has_item("Phoenix Feather") and self.has_item("Fire Starter Kit"):
             self.use_item("Phoenix Feather")
             self.use_item("Fire Starter Kit")
@@ -1462,6 +1496,18 @@ class DaySurvivalMixin:
         type.type("The weather is miserable. Rain sideways. Wind shaking your car.")
         print("\n")
         type.type("You huddle in your seat and wait for it to pass. For hours.")
+        if self.has_item("Storm Suit") or self.has_item("All-Weather Armor"):
+            item_name = "All-Weather Armor" if self.has_item("All-Weather Armor") else "Storm Suit"
+            type.type("The " + cyan(bright(item_name)) + " shrugs at terrible weather like it's a light mist.")
+            print("\n")
+            self.restore_sanity(3)
+            return
+        elif self.has_item("Umbrella") or self.has_item("Poncho"):
+            gear = "Umbrella" if self.has_item("Umbrella") else "Poncho"
+            type.type("Your " + cyan(bright(gear)) + " makes the terrible weather merely annoying instead of miserable.")
+            print("\n")
+            self.lose_sanity(2)
+            return
         self.lose_sanity(5)
         print("\n")
 
@@ -1832,6 +1878,16 @@ class DaySurvivalMixin:
             print("\n")
             type.type("You watch a trash can blow down the street like a tumbleweed. Nature is angry today.")
         print("\n")
+        if self.has_item("All-Weather Armor"):
+            type.type("The " + cyan(bright("All-Weather Armor")) + " was designed for apocalyptic weather. The storm is aesthetically unpleasant and functionally irrelevant.")
+            print("\n")
+            self.restore_sanity(5)
+            return
+        if self.has_item("Storm Suit"):
+            type.type("The " + cyan(bright("Storm Suit")) + " is exactly for this. You step out into the storm. You don't get wet. You arrive at the casino like a weathered professional.")
+            print("\n")
+            self.restore_sanity(3)
+            return
         if self.has_item("Umbrella") or self.has_item("Poncho") or self.has_item("Plastic Poncho"):
             if self.has_item("Poncho"):
                 gear = "Poncho"

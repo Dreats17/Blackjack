@@ -772,9 +772,23 @@ class IllnessMixin:
         type.type("You're confused, disoriented. Your heart is racing. Muscles cramping.")
         print("\n")
         type.type(red("Heat stroke") + ". Your body can't cool itself. You're cooking from the inside.")
-        self.add_status("Heat Stroke")
-        self.hurt(25)
-        self.lose_sanity(4)
+        if self.has_item("Cool Down Kit"):
+            self.use_item("Cool Down Kit")
+            type.type("The " + cyan(bright("Cool Down Kit")) + "'s rapid cooling prevents the heat stroke from fully setting in.")
+            print("\n")
+            self.hurt(8)
+            self.lose_sanity(2)
+        elif self.has_item("All-Weather Armor") or self.has_item("Outdoor Shield"):
+            item_name = "All-Weather Armor" if self.has_item("All-Weather Armor") else "Outdoor Shield"
+            type.type("Your " + cyan(bright(item_name)) + " keeps body temperature managed. The heat stroke is less severe.")
+            print("\n")
+            self.add_status("Heat Stroke")
+            self.hurt(12)
+            self.lose_sanity(2)
+        else:
+            self.add_status("Heat Stroke")
+            self.hurt(25)
+            self.lose_sanity(4)
         self.start_night()
 
     def hypothermia(self):
@@ -785,9 +799,27 @@ class IllnessMixin:
         type.type("You're so tired. Just want to lie down. Just for a minute...")
         print("\n")
         type.type(red("Hypothermia") + ". Your core temperature is dropping. You're dying of cold.")
-        self.add_status("Hypothermia")
-        self.hurt(25)
-        self.lose_sanity(5)
+        if self.has_item("Survival Bivouac"):
+            type.type("The " + cyan(bright("Survival Bivouac")) + " wraps you in warmth. The hypothermia retreats.")
+            print("\n")
+            self.hurt(5)
+            self.lose_sanity(1)
+        elif self.has_item("Emergency Blanket") and self.has_item("Fire Starter Kit"):
+            type.type("Together, the " + cyan(bright("Emergency Blanket")) + " and " + cyan(bright("Fire Starter Kit")) + " create real warmth. The cold loses its grip.")
+            print("\n")
+            self.add_status("Hypothermia")
+            self.hurt(8)
+            self.lose_sanity(2)
+        elif self.has_item("Emergency Blanket"):
+            type.type("The " + cyan(bright("Emergency Blanket")) + " slows the heat loss. The hypothermia sets in, but milder.")
+            print("\n")
+            self.add_status("Hypothermia")
+            self.hurt(12)
+            self.lose_sanity(3)
+        else:
+            self.add_status("Hypothermia")
+            self.hurt(25)
+            self.lose_sanity(5)
         self.start_night()
 
     def crush_injury(self):
