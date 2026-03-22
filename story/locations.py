@@ -48,6 +48,28 @@ def quote(text):
 def space_quote(text):
     return ("\"" + text + "\" ")
 
+_BACK_ROOM_BALANCE_THRESHOLD = 500000
+
+_MARVIN_UPGRADE_MAP = {
+    "Delight Indicator": "Delight Manipulator",
+    "Health Indicator": "Health Manipulator",
+    "Dirty Old Hat": "Unwashed Hair",
+    "Golden Watch": "Sapphire Watch",
+    "Sneaky Peeky Shades": "Sneaky Peeky Goggles",
+    "Quiet Sneakers": "Quiet Bunny Slippers",
+    "Faulty Insurance": "Real Insurance",
+    "Lucky Coin": "Lucky Medallion",
+    "Worn Gloves": "Velvet Gloves",
+    "Tattered Cloak": "Invisible Cloak",
+    "Rusty Compass": "Golden Compass",
+    "Pocket Watch": "Grandfather Clock",
+    "Gambler's Chalice": "Overflowing Goblet",
+    "Twin's Locket": "Mirror of Duality",
+    "White Feather": "Phoenix Feather",
+    "Dealer's Grudge": "Dealer's Mercy",
+    "Gambler's Grimoire": "Oracle's Tome",
+}
+
 class LocationsMixin:
     """Locations: Afternoon choices, doctor, witch doctor, mechanics, convenience store, Marvin, pawn shop, loan shark"""
 
@@ -3734,7 +3756,111 @@ class LocationsMixin:
                     type.type("What was that? ")
 
         type.type("That's all I've got to sell you tonight. Maybe try coming back another day. ")
+
+        # SECRET SHOP - Marvin's Back Room
+        # Unlock: Own all 19 base Marvin items OR balance > $500,000
+        base_marvin_items = [
+            "Delight Indicator", "Health Indicator", "Dirty Old Hat", "Golden Watch",
+            "Faulty Insurance", "Enchanting Silver Bar", "Sneaky Peeky Shades",
+            "Quiet Sneakers", "Lucky Coin", "Worn Gloves", "Tattered Cloak",
+            "Rusty Compass", "Pocket Watch", "Marvin's Monocle", "Gambler's Chalice",
+            "Twin's Locket", "White Feather", "Dealer's Grudge", "Gambler's Grimoire"
+        ]
+        has_all_base = all(
+            self.has_item(i) or (i in _MARVIN_UPGRADE_MAP and self.has_item(_MARVIN_UPGRADE_MAP[i]))
+            for i in base_marvin_items
+        )
+        qualifies = has_all_base or self.get_balance() > _BACK_ROOM_BALANCE_THRESHOLD
+
+        if qualifies:
+            self._offer_back_room()
+
         self.start_night()
+
+    def _offer_back_room(self):
+        back_room_items = {
+            "Dealer's Mirror": {
+                "price": 50000,
+                "description": "A mirror that shows what the Dealer sees. Permanent peek at the hole card.",
+            },
+            "The Last Card": {
+                "price": 100000,
+                "description": "Guarantee the next card drawn is exactly what you need. One devastating use.",
+            },
+            "Marvin's Eye": {
+                "price": 75000,
+                "description": "An eye that sees all hidden outcomes. Choices become clear.",
+            },
+            "Bottle of Tomorrow": {
+                "price": 40000,
+                "description": "Skip to tomorrow with full health and sanity. Time in a bottle.",
+            },
+            "Blank Check": {
+                "price": 200000,
+                "description": "One free purchase from any shop. Any item. No exceptions.",
+            },
+        }
+
+        # Filter out items already owned
+        available = {k: v for k, v in back_room_items.items() if not self.has_item(k)}
+        if not available:
+            return
+
+        # Dramatic introduction
+        print("\n")
+        type.type("Marvin pauses. Studies you for a long moment.")
+        print("\n")
+        type.type(quote("You know what... come with me."))
+        print("\n")
+        type.type("He leads you behind a curtain you never noticed. Down a narrow hallway lit by a single green bulb.")
+        print("\n")
+        type.type("A steel door. Marvin presses his palm against it. Click.")
+        print("\n")
+        type.type(cyan(bright("Welcome to the Back Room.")))
+        print("\n")
+        type.type(quote("These aren't for sale. Not normally. But you've earned it."))
+        print("\n\n")
+
+        # Show available items
+        for item_name, details in available.items():
+            type.type(magenta(bright(item_name)) + " — " + green(bright("${:,}".format(details["price"]))))
+            print("\n")
+            type.type("  " + details["description"])
+            print("\n\n")
+
+        # Purchase loop
+        answer = ask.yes_or_no("Want to buy something from the Back Room? ")
+        while answer == "yes" and available:
+            names = list(available.keys())
+            choice = ask.option("Which one? ", names + ["Nothing"])
+            if choice == "Nothing":
+                break
+
+            item_info = available[choice]
+            price = item_info["price"]
+
+            if self.get_balance() < price:
+                type.type(quote("You don't have that kind of money. Not yet."))
+                print("\n")
+            else:
+                self.change_balance(-price)
+                self.add_item(choice)
+                type.type("Marvin wraps it carefully. " + quote("Handle it with respect. There isn't another one."))
+                print("\n")
+                type.type("You acquired " + magenta(bright(choice)) + "!")
+                print("\n")
+                del available[choice]
+
+            if available:
+                answer = ask.yes_or_no("Anything else? ")
+            else:
+                type.type(quote("That's everything I had back here. You've cleaned me out."))
+                print("\n")
+
+        type.type("Marvin leads you back to the main shop. The curtain falls back into place.")
+        print("\n")
+        type.type(quote("This room doesn't exist. You understand?"))
+        print("\n")
 
     # Loan Shark Interaction
     def visit_loan_shark(self):
