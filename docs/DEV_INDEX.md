@@ -21,6 +21,7 @@
 12. [Endings (11)](#endings)
 13. [Economy](#economy)
 14. [Architecture](#architecture)
+15. [Active Item Docs](#active-item-docs)
 
 ---
 
@@ -45,6 +46,22 @@
 | Named NPCs | 40+ | Recurring characters |
 | Locations | 19 | 13 main + 6 adventure zones |
 | Endings | 11 | 5 routes with branches |
+
+---
+
+# ACTIVE ITEM DOCS
+
+Use these files together when working on item content:
+
+| File | Purpose |
+|------|---------|
+| `ITEM_LIVE_REFERENCE.md` | Live operational master list for what tracked items do, where they matter, and what changed most recently |
+| `04_ITEMS_FLASKS_AND_UPGRADES.md` | Primary reference for what major items, flasks, upgrades, and crafting recipes do |
+| `ITEM_COMPLETION_LEDGER.md` | Per-item completion tracker for coverage, interconnectivity, and remaining gaps |
+++ c:\Users\Dreat\MeFolder\blackjack\docs\DEV_INDEX.md
+| `ITEM_COMPLETION_LEDGER.md` note | Ledger now covers the full planned scope: Marvin items, upgrades, flasks, existing crafts, High-Impact store items, Premium Endgame Shop, 6 new Tier 1 craft categories (Gadgets, Disguises, Tonics, Dark Arts, Luxury Items, Vehicle Upgrades), Tier 2 and 3 crafted items, Tier 4 legendary crafted items, 19 secret multi-item combinations, mechanic loyalty items, item evolution chains, and 7 systemic mechanics |
+| `ITEM_PLANNING_REMAINING.md` | Category-level execution plan for what still needs implementation |
+| `ITEM_PLANNING.md` | Historical master roadmap and design archive |
 
 ---
 

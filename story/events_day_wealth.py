@@ -61,11 +61,21 @@ class DayWealthMixin:
             return
         
         type.type("You count your money and realize you have exactly " + green(bright("$1,111")) + ". One-one-one-one. Make a wish.")
-        print("\n")
+        print()
         type.type("The moment feels charged, electric. Like the universe is listening.")
-        print("\n")
+        print()
         type.type("You close your eyes and make a wish.")
-        print("\n")
+        print()
+
+        if self.has_item("Flask of Fortunate Day"):
+            type.type("The " + cyan(bright("Flask of Fortunate Day")) + " warms in your pocket like a sunrise in miniature.")
+            print()
+            type.type("For one breath, the whole day aligns. Numbers stop fighting you.")
+            day_bonus = random.randint(40, 120)
+            self.change_balance(day_bonus)
+            self.restore_sanity(3)
+            type.type("A folded bill catches on your windshield wiper: " + green(bright("+${:,}".format(day_bonus))) + ".")
+            print()
         
         # Random positive effect
         effect = random.randrange(3)
@@ -75,7 +85,7 @@ class DayWealthMixin:
             self.heal(50)
         elif effect == 1:
             type.type("A gust of wind blows a crumpled bill against your window. Then another. Then another.")
-            print("\n")
+            print()
             bonus = random.randint(100, 300)
             type.type(yellow(bright("Your wish for wealth has been partially granted.")) + " " + green(bright("+${:,}".format(bonus))))
             self.change_balance(bonus)
@@ -83,7 +93,7 @@ class DayWealthMixin:
             type.type("You feel luckier than you have in months.")
             type.type(yellow(bright("Your wish for fortune has been granted.")))
             self.add_status("Lucky")
-        print("\n")
+        print()
 
     # One-Time
 
@@ -98,27 +108,27 @@ class DayWealthMixin:
         
         if self.has_item("Flask of Bonus Fortune"):
             type.type("The " + cyan(bright("Flask of Bonus Fortune")) + " overflows with golden light against your hip.")
-            print("\n")
+            print()
             type.type("Your winnings feel heavier today. Every dollar earned multiplies in your pocket.")
-            print("\n")
+            print()
             type.type("The flask hums with warmth. Fortune isn't just smiling — it's laughing.")
             bonus = random.randint(100, 400)
             self.change_balance(bonus)
             type.type(" " + green(bright("+${:,}".format(bonus))) + " bonus fortune!")
             self.restore_sanity(5)
-            print("\n")
+            print()
 
         type.type("Fifty thousand dollars. " + green(bright("$50,000")) + ". Halfway to the Rich tier.")
-        print("\n")
+        print()
         type.type("You never thought you'd see this much money in your life, let alone in the passenger seat of your car.")
-        print("\n")
+        print()
         type.type("A pigeon lands on your roof. Then another. Then five more. They coo in what sounds almost like... applause?")
-        print("\n")
+        print()
         type.type("The universe is weird sometimes.")
-        print("\n")
+        print()
         type.type(yellow(bright("The halfway point. The journey continues.")))
         self.heal(25)
-        print("\n")
+        print()
 
     # One-Time
             
@@ -131,162 +141,265 @@ class DayWealthMixin:
         variant = random.randrange(4)
         if variant == 0:
             type.type("A Lamborghini roars past your wagon, going at least twice the speed limit. The driver doesn't even glance at you.")
-            print("\n")
+            print()
             type.type("Must be nice. You count your own money pile. Someday, maybe.")
         elif variant == 1:
             type.type("A stretch limo cruises by slowly. Through the tinted windows, you swear you see someone pointing at your car and laughing.")
-            print("\n")
+            print()
             type.type("Okay, that stings a little.")
         elif variant == 2:
             type.type("A Ferrari parks right next to your wagon. The owner gets out, takes one look at your car, and moves his Ferrari further away.")
-            print("\n")
+            print()
             type.type("Rude. But also, fair.")
         else:
             type.type("A Rolls-Royce glides past like a ghost. For a moment, you lock eyes with the elderly man in the back seat.")
-            print("\n")
+            print()
             type.type("He nods at you. Just a simple nod. But it feels... respectful?")
             self.heal(5)
-        print("\n")
+        print()
 
     def paparazzi_mistake(self):
         # EVENT: Photographers/tourists mistake you for someone famous (or not)
         # EFFECTS: 5% rare chance to earn $1,000-3,000 from "exclusive interview"; otherwise just comedic
         # Everytime - comedic event with variants + rare
         rare_chance = random.randrange(100)
+
+        if self.has_item("Flask of Fortunate Day") and random.randrange(6) == 0:
+            type.type("The " + cyan(bright("Flask of Fortunate Day")) + " pulses once. A photographer mistakes you for someone important and insists on paying for a " + quote("quick profile shot.") )
+            print()
+            bonus = random.randint(70, 180)
+            type.type("You shrug, nod, and pocket " + green(bright("${:,}".format(bonus))) + " for existing in the right place at the right minute.")
+            self.change_balance(bonus)
+            self.restore_sanity(2)
+            print()
+            return
         
         if rare_chance < 5:  # 5% - Actually famous
             type.type("A van screeches to a halt. Photographers pour out, cameras flashing!")
-            print("\n")
+            print()
             type.type(quote("IT'S THEM! THE MYSTERIOUS GAMBLING LEGEND!"))
-            print("\n")
+            print()
             type.type("Wait, what? They... think you're famous?")
-            print("\n")
+            print()
             type.type("Before you can correct them, they're shoving microphones in your face, asking about your 'secrets to success.'")
-            print("\n")
+            print()
             type.type("You just roll with it. Why not?")
-            print("\n")
+            print()
             type.type("They leave you with a payment for an 'exclusive interview' you apparently just gave.")
             self.change_balance(random.randint(1000, 3000))
-            print("\n")
+            print()
             return
         
         variant = random.randrange(3)
         if variant == 0:
             type.type("Someone with a camera runs up to your window, snapping photos frantically.")
-            print("\n")
+            print()
             type.type(quote("Excuse me, are you-") + " They look at their phone. Then at you. " + quote("Oh. Sorry. Wrong car."))
-            print("\n")
+            print()
             type.type("They shuffle away, embarrassed. You're not sure whether to be relieved or insulted.")
         elif variant == 1:
             type.type("A group of tourists takes pictures of your wagon. You hear one say, " + quote("Authentic American poverty!"))
-            print("\n")
+            print()
             type.type("You're a tourist attraction now. Great.")
         else:
             type.type("Someone knocks on your window holding an autograph book. They take one look at your face and say, " + quote("Never mind."))
-            print("\n")
+            print()
             type.type("Ouch.")
-        print("\n")
+        print()
 
     def investment_opportunity(self):
         # EVENT: Scammers try to sell you fake investment opportunities
         # EFFECTS: Purely atmospheric - player wisely ignores all scam attempts
         # Everytime - risky event
 
+        # T4 — auto-triggers (legendary, no choice)
         if self.has_item("Phantom Rose"):
             type.type("The " + cyan(bright("Phantom Rose")) + " marks you as legend. Financial doors open by reputation alone.")
-            print("\n")
+            print()
             type.type("Whatever opportunity this was — it's maximum yield now.")
             self.change_balance(random.randint(800, 2000))
             return
+
+        # T3 — auto-triggers
+        if self.has_item("All-Access Pass"):
+            type.type(cyan(bright("All-Access Pass")) + " decodes their books, opens their safe, reads their encrypted emails.")
+            print()
+            type.type("Maximum financial advantage. You know every number before they say it.")
+            self.change_balance(random.randint(400, 900))
+            self.restore_sanity(5)
+            return
         if self.has_item("Ghost Protocol"):
             type.type(cyan(bright("Ghost Protocol")) + " erases your financial footprint. The IRS, the casino, the bank — none of them can find you.")
-            print("\n")
+            print()
             type.type("This transaction is invisible.")
             self.change_balance(random.randint(300, 700))
             return
+
+        # ── PLAYER CHOICE: multiple T2 financial items ──
+        _finance_options = [
+            ("Old Money Identity", "Command institutional trust with the name"),
+            ("Intelligence Dossier", "Negotiate from total knowledge"),
+            ("Cheater's Insurance", "Cover your tracks perfectly"),
+        ]
+        _available = [(n, d) for n, d in _finance_options if self.has_item(n)]
+        if len(_available) >= 2:
+            _chosen = self._offer_item_choice(_available)
+            if _chosen == "Old Money Identity":
+                type.type("The " + cyan(bright("Old Money Identity")) + " commands institutional trust. They defer to the name.")
+                print()
+                type.type("Whatever rate you were getting, you get better.")
+                self.change_balance(random.randint(200, 500))
+                return
+            elif _chosen == "Intelligence Dossier":
+                type.type("The " + magenta(bright("Intelligence Dossier")) + " reveals the real numbers behind the deal. You negotiate from total knowledge.")
+                print()
+                type.type("Perfect intel. They never had a chance.")
+                self.change_balance(random.randint(200, 500))
+                self.restore_sanity(4)
+                return
+            elif _chosen == "Cheater's Insurance":
+                type.type(magenta(bright("Cheater's Insurance")) + " protects the con. Even if they suspect, the evidence points elsewhere.")
+                print()
+                type.type("You cover your tracks perfectly.")
+                self.change_balance(random.randint(150, 400))
+                self.restore_sanity(3)
+                return
+
+        # Single T2 item — auto-triggers
         if self.has_item("Old Money Identity"):
             type.type("The " + cyan(bright("Old Money Identity")) + " commands institutional trust. They defer to the name.")
-            print("\n")
+            print()
             type.type("Whatever rate you were getting, you get better.")
             self.change_balance(random.randint(200, 500))
+            return
+        if self.has_item("Intelligence Dossier"):
+            type.type("The " + magenta(bright("Intelligence Dossier")) + " reveals the real numbers behind the deal. You negotiate from total knowledge.")
+            print()
+            type.type("Perfect intel. They never had a chance.")
+            self.change_balance(random.randint(200, 500))
+            self.restore_sanity(4)
+            return
+        if self.has_item("Cheater's Insurance"):
+            type.type(magenta(bright("Cheater's Insurance")) + " protects the con. Even if they suspect, the evidence points elsewhere.")
+            print()
+            type.type("You cover your tracks perfectly.")
+            self.change_balance(random.randint(150, 400))
+            self.restore_sanity(3)
             return
         # COMBO: Blackmail Letter + Old Money Identity = The Hostile Takeover
         if self.has_item("Blackmail Letter") and self.has_item("Old Money Identity"):
             type.type("You arrive as old money. You present the " + cyan(bright("Blackmail Letter")) + " at the board meeting.")
-            print("\n")
+            print()
             type.type(quote("Resign,") + " you say. They do. You sit in the chair. For one day, you own this business.")
-            print("\n")
+            print()
             amount = random.randint(500, 1500)
             self.change_balance(amount)
             type.type("You extract " + green("${:,}".format(amount)) + " before things get complicated.")
-            print("\n")
+            print()
             type.type("The business was money laundering for someone. They'll come looking.")
             self.add_danger("Hostile Takeover Blowback")
-            print("\n")
+            print()
+            return
+
+        # COMBO: Stink Bomb + Evidence Kit = The Insurance Scam
+        if self.has_item("Stink Bomb") and self.has_item("Evidence Kit"):
+            type.type("You photograph the building with the " + magenta(bright("Evidence Kit")) + ". Clean record.")
+            print()
+            type.type("Then you crack the " + magenta(bright("Stink Bomb")) + " inside. Health code violation. Instant.")
+            print()
+            type.type("You send the 'before' photos to the owner.")
+            print()
+            choice = ask.option("Your choice?", ["extort", "help"])
+            if choice == "extort":
+                type.type("They pay you " + green(bright("$800")) + " to make this go away. The owner looks ruined.")
+                self.change_balance(800)
+                self.lose_sanity(3)
+            else:
+                type.type("You offer to help clean up. They're grateful. " + green(bright("$200")) + " for honest work.")
+                self.change_balance(200)
+                self.restore_sanity(5)
+            self.use_item("Stink Bomb")
+            self.use_item("Evidence Kit")
+            print()
             return
 
         if self.has_item("Oracle's Tome") or self.has_item("Gambler's Grimoire"):
             tome = "Oracle's Tome" if self.has_item("Oracle's Tome") else "Gambler's Grimoire"
             type.type("A man in a cheap suit approaches your car, waving a stack of papers. Same as always.")
-            print("\n")
+            print()
             type.type("But your " + cyan(bright(tome)) + " falls open in your lap, to a page dense with margin notes in tiny, urgent handwriting.")
-            print("\n")
+            print()
             type.type("A cramped footnote reads: " + italic("'This one's real.'"))
-            print("\n")
+            print()
             type.type("You squint through the window at the man. His shoes are worn down at the heels — honest work, not performance.")
-            print("\n")
+            print()
             type.type("You roll down the window. Three days later, " + green(bright("+$200")) + " lands in your account.")
-            print("\n")
+            print()
             type.type("The book always knows.")
             self.change_balance(200)
-            print("\n")
+            print()
+            return
+        if self.has_item("Enchanting Silver Bar"):
+            type.type("The man in the cheap suit starts his pitch, then catches sight of the " + cyan(bright("Enchanting Silver Bar")) + " on your dashboard.")
+            print()
+            type.type("His eyes change. Not greed exactly. Respect. The kind reserved for assets that appreciate while you sleep.")
+            print()
+            type.type(quote("Don't sell that to a pawn shop.") + " He flips over the packet he was about to hand you and scribbles a name, a warehouse address, and a date three days from now.")
+            print()
+            type.type("This isn't the investment. This is an appraisal lead. One that treats the bar like the start of a portfolio instead of a thing to liquidate.")
+            print()
+            amount = random.randint(180, 420)
+            type.type("You follow the lead and walk away with a quiet offer worth " + green(bright("${:,}".format(amount))) + " more than any quick sale would have paid.")
+            self.change_balance(amount)
+            self.restore_sanity(4)
+            print()
             return
         if self.has_item("Gentleman's Charm"):
             type.type("The man in the cheap suit approaches, but stops when he notices the " + cyan(bright("Gentleman's Charm")) + ".")
-            print("\n")
+            print()
             type.type("His whole pitch shifts. The desperation fades. He trusts you before you say a word.")
-            print("\n")
+            print()
             type.type("You listen. Halfway through, you realize — this one's actually legitimate.")
-            print("\n")
+            print()
             amount = random.randint(200, 500)
             type.type("Three weeks later: " + green(bright("$" + str(amount))) + " in returns. The Charm reads people so you don't have to.")
             self.change_balance(amount)
-            print("\n")
+            print()
             return
         if self.has_item("Voice Soother") or self.has_item("Enchanted Vintage"):
             item_name = "Voice Soother" if self.has_item("Voice Soother") else "Enchanted Vintage"
             type.type("The usual scammer approaches — but before he can spiral into his pitch, you speak first.")
-            print("\n")
+            print()
             type.type("The " + cyan(bright(item_name)) + " has done something to your voice. It's smooth. Authoritative. The man stops mid-breath.")
-            print("\n")
+            print()
             type.type("You negotiate him down to something reasonable. Turns out there was a real deal buried under the desperation.")
-            print("\n")
+            print()
             amount = random.randint(100, 250)
             type.type("A modest return — " + green(bright("$" + str(amount))) + " — but honestly earned.")
             self.change_balance(amount)
-            print("\n")
+            print()
             return
         if self.has_item("Flask of Bonus Fortune"):
-            print("\n")
+            print()
             type.type("The " + cyan(bright("Flask of Bonus Fortune")) + " radiates warmth. Money seems to flow toward you today — loose change on the ground, a forgotten bill in your old jacket.")
             self.change_balance(random.randint(5, 25))
-            print("\n")
+            print()
         variant = random.randrange(3)
         if variant == 0:
             type.type("A man in a cheap suit approaches your car, waving a stack of papers.")
-            print("\n")
+            print()
             type.type(quote("Hey buddy! You look like someone who appreciates a good opportunity! How'd you like to get in on the ground floor of-"))
-            print("\n")
+            print()
             type.type("You roll up your window. He keeps talking through the glass.")
         elif variant == 1:
             type.type("Someone slides a business card under your windshield wiper. It says 'GUARANTEED RETURNS - NOT A SCAM.'")
-            print("\n")
+            print()
             type.type("The fact that it says 'NOT A SCAM' makes you think it's definitely a scam.")
         else:
             type.type("Your phone buzzes with a text from an unknown number: " + quote("Congratulations! You've been selected for an exclusive investment opportunity!"))
-            print("\n")
+            print()
             type.type("You delete it immediately. Street smarts.")
-        print("\n")
+        print()
 
     def expensive_taste(self):
         # EVENT: Temptations to spend money on luxury items (real estate, restaurants, jewelry)
@@ -295,17 +408,17 @@ class DayWealthMixin:
         variant = random.randrange(3)
         if variant == 0:
             type.type("Sitting in your car, you catch yourself looking at real estate listings on your phone. Apartments that cost more per month than your entire life savings used to be.")
-            print("\n")
+            print()
             type.type("Snap out of it. You live in a car. Focus on the goal.")
         elif variant == 1:
             type.type("You see a fancy restaurant and your stomach growls. You could afford to eat there now. Probably.")
-            print("\n")
+            print()
             type.type("No. The casino money goes TO the casino. Stay disciplined.")
         else:
             type.type("A jewelry store window catches your eye. A gold watch gleams inside. You have the money...")
-            print("\n")
+            print()
             type.type("But you came here to win a million dollars, not spend the ones you have. Keep moving.")
-        print("\n")
+        print()
 
     def news_van(self):
         # EVENT: News crews appear near your car - might be covering you or something else
@@ -314,25 +427,25 @@ class DayWealthMixin:
         variant = random.randrange(4)
         if variant == 0:
             type.type("A news van pulls up near your spot. Your heart races-are they here for you?")
-            print("\n")
+            print()
             type.type("No. They're filming a story about a pothole two blocks away. You've never been so relieved about a pothole.")
         elif variant == 1:
             type.type("A reporter sets up right next to your car to do a live shot. You duck down and pray they don't pan the camera your way.")
-            print("\n")
+            print()
             type.type("They do. Your mom is definitely going to see this.")
         elif variant == 2:
             type.type("A news crew is interviewing locals. They approach you with a microphone.")
-            print("\n")
+            print()
             type.type(quote("Excuse me sir, do you have any thoughts on the local-"))
-            print("\n")
+            print()
             type.type("You're already driving away. No comments. No interviews. No paper trail.")
         else:
             type.type("The evening news is playing on a TV in a nearby shop window. The anchor is talking about 'the anonymous gambler making waves at local casinos.'")
-            print("\n")
+            print()
             type.type("Is that... you? That could be you.")
-            print("\n")
+            print()
             type.type("You're not sure how you feel about that.")
-        print("\n")
+        print()
 
     # ==========================================
     # NEW RICH DAY EVENTS - Conditional
@@ -348,17 +461,17 @@ class DayWealthMixin:
             return
         
         type.type("You sit up in your car, drenched in cold sweat. Nightmares about losing all your money.")
-        print("\n")
+        print()
         type.type("It's getting harder to sleep with this much cash just... sitting there. What if someone steals it? What if you lose it all in one bad night?")
-        print("\n")
+        print()
         type.type("The anxiety gnaws at you all morning. ")
         self.lose_sanity(random.choice([1, 2]))  # Money anxiety chips away at sanity
-        print("\n")
+        print()
         if self.has_item("Delight Manipulator") or self.has_item("Delight Indicator"):
             gauge = "Delight Manipulator" if self.has_item("Delight Manipulator") else "Delight Indicator"
-            print("\n")
+            print()
             type.type("You glance at the " + cyan(bright(gauge)) + ". The needle swings wildly — euphoric, terrified, euphoric, terrified.")
-            print("\n")
+            print()
             type.type("You could adjust it. Dial down the fear. But would that be living, or just lying to yourself?")
             self.restore_sanity(2)
         if random.randrange(2) == 0:
@@ -367,7 +480,7 @@ class DayWealthMixin:
         else:
             type.type("But then you take a deep breath. You've come this far. You can go further. The money is a tool, not a burden.")
             self.heal(5)
-        print("\n")
+        print()
 
     def tax_man(self):
         # EVENT: IRS agent visits to question your unreported income (one-time)
@@ -385,36 +498,36 @@ class DayWealthMixin:
         self.meet("Tax Man Visit")
         if self.has_item("Ghost Protocol"):
             type.type(cyan(bright("Ghost Protocol")) + " erases your casino footprint. No camera sees you. No record has your name.")
-            print("\n")
+            print()
             type.type("You are invisible to the house.")
             self.restore_sanity(5)
             return
         if self.has_item("New Identity"):
             type.type("The " + cyan(bright("New Identity")) + " deflects the recognition. That was someone else.")
-            print("\n")
+            print()
             type.type(quote("Are you sure that's them?") + " " + quote("No... no, you're right, different person.") + " You walk free.")
             self.restore_sanity(5)
             return
         type.type("A sedan with government plates pulls up. A man in a gray suit steps out, holding a clipboard.")
-        print("\n")
+        print()
         type.type(quote("Excuse me. I'm from the IRS. We've noticed some... unusual financial activity in this area."))
-        print("\n")
+        print()
         type.type("Your blood runs cold. He peers into your car at the pile of cash.")
-        print("\n")
+        print()
         type.type(quote("That's quite a sum you've got there. All reported income, I assume?"))
-        print("\n")
+        print()
         answer = ask.yes_or_no("Lie and say yes? ")
         if answer == "yes":
             type.type(quote("Mm-hmm.") + " He scribbles something on his clipboard. " + quote("Well, everything seems to be in order. For now."))
-            print("\n")
+            print()
             type.type("He hands you his card before driving away. You tear it up immediately.")
         else:
             type.type("You don't say anything. He sighs.")
-            print("\n")
+            print()
             type.type(quote("Look, I don't want to make this complicated. Just... keep your head down, okay? There are bigger fish to fry."))
-            print("\n")
+            print()
             type.type("He drives away. You let out a breath you didn't know you were holding.")
-        print("\n")
+        print()
 
     # ==========================================
     # NEW RICH DAY EVENTS - One-Time
@@ -432,23 +545,23 @@ class DayWealthMixin:
         
         self.meet("The Rival")
         type.type("A motorcycle pulls up next to your wagon. The rider-a woman in a leather jacket-removes her helmet and gives you an appraising look.")
-        print("\n")
+        print()
         type.type(quote("So. You're the one everyone's talking about. The car-dweller who's been cleaning up at the blackjack tables."))
-        print("\n")
+        print()
         type.type("She smirks.")
-        print("\n")
+        print()
         type.type(quote("I'm Victoria. I've been working these casinos for five years. Never seen anyone run as hot as you."))
-        print("\n")
+        print()
         type.type("She leans in, her eyes sharp.")
-        print("\n")
+        print()
         type.type(quote("Enjoy it while it lasts. The house always wins in the end. And if the house doesn't get you..."))
-        print("\n")
+        print()
         type.type("She revs her engine.")
-        print("\n")
+        print()
         type.type(quote("I will."))
-        print("\n")
+        print()
         type.type("She speeds off before you can respond. Something tells you this won't be the last you see of Victoria.")
-        print("\n")
+        print()
 
     def the_bodyguard_offer(self):
         # EVENT: Bruno, a massive bodyguard, offers protection services
@@ -461,25 +574,25 @@ class DayWealthMixin:
         
         self.meet("Bodyguard Offer")
         type.type("A massive man-easily six and a half feet tall and built like a tank-approaches your car.")
-        print("\n")
+        print()
         type.type(quote("Hey. You're the gambling guy, right? Word on the street is you've got a lot of cash on you."))
-        print("\n")
+        print()
         type.type("You tense up, ready for trouble. But he holds up his hands.")
-        print("\n")
+        print()
         type.type(quote("Easy. I'm not here to rob you. I'm here to offer my services. Protection. Fifty bucks a day and nobody messes with you."))
-        print("\n")
+        print()
         answer = ask.yes_or_no("Hire the bodyguard? ")
         if answer == "yes":
             type.type(quote("Smart choice. Name's Bruno. I'll be around."))
-            print("\n")
+            print()
             type.type("He settles into a spot nearby, looking menacing. You feel safer already.")
             self.add_item("Bodyguard Bruno")
             self.change_balance(-50)
         else:
             type.type(quote("Your loss. But if you change your mind, just holler. I'll hear you."))
-            print("\n")
+            print()
             type.type("He lumbers off. You hope you didn't just make a mistake.")
-        print("\n")
+        print()
 
     def high_roller_invitation(self):
         # EVENT: Casino management invites you to the VIP High Roller Lounge
@@ -490,22 +603,34 @@ class DayWealthMixin:
             self.day_event()
             return
         
+        if self.has_item("Kingpin Look"):
+            type.type("You walk in wearing the Kingpin Look. Gold chain. Tailored coat. Presence.")
+            print()
+            type.type("The staff nods immediately. Better table. Better treatment. Better odds.")
+            print()
+            type.type("You don't need an invitation. You earned this.")
+            self.use_item("Kingpin Look")
+            self.change_balance(50)
+            self.restore_sanity(3)
+            print()
+            return
+        
         self.meet("High Roller Invite")
         type.type("A man in an expensive suit approaches your wagon, holding an envelope.")
-        print("\n")
+        print()
         type.type(quote("Excuse me. I represent the casino management. We've noticed your... consistent performance at our tables."))
-        print("\n")
+        print()
         type.type("He hands you the envelope. Inside is an invitation to the 'VIP High Roller Lounge.'")
-        print("\n")
+        print()
         type.type(quote("Consider this a courtesy. Higher stakes. Better odds. Private tables. The high roller experience."))
-        print("\n")
+        print()
         type.type("He adjusts his cufflinks.")
-        print("\n")
+        print()
         type.type(quote("Of course, the minimum bet is considerably higher. But for someone of your... caliber, that shouldn't be a problem."))
-        print("\n")
+        print()
         type.type("He walks away, leaving you with the invitation. This could be interesting.")
         self.add_item("VIP Invitation")
-        print("\n")
+        print()
 
     def old_friend_recognition(self):
         # EVENT: Someone from your old life recognizes you and thought you were dead
@@ -518,32 +643,32 @@ class DayWealthMixin:
         
         self.meet("Old Friend")
         type.type("Someone knocks on your window. You look up to see a vaguely familiar face-someone from your old life, before all this.")
-        print("\n")
+        print()
         type.type(quote("Holy shit... is that you? I thought you were dead! Everyone thought you were dead!"))
-        print("\n")
+        print()
         type.type("The memories come flooding back. A life you left behind. People who probably still wonder what happened to you.")
-        print("\n")
+        print()
         type.type(quote("What are you doing living in a CAR? What happened to you?"))
-        print("\n")
+        print()
         answer = ask.yes_or_no("Tell them the truth? ")
         if answer == "yes":
             type.type("You tell them everything. The gambling. The car. The dream of hitting a million dollars.")
-            print("\n")
+            print()
             type.type("They listen in silence, then shake their head slowly.")
-            print("\n")
+            print()
             type.type(quote("You always were a crazy one. Here-take this. For old times' sake."))
-            print("\n")
+            print()
             type.type("They press some money into your hand. " + green(bright("$500")) + ".")
             self.change_balance(500)
-            print("\n")
+            print()
             type.type(quote("Good luck. And... don't be a stranger, okay?"))
         else:
             type.type(quote("I think you've got the wrong person,") + " you say, looking away.")
-            print("\n")
+            print()
             type.type("They stare at you for a long moment, then shake their head and walk away.")
-            print("\n")
+            print()
             type.type("Some doors are better left closed.")
-        print("\n")
+        print()
 
     # ==========================================
     # SECRET EVENTS - RICH TIER
@@ -559,20 +684,20 @@ class DayWealthMixin:
             return
         
         type.type("You count your money for the third time. Exactly " + green(bright("$250,000")) + ". A quarter of a million dollars.")
-        print("\n")
+        print()
         type.type("A quarter of the way to your goal.")
-        print("\n")
+        print()
         type.type("As if the universe acknowledges this milestone, a golden butterfly lands on your dashboard. ")
         type.type("It sits there for a long moment, wings slowly opening and closing.")
-        print("\n")
+        print()
         type.type("Then it flies away, leaving a small pile of gold dust behind.")
-        print("\n")
+        print()
         type.type("Wait, that's real gold.")
-        print("\n")
+        print()
         self.change_balance(1000)
         type.type(yellow(bright("The universe rewards those who persist.")))
         self.add_status("Lucky")
-        print("\n")
+        print()
 
     def wealthy_doubts(self):
         # EVENT: Existential thoughts about why you're still gambling and what comes after
@@ -581,21 +706,21 @@ class DayWealthMixin:
         variant = random.randrange(3)
         if variant == 0:
             type.type("You're sitting in your car, staring at nothing. You could stop now. Walk away with over half a million dollars. Live comfortably for years.")
-            print("\n")
+            print()
             type.type("But that's not why you're here.")
-            print("\n")
+            print()
             type.type("You're here for a million. Nothing less will do.")
         elif variant == 1:
             type.type("What are you even going to DO with a million dollars? Buy a house? Invest? Travel?")
-            print("\n")
+            print()
             type.type("You realize you've been so focused on the goal, you never thought about what comes after.")
-            print("\n")
+            print()
             type.type("Something to think about. After you win.")
         else:
             type.type("Is it greed that keeps you going? Or pride? Or something else entirely?")
-            print("\n")
+            print()
             type.type("You've spent so long chasing this dream, you're not sure you'd know what to do without it.")
-        print("\n")
+        print()
 
     def people_watching(self):
         # EVENT: Observing regular people and their money problems while you sit on $500k+
@@ -604,22 +729,23 @@ class DayWealthMixin:
         variant = random.randrange(4)
         if variant == 0:
             type.type("Through your car window, you watch a businessman walk by, talking loudly on his phone about a 'big deal' worth $50,000.")
-            print("\n")
+            print()
             type.type("You have ten times that in your car. The thought makes you smile.")
         elif variant == 1:
             type.type("A couple argues about money outside a restaurant. Something about not being able to afford the bill.")
-            print("\n")
+            print()
             type.type("You could pay that bill a thousand times over. But you don't. That's not what the money is for.")
         elif variant == 2:
             type.type("A homeless man asks you for change. You give him a twenty.")
-            print("\n")
+            print()
             type.type("He looks at you like you're crazy. You probably are.")
             self.change_balance(-20)
+            self._total_given_away += 20
         else:
             type.type("You watch people come and go from the casino across the street. Winners celebrating. Losers sulking.")
-            print("\n")
+            print()
             type.type("Tonight, you'll be one of them. You know which one you're betting on.")
-        print("\n")
+        print()
 
     # ==========================================
     # NEW DOUGHMAN DAY EVENTS - Conditional
@@ -639,20 +765,20 @@ class DayWealthMixin:
             return
         
         type.type("A real estate agent knocks on your window.")
-        print("\n")
+        print()
         type.type(quote("Excuse me! I couldn't help but notice you've been living here for a while. "))
         type.type(quote("Did you know that with your... apparent savings... you could afford a nice apartment? Maybe even a house?"))
-        print("\n")
+        print()
         type.type("They slide a business card through the crack in your window.")
-        print("\n")
+        print()
         type.type(quote("Think about it! " + green(bright("${:,}".format(self.get_balance()))) + " could buy you a real home! A real life!"))
-        print("\n")
+        print()
         type.type("They walk away, leaving you with their card and a nagging thought.")
-        print("\n")
+        print()
         type.type("A real home. A real life. Is that what you want? Or do you want the million?")
-        print("\n")
+        print()
         type.type("You crumple the card and throw it away. You know the answer.")
-        print("\n")
+        print()
 
     # ==========================================
     # NEW DOUGHMAN DAY EVENTS - One-Time
@@ -669,23 +795,23 @@ class DayWealthMixin:
         
         self.meet("The Veteran")
         type.type("An old man shuffles up to your car. His clothes are worn but clean. His eyes are sharp.")
-        print("\n")
+        print()
         type.type(quote("You're the one, aren't you? The gambler everyone's talking about."))
-        print("\n")
+        print()
         type.type("He leans against your car with a sigh.")
-        print("\n")
+        print()
         type.type(quote("I used to be like you. Thirty years ago. Had a system. Thought I could beat the house."))
-        print("\n")
+        print()
         type.type("He's quiet for a moment.")
-        print("\n")
+        print()
         type.type(quote("Got up to eight hundred thousand. Then lost it all in one night. Pride. Impatience. Stupidity. Take your pick."))
-        print("\n")
+        print()
         type.type(quote("You've got further than I ever did. Don't make my mistakes."))
-        print("\n")
+        print()
         type.type("He pats your car and walks away, disappearing into the crowd.")
-        print("\n")
+        print()
         type.type(yellow("His words echo in your mind."))
-        print("\n")
+        print()
 
     def the_journalist(self):
         # EVENT: Tribune journalist wants to interview you about your gambling career
@@ -698,24 +824,24 @@ class DayWealthMixin:
         
         self.meet("The Journalist")
         type.type("A woman with a notepad and recorder approaches your car.")
-        print("\n")
+        print()
         type.type(quote("Hi! I'm writing a piece on professional gamblers for the Tribune. Mind if I ask you a few questions?"))
-        print("\n")
+        print()
         answer = ask.yes_or_no("Grant the interview? ")
         if answer == "yes":
             type.type("You tell her your story. The car, the casino, the dream of a million dollars.")
-            print("\n")
+            print()
             type.type("She scribbles furiously, eyes wide.")
-            print("\n")
+            print()
             type.type(quote("This is incredible! The readers are going to love this!"))
-            print("\n")
+            print()
             type.type("She pays you " + green(bright("$300")) + " for the interview and promises to send you a copy when it's published.")
             self.change_balance(300)
         else:
             type.type(quote("I understand. Privacy is important."))
-            print("\n")
+            print()
             type.type("She walks away, looking disappointed.")
-        print("\n")
+        print()
 
     def the_offer_refused(self):
         # EVENT: Casino floor manager offers VIP treatment in exchange for exclusive play
@@ -728,30 +854,30 @@ class DayWealthMixin:
         
         self.meet("Casino Manager")
         type.type("A man in an expensive suit knocks on your window. His smile doesn't reach his eyes.")
-        print("\n")
+        print()
         type.type(quote("Good morning. I'm the floor manager at the casino. We've noticed your... impressive winning streak."))
-        print("\n")
+        print()
         type.type("He clasps his hands together.")
-        print("\n")
+        print()
         type.type(quote("I've been authorized to offer you a complimentary room at our hotel. Free meals. Free drinks. VIP treatment."))
-        print("\n")
+        print()
         type.type("His smile widens.")
-        print("\n")
+        print()
         type.type(quote("All we ask is that you continue playing at OUR tables. Exclusively."))
-        print("\n")
+        print()
         answer = ask.yes_or_no("Accept the VIP treatment? ")
         if answer == "yes":
             type.type(quote("Excellent! We'll have everything arranged. Welcome to the family."))
-            print("\n")
+            print()
             type.type("He hands you a VIP keycard. You feel like you've just made a deal with the devil.")
             self.add_item("Casino VIP Card")
         else:
             type.type("His smile falters, just for a second.")
-            print("\n")
+            print()
             type.type(quote("I see. Well, the offer stands if you change your mind."))
-            print("\n")
+            print()
             type.type("He walks away. You get the feeling you've just made an enemy.")
-        print("\n")
+        print()
 
     # ==========================================
     # SECRET EVENTS - DOUGHMAN TIER
@@ -767,19 +893,19 @@ class DayWealthMixin:
             return
         
         type.type("You count your money. " + green(bright("$777,777")) + ". All sevens.")
-        print("\n")
+        print()
         type.type("Seven is the luckiest number. Everyone knows that.")
-        print("\n")
+        print()
         type.type("And you have six of them.")
-        print("\n")
+        print()
         type.type("The air around you seems to shimmer. A slot machine somewhere in the distance hits a jackpot-you can hear the bells.")
-        print("\n")
+        print()
         type.type("This is a sign. It has to be.")
-        print("\n")
+        print()
         self.add_status("Lucky")
         self.heal(30)
         type.type(yellow(bright("Lucky sevens. The universe is on your side.")))
-        print("\n")
+        print()
 
     # Conditional
             
@@ -803,7 +929,7 @@ class DayWealthMixin:
         type.type("As you crank the window lower, he peers his head inside. ")
         type.type("You can smell the food between his teeth, and the alcohol on his breath. ")
         type.type("He has a gun in his hand, and he points it at you.")
-        print("\n")
+        print()
         percentage = 80
         type.type(quote("I'd say there's about an " + red(bright("80%")) + " chance that I blow your brains out. Right now. Wanna change that?") + " ")
         while True:
@@ -813,7 +939,7 @@ class DayWealthMixin:
                 value = ask.give_cash(self.get_balance(), "How much money do you give him? ")
                 if value == 0:
                     type.type("You tell him that you don't have any money left. A dissapointed look crosses his face.")
-                    print("\n")
+                    print()
                     answer = "no"
                 elif value == self.get_balance():
                     type.type("You hand him all of your money. He laughs, and pushes the gun against your forehead. " + quote("Night night, kiddo."))
@@ -823,9 +949,10 @@ class DayWealthMixin:
                     type.type("You hand him " + green(bright("${:,}".format(value))) + ".")
                     percentage -= int((value / self.get_balance()) * 100)
                     self.change_balance(-value)
+                    self._total_given_away += value
                     if percentage <= 0:
                         type.type("He smiles, and puts the gun down. He laughs, and walks away, leaving you quite poor, but still alive.")
-                        print("\n")
+                        print()
                         self.lose_sanity(random.choice([1, 2]))  # Surviving still leaves a mark
                         return
                     if percentage in (8, 18):
@@ -837,11 +964,11 @@ class DayWealthMixin:
                 type.type("You close them. Breathing in, slowly breathing out, you prepare for the worst. ")
                 type.type("Not that you've ever been scared to face the odds.")
 
-                print("\n")
+                print()
                 if random.randrange(100) > percentage:
                     type.slow(red(bright("The gunman pulls the trigger, and you hear a click.")))
                     type.type(" You open your eyes, and see that the gun is empty. He laughs, and puts the gun down. He walks away. Somehow, you're still alive. What a nightmare")
-                    print("\n")
+                    print()
                     self.lose_sanity(random.choice([2, 3, 4]))  # Surviving Russian roulette leaves a mark
                     return
                 else:
@@ -857,31 +984,31 @@ class DayWealthMixin:
         variant = random.randrange(5)
         if variant == 0:
             type.type("You count your money. Again. Just to make sure it's real.")
-            print("\n")
+            print()
             type.type(green(bright("${:,}".format(self.get_balance()))) + ". So close to a million dollars. So close to freedom.")
-            print("\n")
+            print()
             type.type("Your hands shake a little as you put the money back. Not from fear. From anticipation.")
         elif variant == 1:
             type.type("The morning sun hits your pile of money and it almost glows. All those bills. All that progress.")
-            print("\n")
+            print()
             type.type("You've come so far. From nothing to... almost everything.")
-            print("\n")
+            print()
             type.type("One more good night. Maybe two. That's all it'll take.")
         elif variant == 2:
             type.type("You stare at your reflection in the rearview mirror. Dark circles under your eyes. Hair a mess. But there's something else there too.")
-            print("\n")
+            print()
             type.type("Hope. You see hope.")
-            print("\n")
+            print()
             type.type("The finish line is in sight.")
         elif variant == 3:
             type.type("You dream about what you'll do with a million dollars. A real house. A real bed. Real food that doesn't come from a gas station.")
-            print("\n")
+            print()
             type.type("But first, you have to actually WIN it. No counting chickens before they hatch.")
         else:
             type.type("Your phone buzzes. A notification: 'Motivational quote of the day: Success is not final, failure is not fatal.'")
-            print("\n")
+            print()
             type.type("You stare at it for a long moment. Then delete it. You don't need motivational quotes. You need one more win.")
-        print("\n")
+        print()
 
     def the_weight_of_wealth(self):
         # EVENT: Paranoid behaviors as you guard nearly a million dollars
@@ -890,151 +1017,193 @@ class DayWealthMixin:
         variant = random.randrange(4)
         if variant == 0:
             type.type("You've moved your parking spot three times today. Just in case someone was watching yesterday.")
-            print("\n")
+            print()
             type.type("Paranoia? Maybe. But you're sitting on almost a million dollars in a car. A little paranoia seems reasonable.")
         elif variant == 1:
             type.type("Every person who walks by makes you tense up. Are they looking at your car? Do they know what's inside?")
-            print("\n")
+            print()
             type.type("Probably not. But probably isn't definitely.")
         elif variant == 2:
             type.type("You've started sleeping in shifts. An hour here, an hour there. Never fully unconscious. Never truly rested.")
-            print("\n")
+            print()
             type.type("The money has made you rich in cash and poor in sleep.")
             self.hurt(5)
         else:
             type.type("A car parks nearby. You watch it for an hour. Nothing happens. They were just parking.")
-            print("\n")
+            print()
             type.type("You really need to relax. But how can you relax with this much at stake?")
-        print("\n")
+        print()
 
     def casino_knows(self):
         # EVENT: Signs that the casino is watching/tracking your winning streak
         # EFFECTS: Atmospheric ominous tension; black SUVs, mysterious calls, security guards
         # Everytime - ominous event
+        if self.has_item("Dealer's Mercy") or self.has_item("Dealer's Grudge"):
+            item_name = "Dealer's Mercy" if self.has_item("Dealer's Mercy") else "Dealer's Grudge"
+            type.type("As you cross the casino floor, the " + cyan(bright(item_name)) + " goes warm against your skin.")
+            print()
+            type.type("A pit boss starts toward you, then stops dead. His expression drains. He leans toward security and mutters something you can't hear.")
+            print()
+            type.type("No one approaches after that. The whole surveillance team suddenly finds somewhere else to be.")
+            print()
+            type.type("Whatever they saw on you, they understood it better than you did.")
+            self.restore_sanity(6)
+            self.update_dealers_grudge_durability()
+            print()
+            return
         if self.has_item("Tattered Cloak") or self.has_item("Invisible Cloak"):
             cloak = "Tattered Cloak" if self.has_item("Tattered Cloak") else "Invisible Cloak"
             type.type("You pull the " + cyan(bright(cloak)) + " tight around your shoulders as you approach the casino.")
-            print("\n")
+            print()
             type.type("The security camera pans right past you. The pit boss looks right through you. The black SUV at the curb watches nobody.")
-            print("\n")
+            print()
             type.type("You are no one. You are nothing. You are invisible.")
             self.restore_sanity(5)
-            print("\n")
+            print()
             return
         if self.has_item("Dirty Old Hat") or self.has_item("Unwashed Hair"):
             hat = "Dirty Old Hat" if self.has_item("Dirty Old Hat") else "Unwashed Hair"
             type.type("The casino surveillance team is good. But the man in the " + cyan(bright(hat)) + " doesn't look like anyone worth watching.")
-            print("\n")
+            print()
             type.type("No one expects a millionaire to wear that hat. The pit boss's eyes slide right past you.")
-            print("\n")
+            print()
             type.type("Being unremarkable is the best disguise there is.")
             self.restore_sanity(3)
-            print("\n")
+            print()
             return
         if self.has_item("Low-Profile Outfit"):
             self.use_item("Low-Profile Outfit")
             type.type("You pull on the " + cyan(bright("Low-Profile Outfit")) + " before stepping out. Unremarkable. Forgettable. Perfect.")
-            print("\n")
+            print()
             type.type("The security cameras pan right past you. The pit boss looks right through you. The black SUV at the curb watches nobody.")
-            print("\n")
+            print()
             type.type("You are exactly who they're looking for, dressed as nobody they'd ever notice.")
             self.restore_sanity(5)
-            print("\n")
+            print()
             return
         if self.has_item("Forged Documents"):
             type.type("Security approaches with a photo. You produce your " + cyan(bright("Forged Documents")) + " before they say a word.")
-            print("\n")
+            print()
             type.type(quote("That's not you, sir.") + " The guard frowns, checks the photo again, checks your ID, and waves you through.")
-            print("\n")
+            print()
             type.type("Whoever that high-rolling gambler is, he's definitely not the mild-mannered name on these papers.")
             self.restore_sanity(5)
-            print("\n")
+            print()
+            return
+        if self.has_item("Radio Jammer"):
+            type.type("You activate the " + cyan(bright("Radio Jammer")) + " as you approach. A low hum fills the air.")
+            print()
+            type.type("The security cameras flicker. The pit boss's radio crackles with static. The black SUV's engine dies.")
+            print()
+            type.type("For a moment, the casino's surveillance network is blind. You walk through the gap.")
+            self.restore_sanity(4)
+            print()
             return
         if self.has_item("Radio Jammer") or self.has_item("Surveillance Suite"):
             item_name = "Radio Jammer" if self.has_item("Radio Jammer") else "Surveillance Suite"
             type.type("You activate the " + cyan(bright(item_name)) + " before entering the casino's range.")
-            print("\n")
+            print()
             type.type("The jammer kills the signal. Their cameras start buffering. The black SUV's radio goes dead.")
-            print("\n")
+            print()
             type.type("They lose you entirely. You're a ghost in their system.")
             self.restore_sanity(8)
-            print("\n")
+            print()
             return
         if self.has_item("Sneaky Peeky Goggles") or self.has_item("Sneaky Peeky Shades"):
             lenses = "Sneaky Peeky Goggles" if self.has_item("Sneaky Peeky Goggles") else "Sneaky Peeky Shades"
             type.type("Through your " + cyan(bright(lenses)) + ", you see what others can't — the hidden cameras, the undercover security, the one-way mirrors.")
-            print("\n")
+            print()
             type.type("You map every blind spot in the casino's surveillance. Every angle they can't cover. Every safe route.")
-            print("\n")
+            print()
             type.type("They're watching everyone. But you're watching them watching.")
             self.restore_sanity(6)
-            print("\n")
+            print()
             return
         variant = random.randrange(3)
         if variant == 0:
             type.type("You notice a black SUV drive past your wagon. Slowly. Too slowly.")
-            print("\n")
+            print()
             type.type("The windows are tinted. You can't see who's inside. It doesn't stop. But it comes by twice more throughout the day.")
-            print("\n")
+            print()
             type.type("The casino knows. They have to know.")
         elif variant == 1:
             type.type("Your phone rings from an unknown number. You answer cautiously.")
-            print("\n")
+            print()
             type.type("Silence. Then, a click. They hung up.")
-            print("\n")
+            print()
             type.type("Wrong number? Or something else?")
             if self.has_item("Golden Watch") or self.has_item("Sapphire Watch"):
                 watch = "Golden Watch" if self.has_item("Golden Watch") else "Sapphire Watch"
-                print("\n")
+                print()
                 type.type("You glance at your " + cyan(bright(watch)) + ". If they're watching, let them see someone who belongs at the top.")
-                print("\n")
+                print()
                 type.type("The calls stop after that. Elegance is its own form of intimidation.")
                 self.restore_sanity(5)
         else:
             type.type("There's a new security guard at the casino entrance. He watches you enter. Watches you leave. Takes notes on a clipboard.")
-            print("\n")
+            print()
             type.type("Maybe it's nothing. Maybe it's everything.")
-        print("\n")
+        print()
 
     def last_stretch(self):
         # EVENT: The final stretch before hitting $1 million
         # EFFECTS: 33% chance to heal 10 HP from inner peace; otherwise just tension
         # Everytime - tension building
         type.type("You sit in your car and exhale. This is it. The final stretch. Everything you've worked for comes down to these last few nights.")
-        print("\n")
+        print()
         type.type("Your entire body feels electric. Every nerve is alive. This is what you were born to do.")
-        print("\n")
+        print()
         if random.randrange(3) == 0:
             type.type("A calm settles over you. Whatever happens, happens. You've done everything you can.")
             self.heal(10)
         else:
             type.type("But the pressure... the pressure is immense. One wrong move and it all comes crashing down.")
-        print("\n")
+        print()
 
     def strange_visitors(self):
         # EVENT: Mysterious people appear around your car with cryptic behavior
         # EFFECTS: Atmospheric surreal encounters; hints at supernatural awareness of your journey
         # Everytime - mysterious encounters
+        if self.has_item("Dealer's Mercy") or self.has_item("Dealer's Grudge"):
+            item_name = "Dealer's Mercy" if self.has_item("Dealer's Mercy") else "Dealer's Grudge"
+            type.type("You wake to soft knocking on your car window. Not urgent. Formal.")
+            print()
+            type.type("A man in a white suit stands outside, hands folded, eyes fixed on the " + cyan(bright(item_name)) + " in your lap.")
+            print()
+            if item_name == "Dealer's Mercy":
+                type.type(quote("My employer asked me to confirm whether you were under protection."))
+                print()
+                type.type("He sees enough. He bows once, leaves a pristine white casino chip on your windshield, and walks away without another word.")
+                self.change_balance(100)
+                self.restore_sanity(6)
+            else:
+                type.type(quote("My employer asked whether you were marked."))
+                print()
+                type.type("He sees the answer, goes pale, and backs away from your door like it might bite him. He leaves the rose he brought and retreats fast.")
+                self.restore_sanity(4)
+            self.update_dealers_grudge_durability()
+            print()
+            return
         variant = random.randrange(4)
         if variant == 0:
             type.type("A man in a white suit walks past your car, tips his hat, and keeps walking. You've never seen him before.")
-            print("\n")
+            print()
             type.type("Something about his smile was wrong. Too knowing.")
         elif variant == 1:
             type.type("Two women in matching pantsuits photograph your license plate. When you confront them, they claim to be 'researchers.'")
-            print("\n")
+            print()
             type.type("They refuse to elaborate. Then they're gone.")
         elif variant == 2:
             type.type("A child peers through your window. You didn't hear them approach.")
-            print("\n")
+            print()
             type.type(quote("My daddy says you're going to win,") + " they whisper. Then they run away.")
-            print("\n")
+            print()
             type.type("Who is their daddy? How does he know? WHAT does he know?")
         else:
             type.type("You wake up to find a single rose on your windshield. Red. Perfect. No card.")
-            print("\n")
+            print()
             type.type("Is this romantic? Threatening? You genuinely can't tell.")
-        print("\n")
+        print()
 
     # ==========================================
     # NEW NEARLY DAY EVENTS - Conditional
@@ -1050,17 +1219,17 @@ class DayWealthMixin:
             return
         
         type.type("You're gripping the steering wheel. Less than " + green(bright("$50,000")) + " to go. LESS THAN FIFTY THOUSAND DOLLARS.")
-        print("\n")
+        print()
         type.type("You could walk away right now with " + green(bright("${:,}".format(self.get_balance()))) + ". That's life-changing money for most people.")
-        print("\n")
+        print()
         type.type("But you didn't come this far to come this far.")
-        print("\n")
+        print()
         type.type("Tonight. Tonight could be THE night.")
-        print("\n")
+        print()
         self.heal(20)
         self.add_status("Lucky")
         type.type(yellow(bright("Destiny awaits.")))
-        print("\n")
+        print()
 
     def victoria_returns(self):
         # EVENT: Victoria the rival returns to acknowledge your skill and make peace
@@ -1078,36 +1247,36 @@ class DayWealthMixin:
         
         self.meet("Victoria Confrontation")
         type.type("The motorcycle pulls up. Victoria removes her helmet, but she's not smirking this time.")
-        print("\n")
+        print()
         type.type(quote("I'll be honest. I didn't think you'd make it this far."))
-        print("\n")
+        print()
         type.type("She leans against her bike, studying you.")
-        print("\n")
+        print()
         type.type(quote("I've been doing this for years and never got close to a million. You? A few months in a car and you're almost there."))
-        print("\n")
+        print()
         type.type("She shakes her head.")
-        print("\n")
+        print()
         type.type(quote("I was wrong about you. You're not just running hot. You've got something. Skill, luck, divine intervention-I don't know what. But you've got it."))
-        print("\n")
+        print()
         type.type("She extends her hand.")
-        print("\n")
+        print()
         type.type(quote("No hard feelings?"))
-        print("\n")
+        print()
         answer = ask.yes_or_no("Shake her hand? ")
         if answer == "yes":
             type.type("You shake. Her grip is firm.")
-            print("\n")
+            print()
             type.type(quote("Good luck tonight. You're going to need it."))
-            print("\n")
+            print()
             type.type("She drives off. You feel... lighter, somehow.")
             self.heal(10)
         else:
             type.type("You leave her hanging. She pulls her hand back, expression unreadable.")
-            print("\n")
+            print()
             type.type(quote("Fine. Have it your way. But remember-pride comes before the fall."))
-            print("\n")
+            print()
             type.type("She speeds off without another word.")
-        print("\n")
+        print()
 
     # ==========================================
     # NEW NEARLY DAY EVENTS - One-Time
@@ -1124,21 +1293,21 @@ class DayWealthMixin:
         
         self.meet("The Warning")
         type.type("An old woman shuffles up to your car. Her eyes are milky white-blind, or close to it.")
-        print("\n")
+        print()
         type.type(quote("You're the one,") + " she whispers. " + quote("I've seen you in my dreams."))
-        print("\n")
+        print()
         type.type("She presses a gnarled hand against your window.")
-        print("\n")
+        print()
         type.type(quote("The million isn't the end. It's the beginning. Of what, I don't know. But I see fire. I see cards. I see a choice that will define everything."))
-        print("\n")
+        print()
         type.type("She coughs-a wet, rattling sound.")
-        print("\n")
+        print()
         type.type(quote("Be careful what you wish for. Sometimes the universe gives you exactly what you ask for. And sometimes that's the worst thing that could happen."))
-        print("\n")
+        print()
         type.type("She shuffles away before you can respond, disappearing around a corner.")
-        print("\n")
+        print()
         type.type("You sit in silence for a long time, thinking about her words.")
-        print("\n")
+        print()
 
     def the_celebration(self):
         # EVENT: People mistakenly try to celebrate with you (wrong car) but leave cake behind
@@ -1151,19 +1320,19 @@ class DayWealthMixin:
         
         self.meet("Premature Celebration")
         type.type("A group of people approach your car. They're carrying a cake and balloons.")
-        print("\n")
+        print()
         type.type(quote("CONGRATULATIONS!") + " they shout.")
-        print("\n")
+        print()
         type.type("You blink. Did you already hit a million and forget?")
-        print("\n")
+        print()
         type.type("The leader of the group checks his phone, then looks at your car, then back at his phone.")
-        print("\n")
+        print()
         type.type(quote("Oh. Wrong car. Sorry."))
-        print("\n")
+        print()
         type.type("They shuffle away with their cake and balloons, leaving you very confused.")
-        print("\n")
+        print()
         type.type("But hey, they did drop a slice of cake in your lap. It's chocolate.")
-        print("\n")
+        print()
         self.heal(10)
 
     def final_dream(self):
@@ -1184,26 +1353,26 @@ class DayWealthMixin:
         
         self.meet("Final Dream")
         type.type("You fall asleep and find yourself in a vast, empty casino. The lights are off. The slot machines are silent. The tables are empty.")
-        print("\n")
+        print()
         type.type("Except one.")
-        print("\n")
+        print()
         type.type("The Dealer sits at a blackjack table, illuminated by a single overhead lamp. He beckons you forward.")
-        print("\n")
+        print()
         type.type(quote("You've come a long way,") + " he says. " + quote("Farther than most."))
-        print("\n")
+        print()
         type.type("He shuffles the cards.")
-        print("\n")
+        print()
         type.type(quote("But the final test isn't about skill. It isn't about luck. It's about something else entirely."))
-        print("\n")
+        print()
         type.type("He deals you a hand. You look at your cards. They're blank.")
-        print("\n")
+        print()
         type.type(quote("The cards only show what you already know,") + " he says. " + quote("And you already know how this ends."))
-        print("\n")
+        print()
         type.type("You wake up with a certainty that wasn't there before.")
-        print("\n")
+        print()
         type.type(yellow(bright("Whatever happens tonight, you're ready.")))
         self.add_status("Lucky")
-        print("\n")
+        print()
 
     def the_offer(self):
         # EVENT: Mysterious limo offers to double your money if you walk away and never gamble again
@@ -1216,49 +1385,49 @@ class DayWealthMixin:
         
         self.meet("The Offer")
         type.type("A limousine pulls up next to your wagon. The back window rolls down, revealing a distinguished-looking man in an expensive suit.")
-        print("\n")
+        print()
         type.type(quote("You're the one who's been winning. I've heard a lot about you."))
-        print("\n")
+        print()
         type.type("He smiles, but it doesn't reach his eyes.")
-        print("\n")
+        print()
         type.type(quote("I represent... certain interested parties. We've been watching your progress with great interest."))
-        print("\n")
+        print()
         type.type(quote("Here's my offer: walk away right now, and I'll double whatever you have. Cash. No questions asked."))
-        print("\n")
+        print()
         current = self.get_balance()
         type.type("That would be " + green(bright("${:,}".format(current * 2))) + ". More than your goal.")
-        print("\n")
+        print()
         answer = ask.yes_or_no("Accept the offer? ")
         if answer == "yes":
             type.type("The man smiles.")
-            print("\n")
+            print()
             type.type(quote("Smart. Very smart."))
-            print("\n")
+            print()
             type.type("A briefcase is pushed out the window. It's full of cash.")
-            print("\n")
+            print()
             type.type(quote("Pleasure doing business with you. I suggest you leave town immediately. And never come back to any casino. Ever."))
-            print("\n")
+            print()
             type.type("The limo drives away.")
-            print("\n")
+            print()
             type.type("You stare at the briefcase. You won. But... did you really?")
-            print("\n")
+            print()
             self.change_balance(current)
             type.type(yellow(bright("You got what you wanted. But something feels hollow.")))
         else:
             type.type("The man's smile fades.")
-            print("\n")
+            print()
             type.type(quote("Interesting. Most people would've taken the money."))
-            print("\n")
+            print()
             type.type("He leans forward.")
-            print("\n")
+            print()
             type.type(quote("You're either very brave or very stupid. Time will tell which."))
-            print("\n")
+            print()
             type.type("The window rolls up and the limo drives away.")
-            print("\n")
+            print()
             type.type("You made your choice. Now you have to live with it.")
-            print("\n")
+            print()
             type.type(yellow(bright("The true test lies ahead.")))
-        print("\n")
+        print()
 
     # ==========================================
     # SECRET EVENTS - NEARLY TIER
@@ -1274,26 +1443,26 @@ class DayWealthMixin:
             return
         
         type.type("You count your money. Once. Twice. Three times.")
-        print("\n")
+        print()
         type.type(green(bright("$999,999")) + ".")
-        print("\n")
+        print()
         type.type("One dollar. You are ONE DOLLAR away from a million.")
-        print("\n")
+        print()
         type.type("The universe has a cruel sense of humor.")
-        print("\n")
+        print()
         type.type("As if in response to your thoughts, a single dollar bill blows against your window, carried by the wind.")
-        print("\n")
+        print()
         type.type("You scramble out of the car and grab it before it can fly away.")
-        print("\n")
+        print()
         type.type(green(bright("$1,000,000.")))
-        print("\n")
+        print()
         type.type("You did it. You actually did it.")
-        print("\n")
+        print()
         self.change_balance(1)
         type.type(yellow(bright("ONE. MILLION. DOLLARS.")))
-        print("\n")
+        print()
         type.type(yellow(bright("But your story isn't over yet...")))
-        print("\n")
+        print()
 
     def all_dreams_complete(self):
         # EVENT: Secret - All three dream storylines complete, full revelation of your identity
@@ -1310,24 +1479,24 @@ class DayWealthMixin:
         
         self.meet("All Dreams Complete")
         type.type("There are tears on your face. But not from sadness.")
-        print("\n")
+        print()
         type.type("You remember everything now. Rebecca. Nathan. Johnathan.")
-        print("\n")
+        print()
         type.type("The Dealer. His rage. His scar. His glass eye.")
-        print("\n")
+        print()
         type.type("The casino. The money. The drink. The double.")
-        print("\n")
+        print()
         type.type("It all makes sense now. Every dream was a piece of a puzzle you didn't know you were solving.")
-        print("\n")
+        print()
         type.type(yellow(bright("You know who you are.")))
-        print("\n")
+        print()
         type.type(yellow(bright("You know why you're here.")))
-        print("\n")
+        print()
         type.type(yellow(bright("And you know what you have to do.")))
-        print("\n")
+        print()
         self.heal(100)
         self.add_status("Lucky")
-        print("\n")
+        print()
         
     # Conditional
         
@@ -1350,28 +1519,28 @@ class DayWealthMixin:
         type.type("Through the windshield-again-a car is parked right in front of you. ")
         type.type("You can feel your blood start to boil. What's this guy's problem? ")
         type.type("As you open the door and get out of your car, you notice the man in his bright red suit, once again peering into your trunk.")
-        print("\n")
+        print()
         type.type("The man sees you, and walks up to you, with a pistol holstered to his waist.")
-        print("\n")
+        print()
         type.type(space_quote("You. I'm done playing around. It's time to move. I mean it."))
         type.type("You look down at the gun on his waist. It looks fancy, and certainly deadly.")
-        print("\n")
+        print()
         type.type(quote("I wouldn't test me if I were you. It's time to go, now."))
-        print("\n")
+        print()
         type.type(space_quote("Will you leave?"))
         answer = ask.yes_or_no(space_quote("Answer me. "))
         if answer == "yes":
             type.type(quote("That's great. Fantastic. But I don't believe a word that comes out of your filthy mouth. Prove it. Leave. Go away. GET OUT."))
-            print("\n")
+            print()
             type.type("You are fueled with anger. Who is this guy, and what gives him the right to harass you? ")
             type.type("All for being homeless? No longer. You reach for the gun on his waist.")
-            print("\n")
+            print()
             random_chance = random.randrange(4)
             if random_chance == 0:
                 type.slow(red("Before you get the chance to grab it, the man steps back, unholsters the pistol, then fires three shots into your chest. The glass behind you shatters, and you fall to your knees in the street."))
-                print("\n")
+                print()
                 type.slow(red(quote("You should've just listened to me man! All you had to do was listen! Move, live somewhere else. Find a home, anything. But no! You just had to live in your car, like the homeless piece of shit that you are!")))
-                print("\n")
+                print()
                 type.slow(red(bright("The man kicks you down, and steps on your chest, causing the bullet holes to leak blood onto the concrete below you. As you feel yourself beginning to fade away, you watch the man lift his pistol to your head, and pull the trigger.")))
                 self.kill()
             else:
@@ -1381,39 +1550,39 @@ class DayWealthMixin:
                 type.type("The man punches you in the arm, and it stings. ")
                 type.type("Without thinking twice, you give the man a headbutt, and he falls backwards into the road. ")
                 type.type("You point the gun at the man, and he begins to cry.")
-                print("\n")
+                print()
                 type.type(quote("Please, I'm sorry. I didn't mean to cause any of this. "))
                 type.type(quote("I just, I hate seeing people living on the streets, all alone. "))
                 type.type(quote("I was just trying to help you. Just, please, for the love of god, don't hurt me."))
-                print("\n")
+                print()
                 type.type("As the man begs for his life, the freight truck continues to draw closer, and the horn gets louder. ")
                 type.type("You point at the truck in the distance, but the man can't see through the tears in his eyes.")
-                print("\n")
+                print()
                 type.type(space_quote("Please, I have a family. I have children. My name is Phil. I don't wanna die. I'm too young. I can't die. I can't die. I ca-"))
                 type.type("You watch as the freight truck crushes Phil, and continues down the road. ")
                 type.type("Nothing remained but the splotches of blood that splattered the road where he once stood.")
-                print("\n")
+                print()
                 type.type("After sitting a while, and recollecting your thoughts, you bring the pistol over to Phil's car, and throw it onto the passenger seat. ")
                 type.type("Looking inside, the car has dice hanging on the mirror, and is filled to the brim with red suits. ")
                 type.type("On the dashboard sits a photo of Phil, his wife, and his three kids, all wearing bright red suits. ")
                 type.type("Phil might've been crazy, but at least he was consistent.")
-                print("\n")
+                print()
                 type.type("You get in the car, and drive it down the road, before turning into the woods. ")
                 type.type("You drive a mile in, before parking the car before the lake. ")
                 type.type("You get out, and push the car into the water, watching as it submerges.")
-                print("\n")
+                print()
                 return
         elif answer == "no":
             type.type(quote("Really? You really want to do that? I warned you, man."))
-            print("\n")
+            print()
             type.type("The man pulls out his pistol, and points it at you. You lift your hands above your head, before quickly reaching for the pistol.")
-            print("\n")
+            print()
             random_chance = random.randrange(3)
             if random_chance == 0:
                 type.slow(red("Before you get the chance to grab it, the man steps back, then fires three shots into your chest. The glass behind you shatters, and you fall to your knees in the street."))
-                print("\n")
+                print()
                 type.slow(red(quote("Nice try, man! You should've just listened to me! All you had to do was listen! Move, live somewhere else. Find a home, anything. But no! You just had to live in your car, like the homeless piece of shit that you are!")))
-                print("\n")
+                print()
                 type.slow(red(bright("The man kicks you down, and steps on your chest, causing the bullet holes to leak blood onto the concrete below you. As you feel yourself beginning to fade away, you watch the man lift his pistol to your hand, and pull the trigger.")))
                 self.kill()
             else:
@@ -1422,92 +1591,93 @@ class DayWealthMixin:
                 type.type("The man punches you in the arm, and it stings. ")
                 type.type("Without thinking twice, you give the man a headbutt, and he falls backwards into the road. ")
                 type.type("You point the gun at the man, and he begins to cry.")
-                print("\n")
+                print()
                 type.type(quote("Please, I'm sorry. I didn't mean to cause any of this. "))
                 type.type(quote("I just, I hate seeing people living on the streets, all alone. "))
                 type.type(quote("I was just trying to help you. Just, please, for the love of god, don't hurt me."))
-                print("\n")
+                print()
                 type.type("As the man begs for his life, you cock the gun. You point pistol at the man, and he continues to cry.")
-                print("\n")
+                print()
                 type.type(space_quote("Please, I have a family. I have children. My name is Phil. I don't wanna die. I'm too young. I can't die. I can't die. I ca-"))
                 type.type("You pull the trigger, and Phil becomes quiet. His blood covers the street, but at least his red suit still looks good as new.")
-                print("\n")
+                print()
                 type.type("After sitting a while, and recollecting your thoughts, you drag Phil over to his car. ")
                 type.type("You stuff him into the trunk, and throw his pistol onto the passenger seat. ")
                 type.type("Looking inside, the car has dice hanging on the mirror, and is filled to the brim with red suits. ")
                 type.type("On the dashboard sits a photo, of Phil, his wife, and his three kids, all wearing bright red suits. ")
                 type.type("Phil might've been crazy, but at least he was consistent.")
-                print("\n")
+                print()
                 type.type("You get in the car, and drive it down the road, before turning into the woods. ")
                 type.type("You drive a mile in, before parking the car before the lake. ")
                 type.type("You get out, and push the car into the water, watching as it submerges.")
-                print("\n")
+                print()
                 return
 
     # SUZY STORYLINE - NEARLY THERE DAY (FINALE)
 
     def luxury_problems(self):
         type.type("Sitting in your car, you realize you have money problems now. Rich people money problems.")
-        print("\n")
+        print()
         type.type("Like: which pocket do you keep your money in? It's getting heavy. Your pants are sagging.")
-        print("\n")
+        print()
         type.type("Or: people keep asking you for loans. Random strangers. They can SMELL wealth, apparently.")
-        print("\n")
+        print()
         type.type("Or: you're worried about getting robbed. You're literally sleeping in a car full of cash.")
-        print("\n")
+        print()
         type.type("Somehow, having money is stressful in entirely new ways. Who knew?")
         self.lose_sanity(1)
-        print("\n")
+        print()
 
     def imposter_syndrome(self):
         type.type("You check your balance from your car and feel... weird. This much money? You? The car-sleeping gambler?")
-        print("\n")
+        print()
         type.type("Surely this is a mistake. Surely someone's going to show up and demand it all back.")
-        print("\n")
+        print()
         type.type("'I'm sorry sir, there's been an error. You were never supposed to succeed. Please return to being poor.'")
-        print("\n")
+        print()
         type.type("The money stays. The anxiety doesn't.")
         self.lose_sanity(2)
-        print("\n")
+        print()
 
     def charity_opportunity(self):
         type.type("You step out of your car and a woman approaches you with a clipboard. " + quote("Hi! Would you like to donate to the Children's Hospital Foundation?"))
-        print("\n")
+        print()
         type.type("She has the aggressive cheerfulness of someone who does this professionally.")
-        print("\n")
+        print()
         answer = ask.yes_or_no("Donate $100 to charity? ")
         if answer == "yes":
             if self.get_balance() >= 100:
                 type.type("You hand over " + green(bright("$100")) + ". The woman beams. " + quote("You're making a real difference!"))
-                print("\n")
+                print()
                 type.type("You feel warm inside. Is this what being a good person feels like?")
                 self.change_balance(-100)
+                self._total_given_away += 100
                 self.restore_sanity(10)
                 self.heal(10)
             else:
                 type.type("You reach for your wallet and realize... you don't actually have that much liquid. Awkward.")
         else:
             type.type("You mumble something about being late for an appointment and speed-walk away.")
-            print("\n")
+            print()
             type.type("Her disappointed gaze follows you. The guilt follows you too.")
             self.lose_sanity(3)
-        print("\n")
+        print()
 
     # DOUGHMAN DAY EVENTS - Everytime
 
     def money_counting_ritual(self):
         type.type("You've developed a ritual of counting your money in the car every morning. It takes a while now.")
-        print("\n")
+        print()
         type.type("...four hundred fifty-three thousand, seven hundred twenty-two... twenty-three... twenty-four...")
-        print("\n")
+        print()
         type.type("You lose count and have to start over. Twice.")
-        print("\n")
+        print()
         type.type("By the time you're done, two hours have passed. Was this a good use of time? No. Did it feel good? Also no. Will you do it again tomorrow? Absolutely.")
-        print("\n")
+        print()
 
     def nervous_habits(self):
         type.type("Sitting in your car, you notice you've started developing nervous habits now that you have something to lose.")
-        print("\n")
+        print()
         variant = random.randrange(4)
         if variant == 0:
             type.type("You check your pockets every thirty seconds to make sure the money is still there.")
@@ -1517,14 +1687,14 @@ class DayWealthMixin:
             type.type("You keep making backup plans. If you lose it all, you can always... wait, no, you can't. There's no backup plan.")
         else:
             type.type("You've started having nightmares about the Dealer. He's laughing. He's always laughing.")
-        print("\n")
+        print()
         type.type("This level of wealth-related anxiety probably isn't normal.")
         self.lose_sanity(2)
-        print("\n")
+        print()
 
     def millionaire_fantasy(self):
         type.type("Sitting in your car, you're so close to a million dollars that you can taste it. You start fantasizing about what you'll do.")
-        print("\n")
+        print()
         fantasies = [
             "Buy a real house. With walls. And a roof that doesn't leak gasoline fumes.",
             "Get health insurance. Maybe see a doctor about that thing on your elbow.",
@@ -1534,10 +1704,10 @@ class DayWealthMixin:
             "Help your family. If they'll still talk to you after all this."
         ]
         type.type(random.choice(fantasies))
-        print("\n")
+        print()
         type.type("But first, you have to actually WIN. Back to the tables.")
         self.restore_sanity(3)
-        print("\n")
+        print()
 
     # ==========================================
     # ONE-TIME EVENTS
@@ -1550,35 +1720,35 @@ class DayWealthMixin:
             return
         
         type.type("Blue lights flash behind you. Your heart drops.")
-        print("\n")
+        print()
         type.type("A police officer walks up to your window. " + quote("License and registration, please."))
-        print("\n")
+        print()
         type.type("He runs your plates. His expression darkens.")
-        print("\n")
+        print()
         type.type(quote("Sir, it appears you have... seventeen unpaid parking tickets. That's a $500 fine."))
-        print("\n")
+        print()
         if self.get_balance() >= 500:
             answer = ask.yes_or_no("Pay the $500 fine? ")
             if answer == "yes":
                 type.type("You hand over the money, wincing. The officer tips his hat.")
-                print("\n")
+                print()
                 type.type(quote("Have a nice day. And maybe invest in a parking app."))
                 self.change_balance(-500)
                 self.remove_danger("Unpaid Tickets")
             else:
                 type.type("The officer sighs. " + quote("Then I'll have to impound your vehicle."))
-                print("\n")
+                print()
                 type.type("Just kidding, he doesn't. But he DOES slap a boot on your tire.")
-                print("\n")
+                print()
                 type.type("You spend the next three hours dealing with bureaucracy to get it removed.")
                 self.lose_sanity(10)
         else:
             type.type("You show him your empty wallet. He sighs.")
-            print("\n")
+            print()
             type.type(quote("Look, I'm gonna let you off with a warning this time. But get those tickets paid."))
-            print("\n")
+            print()
             type.type("You got lucky. Very lucky.")
-        print("\n")
+        print()
 
     # ==========================================
     # MEGA EVENT BATCH - POOR TIER
@@ -1586,31 +1756,31 @@ class DayWealthMixin:
 
     def rich_persons_problems(self):
         type.type("You step out of your car and overhear two rich people complaining at a café.")
-        print("\n")
+        print()
         type.type(quote("My Maserati is in the shop AGAIN. I have to drive my backup Porsche."))
         print()
         type.type(quote("Ugh, I know. My yacht needs new curtains and my decorator is on vacation in BALI."))
-        print("\n")
+        print()
         type.type("You make eye contact with a barista. They roll their eyes. Solidarity.")
         self.restore_sanity(3)
-        print("\n")
+        print()
 
     def investment_pitch(self):
         type.type("You step out of your car and a guy in a cheap suit corners you with a 'business opportunity.'")
-        print("\n")
+        print()
         type.type(quote("Crypto. NFTs. AI. Blockchain. Web3. It's gonna be HUGE. I just need investors."))
-        print("\n")
+        print()
         type.type("He's sweating. You recognize the desperation. You've seen it in the mirror.")
-        print("\n")
+        print()
         answer = ask.yes_or_no("Give him $100 to make him go away? ")
         if answer == "yes" and self.get_balance() >= 100:
             type.type("You hand over the money. He promises you'll get 10x returns.")
-            print("\n")
+            print()
             type.type("You'll never see him or that money again. But at least he's gone.")
             self.change_balance(-100)
         else:
             type.type("You decline. He follows you for half a block before giving up.")
-        print("\n")
+        print()
 
     # ==========================================
     # MEGA EVENT BATCH - DOUGHMAN TIER
@@ -1618,11 +1788,11 @@ class DayWealthMixin:
 
     def wealth_paranoia(self):
         type.type("You've started hiding money in weird places. Under the floor mat. In the glove box. In your shoes.")
-        print("\n")
+        print()
         type.type("You can't remember where you put all of it. Was it $500 in the spare tire? Or $700?")
-        print("\n")
+        print()
         type.type("You spend an hour searching your own car like a crazy person.")
-        print("\n")
+        print()
         chance = random.randrange(3)
         if chance == 0:
             amount = random.randint(50, 150)
@@ -1631,7 +1801,7 @@ class DayWealthMixin:
         else:
             type.type("You find nothing. Either you already counted it, or you're losing your mind.")
             self.lose_sanity(3)
-        print("\n")
+        print()
 
     def high_roller_room(self):
         if self.has_met("High Roller Room"):
@@ -1639,16 +1809,16 @@ class DayWealthMixin:
             return
         self.meet("High Roller Room")
         type.type("You step out of your car and a casino employee approaches you with unusual deference.")
-        print("\n")
+        print()
         type.type(quote("Sir, based on your... recent activities... we'd like to invite you to our High Roller Lounge."))
-        print("\n")
+        print()
         type.type("They hand you a black keycard.")
-        print("\n")
+        print()
         type.type(quote("Free drinks. Private tables. Higher limits. You've earned it."))
-        print("\n")
+        print()
         type.type("You pocket the card. You're not sure if this is an honor or a trap.")
         self.add_item("High Roller Keycard")
-        print("\n")
+        print()
 
     def old_rival_returns(self):
         if self.has_met("Old Rival"):
@@ -1656,22 +1826,22 @@ class DayWealthMixin:
             return
         self.meet("Old Rival")
         type.type("You step out of your car and head to the casino. A familiar face appears. Someone from your past.")
-        print("\n")
+        print()
         type.type("Jake Morrison. You used to work together, before... everything.")
-        print("\n")
+        print()
         type.type(quote("Well, well. Look who it is. Still chasing the dragon, huh?"))
-        print("\n")
+        print()
         type.type("He looks good. Successful. Happy. Everything you're not.")
-        print("\n")
+        print()
         type.type(quote("I heard you were doing... this.") + " He gestures vaguely at your existence. " + quote("Good luck with that."))
-        print("\n")
+        print()
         type.type("He walks away. The smugness lingers like a bad smell.")
         self.lose_sanity(10)
-        print("\n")
+        print()
 
     def casino_comps(self):
         type.type("You find a gift bag on your car's hood. The casino sent you free stuff. Trying to keep you gambling, obviously.")
-        print("\n")
+        print()
         items = [
             ("a free buffet voucher", 0, 20, 0),
             ("a free hotel room for the night", 0, 0, 15),
@@ -1681,7 +1851,7 @@ class DayWealthMixin:
         ]
         item, money, health, sanity = random.choice(items)
         type.type("Today's gift: " + item + ".")
-        print("\n")
+        print()
         if money > 0:
             type.type("The chips are worth " + green(bright("$" + str(money))) + " if you cash out.")
             self.change_balance(money)
@@ -1691,25 +1861,25 @@ class DayWealthMixin:
         if sanity > 0:
             type.type("You feel oddly appreciated. Even if it's just manipulation.")
             self.restore_sanity(sanity)
-        print("\n")
+        print()
 
     def millionaire_milestone(self):
         if self.get_balance() >= 750000 and not self.has_met("Almost There Moment"):
             self.meet("Almost There Moment")
             type.type("Sitting in your car, you're looking at your balance. It's so close to a million. SO close.")
-            print("\n")
+            print()
             type.type("Your hands are shaking. You can barely breathe.")
-            print("\n")
+            print()
             type.type("One more good night. One more lucky streak. One more...")
-            print("\n")
+            print()
             type.type("What will you even do when you win? You've been chasing this for so long.")
-            print("\n")
+            print()
             type.type("You realize you haven't thought that far ahead. You've only ever thought about winning.")
-            print("\n")
+            print()
             type.type("What happens after?")
             self.lose_sanity(5)
             self.restore_sanity(10)  # Net positive, but conflicted
-            print("\n")
+            print()
         else:
             self.day_event()
 
@@ -1719,101 +1889,116 @@ class DayWealthMixin:
 
     def the_final_temptation(self):
         type.type("A stranger approaches your car outside the casino. Well-dressed. Confident. Unsettling.")
-        print("\n")
+        print()
         type.type(quote("You're close, aren't you? I can tell. The million."))
-        print("\n")
+        print()
         type.type("How does he know? You didn't tell anyone.")
-        print("\n")
+        print()
         type.type(quote("I can guarantee your victory. Tonight. One hand. You'll win everything."))
-        print("\n")
+        print()
         type.type("He leans in. His eyes are... wrong. Too dark. Too deep.")
-        print("\n")
+        print()
         type.type(quote("All it costs is something small. Something you won't even miss."))
-        print("\n")
+        print()
         answer = ask.yes_or_no("Accept his offer? ")
         if answer == "yes":
             type.type("You shake his hand. It's ice cold.")
-            print("\n")
+            print()
             type.type(quote("Excellent. I'll see you at the tables."))
-            print("\n")
+            print()
             type.type("He disappears into the crowd. You feel different. Lighter. Emptier.")
             self.lose_sanity(25)
             self.add_danger("Devil's Bargain")
             self.change_balance(random.randint(10000, 50000))
         else:
             type.type("You walk away. He doesn't follow. When you look back, he's gone.")
-            print("\n")
+            print()
             type.type("The right choice. Probably. Maybe.")
             self.restore_sanity(10)
-        print("\n")
+        print()
 
     def reporters_found_you(self):
+        if self.has_item("Dealer's Mercy") or self.has_item("Dealer's Grudge"):
+            item_name = "Dealer's Mercy" if self.has_item("Dealer's Mercy") else "Dealer's Grudge"
+            type.type("A reporter has tracked you down to your parking spot. Camera crew, microphone, bright lights, the whole circus.")
+            print()
+            type.type("Then the " + cyan(bright(item_name)) + " flares hot. Not bright enough for anyone else to notice. Just enough for you.")
+            print()
+            type.type("The cameraman lowers his rig. The reporter goes pale halfway through her first question.")
+            print()
+            type.type(quote("You know what? Forget it.") + " She backs up a step. " + quote("Not this one."))
+            print()
+            type.type("They pack up in a hurry and leave you alone with a heartbeat that won't slow down.")
+            self.restore_sanity(4)
+            self.update_dealers_grudge_durability()
+            print()
+            return
         if self.has_item("Tattered Cloak") or self.has_item("Invisible Cloak"):
             cloak = "Tattered Cloak" if self.has_item("Tattered Cloak") else "Invisible Cloak"
             type.type("A reporter has tracked you down to your parking spot. Camera crew and everything.")
-            print("\n")
+            print()
             type.type("You pull the " + cyan(bright(cloak)) + " over your shoulders and step out of the car.")
-            print("\n")
+            print()
             type.type("The reporter blinks. Scans the lot. Checks her phone. Looks back up.")
-            print("\n")
+            print()
             type.type(quote("I... I could have sworn he was just here."))
-            print("\n")
+            print()
             type.type("You slip past them, invisible as a shadow at noon. Nobody films a nobody.")
-            print("\n")
+            print()
             return
         if self.has_item("Dirty Old Hat") or self.has_item("Unwashed Hair"):
             hat = "Dirty Old Hat" if self.has_item("Dirty Old Hat") else "Unwashed Hair"
             type.type("A reporter sweeps the parking lot with her camera crew, hunting for the mystery gambler.")
-            print("\n")
+            print()
             type.type("She walks right past you. The man in the " + cyan(bright(hat)) + " doesn't look like anyone worth filming.")
-            print("\n")
+            print()
             type.type("She drives away unsatisfied. Being unremarkable is a superpower.")
-            print("\n")
+            print()
             return
         if self.has_item("Low-Profile Outfit"):
             self.use_item("Low-Profile Outfit")
             type.type("A reporter sweeps the parking lot with a camera crew, hunting for the mystery gambler.")
-            print("\n")
+            print()
             type.type("You pull on the " + cyan(bright("Low-Profile Outfit")) + " and step outside. She walks right past you without a flicker of recognition.")
-            print("\n")
+            print()
             type.type("Being completely forgettable turns out to be the most useful skill you have.")
             self.restore_sanity(5)
-            print("\n")
+            print()
             return
         if self.has_item("Forged Documents"):
             type.type("A reporter thrusts a photo in your face. " + quote("Excuse me — is this you?"))
-            print("\n")
+            print()
             type.type("You hold up the " + cyan(bright("Forged Documents")) + ". She frowns, compares photos, sighs.")
-            print("\n")
+            print()
             type.type(quote("Sorry. Wrong person."))
-            print("\n")
+            print()
             type.type("They pack up and leave. The name on those documents will never appear in a headline.")
             self.restore_sanity(3)
-            print("\n")
+            print()
             return
         type.type("A reporter has tracked you down to your car. Camera crew and everything.")
-        print("\n")
+        print()
         type.type(quote("Local Gambler Attempts Million Dollar Challenge! How do you feel about your chances?"))
-        print("\n")
+        print()
         type.type("They shove a microphone in your face.")
-        print("\n")
+        print()
         answer = ask.option("What do you say? ", ["confident", "humble", "no comment"])
         if answer == "confident":
             type.type(quote("I've got this. The million is mine. Watch me."))
-            print("\n")
+            print()
             type.type("You'll either look like a legend or an idiot tomorrow.")
         elif answer == "humble":
             type.type(quote("I'm just taking it one day at a time. Anything can happen."))
-            print("\n")
+            print()
             type.type("Boring, but safe.")
         else:
             type.type("You push past them without a word.")
-            print("\n")
+            print()
             type.type(quote("Mysterious! We love it! The Silent Gambler!"))
-        print("\n")
+        print()
         type.type("Great. Now everyone knows who you are.")
         self.meet("Media Attention")
-        print("\n")
+        print()
 
     def casino_owner_meeting(self):
         if self.has_met("Casino Owner"):
@@ -1821,42 +2006,42 @@ class DayWealthMixin:
             return
         self.meet("Casino Owner")
         type.type("You step out of your car and head to the casino. An employee pulls you aside. " + quote("The owner would like to meet you."))
-        print("\n")
+        print()
         type.type("You're led to a private office. Leather furniture. Cigar smoke. Old money.")
-        print("\n")
+        print()
         type.type("The owner is ancient. Wrinkled. Eyes like a shark.")
-        print("\n")
+        print()
         type.type(quote("You're quite the player. I've been watching you."))
-        print("\n")
+        print()
         type.type("He offers you a drink. You're not sure if this is hospitality or intimidation.")
-        print("\n")
+        print()
         type.type(quote("Make your million. Take your victory lap. But remember—the house always wins eventually."))
-        print("\n")
+        print()
         type.type("He smiles, but it doesn't reach his eyes.")
-        print("\n")
+        print()
         type.type(quote("Come back anytime. We'll be waiting."))
         if self.has_item("Blackmail Letter"):
-            print("\n")
+            print()
             type.type("You reach into your pocket and produce the " + cyan(bright("Blackmail Letter")) + ". His shark eyes flicker.")
-            print("\n")
+            print()
             type.type(quote("Where did you get that?"))
-            print("\n")
+            print()
             type.type("Suddenly you're the one with leverage. You name a number. He pays it — quietly, quickly, without a word.")
             amount = random.randint(500, 1000)
-            print("\n")
+            print()
             type.type("The meeting ends with " + green(bright("$" + str(amount))) + " changing hands. Old money isn't so untouchable after all.")
             self.change_balance(amount)
             self.restore_sanity(5)
         elif self.has_item("Evidence Kit"):
-            print("\n")
+            print()
             type.type("As he talks, the " + cyan(bright("Evidence Kit")) + " has you cataloging everything. The cigar brand. The photos on the wall. The ledger just visible in his desk drawer.")
-            print("\n")
+            print()
             type.type("Information is currency. You've just filled your pockets.")
             self.restore_sanity(3)
             self.add_status("Evidence Collected")
         else:
             self.lose_sanity(10)
-        print("\n")
+        print()
 
     # ==========================================
     # NEW CREATIVE EVENTS - SILLY, WEIRD, DARK, GOOFY
@@ -1870,11 +2055,11 @@ class DayWealthMixin:
             self.day_event()
             return
         type.type("A police car pulls up next to you. Your heart stops.")
-        print("\n")
+        print()
         type.type(quote("Sir, can you step out of the vehicle?"))
-        print("\n")
+        print()
         type.type("They have photos. Security footage. The ATM. You taking the money.")
-        print("\n")
+        print()
         chance = random.randrange(10)
         if chance < 5:
             type.type("They give you a ticket. $200 fine for petty theft. Consider yourself lucky.")
@@ -1888,13 +2073,13 @@ class DayWealthMixin:
             self.remove_danger("ATM Theft")
         else:
             type.type("The bank is pressing charges. Felony theft. You spend three months in jail.")
-            print("\n")
+            print()
             type.type("When you get out, you're broke. Broken. But free.")
             self.change_balance(-self.get_balance())
             self.lose_sanity(50)
             self.hurt(30)
             self.remove_danger("ATM Theft")
-        print("\n")
+        print()
 
     # === WEAKENED IMMUNE SYSTEM CHAIN ===
 
@@ -1905,17 +2090,17 @@ class DayWealthMixin:
         if not has_access:
             if self.has_item("Old Money Identity"):
                 type.type("You approach the High Roller entrance. No keycard — but you carry the " + cyan(bright("Old Money Identity")) + ".")
-                print("\n")
+                print()
                 type.type("Old money always carries weight in rooms like this. The bouncer nods and waves you through without a word.")
-                print("\n")
+                print()
                 has_access = True
             elif self.has_item("Heirloom Set"):
                 type.type("The bouncer eyes you skeptically. Then he notices the " + cyan(bright("Heirloom Set")) + " — the pen, the watch, the cufflinks.")
-                print("\n")
+                print()
                 type.type("He straightens up. People who own things like that belong everywhere they choose to be.")
-                print("\n")
+                print()
                 type.type(quote("Right this way, sir."))
-                print("\n")
+                print()
                 has_access = True
             if not has_access:
                 self.day_event()
@@ -1926,28 +2111,28 @@ class DayWealthMixin:
             type.type("You flash your " + magenta(bright("Casino VIP Card")) + " at the entrance. The red rope parts like the Red Sea.")
         else:
             type.type("You leave your car and head to the casino. You use your High Roller Keycard. The doors slide open.")
-        print("\n")
+        print()
         type.type("It's another world in here. Velvet ropes. Crystal chandeliers. Free champagne.")
-        print("\n")
+        print()
         type.type("The other high rollers barely glance at you. You don't belong here. They know it.")
-        print("\n")
+        print()
         type.type("But for one night, you pretend.")
         if self.has_item("Storm Suit"):
-            print("\n")
+            print()
             type.type("Except you're wearing a full " + cyan(bright("Storm Suit")) + ". Someone assumes you're the DJ and hands you a USB drive.")
-            print("\n")
+            print()
             type.type("Inside, a man in a tailored suit offers you a sponsorship deal. You decline. But the room is YOURS tonight.")
             self.restore_sanity(5)
             self.change_balance(random.randint(100, 300))
         elif self.has_item("Beach Bum Disguise"):
-            print("\n")
+            print()
             type.type("The " + cyan(bright("Beach Bum Disguise")) + " has the staff convinced you're hired entertainment.")
-            print("\n")
+            print()
             type.type("They set you up at the best table with free drinks. Whatever the bit is, it's working.")
             self.restore_sanity(5)
         self.restore_sanity(10)
         self.heal(10)
-        print("\n")
+        print()
 
     def high_roller_whale(self):
         has_access = (self.has_item("High Roller Keycard") or
@@ -1961,21 +2146,21 @@ class DayWealthMixin:
             return
         self.meet("Met the Whale")
         type.type("You head to the casino. A massive man in a tailored suit sits next to you at the high roller bar.")
-        print("\n")
+        print()
         type.type(quote("You're new here. I can tell. What's your story?"))
-        print("\n")
+        print()
         type.type("You give him the short version. The million dollar goal. The car. All of it.")
-        print("\n")
+        print()
         type.type("He laughs. Not cruelly. Almost fondly.")
-        print("\n")
+        print()
         type.type(quote("I started the same way. Sleeping in a truck. Now look at me."))
-        print("\n")
+        print()
         type.type("He slides you a chip. Black. Worth $500.")
-        print("\n")
+        print()
         type.type(quote("Consider it a loan from a kindred spirit. Pay it forward someday."))
         self.change_balance(500)
         self.restore_sanity(15)
-        print("\n")
+        print()
 
     # === OLD RIVAL CHAIN ===
 
@@ -1988,37 +2173,37 @@ class DayWealthMixin:
             return
         self.meet("Rival Confrontation")
         type.type("You step out of your car and head to the casino. You see Jake Morrison again. This time, you're not letting him walk away.")
-        print("\n")
+        print()
         type.type(quote("Jake. Wait."))
-        print("\n")
+        print()
         type.type("He turns. That same smug expression. " + quote("What do you want?"))
-        print("\n")
+        print()
         answer = ask.option("What do you say? ", ["apologize", "confront", "ask for help"])
-        print("\n")
+        print()
         if answer == "apologize":
             type.type(quote("I'm sorry. For... everything. Back then."))
-            print("\n")
+            print()
             type.type("His expression softens. Just a little.")
-            print("\n")
+            print()
             type.type(quote("Yeah. Me too. Take care of yourself, man."))
             self.restore_sanity(10)
         elif answer == "confront":
             type.type(quote("You think you're better than me? You're just luckier."))
-            print("\n")
+            print()
             type.type("He laughs. " + quote("Keep telling yourself that. I'll be in my house. You'll be in your car."))
-            print("\n")
+            print()
             type.type("He walks away. You stand there, fists clenched, trembling with rage.")
             self.lose_sanity(15)
         else:
             type.type(quote("I need help. I'm... I'm in trouble. Bad trouble."))
-            print("\n")
+            print()
             type.type("For a moment, something flickers in his eyes. Pity? Concern?")
-            print("\n")
+            print()
             type.type(quote("I can't help you, man. I'm sorry. Get some real help."))
-            print("\n")
+            print()
             type.type("He leaves. At least he said sorry. That's something.")
             self.lose_sanity(5)
-        print("\n")
+        print()
 
     # === MEDIA KNOWN CHAIN ===
 
@@ -2027,16 +2212,16 @@ class DayWealthMixin:
             self.day_event()
             return
         type.type("You step out of your car and someone recognizes you from the news. They're filming you with their phone.")
-        print("\n")
+        print()
         type.type(quote("This is the homeless hero guy! He's gambling! Isn't that ironic?!"))
-        print("\n")
+        print()
         type.type("They're laughing. Mocking you. You try to leave but they follow.")
-        print("\n")
+        print()
         type.type(quote("Homeless hero is GAMBLING! Content! Pure CONTENT!"))
-        print("\n")
+        print()
         type.type("Security finally escorts them out. But the damage is done. You feel exposed.")
         self.lose_sanity(15)
-        print("\n")
+        print()
 
     def media_known_documentary(self):
         if not self.has_met("Media Known"):
@@ -2047,22 +2232,22 @@ class DayWealthMixin:
             return
         self.meet("Documentary Offer")
         type.type("A filmmaker approaches your car. Says they want to make a documentary about you.")
-        print("\n")
+        print()
         type.type(quote("Your story is compelling. The struggle. The goal. The hope."))
-        print("\n")
+        print()
         type.type(quote("We'll pay you $5000 for your participation."))
-        print("\n")
+        print()
         answer = ask.yes_or_no("Agree to the documentary? ")
         if answer == "yes":
             type.type("They film you for weeks. The good days. The bad days. All of it.")
-            print("\n")
+            print()
             type.type("It's exposing. Humiliating sometimes. But $5000 is $5000.")
             self.change_balance(5000)
             self.lose_sanity(10)
             self.restore_sanity(5)  # Mixed feelings
         else:
             type.type("You decline. Some things aren't for sale.")
-        print("\n")
+        print()
 
     # === DAMAGED EXHAUST CHAIN ===
 
@@ -2075,11 +2260,11 @@ class DayWealthMixin:
             return
         self.meet("Car Booted")
         type.type("You return to your car to find a boot on your wheel.")
-        print("\n")
+        print()
         type.type("A bright yellow wheel clamp. Can't drive. Can't move. Trapped.")
-        print("\n")
+        print()
         type.type("The fine is $300 to get it removed. Plus your unpaid tickets.")
-        print("\n")
+        print()
         if self.get_balance() >= 300:
             answer = ask.yes_or_no("Pay to remove the boot? ($300) ")
             if answer == "yes":
@@ -2094,16 +2279,16 @@ class DayWealthMixin:
             type.type("You can't afford it. Your home is now an immobile brick.")
             self.remove_item("Car")
             self.add_danger("Booted Car")
-        print("\n")
+        print()
 
     def booted_car_impound(self):
         if not self.has_danger("Booted Car"):
             self.day_event()
             return
         type.type("The tow truck arrives. They're impounding your car.")
-        print("\n")
+        print()
         type.type(quote("Unpaid tickets plus boot removal plus impound fee. That's $800 to get it back."))
-        print("\n")
+        print()
         if self.get_balance() >= 800:
             answer = ask.yes_or_no("Pay to get your car back? ($800) ")
             if answer == "yes":
@@ -2122,7 +2307,7 @@ class DayWealthMixin:
             type.type("You don't have $800. You watch helplessly as they take everything.")
             self.lose_sanity(50)
             self.remove_danger("Booted Car")
-        print("\n")
+        print()
 
     # === RANDOM SMALL EVENTS ===
 

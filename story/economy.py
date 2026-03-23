@@ -99,13 +99,18 @@ class EconomyMixin:
             self._fraudulent_cash = max(0, min(int(self._fraudulent_cash), self._balance))
 
     def change_balance(self, value):
-        print("\n")
+        # Achievement tracking before balance change
+        old_balance = self._balance
+        print()
         if (self._balance + value) <= 0:
             self._balance = 0
+            self._was_broke = True
+            if old_balance >= 950000:
+                self._reached_950k = True
             if hasattr(self, "_fraudulent_cash"):
                 self._fraudulent_cash = 0
             type.type("Your new balance is " + red(bright("$0")))
-            print("\n")
+            print()
             self.status()
             return
         else:
@@ -119,7 +124,17 @@ class EconomyMixin:
             if self.can_see_fraudulent_cash():
                 print()
                 type.type(cyan("The monocle reveals ") + yellow(bright("${:,}".format(self.visible_fraudulent_cash()))) + cyan(" in hot money."))
-        print("\n")
+        # Achievement balance tracking
+        if self._balance >= 950000:
+            self._reached_950k = True
+        if self._balance >= 1000000:
+            self._was_millionaire_ach = True
+        # Track big swings (crossing 100k boundary) for yo_yo
+        now_above = self._balance >= 100000
+        if hasattr(self, '_last_swing_above') and now_above != self._last_swing_above:
+            self._big_swing_count += 1
+        self._last_swing_above = now_above
+        print()
 
     def get_rank(self):
         return self._rank

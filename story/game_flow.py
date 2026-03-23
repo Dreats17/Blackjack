@@ -55,15 +55,37 @@ class GameFlowMixin:
         # Record how much was won since the previous morning (casino + any balance events)
         self._today_winnings = max(0, self.get_balance() - self._balance_at_day_start)
         self._balance_at_day_start = self.get_balance()
-        print("\n")
+        print()
         type.slow(bright(yellow("═" * 50)))
         type.typeover("Press a key to continue:", bright(yellow("~ ~ ~ Morning, Day " + str(self._day) + " ~ ~ ~ ")), True)
         type.slow(bright(yellow("═" * 50)))
-        print("\n")
+        print()
 
         # ============================================
         # DAILY SYSTEM UPDATES
         # ============================================
+
+        # EARLY GAME ASSISTS
+        if self._day <= 3 and not self.has_status("Beginner's Luck"):
+            self.add_status("Beginner's Luck")
+            if self._day == 1:
+                type.type("Something about tonight feels different. The cards haven't been dealt yet, but you've got a feeling.")
+                print()
+                type.type(cyan("Beginner's Luck") + " — the universe gives newcomers a break. For now.")
+                print()
+        if self._day > 3 and self.has_status("Beginner's Luck"):
+            self.remove_status("Beginner's Luck")
+            type.type("The warm feeling in your gut fades. " + yellow("Beginner's Luck") + " has worn off.")
+            print()
+            type.type("You're on your own now. The real game starts here.")
+            print()
+        if self._day <= 5 and self.get_balance() <= 5:
+            mercy = random.randint(15, 30)
+            type.type("You check your pockets and find a crumpled bill you forgot about. " + green(bright("${:,}".format(mercy))) + ".")
+            print()
+            type.type("Not much, but enough to keep going.")
+            self.change_balance(mercy)
+            print()
         
         # Update companions (happiness decay, check for runaways)
         self.update_companions_daily()
@@ -79,6 +101,53 @@ class GameFlowMixin:
         # Update day survival statistic
         self.increment_statistic("days_survived")
         
+        # ============================================
+        # DAILY ACHIEVEMENT TRACKING
+        # ============================================
+        # Reset daily trackers
+        self._shops_visited_today = set()
+        self._locations_visited_today = set()
+        self._daily_hands_won = 0
+        self._daily_hands_lost = 0
+        self._daily_hands_total = 0
+        self._dealer_happiness_day_start = self._dealer_happiness
+        
+        # Consecutive condition counters
+        if self._is_injured or len(self._injuries) > 0:
+            self._consecutive_injury_days += 1
+        else:
+            self._consecutive_injury_days = 0
+        if self._is_sick:
+            self._consecutive_sick_days += 1
+        else:
+            self._consecutive_sick_days = 0
+        if self._health < 25:
+            self._days_low_health += 1
+        if self._sanity < 30:
+            self._days_low_sanity += 1
+        if self._dealer_happiness < 5:
+            self._days_dealer_low += 1
+        if self._dealer_happiness >= 90:
+            self._days_dealer_high += 1
+        else:
+            self._days_dealer_high = 0
+        
+        # Cursed item tracking
+        cursed_items = {"Cursed Coin", "Devil's Deck", "Binding Portrait", "Necronomicon", "Voodoo Doll", "Dealer's Grudge"}
+        if any(self.has_item(c) for c in cursed_items):
+            self._days_with_cursed += 1
+        
+        # Hermit tracking (increment if player stayed home yesterday, reset otherwise)
+        if len(self._shops_visited_today) == 0 and self._day > 1:
+            self._days_at_camp += 1
+        else:
+            self._days_at_camp = 0
+        # Money hoarder tracking
+        if self._balance >= 500000:
+            self._days_not_spending += 1
+        else:
+            self._days_not_spending = 0
+        
         # Check achievements
         self.check_achievements()
 
@@ -89,13 +158,13 @@ class GameFlowMixin:
         # Suzy's Gift - Slow sanity restoration from her kindness
         if self.apply_suzys_gift_effects():
             type.slow(cyan("You hold Suzy's Gift close. It's warm. Comforting. You feel a little more like yourself."))
-            print("\n")
+            print()
         
         # Necronomicon - Corrupts the soul
         if self.apply_necronomicon_effects():
             if random.randrange(3) == 0:  # Sometimes show a hint
                 type.slow(red("The whispers in your skull are louder this morning. The book pulses in your bag."))
-                print("\n")
+                print()
         
         # Cursed Coin - Random misfortune
         if self.apply_cursed_coin_effects():
@@ -106,7 +175,7 @@ class GameFlowMixin:
                 "Your coffee was somehow already cold. You didn't even have coffee. Where did this cold coffee come from?"
             ])
             type.type(cursed_effect)
-            print("\n")
+            print()
             if random.randrange(5) == 0:
                 small_loss = random.randint(5, 25)
                 type.type("You realize you've lost " + red(bright("${:,}".format(small_loss))) + " somewhere. Weird.")
@@ -117,7 +186,7 @@ class GameFlowMixin:
         if item_flavor:
             item_name, text = item_flavor
             type.slow(cyan(text.replace("{item}", bright(item_name))))
-            print("\n")
+            print()
 
         # Broken state effects at start of day
         if self._is_broken:
@@ -126,7 +195,7 @@ class GameFlowMixin:
             if random.randrange(3) == 0:
                 effect = self.get_broken_effect()
                 type.slow(red(effect))
-                print("\n")
+                print()
         # Display sanity status at start of day
         elif self._sanity <= 75:
             print()
@@ -140,7 +209,7 @@ class GameFlowMixin:
         sleep_quality = self.get_sleep_quality()
         sleep_text = self._lists.get_sleep_text(sleep_quality)
         type.type(sleep_text)
-        print("\n")
+        print()
 
         # MILLIONAIRE MORNING - Special visitor when you've hit $1M and still have it
         if self.is_millionaire() and self._balance >= 1000000 and not self.was_millionaire_visited():
@@ -268,7 +337,7 @@ class GameFlowMixin:
         event = getattr(self, event_name)
         print()
         type.type(yellow("=== CAR TROUBLE ==="))
-        print("\n")
+        print()
         event()
 
         # If the event left the player stranded for the afternoon, give their
@@ -328,7 +397,7 @@ class GameFlowMixin:
         damage = 0
         if self._clear_all_status == True:
             type.type("Whatever the Witch Doctor gave you yesterday, it worked wonders on you. You feel amazing, as though your body had been completely cleansed.")
-            print("\n")
+            print()
             self._status_effects = set()
             self._injuries = set()
             self._is_sick = False
@@ -359,7 +428,7 @@ class GameFlowMixin:
                 else:
                     damage += random.choice([7, 9, 11, 13, 15])
                     type.type("Your spider bite is purple and pussing. A trip to the doctors might be a good idea. ")
-            print("\n")
+            print()
 
             if damage >= self._health:
                 self.hurt(damage)
@@ -382,7 +451,7 @@ class GameFlowMixin:
             elif days_elapsed >= 3:
                 damage += random.choice([7, 14, 18, 22, 26, 30])
                 type.type("Your snake bite is turning black. A trip to the doctors is probably the right choice. ")
-            print("\n")
+            print()
 
             if damage >= self._health:
                 self.hurt(damage)
@@ -400,7 +469,7 @@ class GameFlowMixin:
             elif (days_elapsed == 5):
                 self.remove_status("Squirrel Bite")
                 type.type("Your squirrel bite is starting to heal. ")
-            print("\n")
+            print()
 
         # Rat Bite
         if self.has_status("Rat Bite"):
@@ -416,7 +485,7 @@ class GameFlowMixin:
             elif (days_elapsed == 5):
                 self.remove_status("Rat Bite")
                 type.type("Your rat bite is starting to heal. ")
-            print("\n")
+            print()
 
         # Rabies
         if self.has_status("Rabies"):
@@ -427,12 +496,12 @@ class GameFlowMixin:
                 type.type(red("Your mouth has begun to foam. It seems you've contracted rabies. Death is inevitable, and it's hurdling towards you."))
                 damage += random.choice([10, 30, 50, 70])
                 self.lose_sanity(random.choice([5, 6, 7]))  # Rabies symptoms severely drain sanity
-                print("\n")
+                print()
             elif days_elapsed==4:
                 type.type(red("The foaming has gotten worse, to the point where you begin to choke on it. You have a seizure in your car. Life is coming to an end."))
                 damage += random.choice([50, 70, 90])
                 self.lose_sanity(random.choice([8, 10, 12]))  # Advanced rabies destroys your mind
-                print("\n")
+                print()
             elif days_elapsed==5:
                 type.slow(red(bright("Your mind has gone completely insane. You start tearing at your face, ripping away chunks of skin. The foam in your mouth turns red, and you feel yourself begin to fade from existance. You pull your eyes from their sockets, and scream in agony, as you die a painful death.")))
                 self.kill()
@@ -570,12 +639,12 @@ class GameFlowMixin:
             else:
                 type.type("You feel much less sick than you did yesterday, which is always good.")
             self._is_sick = False
-            print("\n")
+            print()
 
         # if player is sick, prints a sickness update
         if self._is_sick:
             type.type(self._lists.get_sickness_update())
-            print("\n")
+            print()
 
         # If sickness kills the player, this does it.
         if damage >= self._health:
@@ -589,14 +658,28 @@ class GameFlowMixin:
         # Sets is_injured to False if you have 0 injuries, and prints a healed update
         if (self._is_injured) and len(self._injuries)==0:
             type.type("The injuries on your body are doing much better.")
-            print("\n")
+            print()
             self._is_injured = False
         
         # If you're injured, prints an injury update, and adds damage
         if self._is_injured:
             damage += len(self._injuries)
             type.type(self._lists.get_injury_update())
-            print("\n")
+            print()
+
+        # Necronomicon Madness - cumulative sanity drain from repeated readings
+        if self.has_status("Necronomicon Madness"):
+            madness_drain = min(self._necronomicon_readings, 5)
+            self.lose_sanity(madness_drain)
+            if random.randrange(3) == 0:
+                madness_flavor = random.choice([
+                    "The whispers in your skull form words you almost understand.",
+                    "You see symbols from the Necronomicon in the cracks of the dashboard.",
+                    "Something behind your eyes is reading. You're not sure it's you.",
+                    "Your shadow moved wrong. Just for a second. But you saw it.",
+                ])
+                type.type(red(madness_flavor))
+                print()
 
         # If you took damage, this does it.
         if damage > 0:
@@ -611,14 +694,14 @@ class GameFlowMixin:
             self.kill_pests()
             type.type("After giving the wagon a minute to air out, you get back inside.")
             self.restore_sanity(3)
-            print("\n")
+            print()
 
         # Feeds Squirrely if you have Acorns
         if self.has_item("Bag of Acorns") and self.has_item("Squirrely"):
             type.type("You give Squirrely your " + magenta(bright("Bag of Acorns")) + ", and he goes to town, munching down all of them. What a good squirrel.")
             self.use_item("Bag of Acorns")
             self.restore_sanity(3)
-            print("\n")
+            print()
 
         # Gives Squirrely Status Update
         if self.has_item("Squirrely"):
@@ -648,7 +731,7 @@ class GameFlowMixin:
                     type.type("Looking around, you can't find Squirrely anywhere. No, seriously, you can't find him anywhere. ")
                     type.type("And that smell, it reeks! You begin to fear for the worst. ")
                     type.type("Tearing the car apart, you find him, laying lifeless under the passenger seat. Poor Squirrely.")
-                    print("\n")
+                    print()
                     type.type("Using an old shirt, you pick Squirrely off the floor of the wagon. ")
                     type.type("Carrying him into the woods, you set him down, and dig a hole. ")
                     type.type("You place Squirrely inside, cover him up with dirt, and place a flower over the grave. ")
@@ -658,7 +741,7 @@ class GameFlowMixin:
                     self.lose_sanity(random.choice([5, 6, 7]))  # Finding Squirrely dead is traumatic
                 else:
                     type.type(self._lists.get_hungry_squirrely_update())
-            print("\n")
+            print()
 
         # COMPANION BONUS EFFECTS
         companions = self.get_all_companions()
@@ -676,10 +759,10 @@ class GameFlowMixin:
                     if name == "Whiskers":
                         if has_weather:
                             type.type(self._lists.get_whiskers_weather_update())
-                            print("\n")
+                            print()
                         elif happiness >= 70:
                             type.type(self._lists.get_whiskers_happy_update())
-                            print("\n")
+                            print()
                             total_sanity_restore += 2
                             # Whiskers senses danger - warns you about bad events
                             if random.randrange(15) == 0:
@@ -687,27 +770,27 @@ class GameFlowMixin:
                                           "She stares at something you can't see, then slowly relaxes. "
                                           "Whatever it was, it's gone now. Good kitty.")
                                 self.restore_sanity(1)
-                                print("\n")
+                                print()
                             # Whiskers catches vermin
                             if random.randrange(25) == 0:
                                 type.type(cyan(bright("Whiskers")) + " drops a dead mouse at your feet "
                                           "and looks at you with absolute pride. She's providing for the family. "
                                           "You pet her head. She earned it.")
-                                print("\n")
+                                print()
                             # Whiskers finds something
                             if random.randrange(40) == 0:
                                 found = random.randint(1, 3)
                                 type.type(cyan(bright("Whiskers")) + " bats something shiny out from under the seat. "
                                           "It rolls to your feet. " + green("${:,}".format(found)) + ". Not bad for a cat.")
                                 self.change_balance(found)
-                                print("\n")
+                                print()
                         elif happiness >= 40:
                             type.type(self._lists.get_whiskers_morning_update())
-                            print("\n")
+                            print()
                             total_sanity_restore += 1
                         else:
                             type.type(self._lists.get_whiskers_unhappy_update())
-                            print("\n")
+                            print()
                             # Very unhappy Whiskers might leave
                             if happiness <= 15 and random.randrange(8) == 0:
                                 type.type(red(bright("Whiskers")) + " looks at you one last time, then slips out the window. "
@@ -715,7 +798,7 @@ class GameFlowMixin:
                                           "She's gone. The car feels emptier already.")
                                 self.companion_dies(name)
                                 self.lose_sanity(random.choice([4, 5, 6]))
-                                print("\n")
+                                print()
                                 continue
 
                     # =====================
@@ -724,10 +807,10 @@ class GameFlowMixin:
                     elif name == "Lucky":
                         if has_weather:
                             type.type(self._lists.get_lucky_weather_update())
-                            print("\n")
+                            print()
                         elif happiness >= 70:
                             type.type(self._lists.get_lucky_happy_update())
-                            print("\n")
+                            print()
                             total_sanity_restore += 3
                             # Lucky guards the car
                             if random.randrange(20) == 0:
@@ -735,7 +818,7 @@ class GameFlowMixin:
                                           "The stranger backs off immediately. Nobody messes with a three-legged dog "
                                           "with that much heart.")
                                 self.restore_sanity(2)
-                                print("\n")
+                                print()
                             # Lucky finds buried treasure
                             if random.randrange(35) == 0:
                                 found = random.randint(2, 8)
@@ -743,20 +826,20 @@ class GameFlowMixin:
                                           "He drops it at your feet, tail going crazy. " + green("${:,}".format(found)) + 
                                           "! Good boy, Lucky!")
                                 self.change_balance(found)
-                                print("\n")
+                                print()
                             # Lucky brings you comfort when injured
                             if self._is_injured and random.randrange(3) == 0:
                                 type.type(cyan(bright("Lucky")) + " lies down gently next to you, pressing his warm body "
                                           "against your side. He can tell you're hurting. Dogs always know.")
                                 self.restore_sanity(3)
-                                print("\n")
+                                print()
                         elif happiness >= 40:
                             type.type(self._lists.get_lucky_morning_update())
-                            print("\n")
+                            print()
                             total_sanity_restore += 2
                         else:
                             type.type(self._lists.get_lucky_unhappy_update())
-                            print("\n")
+                            print()
                             # Very unhappy Lucky might leave
                             if happiness <= 15 and random.randrange(8) == 0:
                                 type.type(red(bright("Lucky")) + " stands by the car door, looking at you with those big brown eyes. "
@@ -764,7 +847,7 @@ class GameFlowMixin:
                                           "Three legs carrying him into the distance. You couldn't even bring yourself to stop him.")
                                 self.companion_dies(name)
                                 self.lose_sanity(random.choice([5, 6, 7]))
-                                print("\n")
+                                print()
                                 continue
 
                     # =====================
@@ -773,10 +856,10 @@ class GameFlowMixin:
                     elif name == "Mr. Pecks":
                         if has_weather:
                             type.type(self._lists.get_pecks_weather_update())
-                            print("\n")
+                            print()
                         elif happiness >= 70:
                             type.type(self._lists.get_pecks_happy_update())
-                            print("\n")
+                            print()
                             total_sanity_restore += 1
                             # Mr. Pecks finds money (his main bonus)
                             if random.randrange(12) == 0:
@@ -785,7 +868,7 @@ class GameFlowMixin:
                                           "right in your lap. It's " + green("${:,}".format(found)) + "! "
                                           "Where does he find this stuff? You stopped asking.")
                                 self.change_balance(found)
-                                print("\n")
+                                print()
                             # Mr. Pecks brings you an item
                             if random.randrange(50) == 0:
                                 crow_items = ["Shiny Button", "Bottle Cap", "Paper Clip", "Lucky Penny"]
@@ -793,17 +876,17 @@ class GameFlowMixin:
                                 type.type(cyan(bright("Mr. Pecks")) + " lands on the dashboard with something in his beak. "
                                           "He places it down carefully and caws once. It's a " + bright(gift) + ". "
                                           "He looks at you like it's the Crown Jewels.")
-                                print("\n")
+                                print()
                             # Mr. Pecks warns about danger
                             if random.randrange(20) == 0:
                                 type.type(cyan(bright("Mr. Pecks")) + " goes absolutely ballistic, cawing and flapping. "
                                           "You look around — there's a sketchy dude eyeing your car. Mr. Pecks dive-bombs him. "
                                           "The dude runs. " + cyan("Air support."))
                                 self.restore_sanity(1)
-                                print("\n")
+                                print()
                         elif happiness >= 40:
                             type.type(self._lists.get_pecks_morning_update())
-                            print("\n")
+                            print()
                             total_sanity_restore += 1
                             # Reduced money finding
                             if random.randrange(25) == 0:
@@ -811,10 +894,10 @@ class GameFlowMixin:
                                 type.type(cyan(bright("Mr. Pecks")) + " drops " + green("${:,}".format(found)) + 
                                           " at your feet. Not his best haul. But he's trying.")
                                 self.change_balance(found)
-                                print("\n")
+                                print()
                         else:
                             type.type(self._lists.get_pecks_unhappy_update())
-                            print("\n")
+                            print()
                             # Very unhappy Mr. Pecks might leave
                             if happiness <= 15 and random.randrange(8) == 0:
                                 type.type(red(bright("Mr. Pecks")) + " caws once — sharp, final — and takes flight. "
@@ -823,7 +906,7 @@ class GameFlowMixin:
                                           "He took his shiny collection with him.")
                                 self.companion_dies(name)
                                 self.lose_sanity(random.choice([3, 4, 5]))
-                                print("\n")
+                                print()
                                 continue
 
                     # =====================
@@ -832,10 +915,10 @@ class GameFlowMixin:
                     elif name == "Patches":
                         if has_weather:
                             type.type(self._lists.get_patches_weather_update())
-                            print("\n")
+                            print()
                         elif happiness >= 70:
                             type.type(self._lists.get_patches_happy_update())
-                            print("\n")
+                            print()
                             total_sanity_restore += 2
                             # Patches is nocturnal — she reports on the night
                             if random.randrange(15) == 0:
@@ -843,27 +926,27 @@ class GameFlowMixin:
                                           "something to tell you. She clicks her tongue rapidly. "
                                           "You don't speak opossum, but her tone says " + cyan("'coast is clear.'"))
                                 self.restore_sanity(1)
-                                print("\n")
+                                print()
                             # Patches plays dead to scare someone
                             if random.randrange(30) == 0:
                                 type.type("A stranger peers into your car and sees " + cyan(bright("Patches")) + 
                                           " lying motionless on the seat, mouth open, tongue out. "
                                           + red("'THERE'S A DEAD RAT IN THERE!'") + " they scream, and bolt. "
                                           "Patches opens one eye. Mission accomplished.")
-                                print("\n")
+                                print()
                             # Patches eats car pests
                             if self.has_pests() and random.randrange(5) == 0:
                                 type.type(cyan(bright("Patches")) + " found something crawling under the seat and ate it. "
                                           "She looks satisfied. Your pest problem just got a little smaller.")
                                 self.kill_pests()
-                                print("\n")
+                                print()
                         elif happiness >= 40:
                             type.type(self._lists.get_patches_morning_update())
-                            print("\n")
+                            print()
                             total_sanity_restore += 1
                         else:
                             type.type(self._lists.get_patches_unhappy_update())
-                            print("\n")
+                            print()
                             # Very unhappy Patches plays dead and won't stop
                             if happiness <= 15 and random.randrange(8) == 0:
                                 type.type(red(bright("Patches")) + " plays dead one morning. You wait an hour. Two hours. "
@@ -872,7 +955,7 @@ class GameFlowMixin:
                                           "Quietly. Like she always did everything.")
                                 self.companion_dies(name)
                                 self.lose_sanity(random.choice([4, 5, 6]))
-                                print("\n")
+                                print()
                                 continue
 
                     # =====================
@@ -881,10 +964,10 @@ class GameFlowMixin:
                     elif name == "Rusty":
                         if has_weather:
                             type.type(self._lists.get_rusty_weather_update())
-                            print("\n")
+                            print()
                         elif happiness >= 70:
                             type.type(self._lists.get_rusty_happy_update())
-                            print("\n")
+                            print()
                             total_sanity_restore += 2
                             # Rusty steals things (his main bonus)
                             if random.randrange(15) == 0:
@@ -899,7 +982,7 @@ class GameFlowMixin:
                                 else:
                                     type.type("He presents a " + bright(item) + " you already have. "
                                               "It's the thought that counts. And the crime.")
-                                print("\n")
+                                print()
                             # Rusty finds money
                             if random.randrange(20) == 0:
                                 found = random.randint(1, 8)
@@ -907,16 +990,16 @@ class GameFlowMixin:
                                           "Where was he keeping " + green("${:,}".format(found)) + "? "
                                           "The mystery of Rusty deepens.")
                                 self.change_balance(found)
-                                print("\n")
+                                print()
                             # Rusty opens something for you
                             if random.randrange(35) == 0:
                                 type.type(cyan(bright("Rusty")) + " picks the lock on the glovebox. "
                                           "No, wait, it wasn't locked. He just wanted to practice. "
                                           "Those little fingers are scary good.")
-                                print("\n")
+                                print()
                         elif happiness >= 40:
                             type.type(self._lists.get_rusty_morning_update())
-                            print("\n")
+                            print()
                             total_sanity_restore += 1
                             # Reduced stealing
                             if random.randrange(35) == 0:
@@ -926,10 +1009,10 @@ class GameFlowMixin:
                                     self.add_item(item)
                                     type.type(cyan(bright("Rusty")) + " leaves a " + bright(magenta(item)) + 
                                               " on the dashboard. No fanfare. Just a gift.")
-                                    print("\n")
+                                    print()
                         else:
                             type.type(self._lists.get_rusty_unhappy_update())
-                            print("\n")
+                            print()
                             # Very unhappy Rusty hoards everything and leaves
                             if happiness <= 15 and random.randrange(8) == 0:
                                 type.type(red(bright("Rusty")) + " gathers up every single thing he's stolen. "
@@ -938,7 +1021,7 @@ class GameFlowMixin:
                                           "The car feels robbed. In every sense.")
                                 self.companion_dies(name)
                                 self.lose_sanity(random.choice([4, 5, 6]))
-                                print("\n")
+                                print()
                                 continue
 
                     # =====================
@@ -947,10 +1030,10 @@ class GameFlowMixin:
                     elif name == "Slick":
                         if has_weather:
                             type.type(self._lists.get_slick_weather_update())
-                            print("\n")
+                            print()
                         elif happiness >= 70:
                             type.type(self._lists.get_slick_happy_update())
-                            print("\n")
+                            print()
                             total_sanity_restore += 1
                             # Slick finds escape routes
                             if random.randrange(18) == 0:
@@ -958,26 +1041,26 @@ class GameFlowMixin:
                                           "You look — there's a hole in the floor you never noticed. "
                                           "Slick already found three ways out. Just in case. Always just in case.")
                                 self.restore_sanity(1)
-                                print("\n")
+                                print()
                             # Slick warns you about danger
                             if random.randrange(20) == 0:
                                 type.type(cyan(bright("Slick")) + " suddenly goes rigid, ears up, whiskers vibrating. "
                                           "He stares at the door. You lock it. Whatever he sensed, you trust his instincts.")
                                 self.restore_sanity(1)
-                                print("\n")
+                                print()
                             # Slick finds food
                             if random.randrange(30) == 0:
                                 type.type(cyan(bright("Slick")) + " drags out a cracker he'd hidden behind the seat cushion. "
                                           "Then another. Then a whole stash of crumbs. He's been saving for a rainy day. "
                                           "Today, he shares.")
-                                print("\n")
+                                print()
                         elif happiness >= 40:
                             type.type(self._lists.get_slick_morning_update())
-                            print("\n")
+                            print()
                             total_sanity_restore += 1
                         else:
                             type.type(self._lists.get_slick_unhappy_update())
-                            print("\n")
+                            print()
                             # Very unhappy Slick escapes
                             if happiness <= 15 and random.randrange(8) == 0:
                                 type.type(red(bright("Slick")) + " squeezes through a crack in the car you didn't even know existed. "
@@ -985,7 +1068,7 @@ class GameFlowMixin:
                                           "He was always ready to leave. He was just hoping he wouldn't have to.")
                                 self.companion_dies(name)
                                 self.lose_sanity(random.choice([3, 4, 5]))
-                                print("\n")
+                                print()
                                 continue
 
                     # =====================
@@ -994,10 +1077,10 @@ class GameFlowMixin:
                     elif name == "Hopper":
                         if has_weather:
                             type.type(self._lists.get_hopper_weather_update())
-                            print("\n")
+                            print()
                         elif happiness >= 70:
                             type.type(self._lists.get_hopper_happy_update())
-                            print("\n")
+                            print()
                             total_sanity_restore += 2
                             # Hopper brings luck
                             if random.randrange(15) == 0:
@@ -1006,27 +1089,27 @@ class GameFlowMixin:
                                           green("${:,}".format(found)) + " coin falls out of nowhere. "
                                           "Lucky rabbit. Literally. The luck is literal.")
                                 self.change_balance(found)
-                                print("\n")
+                                print()
                             # Hopper is therapeutic
                             if random.randrange(10) == 0:
                                 type.type(cyan(bright("Hopper")) + " crawls into your lap and tooth-purrs. "
                                           "The gentle vibration is better than meditation. Better than therapy. "
                                           "This rabbit is the single most calming force in your life.")
                                 self.restore_sanity(3)
-                                print("\n")
+                                print()
                             # Hopper finds food
                             if random.randrange(30) == 0:
                                 type.type(cyan(bright("Hopper")) + " digs up a patch of clover outside the car. "
                                           "She eats most of it but leaves some for you. "
                                           "You eat clover from the ground. This is your life now.")
-                                print("\n")
+                                print()
                         elif happiness >= 40:
                             type.type(self._lists.get_hopper_morning_update())
-                            print("\n")
+                            print()
                             total_sanity_restore += 1
                         else:
                             type.type(self._lists.get_hopper_unhappy_update())
-                            print("\n")
+                            print()
                             # Very unhappy Hopper bolts
                             if happiness <= 15 and random.randrange(8) == 0:
                                 type.type(red(bright("Hopper")) + " stares at the open car door. You see it in her eyes — "
@@ -1035,7 +1118,7 @@ class GameFlowMixin:
                                           "and she's gone before you can even say her name.")
                                 self.companion_dies(name)
                                 self.lose_sanity(random.choice([4, 5, 6]))
-                                print("\n")
+                                print()
                                 continue
 
                     # =====================
@@ -1044,17 +1127,17 @@ class GameFlowMixin:
                     elif name == "Squirrelly":
                         if has_weather:
                             type.type(self._lists.get_squirrelly_comp_weather_update())
-                            print("\n")
+                            print()
                         elif happiness >= 70:
                             type.type(self._lists.get_squirrelly_comp_happy_update())
-                            print("\n")
+                            print()
                             total_sanity_restore += 2
                             # Squirrelly hides acorns everywhere
                             if random.randrange(20) == 0:
                                 type.type(cyan(bright("Squirrelly")) + " was busy last night. She buried acorns "
                                           "in your shoes, under the seat, inside the glove box, and somehow "
                                           "inside a sealed water bottle. The squirrel economy is booming.")
-                                print("\n")
+                                print()
                             # Squirrelly finds money
                             if random.randrange(25) == 0:
                                 found = random.randint(1, 4)
@@ -1062,21 +1145,21 @@ class GameFlowMixin:
                                           green("${:,}".format(found)) + " she found under a rock. "
                                           "She looks at you like she deserves a medal. She does.")
                                 self.change_balance(found)
-                                print("\n")
+                                print()
                             # Squirrelly makes you laugh
                             if random.randrange(12) == 0:
                                 type.type(cyan(bright("Squirrelly")) + " stuffs both cheeks so full of seeds she looks like "
                                           "a tiny furry balloon. She tries to chirp and seeds spray everywhere. "
                                           "You laugh. Actually laugh. It's been a while.")
                                 self.restore_sanity(2)
-                                print("\n")
+                                print()
                         elif happiness >= 40:
                             type.type(self._lists.get_squirrelly_comp_morning_update())
-                            print("\n")
+                            print()
                             total_sanity_restore += 1
                         else:
                             type.type(self._lists.get_squirrelly_comp_unhappy_update())
-                            print("\n")
+                            print()
                             # Very unhappy Squirrelly runs away
                             if happiness <= 15 and random.randrange(8) == 0:
                                 type.type(red(bright("Squirrelly")) + " sits on the window ledge, chittering softly. "
@@ -1085,7 +1168,7 @@ class GameFlowMixin:
                                           "You wait for an hour. She doesn't come back. She chose the trees.")
                                 self.companion_dies(name)
                                 self.lose_sanity(random.choice([4, 5, 6]))
-                                print("\n")
+                                print()
                                 continue
 
                     # =====================
@@ -1098,11 +1181,11 @@ class GameFlowMixin:
                         if happiness >= 60:
                             dialogue = self._lists.get_companion_dialogue(name, "happy")
                             type.type(dialogue)
-                            print("\n")
+                            print()
                         elif happiness < 30:
                             dialogue = self._lists.get_companion_dialogue(name, "sad")
                             type.type(dialogue)
-                            print("\n")
+                            print()
             
             # Multi-companion interaction
             companion_count = sum(1 for n, d in companions.items() if d["status"] == "alive")
@@ -1119,7 +1202,7 @@ class GameFlowMixin:
                     cyan(bright(pair[0])) + " and " + cyan(bright(pair[1])) + " sleep touching noses. You take a mental photograph.",
                 ]
                 type.type(random.choice(interactions))
-                print("\n")
+                print()
 
             if total_sanity_restore > 0:
                 if companion_count > 1:
@@ -1129,7 +1212,7 @@ class GameFlowMixin:
                     if alive_name:
                         type.type("Having " + cyan(bright(alive_name)) + " by your side makes the world a little less cruel.")
                 self.restore_sanity(total_sanity_restore)
-                print("\n")
+                print()
 
     def get_unlocked_adventure_areas(self):
         """Returns a list of adventure areas the player can walk to.

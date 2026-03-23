@@ -640,12 +640,12 @@ class GameDocumentationGenerator:
         special_items = [
             ("Grandfather Clock", "Running joke item, Dealer comments on it"),
             ("Suzy's Gift", "Heartwarming stuffed animal from Suzy"),
-            ("Witch's Favor", "Single-use emergency help"),
+            ("Witch's Favor", "Met marker (witch grants Lucky status)"),
             ("Map", "Unlocks Marvin's Mystical Merchandise"),
             ("Quiet Sneakers", "Avoid bear attacks, has durability"),
             ("Gambler's Charm", "Luck bonus at blackjack"),
             ("Gator Tooth Necklace", "Gators respect you in swamp"),
-            ("Bear King's Respect", "Bears won't attack you"),
+            ("Bear King's Respect", "Met marker (earned by defeating giant bear)"),
         ]
         for item, effect in special_items:
             lines.append(f"  {item.ljust(25)} {effect}")
@@ -669,7 +669,7 @@ class GameDocumentationGenerator:
             ("At Peace", "Sanity restores faster"),
             ("Energized", "Temporary health regeneration"),
             ("Witch's Blessing", "Good fortune in events"),
-            ("Fairy Lucky", "Enhanced luck from fairy"),
+            ("Lucky", "20% push-on-loss from various events (fairy, witch, mermaid, etc.)"),
             ("Dog Blessed", "Companion bonuses enhanced"),
         ]
         for status, effect in positive:

@@ -96,16 +96,18 @@ The convenience store restocks between visits. Inventory depends on your **wealt
 | Item | Price | Blackjack Effect |
 |------|------:|-----------------|
 | Sneaky Peeky Shades | $14,000 | Peek at next card |
-| Pocket Watch | $9,000 | 4 extra rounds per session |
-| Gambler's Chalice | $11,000 | Enhanced double down |
-| Twin's Locket | $14,000 | Enables splitting pairs |
-| White Feather | $5,000 | Unlocks surrender |
+| Pocket Watch | $9,000 | 4 extra rounds per session; also shows up in time-themed world events |
+| Gambler's Chalice | $11,000 | Enhanced double down; also appears in ritualized social and night-drinking scenes |
+| Twin's Locket | $14,000 | Enables splitting pairs; also reacts to identity and double-self scenes |
+| White Feather | $5,000 | Unlocks surrender; also influences mercy and survival scenes |
 | Lucky Coin | $4,000 | Converts losses to pushes |
 | Worn Gloves | $7,000 | Redraw on bust |
-| Tattered Cloak | $8,000 | Free round (dealer forgets bet) |
-| Dirty Old Hat | $9,000 | Lowers minimum bet |
-| Faulty Insurance | $4,000 | Cheaper doctor visits |
+| Tattered Cloak | $8,000 | Free round (dealer forgets bet); also supports stealth and surveillance-evasion scenes |
+| Dirty Old Hat | $9,000 | Lowers minimum bet; also helps in shabby-disguise or pity-based world scenes |
+| Faulty Insurance | $4,000 | Cheaper doctor visits; also sometimes softens emergency medical fallout |
 | *(+ 8 more)* | $3k–$30k | Various blackjack modifiers |
+
+Notable world-reactive Marvin items in the current build include `Pocket Watch` and `Grandfather Clock` for timing or omen scenes, `White Feather` and `Phoenix Feather` for mercy or survival interventions, `Twin's Locket` and `Mirror of Duality` for identity or double-self scenes, `Dirty Old Hat` and `Unwashed Hair` for shabby-disguise outcomes, `Faulty Insurance` and `Real Insurance` for medical bureaucracy and emergency coverage, `Marvin's Monocle` for truth-reading and hot-money calls, `Rusty Compass` and `Golden Compass` for route-finding and traveler guidance, `Tattered Cloak` and `Invisible Cloak` for stealth scenes, `Gambler's Chalice` and `Overflowing Goblet` for luxury-drink rituals, and `Enchanting Silver Bar` for value or appraisal beats.
 
 ---
 

@@ -185,9 +185,11 @@ class Player(
         self._favorite_color = None
         self._favorite_animal = None
         self._rabbit_chase = 0    # 0-6 tracking which rabbit chase event is next
+        self._recent_events = []  # Track last 3 day event names for time_loop achievement
         self._is_millionaire = False  # True when player hits $1M for the first time
         self._millionaire_visited = False  # True after the special morning visitor comes
         self._chosen_mechanic = None  # Which mechanic the millionaire visitor tells you to see ("Tom", "Frank", or "Oswald")
+        self._necronomicon_readings = 0  # Cumulative Necronomicon use counter - increases madness
         self._car_mechanic = None  # Which mechanic actually fixed the player's car during progression
         self._gus_items_sold = set()  # Tracks which collectibles have been sold to Gus
         self._sanity = 100  # Visible stat - starts at 100, decreases with trauma
@@ -195,6 +197,58 @@ class Player(
         self._sanity_warnings_shown = 0  # Tracks how many sanity warnings have been shown
         self._faced_madness = False  # True after surviving the confrontation
         self._is_broken = False  # True when sanity hits 0 and you survive
+        
+        # ACHIEVEMENT TRACKING — flags, counters, and sets for achievement triggers
+        self._was_broke = False              # Set when balance hits 0 (for rock_bottom)
+        self._was_low_sanity = False          # Set when sanity < 25 (for sanity_saved)
+        self._reached_950k = False            # Set when balance >= 950k (for near_miss)
+        self._was_millionaire_ach = False     # Set when balance >= 1M (for broke_millionaire)
+        self._big_swing_count = 0             # Times balance crossed 100k threshold (for yo_yo)
+        self._last_swing_above = False        # Was last big-swing state above 100k?
+        self._consecutive_injury_days = 0     # Consecutive days with injury (for injured_survival)
+        self._consecutive_sick_days = 0       # Consecutive days while sick (for sick_survival)
+        self._days_low_health = 0             # Days under 25 health (for low_health_master)
+        self._days_low_sanity = 0             # Days under 30 sanity (for sanity_master)
+        self._days_dealer_low = 0             # Days with dealer happiness < 5 (for zero_happiness_survivor)
+        self._days_dealer_high = 0            # Consecutive days with dealer >= 90 (for dealer_friend)
+        self._days_with_cursed = 0            # Days holding a cursed item (for cursed_survival)
+        self._night_events_count = 0          # Total night events experienced (for night_owl)
+        self._day_events_count = 0            # Total day events experienced (for morning_person - counts day events)
+        self._unique_events_seen = set()      # Unique event function names (for event_collector)
+        self._flask_types_used = set()        # Flask types ever used (for flask_connoisseur)
+        self._items_ever_owned = set()        # All items ever owned (for every_item)
+        self._items_ever_used = set()         # All items ever consumed (for item_master)
+        self._companion_types_owned = set()   # Companion types ever owned (for every_companion)
+        self._total_shop_spending = 0         # Total money spent at shops (for shop_spender)
+        self._total_given_away = 0            # Total money given away (for philanthropist)
+        self._sanity_ever_below_50 = False    # Flag for iron_will (set when sanity drops below 50)
+        self._ever_took_loan = False          # Flag for no_loans
+        self._ever_gave_gift = False          # Flag for no_gifts
+        self._ever_bought_item = False        # Flag for never_shop
+        self._companions_lost_count = 0       # Companions that ran away (for pet_cemetery)
+        self._dealer_happiness_day_start = 50 # Snapshot for happiness_rollercoaster
+        self._debt_spiral_count = 0           # Times took loan while in debt (for debt_spiral)
+        self._tony_survived_count = 0         # Times survived Tony (for tony_survivor)
+        self._bad_gifts_given = 0             # Gifts that lowered dealer happiness (for gift_of_death)
+        self._last_dollar_bets = 0            # Times bet last dollar (for suicide_gambler)
+        self._achievement_check_count = 0     # Times checked achievements (for achievement_hunter)
+        self._shops_visited_today = set()     # Shops visited today (for all_shops_one_day / shop_hopper)
+        self._locations_visited_today = set() # Locations visited today (for nomad)
+        self._days_at_camp = 0                # Consecutive days staying at camp (for hermit)
+        self._days_not_spending = 0           # Consecutive days at 500k+ without spending (for money_hoarder)
+        self._oswald_upgrades = 0             # Total Oswald upgrades done (for oswald_masterwork)
+        self._daily_hands_won = 0             # Hands won today (for perfect_day)
+        self._daily_hands_lost = 0            # Hands lost today (for worst_day)
+        self._daily_hands_total = 0           # Total hands today
+        self._ever_lost_hand = False          # Flag for perfect_record
+        self._ever_bet_above_min = False      # Flag for minimum_bet
+        self._blackjack_recent = []           # Recent 10 hand results for blackjack_streak
+        self._no_bust_count = 0               # Consecutive hands without busting (for no_bust_streak/never_bust)
+        self._dealer_bust_streak = 0          # Consecutive dealer busts (for dealer_bust_streak)
+        self._dealer_bj_losses = 0            # Times lost to dealer blackjack (for dealer_blackjack_victim)
+        self._insurance_failures = 0          # Insurance taken without dealer BJ (for insurance_failure)
+        self._twenty_one_pushes = 0           # Push with 21 count (for twenty_one_push)
+        self._natural_blackjacks = 0          # Total natural blackjacks (for blackjack_natural)
         
         # ACHIEVEMENT SYSTEM - Tracks unlocked achievements
         self._achievements = set()
@@ -248,6 +302,9 @@ class Player(
         # COMPANION BETRAYAL TRACKING
         self._companions_sold_count = 0  # Track how many companions sold to Gus for the dark ending
         
+        # WITCH DOCTOR SYSTEM
+        self._witch_doctor_declined_count = 0  # Tracks how many times player has declined her services
+        self._witch_doctor_killed = False  # True if player has killed the witch doctor
         # FRAUDULENT CASH SYSTEM (Loan Shark)
         self._fraudulent_cash = 0  # Hot money hidden inside the visible bankroll
         self._dealer_fake_cash_total = 0  # How much fake cash the Dealer has accumulated
@@ -363,12 +420,12 @@ class Player(
             type.type("Your current health: " + bright(yellow(str(self._health) + "%")))
         else:
             type.type("Your current health: " + bright(red(str(self._health) + "%")))
-        print("\n")
+        print()
         self.update_health_indicator_durability()
 
     def status(self, cause_of_death=None):
         if not self._alive:
-            print("\n")
+            print()
             type.slow("You have died!")
             print()
             if self._day == 1: type.slow("You didn't even last " + bright(yellow(str(self._day) + " day")) + ". That's embarrassing.")
@@ -377,11 +434,13 @@ class Player(
             print()
             type.slow("You met your fate with a final balance of " + green(bright("${:,}".format(self._balance))))
             print()
+            if self._day <= 5:
+                self.unlock_achievement("quick_death")
             self.display_final_achievements()
             type.slow("The police were able to recover your body, but nobody cared enough to show up to your funeral.")
             quit()
         elif (self._balance == 0):
-            print("\n")
+            print()
             type.slow("You have run out of money!")
             print()
             if self._day == 1: type.slow("You didn't even last " + bright(yellow(str(self._day) + " day")) + ". That's absurdly sad.")
@@ -396,7 +455,7 @@ class Player(
         elif (self._balance >= 1000000) and (not self._is_millionaire):
             # First time hitting $1M - set flag but don't end game yet
             self._is_millionaire = True
-            print("\n")
+            print()
             type.slow(green(bright("You've done it. You've hit $1,000,000.")))
             print()
             type.slow("The Dealer stares at you with an expression you've never seen before. Is that... " + yellow("respect?"))
@@ -424,6 +483,8 @@ class Player(
 
     def add_flask(self, flask):
         self._flask_effects.add(flask)
+        self._flask_types_used.add(flask)
+        if not self.has_achievement("first_flask"): self.unlock_achievement("first_flask")
 
     def has_flask_effect(self, flask):
         return flask in self._flask_effects
@@ -467,6 +528,7 @@ class Player(
 
     def add_item(self, item):
         self._inventory.add(item)
+        self._items_ever_owned.add(item)
 
     def has_item(self, item):
         return item in self._inventory
@@ -487,6 +549,7 @@ class Player(
     
     def use_item(self, item):
         self._inventory.discard(item)
+        self._items_ever_used.add(item)
 
     def track_item_use(self, item_name):
         """Track item usage for evolution chains. Returns (old, new) tuple if evolved, else None."""
@@ -505,6 +568,10 @@ class Player(
             "Lantern": (15, "Eternal Light"),
             "Scrap Armor": (5, "Plated Vest"),
             "Plated Vest": (10, "Road Warrior Plate"),
+            "Lucky Penny": (20, "Lucky Coin"),
+            "Lucky Coin": (10, "Fortune's Token"),
+            "Worn Map": (5, "Rusty Compass"),
+            "Rusty Compass": (10, "Golden Compass"),
         }
         if item_name in evolutions:
             threshold, evolved_name = evolutions[item_name]
@@ -524,6 +591,10 @@ class Player(
             ("Lantern", "Eternal Light"): "The LANTERN burns with a light that won't die. You've carried it through so much darkness that it refused to go out. This is ETERNAL LIGHT.",
             ("Scrap Armor", "Plated Vest"): "Your SCRAP ARMOR has taken so many hits it's molded to your body. The dents have become reinforcement. It's now a PLATED VEST.",
             ("Plated Vest", "Road Warrior Plate"): "The PLATED VEST is barely recognizable. Layered, scarred, unbreakable. This is ROAD WARRIOR PLATE.",
+            ("Lucky Penny", "Lucky Coin"): "Your LUCKY PENNY has been rubbed so many times it's changed. The copper gleams gold now. It's become a LUCKY COIN.",
+            ("Lucky Coin", "Fortune's Token"): "The LUCKY COIN hums with accumulated fortune. Every flip, every gamble, every prayer — crystallized. This is FORTUNE'S TOKEN.",
+            ("Worn Map", "Rusty Compass"): "Your WORN MAP has been unfolded so many times the creases are roads themselves. It's transformed into a RUSTY COMPASS.",
+            ("Rusty Compass", "Golden Compass"): "The RUSTY COMPASS needle no longer just points north. It points to where you need to be. This is a GOLDEN COMPASS.",
         }
         return texts.get((old_name, new_name), old_name + " has evolved into " + new_name + "!")
 
@@ -549,16 +620,23 @@ class Player(
     # ============================================
     
     def apply_necronomicon_effects(self):
-        """The Necronomicon slowly corrupts you. Occasionally grants dark visions."""
+        """The Necronomicon slowly corrupts you. Madness scales with cumulative readings."""
         if self.has_item("Necronomicon"):
+            madness = self._necronomicon_readings  # 0, 1, 2, 3...
             roll = random.randrange(10)
             if roll == 0:  # 10% chance: dark vision — money, but heavy sanity cost
                 amount = random.randint(100, 500)
                 self.change_balance(amount)
-                self.lose_sanity(random.choice([8, 10, 12]))
+                base_loss = random.choice([8, 10, 12])
+                self.lose_sanity(base_loss + madness * 2)
                 return True
             elif roll <= 2:  # rolls 1 or 2 → 20% chance: simple corruption
-                self.lose_sanity(random.choice([2, 3, 5]))
+                base_loss = random.choice([2, 3, 5])
+                self.lose_sanity(base_loss + madness)
+                return True
+            elif madness >= 3 and roll == 3:  # 10% at 3+ readings: whispers
+                self.lose_sanity(madness)
+                self.add_status("Necronomicon Madness")
                 return True
         return False
     
@@ -592,8 +670,7 @@ class Player(
             ("Rabbit's Blessing",   "You find a few dollars in a jacket pocket you forgot. The {item}, working quietly.",                                    "sanity_money", (2, 5, 25)),
             ("Championship Medal",  "You glance at the {item} in your bag. You won something once. That's real.",                                           "sanity",       2),
             ("Key to the City",     "The {item} catches someone's eye at the counter. They wave off the fee.",                                              "money",        (25, 100)),
-            ("Bear King's Respect", "People step aside today without knowing why. The {item} carries weight even here.",                                     "sanity",       3),
-            ("Kraken's Memory",     "The {item} pulses behind your eyes. A thousand years of ocean depth, compressed into a moment.",                        "sanity_heal",  (4, 3)),
+
             ("Fight Champion Belt", "The {item} in your bag reminds you what you're capable of. You've won before. You can win again.",                      "sanity",       3),
             ("Deep Stone",          "The {item} glows faint bioluminescent blue. Cold. Deep. Ancient. Calming.",                                            "sanity",       3),
             ("Antique Ring",        "The {item} catches morning light. Whatever story it holds, it isn't yours — but you're part of it now.",                "sanity",       2),
@@ -641,6 +718,32 @@ class Player(
     def has_cutting_tool(self):
         """Check if player has something sharp."""
         return self.has_item("Pocket Knife") or self.has_item("Golden Trident") or self.has_item("Golden Shovel")
+
+    def _offer_item_choice(self, items_with_desc):
+        """When player has multiple applicable items, let them choose which to use.
+        Args: items_with_desc - list of (item_name, short_description) tuples
+              for items the player currently has
+        Returns: chosen item_name, or None if skipped/empty
+        """
+        if not items_with_desc:
+            return None
+        if len(items_with_desc) == 1:
+            return items_with_desc[0][0]
+        type.type("You have options:")
+        print()
+        for i, (name, desc) in enumerate(items_with_desc, 1):
+            type.type("  " + str(i) + ". " + item(name) + " — " + desc)
+        print()
+        choice = ask.option("Choose an item", [str(i) for i in range(1, len(items_with_desc) + 1)] + ["skip"]).lower()
+        if choice == "skip":
+            return None
+        try:
+            idx = int(choice) - 1
+            if 0 <= idx < len(items_with_desc):
+                return items_with_desc[idx][0]
+        except (ValueError, IndexError):
+            pass
+        return items_with_desc[0][0]
 
     # ============================================
     # FOOD ITEM CATEGORIZATION HELPERS
@@ -822,7 +925,7 @@ class Player(
         """Returns the master list of all collectibles Gus will buy"""
         return [
             # Underwater/Beach Adventure (18 items)
-            "Golden Trident", "Kraken Pearl", "Mermaid Crown", "Kraken's Memory",
+            "Golden Trident", "Kraken Pearl", "Mermaid Crown",
             "Ancient Sea Map", "Deep Stone", "Pirate Treasure", "Treasure Coordinates",
             "Captain's Compass", "Cannon Gem", "Sailor's Lockbox", "Mermaid's Pearl",
             "Mermaid Pearl", "Matched Pearls", "Pink Pearl", "Giant Oyster",
@@ -831,8 +934,8 @@ class Player(
             "Golden Shovel", "Underwater Camera", "Crab Racing Trophy", 
             "Championship Medal", "Antique Ring", "Treasure Chest", "Midnight Rose",
             # Woodlands Adventure (8 items)
-            "Hunter's Mark", "Bear King's Respect", "Giant Bear Tooth", "Bear's Gold Coin",
-            "Witch's Favor", "Magic Acorn", "Fairy's Secret Map", "Captured Fairy",
+            "Hunter's Mark", "Giant Bear Tooth", "Bear's Gold Coin",
+            "Magic Acorn", "Fairy's Secret Map", "Captured Fairy",
             # Swamp Adventure (11 items)
             "Gator Tooth Necklace", "Tortoise Trophy", "Ogre's Gemstone", "Ogre's Gift",
             "Swamp Gold", "Witch's Riddle", "Witch's Ward", "Voodoo Doll",
@@ -844,11 +947,72 @@ class Player(
             "Lucky Penny", "Lucky Rabbit Foot", "Carrot", "Rabbit's Blessing",
             # Misc Adventure (6 items)
             "Mysterious Lockbox", "Mysterious Key", "Mysterious Code",
-            "Fountain Water", "Treasure Map", "Joe's Treasure Map",
+            "Treasure Map", "Joe's Treasure Map",
             # Secret Items (2 items)
             "Dealer's Joker", "Ace of Spades",
             # Sentimental Items
-            "Filled Locket"
+            "Filled Locket",
+            # Zone Reward Items (6 items)
+            "Road Warrior Badge", "Druid's Staff", "Swamp Rune",
+            "Sea Glass", "Depth Charm", "Underground Pass",
+            # Storyline Keepsakes (9 items)
+            "Martinez's Card", "Stuart's Number", "Grandpa's Chili Recipe",
+            "Grandma's Scarf", "Dealer's Coin", "Edgar's Letter",
+            "Edgar's List", "Dealer's Lucky Chips", "Veteran's Lucky Chip",
+            # Functional Adventure Items (17 items)
+            "Road Talisman", "Silver Horseshoe", "Cowboy Jacket", "Council Feather",
+            "Dimensional Coin", "Alien Crystal", "Mystery Potion", "Persistent Bottle",
+            "Stolen Marlin", "Hermit's Journal", "Carved Walking Stick", "Junkyard Crown",
+            "Scrap Metal Rose", "Ritual Token", "Old Photograph", "Reunion Photo", "Suzy's Gift",
+            # Story/Character Items (20 items)
+            "Fake Flower", "Feelgood Pill", "Feelgood Bottle", "Radio Numbers",
+            "Radio Logbook", "Carnival Token", "Professor Bear", "Lockbox",
+            "Apartment Key", "Tanya's Number", "Angel's Number", "Grandma's Number",
+            "Beach Romance Number", "Rich Friend's Number",
+            "Herbal Pouch", "Hollow Tree Stash", "Blanket", "Torn Collar",
+            "Artisan's Toolkit", "Stack of Flyers",
+            # Companion/Encounter Items (8 items)
+            "Empty Locket", "Golden Ring", "Worry Stone", "Found Phone",
+            "Maya's Pick", "Secret Route Map", "Worn Map", "Love Potion",
+            # Dark/Criminal Items (4 items)
+            "Casino OD Evidence", "Bag of Cocaine", "Building Manager Key", "Stolen Memory",
+            # Surreal/Occult Items (5 items)
+            "Spoon Satellite", "Necronomicon", "Tinfoil Hat", "Vision Map", "Cursed Coin",
+            # NPC Signature Items (3 items)
+            "Tom's Wrench", "Frank's Flask", "Oswald's Dice",
+            # Wealth/Status Items (4 items)
+            "VIP Invitation", "Casino VIP Card", "High Roller Keycard", "Tony's Gun",
+            # Radio/Pirate Items (4 items)
+            "Night Vision Scope", "Strange Frequency Dial", "Pirate Radio Flyer", "Static Recorder",
+            # Scrap/Craft Components (3 items)
+            "Scrap Armor", "Signal Booster",
+            # Luxury Shop Items (9 items)
+            "Expensive Cologne", "Fancy Cigars", "Gold Chain", "Vintage Wine",
+            "Fancy Pen", "Silk Handkerchief", "Monogrammed Lighter",
+            "Antique Pocket Watch", "Silver Flask",
+            # Basic Shop Gear (15 items)
+            "Flashlight", "Binoculars", "Tool Kit", "First Aid Kit", "Deck of Cards",
+            "Sunglasses", "Leather Gloves", "LifeAlert", "Dog Whistle",
+            "Jumper Cables", "Portable Battery Charger", "Car Jack",
+            "Rope", "Padlock", "Mysterious Envelope",
+            # Auto Parts (21 items)
+            "Spare Tire", "Motor Oil", "Coolant", "Antifreeze", "Brake Fluid",
+            "Brake Pads", "Power Steering Fluid", "Transmission Fluid",
+            "Fix-a-Flat", "Tire Patch Kit", "Gas Can", "Fuel Filter",
+            "Fuel Line Antifreeze", "Serpentine Belt", "OBD Scanner",
+            "Spare Fuses", "Spare Headlight Bulbs", "Spare Spark Plugs",
+            "Oil Stop Leak", "Radiator Stop Leak", "Lock De-Icer",
+            "Exhaust Tape", "Thermostat", "WD-40", "Welding Goggles",
+            # Cheap Consumables/Supplies (24 items)
+            "Bandage", "Granola Bar", "Can of Tuna", "Fish", "Lettuce",
+            "Dog Treat", "Bag of Acorns", "Cough Drops", "Breath Mints",
+            "Rubber Bands", "Bug Spray", "Cheap Sunscreen", "Plastic Poncho",
+            "Water Bottles", "Lighter", "Duct Tape", "Disposable Camera",
+            "Road Flares", "Air Freshener", "Hand Warmers", "Super Glue",
+            "Fishing Line", "Pest Control", "Umbrella",
+            "Bungee Cords", "Garbage Bag", "Plastic Wrap", "Pocket Knife",
+            # Unique Misc (5 items)
+            "Map", "Lucky Coin", "Broken Compass", "Gus's Precious Grime"
         ]
     
     def get_collectible_prices(self):
@@ -858,7 +1022,7 @@ class Player(
             "Golden Trident": 80000,
             "Kraken Pearl": 100000,
             "Mermaid Crown": 75000,
-            "Kraken's Memory": 50000,
+
             "Ancient Sea Map": 25000,
             "Deep Stone": 40000,
             "Pirate Treasure": 60000,
@@ -883,10 +1047,10 @@ class Player(
             "Midnight Rose": 2500,
             # Woodlands Adventure
             "Hunter's Mark": 8000,
-            "Bear King's Respect": 50000,
+
             "Giant Bear Tooth": 15000,
             "Bear's Gold Coin": 5000,
-            "Witch's Favor": 12000,
+
             "Magic Acorn": 6000,
             "Fairy's Secret Map": 8000,
             "Captured Fairy": 25000,
@@ -917,7 +1081,7 @@ class Player(
             "Mysterious Lockbox": 2000,
             "Mysterious Key": 1500,
             "Mysterious Code": 3000,
-            "Fountain Water": 8000,
+
             "Treasure Map": 5000,
             "Joe's Treasure Map": 3000,
             # Secret Items
@@ -925,6 +1089,185 @@ class Player(
             "Ace of Spades": 1000,
             # Sentimental Items
             "Filled Locket": 500,
+            # Zone Reward Items
+            "Road Warrior Badge": 5000,
+            "Druid's Staff": 8000,
+            "Swamp Rune": 6000,
+            "Sea Glass": 4000,
+            "Depth Charm": 10000,
+            "Underground Pass": 7000,
+            # Storyline Keepsakes
+            "Martinez's Card": 500,
+            "Stuart's Number": 500,
+            "Grandpa's Chili Recipe": 2000,
+            "Grandma's Scarf": 1500,
+            "Dealer's Coin": 15000,
+            "Edgar's Letter": 1000,
+            "Edgar's List": 1000,
+            "Dealer's Lucky Chips": 8000,
+            "Veteran's Lucky Chip": 3000,
+            # Functional Adventure Items
+            "Road Talisman": 8000,
+            "Silver Horseshoe": 12000,
+            "Cowboy Jacket": 5000,
+            "Council Feather": 3000,
+            "Dimensional Coin": 20000,
+            "Alien Crystal": 25000,
+            "Mystery Potion": 3000,
+            "Persistent Bottle": 15000,
+            "Stolen Marlin": 10000,
+            "Hermit's Journal": 5000,
+            "Carved Walking Stick": 4000,
+            "Junkyard Crown": 6000,
+            "Scrap Metal Rose": 5000,
+            "Ritual Token": 8000,
+            "Old Photograph": 2000,
+            "Reunion Photo": 1500,
+            "Suzy's Gift": 2000,
+            # Story/Character Items
+            "Fake Flower": 200,
+            "Feelgood Pill": 500,
+            "Feelgood Bottle": 2000,
+            "Radio Numbers": 1000,
+            "Radio Logbook": 1500,
+            "Carnival Token": 300,
+            "Professor Bear": 3000,
+            "Lockbox": 1000,
+            "Apartment Key": 500,
+            "Tanya's Number": 200,
+            "Angel's Number": 500,
+            "Grandma's Number": 100,
+            "Beach Romance Number": 100,
+            "Rich Friend's Number": 500,
+            "Herbal Pouch": 2000,
+            "Hollow Tree Stash": 1500,
+            "Blanket": 100,
+            "Torn Collar": 50,
+            "Artisan's Toolkit": 3000,
+            "Stack of Flyers": 50,
+            # Companion/Encounter Items
+            "Empty Locket": 500,
+            "Golden Ring": 3000,
+            "Worry Stone": 1000,
+            "Found Phone": 500,
+            "Maya's Pick": 1000,
+            "Secret Route Map": 2000,
+            "Worn Map": 1000,
+            "Love Potion": 3000,
+            # Dark/Criminal Items
+            "Casino OD Evidence": 5000,
+            "Bag of Cocaine": 10000,
+            "Building Manager Key": 2000,
+            "Stolen Memory": 2000,
+            # Surreal/Occult Items
+            "Spoon Satellite": 1000,
+            "Necronomicon": 20000,
+            "Tinfoil Hat": 500,
+            "Vision Map": 3000,
+            "Cursed Coin": 2000,
+            # NPC Signature Items
+            "Tom's Wrench": 2000,
+            "Frank's Flask": 3000,
+            "Oswald's Dice": 5000,
+            # Wealth/Status Items
+            "VIP Invitation": 5000,
+            "Casino VIP Card": 8000,
+            "High Roller Keycard": 10000,
+            "Tony's Gun": 15000,
+            # Radio/Pirate Items
+            "Night Vision Scope": 3000,
+            "Strange Frequency Dial": 2000,
+            "Pirate Radio Flyer": 500,
+            "Static Recorder": 1500,
+            # Scrap/Craft Components
+            "Scrap Armor": 2000,
+            "Signal Booster": 1500,
+            # Luxury Shop Items
+            "Expensive Cologne": 800,
+            "Fancy Cigars": 600,
+            "Gold Chain": 2000,
+            "Vintage Wine": 1500,
+            "Fancy Pen": 300,
+            "Silk Handkerchief": 200,
+            "Monogrammed Lighter": 500,
+            "Antique Pocket Watch": 1500,
+            "Silver Flask": 500,
+            # Basic Shop Gear
+            "Flashlight": 100,
+            "Binoculars": 200,
+            "Tool Kit": 500,
+            "First Aid Kit": 200,
+            "Deck of Cards": 100,
+            "Sunglasses": 75,
+            "Leather Gloves": 100,
+            "LifeAlert": 150,
+            "Dog Whistle": 50,
+            "Jumper Cables": 100,
+            "Portable Battery Charger": 150,
+            "Car Jack": 100,
+            "Rope": 50,
+            "Padlock": 75,
+            "Mysterious Envelope": 1000,
+            # Auto Parts
+            "Spare Tire": 100,
+            "Motor Oil": 30,
+            "Coolant": 25,
+            "Antifreeze": 25,
+            "Brake Fluid": 20,
+            "Brake Pads": 50,
+            "Power Steering Fluid": 20,
+            "Transmission Fluid": 25,
+            "Fix-a-Flat": 30,
+            "Tire Patch Kit": 40,
+            "Gas Can": 50,
+            "Fuel Filter": 30,
+            "Fuel Line Antifreeze": 20,
+            "Serpentine Belt": 40,
+            "OBD Scanner": 100,
+            "Spare Fuses": 10,
+            "Spare Headlight Bulbs": 15,
+            "Spare Spark Plugs": 20,
+            "Oil Stop Leak": 15,
+            "Radiator Stop Leak": 15,
+            "Lock De-Icer": 10,
+            "Exhaust Tape": 15,
+            "Thermostat": 25,
+            "WD-40": 15,
+            "Welding Goggles": 50,
+            # Cheap Consumables/Supplies
+            "Bandage": 10,
+            "Granola Bar": 5,
+            "Can of Tuna": 10,
+            "Fish": 5,
+            "Lettuce": 3,
+            "Dog Treat": 5,
+            "Bag of Acorns": 5,
+            "Cough Drops": 15,
+            "Breath Mints": 10,
+            "Rubber Bands": 5,
+            "Bug Spray": 10,
+            "Cheap Sunscreen": 10,
+            "Plastic Poncho": 15,
+            "Water Bottles": 10,
+            "Lighter": 15,
+            "Duct Tape": 15,
+            "Disposable Camera": 50,
+            "Road Flares": 40,
+            "Air Freshener": 5,
+            "Hand Warmers": 20,
+            "Super Glue": 10,
+            "Fishing Line": 15,
+            "Pest Control": 20,
+            "Umbrella": 25,
+            "Bungee Cords": 15,
+            "Garbage Bag": 5,
+            "Plastic Wrap": 5,
+            "Pocket Knife": 50,
+            # Unique Misc
+            "Map": 3000,
+            "Lucky Coin": 5000,
+            "Broken Compass": 1000,
+            "Gus's Precious Grime": 1,
         }
     
     def get_gus_total_collectibles(self):
@@ -1020,7 +1363,7 @@ class Player(
             self.reduce_fatigue(25)
             type.type("You're so exhausted you can barely keep your eyes open... but wait. ")
             type.type("You crack open your " + magenta(bright("Energy Drink")) + " and chug the whole thing.")
-            print("\n")
+            print()
             type.type(random.choice([
                 "The caffeine hits like a freight train. You're AWAKE now.",
                 "Tastes like battery acid and ambition. You're good to go.",
@@ -1028,7 +1371,7 @@ class Player(
                 "It's disgusting. It's beautiful. You can see sounds now.",
                 "The exhaustion evaporates. Temporarily. You'll pay for this later.",
             ]))
-            print("\n")
+            print()
             return False
 
         return would_block

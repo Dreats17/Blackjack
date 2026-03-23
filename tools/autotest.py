@@ -523,6 +523,7 @@ FINAL_RE = re.compile(
     r"\| SAN\s+(?P<sanity>-?\d+) \| Rank\s+(?P<rank>\d+) \| Alive=(?P<alive>True|False)$",
     re.MULTILINE,
 )
+RUN_SUMMARY_SEED_RE = re.compile(r"^Run Summary \| cycles_requested=\d+ \| seed=(?P<seed>\d+)$", re.MULTILINE)
 PEAK_RE = re.compile(r"^Peak\s+\$\s*(?P<balance>[0-9,]+) \| Rank (?P<rank>\d+)$", re.MULTILINE)
 PEAK_DAYS_RE = re.compile(r"^Peak days\s+(?P<days>.+)$", re.MULTILINE)
 INVENTORY_RE = re.compile(r"^Inventory\s+(?P<items>.+)$", re.MULTILINE)
@@ -1179,17 +1180,30 @@ def parse_report(seed: int, return_code: int) -> RunResult:
         with open(REPORT_JSON, "r", encoding="utf-8") as json_handle:
             payload = json.load(json_handle)
         if isinstance(payload, dict):
-            _apply_json_report(result, payload)
+            payload_seed = payload.get("seed")
+            if payload_seed != seed:
+                payload = None
+            else:
+                _apply_json_report(result, payload)
     except FileNotFoundError:
         payload = None
     except (json.JSONDecodeError, OSError, ValueError):
         payload = None
+
+    if return_code not in (0, None):
+        result.result_note = f"runner exited with code {return_code}"
+        return result
 
     try:
         with open(REPORT, "r", encoding="utf-8") as handle:
             text = handle.read()
     except FileNotFoundError:
         result.result_note = "missing report"
+        return result
+
+    report_seed_match = RUN_SUMMARY_SEED_RE.search(text)
+    if report_seed_match is not None and int(report_seed_match.group("seed")) != seed:
+        result.result_note = f"stale report seed mismatch (expected {seed})"
         return result
 
     final_match = FINAL_RE.search(text)
@@ -1427,8 +1441,19 @@ def _terminate_seed_process(process: subprocess.Popen[str]) -> None:
         process.communicate()
 
 
+def _clear_report_artifacts() -> None:
+    for path in (REPORT, REPORT_JSON, STORY_OUT):
+        try:
+            os.remove(path)
+        except FileNotFoundError:
+            continue
+        except OSError:
+            continue
+
+
 def run_seed(cycles: int, seed: int, timeout_seconds: int = 90) -> tuple[RunResult | None, bool]:
     started_at = time.perf_counter()
+    _clear_report_artifacts()
     process = subprocess.Popen(
             [sys.executable, QUICKTEST, str(cycles), str(seed)],
             cwd=ROOT,
@@ -1443,7 +1468,15 @@ def run_seed(cycles: int, seed: int, timeout_seconds: int = 90) -> tuple[RunResu
                 return None, True
 
             try:
-                process.communicate(timeout=STOP_POLL_SECONDS)
+                stdout, stderr = process.communicate(timeout=STOP_POLL_SECONDS)
+                if process.returncode not in (0, None):
+                    result = RunResult(
+                        seed=seed,
+                        return_code=process.returncode,
+                        elapsed_seconds=time.perf_counter() - started_at,
+                        result_note=(stderr.strip() or stdout.strip() or f"runner exited with code {process.returncode}"),
+                    )
+                    return result, False
                 result = parse_report(seed, process.returncode)
                 result.elapsed_seconds = time.perf_counter() - started_at
                 return result, False

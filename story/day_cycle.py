@@ -75,17 +75,17 @@ class DayCycleMixin:
             self._previous_balance = self._balance
             self.heal(random.choice([1, 3, 5]))
             # Show the dream instead of the summary
-            print("\n")
+            print()
             dream()
             ask.press_continue("Press a key to continue: ")
             return
 
         # Normal day summary
-        print("\n")
+        print()
         type.fast(bright(green("═" * 50)))
         type.fast(bright(green("            ~ ~ ~ Day Summary ~ ~ ~")))
         type.fast(bright(green("═" * 50)))
-        print("\n")
+        print()
 
         # Starting cheer (eg. Yippee!)
         type.type(self._lists.get_cheer())
@@ -93,11 +93,11 @@ class DayCycleMixin:
         # Tells day count and previous day's balance
         if self._day == 1:
             type.type(" You've survived " + yellow(bright(str(self._day) + " day")) + "!")
-            print("\n")
+            print()
             type.type("You started your journey with just " + green(bright("$" + str(self._previous_balance))) + ". ")
         else:
             type.type(" You've survived " + yellow(bright(str(self._day) + " days")) + "!")
-            print("\n")
+            print()
             type.type("Yesterday, at this time, you had " + green(bright("$" + str(self._previous_balance))) + ". ")
         # increments day
         self._day += 1
@@ -122,7 +122,7 @@ class DayCycleMixin:
 
         type.type(self._lists.get_rank_comment(self._rank))
 
-        print("\n")
+        print()
 
         # Gives a little personal advice, support, etc
         type.type(self._lists.get_advice())
@@ -134,7 +134,7 @@ class DayCycleMixin:
         type.type(self._lists.get_quote())
 
         # Heals the player before the next day
-        print("\n")
+        print()
         self.heal(random.choice([1, 3, 5]))
 
         ask.press_continue("Press a key to continue: ")
@@ -205,39 +205,27 @@ class DayCycleMixin:
 
         while (True):
             type.type("Type 'y' or 'yes', not case sensitive, to say yes to a question: ")
-            yes_or_no = input("").lower()
-            if (yes_or_no == "y") or (yes_or_no == "yes"):
-                break
-            else:
-                print()
-        print("\n")
+            ask.option("Type yes to continue", ["yes"])
+            break
+        print()
 
         while (True):
             type.type("Type 'n' or 'no', not case sensitive, to say no to a question: ")
-            yes_or_no = input("").lower()
-            if (yes_or_no == "n") or (yes_or_no == "no"):
-                break
-            else:
-                print()
-        print("\n")
+            ask.option("Type no to continue", ["no"])
+            break
+        print()
 
         while (True):
             type.type("Type 'h' or 'hit', not case sensitive, to hit your hand: ")
-            hit_or_stand = input("").lower()
-            if (hit_or_stand == "h") or (hit_or_stand == "hit"):
-                break
-            else:
-                print()
-        print("\n")
+            ask.option("Type hit to continue", ["hit"])
+            break
+        print()
 
         while (True):
             type.type("Type 's' or 'stand', not case sensitive, to stand with your hand's value: ")
-            hit_or_stand = input("").lower()
-            if (hit_or_stand == "s") or (hit_or_stand == "stand"):
-                break
-            else:
-                print()
-        print("\n")
+            ask.option("Type stand to continue", ["stand"])
+            break
+        print()
 
     def opening_lines(self):
 
@@ -245,26 +233,26 @@ class DayCycleMixin:
         type.type("Stranded on the road again, but this time, your money has gone dry. ")
         type.type("All but your 50 dollar bill that Grandma gave you on her last Christmas. ")
         type.type("You've been saving it for when you needed it most, but surely, it won't be enough.")
-        print("\n")
+        print()
 
         type.type("The door creaks open, and you step out into the night sky, coughing up the smoke from your fried vehicle. ")
         type.type("After pushing your car off the road and between the trees, there isn't much else left for you to do, ")
         type.type("so you begin to wander down the dark, lonely street.")
-        print("\n")
+        print()
 
         type.type("But at the end of the road, where concrete turned to stone turned to dirt, you notice a light up ahead, on the top of a hill. ")
-        print("\n")
+        print()
 
         type.type("As you waltz into the old, wooden shack, your eyes begin to light up with the fire of a thousand suns. ")
         type.type("Roulette wheels! Poker tables! And in a dark corner of the abandoned casino, sits a dealer, shuffling cards for a new round of Blackjack. ")
         type.type("That 50 dollars might just come in handy after all. Thanks, Grandma!")
-        print("\n")
+        print()
 
         type.type("As you go to sit down at the table, you hear the Dealer cough, then watch as he sits up.")
-        print("\n")
+        print()
 
         type.type("In a deep, and yet strained voice, the Dealer, cloaked in darkness, poses a question to you.")
-        print("\n")
+        print()
         self.start_night()
 
     # End Days
@@ -310,9 +298,9 @@ class DayCycleMixin:
 
     def start_night_1(self):
         type.slow(red("Would you like to play a game of Blackjack? "))
-        yes_or_no = input("").lower()
+        yes_or_no = ask.yes_or_no("")
         print()
-        if (yes_or_no == "n") or (yes_or_no == "no"):
+        if yes_or_no == "no":
             type.slow(red(bright("Well that's just too bad, isn't it. ")))
             type.slow(red("The Dealer fires three shots into your chest. You bleed out, and as you fade from reality, you see the Dealer reach into your pockets, and take the last 50 dollars from your lifeless body."))
             self.kill()
@@ -324,36 +312,36 @@ class DayCycleMixin:
         
         visits = self.get_visited_tanya()
         
-        print("\n")
+        print()
         type.type("The sun goes down. The casino lights flicker to life in the distance.")
-        print("\n")
+        print()
         
         if visits <= 3:
             type.type("You sit in the driver's seat. Your hand goes to the ignition. Habit.")
-            print("\n")
+            print()
             type.slow("But Tanya's voice is in your head. " + cyan("\"Just don't. Stay in your car.\""))
-            print("\n")
+            print()
             type.type("So you don't. You lean the seat back. You stare at the ceiling. You listen to the wind.")
-            print("\n")
+            print()
             type.type("It's the longest night you've had in a while. But you make it through.")
         elif visits <= 5:
             type.type("You don't even reach for the keys tonight. Progress.")
-            print("\n")
+            print()
             type.type("You find an old book wedged under the passenger seat. Something about fishing. You read three chapters before your eyes get heavy.")
-            print("\n")
+            print()
             type.slow("For the first time in a long time, you fall asleep without the sound of cards shuffling in your head.")
         else:
             type.type("The casino lights don't even tempt you tonight. They're just lights.")
-            print("\n")
+            print()
             type.type("You sit in your car and think about Nathan. About how he's probably taller now. About whether he still draws those stick figures with the big heads.")
-            print("\n")
+            print()
             type.slow("You feel something unfamiliar. It takes you a minute to place it.")
-            print("\n")
+            print()
             type.slow(cyan("Peace. That's what this is."))
         
-        print("\n")
+        print()
         type.type("No blackjack tonight. You just... rest.")
-        print("\n")
+        print()
         
         # Small sanity gain for not gambling
         self.restore_sanity(5)
@@ -365,7 +353,7 @@ class DayCycleMixin:
 
     def start_night_car(self):
         type.type("As the sun begins to set, and the stars light up in the night sky, you walk to the casino, eager to play more Blackjack. ")
-        print("\n")
+        print()
         # Broken state casino perception
         if self._is_broken:
             broken_casino = random.choice([
@@ -376,21 +364,21 @@ class DayCycleMixin:
                 "The door opens before you touch it. It was expecting you."
             ])
             type.slow(red(broken_casino))
-            print("\n")
+            print()
         # Low sanity affects how you perceive the casino
         elif self._sanity <= 50:
             type.slow(cyan("The casino lights seem too bright. Too hungry. They're watching you."))
-            print("\n")
+            print()
         elif self._sanity <= 75:
             type.type("You feel " + yellow(self.get_sanity_description()) + " tonight.")
-            print("\n")
+            print()
         self.grandfather_clock_dialogue()
         type.slow(red(self._lists.get_dealer_welcome()))
-        print("\n")
+        print()
 
     def start_night_car_fixed(self):
         type.type("As the sun begins to set, and the stars light up in the night sky, you drive over to the casino, eager to play more Blackjack. ")
-        print("\n")
+        print()
         # Broken state casino perception
         if self._is_broken:
             broken_casino = random.choice([
@@ -401,17 +389,17 @@ class DayCycleMixin:
                 "The parking lot has too many cars. They're all yours. From timelines that didn't happen."
             ])
             type.slow(red(broken_casino))
-            print("\n")
+            print()
         # Low sanity affects how you perceive the casino
         elif self._sanity <= 50:
             type.slow(cyan("The neon signs blur together. For a moment, you can't remember why you came here."))
-            print("\n")
+            print()
         elif self._sanity <= 75:
             type.type("You feel " + yellow(self.get_sanity_description()) + " tonight.")
-            print("\n")
+            print()
         self.grandfather_clock_dialogue()
         type.slow(red(self._lists.get_dealer_welcome()))
-        print("\n")
+        print()
 
     def grandfather_clock_dialogue(self):
         if self.has_item("Grandfather Clock") and random.randrange(10) == 0:
@@ -423,7 +411,7 @@ class DayCycleMixin:
                 "The Grandfather Clock chimes midnight. The Dealer looks at his watch. " + quote("It's 7 PM.") + " He sighs. " + quote("That thing's about as reliable as my ex-wife.")
             ])
             type.slow(red(dialogue))
-            print("\n")
+            print()
 
 
 

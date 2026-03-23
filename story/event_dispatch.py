@@ -63,7 +63,7 @@ class EventDispatchMixin:
                 type.type(red(" (-$" + str(value) + ")"))
             elif effect_type == "money_gain":
                 type.type(green(" (+$" + str(value) + ")"))
-            print("\n")
+            print()
             time.sleep(1)
         
         # Check for madness confrontation (rare, requires low sanity)
@@ -77,19 +77,19 @@ class EventDispatchMixin:
         if self._sanity <= 75 and random.randrange(5) == 0 and not self._is_broken:
             print()
             type.type("You feel " + yellow(self.get_sanity_description()) + ".")
-            print("\n")
+            print()
         
         # Occasionally show sanity effects (more frequent at low sanity)
         if self.should_show_sanity_effect() and not self._is_broken:
             print()
             type.slow(cyan(self.get_sanity_effect()))
-            print("\n")
+            print()
             time.sleep(1)
         
         # FATIGUE CHECK - Exhaustion can cause you to miss events
         if self.fatigue_blocks_event():
             type.type(self._lists.get_fatigue_blocked_text())
-            print("\n")
+            print()
             return
         
         # COMPANION PASSIVE BONUSES - Applied each day
@@ -100,28 +100,38 @@ class EventDispatchMixin:
         if item_count >= 50:
             if random.randrange(3) == 0:
                 type.type(yellow("Your car is bursting at the seams. Your companion can barely fit. Everything takes longer."))
-                print("\n")
+                print()
                 self.lose_sanity(5)
         elif item_count >= 40:
             if random.randrange(4) == 0:
                 type.type(yellow("People stare at your overloaded car. You look like a hoarder on wheels."))
-                print("\n")
+                print()
                 self.lose_sanity(3)
         elif item_count >= 30:
             if random.randrange(5) == 0:
                 type.type(yellow("The weight of your possessions slows you down. Finding anything takes time."))
-                print("\n")
+                print()
                 self.lose_sanity(2)
         elif item_count >= 20:
             if random.randrange(8) == 0:
                 type.type(yellow("Your car is packed. You spend five minutes looking for your keys under all the stuff."))
-                print("\n")
+                print()
         
         dayEvent = getattr(self, self._lists.get_day_event(), None)
         if dayEvent is None:
             type.type("The day passes uneventfully.")
-            print("\n")
+            print()
             return
+        # Track event for time_loop achievement
+        event_name = dayEvent.__name__
+        self._recent_events.append(event_name)
+        if len(self._recent_events) > 3:
+            self._recent_events.pop(0)
+        if len(self._recent_events) == 3 and self._recent_events[0] == self._recent_events[1] == self._recent_events[2]:
+            self.unlock_achievement("time_loop")
+        # Track unique events and day event count
+        self._unique_events_seen.add(event_name)
+        self._day_events_count += 1
         dayEvent()
         return
 
@@ -137,25 +147,28 @@ class EventDispatchMixin:
                 type.type(red(" (-$" + str(value) + ")"))
             elif effect_type == "money_gain":
                 type.type(green(" (+$" + str(value) + ")"))
-            print("\n")
+            print()
             time.sleep(1)
         
         # Occasionally show sanity effects at night too (dreams are worse)
         if self.should_show_sanity_effect() and not self._is_broken:
             print()
             type.slow(cyan(self.get_sanity_effect()))
-            print("\n")
+            print()
             time.sleep(1)
         
         nightEvent = getattr(self, self._lists.get_night_event(), None)
         if nightEvent is None:
             type.type("The night passes quietly.")
-            print("\n")
+            print()
             self.add_fatigue(random.randint(2, 6))
             self.apply_companion_night_bonuses()
             self.update_rank()
             self.start_night()
             return
+        # Track night events
+        self._night_events_count += 1
+        self._unique_events_seen.add(nightEvent.__name__)
         nightEvent()
 
         # Night events add mild fatigue (staying up doing things)

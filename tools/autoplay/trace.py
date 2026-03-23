@@ -22,6 +22,9 @@ class DecisionTrace:
     metadata: dict[str, Any] = field(default_factory=dict)
 
     def to_dict(self) -> dict[str, Any]:
+        from tools.autoplay.policies.version import HANDLER_VERSION
+        meta = dict(self.metadata) if self.metadata else {}
+        meta["handler_version"] = HANDLER_VERSION
         return {
             "cycle": self.cycle,
             "day": self.day,
@@ -34,5 +37,5 @@ class DecisionTrace:
             "options": list(self.options),
             "game_state_summary": dict(self.game_state_summary),
             "score_breakdown": dict(self.score_breakdown),
-            "metadata": dict(self.metadata),
+            "metadata": meta,
         }

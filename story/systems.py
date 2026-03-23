@@ -64,19 +64,24 @@ class SystemsMixin:
         # Floor at 0
         if self._sanity < 0:
             self._sanity = 0
+        # Achievement tracking flags
+        if self._sanity < 50:
+            self._sanity_ever_below_50 = True
+        if self._sanity < 25:
+            self._was_low_sanity = True
         # Show warning message based on new threshold crossed
         if old_sanity > 75 and self._sanity <= 75:
-            print("\n")
+            print()
             type.slow(yellow("Your mind feels... foggy. Something isn't right."))
-            print("\n")
+            print()
         elif old_sanity > 50 and self._sanity <= 50:
-            print("\n")
+            print()
             type.slow(yellow(bright("The edges of your vision blur. Reality feels thin.")))
-            print("\n")
+            print()
         elif old_sanity > 25 and self._sanity <= 25:
-            print("\n")
+            print()
             type.slow(red(bright("Your thoughts are fracturing. The shadows are getting closer.")))
-            print("\n")
+            print()
         
         # Check if sanity hit zero - trigger madness ending or become broken
         if old_sanity > 0 and self._sanity <= 0:
@@ -90,9 +95,9 @@ class SystemsMixin:
             self._sanity = 100
         # Show recovery message if crossing back above a threshold
         if old_sanity <= 50 and self._sanity > 50:
-            print("\n")
+            print()
             type.slow(green("A sense of clarity washes over you. The fog lifts, if only a little."))
-            print("\n")
+            print()
     
     def sanity_indicator(self):
         """Display current sanity level with color coding"""
@@ -106,7 +111,7 @@ class SystemsMixin:
             type.type("Your current sanity: " + bright(magenta(str(self._sanity) + "%")))
         else:
             type.type("Your current sanity: " + bright(red(str(self._sanity) + "%")))
-        print("\n")
+        print()
     
     def get_sanity_description(self):
         """Get a text description of current sanity state"""
@@ -237,6 +242,7 @@ class SystemsMixin:
             
             if status == "Player Blackjack":
                 stats["blackjacks"] += 1
+                self._natural_blackjacks += 1
             
             # Track streak
             if stats["current_streak"] >= 0:
@@ -249,13 +255,33 @@ class SystemsMixin:
             
             if winnings > stats["biggest_win"]:
                 stats["biggest_win"] = winnings
+            
+            # Achievement tracking - daily and streaks
+            self._daily_hands_won += 1
+            self._daily_hands_total += 1
+            self._no_bust_count += 1
+            if status == "Dealer Bust":
+                self._dealer_bust_streak += 1
+            else:
+                self._dealer_bust_streak = 0
+            # Track recent blackjacks for blackjack_streak
+            self._blackjack_recent.append(1 if status == "Player Blackjack" else 0)
+            if len(self._blackjack_recent) > 10:
+                self._blackjack_recent.pop(0)
                 
         elif status in ["Dealer Blackjack", "Dealer Wins", "Player Bust"]:
             stats["losses"] += 1
             stats["total_lost"] += bet_amount
+            self._ever_lost_hand = True
             
             if status == "Player Bust":
                 stats["busts"] += 1
+                self._no_bust_count = 0
+            else:
+                self._no_bust_count += 1
+            
+            if status == "Dealer Blackjack":
+                self._dealer_bj_losses += 1
             
             # Track streak (negative for losses)
             if stats["current_streak"] <= 0:
@@ -268,10 +294,24 @@ class SystemsMixin:
             
             if bet_amount > stats["biggest_loss"]:
                 stats["biggest_loss"] = bet_amount
+            
+            # Achievement tracking - daily and streaks
+            self._daily_hands_lost += 1
+            self._daily_hands_total += 1
+            self._dealer_bust_streak = 0
+            self._blackjack_recent.append(0)
+            if len(self._blackjack_recent) > 10:
+                self._blackjack_recent.pop(0)
                 
         else:  # Ties
             stats["ties"] += 1
             stats["current_streak"] = 0
+            self._daily_hands_total += 1
+            self._no_bust_count += 1
+            self._dealer_bust_streak = 0
+            self._blackjack_recent.append(0)
+            if len(self._blackjack_recent) > 10:
+                self._blackjack_recent.pop(0)
         
         # Check for record breaks and announce if player has Grimoire
         self.check_grimoire_records(old_best_streak, old_worst_streak, old_biggest_win, old_biggest_loss)
@@ -286,14 +326,14 @@ class SystemsMixin:
             if not self.has_met("Scholar's Insight"):
                 self.meet("Scholar's Insight")
                 tome = "Oracle's Tome" if self.has_item("Oracle's Tome") else "Gambler's Grimoire"
-                print("\n")
+                print()
                 type.type("The " + cyan(bright(tome)) + " and the " + cyan(bright("Hermit's Journal")) + " are open side by side. The handwriting starts to match.")
-                print("\n")
+                print()
                 type.type("Scholar's Insight. Knowledge combines. Recipes reveal themselves — combinations you never would have guessed. The Journal provides ingredients; the Grimoire provides purpose.")
-                print("\n")
+                print()
                 type.type("You feel like you could craft anything. The workbench is no longer a mystery.")
                 self.restore_sanity(15)
-                print("\n")
+                print()
         
         stats = self._gambling_stats
         records_broken = []
@@ -322,7 +362,7 @@ class SystemsMixin:
 
     def grimoire_announcement(self, record_type, value):
         """Cheeky announcements from the Gambler's Grimoire"""
-        print("\n")
+        print()
         
         if self.has_item("Oracle's Tome"):
             book_name = "Oracle's Tome"
@@ -392,9 +432,9 @@ class SystemsMixin:
             book_name = "Gambler's Grimoire"
             book_color = magenta
         
-        print("\n")
+        print()
         type.fast("You open the " + bright(book_color(book_name)) + "...")
-        print("\n")
+        print()
         
         # Win rate calculation
         total = stats["wins"] + stats["losses"]
@@ -487,7 +527,7 @@ class SystemsMixin:
                     else:
                         self.break_item("Gambler's Grimoire")
                         type.slow(red(bright("Your Gambler's Grimoire's pages have faded to illegibility!")))
-                    print("\n")
+                    print()
 
             if (self._item_durability[17] == 0):
                 self._item_durability[17] = 60 if has_base else 100  # Oracle's Tome lasts longer
@@ -512,7 +552,7 @@ class SystemsMixin:
                     else:
                         self.break_item("Gambler's Chalice")
                         type.slow(red(bright("Your Gambler's Chalice has cracked!")))
-                    print("\n")
+                    print()
 
             if (self._item_durability[13] == 0):
                 self._item_durability[13] = 20 if has_base else 30  # Upgrade lasts longer
@@ -537,7 +577,7 @@ class SystemsMixin:
                     else:
                         self.break_item("Twin's Locket")
                         type.slow(red(bright("Your Twin's Locket snapped shut forever!")))
-                    print("\n")
+                    print()
 
             if (self._item_durability[14] == 0):
                 self._item_durability[14] = 18 if has_base else 28  # Upgrade lasts longer
@@ -562,7 +602,7 @@ class SystemsMixin:
                     else:
                         self.break_item("White Feather")
                         type.slow(red(bright("Your White Feather has crumbled to dust!")))
-                    print("\n")
+                    print()
 
             if (self._item_durability[15] == 0):
                 self._item_durability[15] = 25 if has_base else 40  # Phoenix Feather lasts longer
@@ -587,7 +627,7 @@ class SystemsMixin:
                     else:
                         self.break_item("Dealer's Grudge")
                         type.slow(red(bright("Your Dealer's Grudge has lost its power!")))
-                    print("\n")
+                    print()
 
             if (self._item_durability[16] == 0):
                 self._item_durability[16] = 22 if has_base else 35  # Upgrade lasts longer
@@ -595,21 +635,21 @@ class SystemsMixin:
 
     def sanity_depleted(self):
         """Called when sanity hits 0 - either madness ending or become broken"""
-        print("\n")
+        print()
         type.slow(red(bright("===============================================")))
         type.slow(red(bright("         YOUR SANITY HAS SHATTERED           ")))
         type.slow(red(bright("===============================================")))
-        print("\n")
+        print()
         
         type.slow("Everything goes dark. The world folds in on itself.")
-        print("\n")
+        print()
         type.slow("You feel yourself slipping... falling... breaking...")
-        print("\n")
+        print()
         
         # 40% chance of madness ending, 60% chance of becoming broken
         if random.randrange(100) < 40:
             type.slow(red("The darkness swallows you whole."))
-            print("\n")
+            print()
             time.sleep(2)
             self.madness_ending()
         else:
@@ -618,29 +658,29 @@ class SystemsMixin:
     def become_broken(self):
         """You survive the sanity break, but you're never the same"""
         type.slow("...")
-        print("\n")
+        print()
         time.sleep(1)
         type.slow("Something inside you... snaps.")
-        print("\n")
+        print()
         type.slow("But it doesn't kill you. Not physically, anyway.")
-        print("\n")
+        print()
         type.slow(cyan("You open your eyes. The world looks... wrong. Colors are too bright. Sounds are too loud. Everything has edges that shouldn't be there."))
-        print("\n")
+        print()
         type.slow(cyan("Your hands are shaking. They won't stop. You're not sure they ever will."))
-        print("\n")
+        print()
         type.slow(yellow(bright("You have become BROKEN.")))
-        print("\n")
+        print()
         type.slow(yellow("Your mind is shattered, but somehow you continue. The game goes on."))
-        print("\n")
+        print()
         type.slow(yellow("But nothing will ever be the same."))
-        print("\n")
+        print()
         
         self._is_broken = True
         self._sanity = 0  # Sanity stays at 0 forever
         self.meet("Broken Mind")
         
         ask.press_continue("Press any key to continue your broken existence...")
-        print("\n")
+        print()
     
     def is_broken(self):
         """Check if player has been broken"""
@@ -751,6 +791,7 @@ class SystemsMixin:
         if upgraded and self.has_item(item):
             self.use_item(item)
             self.add_item(upgraded)
+            self._oswald_upgrades += 1
             return upgraded
         return None
     
@@ -1022,6 +1063,571 @@ class SystemsMixin:
         if self.has_met("Scrap Armor Made") and not self.has_achievement("scrap_armor_crafted"):
             self.unlock_achievement("scrap_armor_crafted")
         
+        # Zone Exploration Achievements
+        if self.has_item("Road Warrior Badge") and not self.has_achievement("road_explorer"):
+            self.unlock_achievement("road_explorer")
+        if self.has_item("Druid's Staff") and not self.has_achievement("woodland_explorer"):
+            self.unlock_achievement("woodland_explorer")
+        if self.has_item("Swamp Rune") and not self.has_achievement("swamp_explorer"):
+            self.unlock_achievement("swamp_explorer")
+        if self.has_item("Sea Glass") and not self.has_achievement("beach_explorer"):
+            self.unlock_achievement("beach_explorer")
+        if self.has_item("Depth Charm") and not self.has_achievement("underwater_explorer"):
+            self.unlock_achievement("underwater_explorer")
+        if self.has_item("Underground Pass") and not self.has_achievement("city_explorer"):
+            self.unlock_achievement("city_explorer")
+        zone_items = ["Road Warrior Badge", "Druid's Staff", "Swamp Rune", "Sea Glass", "Depth Charm", "Underground Pass"]
+        if all(self.has_item(z) for z in zone_items) and not self.has_achievement("zone_collector"):
+            self.unlock_achievement("zone_collector")
+        
+        # Lucky Status Achievement
+        if self.has_status("Lucky") and not self.has_achievement("lucky_charm"):
+            self.unlock_achievement("lucky_charm")
+        
+        # Pawn Shop Milestone Achievements
+        gus_sold = self.get_gus_items_sold()
+        if gus_sold >= 10 and not self.has_achievement("pawn_shop_regular"):
+            self.unlock_achievement("pawn_shop_regular")
+        if gus_sold >= 50 and not self.has_achievement("pawn_shop_pro"):
+            self.unlock_achievement("pawn_shop_pro")
+        if gus_sold >= 100 and not self.has_achievement("pawn_shop_legend"):
+            self.unlock_achievement("pawn_shop_legend")
+        if gus_sold >= 5 and not self.has_achievement("treasure_hunter"):
+            self.unlock_achievement("treasure_hunter")
+        
+        # Companion relationship achievements
+        for name, data in self._companions.items():
+            if data.get("happiness", 0) >= 50 and not self.has_achievement("companion_bond"):
+                self.unlock_achievement("companion_bond")
+            if data.get("happiness", 0) >= 90 and not self.has_achievement("best_friends"):
+                self.unlock_achievement("best_friends")
+            if data.get("days_owned", 0) >= 30 and not self.has_achievement("loyal_companion"):
+                self.unlock_achievement("loyal_companion")
+            if data.get("days_owned", 0) >= 60 and not self.has_achievement("companion_loyalty"):
+                self.unlock_achievement("companion_loyalty")
+        
+        # Location visit milestones
+        if self._statistics.get("casino_visits", 0) >= 50 and not self.has_achievement("regular"):
+            self.unlock_achievement("regular")
+        if self._statistics.get("casino_visits", 0) >= 100 and not self.has_achievement("casino_rat"):
+            self.unlock_achievement("casino_rat")
+        if self._statistics.get("casino_visits", 0) >= 200 and not self.has_achievement("casino_legend"):
+            self.unlock_achievement("casino_legend")
+        if self._statistics.get("doctor_visits", 0) >= 20 and not self.has_achievement("doctor_regular"):
+            self.unlock_achievement("doctor_regular")
+        if self._statistics.get("mechanic_visits", 0) >= 15 and not self.has_achievement("mechanic_loyal"):
+            self.unlock_achievement("mechanic_loyal")
+        
+        # Dealer happiness achievements
+        if self._dealer_happiness >= 100 and not self.has_achievement("dealer_pleased"):
+            self.unlock_achievement("dealer_pleased")
+        if self._dealer_happiness <= 10 and not self.has_achievement("dealer_furious"):
+            self.unlock_achievement("dealer_furious")
+        
+        # Loan shark achievements
+        if self._statistics.get("loans_taken", 0) >= 5 and not self.has_achievement("vinnie_regular"):
+            self.unlock_achievement("vinnie_regular")
+        if self._statistics.get("loans_taken", 0) >= 50 and not self.has_achievement("loan_shark_best_friend"):
+            self.unlock_achievement("loan_shark_best_friend")
+        if self._loan_shark_debt >= 100000 and not self.has_achievement("debt_collector"):
+            self.unlock_achievement("debt_collector")
+        if self._loan_shark_warning_level >= 4 and not self.has_achievement("beaten_and_bloody"):
+            self.unlock_achievement("beaten_and_bloody")
+        
+        # Pawn shop reputation
+        if self._pawn_shop_reputation >= 75 and not self.has_achievement("gus_trusted"):
+            self.unlock_achievement("gus_trusted")
+        if self._pawn_shop_reputation >= 100 and not self.has_achievement("gus_partner"):
+            self.unlock_achievement("gus_partner")
+        
+        # Gambling stat achievements
+        if stats["busts"] >= 100 and not self.has_achievement("bust_master"):
+            self.unlock_achievement("bust_master")
+        if stats["ties"] >= 100 and not self.has_achievement("push_master"):
+            self.unlock_achievement("push_master")
+        if stats["surrenders_used"] >= 10 and not self.has_achievement("surrender_survivor"):
+            self.unlock_achievement("surrender_survivor")
+        if stats["surrenders_used"] >= 100 and not self.has_achievement("surrender_addiction"):
+            self.unlock_achievement("surrender_addiction")
+        if stats["insurance_collected"] >= 10 and not self.has_achievement("insurance_expert"):
+            self.unlock_achievement("insurance_expert")
+        if stats["double_downs_won"] >= 20 and not self.has_achievement("double_down_king"):
+            self.unlock_achievement("double_down_king")
+        if stats["splits_won"] >= 5 and not self.has_achievement("split_master"):
+            self.unlock_achievement("split_master")
+        if stats["total_hands"] >= 10000 and not self.has_achievement("ten_thousand_hands"):
+            self.unlock_achievement("ten_thousand_hands")
+        if stats["total_lost"] >= 1000000 and not self.has_achievement("million_lost"):
+            self.unlock_achievement("million_lost")
+        
+        # Injury / illness achievements
+        if len(self._injuries) >= 5 and not self.has_achievement("scarred_survivor"):
+            self.unlock_achievement("scarred_survivor")
+        
+        # Fraudulent cash achievements
+        if self._fraudulent_cash >= 500000 and not self.has_achievement("fake_money_king"):
+            self.unlock_achievement("fake_money_king")
+        
+        # Speedrunner achievements
+        if self._balance >= 1000000 and self._day <= 30 and not self.has_achievement("speedrunner"):
+            self.unlock_achievement("speedrunner")
+        if self._balance >= 100000 and self._day <= 30 and not self.has_achievement("speedrunner_rich"):
+            self.unlock_achievement("speedrunner_rich")
+        
+        # Kyle's store
+        if hasattr(self, '_convenience_store_purchases') and self._convenience_store_purchases >= 10 and not self.has_achievement("kyle_regular"):
+            self.unlock_achievement("kyle_regular")
+        
+        # Companion sales path
+        if self._companions_sold_count >= 1 and not self.has_achievement("first_sale"):
+            self.unlock_achievement("first_sale")
+        if self._companions_sold_count >= 3 and not self.has_achievement("three_sales"):
+            self.unlock_achievement("three_sales")
+        if self._companions_sold_count >= 5 and not self.has_achievement("five_sales"):
+            self.unlock_achievement("five_sales")
+        if self._companions_sold_count >= 7 and not self.has_achievement("seven_sales"):
+            self.unlock_achievement("seven_sales")
+        if self._companions_sold_count >= 10 and not self.has_achievement("ten_sales"):
+            self.unlock_achievement("ten_sales")
+        if self._companions_sold_count >= 15 and not self.has_achievement("cube_master"):
+            self.unlock_achievement("cube_master")
+        
+        # Day-based balance check
+        if self._balance_at_day_start < 100 and self._balance >= 10000 and not self.has_achievement("broke_to_rich"):
+            self.unlock_achievement("broke_to_rich")
+        
+        # Mega hoarder (50 items)
+        if len(self._inventory) >= 50 and not self.has_achievement("mega_hoarder"):
+            self.unlock_achievement("mega_hoarder")
+        
+        # Specific item discovery achievements
+        if self.has_item("Animal Whistle") and not self.has_achievement("animal_whisperer"):
+            self.unlock_achievement("animal_whisperer")
+        if self.has_item("Gambler's Grimoire") and not self.has_achievement("grimoire_keeper"):
+            self.unlock_achievement("grimoire_keeper")
+        if self.has_item("Oracle's Tome") and not self.has_achievement("oracle_ascended"):
+            self.unlock_achievement("oracle_ascended")
+        
+        # Madness / broken state
+        if self._is_broken and not self.has_achievement("broken_but_alive"):
+            self.unlock_achievement("broken_but_alive")
+        
+        # Rabbit chase completion
+        if self._rabbit_chase >= 6 and not self.has_achievement("rabbit_chaser"):
+            self.unlock_achievement("rabbit_chaser")
+        
+        # Dream walker - all 3 dream sequences experienced
+        if self._tom_dreams >= 3 and self._frank_dreams >= 3 and self._oswald_dreams >= 3 and not self.has_achievement("dream_walker"):
+            self.unlock_achievement("dream_walker")
+        
+        # Millennium survivor
+        if self._day >= 1000 and not self.has_achievement("millennium_survivor"):
+            self.unlock_achievement("millennium_survivor")
+        
+        # All mechanics visited
+        if self.has_met("Tom") and self.has_met("Frank") and self.has_met("Oswald") and not self.has_achievement("all_mechanics"):
+            self.unlock_achievement("all_mechanics")
+        
+        # Flask master - 5 active flask effects
+        if len(self._flask_effects) >= 5 and not self.has_achievement("flask_master"):
+            self.unlock_achievement("flask_master")
+        
+        # Lone wolf - day 100 with no companions
+        if self._day >= 100 and len(self.get_all_companions()) == 0 and not self.has_achievement("lone_wolf"):
+            self.unlock_achievement("lone_wolf")
+        
+        # Penny pincher - under $100 for 10+ days
+        if self._balance < 100 and self._day >= 10 and not self.has_achievement("penny_pincher"):
+            self.unlock_achievement("penny_pincher")
+        
+        # Zero balance
+        if self._balance == 0 and not self.has_achievement("zero_balance"):
+            self.unlock_achievement("zero_balance")
+        
+        # Completionist — 90% of all achievements
+        total = self._lists.get_total_achievements()
+        if total > 0 and len(self._achievements) >= int(total * 0.9) and not self.has_achievement("completionist"):
+            self.unlock_achievement("completionist")
+        
+        # Money laundering milestones
+        if self._dealer_fake_cash_total >= 10000 and not self.has_achievement("money_launderer"):
+            self.unlock_achievement("money_launderer")
+        if self._dealer_fake_cash_total >= 100000 and not self.has_achievement("master_launderer"):
+            self.unlock_achievement("master_launderer")
+        
+        # Max everything — all key stats at maximum simultaneously
+        if (self._balance >= 1000000 and self._health >= 100 and self._sanity >= 100
+                and self._dealer_happiness >= 100 and self._pawn_shop_reputation >= 100
+                and not self.has_achievement("max_everything")):
+            self.unlock_achievement("max_everything")
+        
+        # ============================================
+        # RECOVERY / CONDITION ACHIEVEMENTS
+        # ============================================
+        
+        # Rock bottom — lost all money and recovered
+        if self._was_broke and self._balance > 0 and not self.has_achievement("rock_bottom"):
+            self.unlock_achievement("rock_bottom")
+        
+        # Sanity saved — recovered from below 25 to above 75
+        if self._was_low_sanity and self._sanity > 75 and not self.has_achievement("sanity_saved"):
+            self.unlock_achievement("sanity_saved")
+        
+        # Economic yo-yo — crossed the 100k threshold multiple times
+        if self._big_swing_count >= 4 and not self.has_achievement("yo_yo"):
+            self.unlock_achievement("yo_yo")
+        
+        # Near miss — reached 950k+ then went broke
+        if self._reached_950k and self._balance == 0 and not self.has_achievement("near_miss"):
+            self.unlock_achievement("near_miss")
+        
+        # Broke millionaire — reached 1M then lost to 0
+        if self._was_millionaire_ach and self._balance == 0 and not self.has_achievement("broke_millionaire"):
+            self.unlock_achievement("broke_millionaire")
+        
+        # Bankruptcy expert — 100k+ to $0 in one day
+        if self._balance == 0 and self._balance_at_day_start >= 100000 and not self.has_achievement("bankruptcy_expert"):
+            self.unlock_achievement("bankruptcy_expert")
+        
+        # ============================================
+        # CONSECUTIVE DAY CONDITION ACHIEVEMENTS
+        # ============================================
+        
+        if self._consecutive_injury_days >= 7 and not self.has_achievement("injured_survival"):
+            self.unlock_achievement("injured_survival")
+        if self._consecutive_sick_days >= 7 and not self.has_achievement("sick_survival"):
+            self.unlock_achievement("sick_survival")
+        if self._days_low_health >= 10 and not self.has_achievement("low_health_master"):
+            self.unlock_achievement("low_health_master")
+        if self._days_low_sanity >= 20 and not self.has_achievement("sanity_master"):
+            self.unlock_achievement("sanity_master")
+        if self._days_dealer_low >= 10 and not self.has_achievement("zero_happiness_survivor"):
+            self.unlock_achievement("zero_happiness_survivor")
+        if self._days_dealer_high >= 20 and not self.has_achievement("dealer_friend"):
+            self.unlock_achievement("dealer_friend")
+        if self._days_with_cursed >= 30 and not self.has_achievement("cursed_survival"):
+            self.unlock_achievement("cursed_survival")
+        if self._days_at_camp >= 20 and not self.has_achievement("hermit"):
+            self.unlock_achievement("hermit")
+        if self._days_not_spending >= 10 and not self.has_achievement("money_hoarder"):
+            self.unlock_achievement("money_hoarder")
+        
+        # ============================================
+        # TIME-BASED ACHIEVEMENTS
+        # ============================================
+        
+        if self._day >= 200 and not self.has_achievement("marathon_man"):
+            self.unlock_achievement("marathon_man")
+        
+        # ============================================
+        # EVENT TRACKING ACHIEVEMENTS
+        # ============================================
+        
+        if self._night_events_count >= 20 and not self.has_achievement("night_owl"):
+            self.unlock_achievement("night_owl")
+        if self._day_events_count >= 20 and not self.has_achievement("morning_person"):
+            self.unlock_achievement("morning_person")
+        if len(self._unique_events_seen) >= 50 and not self.has_achievement("event_collector"):
+            self.unlock_achievement("event_collector")
+        
+        # ============================================
+        # FLASK ACHIEVEMENTS
+        # ============================================
+        
+        if len(self._flask_types_used) >= 10 and not self.has_achievement("flask_connoisseur"):
+            self.unlock_achievement("flask_connoisseur")
+        
+        # ============================================
+        # COMPANION ACHIEVEMENTS
+        # ============================================
+        
+        living = self.get_all_companions()
+        companion_count = len(living)
+        
+        if companion_count >= 50 and not self.has_achievement("companion_army"):
+            self.unlock_achievement("companion_army")
+        if self._companions_lost_count >= 3 and not self.has_achievement("pet_cemetery"):
+            self.unlock_achievement("pet_cemetery")
+        
+        # Companion type categories
+        cat_types = {"Alley Cat", "Cat", "Kitten", "Tabby", "Calico", "Siamese", "Persian"}
+        dog_types = {"Three-Legged Dog", "Stray Dog", "Dog", "Puppy", "Hound", "Mutt", "Labrador"}
+        aquatic_types = {"Giant Octopus", "Fish", "Crab", "Turtle", "Frog", "Newt", "Goldfish", "Koi", "Jellyfish", "Seahorse"}
+        bird_types = {"Crow", "Seagull", "Duck Commander", "Parrot", "Eagle", "Hawk", "Owl", "Pigeon", "Robin", "Pelican"}
+        mythical_types = {"Giant Octopus", "Phoenix", "Dragon", "Unicorn", "Griffin"}
+        
+        cats = sum(1 for c in living.values() if c.get("type", "") in cat_types)
+        dogs = sum(1 for c in living.values() if c.get("type", "") in dog_types)
+        aquatics = sum(1 for c in living.values() if c.get("type", "") in aquatic_types)
+        birds = sum(1 for c in living.values() if c.get("type", "") in bird_types)
+        mythicals = sum(1 for c in living.values() if c.get("type", "") in mythical_types)
+        
+        if cats >= 5 and not self.has_achievement("cat_person"):
+            self.unlock_achievement("cat_person")
+        if dogs >= 5 and not self.has_achievement("dog_person"):
+            self.unlock_achievement("dog_person")
+        if aquatics >= 10 and not self.has_achievement("aquarium"):
+            self.unlock_achievement("aquarium")
+        if birds >= 10 and not self.has_achievement("aviary"):
+            self.unlock_achievement("aviary")
+        if mythicals >= 5 and not self.has_achievement("mythical_menagerie"):
+            self.unlock_achievement("mythical_menagerie")
+        
+        # ============================================
+        # ITEM CATEGORY ACHIEVEMENTS
+        # ============================================
+        
+        cursed_items = {"Cursed Coin", "Devil's Deck", "Binding Portrait", "Necronomicon", "Voodoo Doll", "Dealer's Grudge"}
+        weapon_items = {"Shiv", "Slingshot", "Road Flare Torch", "Pepper Spray", "Assassin's Kit",
+                        "Fire Launcher", "Tear Gas", "Street Fighter Set", "Road Warrior Armor",
+                        "Brass Knuckles", "Pocket Knife", "Utility Blade"}
+        
+        cursed_count = sum(1 for c in cursed_items if self.has_item(c))
+        weapon_count = sum(1 for w in weapon_items if self.has_item(w))
+        
+        if cursed_count >= 5 and not self.has_achievement("cursed_collector"):
+            self.unlock_achievement("cursed_collector")
+        if weapon_count >= 5 and not self.has_achievement("weapon_dealer"):
+            self.unlock_achievement("weapon_dealer")
+        
+        # Cursed millionaire — 1M with only cursed items in inventory
+        if self._balance >= 1000000 and len(self._inventory) > 0 and not self.has_achievement("cursed_millionaire"):
+            if all(item in cursed_items for item in self._inventory):
+                self.unlock_achievement("cursed_millionaire")
+        
+        # Blessing tracking via status effects
+        blessing_statuses = {"Fairy Blessed", "Love Blessed", "Fire Empowered", "Enlightened",
+                             "Witch's Blessing", "Lucky", "Beginner's Luck", "Oswald's Luck",
+                             "Protected", "Blessed"}
+        active_blessings = sum(1 for b in blessing_statuses if self.has_status(b))
+        if active_blessings >= 10 and not self.has_achievement("blessing_hoarder"):
+            self.unlock_achievement("blessing_hoarder")
+        
+        # Fully upgraded items
+        upgraded_items = {"Delight Manipulator", "Health Manipulator", "Unwashed Hair", "Sapphire Watch",
+                          "Sneaky Peeky Goggles", "Quiet Bunny Slippers", "Real Insurance", "Lucky Medallion",
+                          "Velvet Gloves", "Invisible Cloak", "Golden Compass", "Grandfather Clock",
+                          "Overflowing Goblet", "Mirror of Duality", "Phoenix Feather", "Dealer's Mercy",
+                          "Oracle's Tome"}
+        owned_upgraded = sum(1 for u in upgraded_items if self.has_item(u))
+        if owned_upgraded >= 5 and not self.has_achievement("fully_upgraded"):
+            self.unlock_achievement("fully_upgraded")
+        
+        # ============================================
+        # SHOP / NPC MILESTONES
+        # ============================================
+        
+        if self._total_shop_spending >= 100000 and not self.has_achievement("shop_spender"):
+            self.unlock_achievement("shop_spender")
+        if self._total_given_away >= 100000 and not self.has_achievement("philanthropist"):
+            self.unlock_achievement("philanthropist")
+        if self._oswald_upgrades >= 10 and not self.has_achievement("oswald_masterwork"):
+            self.unlock_achievement("oswald_masterwork")
+        if self._achievement_check_count >= 100 and not self.has_achievement("achievement_hunter"):
+            self.unlock_achievement("achievement_hunter")
+        if self._debt_spiral_count >= 5 and not self.has_achievement("debt_spiral"):
+            self.unlock_achievement("debt_spiral")
+        if self._tony_survived_count >= 10 and not self.has_achievement("tony_survivor"):
+            self.unlock_achievement("tony_survivor")
+        if self._bad_gifts_given >= 5 and not self.has_achievement("gift_of_death"):
+            self.unlock_achievement("gift_of_death")
+        
+        # Dealer tormentor — dealer happiness below 5 on 10 different days
+        if self._days_dealer_low >= 10 and not self.has_achievement("dealer_tormentor"):
+            self.unlock_achievement("dealer_tormentor")
+        
+        # Happiness rollercoaster — happiness changed by 100+ in one day
+        happiness_change = abs(self._dealer_happiness - self._dealer_happiness_day_start)
+        if happiness_change >= 100 and not self.has_achievement("happiness_rollercoaster"):
+            self.unlock_achievement("happiness_rollercoaster")
+        
+        # Kyle confidant
+        if hasattr(self, '_convenience_store_purchases') and self._convenience_store_purchases >= 50 and not self.has_achievement("kyle_confidant"):
+            self.unlock_achievement("kyle_confidant")
+        
+        # Shop/location daily achievements
+        core_shops = {"Doctor's Office", "Witch Doctor's Tower", "Convenience Store",
+                      "Marvin's Mystical Merchandise", "Grimy Gus's Pawn Emporium", "Vinnie's Back Alley Loans"}
+        if len(self._shops_visited_today) >= len(core_shops) and not self.has_achievement("all_shops_one_day"):
+            if core_shops.issubset(self._shops_visited_today):
+                self.unlock_achievement("all_shops_one_day")
+        if len(self._shops_visited_today) >= 4 and not self.has_achievement("shop_hopper"):
+            self.unlock_achievement("shop_hopper")
+        if len(self._locations_visited_today) >= 5 and not self.has_achievement("nomad"):
+            self.unlock_achievement("nomad")
+        
+        # ============================================
+        # BLACKJACK ACHIEVEMENT CHECKS
+        # ============================================
+        
+        # Blackjack streak — 3 BJs in last 10 hands
+        if sum(self._blackjack_recent) >= 3 and not self.has_achievement("blackjack_streak"):
+            self.unlock_achievement("blackjack_streak")
+        
+        # Comeback master — win 5 after losing 5 (check current streak after worst streak)
+        if (stats["best_win_streak"] >= 5 and stats["worst_loss_streak"] >= 5
+                and stats["current_streak"] >= 5 and not self.has_achievement("comeback_master")):
+            self.unlock_achievement("comeback_master")
+        
+        # No bust streak / never bust
+        if self._no_bust_count >= 20 and not self.has_achievement("no_bust_streak"):
+            self.unlock_achievement("no_bust_streak")
+        if self._no_bust_count >= 50 and not self.has_achievement("never_bust"):
+            self.unlock_achievement("never_bust")
+        
+        # Natural blackjacks
+        if self._natural_blackjacks >= 10 and not self.has_achievement("blackjack_natural"):
+            self.unlock_achievement("blackjack_natural")
+        
+        # All naturals — 5 BJs in a row
+        if stats["current_streak"] >= 5 and self._natural_blackjacks >= 5 and not self.has_achievement("all_naturals"):
+            bj_recent = self._blackjack_recent[-5:] if len(self._blackjack_recent) >= 5 else []
+            if len(bj_recent) == 5 and all(x == 1 for x in bj_recent):
+                self.unlock_achievement("all_naturals")
+        
+        # All busts — 10 busts in a row (worst_loss_streak tracks overall losses, use busts specifically)
+        if stats["busts"] >= 10 and not self.has_achievement("all_busts"):
+            # Approximate: if current streak is -10 or worse and all were busts
+            pass  # Tracked via bust_streak in blackjack.py instead
+        
+        # Lose streak — 50 losses in a row
+        if stats["worst_loss_streak"] >= 50 and not self.has_achievement("lose_streak"):
+            self.unlock_achievement("lose_streak")
+        
+        # Dealer bust streak — 10 in a row
+        if self._dealer_bust_streak >= 10 and not self.has_achievement("dealer_bust_streak"):
+            self.unlock_achievement("dealer_bust_streak")
+        
+        # Dealer blackjack victim — 50 times
+        if self._dealer_bj_losses >= 50 and not self.has_achievement("dealer_blackjack_victim"):
+            self.unlock_achievement("dealer_blackjack_victim")
+        
+        # Insurance failure — 20 times
+        if self._insurance_failures >= 20 and not self.has_achievement("insurance_failure"):
+            self.unlock_achievement("insurance_failure")
+        
+        # Twenty-one push — 5 times
+        if self._twenty_one_pushes >= 5 and not self.has_achievement("twenty_one_push"):
+            self.unlock_achievement("twenty_one_push")
+        
+        # Perfect day — won all hands (min 10)
+        if self._daily_hands_total >= 10 and self._daily_hands_lost == 0 and self._daily_hands_won >= 10 and not self.has_achievement("perfect_day"):
+            self.unlock_achievement("perfect_day")
+        
+        # Worst day — lost all hands (min 10)
+        if self._daily_hands_total >= 10 and self._daily_hands_won == 0 and self._daily_hands_lost >= 10 and not self.has_achievement("worst_day"):
+            self.unlock_achievement("worst_day")
+        
+        # Perfect record — reach $100k without ever losing a hand
+        if self._balance >= 100000 and not self._ever_lost_hand and not self.has_achievement("perfect_record"):
+            self.unlock_achievement("perfect_record")
+        
+        # Comeback king — under $100 to over $10k in one session (approximated by daily)
+        if self._balance_at_day_start < 100 and self._balance >= 10000 and not self.has_achievement("comeback_king"):
+            self.unlock_achievement("comeback_king")
+        
+        # Last dollar bets
+        if self._last_dollar_bets >= 100 and not self.has_achievement("suicide_gambler"):
+            self.unlock_achievement("suicide_gambler")
+        
+        # ============================================
+        # CHALLENGE RUN / ABSENCE ACHIEVEMENTS
+        # ============================================
+        
+        # Iron will — never dropped below 50 sanity
+        if self._day >= 50 and not self._sanity_ever_below_50 and not self.has_achievement("iron_will"):
+            self.unlock_achievement("iron_will")
+        
+        # No loans — reach 1M without ever taking a loan
+        if self._balance >= 1000000 and not self._ever_took_loan and not self.has_achievement("no_loans"):
+            self.unlock_achievement("no_loans")
+        
+        # No gifts — day 100 without giving dealer any gifts
+        if self._day >= 100 and not self._ever_gave_gift and not self.has_achievement("no_gifts"):
+            self.unlock_achievement("no_gifts")
+        
+        # Never shop — day 50 without buying
+        if self._day >= 50 and not self._ever_bought_item and not self.has_achievement("never_shop"):
+            self.unlock_achievement("never_shop")
+        
+        # Pacifist — day 100 without weapons
+        has_weapon = any(self.has_item(w) for w in weapon_items)
+        if self._day >= 100 and not has_weapon and not self.has_achievement("pacifist_run"):
+            self.unlock_achievement("pacifist_run")
+        
+        # No item millionaire / Item minimalist — 1M with empty inventory
+        if self._balance >= 1000000 and len(self._inventory) == 0 and not self.has_achievement("no_item_millionaire"):
+            self.unlock_achievement("no_item_millionaire")
+        if self._balance >= 1000000 and len(self._inventory) == 0 and not self.has_achievement("item_minimalist"):
+            self.unlock_achievement("item_minimalist")
+        
+        # Casino only — 100k visiting only casino (approximation: never bought anything)
+        if self._balance >= 100000 and not self._ever_bought_item and not self.has_achievement("casino_only"):
+            self.unlock_achievement("casino_only")
+        
+        # Minimum bet — 100k betting minimum only
+        if self._balance >= 100000 and not self._ever_bet_above_min and not self.has_achievement("minimum_bet"):
+            self.unlock_achievement("minimum_bet")
+        
+        # Vegan run — complete game (day 100+) without eating meat
+        meat_items_in_inv = {"Beef Jerky", "Hot Dog", "Turkey Sandwich", "Fish", "Stolen Marlin", "Meat Cube"}
+        has_eaten_meat = any(m in self._items_ever_used for m in meat_items_in_inv)
+        if self._day >= 100 and not has_eaten_meat and not self.has_achievement("vegan_run"):
+            self.unlock_achievement("vegan_run")
+        
+        # ============================================
+        # COLLECTION COMPLETION ACHIEVEMENTS
+        # ============================================
+        
+        # Marvin believer — bought all Marvin items
+        marvin_items = {"Sneaky Peeky Shades", "Pocket Watch", "Lucky Coin", "Worn Gloves",
+                        "Tattered Cloak", "Gambler's Chalice", "Twin's Locket", "White Feather",
+                        "Dealer's Grudge", "Delight Indicator", "Health Indicator", "Dirty Old Hat",
+                        "Golden Watch", "Faulty Insurance", "Enchanting Silver Bar", "Marvin's Monocle",
+                        "Gambler's Grimoire", "Quiet Sneakers", "Rusty Compass", "Animal Whistle"}
+        if marvin_items.issubset(self._items_ever_owned) and not self.has_achievement("marvin_believer"):
+            self.unlock_achievement("marvin_believer")
+        
+        # Every companion type
+        if len(self._companion_types_owned) >= 15 and not self.has_achievement("every_companion"):
+            self.unlock_achievement("every_companion")
+        
+        # Zoo betrayal — befriended 30+ companions then sold them all
+        if (self._statistics["companions_befriended"] >= 30 and self._companions_sold_count >= 30
+                and len(self.get_all_companions()) == 0 and not self.has_achievement("zoo_betrayal")):
+            self.unlock_achievement("zoo_betrayal")
+        
+        # Collector betrayer — own every animal type then sell them all
+        if (len(self._companion_types_owned) >= 15 and len(self.get_all_companions()) == 0
+                and self._companions_sold_count >= 15 and not self.has_achievement("collector_betrayer")):
+            self.unlock_achievement("collector_betrayer")
+        
+        # Every item — own every item at least once
+        if len(self._items_ever_owned) >= 50 and not self.has_achievement("every_item"):
+            self.unlock_achievement("every_item")
+        
+        # Item master — use every item in the game
+        if len(self._items_ever_used) >= 30 and not self.has_achievement("item_master"):
+            self.unlock_achievement("item_master")
+        
+        # Full house — own every collectible at once (Marvin items + upgraded items)
+        collectible_items = {"Delight Indicator", "Health Indicator", "Dirty Old Hat", "Golden Watch",
+                             "Faulty Insurance", "Lucky Coin", "Worn Gloves", "Tattered Cloak",
+                             "Rusty Compass", "Pocket Watch", "Gambler's Chalice", "Twin's Locket",
+                             "White Feather", "Dealer's Grudge", "Gambler's Grimoire", "Quiet Sneakers",
+                             "Sneaky Peeky Shades", "Marvin's Monocle", "Animal Whistle",
+                             "Enchanting Silver Bar"}
+        owned_collectibles = sum(1 for c in collectible_items if self.has_item(c))
+        if owned_collectibles >= len(collectible_items) and not self.has_achievement("full_house"):
+            self.unlock_achievement("full_house")
+        
+        # Trinket master — collect every trinket type (approximation via items_ever_owned)
+        trinket_items = {"Lucky Coin", "Pocket Watch", "Twin's Locket", "White Feather",
+                         "Gambler's Chalice", "Rusty Compass", "Marvin's Monocle",
+                         "Enchanting Silver Bar", "Animal Whistle", "Worn Gloves"}
+        if trinket_items.issubset(self._items_ever_owned) and not self.has_achievement("trinket_master"):
+            self.unlock_achievement("trinket_master")
+        
         # Track highest balance
         if self._balance > self._statistics["highest_balance"]:
             self._statistics["highest_balance"] = self._balance
@@ -1030,7 +1636,8 @@ class SystemsMixin:
     
     def show_achievements(self):
         """Display all unlocked achievements"""
-        print("\n")
+        self._achievement_check_count += 1
+        print()
         type.fast(yellow(bright("═══════════════════════════════════════")))
         print()
         type.fast(yellow(bright("         YOUR ACHIEVEMENTS             ")))
@@ -1040,7 +1647,7 @@ class SystemsMixin:
         
         if len(self._achievements) == 0:
             type.type("You haven't unlocked any achievements yet.")
-            print("\n")
+            print()
             return
         
         for achievement_id in sorted(self._achievements):
@@ -1051,7 +1658,7 @@ class SystemsMixin:
         
         total = self._lists.get_total_achievements()
         type.type(f"\nUnlocked: {len(self._achievements)}/{total}")
-        print("\n")
+        print()
 
     # ==========================================
     # STATISTICS TRACKING SYSTEM
@@ -1071,7 +1678,7 @@ class SystemsMixin:
         stats = self._statistics
         g_stats = self._gambling_stats
         
-        print("\n")
+        print()
         type.fast(cyan(bright("═══════════════════════════════════════")))
         print()
         type.fast(cyan(bright("         YOUR JOURNEY SO FAR           ")))
@@ -1118,7 +1725,7 @@ class SystemsMixin:
         type.fast(f"Loans Taken: {str(stats['loans_taken'])}")
         print()
         type.fast(f"Times Robbed: {red(str(stats['times_robbed']))}")
-        print("\n")
+        print()
 
     # ==========================================
     # COMPANION SYSTEM
@@ -1144,8 +1751,9 @@ class SystemsMixin:
                 "bonded": False
             }
             self._statistics["companions_befriended"] += 1
+            self._companion_types_owned.add(companion_type)
             type.type(f"You have befriended " + bright(magenta(name)) + "!")
-            print("\n")
+            print()
     
     def has_companion(self, name):
         """Check if player has a specific companion"""
@@ -1200,15 +1808,16 @@ class SystemsMixin:
                         companion["bonded"] = True
                         print()
                         type.type(bright(magenta(name)) + " has bonded with you! Your friendship is unbreakable.")
-                        print("\n")
+                        print()
 
                 # Check for running away (very low happiness)
                 if companion["happiness"] <= 10:
                     if random.randrange(3) == 0:
                         companion["status"] = "lost"
+                        self._companions_lost_count += 1
                         print()
                         type.slow(red(name + " has run away. They were too unhappy to stay."))
-                        print("\n")
+                        print()
                         self.lose_sanity(10)
 
         # If companions are upset, they may keep their distance this afternoon.
@@ -1223,7 +1832,7 @@ class SystemsMixin:
             self._companions[name]["status"] = "dead"
             print()
             type.slow(red(bright(name + " has died.")))
-            print("\n")
+            print()
             self.lose_sanity(20)
     
     def apply_companion_day_bonuses(self):
@@ -1316,7 +1925,7 @@ class SystemsMixin:
         """Display all companions"""
         living = self.get_all_companions()
         
-        print("\n")
+        print()
         type.fast(magenta(bright("═══════════════════════════════════════")))
         print()
         type.fast(magenta(bright("         YOUR COMPANIONS               ")))
@@ -1326,7 +1935,7 @@ class SystemsMixin:
         
         if len(living) == 0:
             type.type("You have no companions. The road is lonely.")
-            print("\n")
+            print()
             return
         
         for name, data in living.items():
@@ -1346,12 +1955,12 @@ class SystemsMixin:
         
         if len(living_companions) == 0:
             type.type("You have no companions to spend time with.")
-            print("\n")
+            print()
             self.start_night()
             return
         
         type.type(cyan(bright("═══ AFTERNOON WITH YOUR COMPANIONS ═══")))
-        print("\n")
+        print()
         
         # List all companions
         companion_names = list(living_companions.keys())
@@ -1362,54 +1971,46 @@ class SystemsMixin:
         
         type.type(f"{len(companion_names) + 1}. Spend time with all of them")
         type.type(f"{len(companion_names) + 2}. Skip and head out")
-        print("\n")
-        
-        choice = input("Who do you want to interact with? ").strip()
-        
-        try:
-            choice_num = int(choice)
-            if choice_num == len(companion_names) + 2:
-                type.type("You wave goodbye to your companions and head out.")
-                print("\n")
-                self.start_night()
-                return
-            elif choice_num == len(companion_names) + 1:
-                # Group activity
-                type.type("You gather all your companions together. This is... quite a sight.")
-                print("\n")
-                if len(companion_names) >= 10:
-                    type.type("You've basically got a zoo at this point. A traveling menagerie. A Disney Princess situation.")
-                elif len(companion_names) >= 5:
-                    type.type("The Noah's Ark energy is strong. You're collecting two of everything at this rate.")
-                else:
-                    type.type("Your little found family settles around you. Each one chose you. That means something.")
-                print("\n")
-                
-                # Feed everyone
-                type.type("You share what food you have. It's not much, but it's enough.")
-                for name in companion_names:
-                    self.feed_companion(name)
-                    self.pet_companion(name)
-                
-                self.restore_sanity(10)
-                self.heal(15)
-                
-                type.type("You spend the afternoon together - a strange, beautiful collection of souls. ")
-                type.type("For a little while, you're not just a gambler on the run. You're someone who matters to others.")
-                print("\n")
-                
-                # Check for collection achievements
-                self.check_companion_achievements()
-                
-            elif 1 <= choice_num <= len(companion_names):
-                name = companion_names[choice_num - 1]
-                self.interact_with_companion(name)
+        print()
+
+        choice = ask.option("Who do you want to interact with?", [str(i) for i in range(1, len(companion_names) + 3)])
+        choice_num = int(choice)
+        if choice_num == len(companion_names) + 2:
+            type.type("You wave goodbye to your companions and head out.")
+            print()
+            self.start_night()
+            return
+        elif choice_num == len(companion_names) + 1:
+            # Group activity
+            type.type("You gather all your companions together. This is... quite a sight.")
+            print()
+            if len(companion_names) >= 10:
+                type.type("You've basically got a zoo at this point. A traveling menagerie. A Disney Princess situation.")
+            elif len(companion_names) >= 5:
+                type.type("The Noah's Ark energy is strong. You're collecting two of everything at this rate.")
             else:
-                type.type("Not a valid choice.")
-                print("\n")
-        except:
-            type.type("Not a valid choice.")
-            print("\n")
+                type.type("Your little found family settles around you. Each one chose you. That means something.")
+            print()
+
+            # Feed everyone
+            type.type("You share what food you have. It's not much, but it's enough.")
+            for name in companion_names:
+                self.feed_companion(name)
+                self.pet_companion(name)
+
+            self.restore_sanity(10)
+            self.heal(15)
+
+            type.type("You spend the afternoon together - a strange, beautiful collection of souls. ")
+            type.type("For a little while, you're not just a gambler on the run. You're someone who matters to others.")
+            print()
+
+            # Check for collection achievements
+            self.check_companion_achievements()
+
+        else:
+            name = companion_names[choice_num - 1]
+            self.interact_with_companion(name)
         
         self.start_night()
     
@@ -1420,7 +2021,7 @@ class SystemsMixin:
             return
         
         type.type(f"You spend time with {cyan(bright(name))} the {companion['type']}.")
-        print("\n")
+        print()
         
         # Companion-specific dialogue
         companion_type = companion['type']
@@ -1594,7 +2195,7 @@ class SystemsMixin:
             else:
                 type.type(f"{name} seems hungry and a bit distant. You should take better care of them.")
         
-        print("\n")
+        print()
         
         # Interaction options
         type.type("What would you like to do?")
@@ -1602,9 +2203,9 @@ class SystemsMixin:
         type.type("2. Pet/Play with them")
         type.type("3. Just sit together")
         type.type("4. Leave them be")
-        print("\n")
-        
-        action = input("Choose: ").strip()
+        print()
+
+        action = ask.option("Choose", ["1", "2", "3", "4"])
         
         if action == "1":
             if self.feed_companion(name):
@@ -1623,7 +2224,7 @@ class SystemsMixin:
         else:
             type.type(f"You give {name} space. They understand.")
         
-        print("\n")
+        print()
     
     def check_companion_achievements(self):
         """Check and unlock companion collection achievements"""
@@ -1634,14 +2235,14 @@ class SystemsMixin:
         if num_companions >= 10 and not self.has_achievement("zookeeper"):
             self.unlock_achievement("zookeeper")
             type.type(cyan(bright("🏆 ACHIEVEMENT UNLOCKED: Zookeeper - 10 companions!")))
-            print("\n")
+            print()
         
         # Noah's Ark (20 companions)
         if num_companions >= 20 and not self.has_achievement("noahs_ark"):
             self.unlock_achievement("noahs_ark")
             type.type(cyan(bright("🏆 EPIC ACHIEVEMENT: Noah's Ark - 20 companions!")))
             type.type("You're basically running an ark at this point. Where's the flood?")
-            print("\n")
+            print()
         
         # Check for themed achievements
         water_animals = ["Chomper", "Scooter", "Kraken", "Shellbert", "Deathclaw"]
@@ -1652,7 +2253,7 @@ class SystemsMixin:
         if water_count >= len(water_animals) and not self.has_achievement("marine_biologist"):
             self.unlock_achievement("marine_biologist")
             type.type(cyan(bright("🏆 EPIC ACHIEVEMENT: Marine Biologist - All water creatures!")))
-            print("\n")
+            print()
         
         # Disney Princess (all forest animals)
         forest_count = sum(1 for name in forest_animals if self.has_companion(name))
@@ -1660,7 +2261,7 @@ class SystemsMixin:
             self.unlock_achievement("disney_princess")
             type.type(cyan(bright("🏆 EPIC ACHIEVEMENT: Disney Princess - All forest creatures!")))
             type.type("Birds land on your shoulders. Deer follow you. Squirrels present you with acorns. This is your life now.")
-            print("\n")
+            print()
 
     # ==========================================
     # LOAN SHARK SYSTEM
@@ -1671,6 +2272,9 @@ class SystemsMixin:
     
     def take_loan(self, amount):
         """Take a loan from the loan shark - adds hot cash into your visible bankroll."""
+        if self._loan_shark_debt > 0:
+            self._debt_spiral_count += 1
+        self._ever_took_loan = True
         fee = int(amount * self.get_loan_shark_fee_rate())
         self._loan_shark_debt += amount + fee
         self.add_fraudulent_cash(amount)
@@ -1691,7 +2295,7 @@ class SystemsMixin:
             type.type("Total debt added: " + red(bright("${:,}".format(amount + fee))))
             print()
         type.type(quote("Oh, and the interest is ") + red(bright(f"{int(self.get_loan_shark_interest_rate() * 100)}%")) + quote(" per week. Don't be late."))
-        print("\n")
+        print()
     
     def repay_loan(self, amount):
         """Repay part or all of the loan"""
@@ -1704,14 +2308,15 @@ class SystemsMixin:
             self._statistics["total_repaid"] += amount
             self.spend_balance(amount)
             type.type("You've paid off your debt completely. Vinnie seems almost disappointed.")
-            print("\n")
+            if not self.has_achievement("debt_free"): self.unlock_achievement("debt_free")
+            print()
         else:
             self._statistics["total_repaid"] += amount
             self._loan_shark_debt -= amount
             self.spend_balance(amount)
             type.type("You pay " + green(bright("${:,}".format(amount))) + ". ")
             type.type("You still owe " + red(bright("${:,}".format(self._loan_shark_debt))) + ".")
-            print("\n")
+            print()
     
     def update_loan_shark_daily(self):
         """Called each day to update loan shark status"""
@@ -1728,7 +2333,7 @@ class SystemsMixin:
             type.type(red("Interest accrued on your loan: ") + red(bright("${:,}".format(interest))))
             print()
             type.type("You now owe Vinnie " + red(bright("${:,}".format(self._loan_shark_debt))) + ".")
-            print("\n")
+            print()
         
         # Escalate warnings
         if self._loan_shark_days_overdue >= 21 and self._loan_shark_warning_level < 4:
@@ -1826,37 +2431,38 @@ class SystemsMixin:
     
     def dealer_kills_you(self):
         """Dealer has had enough and kills you"""
-        print("\n")
+        self.unlock_achievement("dealer_executed")
+        print()
         type.slow(red(bright("═" * 50)))
         type.slow(red(bright("           THE DEALER'S JUDGMENT")))
         type.slow(red(bright("═" * 50)))
-        print("\n")
+        print()
         time.sleep(1)
         type.slow("The Dealer sets down the cards. Slowly. Deliberately.")
-        print("\n")
+        print()
         type.slow(red("\"Enough.\""))
-        print("\n")
+        print()
         type.slow("His jade eye catches the dim casino light. It doesn't blink.")
-        print("\n")
+        print()
         type.slow(red("\"You've tested my patience for the last time.\""))
-        print("\n")
+        print()
         time.sleep(2)
         type.slow("You try to stand. To leave. To run.")
-        print("\n")
+        print()
         type.slow("Your legs won't move.")
-        print("\n")
+        print()
         type.slow(red("\"The game is over. YOU are over.\""))
-        print("\n")
+        print()
         time.sleep(2)
         type.slow("The last thing you see is his hand reaching across the table.")
-        print("\n")
+        print()
         type.slow("Then darkness.")
-        print("\n")
+        print()
         type.slow("Then nothing.")
-        print("\n")
+        print()
         time.sleep(2)
         type.slow(red(bright("The Dealer does not forgive. The Dealer does not forget.")))
-        print("\n")
+        print()
         self.kill("The Dealer's wrath")
     
     # ==========================================
@@ -1906,15 +2512,15 @@ class SystemsMixin:
         item = self._gift_wrapped_item
         self._gift_wrapped_item = None
         
-        print("\n")
+        print()
         type.slow("You approach the table with a wrapped package.")
-        print("\n")
+        print()
         type.slow("The Dealer's jade eye fixes on it.")
-        print("\n")
+        print()
         type.slow(red("\"What is this?\""))
-        print("\n")
+        print()
         type.type("You slide the gift across the table.")
-        print("\n")
+        print()
         time.sleep(1)
         
         # Get reaction from lists.py
@@ -1922,35 +2528,41 @@ class SystemsMixin:
         
         # Display unwrapping
         type.slow("He unwraps it slowly. Deliberately.")
-        print("\n")
+        print()
         time.sleep(1)
         
         # Display the reveal
         type.slow(f"Inside: " + bright(yellow(item)))
-        print("\n")
+        print()
         time.sleep(1)
         
         # Display dealer reaction
         for line in reaction_data["dialogue"]:
             type.slow(red(line))
-            print("\n")
+            print()
             time.sleep(0.5)
         
         # Apply happiness change
         happiness_change = reaction_data["happiness"]
         if happiness_change != 0:
             self.change_dealer_happiness(happiness_change)
+            self._ever_gave_gift = True
+            if not self.has_achievement("gift_giver"): self.unlock_achievement("gift_giver")
+            if happiness_change >= 25 and not self.has_achievement("perfect_gift"): self.unlock_achievement("perfect_gift")
+            if happiness_change < 0:
+                self._bad_gifts_given += 1
             if happiness_change > 0:
                 type.slow(green(f"The Dealer seems... pleased? (Happiness +{happiness_change})"))
             else:
                 type.slow(red(f"The Dealer does NOT look happy. (Happiness {happiness_change})"))
-            print("\n")
+            print()
         
         # Check if gift causes death
         if reaction_data.get("kills_you", False):
+            self.unlock_achievement("death_wish")
             time.sleep(2)
             type.slow(red(bright("His hand moves faster than you can see.")))
-            print("\n")
+            print()
             self.kill(f"The Dealer's reaction to {item}")
     
 

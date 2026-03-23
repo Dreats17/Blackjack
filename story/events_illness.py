@@ -57,6 +57,59 @@ class IllnessMixin:
 
     def random_illness(self):
         """Pick a rank-appropriate illness at random and trigger it."""
+        if self.has_item("Guardian Angel"):
+            type.type(cyan(bright("Guardian Angel")) + " calls for medical help before you even realize you're sick. EMTs arrive in minutes.")
+            print()
+            type.type("They check your vitals, administer treatment, and you're back on your feet. The illness never takes hold.")
+            self.heal(15)
+            self.restore_sanity(8)
+            self.start_night()
+            return
+        if self.has_item("New Identity"):
+            type.type("The " + magenta(bright("New Identity")) + " gets you treated under a different name. No questions, no records.")
+            print()
+            type.type("Anonymous medical care. The illness never takes hold.")
+            self.restore_sanity(5)
+            self.heal(10)
+            self.start_night()
+            return
+        # WILD: Forged Documents at hospital — pretend to be a doctor
+        if self.has_item("Forged Documents"):
+            type.type("The " + cyan(bright("Forged Documents")) + " identify you as Dr. Robert Chen, MD. The nurse doesn't question it.")
+            print()
+            type.type("They hand you a lab coat. Suddenly you're not the patient — you're the doctor.")
+            print()
+            if random.randrange(10) < 3:
+                type.type("Then someone asks you to check a patient's chart. You stare at it blankly.")
+                print()
+                type.type(quote("I'm... not actually a doctor.") + " Long pause. The real doctor treats you free out of amusement.")
+                self.heal(20)
+                self.restore_sanity(5)
+            else:
+                type.type("Free medical treatment. No questions asked. The lab coat feels surprisingly natural.")
+                self.heal(15)
+                self.restore_sanity(3)
+            print()
+            self.start_night()
+            return
+        # WRONG-ITEM: Flask of Anti-Venom at hospital — you're not a doctor, and neither is it
+        if self.has_item("Flask of Anti-Venom"):
+            type.type("You pull out a " + cyan(bright("Flask of Anti-Venom")) + " and hand it to the nurse. " + quote("Here. This should fix it."))
+            print()
+            type.type("The nurse looks at the flask. Looks at you. Looks at the flask again.")
+            print()
+            type.type(quote("Sir, you have a sinus infection. This is anti-venom. For snake bites."))
+            print()
+            type.type(quote("...I know what it's for."))
+            print()
+            type.type("They confiscate it. You don't get treated. You don't get your flask back.")
+            print()
+            type.type("On the way out, a security guard watches you leave. You hear the word " + quote("delusional") + " behind you.")
+            self.use_item("Flask of Anti-Venom")
+            self.lose_sanity(8)
+            print()
+            self.start_night()
+            return
         rank = self.get_rank()
 
         minor = [
@@ -126,18 +179,18 @@ class IllnessMixin:
 
     def contract_cold(self):
         type.type("It started with a tickle in your throat. Then the sniffles. Then the coughing.")
-        print("\n")
+        print()
         type.type("Your nose is running like a faucet. Your head feels stuffed with cotton.")
-        print("\n")
+        print()
         type.type("Just a common " + red("cold") + ". Nothing serious, but you feel miserable.")
         self.add_status("Cold")
         self.hurt(5)
         if self.has_item("Voice Soother"):
-            print("\n")
+            print()
             type.type("You sip the " + cyan(bright("Voice Soother")) + ". The throat irritation dissolves. The cold still lingers but you can at least TALK.")
             self.heal(3)
         if self.has_item("Home Remedy"):
-            print("\n")
+            print()
             type.type("You reach for the " + cyan(bright("Home Remedy")) + ". The warm liquid cuts through the congestion like a small, domestic miracle.")
             self.heal(2)
             self.restore_sanity(1)
@@ -147,18 +200,18 @@ class IllnessMixin:
         if self.has_item("Flask of Anti-Virus"):
             self.use_item("Flask of Anti-Virus")
             type.type("You feel the familiar warning signs: fatigue, a creeping fever, the heavy ache behind your eyes.")
-            print("\n")
+            print()
             type.type("You reach for the " + cyan(bright("Flask of Anti-Virus")) + " before the symptoms can fully take hold.")
-            print("\n")
+            print()
             type.type("The flask fights the infection before it sets in. You feel it working — a warm resistance spreading through your blood.")
-            print("\n")
+            print()
             type.type(green("The flu never gets its grip on you. Crisis averted."))
             self.start_night()
             return
         type.type("It hits you like a truck. One moment you're fine, the next you can barely move.")
-        print("\n")
+        print()
         type.type("Fever. Chills. Body aches so severe you can't get comfortable in any position.")
-        print("\n")
+        print()
         type.type("Your throat is raw. Your cough is painful. This is the " + red("flu") + " - the real deal.")
         self.add_status("Flu")
         self.hurt(12)
@@ -170,19 +223,29 @@ class IllnessMixin:
         # EFFECTS: Adds "Pneumonia" status, 15 damage, 2 sanity loss
         # NOTE: Requires doctor visit to treat
         type.type("You wake up coughing. Deep, rattling coughs that feel like they're coming from the bottom of your lungs.")
-        print("\n")
+        print()
         type.type("Your chest hurts. Every breath is a struggle. You're burning up with fever but shivering uncontrollably.")
-        print("\n")
+        print()
         type.type("This isn't just a cold. This is " + red("pneumonia") + ".")
-        print("\n")
+        print()
         type.type("You need a doctor. Soon.")
         pneumonia_damage = 15
+        if self.has_item("Health Indicator") or self.has_item("Health Manipulator"):
+            indicator = "Health Manipulator" if self.has_item("Health Manipulator") else "Health Indicator"
+            print()
+            if indicator == "Health Manipulator":
+                type.type("The " + cyan(bright(indicator)) + " floods your body with cold diagnostic certainty. Oxygen. Inflammation. Fever curve. It catches the worst of the spiral before it can become catastrophic.")
+                pneumonia_damage -= 6
+            else:
+                type.type("The " + cyan(bright(indicator)) + " starts shrilling before you can finish pretending this is just a bad cough. Seeing the numbers drop forces you to take it seriously.")
+                pneumonia_damage -= 3
+            self.update_health_indicator_durability()
         if self.has_item("First Aid Kit"):
-            print("\n")
+            print()
             type.type("The " + cyan(bright("First Aid Kit")) + " has a respiratory mask. You strap it on. The pneumonia is real, but the breathing helps.")
             pneumonia_damage -= 5
         if self.has_item("Hydration Station"):
-            print("\n")
+            print()
             type.type("The " + cyan(bright("Hydration Station")) + " keeps you from dehydrating during the worst of it. Water fights infection.")
             pneumonia_damage -= 5
         self.add_status("Pneumonia")
@@ -194,11 +257,11 @@ class IllnessMixin:
         # EVENT: Contract bronchitis - persistent coughing with mucus
         # EFFECTS: Adds "Bronchitis" status, 8 damage
         type.type("The coughing started a few days ago. Now it won't stop.")
-        print("\n")
+        print()
         type.type("Every cough produces thick, yellow mucus. Your throat is raw. Your chest aches.")
-        print("\n")
+        print()
         type.type("You can barely speak without triggering another coughing fit.")
-        print("\n")
+        print()
         type.type(red("Bronchitis") + " has set in.")
         self.add_status("Bronchitis")
         self.hurt(8)
@@ -208,11 +271,11 @@ class IllnessMixin:
         # EVENT: Contract strep throat - severe throat infection
         # EFFECTS: Adds "Strep Throat" status, 10 damage; needs antibiotics
         type.type("Your throat feels like it's being scraped with broken glass.")
-        print("\n")
+        print()
         type.type("Swallowing is agony. Your tonsils are swollen and covered in white patches.")
-        print("\n")
+        print()
         type.type("Fever. Headache. Body aches. This is " + red("strep throat") + ".")
-        print("\n")
+        print()
         type.type("Without antibiotics, this could get much, much worse.")
         self.add_status("Strep Throat")
         self.hurt(10)
@@ -223,26 +286,26 @@ class IllnessMixin:
         # EFFECTS: Adds "Stomach Flu" status, 12 damage, 1 sanity loss
         if self.has_item("Hydration Station"):
             type.type("The " + cyan(bright("Hydration Station")) + " purifies everything that enters. Waterborne illness doesn't reach you.")
-            print("\n")
+            print()
             self.heal(5)
             return
         if self.has_item("Water Purifier"):
             type.type("The " + cyan(bright("Water Purifier")) + " ensures every sip is clean.")
-            print("\n")
+            print()
             type.type("The illness never begins.")
             return
         type.type("It started with nausea. Then came the vomiting. Then the other end started.")
-        print("\n")
+        print()
         type.type("You've spent the last several hours in the bathroom, alternating between the toilet and the cold floor.")
-        print("\n")
+        print()
         type.type("Your body is expelling everything. You're getting dehydrated fast.")
-        print("\n")
+        print()
         type.type(red("Stomach flu") + " has you in its grip.")
         if self.has_item("Antacid Brew"):
             self.use_item("Antacid Brew")
-            print("\n")
+            print()
             type.type("Before the stomach flu can fully set in, you chug the " + cyan(bright("Antacid Brew")) + ". The neutralization is immediate and impressive.")
-            print("\n")
+            print()
             type.type(green("The worst of it never arrives."))
             self.hurt(3)
             self.start_night()
@@ -256,11 +319,11 @@ class IllnessMixin:
         # EVENT: Contract ear infection - painful infection with hearing loss
         # EFFECTS: Adds "Ear Infection" status, 5 damage
         type.type("The pain in your ear is unbearable. A deep, throbbing ache that radiates through your skull.")
-        print("\n")
+        print()
         type.type("You can barely hear out of that side. Everything sounds muffled, underwater.")
-        print("\n")
+        print()
         type.type("Yellow fluid is starting to leak out.")
-        print("\n")
+        print()
         type.type(red("Ear infection") + ". Nasty one.")
         self.add_status("Ear Infection")
         self.hurt(5)
@@ -270,9 +333,9 @@ class IllnessMixin:
         # EVENT: Contract sinus infection - severe facial pressure and mucus
         # EFFECTS: Adds "Sinus Infection" status, 6 damage
         type.type("Your face feels like it's going to explode. The pressure behind your eyes, your cheeks, your forehead - it's immense.")
-        print("\n")
+        print()
         type.type("Thick green mucus drains down your throat constantly. Your head pounds with every heartbeat.")
-        print("\n")
+        print()
         type.type("The " + red("sinus infection") + " has fully taken hold.")
         self.add_status("Sinus Infection")
         self.hurt(6)
@@ -282,11 +345,11 @@ class IllnessMixin:
         # EVENT: Contract urinary tract infection - painful and potentially serious
         # EFFECTS: Adds "UTI" status, 8 damage; can spread to kidneys if untreated
         type.type("It started as a slight burning sensation. Now every trip to the bathroom is torture.")
-        print("\n")
+        print()
         type.type("You have to go constantly, but barely anything comes out. What does is cloudy and smells wrong.")
-        print("\n")
+        print()
         type.type("Your lower back aches. You might have a fever.")
-        print("\n")
+        print()
         type.type(red("Urinary tract infection") + ". If it spreads to your kidneys...")
         self.add_status("UTI")
         self.hurt(8)
@@ -296,11 +359,11 @@ class IllnessMixin:
         # EVENT: Contract conjunctivitis (pink eye) - contagious eye infection
         # EFFECTS: Adds "Pink Eye" status, 3 damage
         type.type("You wake up and can't open your left eye. It's crusted shut with dried discharge.")
-        print("\n")
+        print()
         type.type("Once you manage to pry it open, you see the white of your eye is bright pink. Bloodshot veins everywhere.")
-        print("\n")
+        print()
         type.type("It itches like crazy. Tears stream down constantly.")
-        print("\n")
+        print()
         type.type(red("Conjunctivitis") + ". Pink eye. Extremely contagious.")
         self.add_status("Pink Eye")
         self.hurt(3)
@@ -310,11 +373,11 @@ class IllnessMixin:
         # EVENT: Contract mononucleosis - extreme fatigue for months
         # EFFECTS: Adds "Mononucleosis" status, 20 damage, 3 sanity loss
         type.type("The exhaustion is unlike anything you've ever felt. You slept fourteen hours and woke up more tired than when you went to bed.")
-        print("\n")
+        print()
         type.type("Your throat is sore. Your lymph nodes are swollen. Your spleen aches.")
-        print("\n")
+        print()
         type.type("The doctor would tell you it's " + red("mononucleosis") + ". The kissing disease.")
-        print("\n")
+        print()
         type.type("It could take months to fully recover.")
         self.add_status("Mononucleosis")
         self.hurt(20)
@@ -325,11 +388,11 @@ class IllnessMixin:
         # EVENT: Shingles outbreak from dormant chickenpox virus
         # EFFECTS: Adds "Shingles" status, 18 damage, 2 sanity loss; can cause permanent nerve damage
         type.type("The rash appeared yesterday. Today, it's on fire.")
-        print("\n")
+        print()
         type.type("Blisters have formed in a band across your torso, following the path of a nerve. The pain is excruciating.")
-        print("\n")
+        print()
         type.type("Burning. Stabbing. Constant. You had chickenpox as a kid - the virus never left.")
-        print("\n")
+        print()
         type.type(red("Shingles") + ". And without treatment, the nerve damage could be permanent.")
         self.add_status("Shingles")
         self.hurt(18)
@@ -339,12 +402,21 @@ class IllnessMixin:
     def contract_lyme_disease(self):
         # EVENT: Contract Lyme disease from tick bite
         # EFFECTS: Adds "Lyme Disease" status, 15 damage, 2 sanity loss; devastating if untreated
+        if self.has_item("Flask of Anti-Venom"):
+            self.use_item("Flask of Anti-Venom")
+            type.type("You spot the bullseye rash and don't wait. A dose of " + cyan(bright("Flask of Anti-Venom")) + " burns going down, then cools your blood.")
+            print()
+            type.type("The joint pain backs off before it can settle in. You caught it early. Very early.")
+            self.hurt(5)
+            self.restore_sanity(2)
+            self.start_night()
+            return
         type.type("You notice the rash first. A perfect bullseye - red ring, clear center, red outer ring.")
-        print("\n")
+        print()
         type.type("Then come the joint pains. The fatigue. The brain fog that makes it hard to think.")
-        print("\n")
+        print()
         type.type("You must have been bitten by a tick at some point. Didn't even notice.")
-        print("\n")
+        print()
         type.type(red("Lyme disease") + ". Caught early, treatable. Left untreated... devastating.")
         self.add_status("Lyme Disease")
         self.hurt(15)
@@ -355,9 +427,9 @@ class IllnessMixin:
         # EVENT: Contract ringworm fungal infection
         # EFFECTS: Adds "Ringworm" status, 3 damage; contagious and spreading
         type.type("The itchy patch on your arm has grown. What started as a small red spot is now a perfect red ring.")
-        print("\n")
+        print()
         type.type("It's not actually a worm - it's a fungal infection. But that doesn't make it less disgusting.")
-        print("\n")
+        print()
         type.type(red("Ringworm") + ". Contagious. Spreading. Needs treatment.")
         self.add_status("Ringworm")
         self.hurt(3)
@@ -367,11 +439,11 @@ class IllnessMixin:
         # EVENT: Contract scabies - mites burrowing under skin
         # EFFECTS: Adds "Scabies" status, 5 damage, 2 sanity loss; maddening itch
         type.type("The itching is maddening. Especially at night. Tiny burrows appearing between your fingers, on your wrists, in your armpits.")
-        print("\n")
+        print()
         type.type("Microscopic mites have burrowed into your skin. They're laying eggs under your flesh.")
-        print("\n")
+        print()
         type.type("You scratch until you bleed, but the relief is only momentary.")
-        print("\n")
+        print()
         type.type(red("Scabies") + ". Your skin is infested.")
         self.add_status("Scabies")
         self.hurt(5)
@@ -382,11 +454,11 @@ class IllnessMixin:
         # EVENT: Contract staph infection from wound - potentially fatal
         # EFFECTS: Adds "Staph Infection" status, 20 damage, 1 sanity loss; can kill if reaches bloodstream
         type.type("What started as a small cut has become something much worse.")
-        print("\n")
+        print()
         type.type("The wound is hot, swollen, and filled with pus. Red streaks are spreading outward from the site.")
-        print("\n")
+        print()
         type.type("The area around it is hard to the touch. You're developing a fever.")
-        print("\n")
+        print()
         type.type(red("Staph infection") + ". If it gets into your bloodstream, it could kill you.")
         self.add_status("Staph Infection")
         self.hurt(20)
@@ -397,11 +469,11 @@ class IllnessMixin:
         # EVENT: Contract tetanus (lockjaw) from rusty wound - life threatening
         # EFFECTS: Adds "Tetanus" status, 25 damage, 3 sanity loss; needs antitoxin or death
         type.type("You stepped on that rusty nail a few days ago. You thought it was fine.")
-        print("\n")
+        print()
         type.type("Now your jaw is stiffening. Your muscles are cramping. You're having trouble swallowing.")
-        print("\n")
+        print()
         type.type("Your back arches involuntarily. Spasms rack your body.")
-        print("\n")
+        print()
         type.type(red("Tetanus") + ". Lockjaw. Without antitoxin, the spasms will get worse until you can't breathe.")
         self.add_status("Tetanus")
         self.hurt(25)
@@ -412,11 +484,11 @@ class IllnessMixin:
         # EVENT: Possible rabies infection from animal bite - almost always fatal once symptoms appear
         # EFFECTS: Adds "Possible Rabies" status, 10 damage, 5 sanity loss; time-critical treatment needed
         type.type("That animal that bit you last week - you never did find out if it was rabid.")
-        print("\n")
+        print()
         type.type("Now you're having headaches. Fever. You feel anxious, confused.")
-        print("\n")
+        print()
         type.type("Is it just paranoia? Or is the virus already in your brain?")
-        print("\n")
+        print()
         type.type("Once symptoms appear, " + red("rabies") + " is almost always fatal. But maybe there's still time...")
         self.add_status("Possible Rabies")
         self.hurt(10)
@@ -426,12 +498,21 @@ class IllnessMixin:
     def contract_measles(self):
         # EVENT: Contract measles - serious viral infection with rash and fever
         # EFFECTS: Adds "Measles" status, 18 damage, 2 sanity loss
+        if self.has_item("Flask of Anti-Virus"):
+            self.use_item("Flask of Anti-Virus")
+            type.type("Your skin starts to prickle and your fever spikes. You uncap the " + cyan(bright("Flask of Anti-Virus")) + " before the rash fully blooms.")
+            print()
+            type.type("By evening you're still shaky, but functional. Whatever this was, you interrupted it in time.")
+            self.hurt(6)
+            self.restore_sanity(1)
+            self.start_night()
+            return
         type.type("The rash covers your entire body now. Red, blotchy, spreading across your face and trunk.")
-        print("\n")
+        print()
         type.type("Your eyes are red and watering. Light is painful. You've had a high fever for days.")
-        print("\n")
+        print()
         type.type("Small white spots have appeared inside your mouth.")
-        print("\n")
+        print()
         type.type(red("Measles") + ". You thought it was eradicated. You were wrong.")
         self.add_status("Measles")
         self.hurt(18)
@@ -442,12 +523,29 @@ class IllnessMixin:
     def develop_diabetes_symptoms(self):
         # EVENT: Develop uncontrolled diabetes symptoms
         # EFFECTS: Adds "Uncontrolled Diabetes" status, 15 damage; needs medication
+        if self.has_item("Health Indicator") or self.has_item("Health Manipulator"):
+            tool_name = "Health Manipulator" if self.has_item("Health Manipulator") else "Health Indicator"
+            type.type("You glance at the " + cyan(bright(tool_name)) + ". The numbers have been trending wrong for days.")
+            print()
+            if tool_name == "Health Manipulator":
+                type.type("You run a stabilization pass before symptoms spiral. Not a cure, but enough to keep your head clear.")
+                self.add_status("Uncontrolled Diabetes")
+                self.hurt(8)
+                self.restore_sanity(3)
+            else:
+                type.type("It warned you early. You're still in trouble, but not blindsided.")
+                self.add_status("Uncontrolled Diabetes")
+                self.hurt(12)
+                self.restore_sanity(1)
+            self.update_health_indicator_durability()
+            self.start_night()
+            return
         type.type("You've been drinking water constantly. Gallons a day. And yet your mouth is always dry.")
-        print("\n")
+        print()
         type.type("You're losing weight despite eating more than ever. You're exhausted. Your vision is blurry.")
-        print("\n")
+        print()
         type.type("You've been urinating constantly. The symptoms point to one thing.")
-        print("\n")
+        print()
         type.type(red("Diabetes") + ". Your blood sugar is out of control. You need medication.")
         self.add_status("Uncontrolled Diabetes")
         self.hurt(15)
@@ -456,12 +554,29 @@ class IllnessMixin:
     def high_blood_pressure_crisis(self):
         # EVENT: Hypertensive crisis - dangerously high blood pressure
         # EFFECTS: Adds "Blood Pressure Crisis" status, 20 damage, 2 sanity loss; stroke risk
+        if self.has_item("Health Indicator") or self.has_item("Health Manipulator"):
+            tool_name = "Health Manipulator" if self.has_item("Health Manipulator") else "Health Indicator"
+            type.type("Your " + cyan(bright(tool_name)) + " starts shrieking in your pocket before the nosebleed even begins.")
+            print()
+            if tool_name == "Health Manipulator":
+                type.type("You force a guided cooldown: breath pacing, pressure regulation, posture lock. Crude, but effective.")
+                self.add_status("Blood Pressure Crisis")
+                self.hurt(10)
+                self.restore_sanity(3)
+            else:
+                type.type("You get warning and act fast. You're still in crisis, but not seconds from collapse.")
+                self.add_status("Blood Pressure Crisis")
+                self.hurt(14)
+                self.restore_sanity(1)
+            self.update_health_indicator_durability()
+            self.start_night()
+            return
         type.type("The headache hits like a hammer. Your vision swims. You feel your pulse pounding in your temples.")
-        print("\n")
+        print()
         type.type("Your face is flushed. Nosebleed starts. You're dizzy, disoriented.")
-        print("\n")
+        print()
         type.type("This is a " + red("hypertensive crisis") + ". Your blood pressure is dangerously high.")
-        print("\n")
+        print()
         type.type("Without intervention, you could stroke out any minute.")
         self.add_status("Blood Pressure Crisis")
         self.hurt(20)
@@ -472,11 +587,11 @@ class IllnessMixin:
         # EVENT: Anaphylactic shock - life-threatening allergic reaction
         # EFFECTS: Adds "Anaphylaxis" status, 30 damage, 3 sanity loss; needs epinephrine immediately
         type.type("It happens fast. One moment you're fine. The next, your throat is closing.")
-        print("\n")
+        print()
         type.type("Hives break out across your body. Your face swells. Your lips balloon.")
-        print("\n")
+        print()
         type.type("You can barely breathe. The wheezing gets louder.")
-        print("\n")
+        print()
         type.type(red("Anaphylaxis") + ". You need epinephrine. NOW.")
         self.add_status("Anaphylaxis")
         self.hurt(30)
@@ -487,11 +602,11 @@ class IllnessMixin:
         # EVENT: Severe asthma attack - can't breathe
         # EFFECTS: Adds asthma status, needs nebulizer treatment; life-threatening
         type.type("You can't breathe. You can't breathe. YOU CAN'T BREATHE.")
-        print("\n")
+        print()
         type.type("Your airways have constricted. Every breath is a whistle, a wheeze, barely any air getting through.")
-        print("\n")
+        print()
         type.type("Your lips are turning blue. You're panicking, which makes it worse.")
-        print("\n")
+        print()
         type.type(red("Asthma attack") + ". Severe one. You need a nebulizer treatment.")
         self.add_status("Severe Asthma")
         self.hurt(20)
@@ -500,11 +615,11 @@ class IllnessMixin:
 
     def kidney_stones(self):
         type.type("The pain is unlike anything you've ever experienced.")
-        print("\n")
+        print()
         type.type("It started in your back and radiated around to your front, down toward your groin. Waves of agony.")
-        print("\n")
+        print()
         type.type("You're vomiting from the pain. There's blood in your urine.")
-        print("\n")
+        print()
         type.type(red("Kidney stone") + ". Trying to pass through a tube not meant for jagged rocks.")
         self.add_status("Kidney Stones")
         self.hurt(25)
@@ -513,11 +628,11 @@ class IllnessMixin:
 
     def gallbladder_attack(self):
         type.type("After that greasy meal, the pain starts. Upper right abdomen, radiating to your back and shoulder blade.")
-        print("\n")
+        print()
         type.type("It's constant, not crampy. You're nauseous, sweating. The pain lasts for hours.")
-        print("\n")
+        print()
         type.type("Your gallbladder is full of stones. And one is blocking the duct.")
-        print("\n")
+        print()
         type.type(red("Gallbladder attack") + ". You might need surgery.")
         self.add_status("Gallbladder Attack")
         self.hurt(20)
@@ -526,11 +641,11 @@ class IllnessMixin:
 
     def appendicitis_attack(self):
         type.type("It started around your belly button. Dull ache. Now it's moved to your lower right side.")
-        print("\n")
+        print()
         type.type("The pain is sharp, constant, getting worse by the hour. You can't stand up straight.")
-        print("\n")
+        print()
         type.type("Pressing on your abdomen makes it worse. Releasing quickly - even worse.")
-        print("\n")
+        print()
         type.type(red("Appendicitis") + ". If it ruptures, you'll die of sepsis.")
         self.add_status("Appendicitis")
         self.hurt(30)
@@ -539,11 +654,11 @@ class IllnessMixin:
 
     def blood_clot_in_leg(self):
         type.type("Your calf is swollen, red, and warm to the touch. It aches deeply.")
-        print("\n")
+        print()
         type.type("You've been sitting too much. Not moving enough. The blood pooled and clotted.")
-        print("\n")
+        print()
         type.type(red("Deep vein thrombosis") + ". A blood clot in your leg.")
-        print("\n")
+        print()
         type.type("If it breaks loose and travels to your lungs, it's called a pulmonary embolism. And it can kill you in seconds.")
         self.add_status("DVT")
         self.hurt(15)
@@ -551,23 +666,40 @@ class IllnessMixin:
         self.start_night()
 
     def migraine_severe(self):
+        if self.has_item("Health Indicator") or self.has_item("Health Manipulator"):
+            tool_name = "Health Manipulator" if self.has_item("Health Manipulator") else "Health Indicator"
+            type.type("The aura spikes across the " + cyan(bright(tool_name)) + " before the pain crests.")
+            print()
+            if tool_name == "Health Manipulator":
+                type.type("You dampen the worst wave with targeted stimulation. The migraine still lands, but it doesn't flatten you.")
+                self.add_status("Severe Migraine")
+                self.hurt(4)
+                self.restore_sanity(2)
+            else:
+                type.type("Early warning buys you darkness, water, and stillness before impact.")
+                self.add_status("Severe Migraine")
+                self.hurt(7)
+                self.restore_sanity(1)
+            self.update_health_indicator_durability()
+            self.start_night()
+            return
         if self.has_item("Mind Shield"):
             type.type("The " + cyan(bright("Mind Shield")) + " keeps the migraine behind the wall where it can't touch you.")
-            print("\n")
+            print()
             self.restore_sanity(5)
             return
         if self.has_item("Smelling Salts"):
             self.use_item("Smelling Salts")
             type.type("The " + cyan(bright("Smelling Salts")) + " hit like a freight train. The migraine retreats from a more alarming sensation.")
-            print("\n")
+            print()
             self.heal(5)
             return
         type.type("The aura started an hour ago. Zigzag lines dancing across your vision.")
-        print("\n")
+        print()
         type.type("Now the pain has arrived. A sledgehammer behind your left eye. Light is agony. Sound is torture.")
-        print("\n")
+        print()
         type.type("You're nauseous. Vomiting. Lying in darkness, praying for it to end.")
-        print("\n")
+        print()
         type.type(red("Migraine") + ". Severe. You're completely incapacitated.")
         self.add_status("Severe Migraine")
         self.hurt(10)
@@ -576,11 +708,11 @@ class IllnessMixin:
 
     def vertigo_episode(self):
         type.type("The room is spinning. No - YOU'RE spinning. Everything is tilted, rotating, impossible to focus on.")
-        print("\n")
+        print()
         type.type("You can't stand. You can't walk. Moving your head makes it exponentially worse.")
-        print("\n")
+        print()
         type.type("You vomit from the dizziness. This isn't just being lightheaded.")
-        print("\n")
+        print()
         type.type(red("Vertigo") + ". Something is wrong with your inner ear.")
         self.add_status("Vertigo")
         self.hurt(5)
@@ -589,15 +721,15 @@ class IllnessMixin:
 
     def seizure_episode(self):
         type.type("You feel it coming. The strange taste in your mouth. The déjà vu. The rising sense of dread.")
-        print("\n")
+        print()
         type.type("Then everything goes blank.")
-        print("\n")
+        print()
         type.type("...")
-        print("\n")
+        print()
         type.type("You wake up on the ground. Your tongue is bloody where you bit it. Your pants are wet.")
-        print("\n")
+        print()
         type.type("People are staring. Paramedics are being called.")
-        print("\n")
+        print()
         type.type(red("Seizure") + ". Grand mal. You don't know when the next one will come.")
         self.add_status("Seizure Disorder")
         self.hurt(20)
@@ -606,11 +738,11 @@ class IllnessMixin:
 
     def pancreatitis_attack(self):
         type.type("The pain is centered in your upper abdomen and radiates straight through to your back.")
-        print("\n")
+        print()
         type.type("It's constant, severe, made worse by eating. You're vomiting, running a fever.")
-        print("\n")
+        print()
         type.type("You've been drinking too much. Or maybe it's gallstones. Either way...")
-        print("\n")
+        print()
         type.type(red("Pancreatitis") + ". Your pancreas is inflamed. It's eating itself.")
         self.add_status("Pancreatitis")
         self.hurt(25)
@@ -620,11 +752,11 @@ class IllnessMixin:
     # INJURIES AND TRAUMA
     def severe_burn_injury(self):
         type.type("The burn covers a large portion of your arm. The skin is blistered, weeping, raw.")
-        print("\n")
+        print()
         type.type("Some areas are white and waxy - third degree. You can't feel those parts. That's not a good sign.")
-        print("\n")
+        print()
         type.type("The pain in the surrounding areas is excruciating.")
-        print("\n")
+        print()
         type.type(red("Severe burns") + ". Risk of infection. Possible need for skin grafts.")
         self.add_injury("Severe Burns")
         self.hurt(25)
@@ -633,11 +765,11 @@ class IllnessMixin:
 
     def concussion_injury(self):
         type.type("Your head hit hard. Too hard.")
-        print("\n")
+        print()
         type.type("Now everything is fuzzy. Light hurts. Sound hurts. You can't remember what happened before the impact.")
-        print("\n")
+        print()
         type.type("Nausea. Dizziness. You're not supposed to fall asleep, but you're so tired...")
-        print("\n")
+        print()
         type.type(red("Concussion") + ". Your brain bounced around inside your skull.")
         self.add_injury("Concussion")
         self.hurt(15)
@@ -646,11 +778,11 @@ class IllnessMixin:
 
     def broken_ribs_injury(self):
         type.type("Every breath is agony. You can feel the bones grinding against each other in your chest.")
-        print("\n")
+        print()
         type.type("Three ribs, at least. Maybe more. You can't take a deep breath without crying out.")
-        print("\n")
+        print()
         type.type("Laughing, coughing, sneezing - all torture. Sleeping is nearly impossible.")
-        print("\n")
+        print()
         type.type(red("Broken ribs") + ". Nothing to do but wait for them to heal. And pray they don't puncture a lung.")
         self.add_injury("Broken Ribs")
         self.hurt(20)
@@ -659,11 +791,11 @@ class IllnessMixin:
 
     def dislocated_shoulder(self):
         type.type("Your arm is hanging at a wrong angle. The shoulder joint has popped out of its socket.")
-        print("\n")
+        print()
         type.type("The pain is overwhelming. You can't move the arm at all. Every jostle is excruciating.")
-        print("\n")
+        print()
         type.type("Someone needs to put it back in. The longer you wait, the worse the muscle damage.")
-        print("\n")
+        print()
         type.type(red("Dislocated shoulder") + ". Needs reduction immediately.")
         self.add_injury("Dislocated Shoulder")
         self.hurt(18)
@@ -672,11 +804,11 @@ class IllnessMixin:
 
     def broken_hand(self):
         type.type("Your hand is swelling up like a balloon. The fingers are bent at unnatural angles.")
-        print("\n")
+        print()
         type.type("Multiple metacarpal fractures. You can see the bones misaligned under the skin.")
-        print("\n")
+        print()
         type.type("Picking up anything is impossible. Making a fist is impossible. Doing anything is impossible.")
-        print("\n")
+        print()
         type.type(red("Broken hand") + ". Going to need surgery to pin those bones.")
         self.add_injury("Broken Hand")
         self.hurt(15)
@@ -685,11 +817,11 @@ class IllnessMixin:
 
     def broken_wrist(self):
         type.type("You landed wrong. All your weight came down on your outstretched hand.")
-        print("\n")
+        print()
         type.type("Your wrist is already purple and misshapen. You can feel the bones grinding.")
-        print("\n")
+        print()
         type.type("Moving it sends bolts of white-hot pain up your arm.")
-        print("\n")
+        print()
         type.type(red("Broken wrist") + ". Colles fracture. Classic. Painful.")
         self.add_injury("Broken Wrist")
         self.hurt(12)
@@ -698,11 +830,11 @@ class IllnessMixin:
 
     def broken_ankle(self):
         type.type("You heard the snap when it happened. Felt it too.")
-        print("\n")
+        print()
         type.type("Your ankle is already swelling, turning purple. You can't put any weight on it at all.")
-        print("\n")
+        print()
         type.type("Walking is out of the question. You're going to need crutches. Maybe a boot. Maybe surgery.")
-        print("\n")
+        print()
         type.type(red("Broken ankle") + ". You're not going anywhere fast.")
         self.add_injury("Broken Ankle")
         self.hurt(15)
@@ -711,11 +843,11 @@ class IllnessMixin:
 
     def torn_acl(self):
         type.type("You pivoted wrong and felt the pop. Knew immediately something was very wrong.")
-        print("\n")
+        print()
         type.type("Your knee buckled. You went down. Now the joint is swelling rapidly.")
-        print("\n")
+        print()
         type.type("The knee feels unstable. Like it could give out at any moment.")
-        print("\n")
+        print()
         type.type(red("Torn ACL") + ". Going to need reconstruction surgery. And months of rehab.")
         self.add_injury("Torn ACL")
         self.hurt(20)
@@ -724,11 +856,11 @@ class IllnessMixin:
 
     def herniated_disc(self):
         type.type("You lifted something heavy and felt your back give out.")
-        print("\n")
+        print()
         type.type("Now there's shooting pain down your leg. Numbness. Tingling. Weakness.")
-        print("\n")
+        print()
         type.type("The disc between your vertebrae has ruptured, pressing on your spinal nerves.")
-        print("\n")
+        print()
         type.type(red("Herniated disc") + ". Every movement is agony. You might need surgery.")
         self.add_injury("Herniated Disc")
         self.hurt(18)
@@ -737,11 +869,11 @@ class IllnessMixin:
 
     def deep_laceration(self):
         type.type("The cut is deep. Really deep. You can see layers of tissue you're not supposed to see.")
-        print("\n")
+        print()
         type.type("Blood is pulsing out in rhythm with your heartbeat. That means an artery.")
-        print("\n")
+        print()
         type.type("You're applying pressure, but it keeps seeping through. You need stitches. Many of them.")
-        print("\n")
+        print()
         type.type(red("Deep laceration") + ". Maybe nicked an artery. Definitely needs sutures.")
         self.add_injury("Deep Laceration")
         self.hurt(22)
@@ -749,11 +881,11 @@ class IllnessMixin:
 
     def puncture_wound(self):
         type.type("The object went in clean. Small entry wound. But the damage is internal.")
-        print("\n")
+        print()
         type.type("Blood is pooling inside. You can feel things that shouldn't be damaged... damaged.")
-        print("\n")
+        print()
         type.type("The wound is barely bleeding on the outside. That's actually worse.")
-        print("\n")
+        print()
         type.type(red("Puncture wound") + ". Internal bleeding likely. Needs imaging. Needs surgery maybe.")
         self.add_injury("Puncture Wound")
         self.hurt(25)
@@ -762,11 +894,11 @@ class IllnessMixin:
 
     def second_degree_burns(self):
         type.type("The blisters cover your forearm. Large, fluid-filled, ready to pop.")
-        print("\n")
+        print()
         type.type("The skin around them is angry red. The pain is constant, throbbing.")
-        print("\n")
+        print()
         type.type("Every accidental brush against anything makes you gasp.")
-        print("\n")
+        print()
         type.type(red("Second degree burns") + ". Going to scar. Risk of infection is high.")
         self.add_status("Second Degree Burns")
         self.hurt(15)
@@ -774,11 +906,11 @@ class IllnessMixin:
 
     def frostbite(self):
         type.type("Your fingers and toes have gone white. Then grayish-blue. Now they're turning black at the tips.")
-        print("\n")
+        print()
         type.type("At first they hurt. Then they went numb. Now the feeling is coming back - and it's agony.")
-        print("\n")
+        print()
         type.type("Blood blisters are forming. The tissue is dying.")
-        print("\n")
+        print()
         type.type(red("Frostbite") + ". You might lose those extremities.")
         self.add_injury("Frostbite")
         self.hurt(20)
@@ -787,22 +919,22 @@ class IllnessMixin:
 
     def heat_stroke(self):
         type.type("You stopped sweating an hour ago. That was the first sign.")
-        print("\n")
+        print()
         type.type("Your skin is hot and dry. Your temperature is spiking - 104, 105, climbing.")
-        print("\n")
+        print()
         type.type("You're confused, disoriented. Your heart is racing. Muscles cramping.")
-        print("\n")
+        print()
         type.type(red("Heat stroke") + ". Your body can't cool itself. You're cooking from the inside.")
         if self.has_item("Cool Down Kit"):
             self.use_item("Cool Down Kit")
             type.type("The " + cyan(bright("Cool Down Kit")) + "'s rapid cooling prevents the heat stroke from fully setting in.")
-            print("\n")
+            print()
             self.hurt(8)
             self.lose_sanity(2)
         elif self.has_item("All-Weather Armor") or self.has_item("Outdoor Shield"):
             item_name = "All-Weather Armor" if self.has_item("All-Weather Armor") else "Outdoor Shield"
             type.type("Your " + cyan(bright(item_name)) + " keeps body temperature managed. The heat stroke is less severe.")
-            print("\n")
+            print()
             self.add_status("Heat Stroke")
             self.hurt(12)
             self.lose_sanity(2)
@@ -814,26 +946,36 @@ class IllnessMixin:
 
     def hypothermia(self):
         type.type("You can't stop shivering. No, wait - you stopped shivering. That's worse.")
-        print("\n")
+        print()
         type.type("Your fingers are clumsy, numb. Your thoughts are slowing. Everything seems so... far away.")
-        print("\n")
+        print()
         type.type("You're so tired. Just want to lie down. Just for a minute...")
-        print("\n")
+        print()
         type.type(red("Hypothermia") + ". Your core temperature is dropping. You're dying of cold.")
+        if self.has_item("Flask of No Bust"):
+            self.use_item("Flask of No Bust")
+            type.type("You drink the " + cyan(bright("Flask of No Bust")) + ". Warmth slams through your chest like an emergency restart.")
+            print()
+            type.type("You still hurt. You are still cold. But you do not crash. Not tonight.")
+            self.add_status("Hypothermia")
+            self.hurt(8)
+            self.lose_sanity(2)
+            self.start_night()
+            return
         if self.has_item("Survival Bivouac"):
             type.type("The " + cyan(bright("Survival Bivouac")) + " wraps you in warmth. The hypothermia retreats.")
-            print("\n")
+            print()
             self.hurt(5)
             self.lose_sanity(1)
         elif self.has_item("Emergency Blanket") and self.has_item("Fire Starter Kit"):
             type.type("Together, the " + cyan(bright("Emergency Blanket")) + " and " + cyan(bright("Fire Starter Kit")) + " create real warmth. The cold loses its grip.")
-            print("\n")
+            print()
             self.add_status("Hypothermia")
             self.hurt(8)
             self.lose_sanity(2)
         elif self.has_item("Emergency Blanket"):
             type.type("The " + cyan(bright("Emergency Blanket")) + " slows the heat loss. The hypothermia sets in, but milder.")
-            print("\n")
+            print()
             self.add_status("Hypothermia")
             self.hurt(12)
             self.lose_sanity(3)
@@ -845,11 +987,11 @@ class IllnessMixin:
 
     def crush_injury(self):
         type.type("The weight came down on your leg. You were trapped for hours before help came.")
-        print("\n")
+        print()
         type.type("Now that you're free, the real danger begins. Crush syndrome.")
-        print("\n")
+        print()
         type.type("Toxins from your damaged muscles are flooding your bloodstream. Your kidneys are failing.")
-        print("\n")
+        print()
         type.type(red("Crush injury") + ". You need dialysis. You need it now.")
         self.add_injury("Crush Injury")
         self.hurt(35)
@@ -858,11 +1000,11 @@ class IllnessMixin:
 
     def chemical_burn(self):
         type.type("The substance ate through your clothes and into your skin.")
-        print("\n")
+        print()
         type.type("The burning sensation won't stop. You've rinsed it but the damage is done.")
-        print("\n")
+        print()
         type.type("The affected area is white, then red, then blistering. Layers of skin sloughing off.")
-        print("\n")
+        print()
         type.type(red("Chemical burn") + ". Acid or base, it doesn't matter. The tissue is destroyed.")
         self.add_injury("Chemical Burn")
         self.hurt(22)
@@ -871,11 +1013,11 @@ class IllnessMixin:
 
     def electrical_burn(self):
         type.type("The entry wound is small. The exit wound is larger. But the real damage is inside.")
-        print("\n")
+        print()
         type.type("The current passed through your body, cooking tissue from within.")
-        print("\n")
+        print()
         type.type("Your heart rhythm was disrupted. You're still feeling palpitations. Muscles ache deeply.")
-        print("\n")
+        print()
         type.type(red("Electrical burn") + ". Internal damage unknown. Cardiac monitoring required.")
         self.add_injury("Electrical Burns")
         self.hurt(28)
@@ -884,11 +1026,11 @@ class IllnessMixin:
 
     def whiplash_injury(self):
         type.type("The impact threw your head forward, then back, violently.")
-        print("\n")
+        print()
         type.type("Now your neck is stiff, painful. You can barely turn your head.")
-        print("\n")
+        print()
         type.type("Headaches. Dizziness. Your shoulders ache. Symptoms might last months.")
-        print("\n")
+        print()
         type.type(red("Whiplash") + ". Neck sprain. Might be worse - need imaging to know.")
         self.add_injury("Whiplash")
         self.hurt(12)
@@ -897,11 +1039,11 @@ class IllnessMixin:
 
     def jaw_fracture(self):
         type.type("Your jaw won't close properly. Pain radiates through your face with every movement.")
-        print("\n")
+        print()
         type.type("You can feel the bones grinding against each other. The swelling is massive.")
-        print("\n")
+        print()
         type.type("Eating is impossible. Talking is agony.")
-        print("\n")
+        print()
         type.type(red("Fractured jaw") + ". Going to need wiring. Liquid diet for weeks.")
         self.add_injury("Fractured Jaw")
         self.hurt(18)
@@ -910,11 +1052,11 @@ class IllnessMixin:
 
     def skull_fracture(self):
         type.type("You can feel the depression in your skull where the bone gave way.")
-        print("\n")
+        print()
         type.type("Clear fluid is leaking from your nose and ear. That's cerebrospinal fluid. That's bad.")
-        print("\n")
+        print()
         type.type("Your pupils are different sizes. You're losing consciousness intermittently.")
-        print("\n")
+        print()
         type.type(red("Skull fracture") + ". Brain swelling likely. Emergency surgery required.")
         self.add_injury("Skull Fracture")
         self.hurt(40)
@@ -923,11 +1065,11 @@ class IllnessMixin:
 
     def collapsed_lung(self):
         type.type("You can only breathe with half your lungs. The other half has collapsed.")
-        print("\n")
+        print()
         type.type("Sharp chest pain. Shortness of breath. Your oxygen is dropping.")
-        print("\n")
+        print()
         type.type("The trauma to your chest forced air into the space around your lung.")
-        print("\n")
+        print()
         type.type(red("Pneumothorax") + ". Collapsed lung. Needs a chest tube. Now.")
         self.add_injury("Collapsed Lung")
         self.hurt(30)
@@ -936,11 +1078,11 @@ class IllnessMixin:
 
     def ruptured_spleen(self):
         type.type("The blow to your abdomen didn't seem that bad at first.")
-        print("\n")
+        print()
         type.type("But now your left shoulder hurts - referred pain. Your abdomen is rigid, distended.")
-        print("\n")
+        print()
         type.type("You're getting pale, sweaty, heart racing. Internal bleeding.")
-        print("\n")
+        print()
         type.type(red("Ruptured spleen") + ". You're bleeding out internally. Surgery. Immediately.")
         self.add_injury("Ruptured Spleen")
         self.hurt(35)
@@ -949,11 +1091,11 @@ class IllnessMixin:
 
     def liver_laceration(self):
         type.type("Right upper quadrant pain. Severe. Getting worse by the minute.")
-        print("\n")
+        print()
         type.type("You're bleeding internally. The liver is one of the most vascular organs.")
-        print("\n")
+        print()
         type.type("Blood pressure dropping. Consciousness fading. You need an OR. NOW.")
-        print("\n")
+        print()
         type.type(red("Liver laceration") + ". Every second counts.")
         self.add_injury("Liver Laceration")
         self.hurt(40)
@@ -962,11 +1104,11 @@ class IllnessMixin:
 
     def ruptured_eardrum(self):
         type.type("The explosion of pain in your ear was followed by sudden deafness.")
-        print("\n")
+        print()
         type.type("Blood and fluid are draining out. The ringing is constant, overwhelming.")
-        print("\n")
+        print()
         type.type("You're dizzy, nauseous. Your balance is off.")
-        print("\n")
+        print()
         type.type(red("Ruptured eardrum") + ". May heal on its own. May need surgery. Hearing loss possible.")
         self.add_injury("Ruptured Eardrum")
         self.hurt(10)
@@ -975,11 +1117,11 @@ class IllnessMixin:
 
     def detached_retina(self):
         type.type("It started with flashing lights in your vision. Then floating spots.")
-        print("\n")
+        print()
         type.type("Now there's a shadow creeping across your visual field. A curtain closing.")
-        print("\n")
+        print()
         type.type("Your retina is peeling away from the back of your eye.")
-        print("\n")
+        print()
         type.type(red("Retinal detachment") + ". Without surgery, permanent blindness in that eye.")
         self.add_injury("Detached Retina")
         self.hurt(8)
@@ -988,11 +1130,11 @@ class IllnessMixin:
 
     def orbital_fracture(self):
         type.type("The blow to your face was devastating.")
-        print("\n")
+        print()
         type.type("The bone around your eye socket has fractured. Your eye is sunken, not tracking properly.")
-        print("\n")
+        print()
         type.type("Double vision. Numbness in your cheek. Blood pooling in the white of your eye.")
-        print("\n")
+        print()
         type.type(red("Orbital fracture") + ". Your eye socket is broken. Reconstructive surgery needed.")
         self.add_injury("Orbital Fracture")
         self.hurt(20)
@@ -1001,11 +1143,11 @@ class IllnessMixin:
 
     def broken_nose(self):
         type.type("The crunch was audible. Blood immediately poured from both nostrils.")
-        print("\n")
+        print()
         type.type("Your nose is clearly bent to one side now. Swelling is distorting your face.")
-        print("\n")
+        print()
         type.type("Breathing through your nose is impossible. The pain throbs with every heartbeat.")
-        print("\n")
+        print()
         type.type(red("Broken nose") + ". Needs to be set before it heals crooked.")
         self.add_injury("Broken Nose")
         self.hurt(8)
@@ -1014,11 +1156,11 @@ class IllnessMixin:
 
     def broken_collarbone(self):
         type.type("You can see the bump where your collarbone is no longer aligned.")
-        print("\n")
+        print()
         type.type("Moving your arm on that side is excruciating. The bone grinds audibly.")
-        print("\n")
+        print()
         type.type("Your shoulder is drooping forward. Supporting the arm helps the pain.")
-        print("\n")
+        print()
         type.type(red("Broken clavicle") + ". Going to need a sling for weeks. Maybe surgery.")
         self.add_injury("Broken Collarbone")
         self.hurt(15)
@@ -1027,11 +1169,11 @@ class IllnessMixin:
 
     def tooth_abscess(self):
         type.type("The toothache has become unbearable. Throbbing, constant, radiating through your jaw.")
-        print("\n")
+        print()
         type.type("Your face is swelling. You can taste the infection - pus draining into your mouth.")
-        print("\n")
+        print()
         type.type("Fever. Chills. The infection is spreading.")
-        print("\n")
+        print()
         type.type(red("Tooth abscess") + ". If it reaches your bloodstream or your brain, you're dead.")
         self.add_status("Tooth Abscess")
         self.hurt(15)
@@ -1039,12 +1181,22 @@ class IllnessMixin:
         self.start_night()
 
     def blood_poisoning(self):
+        if self.has_item("Flask of Anti-Virus"):
+            self.use_item("Flask of Anti-Virus")
+            type.type("The fever spikes, then you force down the " + cyan(bright("Flask of Anti-Virus")) + " before the septic spiral can lock in.")
+            print()
+            type.type("You're not healthy. You're just no longer at death's door this minute.")
+            self.add_status("Sepsis")
+            self.hurt(15)
+            self.lose_sanity(2)
+            self.start_night()
+            return
         type.type("That wound got infected. And now the infection is in your blood.")
-        print("\n")
+        print()
         type.type("Red streaks are spreading from the site. You're burning with fever, shaking with chills.")
-        print("\n")
+        print()
         type.type("Your heart is racing. Blood pressure dropping. Organs starting to fail.")
-        print("\n")
+        print()
         type.type(red("Sepsis") + ". Blood poisoning. Without IV antibiotics, you'll be dead within hours.")
         self.add_status("Sepsis")
         self.hurt(35)
@@ -1053,11 +1205,11 @@ class IllnessMixin:
 
     def severe_dehydration(self):
         type.type("Your mouth is bone dry. Your skin has lost elasticity - when pinched, it stays tented.")
-        print("\n")
+        print()
         type.type("You're dizzy, confused. Heart racing. Haven't urinated in hours.")
-        print("\n")
+        print()
         type.type("Your blood is thickening. Your kidneys are shutting down.")
-        print("\n")
+        print()
         type.type(red("Severe dehydration") + ". You need IV fluids. Lots of them.")
         self.add_status("Severe Dehydration")
         self.hurt(20)
@@ -1066,11 +1218,11 @@ class IllnessMixin:
 
     def malnutrition(self):
         type.type("You've been eating poorly. Or not at all. For too long.")
-        print("\n")
+        print()
         type.type("Your hair is falling out. Your nails are brittle. Wounds won't heal.")
-        print("\n")
+        print()
         type.type("You're exhausted, weak. Your immune system is compromised.")
-        print("\n")
+        print()
         type.type(red("Malnutrition") + ". Your body is eating itself to survive.")
         self.add_status("Malnutrition")
         self.hurt(15)
@@ -1079,11 +1231,11 @@ class IllnessMixin:
 
     def nerve_damage(self):
         type.type("The injury damaged something important. A nerve bundle.")
-        print("\n")
+        print()
         type.type("Parts of your body are numb. Other parts are on fire with phantom pain.")
-        print("\n")
+        print()
         type.type("Some muscles won't respond at all. The signals just don't get through.")
-        print("\n")
+        print()
         type.type(red("Nerve damage") + ". May be permanent. May need surgery. May never fully recover.")
         self.add_injury("Nerve Damage")
         self.hurt(12)
@@ -1092,11 +1244,11 @@ class IllnessMixin:
 
     def tendon_rupture(self):
         type.type("You felt the snap. Like a rubber band breaking inside your limb.")
-        print("\n")
+        print()
         type.type("The muscle bunched up, detached from where it should connect.")
-        print("\n")
+        print()
         type.type("You can't move the affected part. The power just isn't there.")
-        print("\n")
+        print()
         type.type(red("Ruptured tendon") + ". Needs surgical reattachment. Months of recovery.")
         self.add_injury("Ruptured Tendon")
         self.hurt(18)
@@ -1105,11 +1257,11 @@ class IllnessMixin:
 
     def muscle_tear(self):
         type.type("The pop in your leg was followed by searing pain.")
-        print("\n")
+        print()
         type.type("A lump has formed where the muscle has bunched up. The area is bruising rapidly.")
-        print("\n")
+        print()
         type.type("Walking is nearly impossible. Every step is agony.")
-        print("\n")
+        print()
         type.type(red("Muscle tear") + ". Grade III. Complete rupture. Surgery likely.")
         self.add_injury("Muscle Tear")
         self.hurt(15)
@@ -1118,11 +1270,11 @@ class IllnessMixin:
 
     def gangrene_infection(self):
         type.type("The wound has turned black. The tissue is dying, rotting while still attached to your body.")
-        print("\n")
+        print()
         type.type("The smell is unmistakable. Sweet, sickly, the odor of death.")
-        print("\n")
+        print()
         type.type("It's spreading. Every hour, more tissue dies.")
-        print("\n")
+        print()
         type.type(red("Gangrene") + ". Amputation may be the only option to save your life.")
         self.add_status("Gangrene")
         self.hurt(30)
@@ -1132,23 +1284,33 @@ class IllnessMixin:
     # MENTAL HEALTH CONDITIONS (Doctor can help with these too)
     def severe_anxiety_attack(self):
         type.type("Your heart is pounding out of your chest. You can't breathe. You're dying - you're sure of it.")
-        print("\n")
+        print()
         type.type("Except you're not. This is a panic attack. But it feels like death.")
-        print("\n")
+        print()
         type.type("Trembling, sweating, derealization. The world doesn't feel real.")
-        print("\n")
+        print()
         type.type(red("Severe anxiety disorder") + ". You need medication. Therapy. Something.")
+        if self.has_item("Delight Indicator") or self.has_item("Delight Manipulator"):
+            gauge = "Delight Manipulator" if self.has_item("Delight Manipulator") else "Delight Indicator"
+            print()
+            if gauge == "Delight Manipulator":
+                type.type("You grab the " + cyan(bright(gauge)) + " and force yourself to watch the surge instead of drown in it. The settings hum. The panic doesn't vanish, but it stops owning the whole room.")
+                self.restore_sanity(3)
+            else:
+                type.type("The " + cyan(bright(gauge)) + " gives the terror a shape. Rising. Peaking. Falling. Numbers are easier to survive than oblivion.")
+                self.restore_sanity(1)
+            self.update_delight_indicator_durability()
         self.add_status("Anxiety Disorder")
         self.lose_sanity(5)
         self.start_night()
 
     def severe_depression_episode(self):
         type.type("You can't get out of bed. Not 'don't want to' - literally cannot.")
-        print("\n")
+        print()
         type.type("Everything is gray. Nothing matters. You haven't showered in days. Eaten in longer.")
-        print("\n")
+        print()
         type.type("The weight on your chest is crushing. You're drowning in numbness.")
-        print("\n")
+        print()
         type.type(red("Major depressive episode") + ". You need help. If you can just reach out...")
         self.add_status("Severe Depression")
         self.lose_sanity(8)
@@ -1156,11 +1318,11 @@ class IllnessMixin:
 
     def insomnia_chronic(self):
         type.type("You haven't slept properly in weeks. Months maybe. The hours blur together.")
-        print("\n")
+        print()
         type.type("Your eyes burn. Your thoughts are sluggish. You're making mistakes constantly.")
-        print("\n")
+        print()
         type.type("Every night you lie there, exhausted but wired, watching the hours tick by.")
-        print("\n")
+        print()
         type.type(red("Chronic insomnia") + ". Your body is breaking down without rest.")
         self.add_status("Chronic Insomnia")
         self.hurt(10)
@@ -1169,13 +1331,13 @@ class IllnessMixin:
 
     def ptsd_flashback(self):
         type.type("The sound triggers it. Or was it a smell? Suddenly you're THERE again.")
-        print("\n")
+        print()
         type.type("Not a memory - you're LIVING it. The fear is immediate, overwhelming.")
-        print("\n")
+        print()
         type.type("Your body reacts as if the trauma is happening NOW. Heart racing. Sweating. Shaking.")
-        print("\n")
+        print()
         type.type("When you come back to the present, you're curled on the floor. Hours have passed.")
-        print("\n")
+        print()
         type.type(red("PTSD flashback") + ". The trauma lives in your body. You need specialized help.")
         self.add_status("PTSD")
         self.lose_sanity(7)
@@ -1184,13 +1346,13 @@ class IllnessMixin:
     # EVENTS THAT CAUSE THESE CONDITIONS
     def dirty_needle_stick(self):
         type.type("You weren't paying attention. The needle went right into your hand.")
-        print("\n")
+        print()
         type.type("It wasn't clean. Rusty. Used. You don't know where it came from.")
-        print("\n")
+        print()
         type.type("Blood is beading at the puncture site. Your heart is racing with dread.")
-        print("\n")
+        print()
         type.type("What was on that needle? Hepatitis? HIV? " + red("Tetanus") + "?")
-        print("\n")
+        print()
         type.type("You need to get to a doctor. Get tested. Get prophylaxis. NOW.")
         self.add_status("Needle Exposure")
         self.add_danger("Possible Blood Disease")
@@ -1200,11 +1362,11 @@ class IllnessMixin:
 
     def bad_oysters(self):
         type.type("The oysters tasted... off. You ate them anyway.")
-        print("\n")
+        print()
         type.type("Big mistake.")
-        print("\n")
+        print()
         type.type("Within hours, you're violently ill. Vomiting, diarrhea, fever, chills.")
-        print("\n")
+        print()
         type.type(red("Shellfish poisoning") + ". Vibrio bacteria. Could be fatal without treatment.")
         self.add_status("Shellfish Poisoning")
         self.hurt(20)
@@ -1213,11 +1375,11 @@ class IllnessMixin:
 
     def rat_bite(self):
         type.type("The rat came out of nowhere. Cornered, scared, it bit down HARD on your hand.")
-        print("\n")
+        print()
         type.type("The wound is deep, ragged. Rat teeth are dirty - full of bacteria.")
-        print("\n")
+        print()
         type.type("Within days, you're running a fever. Red streaks spreading from the bite.")
-        print("\n")
+        print()
         type.type(red("Rat bite fever") + ". Without antibiotics, this could kill you.")
         self.add_status("Rat Bite Fever")
         self.add_injury("Rat Bite")
@@ -1226,11 +1388,11 @@ class IllnessMixin:
 
     def bad_mushrooms(self):
         type.type("You thought they were the safe kind. They were not.")
-        print("\n")
+        print()
         type.type("First came the nausea. Then the vomiting. Then the liver failure symptoms.")
-        print("\n")
+        print()
         type.type("Your skin is turning yellow. Your urine is dark brown. You're dying.")
-        print("\n")
+        print()
         type.type(red("Amanita poisoning") + ". Death cap mushroom. You need a liver transplant or you're dead.")
         self.add_status("Mushroom Poisoning")
         self.hurt(40)
@@ -1239,32 +1401,32 @@ class IllnessMixin:
 
     def unclean_water(self):
         type.type("The water looked clear. But it was from a contaminated source.")
-        print("\n")
+        print()
         type.type("Giardia. Cryptosporidium. E. coli. Something got into your gut.")
-        print("\n")
+        print()
         type.type("The cramping is severe. The diarrhea is watery, foul. You're getting dehydrated fast.")
-        print("\n")
+        print()
         type.type(red("Waterborne illness") + ". You need treatment before you lose too many fluids.")
         if self.has_item("Flask of Anti-Virus"):
             self.use_item("Flask of Anti-Virus")
-            print("\n")
+            print()
             type.type("A drop of " + cyan(bright("Flask of Anti-Virus")) + " in the water. The contamination dissolves before it can take hold.")
-            print("\n")
+            print()
             type.type(green("The infection never gets its foothold. Your gut is fine."))
             self.start_night()
             return
         if self.has_item("Water Purifier") or self.has_item("Hydration Station"):
             purifier = "Water Purifier" if self.has_item("Water Purifier") else "Hydration Station"
-            print("\n")
+            print()
             type.type("You run the water through your " + cyan(bright(purifier)) + " before drinking. The contamination is filtered out before it reaches you.")
-            print("\n")
+            print()
             type.type(green("Clean water. No illness today."))
             self.start_night()
             return
         if self.has_item("Rain Collector"):
-            print("\n")
+            print()
             type.type("But wait — you've been drinking from your " + cyan(bright("Rain Collector")) + " all day. Purified rainwater, not that contaminated swill.")
-            print("\n")
+            print()
             type.type(green("Your gut is fine. The Rain Collector saved you from a miserable night."))
             self.start_night()
             return
@@ -1276,11 +1438,11 @@ class IllnessMixin:
         # EVENT: Toxic black mold exposure - chronic respiratory and cognitive issues
         # EFFECTS: Adds "Mold Toxicity" status, 12 damage, 3 sanity loss
         type.type("The building you stayed in was full of black mold. You didn't realize until too late.")
-        print("\n")
+        print()
         type.type("Now you're coughing constantly. Wheezing. Your sinuses are on fire.")
-        print("\n")
+        print()
         type.type("Headaches. Fatigue. Brain fog. Memory problems.")
-        print("\n")
+        print()
         type.type(red("Toxic mold exposure") + ". The spores are in your lungs. This could be chronic.")
         self.add_status("Mold Toxicity")
         self.hurt(12)
@@ -1291,17 +1453,17 @@ class IllnessMixin:
         # EVENT: Severe allergic reaction to bee sting - anaphylaxis
         # EFFECTS: Adds "Anaphylaxis" status, 30 damage, 3 sanity loss; needs EpiPen immediately
         type.type("One sting. That's all it took.")
-        print("\n")
+        print()
         type.type("Your throat is closing. Hives everywhere. Heart racing, blood pressure dropping.")
-        print("\n")
+        print()
         type.type("You're going into anaphylactic shock. Without an EpiPen, you have minutes.")
-        print("\n")
+        print()
         type.type(red("Severe bee allergy") + ". You need epinephrine NOW.")
         if self.has_item("Flask of Anti-Venom"):
             self.use_item("Flask of Anti-Venom")
-            print("\n")
+            print()
             type.type("You slam the " + cyan(bright("Flask of Anti-Venom")) + " before the anaphylaxis can close your throat.")
-            print("\n")
+            print()
             type.type(green("The anti-venom works fast. Your throat stays open. The swelling retreats."))
             self.hurt(5)
             self.start_night()
@@ -1315,11 +1477,11 @@ class IllnessMixin:
         # EVENT: Lead poisoning from old paint/pipes - neurological damage
         # EFFECTS: Adds "Lead Poisoning" status, 15 damage, 4 sanity loss; needs chelation therapy
         type.type("The paint was old. The pipes were ancient. You didn't think about it.")
-        print("\n")
+        print()
         type.type("But the lead built up in your system over time. Now the symptoms are showing.")
-        print("\n")
+        print()
         type.type("Abdominal pain. Confusion. Fatigue. The blue-gray line on your gums.")
-        print("\n")
+        print()
         type.type(red("Lead poisoning") + ". Your brain is being damaged. You need chelation therapy.")
         self.add_status("Lead Poisoning")
         self.hurt(15)
@@ -1330,11 +1492,11 @@ class IllnessMixin:
         # EVENT: Asbestos fiber inhalation - permanent lung damage and cancer risk
         # EFFECTS: Adds "Asbestos Damage" status + "Cancer Risk" danger, 15 damage, 5 sanity loss
         type.type("You worked in that old building for months. Inhaling the dust.")
-        print("\n")
+        print()
         type.type("Now you're coughing. Short of breath. Chest pain.")
-        print("\n")
+        print()
         type.type("The X-ray shows scarring in your lungs. Plaques on your pleura.")
-        print("\n")
+        print()
         type.type(red("Asbestos exposure") + ". The fibers are embedded in your lungs forever. Mesothelioma is possible.")
         self.add_status("Asbestos Damage")
         self.add_danger("Cancer Risk")
@@ -1346,11 +1508,11 @@ class IllnessMixin:
         # EVENT: Mercury poisoning from fish consumption - neurological damage
         # EFFECTS: Adds "Mercury Poisoning" status, 18 damage, 4 sanity loss; may be permanent
         type.type("You've been eating too much fish. The wrong kind. Mercury-laden.")
-        print("\n")
+        print()
         type.type("The tremors started first. Then the numbness in your hands and feet.")
-        print("\n")
+        print()
         type.type("Memory problems. Mood swings. Your vision is narrowing.")
-        print("\n")
+        print()
         type.type(red("Mercury poisoning") + ". Heavy metal toxicity. Neurological damage may be permanent.")
         self.add_status("Mercury Poisoning")
         self.hurt(18)
@@ -1366,13 +1528,13 @@ class IllnessMixin:
         # EVENT: Weight lifting accident - herniated disc from ego lifting
         # EFFECTS: Adds "Herniated Disc" injury, 20 damage, 3 sanity loss
         type.type("You decide to hit the gym. Get in shape. How hard could it be?")
-        print("\n")
+        print()
         type.type("You load up the barbell with way too much weight. Ego lifting.")
-        print("\n")
+        print()
         type.type("On the third rep, something gives. Your back spasms. You drop the weight.")
-        print("\n")
+        print()
         type.type("You're on the ground, unable to move. People are gathering around.")
-        print("\n")
+        print()
         type.type(red("Herniated disc") + ". Your gym career is over before it started.")
         self.add_injury("Herniated Disc")
         self.hurt(20)
@@ -1383,13 +1545,13 @@ class IllnessMixin:
         # EVENT: Slip and fall in shower - concussion and head laceration
         # EFFECTS: Adds "Concussion" + "Deep Laceration" injuries, 25 damage, 3 sanity loss
         type.type("The shower floor is wet. Obviously. You reach for the shampoo...")
-        print("\n")
+        print()
         type.type("Your foot slips. You go down HARD.")
-        print("\n")
+        print()
         type.type("Your head bounces off the tile. Everything goes dark for a moment.")
-        print("\n")
+        print()
         type.type("You wake up with water pelting your face, blood mixing with the drain.")
-        print("\n")
+        print()
         type.type(red("Concussion") + " and a nasty gash on your head.")
         self.add_injury("Concussion")
         self.add_injury("Deep Laceration")
@@ -1401,11 +1563,11 @@ class IllnessMixin:
         # EVENT: Fall down a flight of stairs - broken collarbone and ribs
         # EFFECTS: Adds "Broken Collarbone" + "Broken Ribs" injuries, 30 damage, 3 sanity loss
         type.type("You miss the top step. Just one moment of inattention.")
-        print("\n")
+        print()
         type.type("You tumble down the entire flight, hitting every step on the way.")
-        print("\n")
+        print()
         type.type("When you reach the bottom, you can't move your arm. Your ribs scream with every breath.")
-        print("\n")
+        print()
         type.type(red("Broken collarbone") + ". Possibly broken ribs too.")
         self.add_injury("Broken Collarbone")
         self.add_injury("Broken Ribs")
@@ -1417,11 +1579,11 @@ class IllnessMixin:
         # EVENT: Minor car accident - whiplash and possible broken ribs
         # EFFECTS: Adds "Whiplash" injury + 33% chance "Broken Ribs", 22 damage, 2 sanity loss
         type.type("The other car comes out of nowhere. You slam on the brakes but it's too late.")
-        print("\n")
+        print()
         type.type("CRUNCH. Your airbag deploys, slamming into your face.")
-        print("\n")
+        print()
         type.type("You're alive. But your neck... your neck won't turn. The seat belt bruised your chest badly.")
-        print("\n")
+        print()
         type.type(red("Whiplash") + " and possible broken ribs from the impact.")
         self.add_injury("Whiplash")
         if random.randint(1, 3) == 1:
@@ -1429,17 +1591,24 @@ class IllnessMixin:
             type.type(" Those ribs are definitely cracked.")
         self.hurt(22)
         self.lose_sanity(2)
+        if self.has_item("Real Insurance"):
+            print()
+            type.type("You fumble for the " + cyan(bright("Real Insurance")) + " card with shaking hands. The paramedic scans it, nods once, and suddenly every sentence changes from 'this could ruin you' to 'we've got you covered.'")
+            print()
+            type.type("Pain still hurts. But panic gets a lot quieter when the ambulance ride isn't also a financial execution.")
+            self.restore_sanity(4)
+            self.update_faulty_insurance_durability()
         self.start_night()
 
     def construction_site_accident(self):
         # EVENT: Fall into construction pit - broken ankle
         # EFFECTS: Adds "Broken Ankle" injury, 18 damage, 2 sanity loss
         type.type("You're walking past a construction site when the barrier gives way.")
-        print("\n")
+        print()
         type.type("You fall into the pit. It's not deep, but your ankle folds under you.")
-        print("\n")
+        print()
         type.type("The snap echoes off the concrete walls. You scream.")
-        print("\n")
+        print()
         type.type(red("Broken ankle") + ". The workers rush over, but the damage is done.")
         self.add_injury("Broken Ankle")
         self.hurt(18)
@@ -1448,11 +1617,11 @@ class IllnessMixin:
 
     def bar_fight_aftermath(self):
         type.type("You don't remember who started it. You remember the fist connecting with your face.")
-        print("\n")
+        print()
         type.type("Blood sprays from your nose. You go down. Someone stomps on your hand.")
-        print("\n")
+        print()
         type.type("When security finally breaks it up, you're a mess.")
-        print("\n")
+        print()
         type.type(red("Broken nose") + ". " + red("Broken hand") + ". Maybe a black eye too.")
         self.add_injury("Broken Nose")
         self.add_injury("Broken Hand")
@@ -1462,11 +1631,11 @@ class IllnessMixin:
 
     def kitchen_accident(self):
         type.type("You're chopping vegetables when your phone buzzes. You look away for one second...")
-        print("\n")
+        print()
         type.type("The knife goes straight through your finger. You can see bone.")
-        print("\n")
+        print()
         type.type("Blood is everywhere. You're going to need stitches. Probably surgery.")
-        print("\n")
+        print()
         type.type(red("Deep laceration") + ". Nearly severed your finger.")
         self.add_injury("Deep Laceration")
         self.hurt(15)
@@ -1474,11 +1643,11 @@ class IllnessMixin:
 
     def grease_fire(self):
         type.type("You're frying something when the oil catches fire. Panicking, you throw water on it.")
-        print("\n")
+        print()
         type.type("The fireball that erupts catches you full in the face and arms.")
-        print("\n")
+        print()
         type.type("You scream as your skin blisters and chars.")
-        print("\n")
+        print()
         type.type(red("Second degree burns") + " covering your arms. Some might be third degree.")
         self.add_status("Second Degree Burns")
         self.hurt(25)
@@ -1487,11 +1656,11 @@ class IllnessMixin:
 
     def sports_injury(self):
         type.type("You're playing basketball when you pivot to shoot...")
-        print("\n")
+        print()
         type.type("POP.")
-        print("\n")
+        print()
         type.type("You heard it before you felt it. Your knee buckles. You go down clutching your leg.")
-        print("\n")
+        print()
         type.type(red("Torn ACL") + ". Season over. Maybe career over.")
         self.add_injury("Torn ACL")
         self.hurt(20)
@@ -1500,11 +1669,11 @@ class IllnessMixin:
 
     def motorcycle_crash(self):
         type.type("The car didn't see you. Pulled right out in front of you.")
-        print("\n")
+        print()
         type.type("You lay the bike down, sliding across the pavement. Your leg gets trapped under the motorcycle.")
-        print("\n")
+        print()
         type.type("Road rash everywhere. But worse - your leg is mangled. You can see the bone.")
-        print("\n")
+        print()
         type.type(red("Broken leg") + ". " + red("Severe burns") + " from the friction and exhaust.")
         self.add_injury("Broken Leg")
         self.add_injury("Severe Burns")
@@ -1514,25 +1683,32 @@ class IllnessMixin:
 
     def dog_attack_severe(self):
         type.type("The dog was loose. No leash. No owner in sight.")
-        print("\n")
+        print()
         type.type("It lunges at you before you can react. Teeth sink into your forearm.")
-        print("\n")
+        print()
         type.type("You fight it off but the damage is done. Your arm is torn to shreds.")
-        print("\n")
+        print()
         type.type(red("Deep lacerations") + ". Possible " + red("rabies exposure") + ". Definitely need stitches.")
         self.add_injury("Deep Laceration")
         self.add_status("Possible Rabies")
         self.hurt(28)
         self.lose_sanity(4)
+        if self.has_item("Real Insurance"):
+            print()
+            type.type("You nearly drop the " + cyan(bright("Real Insurance")) + " card because your hand is slick with blood, but the ER triage nurse sees it and starts moving with impossible speed.")
+            print()
+            type.type("Suddenly the rabies shots, the stitches, the awful paperwork — all of it becomes survivable in a practical sense, not just a biological one.")
+            self.restore_sanity(5)
+            self.update_faulty_insurance_durability()
         self.start_night()
 
     def pool_diving_accident(self):
         type.type("The pool looked deeper than it was. You dive in headfirst.")
-        print("\n")
+        print()
         type.type("Your head hits the bottom. Your neck compresses. Everything goes numb for a terrifying moment.")
-        print("\n")
+        print()
         type.type("You surface, panicking, but find you can still move. Barely.")
-        print("\n")
+        print()
         type.type(red("Fractured spine") + ". You're lucky you're not paralyzed.")
         self.add_injury("Fractured Spine")
         self.hurt(35)
@@ -1541,11 +1717,11 @@ class IllnessMixin:
 
     def chemical_spill(self):
         type.type("The bottle wasn't labeled. You opened it and it splashed on your skin.")
-        print("\n")
+        print()
         type.type("Immediately, burning. Intense, searing burning. Your skin is bubbling.")
-        print("\n")
+        print()
         type.type("You rinse and rinse but the damage is done.")
-        print("\n")
+        print()
         type.type(red("Chemical burn") + ". Whatever that was, it ate through your flesh.")
         self.add_injury("Chemical Burn")
         self.hurt(22)
@@ -1554,11 +1730,11 @@ class IllnessMixin:
 
     def electric_shock(self):
         type.type("The wire was exposed. You didn't see it.")
-        print("\n")
+        print()
         type.type("The jolt throws you across the room. Your heart stutters. Your muscles seize.")
-        print("\n")
+        print()
         type.type("You come to on the floor, smoking slightly, your hand charred where you touched it.")
-        print("\n")
+        print()
         type.type(red("Electrical burns") + ". Internal damage unknown. Your heart is still skipping beats.")
         self.add_injury("Electrical Burns")
         self.hurt(30)
@@ -1567,11 +1743,11 @@ class IllnessMixin:
 
     def workplace_injury(self):
         type.type("The machinery caught your arm. Before you could pull away, it crushed everything.")
-        print("\n")
+        print()
         type.type("Bones shattered. Muscles pulped. You screamed until you passed out.")
-        print("\n")
+        print()
         type.type("When you wake up in the hospital, your arm is heavily bandaged. The doctor looks grim.")
-        print("\n")
+        print()
         type.type(red("Crush injury") + ". They saved the arm. Barely. Function uncertain.")
         self.add_injury("Crush Injury")
         self.hurt(40)
@@ -1580,11 +1756,11 @@ class IllnessMixin:
 
     def assault_aftermath(self):
         type.type("They came out of nowhere. Multiple attackers. You didn't stand a chance.")
-        print("\n")
+        print()
         type.type("The beating was brutal. When they left, you couldn't move.")
-        print("\n")
+        print()
         type.type("Broken ribs. Concussion. Internal bleeding. You're barely conscious when help arrives.")
-        print("\n")
+        print()
         type.type(red("Multiple injuries") + ". You might have a " + red("ruptured spleen") + ".")
         self.add_injury("Broken Ribs")
         self.add_injury("Concussion")
@@ -1596,11 +1772,11 @@ class IllnessMixin:
 
     def caught_in_fire(self):
         type.type("The building is on fire. You're trapped.")
-        print("\n")
+        print()
         type.type("You run through the flames, your clothes igniting. The smoke fills your lungs.")
-        print("\n")
+        print()
         type.type("You make it out. Barely. Your skin is charred. You can't stop coughing.")
-        print("\n")
+        print()
         type.type(red("Severe burns") + ". Smoke inhalation. " + red("Collapsed lung") + " from the heat damage.")
         self.add_injury("Severe Burns")
         self.add_injury("Collapsed Lung")
@@ -1610,11 +1786,11 @@ class IllnessMixin:
 
     def frozen_outdoors(self):
         type.type("You got lost. The temperature dropped. You couldn't find shelter.")
-        print("\n")
+        print()
         type.type("By the time they found you, your extremities were black. Your core temperature was dangerously low.")
-        print("\n")
+        print()
         type.type("You survived. But your fingers and toes...")
-        print("\n")
+        print()
         type.type(red("Frostbite") + ". Amputation might be necessary. " + red("Hypothermia") + " damage to your organs.")
         self.add_injury("Frostbite")
         self.add_status("Hypothermia")
@@ -1624,11 +1800,11 @@ class IllnessMixin:
 
     def heat_exhaustion_collapse(self):
         type.type("You were outside too long. Too hot. Not enough water.")
-        print("\n")
+        print()
         type.type("First you stopped sweating. Then you got dizzy. Then you collapsed.")
-        print("\n")
+        print()
         type.type("When you wake up, you're in an ambulance, ice packs covering your body.")
-        print("\n")
+        print()
         type.type(red("Heat stroke") + ". Your body temperature hit 106. You're lucky to be alive.")
         self.add_status("Heat Stroke")
         self.hurt(30)
@@ -1637,11 +1813,11 @@ class IllnessMixin:
 
     def drug_overdose_survival(self):
         type.type("You took too much. You knew immediately.")
-        print("\n")
+        print()
         type.type("Your heart raced. Or maybe it slowed. You couldn't tell. Everything was wrong.")
-        print("\n")
+        print()
         type.type("You woke up in the ER with someone pulling a tube out of your throat.")
-        print("\n")
+        print()
         type.type(red("Overdose") + ". They gave you Narcan. Or charcoal. Whatever it took to save your life.")
         self.add_status("Severe Dehydration")
         self.add_status("Seizure Disorder")
@@ -1651,11 +1827,11 @@ class IllnessMixin:
 
     def allergic_reaction_restaurant(self):
         type.type("They said there were no nuts in the dish. They lied.")
-        print("\n")
+        print()
         type.type("Within minutes, your throat is closing. Hives everywhere. You can't breathe.")
-        print("\n")
+        print()
         type.type("Someone stabs you with an EpiPen. You're rushed to the hospital.")
-        print("\n")
+        print()
         type.type(red("Anaphylaxis") + ". Severe allergic reaction. You almost died in that restaurant.")
         self.add_status("Anaphylaxis")
         self.hurt(25)
@@ -1664,18 +1840,18 @@ class IllnessMixin:
 
     def botched_surgery(self):
         type.type("The surgery was supposed to be routine. It wasn't.")
-        print("\n")
+        print()
         type.type("When you wake up, something is wrong. Terribly wrong.")
-        print("\n")
+        print()
         type.type("They nicked an artery. They left something inside. Something went septic.")
-        print("\n")
+        print()
         type.type(red("Surgical complications") + ". Now you're fighting for your life instead of recovering.")
         if self.has_item("Forged Documents"):
-            print("\n")
+            print()
             type.type("The " + cyan(bright("Forged Documents")) + " identify you as Dr. Robert Chen, MD. The nurse doesn't question it.")
-            print("\n")
+            print()
             type.type("You supervise your own surgery. The nurses follow your instructions. The artery gets patched. Nothing gets left inside.")
-            print("\n")
+            print()
             type.type(green("Free treatment. Successful surgery. The papers work perfectly."))
             self.restore_sanity(3)
             self.start_night()
@@ -1688,11 +1864,11 @@ class IllnessMixin:
 
     def dental_disaster(self):
         type.type("You've been ignoring that toothache for weeks. Months. It's gotten worse.")
-        print("\n")
+        print()
         type.type("Now your face is swollen. You can feel pus draining into your mouth. The fever is high.")
-        print("\n")
+        print()
         type.type("The infection is spreading toward your brain.")
-        print("\n")
+        print()
         type.type(red("Tooth abscess") + " gone systemic. " + red("Sepsis") + " is setting in.")
         self.add_status("Tooth Abscess")
         self.add_status("Sepsis")
@@ -1702,11 +1878,11 @@ class IllnessMixin:
 
     def gym_collapse(self):
         type.type("You're on the treadmill, pushing hard. Too hard.")
-        print("\n")
+        print()
         type.type("Your chest tightens. Your left arm goes numb. You stumble off the machine.")
-        print("\n")
+        print()
         type.type("Is this... a heart attack? At your age?")
-        print("\n")
+        print()
         type.type(red("Cardiac event") + ". You need help. NOW.")
         self.add_status("Blood Pressure Crisis")
         self.add_danger("Heart Condition")
@@ -1716,11 +1892,21 @@ class IllnessMixin:
 
     def food_truck_nightmare(self):
         type.type("The food truck looked sketchy but you were hungry. Big mistake.")
-        print("\n")
+        print()
         type.type("Hours later, you're praying to the porcelain god. Both ends. Simultaneously.")
-        print("\n")
+        print()
         type.type("The cramping is severe. There's blood in the diarrhea. This is serious.")
-        print("\n")
+        print()
+        if self.has_item("Antacid Brew"):
+            self.use_item("Antacid Brew")
+            type.type("Under the table, you chug the " + cyan(bright("Antacid Brew")) + ". The fizzing is... loud. Everyone stares. 'What was that noise?'")
+            print()
+            type.type("You burp with the force of a foghorn. Silence. Then the host laughs. Then everyone laughs.")
+            print()
+            type.type("You've become the legend of this dinner party. 'The Burp Guy.' Forever.")
+            self.restore_sanity(5)
+            self.start_night()
+            return
         type.type(red("Severe food poisoning") + ". E. coli or Salmonella. You need IV fluids.")
         self.add_status("Stomach Flu")
         self.add_status("Severe Dehydration")
@@ -1730,11 +1916,11 @@ class IllnessMixin:
 
     def public_pool_infection(self):
         type.type("The public pool was crowded. Too crowded. The water was... questionable.")
-        print("\n")
+        print()
         type.type("A week later, your ear is killing you. Burning when you urinate. Eye is crusty.")
-        print("\n")
+        print()
         type.type("You picked up everything in that cesspool.")
-        print("\n")
+        print()
         type.type(red("Ear infection") + ". " + red("Pink eye") + ". Possibly a " + red("UTI") + ".")
         self.add_status("Ear Infection")
         self.add_status("Pink Eye")
@@ -1745,11 +1931,11 @@ class IllnessMixin:
 
     def hiking_disaster(self):
         type.type("The hike was supposed to be easy. Then the trail gave way.")
-        print("\n")
+        print()
         type.type("You tumbled down the ravine, bouncing off rocks, trying to protect your head.")
-        print("\n")
+        print()
         type.type("When you stop falling, you can't move your ankle. Your wrist is bent wrong. You're bleeding from somewhere.")
-        print("\n")
+        print()
         type.type(red("Broken ankle") + ". " + red("Broken wrist") + ". Miles from help.")
         self.add_injury("Broken Ankle")
         self.add_injury("Broken Wrist")
@@ -1759,17 +1945,17 @@ class IllnessMixin:
 
     def wasp_nest_encounter(self):
         type.type("You didn't see the nest. Not until it was too late.")
-        print("\n")
+        print()
         type.type("The swarm descends on you. Stings everywhere. You run, but they follow.")
-        print("\n")
+        print()
         type.type("By the time you escape, you've been stung dozens of times. Your throat is tightening...")
-        print("\n")
+        print()
         type.type(red("Multiple wasp stings") + ". Possible " + red("anaphylaxis") + ".")
         if self.has_item("Flask of Anti-Venom"):
             self.use_item("Flask of Anti-Venom")
-            print("\n")
+            print()
             type.type("You down the " + cyan(bright("Flask of Anti-Venom")) + " before your throat can close. The swelling recedes. You breathe.")
-            print("\n")
+            print()
             type.type(green("The venom doesn't win today."))
             self.hurt(5)
             self.start_night()
@@ -1781,11 +1967,11 @@ class IllnessMixin:
 
     def camping_tick_bite(self):
         type.type("You find the tick embedded in your skin days after the camping trip.")
-        print("\n")
+        print()
         type.type("It's engorged. Been feeding for a while. You pull it out, but the damage is done.")
-        print("\n")
+        print()
         type.type("Weeks later, the symptoms start. Joint pain. Fatigue. The telltale rash.")
-        print("\n")
+        print()
         type.type(red("Lyme disease") + ". That one tick has changed your life.")
         self.add_status("Lyme Disease")
         self.hurt(15)
@@ -1794,11 +1980,11 @@ class IllnessMixin:
 
     def homeless_shelter_outbreak(self):
         type.type("You stayed at the shelter when you had nowhere else to go.")
-        print("\n")
+        print()
         type.type("The beds were close together. Too close. Someone was coughing all night.")
-        print("\n")
+        print()
         type.type("Within days, you're coughing too. Deep, rattling coughs. Fever. Night sweats.")
-        print("\n")
+        print()
         type.type(red("Pneumonia") + ". Maybe something worse. The conditions were ripe for disease.")
         self.add_status("Pneumonia")
         self.hurt(18)
@@ -1807,11 +1993,11 @@ class IllnessMixin:
 
     def prison_shiv_wound(self):
         type.type("Wrong place. Wrong time. Wrong look at the wrong guy.")
-        print("\n")
+        print()
         type.type("The sharpened toothbrush went into your gut before you even saw it coming.")
-        print("\n")
+        print()
         type.type("You're on the ground, holding your intestines in, as guards finally respond.")
-        print("\n")
+        print()
         type.type(red("Puncture wound") + ". Perforated bowel. " + red("Sepsis") + " is a certainty without immediate surgery.")
         self.add_injury("Puncture Wound")
         self.add_status("Sepsis")
@@ -1821,11 +2007,11 @@ class IllnessMixin:
 
     def daycare_plague(self):
         type.type("Your kid brought home something from daycare. Now everyone has it.")
-        print("\n")
+        print()
         type.type("First the stomach flu spread through the family. Then the ear infections. Then the pink eye.")
-        print("\n")
+        print()
         type.type("You're exhausted, sick, and covered in various bodily fluids.")
-        print("\n")
+        print()
         type.type(red("Multi-infection") + ". Kids are disease vectors. You're patient zero's victim.")
         self.add_status("Stomach Flu")
         self.add_status("Ear Infection")
@@ -1836,11 +2022,11 @@ class IllnessMixin:
 
     def bad_tattoo_infection(self):
         type.type("The tattoo parlor was cheap. Too cheap. Now you know why.")
-        print("\n")
+        print()
         type.type("The fresh ink is swollen, oozing pus. Red lines spreading outward.")
-        print("\n")
+        print()
         type.type("The artist didn't sterilize properly. Or used contaminated ink.")
-        print("\n")
+        print()
         type.type(red("Staph infection") + " from a dirty needle. Your new tattoo might kill you.")
         self.add_status("Staph Infection")
         self.hurt(18)
@@ -1849,11 +2035,11 @@ class IllnessMixin:
 
     def mma_fight_aftermath(self):
         type.type("You thought you could handle yourself in a fight. You were wrong.")
-        print("\n")
+        print()
         type.type("The armbar hyperextended your elbow. The chokehold knocked you out. The ground and pound did the rest.")
-        print("\n")
+        print()
         type.type("You leave the cage on a stretcher.")
-        print("\n")
+        print()
         type.type(red("Dislocated shoulder") + ". " + red("Concussion") + ". " + red("Broken ribs") + ".")
         self.add_injury("Dislocated Shoulder")
         self.add_injury("Concussion")
@@ -1864,11 +2050,11 @@ class IllnessMixin:
 
     def covid_complications(self):
         type.type("It started like a cold. Then you couldn't breathe.")
-        print("\n")
+        print()
         type.type("Your oxygen levels dropped. Your lungs filled with fluid. You were intubated for two weeks.")
-        print("\n")
+        print()
         type.type("You survived. But the damage...")
-        print("\n")
+        print()
         type.type(red("Severe respiratory infection") + ". " + red("DVT") + " from lying in bed. Long-term effects unknown.")
         self.add_status("Pneumonia")
         self.add_status("DVT")
@@ -1878,11 +2064,11 @@ class IllnessMixin:
 
     def earthquake_injury(self):
         type.type("The building shook. The ceiling came down.")
-        print("\n")
+        print()
         type.type("You were trapped under debris for hours. Concrete pinning your legs.")
-        print("\n")
+        print()
         type.type("When they pulled you out, the real danger began - crush syndrome.")
-        print("\n")
+        print()
         type.type(red("Crush injury") + ". Toxins flooding your system. Kidneys failing.")
         self.add_injury("Crush Injury")
         self.hurt(40)
@@ -1891,11 +2077,11 @@ class IllnessMixin:
 
     def carnival_ride_accident(self):
         type.type("The ride malfunctioned. The safety bar wasn't locked properly.")
-        print("\n")
+        print()
         type.type("You were thrown from the car, hitting multiple surfaces on the way down.")
-        print("\n")
+        print()
         type.type("The crowd screams. You can't feel your legs.")
-        print("\n")
+        print()
         type.type(red("Fractured spine") + ". " + red("Broken collarbone") + ". Internal injuries unknown.")
         self.add_injury("Fractured Spine")
         self.add_injury("Broken Collarbone")
@@ -1905,11 +2091,11 @@ class IllnessMixin:
 
     def window_crash(self):
         type.type("Someone pushed you. Or you fell. The glass shattered around you.")
-        print("\n")
+        print()
         type.type("You're covered in cuts. Some are deep - arterial spurting. Glass is embedded everywhere.")
-        print("\n")
+        print()
         type.type("You're losing blood fast.")
-        print("\n")
+        print()
         type.type(red("Multiple lacerations") + ". " + red("Puncture wounds") + " from glass shards.")
         self.add_injury("Deep Laceration")
         self.add_injury("Puncture Wound")
@@ -1919,11 +2105,11 @@ class IllnessMixin:
 
     def trampoline_disaster(self):
         type.type("You're never too old for trampolines. That's what you told yourself.")
-        print("\n")
+        print()
         type.type("You landed wrong. Your knee went in a direction knees don't go.")
-        print("\n")
+        print()
         type.type("The pop was audible. The pain was indescribable.")
-        print("\n")
+        print()
         type.type(red("Torn ACL") + ". Also " + red("dislocated kneecap") + ". Reconstruction required.")
         self.add_injury("Torn ACL")
         self.hurt(25)
@@ -1932,11 +2118,11 @@ class IllnessMixin:
 
     def explosion_nearby(self):
         type.type("The explosion threw you ten feet. Your ears are ringing. Blood coming from everywhere.")
-        print("\n")
+        print()
         type.type("Shrapnel. Burns. Concussion. You don't know which direction is up.")
-        print("\n")
+        print()
         type.type("Everything is muffled. Everything hurts.")
-        print("\n")
+        print()
         type.type(red("Ruptured eardrums") + ". " + red("Concussion") + ". " + red("Second degree burns") + ". " + red("Shrapnel wounds") + ".")
         self.add_injury("Ruptured Eardrum")
         self.add_injury("Concussion")
@@ -1948,11 +2134,11 @@ class IllnessMixin:
 
     def botched_piercing(self):
         type.type("The piercing didn't heal right. It got infected. Then REALLY infected.")
-        print("\n")
+        print()
         type.type("Your ear is swollen, hot, draining pus. The cartilage might be damaged.")
-        print("\n")
+        print()
         type.type("All for a little hole.")
-        print("\n")
+        print()
         type.type(red("Staph infection") + " from improper aftercare. Possible permanent ear deformity.")
         self.add_status("Staph Infection")
         self.hurt(12)
@@ -1961,11 +2147,11 @@ class IllnessMixin:
 
     def weight_dropping(self):
         type.type("You're spotting someone at the gym. They lose control of the weight.")
-        print("\n")
+        print()
         type.type("The barbell comes down on your hand before you can move.")
-        print("\n")
+        print()
         type.type("You hear the bones crack before you feel it.")
-        print("\n")
+        print()
         type.type(red("Broken hand") + ". Multiple metacarpal fractures. Surgical repair needed.")
         self.add_injury("Broken Hand")
         self.hurt(18)
@@ -1974,11 +2160,11 @@ class IllnessMixin:
 
     def bad_sushi(self):
         type.type("The sushi was a day old. Maybe two. You ate it anyway.")
-        print("\n")
+        print()
         type.type("The food poisoning hits hard. But there's something else. Parasites.")
-        print("\n")
+        print()
         type.type("You can feel something moving in your gut. Something alive.")
-        print("\n")
+        print()
         type.type(red("Parasitic infection") + ". Anisakis worms from raw fish. They're eating you from inside.")
         self.add_status("Waterborne Illness")
         self.add_status("Stomach Flu")
@@ -1988,11 +2174,11 @@ class IllnessMixin:
 
     def coma_awakening(self):
         type.type("You don't remember the accident. You don't remember the last three weeks.")
-        print("\n")
+        print()
         type.type("You wake up in a hospital bed, tubes everywhere. Muscles atrophied. Confused.")
-        print("\n")
+        print()
         type.type("The doctors tell you you're lucky to be alive. You don't feel lucky.")
-        print("\n")
+        print()
         type.type(red("Severe injuries") + " from an event you can't recall. " + red("Nerve damage") + ". " + red("DVT") + " from bed rest.")
         self.add_injury("Nerve Damage")
         self.add_status("DVT")
@@ -2003,12 +2189,22 @@ class IllnessMixin:
 
     def stress_breakdown(self):
         type.type("It's all too much. The gambling. The stress. The fear. The debt.")
-        print("\n")
+        print()
         type.type("Your heart starts racing and won't stop. You can't breathe. You're dying. You're sure of it.")
-        print("\n")
+        print()
         type.type("Hours later, still trembling, you realize it was a panic attack. But it felt real.")
-        print("\n")
+        print()
         type.type(red("Severe anxiety disorder") + ". " + red("Chronic insomnia") + ". Your mind is breaking.")
+        if self.has_item("Health Indicator") or self.has_item("Health Manipulator"):
+            indicator = "Health Manipulator" if self.has_item("Health Manipulator") else "Health Indicator"
+            print()
+            if indicator == "Health Manipulator":
+                type.type("The " + cyan(bright(indicator)) + " confirms what your fear couldn't: your heart is not failing, just screaming. It steadies your breathing enough to keep the breakdown from becoming a hospital run.")
+                self.restore_sanity(2)
+            else:
+                type.type("You stare at the readout on the " + cyan(bright(indicator)) + " until the panic loses some of its authority. Bad, yes. Fatal, no.")
+                self.restore_sanity(1)
+            self.update_health_indicator_durability()
         self.add_status("Anxiety Disorder")
         self.add_status("Chronic Insomnia")
         self.lose_sanity(10)
@@ -2016,11 +2212,11 @@ class IllnessMixin:
 
     def trauma_flashback(self):
         type.type("Something triggers it. A sound. A smell. Suddenly you're THERE again.")
-        print("\n")
+        print()
         type.type("The casino. The Dealer. The losses. The fear. You relive it all in an instant.")
-        print("\n")
+        print()
         type.type("When you come back to reality, you're curled on the floor, shaking.")
-        print("\n")
+        print()
         type.type(red("PTSD episode") + ". The trauma is embedded in your nervous system.")
         self.add_status("PTSD")
         self.lose_sanity(8)
@@ -2028,11 +2224,11 @@ class IllnessMixin:
 
     def sleep_deprivation_crisis(self):
         type.type("How long since you slept? Three days? Four? You've lost count.")
-        print("\n")
+        print()
         type.type("You're seeing things. Hearing things. Your thoughts don't connect properly.")
-        print("\n")
+        print()
         type.type("Your body is shutting down from lack of rest.")
-        print("\n")
+        print()
         type.type(red("Chronic insomnia") + " induced psychosis. " + red("Severe depression") + ". You need medical intervention.")
         self.add_status("Chronic Insomnia")
         self.add_status("Severe Depression")

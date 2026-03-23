@@ -1,410 +1,215 @@
-=== AUTOTEST RUN 2026-03-19 16:24:32 ===
-AUTOTEST cycles=1000 seeds=random/100 total=100
-Outcomes win=0/100 died=31/100 broke=42/100 ending=24/100 stalled=0/100 capped=0/100 crash=0/100 timeouts=3/100 doctor_missed=17
-Progress car=40/100 ever_car=41/100 location=37/100 rank1+=20/100 clean=95/100
-Unlocks map=1/100 worn_map=36/100 marvin_access=37/100 witch=36/100 gus=28/100 vinnie=25/100 million=0/100
-Visits doctor=32/100 witch_doctor=6/100 store=19/100 pawn=11/100 loan=21/100 marvin=11/100 tom=3/100 frank=2/100 oswald=1/100 upgrade=9/100 crafting=0/100 companion=0/100 adventure=0/100 airport=0/100 mechanic_end=0/100 airport_win=0/100 wins=0/100
-Presence gift_unlock=0/100 wrapped_gift=0/100 workbench_unlock=12/100 workbench_visit=8/100 marvin_items=1/100 companion_roster=50/100
+=== AUTOTEST RUN 2026-03-23 02:15:04 ===
+AUTOTEST cycles=10 seeds=random/5 total=5
+Outcomes win=0/5 died=0/5 broke=0/5 ending=1/5 stalled=0/5 capped=4/5 crash=0/5 timeouts=0/5 doctor_missed=0
+Progress car=1/5 ever_car=1/5 location=1/5 rank1+=0/5 clean=5/5
+Unlocks map=0/5 worn_map=1/5 marvin_access=1/5 witch=0/5 gus=0/5 vinnie=0/5 million=0/5
+Visits doctor=1/5 witch_doctor=0/5 store=0/5 pawn=0/5 loan=0/5 marvin=0/5 tom=1/5 frank=0/5 oswald=0/5 upgrade=0/5 crafting=0/5 companion=0/5 adventure=0/5 airport=0/5 mechanic_end=0/5 airport_win=0/5 wins=0/5
+Presence gift_unlock=0/5 wrapped_gift=0/5 workbench_unlock=0/5 workbench_visit=0/5 marvin_items=0/5 companion_roster=3/5
 Outcome labels win=successful ending ending=named non-win terminal ending crash=unexpected runner/report failure capped=reached cycle limit
-Named endings madness=24
+Named endings madness=1
 
 Coverage & Routing
 ------------------
-Decision Coverage requests=14841 traces=15072
-Requests blackjack_action=7645 blackjack_bet=4854 yes_no=1721 route_select=208 event_branch=160 menu_select=83 purchase_select=83 loan_decision=77
-Traces   blackjack_action=7645 blackjack_bet=4854 yes_no=1721 route_select=439 event_branch=160 menu_select=83 purchase_select=83 loan_decision=77
-Contexts blackjack_action=7645 blackjack_bet=4854 yes_no_prompt=1721 afternoon_destination=208 option_prompt=160 convenience_store_menu=83 pawn_menu=74 loan_borrow_amount=44
-Goals    acquire_car=8454 survive_emergency=1589 push_next_rank=1098 stabilize_health=1010 stabilize_sanity=972 cashout_pawn_inventory=537 restock_supplies=437 reach_adventure_threshold=336
-Route outcomes interrupt=231 applied=163 suppressed=45
-Route interrupts medical_stabilization=84 recovery_day=60 urgent_medical=56 poverty_loan_bootstrap=21 marvin_conversion_window=7 debt_cleanup_window=3
-Blocked goals advance_mechanic_arc=231 reach_adventure_threshold=231 restock_supplies=166 stabilize_health=164 stabilize_sanity=137 push_next_rank=118 recover_from_car_trouble=82 survive_emergency=72
-Interrupted top goals restock_supplies=51 cashout_pawn_inventory=37 stabilize_sanity=35 survive_emergency=34 exploit_marvin=34 stabilize_health=29 push_next_rank=7 recover_from_car_trouble=4
-Applied routes cashout_pawn_inventory=56 restock_supplies=35 push_next_rank=26 recover_from_car_trouble=16 stabilize_sanity=8 reach_adventure_threshold=7 advance_mechanic_arc=6 stabilize_health=5
-Suppressed routes push_next_rank=19 stabilize_health=9 survive_emergency=9 stabilize_sanity=6 recover_from_car_trouble=1 advance_mechanic_arc=1
+Decision Coverage requests=374 traces=375
+Requests blackjack_action=206 blackjack_bet=139 yes_no=21 event_branch=6 route_select=2
+Traces   blackjack_action=206 blackjack_bet=139 yes_no=21 event_branch=6 route_select=3
+Contexts blackjack_action=206 blackjack_bet=139 yes_no_prompt=21 option_prompt=6 afternoon_destination=2
+Goals    acquire_car=333 survive_emergency=18 push_next_rank=15 stabilize_health=8 advance_mechanic_arc=1
+Route outcomes applied=2 interrupt=1
+Route interrupts urgent_medical=1
+Blocked goals advance_mechanic_arc=1 push_next_rank=1 reach_adventure_threshold=1 restock_supplies=1 stabilize_health=1 unlock_marvin=1
+Interrupted top goals restock_supplies=1
+Applied routes advance_mechanic_arc=1 push_next_rank=1
 
 Shop Summary
 shop              unlocked-runs visited-runs total-visits
 ----------------- ------------- ------------ ------------
-Doctor                       41/100           32/100           86
-Witch Doctor                 36/100            6/100           33
-Convenience Store            41/100           19/100           37
-Pawn Shop                    28/100           11/100           74
-Loan Shark                   25/100           21/100           26
-Marvin                       37/100           11/100           21
-Tom                          34/100            3/100           10
-Frank                         3/100            2/100            3
-Oswald                        4/100            1/100            1
-Car Access                   41/100           19/100           37
-Car Workbench                12/100            8/100           10
-Crafting                      0/100            8/100           10
-Companion                     0/100            0/100            0
-Airport                       0/100            0/100            0
+Doctor                        1/5             1/5             2
+Witch Doctor                  0/5             0/5             0
+Convenience Store             1/5             0/5             0
+Pawn Shop                     0/5             0/5             0
+Loan Shark                    0/5             0/5             0
+Marvin                        1/5             0/5             0
+Tom                           1/5             1/5             1
+Frank                         0/5             0/5             0
+Oswald                        0/5             0/5             0
+Car Access                    1/5             0/5             0
+Car Workbench                 0/5             0/5             0
+Crafting                      0/5             0/5             0
+Companion                     0/5             0/5             0
+Airport                       0/5             0/5             0
 note: ALL locations (including Doctor) require a car. Car Workbench additionally requires a Tool Kit.
 
-No-Car Review runs=60/100 early(day<=10)=34 mid(11-30)=24 late(31+)=2 ever-had-then-lost=1 all-three-seen-no-car=0
-early funnel d<=10 threshold=200 reached=5/60 offer-runs=3/60 affordable-offer-runs=3/60 accept-runs=2/60 avg_peak=105
-early route pressure interrupt-runs=0/60 medical-interrupt-runs=0/60 suppressed-runs=0/60 applied-runs=1/60 peak<100=32 peak100-199=23 peak200+=5
-peak-balance buckets peak<100=27 peak100-199=23 peak200-349=10 peak350-799=0 peak800+=0
-mechanic outcomes no mechanic offer=52 | Tom path no car=4 | Frank accepted no car=3 | declined affordable offer=1
+No-Car Review runs=4/5 early(day<=10)=1 mid(11-30)=3 late(31+)=0 ever-had-then-lost=0 all-three-seen-no-car=0
+early funnel d<=10 threshold=200 reached=0/4 offer-runs=0/4 affordable-offer-runs=0/4 accept-runs=0/4 avg_peak=97
+early route pressure interrupt-runs=0/4 medical-interrupt-runs=0/4 suppressed-runs=0/4 applied-runs=0/4 peak<100=3 peak100-199=1 peak200+=0
+peak-balance buckets peak<100=2 peak100-199=2 peak200-349=0 peak350-799=0 peak800+=0
+mechanic outcomes no mechanic offer=4
 
-Stagnation Audit stalled-runs=23/100
-day-bucket   runs avg-peak$ no-car marvin-access marvin-visit doctor loan top-deaths                                           
----------- ------ --------- ------ ------------- ------------ ------ ---- -----------------------------------------------------
-20-39      19/100       258      6            10            0      9    1 infection-pressure=2 | untreated-wounds=1 | Unknown=1
-40-69       4/100       397      2             2            0      2    0 none                                                 
+Stagnation Audit
+none
 
 Distributions
 Peak balance
-peak<100     28/100 #######.................
-100-199      25/100 ######..................
-200-349      21/100 #####...................
-350-799       5/100 #.......................
-800-1,999     3/100 #.......................
-2k-4,999     12/100 ###.....................
-5k-9,999      5/100 #.......................
-10k-19k       1/100 #.......................
-20k-49k       0/100 ........................
-50k-99k       0/100 ........................
-100k-249k     0/100 ........................
-250k-399k     0/100 ........................
-400k-749k     0/100 ........................
-750k-999k     0/100 ........................
-1m+           0/100 ........................
+peak<100      2/5   ##########..............
+100-199       2/5   ##########..............
+200-349       1/5   #####...................
+350-799       0/5   ........................
+800-1,999     0/5   ........................
+2k-4,999      0/5   ........................
+5k-9,999      0/5   ........................
+10k-19k       0/5   ........................
+20k-49k       0/5   ........................
+50k-99k       0/5   ........................
+100k-249k     0/5   ........................
+250k-399k     0/5   ........................
+400k-749k     0/5   ........................
+750k-999k     0/5   ........................
+1m+           0/5   ........................
 
 Peak rank
-rank=0       80/100 ###################.....
-rank=1       19/100 #####...................
-rank=2        1/100 #.......................
-rank=3        0/100 ........................
-rank=4        0/100 ........................
-rank>=5       0/100 ........................
+rank=0        5/5   ########################
+rank=1        0/5   ........................
+rank=2        0/5   ........................
+rank=3        0/5   ........................
+rank=4        0/5   ........................
+rank>=5       0/5   ........................
 
 Run length
-day<=10      34/100 ########................
-11-30        45/100 ###########.............
-31-60        20/100 #####...................
-61-90         1/100 #.......................
-91+           0/100 ........................
+day<=10       1/5   #####...................
+11-30         4/5   ###################.....
+31-60         0/5   ........................
+61-90         0/5   ........................
+91+           0/5   ........................
 
 Max Rank Cohorts
-cohort   runs survived avg-peak$ avg-end$ avg-day ever-car doctor marvin pawn  loan witchdr
------- ------ -------- --------- -------- ------- -------- ------ ------ ---- ----- -------
-rank0  80/100     0/80       176       56      16    21/80  14/80   2/80 2/80  2/80    2/80
-rank1  19/100     0/19     3,371      761      34    19/19  17/19   9/19 9/19 18/19    3/19
-rank2   1/100      0/1    10,981        0      49      1/1    1/1    0/1  0/1   1/1     1/1
-common rank0 outcomes broke=29 | died=28 | madness=20
-common rank0 routes   none=63 | doctor=10 | shop:convenience_store=2
-common rank0 deaths   early-untreated-wounds=6 | infection-pressure=5 | nightmare-drowning=4
-common rank1 outcomes broke=12 | madness=4 | died=3
-common rank1 routes   shop:pawn_shop=8 | doctor=3 | shop:loan_shark=2
-common rank1 deaths   car-mechanical-fatality=1 | nightmare-drowning=1 | Unknown=1
-common rank2 outcomes broke=1
-common rank2 routes   doctor:witch=1
-common rank2 deaths   none
+cohort runs survived avg-peak$ avg-end$ avg-day ever-car doctor marvin pawn loan witchdr
+------ ---- -------- --------- -------- ------- -------- ------ ------ ---- ---- -------
+rank0   5/5      4/5       157       86      11      1/5    1/5    0/5  0/5  0/5     0/5
+common rank0 outcomes capped=4 | madness=1
+common rank0 routes   none=4 | doctor=1
+common rank0 deaths   none
 
 System Presence
-system      present engaged payoff notes                                     
------------ ------- ------- ------ ------------------------------------------
-doctor       41/100  32/100     86 car / doctor-runs / total-visits          
-store        41/100  19/100     37 car / store-runs / total-visits           
-pawn         28/100  11/100     74 gus / pawn-runs / total-visits            
-loan         25/100  21/100     26 vinnie / loan-runs / total-visits         
-marvin       37/100  11/100  1/100 access / visit / item-run total-visits=21 
-gift-wrap     0/100   0/100 97/100 delivered / dealer<78 end / avg=50        
-workbench    12/100   8/100  0/100 tool-kit / visit / crafted total-visits=10
-tom          34/100   3/100     10 met / mechanic-runs / total-visits        
-frank         3/100   2/100      3 met / mechanic-runs / total-visits        
-oswald        4/100   1/100      1 met / mechanic-runs / total-visits        
-companions    0/100  50/100  0/100 whistle / roster / befriended             
-witch        36/100   6/100  0/100 met / doctor / flask-buy total-visits=33  
-millionaire   0/100   0/100  0/100 reach / visitor / airport-runs            
-airport       0/100   0/100      0 unlock / airport-runs / total-visits      
+system      present engaged payoff notes                                    
+----------- ------- ------- ------ -----------------------------------------
+doctor          1/5     1/5      2 car / doctor-runs / total-visits         
+store           1/5     0/5      0 car / store-runs / total-visits          
+pawn            0/5     0/5      0 gus / pawn-runs / total-visits           
+loan            0/5     0/5      0 vinnie / loan-runs / total-visits        
+marvin          1/5     0/5    0/5 access / visit / item-run total-visits=0 
+gift-wrap       0/5     0/5    5/5 delivered / dealer<78 end / avg=50       
+workbench       0/5     0/5    0/5 tool-kit / visit / crafted total-visits=0
+tom             1/5     1/5      1 met / mechanic-runs / total-visits       
+frank           0/5     0/5      0 met / mechanic-runs / total-visits       
+oswald          0/5     0/5      0 met / mechanic-runs / total-visits       
+companions      0/5     3/5    0/5 whistle / roster / befriended            
+witch           0/5     0/5    0/5 met / doctor / flask-buy total-visits=0  
+millionaire     0/5     0/5    0/5 reach / visitor / airport-runs           
+airport         0/5     0/5      0 unlock / airport-runs / total-visits     
 
 Seed Overview
 -------------
 all seeds ordered by peak balance, then run length
-      seed outcome car rank peak-rank  peak$ peak-days end-day  end$  hp san top-route             
----------- ------- --- ---- --------- ------ --------- ------- ----- --- --- ----------------------
-1259956336 broke    Y     1         2 10,981        35      49     0  70   0 doctor:witch          
- 778547813 madness  Y     1         1  7,021        26      34  -617   1   0 shop:loan_shark       
-1428164705 madness  Y     1         1  5,492        27      27 5,492 100  33 doctor                
- 963491798 broke    Y     1         1  5,180        33      41     0 100  61 shop:pawn_shop        
- 739221871 madness  Y     0         1  5,145        23      35   710  99   0 shop:pawn_shop        
- 589410621 died     Y     1         1  5,114        36      37 4,305 100  34 shop:pawn_shop        
- 931487472 broke    Y     1         1  4,242        23      39     0  21  13 doctor:witch          
-1209581459 madness  Y     1         1  3,883        17      22 2,864  60  25 doctor                
-1153527485 died     Y     1         1  3,321        22      37 1,851 100  34 mechanic:tom          
-1921687391 broke    Y     1         1  2,714        13      14     0 100  29 shop:loan_shark       
-1793449238 broke    Y     1         1  2,575        29      38     0  95  56 shop:pawn_shop        
-2005184339 broke    Y     1         1  2,533        16      22     0  53  57 shop:marvin           
- 484078325 broke    Y     0         1  2,532        20      40     0  93  83 doctor                
-1931887151 broke    Y     1         1  2,524        47      50     0  93  38 shop:pawn_shop        
-2023301401 broke    Y     1         1  2,517        18      25     0  98  45 shop:pawn_shop        
- 191219781 died     Y     1         1  2,510        37      54  -148   2 100 shop:pawn_shop        
- 905898819 broke    Y     1         1  2,509        19      24     0  72  62 shop:marvin           
-  29195372 broke    Y     0         1  2,179        39      59     0  29  25 shop:convenience_store
-  29820227 broke    Y     1         1  1,042        16      16     0  99  63 shop:pawn_shop        
-1873329293 broke    Y     0         0  1,029        33      60     0  37   0 shop:pawn_shop        
-1536704457 broke    Y     1         1  1,018        30      30     0 100  44 shop:convenience_store
-1173857051 broke    Y     0         0    706        55      61     0 100 100 doctor                
- 750868584 madness  Y     0         0    568        30      38    37 100  18 doctor                
-2022736221 madness  Y     0         0    526        24      27   425 100  29 doctor                
-1015877006 broke    Y     0         0    364         8      15     0 100  87 shop:convenience_store
-1378015084 broke    Y     0         0    356        25      31     0 100  51 doctor                
-1629761851 madness  N     0         0    348        28      41    37  89  22 none                  
-1117848236 madness  N     0         0    333        18      18   333 100  24 none                  
-1462425422 broke    Y     0         0    305        25      43     0 100  11 shop:pawn_shop        
-1424929178 madness  N     0         0    282        15      15   282  28  35 none                  
-1034128364 madness  N     0         0    270        10      10   270  84   0 none                  
- 747061783 madness  Y     0         0    269        18      25    86  93  27 doctor                
-1091916732 broke    Y     0         0    268         6      14     0 100  60 shop:car_workbench    
-   4064534 broke    N     0         0    265         8      22     0  13  45 shop:convenience_store
-1153748263 madness  N     0         0    260        11      23    20  81  27 none                  
- 685694649 broke    Y     0         0    257        14      20     0 100  60 doctor                
-  88635854 madness  Y     0         0    256        15      23   113 100  12 doctor:witch          
-1373439072 broke    Y     0         0    248        20      25     0  94  30 doctor                
- 842636573 madness  Y     0         0    243        18      20    27   7  14 none                  
-2024218430 died     N     0         0    238        10      10   238 100  59 none                  
-1630622054 madness  N     0         0    228        17      51    14  65  10 none                  
- 185610607 broke    N     0         0    227        12      13     0  59  31 none                  
-1924581542 died     Y     0         0    224        26      28    41   0  34 none                  
-1193741182 died     N     0         0    224        11      17    72   0  38 none                  
-2104084587 broke    Y     0         0    222        12      20     0 100  47 doctor                
- 492237967 broke    Y     0         0    220        24      26     0  96  45 none                  
- 146986330 madness  Y     0         0    214        32      37   120  99   0 doctor                
- 852302589 died     N     0         0    187        24      27   162   0  50 none                  
- 150211897 madness  N     0         0    186         5       8   109  97  28 none                  
-  66014365 madness  N     0         0    178         8      11   113  99  11 none                  
-1771106036 broke    N     0         0    177         3       5     0  96  97 none                  
-1921935779 broke    N     0         0    173         4      16     0 100  82 none                  
- 208764828 died     Y     0         0    160         6      17    23  74  53 shop:marvin           
-1803850687 died     N     0         0    157        15      21    91   6  41 none                  
-1758294399 died     N     0         0    156        10      12   155   0  90 none                  
-1093218192 died     N     0         0    155         9      20   107   9  14 none                  
-1434297179 died     N     0         0    155        12      13   146  17  97 none                  
-   8534798 died     N     0         0    151         8      15   124   0  35 none                  
-1571230983 madness  N     0         0    151         3       7    71  97   0 none                  
-1052716950 broke    N     0         0    150        10      13     0  82  35 none                  
- 608111876 madness  Y     0         0    149        20      22    56  10  40 none                  
-1331161566 died     N     0         0    146         4       4   146   0  95 none                  
- 977485038 broke    N     0         0    144         6       7     0  82  72 none                  
-1594371695 died     N     0         0    141         9      17    41   0  20 none                  
-2074698640 died     N     0         0    132        23      23   132   3   0 none                  
-1139955198 died     N     0         0    129     14,15      15   129  53  40 none                  
-2069682928 died     N     0         0    124         3      10    30  97  70 none                  
-1473460764 died     N     0         0    119         2       8    71   0  90 none                  
- 353080723 died     N     0         0    114        10      10   114   3  49 none                  
-1052911846 broke    N     0         0    112        10      11     0  81  77 none                  
- 599714647 broke    N     0         0    112         8      10     0  73   1 none                  
- 958694556 broke    N     0         0    100         3       4     0 100  89 none                  
- 741474844 madness  Y     0         0     98        11      36     6  95  10 doctor                
- 774421304 died     N     0         0     93         8       9    90   0  55 none                  
-1356409696 madness  N     0         0     92         5       6    63  90  29 none                  
-1555435534 died     N     0         0     80         7      11    74   0  50 none                  
- 363226622 died     N     0         0     74         8      10     7   0  54 none                  
-2121362868 died     N     0         0     60         8      15    22  10  40 none                  
-1229919559 died     N     0         0     60         5       7    40   5 100 none                  
- 176671972 broke    N     0         0     58         4      17     0  96  16 none                  
- 325555799 broke    N     0         0     58         2       4     0  96  97 none                  
-1460128875 died     N     0         0     57         2       7    40  13  54 none                  
-  51997543 madness  N     0         0     55         2      17    25  40  12 none                  
- 665513913 madness  N     0         0     55         2       6    48  94   0 none                  
- 730746980 broke    N     0         0     54         3       4     0 100  87 none                  
- 357756656 died     N     0         0     52         5       6    31   0  90 none                  
-2078431135 died     N     0         0     50         1      12    16  61  42 none                  
- 221853918 broke    N     0         0     50         1      10     0  56  68 none                  
-1172310199 broke    N     0         0     50         1       9     0  89  52 none                  
-1266021064 died     N     0         0     50         1       8    15  51  79 none                  
-1055297750 broke    N     0         0     50         1       8     0  64  88 none                  
-1644886226 died     N     0         0     50         1       6    34  66  87 none                  
-1110193468 died     N     0         0     50         1       6    31   0  76 none                  
-1756753219 broke    N     0         0     50         1       4     0 100  96 none                  
- 631827777 broke    N     0         0     50         1       3     0 100  92 none                  
- 742906625 broke    N     0         0     50         1       3     0 100  91 none                  
-1487105945 broke    N     0         0     50         1       2     0 100 100 none                  
- 783419947 timeout  -     -         -      -         -       -     -   -   - -                     
-1446612818 timeout  -     -         -      -         -       -     -   -   - -                     
-1684377336 timeout  -     -         -      -         -       -     -   -   - -                     
-
-Deaths illness injury=13 Unknown=8 nightmare accident=5 animal attack=3 car mechanical=1 poisoning overdose=1
-
-Top 10 Deaths By Run Length
-day peak$ peak-day  end$ drop$       seed rank tag                      cause                                     
---- ----- -------- ----- ----- ---------- ---- ------------------------ ------------------------------------------
- 54 2,510       37  -148 2,658  191219781    1 Unknown                  Unknown                                   
- 37 5,114       36 4,305   809  589410621    1 car-mechanical-fatality  Electrocution. A faulty wire and a pudd...
- 37 3,321       22 1,851 1,470 1153527485    1 nightmare-drowning       Drowned in your car. Some nightmares ar...
- 28   224       26    41   183 1924581542    0 compound-trauma-collapse You have succumbed to your wounds         
- 27   187       24   162    25  852302589    0 untreated-wounds         You have succumbed to your wounds         
- 23   132       23   132     0 2074698640    0 infection-pressure       Unknown                                   
- 21   157       15    91    66 1803850687    0 Unknown                  Unknown                                   
- 20   155        9   107    48 1093218192    0 infection-pressure       Unknown                                   
- 17   224       11    72   152 1193741182    0 untreated-wounds         You have succumbed to your wounds         
- 17   160        6    23   137  208764828    0 animal-attack            Mauled to death by a stray dog. Not eve...
-
-Top 10 Deaths By Peak Balance
-peak$ day peak-day  end$ drop$       seed rank tag                      cause                                     
------ --- -------- ----- ----- ---------- ---- ------------------------ ------------------------------------------
-5,114  37       36 4,305   809  589410621    1 car-mechanical-fatality  Electrocution. A faulty wire and a pudd...
-3,321  37       22 1,851 1,470 1153527485    1 nightmare-drowning       Drowned in your car. Some nightmares ar...
-2,510  54       37  -148 2,658  191219781    1 Unknown                  Unknown                                   
-  238  10       10   238     0 2024218430    0 nightmare-drowning       Drowned in your car. Some nightmares ar...
-  224  28       26    41   183 1924581542    0 compound-trauma-collapse You have succumbed to your wounds         
-  224  17       11    72   152 1193741182    0 untreated-wounds         You have succumbed to your wounds         
-  187  27       24   162    25  852302589    0 untreated-wounds         You have succumbed to your wounds         
-  160  17        6    23   137  208764828    0 animal-attack            Mauled to death by a stray dog. Not eve...
-  157  21       15    91    66 1803850687    0 Unknown                  Unknown                                   
-  156  12       10   155     1 1758294399    0 early-untreated-wounds   You have succumbed to your wounds         
-
-Top 10 Bankrupts By Run Length
-day  peak$ peak-day end$       seed outcome rank  hp san route                  detail                      
---- ------ -------- ---- ---------- ------- ---- --- --- ---------------------- ----------------------------
- 61    706       55    0 1173857051 broke      0 100 100 doctor                 player hit $0 during cycl...
- 60  1,029       33    0 1873329293 broke      0  37   0 shop:pawn_shop         player hit $0 during cycl...
- 59  2,179       39    0   29195372 broke      0  29  25 shop:convenience_store player hit $0 during cycl...
- 50  2,524       47    0 1931887151 broke      1  93  38 shop:pawn_shop         player hit $0 during cycl...
- 49 10,981       35    0 1259956336 broke      1  70   0 doctor:witch           player hit $0 during cycl...
- 43    305       25    0 1462425422 broke      0 100  11 shop:pawn_shop         player hit $0 during cycl...
- 41  5,180       33    0  963491798 broke      1 100  61 shop:pawn_shop         player hit $0 during cycl...
- 40  2,532       20    0  484078325 broke      0  93  83 doctor                 player hit $0 during cycl...
- 39  4,242       23    0  931487472 broke      1  21  13 doctor:witch           player hit $0 during cycl...
- 38  2,575       29    0 1793449238 broke      1  95  56 shop:pawn_shop         player hit $0 during cycl...
-
-Top 10 Bankrupts By Peak Balance
- peak$ day peak-day end$       seed outcome rank  hp san route           detail                      
------- --- -------- ---- ---------- ------- ---- --- --- --------------- ----------------------------
-10,981  49       35    0 1259956336 broke      1  70   0 doctor:witch    player hit $0 during cycl...
- 5,180  41       33    0  963491798 broke      1 100  61 shop:pawn_shop  player hit $0 during cycl...
- 4,242  39       23    0  931487472 broke      1  21  13 doctor:witch    player hit $0 during cycl...
- 2,714  14       13    0 1921687391 broke      1 100  29 shop:loan_shark player hit $0 during cycl...
- 2,575  38       29    0 1793449238 broke      1  95  56 shop:pawn_shop  player hit $0 during cycl...
- 2,533  22       16    0 2005184339 broke      1  53  57 shop:marvin     player hit $0 during cycl...
- 2,532  40       20    0  484078325 broke      0  93  83 doctor          player hit $0 during cycl...
- 2,524  50       47    0 1931887151 broke      1  93  38 shop:pawn_shop  player hit $0 during cycl...
- 2,517  25       18    0 2023301401 broke      1  98  45 shop:pawn_shop  player hit $0 during cycl...
- 2,509  24       19    0  905898819 broke      1  72  62 shop:marvin     player hit $0 during cycl...
+      seed outcome car rank peak-rank peak$ peak-days end-day end$  hp san top-route
+---------- ------- --- ---- --------- ----- --------- ------- ---- --- --- ---------
+ 476312311 capped   Y     0         0   267         8      11   39 100  62 doctor   
+  57284035 capped   N     0         0   190        11      11  190  43  66 none     
+1594246017 capped   N     0         0   141         6      11   60  98  53 none     
+1090625786 capped   N     0         0    98        10      11   97 100  40 none     
+1073362907 madness  N     0         0    87         8      10   42  68   0 none     
 
 Top 10 Runs By Run Length
-day  peak$ peak-day end$       seed outcome rank  hp san route                  detail                      
---- ------ -------- ---- ---------- ------- ---- --- --- ---------------------- ----------------------------
- 61    706       55    0 1173857051 broke      0 100 100 doctor                 player hit $0 during cycl...
- 60  1,029       33    0 1873329293 broke      0  37   0 shop:pawn_shop         player hit $0 during cycl...
- 59  2,179       39    0   29195372 broke      0  29  25 shop:convenience_store player hit $0 during cycl...
- 54  2,510       37 -148  191219781 died       1   2 100 shop:pawn_shop         Unknown                     
- 51    228       17   14 1630622054 madness    0  65  10 none                   terminal ending during cy...
- 50  2,524       47    0 1931887151 broke      1  93  38 shop:pawn_shop         player hit $0 during cycl...
- 49 10,981       35    0 1259956336 broke      1  70   0 doctor:witch           player hit $0 during cycl...
- 43    305       25    0 1462425422 broke      0 100  11 shop:pawn_shop         player hit $0 during cycl...
- 41  5,180       33    0  963491798 broke      1 100  61 shop:pawn_shop         player hit $0 during cycl...
- 41    348       28   37 1629761851 madness    0  89  22 none                   terminal ending during cy...
+day peak$ peak-day end$       seed outcome rank  hp san route  detail                      
+--- ----- -------- ---- ---------- ------- ---- --- --- ------ ----------------------------
+ 11   267        8   39  476312311 capped     0 100  62 doctor reached cycle cap 10        
+ 11   190       11  190   57284035 capped     0  43  66 none   reached cycle cap 10        
+ 11   141        6   60 1594246017 capped     0  98  53 none   reached cycle cap 10        
+ 11    98       10   97 1090625786 capped     0 100  40 none   reached cycle cap 10        
+ 10    87        8   42 1073362907 madness    0  68   0 none   terminal ending during cy...
 
 Top 10 Runs By Peak Balance
- peak$ day peak-day  end$       seed outcome rank  hp san route           detail                      
------- --- -------- ----- ---------- ------- ---- --- --- --------------- ----------------------------
-10,981  49       35     0 1259956336 broke      1  70   0 doctor:witch    player hit $0 during cycl...
- 7,021  34       26  -617  778547813 madness    1   1   0 shop:loan_shark terminal ending during cy...
- 5,492  27       27 5,492 1428164705 madness    1 100  33 doctor          terminal ending during cy...
- 5,180  41       33     0  963491798 broke      1 100  61 shop:pawn_shop  player hit $0 during cycl...
- 5,145  35       23   710  739221871 madness    0  99   0 shop:pawn_shop  terminal ending during cy...
- 5,114  37       36 4,305  589410621 died       1 100  34 shop:pawn_shop  car-mechanical-fatality     
- 4,242  39       23     0  931487472 broke      1  21  13 doctor:witch    player hit $0 during cycl...
- 3,883  22       17 2,864 1209581459 madness    1  60  25 doctor          terminal ending during cy...
- 3,321  37       22 1,851 1153527485 died       1 100  34 mechanic:tom    nightmare-drowning          
- 2,714  14       13     0 1921687391 broke      1 100  29 shop:loan_shark player hit $0 during cycl...
+peak$ day peak-day end$       seed outcome rank  hp san route  detail                      
+----- --- -------- ---- ---------- ------- ---- --- --- ------ ----------------------------
+  267  11        8   39  476312311 capped     0 100  62 doctor reached cycle cap 10        
+  190  11       11  190   57284035 capped     0  43  66 none   reached cycle cap 10        
+  141  11        6   60 1594246017 capped     0  98  53 none   reached cycle cap 10        
+   98  11       10   97 1090625786 capped     0 100  40 none   reached cycle cap 10        
+   87  10        8   42 1073362907 madness    0  68   0 none   terminal ending during cy...
 
 Top 10 Runs By End Balance
- end$ day peak$ peak-day       seed outcome rank  hp san route          detail                      
------ --- ----- -------- ---------- ------- ---- --- --- -------------- ----------------------------
-5,492  27 5,492       27 1428164705 madness    1 100  33 doctor         terminal ending during cy...
-4,305  37 5,114       36  589410621 died       1 100  34 shop:pawn_shop car-mechanical-fatality     
-2,864  22 3,883       17 1209581459 madness    1  60  25 doctor         terminal ending during cy...
-1,851  37 3,321       22 1153527485 died       1 100  34 mechanic:tom   nightmare-drowning          
-  710  35 5,145       23  739221871 madness    0  99   0 shop:pawn_shop terminal ending during cy...
-  425  27   526       24 2022736221 madness    0 100  29 doctor         terminal ending during cy...
-  333  18   333       18 1117848236 madness    0 100  24 none           terminal ending during cy...
-  282  15   282       15 1424929178 madness    0  28  35 none           terminal ending during cy...
-  270  10   270       10 1034128364 madness    0  84   0 none           terminal ending during cy...
-  238  10   238       10 2024218430 died       0 100  59 none           nightmare-drowning          
+end$ day peak$ peak-day       seed outcome rank  hp san route  detail                      
+---- --- ----- -------- ---------- ------- ---- --- --- ------ ----------------------------
+ 190  11   190       11   57284035 capped     0  43  66 none   reached cycle cap 10        
+  97  11    98       10 1090625786 capped     0 100  40 none   reached cycle cap 10        
+  60  11   141        6 1594246017 capped     0  98  53 none   reached cycle cap 10        
+  42  10    87        8 1073362907 madness    0  68   0 none   terminal ending during cy...
+  39  11   267        8  476312311 capped     0 100  62 doctor reached cycle cap 10        
 
-Best peak    seed=1259956336 peak=10981 peak_days=35 rank=2 final_day=49 final_balance=0
-Longest run  seed=1173857051 day=61 balance=0 peak=706 peak_days=55 rank=0
+Best peak    seed=476312311 peak=267 peak_days=8 rank=0 final_day=11 final_balance=39
+Longest run  seed=57284035 day=11 balance=190 peak=190 peak_days=11 rank=0
 
 Systems, Economy & Content
 --------------------------
 Medical Cohorts
-cohort       runs survived avg-peak$ 2k+ avg-end$ avg-day missed
----------- ------ -------- --------- --- -------- ------- ------
-doctor-any 32/100        0     2,400  17      476      34      0
-witch-only  1/100        0       160   0       23      17      0
-no-medical 67/100        0       182   1       55      13     17
+cohort     runs survived avg-peak$ 2k+ avg-end$ avg-day missed
+---------- ---- -------- --------- --- -------- ------- ------
+doctor-any  1/5        1       267   0       39      11      0
+witch-only  0/5        0         0   0        0       0      0
+no-medical  4/5        3       129   0       97      11      0
 
 Event Economy
-cash gains   storyline:vinnie:stage0 total=+8263 avg=+344.3 hits=24 | storyline:dealer_past:stage0 total=+4128 avg=+125.1 hits=33 | day:social_encounter total=+2800 avg=+1399.9 hits=2 | day:clogged_fuel_filter total=+2338 avg=+2338.0 hits=1
-cash losses  storyline:suzy:stage0 total=-1519 avg=-379.7 hits=4 | day:severe_dehydration total=-1428 avg=-1428.5 hits=1 | storyline:marvin:stage0 total=-1345 avg=-37.4 hits=36 | storyline:mechanics:stage1 total=-1233 avg=-36.3 hits=34
-health losses night:drowning_dream total=-376 avg=-5.3 hits=71 | night:insomnia_night total=-203 avg=-2.3 hits=88 | storyline:gas_station_hero:stage0 total=-163 avg=-2.0 hits=83 | night:nightmare total=-136 avg=-1.5 hits=90
-sanity losses storyline:gas_station_hero:stage0 total=-524 avg=-6.3 hits=83 | night:nightmare total=-390 avg=-4.3 hits=90 | night:drowning_dream total=-387 avg=-5.5 hits=71 | night:nightmare_of_losing total=-290 avg=-3.0 hits=97
+cash gains   night:ditched_wallet total=+69 avg=+34.4 hits=2 | night:woodlands_path total=+68 avg=+22.5 hits=3 | storyline:gas_station_hero:stage0 total=+47 avg=+9.4 hits=5 | day:found_twenty total=+34 avg=+17.2 hits=2
+cash losses  storyline:mechanics:stage0 total=-40 avg=-40.4 hits=1 | day:fortune_cards_warning total=-25 avg=-12.3 hits=2 | night:nightmare_of_losing total=-24 avg=-7.8 hits=3 | night:went_jogging total=-14 avg=-4.6 hits=3
+health losses day:assault_aftermath total=-16 avg=-16.5 hits=1 | day:public_pool_infection total=-15 avg=-7.7 hits=2 | night:peaceful_night total=-12 avg=-5.8 hits=2 | night:nice_dream total=-8 avg=-1.9 hits=4
+sanity losses storyline:gas_station_hero:stage0 total=-33 avg=-6.6 hits=5 | night:drowning_dream total=-24 avg=-4.8 hits=5 | night:chase_the_rabbit total=-17 avg=-4.3 hits=4 | night:went_jogging total=-10 avg=-3.5 hits=3
 
-Storyline Audit touched-any=92/100 completed-any=39/100 failed-any=0/100
+Storyline Audit touched-any=5/5 completed-any=1/5 failed-any=0/5
 storyline        any-state completed failed active-end
 ---------------- --------- --------- ------ ----------
-betsy                0/100     0/100  0/100      0/100
-bridge_angel        22/100     3/100  0/100     19/100
-carnival            10/100     2/100  0/100      8/100
-collector            0/100     0/100  0/100      0/100
-dealer_past         36/100     0/100  0/100     36/100
-dr_feelgood         19/100     0/100  0/100     19/100
-gas_station_hero    83/100     0/100  0/100     83/100
-grandma              0/100     0/100  0/100      0/100
-graveyard            5/100     0/100  0/100      5/100
-grimy_gus           28/100    28/100  0/100      0/100
-jameson             56/100     0/100  0/100     56/100
-kyle                 0/100     0/100  0/100      0/100
-lockbox             18/100     3/100  0/100     15/100
-lucky_dog            4/100     0/100  0/100      4/100
-martinez            25/100     0/100  0/100     25/100
-marvin              37/100    37/100  0/100      0/100
-mechanic_dreams      5/100     0/100  0/100      5/100
-mechanics           47/100     7/100  0/100     40/100
-mime                46/100     1/100  0/100     45/100
-painkiller           0/100     0/100  0/100      0/100
-phil                39/100     3/100  0/100     36/100
-radio_signal         2/100     0/100  0/100      2/100
-sleep_paralysis     50/100     2/100  0/100     48/100
-stray_cat           43/100     0/100  0/100     43/100
-stuart               0/100     0/100  0/100      0/100
-suzy                 4/100     0/100  0/100      4/100
-tanya                0/100     0/100  0/100      0/100
-victoria             0/100     0/100  0/100      0/100
-vinnie              25/100    25/100  0/100      0/100
-witch               36/100    36/100  0/100      0/100
+betsy                  0/5       0/5    0/5        0/5
+bridge_angel           0/5       0/5    0/5        0/5
+carnival               1/5       0/5    0/5        1/5
+collector              0/5       0/5    0/5        0/5
+dealer_past            0/5       0/5    0/5        0/5
+dr_feelgood            0/5       0/5    0/5        0/5
+gas_station_hero       5/5       0/5    0/5        5/5
+grandma                0/5       0/5    0/5        0/5
+graveyard              0/5       0/5    0/5        0/5
+grimy_gus              0/5       0/5    0/5        0/5
+jameson                3/5       0/5    0/5        3/5
+kyle                   0/5       0/5    0/5        0/5
+lockbox                0/5       0/5    0/5        0/5
+lucky_dog              0/5       0/5    0/5        0/5
+martinez               1/5       0/5    0/5        1/5
+marvin                 1/5       1/5    0/5        0/5
+mechanic_dreams        0/5       0/5    0/5        0/5
+mechanics              1/5       0/5    0/5        1/5
+mime                   1/5       0/5    0/5        1/5
+painkiller             0/5       0/5    0/5        0/5
+phil                   4/5       0/5    0/5        4/5
+radio_signal           0/5       0/5    0/5        0/5
+sleep_paralysis        2/5       0/5    0/5        2/5
+stray_cat              3/5       0/5    0/5        3/5
+stuart                 0/5       0/5    0/5        0/5
+suzy                   0/5       0/5    0/5        0/5
+tanya                  0/5       0/5    0/5        0/5
+victoria               0/5       0/5    0/5        0/5
+vinnie                 0/5       0/5    0/5        0/5
+witch                  0/5       0/5    0/5        0/5
 
 Adventures
-area          runs visits item-gets item-runs status+ status- inj+ inj-
------------- ----- ------ --------- --------- ------- ------- ---- ----
-Road         0/100      0         0     0/100       0       0    0    0
-Woodlands    0/100      0         0     0/100       0       0    0    0
-Swamp        0/100      0         0     0/100       0       0    0    0
-Beach        0/100      0         0     0/100       0       0    0    0
-Ocean Depths 0/100      0         0     0/100       0       0    0    0
-City         0/100      0         0     0/100       0       0    0    0
+area         runs visits item-gets item-runs status+ status- inj+ inj-
+------------ ---- ------ --------- --------- ------- ------- ---- ----
+Road          0/5      0         0       0/5       0       0    0    0
+Woodlands     0/5      0         0       0/5       0       0    0    0
+Swamp         0/5      0         0       0/5       0       0    0    0
+Beach         0/5      0         0       0/5       0       0    0    0
+Ocean Depths  0/5      0         0       0/5       0       0    0    0
+City          0/5      0         0       0/5       0       0    0    0
 
 Convenience Store Dealings
-item                     acquired   runs removed used brk fix repair
------------------------- -------- ------ ------- ---- --- --- ------
-Tool Kit                       12 12/100       0    0   0   0      0
-Fix-a-Flat                      7  7/100       0    0   0   0      0
-First Aid Kit                   7  7/100       0    0   0   0      0
-Flashlight                      6  6/100       0    0   0   0      0
-Duct Tape                       3  3/100       0    0   0   0      0
-Spare Tire                      2  2/100       0    0   0   0      0
-Turkey Sandwich                 1  1/100       0    0   0   0      0
-Portable Battery Charger        1  1/100       0    0   0   0      0
-Jumper Cables                   1  1/100       0    0   0   0      0
-Energy Drink                    1  1/100       0    0   0   0      0
-Cup Noodles                     1  1/100       0    0   0   0      0
-Candy Bar                       1  1/100       0    0   0   0      0
-Bug Spray                       1  1/100       0    0   0   0      0
-Beef Jerky                      1  1/100       0    0   0   0      0
+none
 
 Pawn Shop Dealings
 none
@@ -412,909 +217,884 @@ none
 Marvin Provenance
 item                  bought-runs used-runs broken-runs fixed-runs avg-buy-day avg-use-day use-sources
 --------------------- ----------- --------- ----------- ---------- ----------- ----------- -----------
-Faulty Insurance            0/100     0/100       0/100      0/100           -           - none       
-Rusty Compass               0/100     0/100       0/100      0/100           -           - none       
-Lucky Coin                  0/100     0/100       0/100      0/100           -           - none       
-Pocket Watch                0/100     0/100       0/100      0/100           -           - none       
-White Feather               0/100     0/100       0/100      0/100           -           - none       
-Quiet Sneakers              0/100     0/100       0/100      0/100           -           - none       
-Gambler's Chalice           0/100     0/100       0/100      0/100           -           - none       
-Sneaky Peeky Shades         0/100     0/100       0/100      0/100           -           - none       
-Twin's Locket               0/100     0/100       0/100      0/100           -           - none       
-Tattered Cloak              0/100     0/100       0/100      0/100           -           - none       
-Worn Gloves                 0/100     0/100       0/100      0/100           -           - none       
-Dealer's Grudge             0/100     0/100       0/100      0/100           -           - none       
-Marvin's Monocle            0/100     0/100       0/100      0/100           -           - none       
-Gambler's Grimoire          1/100     0/100       0/100      0/100          24           - none       
-Health Indicator            0/100     0/100       0/100      0/100           -           - none       
-Delight Indicator           0/100     0/100       0/100      0/100           -           - none       
-Golden Watch                0/100     0/100       0/100      0/100           -           - none       
-Animal Whistle              0/100     0/100       0/100      0/100           -           - none       
-Dirty Old Hat               0/100     0/100       0/100      0/100           -           - none       
-Enchanting Silver Bar       0/100     0/100       0/100      0/100           -           - none       
+Faulty Insurance              0/5       0/5         0/5        0/5           -           - none       
+Rusty Compass                 0/5       0/5         0/5        0/5           -           - none       
+Lucky Coin                    0/5       0/5         0/5        0/5           -           - none       
+Pocket Watch                  0/5       0/5         0/5        0/5           -           - none       
+White Feather                 0/5       0/5         0/5        0/5           -           - none       
+Quiet Sneakers                0/5       0/5         0/5        0/5           -           - none       
+Gambler's Chalice             0/5       0/5         0/5        0/5           -           - none       
+Sneaky Peeky Shades           0/5       0/5         0/5        0/5           -           - none       
+Twin's Locket                 0/5       0/5         0/5        0/5           -           - none       
+Tattered Cloak                0/5       0/5         0/5        0/5           -           - none       
+Worn Gloves                   0/5       0/5         0/5        0/5           -           - none       
+Dealer's Grudge               0/5       0/5         0/5        0/5           -           - none       
+Marvin's Monocle              0/5       0/5         0/5        0/5           -           - none       
+Gambler's Grimoire            0/5       0/5         0/5        0/5           -           - none       
+Health Indicator              0/5       0/5         0/5        0/5           -           - none       
+Delight Indicator             0/5       0/5         0/5        0/5           -           - none       
+Golden Watch                  0/5       0/5         0/5        0/5           -           - none       
+Animal Whistle                0/5       0/5         0/5        0/5           -           - none       
+Dirty Old Hat                 0/5       0/5         0/5        0/5           -           - none       
+Enchanting Silver Bar         0/5       0/5         0/5        0/5           -           - none       
 
 Illness Universe
 tracker note: add/remove counts are cycle-diff based; same-cycle cures may not appear in seen/removed totals, but end-of-run conditions are final-state accurate
-name                   seen seen-runs removed removed-runs end-runs removed% still-end% died-end doctor-heals witch-heals
----------------------- ---- --------- ------- ------------ -------- -------- ---------- -------- ------------ -----------
-Chronic Insomnia         15    15/100      10       10/100    5/100      67%        33%        1            1           0
-Hepatitis                11     9/100       6        5/100    5/100      56%        56%        5            0           0
-Anxiety Disorder         11    11/100       7        7/100    4/100      64%        36%        0            0           0
-Severe Depression        10    10/100       6        6/100    4/100      60%        40%        1            0           0
-Strep Throat              9     9/100       5        5/100    4/100      56%        44%        3            1           0
-Stomach Flu               9     9/100       6        6/100    3/100      67%        33%        3            0           0
-Severe Dehydration        9     9/100       6        6/100    3/100      67%        33%        3            0           0
-Pneumonia                 4     4/100       1        1/100    3/100      25%        75%        2            0           0
-Perfect Condition         3     3/100       0        0/100    3/100       0%       100%        0            0           0
-Pink Eye                 10    10/100       8        8/100    2/100      80%        20%        1            1           0
-Mold Toxicity             8     8/100       6        6/100    2/100      75%        25%        2            1           0
-Lead Poisoning            6     6/100       4        4/100    2/100      67%        33%        2            0           0
-Staph Infection           4     4/100       2        2/100    2/100      50%        50%        1            0           0
-Sore Throat               8     8/100       7        7/100    1/100      88%        12%        0            0           0
-Possible Rabies           4     4/100       3        3/100    1/100      75%        25%        1            1           0
-Sinus Infection           4     4/100       3        3/100    1/100      75%        25%        1            0           0
-Shellfish Poisoning       3     3/100       2        2/100    1/100      67%        33%        1            0           0
-Scabies                   2     2/100       1        1/100    1/100      50%        50%        1            0           0
-Lyme Disease              2     2/100       1        1/100    1/100      50%        50%        1            0           0
-Severe Asthma             1     1/100       0        0/100    1/100       0%       100%        0            0           0
-Glimpsed the Void         1     1/100       0        0/100    1/100       0%       100%        0            0           0
-Ear Infection            11    10/100      11       10/100    0/100     100%         0%        0            1           0
-Flu                       9     9/100       9        9/100    0/100     100%         0%        0            0           0
-Needle Exposure           7     7/100       7        7/100    0/100     100%         0%        0            0           0
-Waterborne Illness        4     4/100       4        4/100    0/100     100%         0%        0            0           0
-Ringworm                  3     3/100       3        3/100    0/100     100%         0%        0            0           0
-PTSD                      2     2/100       2        2/100    0/100     100%         0%        0            0           0
-Cold                      2     2/100       2        2/100    0/100     100%         0%        0            0           0
-Bronchitis                2     2/100       2        2/100    0/100     100%         0%        0            0           0
-UTI                       1     1/100       1        1/100    0/100     100%         0%        0            0           0
-Tooth Abscess             1     1/100       1        1/100    0/100     100%         0%        0            0           0
-Severe Migraine           1     1/100       1        1/100    0/100     100%         0%        0            0           0
-Anaphylaxis               1     1/100       1        1/100    0/100     100%         0%        0            0           0
-Scraped Knee              0     0/100       0        0/100    0/100        -          -        0           10           0
-Deep Laceration           0     0/100       0        0/100    0/100        -          -        0            9           0
-Broken Nose               0     0/100       0        0/100    0/100        -          -        0            9           0
-Broken Ribs               0     0/100       0        0/100    0/100        -          -        0            5           0
-Concussion                0     0/100       0        0/100    0/100        -          -        0            3           0
-Broken Wrist              0     0/100       0        0/100    0/100        -          -        0            2           0
-Broken Hand               0     0/100       0        0/100    0/100        -          -        0            2           0
-Whiplash                  0     0/100       0        0/100    0/100        -          -        0            1           0
-Severed Skin              0     0/100       0        0/100    0/100        -          -        0            1           0
-Ruptured Spleen           0     0/100       0        0/100    0/100        -          -        0            1           0
-Herniated Disc            0     0/100       0        0/100    0/100        -          -        0            1           0
-Broken Collarbone         0     0/100       0        0/100    0/100        -          -        0            1           0
-Broken Ankle              0     0/100       0        0/100    0/100        -          -        0            1           0
-Youthful                  0     0/100       0        0/100    0/100        -          -        0            0           0
-Year Shorter              0     0/100       0        0/100    0/100        -          -        0            0           0
-Witnessed Suicide         0     0/100       0        0/100    0/100        -          -        0            0           0
-Witnessed Death           0     0/100       0        0/100    0/100        -          -        0            0           0
-Witness                   0     0/100       0        0/100    0/100        -          -        0            0           0
-Witch's Blessing          0     0/100       0        0/100    0/100        -          -        0            0           0
-Witch Lucky               0     0/100       0        0/100    0/100        -          -        0            0           0
-Witch Cursed              0     0/100       0        0/100    0/100        -          -        0            0           0
-Wise                      0     0/100       0        0/100    0/100        -          -        0            0           0
-Warned                    0     0/100       0        0/100    0/100        -          -        0            0           0
-Wanted Felon              0     0/100       0        0/100    0/100        -          -        0            0           0
-Wanted                    0     0/100       0        0/100    0/100        -          -        0            0           0
-VIP Connection            0     0/100       0        0/100    0/100        -          -        0            0           0
-Vertigo                   0     0/100       0        0/100    0/100        -          -        0            0           0
-Vengeance Mode            0     0/100       0        0/100    0/100        -          -        0            0           0
-Underwater Criminal       0     0/100       0        0/100    0/100        -          -        0            0           0
-Underground Intel         0     0/100       0        0/100    0/100        -          -        0            0           0
-Uncontrolled Diabetes     0     0/100       0        0/100    0/100        -          -        0            0           0
-Trespasser                0     0/100       0        0/100    0/100        -          -        0            0           0
-Tracker's Eye             0     0/100       0        0/100    0/100        -          -        0            0           0
-Tortoise Luck             0     0/100       0        0/100    0/100        -          -        0            0           0
-Time-Touched              0     0/100       0        0/100    0/100        -          -        0            0           0
-Tetanus                   0     0/100       0        0/100    0/100        -          -        0            0           0
-Terminal                  0     0/100       0        0/100    0/100        -          -        0            0           0
-Swamp Wise                0     0/100       0        0/100    0/100        -          -        0            0           0
-Swamp Respected           0     0/100       0        0/100    0/100        -          -        0            0           0
-Swamp Lucky               0     0/100       0        0/100    0/100        -          -        0            0           0
-Survivor's Resolve        0     0/100       0        0/100    0/100        -          -        0            0           0
-Survived Attempt          0     0/100       0        0/100    0/100        -          -        0            0           0
-Street Lucky              0     0/100       0        0/100    0/100        -          -        0            0           0
-Strategic                 0     0/100       0        0/100    0/100        -          -        0            0           0
-Squirrel Bite             0     0/100       0        0/100    0/100        -          -        0            0           0
-Spider Bite               0     0/100       0        0/100    0/100        -          -        0            0           0
-Snake Bite                0     0/100       0        0/100    0/100        -          -        0            0           0
-Simple Joy                0     0/100       0        0/100    0/100        -          -        0            0           0
-Shingles                  0     0/100       0        0/100    0/100        -          -        0            0           0
-Sharp                     0     0/100       0        0/100    0/100        -          -        0            0           0
-Shame                     0     0/100       0        0/100    0/100        -          -        0            0           0
-Severe Trauma             0     0/100       0        0/100    0/100        -          -        0            0           0
-Sequential Luck           0     0/100       0        0/100    0/100        -          -        0            0           0
-Sepsis                    0     0/100       0        0/100    0/100        -          -        0            0           0
-Self-Aware                0     0/100       0        0/100    0/100        -          -        0            0           0
-Seizure Disorder          0     0/100       0        0/100    0/100        -          -        0            0           0
-Second Degree Burns       0     0/100       0        0/100    0/100        -          -        0            0           0
-Sea Cursed                0     0/100       0        0/100    0/100        -          -        0            0           0
-Sandcastle Villain        0     0/100       0        0/100    0/100        -          -        0            0           0
-Road Blessed              0     0/100       0        0/100    0/100        -          -        0            0           0
-Ritual Protection         0     0/100       0        0/100    0/100        -          -        0            0           0
-Refreshed                 0     0/100       0        0/100    0/100        -          -        0            0           0
-Rat Bite Fever            0     0/100       0        0/100    0/100        -          -        0            0           0
-Rat Bite                  0     0/100       0        0/100    0/100        -          -        0            0           0
-Raid Survivor             0     0/100       0        0/100    0/100        -          -        0            0           0
-Rabies                    0     0/100       0        0/100    0/100        -          -        0            0           0
-Pigeon King               0     0/100       0        0/100    0/100        -          -        0            0           0
-Pigeon Blessed            0     0/100       0        0/100    0/100        -          -        0            0           0
-Paranoid                  0     0/100       0        0/100    0/100        -          -        0            0           0
-Pancreatitis              0     0/100       0        0/100    0/100        -          -        0            0           0
-One Kidney                0     0/100       0        0/100    0/100        -          -        0            0           0
-Oceanwise                 0     0/100       0        0/100    0/100        -          -        0            0           0
-Ocean-Blessed             0     0/100       0        0/100    0/100        -          -        0            0           0
-Nothing Left to Lose      0     0/100       0        0/100    0/100        -          -        0            0           0
-Negotiator's Luck         0     0/100       0        0/100    0/100        -          -        0            0           0
-Nature Blessed            0     0/100       0        0/100    0/100        -          -        0            0           0
-Mysteriously Refreshed    0     0/100       0        0/100    0/100        -          -        0            0           0
-Mushroom Poisoning        0     0/100       0        0/100    0/100        -          -        0            0           0
-Morally Flexible          0     0/100       0        0/100    0/100        -          -        0            0           0
-Mononucleosis             0     0/100       0        0/100    0/100        -          -        0            0           0
-Missing Finger            0     0/100       0        0/100    0/100        -          -        0            0           0
-Mermaid Kissed            0     0/100       0        0/100    0/100        -          -        0            0           0
-Mermaid Friend            0     0/100       0        0/100    0/100        -          -        0            0           0
-Mermaid Enemy             0     0/100       0        0/100    0/100        -          -        0            0           0
-Mercury Poisoning         0     0/100       0        0/100    0/100        -          -        0            0           0
-Measles                   0     0/100       0        0/100    0/100        -          -        0            0           0
-Maximum Nice              0     0/100       0        0/100    0/100        -          -        0            0           0
-Marked                    0     0/100       0        0/100    0/100        -          -        0            0           0
-Malnutrition              0     0/100       0        0/100    0/100        -          -        0            0           0
-Lunar Frenzy              0     0/100       0        0/100    0/100        -          -        0            0           0
-Lucky Gambler             0     0/100       0        0/100    0/100        -          -        0            0           0
-Lucky                     0     0/100       0        0/100    0/100        -          -        0            0           0
-Love Blessed              0     0/100       0        0/100    0/100        -          -        0            0           0
-Loan Shark Debt           0     0/100       0        0/100    0/100        -          -        0            0           0
-Legend                    0     0/100       0        0/100    0/100        -          -        0            0           0
-Kraken Respect            0     0/100       0        0/100    0/100        -          -        0            0           0
-Kraken Friend             0     0/100       0        0/100    0/100        -          -        0            0           0
-Kidney Stones             0     0/100       0        0/100    0/100        -          -        0            0           0
-Inspired                  0     0/100       0        0/100    0/100        -          -        0            0           0
-Informant                 0     0/100       0        0/100    0/100        -          -        0            0           0
-Ignored Death             0     0/100       0        0/100    0/100        -          -        0            0           0
-Hypothermia               0     0/100       0        0/100    0/100        -          -        0            0           0
-Humbled                   0     0/100       0        0/100    0/100        -          -        0            0           0
-Heat Stroke               0     0/100       0        0/100    0/100        -          -        0            0           0
-Haunted                   0     0/100       0        0/100    0/100        -          -        0            0           0
-Good Samaritan            0     0/100       0        0/100    0/100        -          -        0            0           0
-Good Karma                0     0/100       0        0/100    0/100        -          -        0            0           0
-Generous                  0     0/100       0        0/100    0/100        -          -        0            0           0
-Gangrene                  0     0/100       0        0/100    0/100        -          -        0            0           0
-Gallbladder Attack        0     0/100       0        0/100    0/100        -          -        0            0           0
-Fresh Start               0     0/100       0        0/100    0/100        -          -        0            0           0
-Forewarned                0     0/100       0        0/100    0/100        -          -        0            0           0
-Forest Blessed            0     0/100       0        0/100    0/100        -          -        0            0           0
-Fire Empowered            0     0/100       0        0/100    0/100        -          -        0            0           0
-Fire Cursed               0     0/100       0        0/100    0/100        -          -        0            0           0
-Fight Veteran             0     0/100       0        0/100    0/100        -          -        0            0           0
-Fight Promoter            0     0/100       0        0/100    0/100        -          -        0            0           0
-Fairy Lucky               0     0/100       0        0/100    0/100        -          -        0            0           0
-Fairy Friend              0     0/100       0        0/100    0/100        -          -        0            0           0
-Fairy Cursed              0     0/100       0        0/100    0/100        -          -        0            0           0
-Fairy Blessed             0     0/100       0        0/100    0/100        -          -        0            0           0
-Fair Judge                0     0/100       0        0/100    0/100        -          -        0            0           0
-Experimental Treatment    0     0/100       0        0/100    0/100        -          -        0            0           0
-Entertained               0     0/100       0        0/100    0/100        -          -        0            0           0
-Enlightened               0     0/100       0        0/100    0/100        -          -        0            0           0
-Energized                 0     0/100       0        0/100    0/100        -          -        0            0           0
-DVT                       0     0/100       0        0/100    0/100        -          -        0            0           0
-Dog Blessed               0     0/100       0        0/100    0/100        -          -        0            0           0
-Decent Human              0     0/100       0        0/100    0/100        -          -        0            0           0
-Cursed                    0     0/100       0        0/100    0/100        -          -        0            0           0
-Cultist Enemy             0     0/100       0        0/100    0/100        -          -        0            0           0
-Criminal Contacts         0     0/100       0        0/100    0/100        -          -        0            0           0
-CPR Failure               0     0/100       0        0/100    0/100        -          -        0            0           0
-Corrupt Judge             0     0/100       0        0/100    0/100        -          -        0            0           0
-Confused but Wiser        0     0/100       0        0/100    0/100        -          -        0            0           0
-Confessor's Burden        0     0/100       0        0/100    0/100        -          -        0            0           0
-Chemotherapy              0     0/100       0        0/100    0/100        -          -        0            0           0
-Chaos Gambler             0     0/100       0        0/100    0/100        -          -        0            0           0
-Centered                  0     0/100       0        0/100    0/100        -          -        0            0           0
-Cat Whisperer             0     0/100       0        0/100    0/100        -          -        0            0           0
-Called for Help           0     0/100       0        0/100    0/100        -          -        0            0           0
-Blood Pressure Crisis     0     0/100       0        0/100    0/100        -          -        0            0           0
-Blood Moon Luck           0     0/100       0        0/100    0/100        -          -        0            0           0
-Blessed                   0     0/100       0        0/100    0/100        -          -        0            0           0
-Blacklisted               0     0/100       0        0/100    0/100        -          -        0            0           0
-Benjamin's Blessing       0     0/100       0        0/100    0/100        -          -        0            0           0
-Being Watched             0     0/100       0        0/100    0/100        -          -        0            0           0
-Beast Master              0     0/100       0        0/100    0/100        -          -        0            0           0
-Beach Relaxed             0     0/100       0        0/100    0/100        -          -        0            0           0
-At Peace                  0     0/100       0        0/100    0/100        -          -        0            0           0
-Asbestos Damage           0     0/100       0        0/100    0/100        -          -        0            0           0
-Archaeological Hero       0     0/100       0        0/100    0/100        -          -        0            0           0
-Appendicitis              0     0/100       0        0/100    0/100        -          -        0            0           0
-Ant Bites                 0     0/100       0        0/100    0/100        -          -        0            0           0
-Amused                    0     0/100       0        0/100    0/100        -          -        0            0           0
-Aged                      0     0/100       0        0/100    0/100        -          -        0            0           0
+name                    seen seen-runs removed removed-runs end-runs removed% still-end% died-end doctor-heals witch-heals
+----------------------- ---- --------- ------- ------------ -------- -------- ---------- -------- ------------ -----------
+Severe Depression          1       1/5       0          0/5      1/5       0%       100%        0            0           0
+PTSD                       1       1/5       0          0/5      1/5       0%       100%        0            0           0
+Perfect Condition          1       1/5       0          0/5      1/5       0%       100%        0            0           0
+Chronic Insomnia           1       1/5       0          0/5      1/5       0%       100%        0            0           0
+Beginner's Luck            5       5/5       5          5/5      0/5     100%         0%        0            0           0
+Pink Eye                   2       2/5       2          2/5      0/5     100%         0%        0            1           0
+Ear Infection              2       2/5       2          2/5      0/5     100%         0%        0            0           0
+Pneumonia                  1       1/5       1          1/5      0/5     100%         0%        0            0           0
+Anxiety Disorder           1       1/5       1          1/5      0/5     100%         0%        0            0           0
+Youthful                   0       0/5       0          0/5      0/5        -          -        0            0           0
+Year Shorter               0       0/5       0          0/5      0/5        -          -        0            0           0
+Witnessed Suicide          0       0/5       0          0/5      0/5        -          -        0            0           0
+Witnessed Death            0       0/5       0          0/5      0/5        -          -        0            0           0
+Witness                    0       0/5       0          0/5      0/5        -          -        0            0           0
+Witch's Blessing           0       0/5       0          0/5      0/5        -          -        0            0           0
+Witch Cursed               0       0/5       0          0/5      0/5        -          -        0            0           0
+Wise                       0       0/5       0          0/5      0/5        -          -        0            0           0
+Waterborne Illness         0       0/5       0          0/5      0/5        -          -        0            0           0
+Warned                     0       0/5       0          0/5      0/5        -          -        0            0           0
+Wanted Felon               0       0/5       0          0/5      0/5        -          -        0            0           0
+Wanted                     0       0/5       0          0/5      0/5        -          -        0            0           0
+Voice of God               0       0/5       0          0/5      0/5        -          -        0            0           0
+VIP Connection             0       0/5       0          0/5      0/5        -          -        0            0           0
+Vertigo                    0       0/5       0          0/5      0/5        -          -        0            0           0
+Vengeance Mode             0       0/5       0          0/5      0/5        -          -        0            0           0
+UTI                        0       0/5       0          0/5      0/5        -          -        0            0           0
+Underwater Criminal        0       0/5       0          0/5      0/5        -          -        0            0           0
+Underground Intel          0       0/5       0          0/5      0/5        -          -        0            0           0
+Uncontrolled Diabetes      0       0/5       0          0/5      0/5        -          -        0            0           0
+Trespasser                 0       0/5       0          0/5      0/5        -          -        0            0           0
+Tracker's Eye              0       0/5       0          0/5      0/5        -          -        0            0           0
+Tooth Abscess              0       0/5       0          0/5      0/5        -          -        0            0           0
+Time-Touched               0       0/5       0          0/5      0/5        -          -        0            0           0
+The Gentleman              0       0/5       0          0/5      0/5        -          -        0            0           0
+Tetanus                    0       0/5       0          0/5      0/5        -          -        0            0           0
+Terminal                   0       0/5       0          0/5      0/5        -          -        0            0           0
+Swamp Wise                 0       0/5       0          0/5      0/5        -          -        0            0           0
+Swamp Respected            0       0/5       0          0/5      0/5        -          -        0            0           0
+Swamp Lucky                0       0/5       0          0/5      0/5        -          -        0            0           0
+Survivor's Resolve         0       0/5       0          0/5      0/5        -          -        0            0           0
+Survived Attempt           0       0/5       0          0/5      0/5        -          -        0            0           0
+Strep Throat               0       0/5       0          0/5      0/5        -          -        0            0           0
+Street Lucky               0       0/5       0          0/5      0/5        -          -        0            0           0
+Strategic                  0       0/5       0          0/5      0/5        -          -        0            0           0
+Stomach Flu                0       0/5       0          0/5      0/5        -          -        0            0           0
+Staph Infection            0       0/5       0          0/5      0/5        -          -        0            0           0
+Squirrel Bite              0       0/5       0          0/5      0/5        -          -        0            0           0
+Spider Bite                0       0/5       0          0/5      0/5        -          -        0            0           0
+Sore Throat                0       0/5       0          0/5      0/5        -          -        0            0           0
+Snake Bite                 0       0/5       0          0/5      0/5        -          -        0            0           0
+Sinus Infection            0       0/5       0          0/5      0/5        -          -        0            0           0
+Simple Joy                 0       0/5       0          0/5      0/5        -          -        0            0           0
+Shingles                   0       0/5       0          0/5      0/5        -          -        0            0           0
+Shellfish Poisoning        0       0/5       0          0/5      0/5        -          -        0            0           0
+Sharp                      0       0/5       0          0/5      0/5        -          -        0            0           0
+Shame                      0       0/5       0          0/5      0/5        -          -        0            0           0
+Severe Trauma              0       0/5       0          0/5      0/5        -          -        0            0           0
+Severe Migraine            0       0/5       0          0/5      0/5        -          -        0            0           0
+Severe Dehydration         0       0/5       0          0/5      0/5        -          -        0            0           0
+Severe Asthma              0       0/5       0          0/5      0/5        -          -        0            0           0
+Sequential Luck            0       0/5       0          0/5      0/5        -          -        0            0           0
+Sepsis                     0       0/5       0          0/5      0/5        -          -        0            0           0
+Self-Aware                 0       0/5       0          0/5      0/5        -          -        0            0           0
+Seizure Disorder           0       0/5       0          0/5      0/5        -          -        0            0           0
+Second Degree Burns        0       0/5       0          0/5      0/5        -          -        0            0           0
+Sea Cursed                 0       0/5       0          0/5      0/5        -          -        0            0           0
+Scabies                    0       0/5       0          0/5      0/5        -          -        0            0           0
+Saw Tomorrow               0       0/5       0          0/5      0/5        -          -        0            0           0
+Sandcastle Villain         0       0/5       0          0/5      0/5        -          -        0            0           0
+Road Blessed               0       0/5       0          0/5      0/5        -          -        0            0           0
+Ritual Protection          0       0/5       0          0/5      0/5        -          -        0            0           0
+Ringworm                   0       0/5       0          0/5      0/5        -          -        0            0           0
+Remembered the Loop        0       0/5       0          0/5      0/5        -          -        0            0           0
+Refreshed                  0       0/5       0          0/5      0/5        -          -        0            0           0
+Rat Bite Fever             0       0/5       0          0/5      0/5        -          -        0            0           0
+Rat Bite                   0       0/5       0          0/5      0/5        -          -        0            0           0
+Raid Survivor              0       0/5       0          0/5      0/5        -          -        0            0           0
+Rabies                     0       0/5       0          0/5      0/5        -          -        0            0           0
+Probability Haunted        0       0/5       0          0/5      0/5        -          -        0            0           0
+Probability Edge           0       0/5       0          0/5      0/5        -          -        0            0           0
+Possible Rabies            0       0/5       0          0/5      0/5        -          -        0            0           0
+Pigeon King                0       0/5       0          0/5      0/5        -          -        0            0           0
+Pigeon Dealer's Respect    0       0/5       0          0/5      0/5        -          -        0            0           0
+Pigeon Blessed             0       0/5       0          0/5      0/5        -          -        0            0           0
+Paranoid                   0       0/5       0          0/5      0/5        -          -        0            0           0
+Pancreatitis               0       0/5       0          0/5      0/5        -          -        0            0           0
+Oswald's Luck              0       0/5       0          0/5      0/5        -          -        0            0           0
+One Kidney                 0       0/5       0          0/5      0/5        -          -        0            0           0
+Oceanwise                  0       0/5       0          0/5      0/5        -          -        0            0           0
+Ocean-Blessed              0       0/5       0          0/5      0/5        -          -        0            0           0
+Nothing Left to Lose       0       0/5       0          0/5      0/5        -          -        0            0           0
+Needle Exposure            0       0/5       0          0/5      0/5        -          -        0            0           0
+Necronomicon Madness       0       0/5       0          0/5      0/5        -          -        0            0           0
+Nature Blessed             0       0/5       0          0/5      0/5        -          -        0            0           0
+Mysteriously Refreshed     0       0/5       0          0/5      0/5        -          -        0            0           0
+Mushroom Poisoning         0       0/5       0          0/5      0/5        -          -        0            0           0
+Morally Flexible           0       0/5       0          0/5      0/5        -          -        0            0           0
+Mononucleosis              0       0/5       0          0/5      0/5        -          -        0            0           0
+Mold Toxicity              0       0/5       0          0/5      0/5        -          -        0            0           0
+Missing Finger             0       0/5       0          0/5      0/5        -          -        0            0           0
+Mermaid Friend             0       0/5       0          0/5      0/5        -          -        0            0           0
+Mermaid Enemy              0       0/5       0          0/5      0/5        -          -        0            0           0
+Mercury Poisoning          0       0/5       0          0/5      0/5        -          -        0            0           0
+Measles                    0       0/5       0          0/5      0/5        -          -        0            0           0
+Maximum Nice               0       0/5       0          0/5      0/5        -          -        0            0           0
+Marvin Discount            0       0/5       0          0/5      0/5        -          -        0            0           0
+Marked                     0       0/5       0          0/5      0/5        -          -        0            0           0
+Malnutrition               0       0/5       0          0/5      0/5        -          -        0            0           0
+Lyme Disease               0       0/5       0          0/5      0/5        -          -        0            0           0
+Lunar Frenzy               0       0/5       0          0/5      0/5        -          -        0            0           0
+Lucky                      0       0/5       0          0/5      0/5        -          -        0            0           0
+Love Blessed               0       0/5       0          0/5      0/5        -          -        0            0           0
+Loan Shark Debt            0       0/5       0          0/5      0/5        -          -        0            0           0
+Legend                     0       0/5       0          0/5      0/5        -          -        0            0           0
+Lead Poisoning             0       0/5       0          0/5      0/5        -          -        0            0           0
+Kraken Respect             0       0/5       0          0/5      0/5        -          -        0            0           0
+Kraken Friend              0       0/5       0          0/5      0/5        -          -        0            0           0
+Kingpin Reputation         0       0/5       0          0/5      0/5        -          -        0            0           0
+Kidney Stones              0       0/5       0          0/5      0/5        -          -        0            0           0
+Inspired                   0       0/5       0          0/5      0/5        -          -        0            0           0
+Informant                  0       0/5       0          0/5      0/5        -          -        0            0           0
+Ignored Death              0       0/5       0          0/5      0/5        -          -        0            0           0
+Hypothermia                0       0/5       0          0/5      0/5        -          -        0            0           0
+Humbled                    0       0/5       0          0/5      0/5        -          -        0            0           0
+Hepatitis                  0       0/5       0          0/5      0/5        -          -        0            0           0
+Heat Stroke                0       0/5       0          0/5      0/5        -          -        0            0           0
+Haunted                    0       0/5       0          0/5      0/5        -          -        0            0           0
+Good Samaritan             0       0/5       0          0/5      0/5        -          -        0            0           0
+Good Karma                 0       0/5       0          0/5      0/5        -          -        0            0           0
+Glimpsed the Void          0       0/5       0          0/5      0/5        -          -        0            0           0
+Ghost                      0       0/5       0          0/5      0/5        -          -        0            0           0
+Generous                   0       0/5       0          0/5      0/5        -          -        0            0           0
+Gangrene                   0       0/5       0          0/5      0/5        -          -        0            0           0
+Gallbladder Attack         0       0/5       0          0/5      0/5        -          -        0            0           0
+Fresh Start                0       0/5       0          0/5      0/5        -          -        0            0           0
+Forewarned                 0       0/5       0          0/5      0/5        -          -        0            0           0
+Forest Blessed             0       0/5       0          0/5      0/5        -          -        0            0           0
+Flu                        0       0/5       0          0/5      0/5        -          -        0            0           0
+Fire Empowered             0       0/5       0          0/5      0/5        -          -        0            0           0
+Fire Cursed                0       0/5       0          0/5      0/5        -          -        0            0           0
+Fight Veteran              0       0/5       0          0/5      0/5        -          -        0            0           0
+Fight Promoter             0       0/5       0          0/5      0/5        -          -        0            0           0
+Fairy Friend               0       0/5       0          0/5      0/5        -          -        0            0           0
+Fairy Cursed               0       0/5       0          0/5      0/5        -          -        0            0           0
+Fairy Blessed              0       0/5       0          0/5      0/5        -          -        0            0           0
+Fair Judge                 0       0/5       0          0/5      0/5        -          -        0            0           0
+Experimental Treatment     0       0/5       0          0/5      0/5        -          -        0            0           0
+Evidence Collected         0       0/5       0          0/5      0/5        -          -        0            0           0
+Entertained                0       0/5       0          0/5      0/5        -          -        0            0           0
+Enlightened                0       0/5       0          0/5      0/5        -          -        0            0           0
+Energized                  0       0/5       0          0/5      0/5        -          -        0            0           0
+DVT                        0       0/5       0          0/5      0/5        -          -        0            0           0
+Dream Win                  0       0/5       0          0/5      0/5        -          -        0            0           0
+Dog Blessed                0       0/5       0          0/5      0/5        -          -        0            0           0
+Decent Human               0       0/5       0          0/5      0/5        -          -        0            0           0
+Dark Knowledge             0       0/5       0          0/5      0/5        -          -        0            0           0
+Cursed                     0       0/5       0          0/5      0/5        -          -        0            0           0
+Cultist Enemy              0       0/5       0          0/5      0/5        -          -        0            0           0
+Criminal Contacts          0       0/5       0          0/5      0/5        -          -        0            0           0
+CPR Failure                0       0/5       0          0/5      0/5        -          -        0            0           0
+Corrupt Judge              0       0/5       0          0/5      0/5        -          -        0            0           0
+Confused but Wiser         0       0/5       0          0/5      0/5        -          -        0            0           0
+Confessor's Burden         0       0/5       0          0/5      0/5        -          -        0            0           0
+Concussion                 0       0/5       0          0/5      0/5        -          -        0            0           0
+Cold Operator              0       0/5       0          0/5      0/5        -          -        0            0           0
+Cold                       0       0/5       0          0/5      0/5        -          -        0            0           0
+Chemotherapy               0       0/5       0          0/5      0/5        -          -        0            0           0
+Chaos Gambler              0       0/5       0          0/5      0/5        -          -        0            0           0
+Centered                   0       0/5       0          0/5      0/5        -          -        0            0           0
+Cat Whisperer              0       0/5       0          0/5      0/5        -          -        0            0           0
+Cat Hero                   0       0/5       0          0/5      0/5        -          -        0            0           0
+Car Prediction             0       0/5       0          0/5      0/5        -          -        0            0           0
+Called for Help            0       0/5       0          0/5      0/5        -          -        0            0           0
+Builds Things              0       0/5       0          0/5      0/5        -          -        0            0           0
+Bronchitis                 0       0/5       0          0/5      0/5        -          -        0            0           0
+Broken Ribs                0       0/5       0          0/5      0/5        -          -        0            0           0
+Blood Pressure Crisis      0       0/5       0          0/5      0/5        -          -        0            0           0
+Blood Moon Luck            0       0/5       0          0/5      0/5        -          -        0            0           0
+Blessed                    0       0/5       0          0/5      0/5        -          -        0            0           0
+Blacklisted                0       0/5       0          0/5      0/5        -          -        0            0           0
+Benjamin's Blessing        0       0/5       0          0/5      0/5        -          -        0            0           0
+Being Watched              0       0/5       0          0/5      0/5        -          -        0            0           0
+Beast Master               0       0/5       0          0/5      0/5        -          -        0            0           0
+Beach Relaxed              0       0/5       0          0/5      0/5        -          -        0            0           0
+At Peace                   0       0/5       0          0/5      0/5        -          -        0            0           0
+Asbestos Damage            0       0/5       0          0/5      0/5        -          -        0            0           0
+Archaeological Hero        0       0/5       0          0/5      0/5        -          -        0            0           0
+Appendicitis               0       0/5       0          0/5      0/5        -          -        0            0           0
+Ant Bites                  0       0/5       0          0/5      0/5        -          -        0            0           0
+Anaphylaxis                0       0/5       0          0/5      0/5        -          -        0            0           0
+Amused                     0       0/5       0          0/5      0/5        -          -        0            0           0
+Aged                       0       0/5       0          0/5      0/5        -          -        0            0           0
 
 Injury Universe
 tracker note: add/remove counts are cycle-diff based; same-cycle cures may not appear in seen/removed totals, but end-of-run conditions are final-state accurate
 name                seen seen-runs removed removed-runs end-runs removed% still-end% died-end doctor-heals witch-heals
 ------------------- ---- --------- ------- ------------ -------- -------- ---------- -------- ------------ -----------
-Deep Laceration       30    29/100       9        9/100   21/100      31%        72%       12            9           0
-Scraped Knee          27    27/100      10       10/100   17/100      37%        63%       11           10           0
-Concussion            18    18/100       3        3/100   15/100      17%        83%        9            3           0
-Broken Nose           17    16/100       9        8/100    8/100      50%        50%        5            9           0
-Broken Hand           10    10/100       2        2/100    8/100      20%        80%        3            2           0
-Broken Ribs           11    10/100       5        5/100    6/100      50%        60%        4            5           0
-Whiplash               5     5/100       1        1/100    4/100      20%        80%        2            1           0
-Broken Wrist           5     5/100       2        2/100    3/100      40%        60%        0            2           0
-Ruptured Spleen        4     4/100       1        1/100    3/100      25%        75%        1            1           0
-Broken Collarbone      2     2/100       1        1/100    1/100      50%        50%        1            1           0
-Torn ACL               1     1/100       0        0/100    1/100       0%       100%        0            0           0
-Electrical Burns       1     1/100       0        0/100    1/100       0%       100%        0            0           0
-Severed Skin           1     1/100       1        1/100    0/100     100%         0%        0            1           0
-Herniated Disc         1     1/100       1        1/100    0/100     100%         0%        0            1           0
-Broken Ankle           1     1/100       1        1/100    0/100     100%         0%        0            1           0
-Strep Throat           0     0/100       0        0/100    0/100        -          -        0            1           0
-Possible Rabies        0     0/100       0        0/100    0/100        -          -        0            1           0
-Pink Eye               0     0/100       0        0/100    0/100        -          -        0            1           0
-Mold Toxicity          0     0/100       0        0/100    0/100        -          -        0            1           0
-Ear Infection          0     0/100       0        0/100    0/100        -          -        0            1           0
-Chronic Insomnia       0     0/100       0        0/100    0/100        -          -        0            1           0
-Skull Fracture         0     0/100       0        0/100    0/100        -          -        0            0           0
-Severe Burns           0     0/100       0        0/100    0/100        -          -        0            0           0
-Ruptured Tendon        0     0/100       0        0/100    0/100        -          -        0            0           0
-Ruptured Eardrum       0     0/100       0        0/100    0/100        -          -        0            0           0
-Rat Bite               0     0/100       0        0/100    0/100        -          -        0            0           0
-Puncture Wound         0     0/100       0        0/100    0/100        -          -        0            0           0
-Orbital Fracture       0     0/100       0        0/100    0/100        -          -        0            0           0
-Nerve Damage           0     0/100       0        0/100    0/100        -          -        0            0           0
-Muscle Tear            0     0/100       0        0/100    0/100        -          -        0            0           0
-Liver Laceration       0     0/100       0        0/100    0/100        -          -        0            0           0
-Frostbite              0     0/100       0        0/100    0/100        -          -        0            0           0
-Fractured Spine        0     0/100       0        0/100    0/100        -          -        0            0           0
-Fractured Jaw          0     0/100       0        0/100    0/100        -          -        0            0           0
-Dislocated Shoulder    0     0/100       0        0/100    0/100        -          -        0            0           0
-Detached Retina        0     0/100       0        0/100    0/100        -          -        0            0           0
-Crush Injury           0     0/100       0        0/100    0/100        -          -        0            0           0
-Collapsed Lung         0     0/100       0        0/100    0/100        -          -        0            0           0
-Chemical Burn          0     0/100       0        0/100    0/100        -          -        0            0           0
-Broken Leg             0     0/100       0        0/100    0/100        -          -        0            0           0
+Scraped Knee           1       1/5       0          0/5      1/5       0%       100%        0            0           0
+Ruptured Spleen        1       1/5       0          0/5      1/5       0%       100%        0            0           0
+Concussion             1       1/5       0          0/5      1/5       0%       100%        0            0           0
+Broken Ribs            1       1/5       0          0/5      1/5       0%       100%        0            0           0
+Pink Eye               0       0/5       0          0/5      0/5        -          -        0            1           0
+Whiplash               0       0/5       0          0/5      0/5        -          -        0            0           0
+Torn ACL               0       0/5       0          0/5      0/5        -          -        0            0           0
+Skull Fracture         0       0/5       0          0/5      0/5        -          -        0            0           0
+Severed Skin           0       0/5       0          0/5      0/5        -          -        0            0           0
+Severe Burns           0       0/5       0          0/5      0/5        -          -        0            0           0
+Ruptured Tendon        0       0/5       0          0/5      0/5        -          -        0            0           0
+Ruptured Eardrum       0       0/5       0          0/5      0/5        -          -        0            0           0
+Rat Bite               0       0/5       0          0/5      0/5        -          -        0            0           0
+Puncture Wound         0       0/5       0          0/5      0/5        -          -        0            0           0
+Orbital Fracture       0       0/5       0          0/5      0/5        -          -        0            0           0
+Nerve Damage           0       0/5       0          0/5      0/5        -          -        0            0           0
+Muscle Tear            0       0/5       0          0/5      0/5        -          -        0            0           0
+Liver Laceration       0       0/5       0          0/5      0/5        -          -        0            0           0
+Herniated Disc         0       0/5       0          0/5      0/5        -          -        0            0           0
+Frostbite              0       0/5       0          0/5      0/5        -          -        0            0           0
+Fractured Spine        0       0/5       0          0/5      0/5        -          -        0            0           0
+Fractured Jaw          0       0/5       0          0/5      0/5        -          -        0            0           0
+Electrical Burns       0       0/5       0          0/5      0/5        -          -        0            0           0
+Dislocated Shoulder    0       0/5       0          0/5      0/5        -          -        0            0           0
+Detached Retina        0       0/5       0          0/5      0/5        -          -        0            0           0
+Deep Laceration        0       0/5       0          0/5      0/5        -          -        0            0           0
+Crush Injury           0       0/5       0          0/5      0/5        -          -        0            0           0
+Collapsed Lung         0       0/5       0          0/5      0/5        -          -        0            0           0
+Chemical Burn          0       0/5       0          0/5      0/5        -          -        0            0           0
+Broken Wrist           0       0/5       0          0/5      0/5        -          -        0            0           0
+Broken Nose            0       0/5       0          0/5      0/5        -          -        0            0           0
+Broken Leg             0       0/5       0          0/5      0/5        -          -        0            0           0
+Broken Hand            0       0/5       0          0/5      0/5        -          -        0            0           0
+Broken Collarbone      0       0/5       0          0/5      0/5        -          -        0            0           0
+Broken Ankle           0       0/5       0          0/5      0/5        -          -        0            0           0
 
-Doctor Visits runs=32/100 total-visits=86 heal-visits=71 fail-visits=15 cash=-13,584 avg-cash=-158.0 hp=+1675 san=-122 heal-runs=30 fail-runs=11
-      seed visits heals fails outcome end-day rank  end$  hp san end-cond cause                               
----------- ------ ----- ----- ------- ------- ---- ----- --- --- -------- ------------------------------------
- 484078325     13    10     3 broke        40    0     0  93  83        1 player hit $0 during cycle 39       
-1873329293      4     4     0 broke        60    0     0  37   0        4 player hit $0 during cycle 59       
-1931887151      4     4     0 broke        50    1     0  93  38        2 player hit $0 during cycle 49       
- 589410621      4     3     1 died         37    1 4,305 100  34        0 Electrocution. A faulty wire and ...
-1173857051      4     1     3 broke        61    0     0 100 100        1 player hit $0 during cycle 60       
- 739221871      3     3     0 ending       35    0   710  99   0        1 terminal ending during cycle 34 |...
- 741474844      3     3     0 ending       36    0     6  95  10        2 terminal ending during cycle 35 |...
- 931487472      3     3     0 broke        39    1     0  21  13        4 player hit $0 during cycle 38       
-1153527485      3     3     0 died         37    1 1,851 100  34        0 Drowned in your car. Some nightma...
-1259956336      3     3     0 broke        49    1     0  70   0        1 player hit $0 during cycle 48       
-2022736221      3     3     0 ending       27    0   425 100  29        0 terminal ending during cycle 26 |...
-1209581459      3     2     1 ending       22    1 2,864  60  25        0 terminal ending during cycle 21 |...
-1462425422      3     2     1 broke        43    0     0 100  11        0 player hit $0 during cycle 42       
-2104084587      3     2     1 broke        20    0     0 100  47        1 player hit $0 during cycle 19       
- 146986330      2     2     0 ending       37    0   120  99   0        1 terminal ending during cycle 36 |...
- 191219781      2     2     0 died         54    1  -148   2 100        2 Unknown                             
- 685694649      2     2     0 broke        20    0     0 100  60        0 player hit $0 during cycle 19       
- 750868584      2     2     0 ending       38    0    37 100  18        2 terminal ending during cycle 37 |...
- 905898819      2     2     0 broke        24    1     0  72  62        1 player hit $0 during cycle 23       
-1373439072      2     2     0 broke        25    0     0  94  30        1 player hit $0 during cycle 25       
-1378015084      2     2     0 broke        31    0     0 100  51        2 player hit $0 during cycle 30       
-1428164705      2     2     0 ending       27    1 5,492 100  33        0 terminal ending during cycle 26 |...
-1793449238      2     2     0 broke        38    1     0  95  56        0 player hit $0 during cycle 37       
-  29195372      2     1     1 broke        59    0     0  29  25        0 player hit $0 during cycle 58       
- 778547813      2     1     1 ending       34    1  -617   1   0        1 terminal ending during cycle 33 |...
- 963491798      2     1     1 broke        41    1     0 100  61        0 player hit $0 during cycle 40       
-  29820227      1     1     0 broke        16    1     0  99  63        1 player hit $0 during cycle 16       
-  88635854      1     1     0 ending       23    0   113 100  12        0 terminal ending during cycle 22 |...
- 747061783      1     1     0 ending       25    0    86  93  27        1 terminal ending during cycle 24 |...
-2023301401      1     1     0 broke        25    1     0  98  45        0 player hit $0 during cycle 24       
-1091916732      1     0     1 broke        14    0     0 100  60        0 player hit $0 during cycle 13       
-1921687391      1     0     1 broke        14    1     0 100  29        0 player hit $0 during cycle 13       
+Doctor Visits runs=1/5 total-visits=2 heal-visits=2 fail-visits=0 cash=-224 avg-cash=-112.0 hp=+32 san=-2 heal-runs=1 fail-runs=0
+     seed visits heals fails outcome end-day rank end$  hp san end-cond cause               
+--------- ------ ----- ----- ------- ------- ---- ---- --- --- -------- --------------------
+476312311      2     2     0 capped       11    0   39 100  62        0 reached cycle cap 10
 Doctor Visits Heals
-condition         heals   runs
------------------ ----- ------
-Scraped Knee         10 10/100
-Broken Nose           9  8/100
-Deep Laceration       9  9/100
-Broken Ribs           5  5/100
-Concussion            3  3/100
-Broken Wrist          2  2/100
-Broken Hand           2  2/100
-Strep Throat          1  1/100
-Whiplash              1  1/100
-Ear Infection         1  1/100
-Pink Eye              1  1/100
-Broken Ankle          1  1/100
-Chronic Insomnia      1  1/100
-Possible Rabies       1  1/100
-Severed Skin          1  1/100
-Herniated Disc        1  1/100
-Mold Toxicity         1  1/100
-Broken Collarbone     1  1/100
-Ruptured Spleen       1  1/100
-Doctor Visits Fails
-      seed visits fails outcome end-day  end$ end-cond cause                               
----------- ------ ----- ------- ------- ----- -------- ------------------------------------
- 484078325     13     3 broke        40     0        1 player hit $0 during cycle 39       
- 589410621      4     1 died         37 4,305        0 Electrocution. A faulty wire and ...
-1173857051      4     3 broke        61     0        1 player hit $0 during cycle 60       
-1209581459      3     1 ending       22 2,864        0 terminal ending during cycle 21 |...
-1462425422      3     1 broke        43     0        0 player hit $0 during cycle 42       
-2104084587      3     1 broke        20     0        1 player hit $0 during cycle 19       
-  29195372      2     1 broke        59     0        0 player hit $0 during cycle 58       
- 778547813      2     1 ending       34  -617        1 terminal ending during cycle 33 |...
- 963491798      2     1 broke        41     0        0 player hit $0 during cycle 40       
-1091916732      1     1 broke        14     0        0 player hit $0 during cycle 13       
-1921687391      1     1 broke        14     0        0 player hit $0 during cycle 13       
+condition heals runs
+--------- ----- ----
+Pink Eye      1  1/5
 
-Witch Doctor Visits runs=6/100 total-visits=33 heal-visits=16 fail-visits=17 cash=216 avg-cash=+6.5 hp=-183 san=-83 heal-runs=5 fail-runs=5
-      seed visits heals fails outcome end-day rank end$  hp san end-cond cause                               
----------- ------ ----- ----- ------- ------- ---- ---- --- --- -------- ------------------------------------
-1259956336     15     9     6 broke        49    1    0  70   0        1 player hit $0 during cycle 48       
- 931487472     10     3     7 broke        39    1    0  21  13        4 player hit $0 during cycle 38       
-  88635854      3     2     1 ending       23    0  113 100  12        0 terminal ending during cycle 22 |...
-  29195372      3     1     2 broke        59    0    0  29  25        0 player hit $0 during cycle 58       
- 208764828      1     1     0 died         17    0   23  74  53        2 Mauled to death by a stray dog. N...
-1931887151      1     0     1 broke        50    1    0  93  38        2 player hit $0 during cycle 49       
-Witch Doctor Visits Fails
-      seed visits fails outcome end-day end$ end-cond cause                               
----------- ------ ----- ------- ------- ---- -------- ------------------------------------
-1259956336     15     6 broke        49    0        1 player hit $0 during cycle 48       
- 931487472     10     7 broke        39    0        4 player hit $0 during cycle 38       
-  88635854      3     1 ending       23  113        0 terminal ending during cycle 22 |...
-  29195372      3     2 broke        59    0        0 player hit $0 during cycle 58       
-1931887151      1     1 broke        50    0        2 player hit $0 during cycle 49       
+Witch Doctor Visits
+none
 
 Game Statistics
 stat                     avg   max   min  nonzero       sum
 -----------------------------------------------------------
-injuries-sustained       1.4     7     0   60/100       138
-illnesses-contracted     2.2     8     0   76/100       219
-loans-taken              0.2     2     0   21/100        22
-loans-repaid             0.0     1     0    1/100         1
-total-borrowed          $590 $6,000    $0   21/100   $59,000
-companions-befriended    1.1     4     0   50/100       114
-near-deaths              0.0     0     0    0/100         0
-times-robbed             0.0     0     0    0/100         0
-times-hospitalized       0.0     0     0    0/100         0
-mechanic-visits          0.1     6     0    6/100        14
-doctor-visits            0.9    13     0   32/100        86
-witch-dr-visits          0.3    15     0    6/100        33
+injuries-sustained       0.8     4     0    1/5          4
+illnesses-contracted     3.4     7     2    5/5         17
+loans-taken              0.0     0     0    0/5          0
+loans-repaid             0.0     0     0    0/5          0
+total-borrowed            $0    $0    $0    0/5         $0
+companions-befriended    1.6     4     0    3/5          8
+near-deaths              0.0     0     0    0/5          0
+times-robbed             0.0     0     0    0/5          0
+times-hospitalized       0.0     0     0    0/5          0
+mechanic-visits          0.2     1     0    1/5          1
+doctor-visits            0.4     2     0    1/5          2
+witch-dr-visits          0.0     0     0    0/5          0
 
 Injury & Illness Distribution
-cohort     n avg-inj-total avg-ill-total avg-inj-end avg-ill-end max-inj-end max-ill-end
--------- --- ------------- ------------- ----------- ----------- ----------- -----------
-all      100           1.4           2.2         0.9         0.5           4           3
-survived   0             -             -           -           -           -           -
-died      31           1.7           2.2         1.5         0.9           4           3
-broke     42           1.3           1.9         0.5         0.2           4           2
-most injuries: s931487472=7(end:4) | s1931887151=6(end:2) | s1873329293=6(end:2) | s741474844=5(end:2) | s2074698640=4(end:4) | s1924581542=4(end:4) | s8534798=4(end:4) | s1378015084=4(end:2) | s750868584=4(end:2) | s1259956336=4(end:1)
-most illnesses: s191219781=8(end:1) | s1630622054=7(end:2) | s1462425422=7(end:0) | s1259956336=6(end:0) | s589410621=6(end:0) | s146986330=6(end:0) | s29195372=6(end:0) | s4064534=6(end:0) | s1173857051=5(end:1) | s484078325=5(end:1)
-least injuries (incl 0): s66014365=0(end:0) | s150211897=0(end:0) | s176671972=0(end:0) | s185610607=0(end:0) | s325555799=0(end:0) | s484078325=0(end:0) | s492237967=0(end:0) | s599714647=0(end:0) | s608111876=0(end:0) | s631827777=0(end:0)
-least illnesses (incl 0): s8534798=0(end:0) | s29820227=0(end:0) | s176671972=0(end:0) | s208764828=0(end:0) | s325555799=0(end:0) | s363226622=0(end:0) | s631827777=0(end:0) | s730746980=0(end:0) | s742906625=0(end:0) | s783419947=0(end:0)
+cohort   n avg-inj-total avg-ill-total avg-inj-end avg-ill-end max-inj-end max-ill-end
+-------- - ------------- ------------- ----------- ----------- ----------- -----------
+all      5           0.8           3.4         0.8         0.8           4           2
+survived 4           1.0           2.5         1.0         0.5           4           1
+died     0             -             -           -           -           -           -
+broke    0             -             -           -           -           -           -
+most injuries: s57284035=4(end:4) | s1594246017=0(end:0) | s1090625786=0(end:0) | s1073362907=0(end:0) | s476312311=0(end:0)
+most illnesses: s1073362907=7(end:2) | s1090625786=3(end:1) | s476312311=3(end:0) | s1594246017=2(end:1) | s57284035=2(end:0)
+least injuries (incl 0): s476312311=0(end:0) | s1073362907=0(end:0) | s1090625786=0(end:0) | s1594246017=0(end:0) | s57284035=4(end:4)
+least illnesses (incl 0): s57284035=2(end:0) | s1594246017=2(end:1) | s476312311=3(end:0) | s1090625786=3(end:1) | s1073362907=7(end:2)
 
-Companion Roster runs-with-companions=50/100 avg-per-run=0.6 max=2(seed=1921687391)
+Companion Roster runs-with-companions=3/5 avg-per-run=0.8 max=2(seed=1090625786)
 companion         acquired  (seeds)
 ----------------  --------  ------
-Whiskers             45/100  s=852302589,1555435534,1921687391,1629761851,1630622054,176671972,747061783,1052716950...
-Lucky                 7/100  s=2024218430,963491798,1462425422,739221871,191219781,29195372,750868584
-Patches               5/100  s=1921687391,1629761851,2104084587,2022736221,741474844
-total companions-befriended stat across all seeds: 114
+Whiskers              3/5   s=1090625786,1594246017,1073362907
+Patches               1/5   s=1090625786
+total companions-befriended stat across all seeds: 8
 
-Companion State Coverage runs-with-any=50/100 bonded-runs=0/100 lost-runs=25/100 dead-runs=16/100
-companion  type               seen alive lost dead bonded avg-happy max-days
----------- ---------------- ------ ----- ---- ---- ------ --------- --------
-Hopper     -                 0/100     0    0    0      0         -        0
-Lucky      Three-Legged Dog  7/100     0    5    2      0       5.0       15
-Mr. Pecks  -                 0/100     0    0    0      0         -        0
-Patches    Opossum           5/100     0    3    2      0      11.6        9
-Rusty      -                 0/100     0    0    0      0         -        0
-Slick      -                 0/100     0    0    0      0         -        0
-Squirrelly -                 0/100     0    0    0      0         -        0
-Whiskers   Stray Cat        45/100    12   21   12      0      10.9       17
+Companion State Coverage runs-with-any=3/5 bonded-runs=0/5 lost-runs=1/5 dead-runs=0/5
+companion  type      seen alive lost dead bonded avg-happy max-days
+---------- --------- ---- ----- ---- ---- ------ --------- --------
+Hopper     -          0/5     0    0    0      0         -        0
+Lucky      -          0/5     0    0    0      0         -        0
+Mr. Pecks  -          0/5     0    0    0      0         -        0
+Patches    Opossum    1/5     0    1    0      0       5.0        9
+Rusty      -          0/5     0    0    0      0         -        0
+Slick      -          0/5     0    0    0      0         -        0
+Squirrelly -          0/5     0    0    0      0         -        0
+Whiskers   Stray Cat  3/5     3    0    0      0      10.0        9
 
-Loan Distribution runs-with-loans=21/100 total-loans=22 total-repaid=1 total-borrowed=$59,000 total-repaid-amt=$6,670
-end-state open-debt=21/100 warning2+=12/100 warning3+=6/100 fake-cash-end=2/100
-seed  loans  repaid  borrowed    repaid-amt  end-debt    warn  fake$      outcome   peak
-----  -----  ------  ----------  ----------  ----------  ----  ---------  --------  --------
-778547813      2       1  $    6,000  $    1,000  $    6,000     2  $       0  ending    $  7,021
-1259956336      1       0  $    5,000  $    2,606  $    6,034     4  $       0  broke     $ 10,981
-963491798      1       0  $    5,000  $        0  $    6,000     2  $       0  broke     $  5,180
-739221871      1       0  $    5,000  $        0  $    6,000     2  $       0  ending    $  5,145
-589410621      1       0  $    5,000  $        0  $    5,000     0  $   3,409  died      $  5,114
-1428164705      1       0  $    5,000  $        0  $    5,000     0  $   2,784  ending    $  5,492
-1153527485      1       0  $    2,500  $        0  $    3,600     3  $       0  died      $  3,321
-191219781      1       0  $    2,500  $        0  $    3,600     3  $       0  died      $  2,510
-2023301401      1       0  $    2,500  $        0  $    3,000     2  $       0  broke     $  2,517
-1793449238      1       0  $    2,500  $        0  $    3,000     2  $       0  broke     $  2,575
-2005184339      1       0  $    2,500  $        0  $    2,500     1  $       0  broke     $  2,533
-1931887151      1       0  $    2,500  $        0  $    2,500     1  $       0  broke     $  2,524
-1921687391      1       0  $    2,500  $        0  $    2,500     0  $       0  broke     $  2,714
-905898819      1       0  $    2,500  $        0  $    2,500     1  $       0  broke     $  2,509
-1209581459      1       0  $    2,500  $    1,250  $    1,500     2  $       0  ending    $  3,883
-1873329293      1       0  $    1,000  $      304  $    1,424     4  $       0  broke     $  1,029
-1536704457      1       0  $    1,000  $        0  $    1,000     0  $       0  broke     $  1,018
-29820227      1       0  $    1,000  $        0  $    1,000     0  $       0  broke     $  1,042
-931487472      1       0  $    1,000  $      795  $      933     4  $       0  broke     $  4,242
-29195372      1       0  $    1,000  $      715  $      649     4  $       0  broke     $  2,179
-2022736221      1       0  $      500  $        0  $      500     1  $       0  ending    $    526
+Loan Distribution runs-with-loans=0/5 total-loans=0 total-repaid=0 total-borrowed=$0 total-repaid-amt=$0
+end-state open-debt=0/5 warning2+=0/5 warning3+=0/5 fake-cash-end=0/5
 
-Gambling Performance seeds=100 total-hands=5,650
-win-rate=44.8%  bj-rate=10.3%  bust-rate=15.7%  tie-rate=7.4%
-total-won=$103,895  total-lost=$126,296  net=$-22,401
+Gambling Performance seeds=5 total-hands=147
+win-rate=38.8%  bj-rate=6.1%  bust-rate=17.7%  tie-rate=15.6%
+total-won=$519  total-lost=$533  net=$-14
 double-downs-won=0  splits-won=0  surrenders=0
-best-wr: s353080723=63.0%(27h) | s1034128364=63.0%(27h) | s599714647=59.3%(27h)
-worst-wr: s1266021064=19.0%(21h) | s185610607=25.0%(36h) | s1172310199=25.0%(24h)
+best-wr: s1090625786=46.7%(30h) | s1073362907=44.4%(27h) | s57284035=40.0%(30h)
+worst-wr: s476312311=30.0%(30h) | s1594246017=33.3%(30h) | s57284035=40.0%(30h)
 
-Flask Purchases runs-bought=0/100 total-purchased=0
+Flask Purchases runs-bought=0/5 total-purchased=0
 flask                  times-bought  runs
 ---------------------  ------------  ----
-No Bust                       0     0/100
-Second Chance                 0     0/100
-Dealer's Whispers             0     0/100
-Bonus Fortune                 0     0/100
-Dealer's Hesitation           0     0/100
-Split Serum                   0     0/100
-Pocket Aces                   0     0/100
-Imminent Blackjack            0     0/100
-Anti-Virus                    0     0/100
-Anti-Venom                    0     0/100
-Fortunate Day                 0     0/100
-Fortunate Night               0     0/100
+No Bust                       0     0/5
+Second Chance                 0     0/5
+Dealer's Whispers             0     0/5
+Bonus Fortune                 0     0/5
+Dealer's Hesitation           0     0/5
+Split Serum                   0     0/5
+Pocket Aces                   0     0/5
+Imminent Blackjack            0     0/5
+Anti-Virus                    0     0/5
+Anti-Venom                    0     0/5
+Fortunate Day                 0     0/5
+Fortunate Night               0     0/5
 
-Item Breakage runs-with-breaks=0/100 total-breaks=0
+Item Breakage runs-with-breaks=0/5 total-breaks=0
 no item breakages recorded
 
-Dealer Happiness & Gifts unlocked=0/100 gift-runs=0/100 deliveries=0 free-hand-runs=76/100 free-hands=796
+Dealer Happiness & Gifts unlocked=0/5 gift-runs=0/5 deliveries=0 free-hand-runs=5/5 free-hands=8
 no gift deliveries recorded
-free hands 100=633 | >90=54 | >95=109 | avg-bet=$11 | max-bet=$560
+free hands 100=4 | >90=1 | >95=3 | avg-bet=$7 | max-bet=$21
 
-Mechanic Repair runs-visited=6/100 total-mechanic-visits=14
+Mechanic Repair runs-visited=1/5 total-mechanic-visits=1
 no items fixed at mechanic recorded
 
 Mechanic Dream Progress
-mechanic    1+    2+    3+    4+ max  avg
--------- ----- ----- ----- ----- --- ----
-Tom      2/100 0/100 0/100 0/100   1 0.02
-Frank    5/100 0/100 0/100 0/100   1 0.05
-Oswald   5/100 0/100 0/100 0/100   1 0.05
-car mechanic none=59 | Tom=34 | Oswald=4 | Frank=3
-millionaire chosen mechanic none=100
-frank dealer-dream gate 0/100
-final mechanic ending gate 0/100
+mechanic  1+  2+  3+  4+ max  avg
+-------- --- --- --- --- --- ----
+Tom      0/5 0/5 0/5 0/5   0 0.00
+Frank    0/5 0/5 0/5 0/5   0 0.00
+Oswald   0/5 0/5 0/5 0/5   0 0.00
+car mechanic none=4 | Tom=1
+millionaire chosen mechanic none=5
+frank dealer-dream gate 0/5
+final mechanic ending gate 0/5
 
 System Presence
-system      present engaged payoff notes                                     
------------ ------- ------- ------ ------------------------------------------
-doctor       41/100  32/100     86 car / doctor-runs / total-visits          
-store        41/100  19/100     37 car / store-runs / total-visits           
-pawn         28/100  11/100     74 gus / pawn-runs / total-visits            
-loan         25/100  21/100     26 vinnie / loan-runs / total-visits         
-marvin       37/100  11/100  1/100 access / visit / item-run total-visits=21 
-gift-wrap     0/100   0/100 97/100 delivered / dealer<78 end / avg=50        
-workbench    12/100   8/100  0/100 tool-kit / visit / crafted total-visits=10
-tom          34/100   3/100     10 met / mechanic-runs / total-visits        
-frank         3/100   2/100      3 met / mechanic-runs / total-visits        
-oswald        4/100   1/100      1 met / mechanic-runs / total-visits        
-companions    0/100  50/100  0/100 whistle / roster / befriended             
-witch        36/100   6/100  0/100 met / doctor / flask-buy total-visits=33  
-millionaire   0/100   0/100  0/100 reach / visitor / airport-runs            
-airport       0/100   0/100      0 unlock / airport-runs / total-visits      
+system      present engaged payoff notes                                    
+----------- ------- ------- ------ -----------------------------------------
+doctor          1/5     1/5      2 car / doctor-runs / total-visits         
+store           1/5     0/5      0 car / store-runs / total-visits          
+pawn            0/5     0/5      0 gus / pawn-runs / total-visits           
+loan            0/5     0/5      0 vinnie / loan-runs / total-visits        
+marvin          1/5     0/5    0/5 access / visit / item-run total-visits=0 
+gift-wrap       0/5     0/5    5/5 delivered / dealer<78 end / avg=50       
+workbench       0/5     0/5    0/5 tool-kit / visit / crafted total-visits=0
+tom             1/5     1/5      1 met / mechanic-runs / total-visits       
+frank           0/5     0/5      0 met / mechanic-runs / total-visits       
+oswald          0/5     0/5      0 met / mechanic-runs / total-visits       
+companions      0/5     3/5    0/5 whistle / roster / befriended            
+witch           0/5     0/5    0/5 met / doctor / flask-buy total-visits=0  
+millionaire     0/5     0/5    0/5 reach / visitor / airport-runs           
+airport         0/5     0/5      0 unlock / airport-runs / total-visits     
 
 Medical, Fatality & Diagnostics
 -------------------------------
-Death Stage Audit
-day-bucket deaths avg-day avg-peak$ top-tags                                                               common-conditions                                 
----------- ------ ------- --------- ---------------------------------------------------------------------- --------------------------------------------------
-day<=10        13       8        94 early-untreated-wounds=5 | nightmare-drowning=3 | poisoning-overdose=1 Scraped Knee=5 | Stomach Flu=3 | Deep Laceration=3
-11-30          15      18       144 infection-pressure=4 | untreated-wounds=3 | animal-attack=2            Deep Laceration=8 | Concussion=7 | Scraped Knee=6 
-31-60           3      43     3,648 car-mechanical-fatality=1 | nightmare-drowning=1 | Unknown=1           Lyme Disease=1 | Deep Laceration=1                
+Pawn Shop / Gus Progress runs-with-sales=0/5 unique-sold=0/221 avg-unique-sold=0.0/221 best-seed=-
+progress gates 1+=0/5 5+=0/5 10+=0/5 25+=0/5 full=0/5
+item                     sold-runs sold%
+------------------------ --------- -----
+Ace of Spades                  0/5    0%
+Air Freshener                  0/5    0%
+Alien Crystal                  0/5    0%
+Ancient Sea Map                0/5    0%
+Angel's Number                 0/5    0%
+Antifreeze                     0/5    0%
+Antique Pocket Watch           0/5    0%
+Antique Ring                   0/5    0%
+Apartment Key                  0/5    0%
+Artisan's Toolkit              0/5    0%
+Bag of Acorns                  0/5    0%
+Bag of Cocaine                 0/5    0%
+Bandage                        0/5    0%
+Beach Romance Number           0/5    0%
+Bear's Gold Coin               0/5    0%
+Binoculars                     0/5    0%
+Blanket                        0/5    0%
+Brake Fluid                    0/5    0%
+Brake Pads                     0/5    0%
+Breath Mints                   0/5    0%
+Broken Compass                 0/5    0%
+Bug Spray                      0/5    0%
+Building Manager Key           0/5    0%
+Bungee Cords                   0/5    0%
+Can of Tuna                    0/5    0%
+Cannon Gem                     0/5    0%
+Captain's Compass              0/5    0%
+Captured Fairy                 0/5    0%
+Car Jack                       0/5    0%
+Carnival Token                 0/5    0%
+Carrot                         0/5    0%
+Carved Walking Stick           0/5    0%
+Casino OD Evidence             0/5    0%
+Casino VIP Card                0/5    0%
+Championship Medal             0/5    0%
+Cheap Sunscreen                0/5    0%
+Coolant                        0/5    0%
+Cough Drops                    0/5    0%
+Council Feather                0/5    0%
+Cowboy Jacket                  0/5    0%
+Crab Racing Trophy             0/5    0%
+Cursed Coin                    0/5    0%
+Dealer's Coin                  0/5    0%
+Dealer's Joker                 0/5    0%
+Dealer's Lucky Chips           0/5    0%
+Deck of Cards                  0/5    0%
+Deep Stone                     0/5    0%
+Depth Charm                    0/5    0%
+Dimensional Coin               0/5    0%
+Disposable Camera              0/5    0%
+Dog Treat                      0/5    0%
+Dog Whistle                    0/5    0%
+Druid's Staff                  0/5    0%
+Duct Tape                      0/5    0%
+Earl's Lucky Lure              0/5    0%
+Edgar's Letter                 0/5    0%
+Edgar's List                   0/5    0%
+Empty Locket                   0/5    0%
+Exhaust Tape                   0/5    0%
+Expensive Cologne              0/5    0%
+Fairy's Secret Map             0/5    0%
+Fake Flower                    0/5    0%
+Fancy Cigars                   0/5    0%
+Fancy Pen                      0/5    0%
+Feelgood Bottle                0/5    0%
+Feelgood Pill                  0/5    0%
+Fight Champion Belt            0/5    0%
+Filled Locket                  0/5    0%
+First Aid Kit                  0/5    0%
+Fish                           0/5    0%
+Fishing Line                   0/5    0%
+Fix-a-Flat                     0/5    0%
+Flashlight                     0/5    0%
+Found Phone                    0/5    0%
+Frank's Flask                  0/5    0%
+Fuel Filter                    0/5    0%
+Fuel Line Antifreeze           0/5    0%
+Garbage Bag                    0/5    0%
+Gas Can                        0/5    0%
+Gator Tooth Necklace           0/5    0%
+Giant Bear Tooth               0/5    0%
+Giant Oyster                   0/5    0%
+Gold Chain                     0/5    0%
+Golden Ring                    0/5    0%
+Golden Shovel                  0/5    0%
+Golden Trident                 0/5    0%
+Grandma's Number               0/5    0%
+Grandma's Scarf                0/5    0%
+Grandpa's Chili Recipe         0/5    0%
+Granny's Swamp Nectar          0/5    0%
+Granola Bar                    0/5    0%
+Gus's Precious Grime           0/5    0%
+Hand Warmers                   0/5    0%
+Herbal Pouch                   0/5    0%
+Hermit's Journal               0/5    0%
+Hero Medal                     0/5    0%
+High Roller Keycard            0/5    0%
+Hollow Tree Stash              0/5    0%
+Hunter's Mark                  0/5    0%
+Joe's Treasure Map             0/5    0%
+Jumper Cables                  0/5    0%
+Junkyard Crown                 0/5    0%
+Key to the City                0/5    0%
+Kraken Pearl                   0/5    0%
+Leather Gloves                 0/5    0%
+Lettuce                        0/5    0%
+LifeAlert                      0/5    0%
+Lighter                        0/5    0%
+Live Fish                      0/5    0%
+Lock De-Icer                   0/5    0%
+Lockbox                        0/5    0%
+Love Potion                    0/5    0%
+Lucky Coin                     0/5    0%
+Lucky Lure                     0/5    0%
+Lucky Penny                    0/5    0%
+Lucky Rabbit Foot              0/5    0%
+Magic Acorn                    0/5    0%
+Map                            0/5    0%
+Martinez's Card                0/5    0%
+Matched Pearls                 0/5    0%
+Maya's Pick                    0/5    0%
+Mermaid Crown                  0/5    0%
+Mermaid Pearl                  0/5    0%
+Mermaid's Pearl                0/5    0%
+Midnight Rose                  0/5    0%
+Monogrammed Lighter            0/5    0%
+Moon Shard                     0/5    0%
+Motor Oil                      0/5    0%
+Mysterious Code                0/5    0%
+Mysterious Envelope            0/5    0%
+Mysterious Key                 0/5    0%
+Mysterious Lockbox             0/5    0%
+Mystery Potion                 0/5    0%
+Necronomicon                   0/5    0%
+Night Vision Scope             0/5    0%
+OBD Scanner                    0/5    0%
+Ogre's Gemstone                0/5    0%
+Ogre's Gift                    0/5    0%
+Oil Stop Leak                  0/5    0%
+Old Photograph                 0/5    0%
+Oswald's Dice                  0/5    0%
+Padlock                        0/5    0%
+Persistent Bottle              0/5    0%
+Pest Control                   0/5    0%
+Pink Pearl                     0/5    0%
+Pirate Radio Flyer             0/5    0%
+Pirate Treasure                0/5    0%
+Plastic Poncho                 0/5    0%
+Plastic Wrap                   0/5    0%
+Pocket Knife                   0/5    0%
+Portable Battery Charger       0/5    0%
+Power Steering Fluid           0/5    0%
+Professor Bear                 0/5    0%
+Rabbit's Blessing              0/5    0%
+Radiator Stop Leak             0/5    0%
+Radio Logbook                  0/5    0%
+Radio Numbers                  0/5    0%
+Reunion Photo                  0/5    0%
+Rich Friend's Number           0/5    0%
+Ritual Token                   0/5    0%
+Road Flares                    0/5    0%
+Road Talisman                  0/5    0%
+Road Warrior Badge             0/5    0%
+Rope                           0/5    0%
+Rubber Bands                   0/5    0%
+Sailor's Lockbox               0/5    0%
+Scrap Armor                    0/5    0%
+Scrap Metal Rose               0/5    0%
+Sea Glass                      0/5    0%
+Secret Route Map               0/5    0%
+Serpentine Belt                0/5    0%
+Signal Booster                 0/5    0%
+Silk Handkerchief              0/5    0%
+Silver Flask                   0/5    0%
+Silver Horseshoe               0/5    0%
+Spare Fuses                    0/5    0%
+Spare Headlight Bulbs          0/5    0%
+Spare Spark Plugs              0/5    0%
+Spare Tire                     0/5    0%
+Spoon Satellite                0/5    0%
+Stack of Flyers                0/5    0%
+Static Recorder                0/5    0%
+Stolen Marlin                  0/5    0%
+Stolen Memory                  0/5    0%
+Stolen Watch                   0/5    0%
+Strange Frequency Dial         0/5    0%
+Stuart's Number                0/5    0%
+Sunglasses                     0/5    0%
+Super Glue                     0/5    0%
+Suspicious Package             0/5    0%
+Suzy's Gift                    0/5    0%
+Swamp Gold                     0/5    0%
+Swamp Rune                     0/5    0%
+Tanya's Number                 0/5    0%
+Thermostat                     0/5    0%
+Tinfoil Hat                    0/5    0%
+Tire Patch Kit                 0/5    0%
+Tom's Wrench                   0/5    0%
+Tony's Gun                     0/5    0%
+Tool Kit                       0/5    0%
+Torn Collar                    0/5    0%
+Tortoise Trophy                0/5    0%
+Transmission Fluid             0/5    0%
+Treasure Chest                 0/5    0%
+Treasure Coordinates           0/5    0%
+Treasure Map                   0/5    0%
+Umbrella                       0/5    0%
+Underground Pass               0/5    0%
+Underwater Camera              0/5    0%
+Veteran's Lucky Chip           0/5    0%
+Vintage Wine                   0/5    0%
+VIP Invitation                 0/5    0%
+Vision Map                     0/5    0%
+Voodoo Doll                    0/5    0%
+Water Bottles                  0/5    0%
+WD-40                          0/5    0%
+Welding Goggles                0/5    0%
+Witch's Riddle                 0/5    0%
+Witch's Ward                   0/5    0%
+Worn Map                       0/5    0%
+Worry Stone                    0/5    0%
 
-Death Rank Audit
-end-rank deaths avg-day avg-peak$ top-tags                                                               top-causes                                                                                                         
--------- ------ ------- --------- ---------------------------------------------------------------------- -------------------------------------------------------------------------------------------------------------------
-       0     28      13       121 early-untreated-wounds=6 | infection-pressure=5 | nightmare-drowning=4 You have succumbed to your wounds=13 | Unknown=7                                                                   
-       1      3      43     3,648 car-mechanical-fatality=1 | nightmare-drowning=1 | Unknown=1           Electrocution. A faulty wire and a puddle. That's all it took.=1 | Drowned in your car. Some nightmares are real.=1
-
-Fatal Pressure
-recent-damage-events night:drowning_dream=11 | met:Drowning Dream=11 | storyline:gas_station_hero:stage0=8 | night:dream_of_winning=7 | night:midnight_walk=7 | storyline:sleep_paralysis:stage0=6
-health-damage-events night:drowning_dream=155.2 | met:Drowning Dream=155.2 | night:dream_of_winning=94.7 | storyline:gas_station_hero:stage0=90.2 | night:nice_dream=72.2 | day:food_truck_nightmare=69.9
-sanity-damage-events storyline:gas_station_hero:stage0=169.4 | night:nightmare=115.2 | night:drowning_dream=110.6 | met:Drowning Dream=110.6 | night:stray_cat_dies=68.6 | night:nightmare_of_losing=60.2
-injuries Deep Laceration=12 | Scraped Knee=11 | Concussion=9 | Broken Nose=5 | Broken Ribs=4 | Broken Hand=3
-statuses Hepatitis=5 | Severe Dehydration=3 | Stomach Flu=3 | Strep Throat=3 | Lead Poisoning=2 | Pneumonia=2
-
-Fatal Context Samples
-seed=589410621 day=37 rank=1 peak=5,114 tag=car-mechanical-fatality cause=Electrocution. A faulty wire and a puddle. That's all it took.
-  recent=d33 hp+13 san-2 ev=day:estranged_dog/night:ditched_wallet || d31 hp-13 san-2 ev=day:homeless_shelter_outbreak/location:shop:pawn_shop || d30 hp-5 san-5 ev=storyline:sleep_paralysis:stage0/met:Sleep Paralysis
-  top-hp=day:public_pool_infection=-8.5 | night:nightmare=-8.5 | met:Tom=-6.7
-  top-san=night:insomnia_night=-9.0 | storyline:gas_station_hero:stage0=-9.0 | day:public_pool_infection=-4.0
-  injuries=none | statuses=none
-seed=1153527485 day=37 rank=1 peak=3,321 tag=nightmare-drowning cause=Drowned in your car. Some nightmares are real.
-  recent=d35 hp+0 san+3 ev=day:painkiller_overdose/day:unpaid_tickets_boot +status=UTI || d34 hp+0 san-1 ev=storyline:mechanic_dreams:stage0/location:shop:convenience_store || d33 hp+0 san-25 ev=day:drug_dealer_encounter/night:police_checkpoint
-  top-hp=day:deck_of_cards_street_game=-3.3 | day:freezing_night=-3.3 | day:heart_condition_flare=-3.3
-  top-san=day:drug_dealer_encounter=-12.5 | night:police_checkpoint=-12.5 | day:roadside_breakdown=-12.0
-  injuries=none | statuses=none
-seed=191219781 day=54 rank=1 peak=2,510 tag=Unknown cause=Unknown
-  recent=d54 hp+0 san+0 ev=day:camping_tick_bite +status=Lyme Disease || d40 hp+0 san+0 ev=day:roadside_bone_chimes/day:squirrelly_stash +status=Bronchitis || d38 hp+0 san+0 ev=day:midnight_radio_signal/day:migraine_severe +status=Severe Migraine
-  top-hp=day:dog_attack_severe=-14.0 | night:dream_of_winning=-14.0 | day:unclean_water=-12.0
-  top-san=met:Drowning Dream=-10.0 | night:drowning_dream=-10.0 | storyline:gas_station_hero:stage0=-10.0
-  injuries=Deep Laceration | statuses=Lyme Disease
-seed=2024218430 day=10 rank=0 peak=238 tag=nightmare-drowning cause=Drowned in your car. Some nightmares are real.
-  recent=d10 hp+0 san-26 ev=day:slingshot_bird_hunt/night:drowning_dream || d9 hp+0 san-15 ev=storyline:gas_station_hero:stage0/night:ditched_wallet || d4 hp-5 san-21 ev=day:someone_stole_your_stuff/night:nightmare
-  top-hp=day:someone_stole_your_stuff=-2.5 | night:nightmare=-2.5
-  top-san=day:someone_stole_your_stuff=-10.5 | night:nightmare=-10.5 | day:slingshot_bird_hunt=-8.7
-  injuries=none | statuses=none
-seed=1924581542 day=28 rank=0 peak=224 tag=compound-trauma-collapse cause=You have succumbed to your wounds
-  recent=d28 hp-6 san+0 ev=day:deep_laceration +inj=Deep Laceration || d25 hp-47 san-9 ev=day:hopper_lucky_day/day:day_palindrome +inj=Broken Ribs,Concussion || d24 hp+0 san-9 ev=storyline:lockbox:stage0/met:Lockbox
-  top-hp=met:Woodlands Path Event=-9.8 | night:woodlands_path=-9.8 | day:assault_aftermath=-9.4
-  top-san=day:contract_strep_throat=-8.7 | met:Cat Died=-8.7 | night:stray_cat_dies=-7.5
-  injuries=Broken Ribs, Concussion, Deep Laceration, Scraped Knee | statuses=none
-seed=1193741182 day=17 rank=0 peak=224 tag=untreated-wounds cause=You have succumbed to your wounds
-  recent=d17 hp-7 san-2 ev=day:slip_in_shower +inj=Concussion,Deep Laceration || d16 hp-7 san+3 ev=storyline:sleep_paralysis:stage0/met:Sleep Paralysis || d15 hp-10 san+0 ev=day:hollow_tree_stash_find/day:headlights_burned_out
-  top-hp=day:lead_poisoning=-13.5 | night:nice_dream=-13.5 | met:Drowning Dream=-13.3
-  top-san=met:Drowning Dream=-8.0 | night:drowning_dream=-8.0 | storyline:phil:stage1=-8.0
-  injuries=Broken Nose, Concussion, Deep Laceration | statuses=Lead Poisoning
-seed=852302589 day=27 rank=0 peak=187 tag=untreated-wounds cause=You have succumbed to your wounds
-  recent=d27 hp-35 san+1 ev=day:mystery_car_problem_worsens/day:deep_laceration +inj=Deep Laceration || d26 hp+4 san-2 ev=storyline:jameson:stage1/night:woodlands_path +status=Hepatitis || d25 hp-15 san+8 ev=day:sunburn/night:stray_cat_returns
-  top-hp=day:deep_laceration=-17.5 | day:mystery_car_problem_worsens=-17.5 | met:Drowning Dream=-12.7
-  top-san=night:stray_cat_dies=-9.5 | met:Drowning Dream=-8.7 | night:drowning_dream=-8.7
-  injuries=Deep Laceration, Scraped Knee | statuses=Hepatitis
-seed=208764828 day=17 rank=0 peak=160 tag=animal-attack cause=Mauled to death by a stray dog. Not every monster is human.
-  recent=d17 hp+5 san-1 ev=day:attacked_by_dog || d15 hp-32 san-18 ev=day:completely_broke_wisdom/day:slip_in_shower +inj=Concussion,Deep Laceration || d13 hp+0 san-5 ev=day:slick_escape_route/day:treasure_map_follow
-  top-hp=day:completely_broke_wisdom=-8.0 | day:slip_in_shower=-8.0 | met:Drowning Dream=-8.0
-  top-san=night:ditched_wallet=-7.5 | storyline:gas_station_hero:stage0=-7.5 | day:completely_broke_wisdom=-4.5
-  injuries=Concussion, Deep Laceration | statuses=none
-seed=1803850687 day=21 rank=0 peak=157 tag=Unknown cause=Unknown
-  recent=d20 hp-5 san+0 ev=storyline:lockbox:stage1/night:dream_of_winning || d19 hp-1 san-10 ev=day:same_as_health/day:windshield_cracked || d18 hp-3 san+0 ev=storyline:mime:stage1/night:ditched_wallet
-  top-hp=met:Asked About Photo=-8.2 | met:Dealer Photo=-8.2 | met:Drowning Dream=-8.2
-  top-san=night:nightmare_of_losing=-6.5 | met:Woodlands Path Event=-5.7 | night:woodlands_path=-5.7
-  injuries=none | statuses=Mold Toxicity
-seed=1758294399 day=12 rank=0 peak=156 tag=early-untreated-wounds cause=You have succumbed to your wounds
-  recent=d12 hp-3 san+1 ev=day:companion_nightmare/day:damaged_exhaust_again || d11 hp-52 san-2 ev=day:ant_bite/day:witch_ward_dark_protection +inj=Broken Ribs,Concussion || d10 hp-3 san+2 ev=day:contract_pink_eye/night:nice_dream +status=Pink Eye
-  top-hp=day:ant_bite=-13.0 | day:assault_aftermath=-13.0 | day:witch_ward_dark_protection=-13.0
-  top-san=met:Woodlands Path Event=-5.0 | night:woodlands_path=-5.0 | storyline:gas_station_hero:stage0=-5.0
-  injuries=Broken Ribs, Concussion, Ruptured Spleen | statuses=Pink Eye
-
-Doctor Review
-seed cause-group        hp san statuses injuries cause
----- ------------------ -- --- -------- -------- ------------------------------------------
-852302589 illness injury      0  50        1        2 You have succumbed to your wounds
-1555435534 illness injury      0  50        2        2 You have succumbed to your wounds
-1758294399 illness injury      0  90        1        3 You have succumbed to your wounds
-1460128875 poisoning overdose 13  54        3        1 Severe food poisoning. E. coli or Salmo...
-1473460764 illness injury      0  90        2        1 You have succumbed to your wounds
-1434297179 Unknown            17  97        1        3 Unknown
-774421304 illness injury      0  55        2        1 You have succumbed to your wounds
-1193741182 illness injury      0  38        1        3 You have succumbed to your wounds
-8534798 illness injury      0  35        0        4 You have succumbed to your wounds
-357756656 illness injury      0  90        0        2 You have succumbed to your wounds
-1594371695 illness injury      0  20        1        1 You have succumbed to your wounds
-1110193468 illness injury      0  76        3        2 You have succumbed to your wounds
-
-Pawn Shop / Gus Progress runs-with-sales=0/100 unique-sold=0/62 avg-unique-sold=0.0/62 best-seed=-
-progress gates 1+=0/100 5+=0/100 10+=0/100 25+=0/100 full=0/100
-item                  sold-runs sold%
---------------------- --------- -----
-Ace of Spades             0/100    0%
-Ancient Sea Map           0/100    0%
-Antique Ring              0/100    0%
-Bear King's Respect       0/100    0%
-Bear's Gold Coin          0/100    0%
-Cannon Gem                0/100    0%
-Captain's Compass         0/100    0%
-Captured Fairy            0/100    0%
-Carrot                    0/100    0%
-Championship Medal        0/100    0%
-Crab Racing Trophy        0/100    0%
-Dealer's Joker            0/100    0%
-Deep Stone                0/100    0%
-Earl's Lucky Lure         0/100    0%
-Fairy's Secret Map        0/100    0%
-Fight Champion Belt       0/100    0%
-Filled Locket             0/100    0%
-Fountain Water            0/100    0%
-Gator Tooth Necklace      0/100    0%
-Giant Bear Tooth          0/100    0%
-Giant Oyster              0/100    0%
-Golden Shovel             0/100    0%
-Golden Trident            0/100    0%
-Granny's Swamp Nectar     0/100    0%
-Hero Medal                0/100    0%
-Hunter's Mark             0/100    0%
-Joe's Treasure Map        0/100    0%
-Key to the City           0/100    0%
-Kraken Pearl              0/100    0%
-Kraken's Memory           0/100    0%
-Live Fish                 0/100    0%
-Lucky Lure                0/100    0%
-Lucky Penny               0/100    0%
-Lucky Rabbit Foot         0/100    0%
-Magic Acorn               0/100    0%
-Matched Pearls            0/100    0%
-Mermaid Crown             0/100    0%
-Mermaid Pearl             0/100    0%
-Mermaid's Pearl           0/100    0%
-Midnight Rose             0/100    0%
-Moon Shard                0/100    0%
-Mysterious Code           0/100    0%
-Mysterious Key            0/100    0%
-Mysterious Lockbox        0/100    0%
-Ogre's Gemstone           0/100    0%
-Ogre's Gift               0/100    0%
-Pink Pearl                0/100    0%
-Pirate Treasure           0/100    0%
-Rabbit's Blessing         0/100    0%
-Sailor's Lockbox          0/100    0%
-Stolen Watch              0/100    0%
-Suspicious Package        0/100    0%
-Swamp Gold                0/100    0%
-Tortoise Trophy           0/100    0%
-Treasure Chest            0/100    0%
-Treasure Coordinates      0/100    0%
-Treasure Map              0/100    0%
-Underwater Camera         0/100    0%
-Voodoo Doll               0/100    0%
-Witch's Favor             0/100    0%
-Witch's Riddle            0/100    0%
-Witch's Ward              0/100    0%
-
-Fallback Review runs=0/100
+Fallback Review runs=0/5
 none
 
-Event Polarity total=5594
-positive=2042 (36.5%)
-negative=3058 (54.7%)
-neutral=494 (8.8%)
+Event Polarity total=146
+positive=33 (22.6%)
+negative=92 (63.0%)
+neutral=21 (14.4%)
 
 Item Acquisition & Impact
-item                     got   runs used brk fix hits pos neg neu   cash  hp  san
------------------------- --- ------ ---- --- --- ---- --- --- --- ------ --- ----
-Carrot                    56 56/100    0   0   0   56  19  27  10    451 -93 -112
-Car                       41 41/100    0   0   0    0   0   0   0      0   0    0
-Worn Map                  36 36/100    0   0   0   36  13  11  12 -5,123 272  -34
-Lockbox                   18 18/100    2   0   0   23  12  10   1  9,010  41   56
-Granny's Swamp Nectar     13 13/100    0   0   0   13   4   2   7   -265  10  -18
-Tool Kit                  12 12/100    0   0   0   12   3   6   3 -1,068   4   -4
-Angel's Number            10 10/100    0   0   0   10  10   0   0     73  15  149
-Stack of Flyers            8  8/100    1   0   0    9   4   3   2    297   1   -8
-Fix-a-Flat                 7  7/100    0   0   0    7   1   3   3   -215  -6    2
-First Aid Kit              7  7/100    5   0   0   12   1   9   2 -1,830 -49  -39
-Carnival Token             6  6/100    3   0   0    9   6   2   1  3,551  16   19
-Flashlight                 6  6/100    1   0   0    7   2   4   1   -292  -1   -5
-Dimensional Coin           5  5/100    0   0   0    5   1   4   0   -807  24  -69
-Apartment Key              3  3/100    0   0   0    3   3   0   0  6,150  16   68
-Duct Tape                  3  3/100    0   0   0    3   2   1   0      3   0    5
-Alien Crystal              3  3/100    0   0   0    3   2   1   0   -150  80    1
-Radio Numbers              2  2/100    0   0   0    2   1   1   0    629   0   -4
-Spare Tire                 2  2/100    0   0   0    2   1   1   0   -375   1    0
-Fake Flower                1  1/100    0   0   0    1   1   0   0    290   5    0
-Portable Battery Charger   1  1/100    0   0   0    1   1   0   0     41   0    5
-Hermit's Journal           1  1/100    0   0   0    1   1   0   0     -1   0    5
-Energy Drink               1  1/100    0   0   0    1   1   0   0    -10   5    2
-Turkey Sandwich            1  1/100    0   0   0    1   1   0   0    -14   2    1
-Cup Noodles                1  1/100    0   0   0    1   1   0   0    -23   4   -3
-Map                        1  1/100    0   0   0    0   0   0   0      0   0    0
-Martinez's Card            1  1/100    0   0   0    1   0   1   0     33  -3   -2
-Professor Bear             1  1/100    0   0   0    1   0   1   0     -5  -3   -7
-Bug Spray                  1  1/100    0   0   0    1   0   1   0    -19 -12    0
-Beef Jerky                 1  1/100    0   0   0    1   0   1   0    -30  -3    0
-Candy Bar                  1  1/100    0   0   0    1   0   1   0    -58  -2   -1
-Gas Can                    1  1/100    0   0   0    1   0   1   0   -185   0    0
-Jumper Cables              1  1/100    0   0   0    1   0   1   0   -540   0   -1
-Gambler's Grimoire         1  1/100    0   0   0    1   0   1   0 -4,560   0    0
-Worn Gloves                0  0/100    0   0   0    0   0   0   0      0   0    0
-Witch's Ward               0  0/100    0   0   0    0   0   0   0      0   0    0
-Witch's Riddle             0  0/100    0   0   0    0   0   0   0      0   0    0
-Witch's Favor              0  0/100    0   0   0    0   0   0   0      0   0    0
-White Feather              0  0/100    0   0   0    0   0   0   0      0   0    0
-Welding Goggles            0  0/100    0   0   0    0   0   0   0      0   0    0
-Water Bottles              0  0/100    0   0   0    0   0   0   0      0   0    0
-WD-40                      0  0/100    0   0   0    0   0   0   0      0   0    0
-Voodoo Doll                0  0/100    0   0   0    0   0   0   0      0   0    0
-Vision Map                 0  0/100    0   0   0    0   0   0   0      0   0    0
-Vintage Wine               0  0/100    0   0   0    0   0   0   0      0   0    0
-Veteran's Lucky Chip       0  0/100    0   0   0    0   0   0   0      0   0    0
-Velvet Gloves              0  0/100    0   0   0    0   0   0   0      0   0    0
-VIP Invitation             0  0/100    0   0   0    0   0   0   0      0   0    0
-Unwashed Hair              0  0/100    0   0   0    0   0   0   0      0   0    0
-Underwater Camera          0  0/100    0   0   0    0   0   0   0      0   0    0
-Umbrella                   0  0/100    0   0   0    0   0   0   0      0   0    0
-Twin's Locket              0  0/100    0   0   0    0   0   0   0      0   0    0
-Treasure Map               0  0/100    0   0   0    0   0   0   0      0   0    0
-Treasure Coordinates       0  0/100    0   0   0    0   0   0   0      0   0    0
-Treasure Chest             0  0/100    0   0   0    0   0   0   0      0   0    0
-Transmission Fluid         0  0/100    0   0   0    0   0   0   0      0   0    0
-Tortoise Trophy            0  0/100    0   0   0    0   0   0   0      0   0    0
-Torn Collar                0  0/100    0   0   0    0   0   0   0      0   0    0
-Tony's Gun                 0  0/100    0   0   0    0   0   0   0      0   0    0
-Tire Patch Kit             0  0/100    0   0   0    0   0   0   0      0   0    0
-Tinfoil Hat                0  0/100    0   0   0    0   0   0   0      0   0    0
-Thermostat                 0  0/100    0   0   0    0   0   0   0      0   0    0
-Tattered Cloak             0  0/100    0   0   0    0   0   0   0      0   0    0
-Tanya's Number             0  0/100    0   0   0    0   0   0   0      0   0    0
-Swamp Gold                 0  0/100    0   0   0    0   0   0   0      0   0    0
-Suzy's Gift                0  0/100    0   0   0    0   0   0   0      0   0    0
-Suspicious Package         0  0/100    0   0   0    0   0   0   0      0   0    0
-Super Glue                 0  0/100    0   0   0    0   0   0   0      0   0    0
-Sunglasses                 0  0/100    0   0   0    0   0   0   0      0   0    0
-Stuart's Number            0  0/100    0   0   0    0   0   0   0      0   0    0
-Street Cat Ally            0  0/100    0   0   0    0   0   0   0      0   0    0
-Strange Frequency Dial     0  0/100    0   0   0    0   0   0   0      0   0    0
-Stolen Watch               0  0/100    0   0   0    0   0   0   0      0   0    0
-Stolen Marlin              0  0/100    0   0   0    0   0   0   0      0   0    0
-Static Recorder            0  0/100    0   0   0    0   0   0   0      0   0    0
-Squirrely                  0  0/100    0   0   0    0   0   0   0      0   0    0
-Spare Spark Plugs          0  0/100    0   0   0    0   0   0   0      0   0    0
-Spare Headlight Bulbs      0  0/100    0   0   0    0   0   0   0      0   0    0
-Spare Fuses                0  0/100    0   0   0    0   0   0   0      0   0    0
-Sneaky Peeky Shades        0  0/100    0   0   0    0   0   0   0      0   0    0
-Sneaky Peeky Goggles       0  0/100    0   0   0    0   0   0   0      0   0    0
-Silver Horseshoe           0  0/100    0   0   0    0   0   0   0      0   0    0
-Silver Flask               0  0/100    0   0   0    0   0   0   0      0   0    0
-Silk Handkerchief          0  0/100    0   0   0    0   0   0   0      0   0    0
-Signal Booster             0  0/100    0   0   0    0   0   0   0      0   0    0
-Serpentine Belt            0  0/100    0   0   0    0   0   0   0      0   0    0
-Secret Route Map           0  0/100    0   0   0    0   0   0   0      0   0    0
-Scrap Metal Rose           0  0/100    0   0   0    0   0   0   0      0   0    0
-Scrap Armor                0  0/100    0   0   0    0   0   0   0      0   0    0
-Sapphire Watch             0  0/100    0   0   0    0   0   0   0      0   0    0
-Sailor's Lockbox           0  0/100    0   0   0    0   0   0   0      0   0    0
-Rusty Compass              0  0/100    0   0   0    0   0   0   0      0   0    0
-Rubber Bands               0  0/100    0   0   0    0   0   0   0      0   0    0
-Rope                       0  0/100    0   0   0    0   0   0   0      0   0    0
-Road Talisman              0  0/100    0   0   0    0   0   0   0      0   0    0
-Road Flares                0  0/100    0   0   0    0   0   0   0      0   0    0
-Ritual Token               0  0/100    0   0   0    0   0   0   0      0   0    0
-Rich Friend's Number       0  0/100    0   0   0    0   0   0   0      0   0    0
-Reunion Photo              0  0/100    0   0   0    0   0   0   0      0   0    0
-Real Insurance             0  0/100    0   0   0    0   0   0   0      0   0    0
-Radio Logbook              0  0/100    0   0   0    0   0   0   0      0   0    0
-Radiator Stop Leak         0  0/100    0   0   0    0   0   0   0      0   0    0
-Rabbit's Blessing          0  0/100    0   0   0    0   0   0   0      0   0    0
-Quiet Sneakers             0  0/100    0   0   0    0   0   0   0      0   0    0
-Quiet Bunny Slippers       0  0/100    0   0   0    0   0   0   0      0   0    0
-Power Steering Fluid       0  0/100    0   0   0    0   0   0   0      0   0    0
-Pocket Watch               0  0/100    0   0   0    0   0   0   0      0   0    0
-Pocket Knife               0  0/100    0   0   0    0   0   0   0      0   0    0
-Plastic Wrap               0  0/100    0   0   0    0   0   0   0      0   0    0
-Plastic Poncho             0  0/100    0   0   0    0   0   0   0      0   0    0
-Pirate Treasure            0  0/100    0   0   0    0   0   0   0      0   0    0
-Pirate Radio Flyer         0  0/100    0   0   0    0   0   0   0      0   0    0
-Pink Pearl                 0  0/100    0   0   0    0   0   0   0      0   0    0
-Phoenix Feather            0  0/100    0   0   0    0   0   0   0      0   0    0
-Pest Control               0  0/100    0   0   0    0   0   0   0      0   0    0
-Persistent Bottle          0  0/100    0   0   0    0   0   0   0      0   0    0
-Padlock                    0  0/100    0   0   0    0   0   0   0      0   0    0
-Overflowing Goblet         0  0/100    0   0   0    0   0   0   0      0   0    0
-Oracle's Tome              0  0/100    0   0   0    0   0   0   0      0   0    0
-Old Photograph             0  0/100    0   0   0    0   0   0   0      0   0    0
-Oil Stop Leak              0  0/100    0   0   0    0   0   0   0      0   0    0
-Ogre's Gift                0  0/100    0   0   0    0   0   0   0      0   0    0
-Ogre's Gemstone            0  0/100    0   0   0    0   0   0   0      0   0    0
-OBD Scanner                0  0/100    0   0   0    0   0   0   0      0   0    0
-Night Vision Scope         0  0/100    0   0   0    0   0   0   0      0   0    0
-Necronomicon               0  0/100    0   0   0    0   0   0   0      0   0    0
-Mystery Potion             0  0/100    0   0   0    0   0   0   0      0   0    0
-Mysterious Lockbox         0  0/100    0   0   0    0   0   0   0      0   0    0
-Mysterious Key             0  0/100    0   0   0    0   0   0   0      0   0    0
-Mysterious Envelope        0  0/100    0   0   0    0   0   0   0      0   0    0
-Mysterious Code            0  0/100    0   0   0    0   0   0   0      0   0    0
-Motor Oil                  0  0/100    0   0   0    0   0   0   0      0   0    0
-Moon Shard                 0  0/100    0   0   0    0   0   0   0      0   0    0
-Monogrammed Lighter        0  0/100    0   0   0    0   0   0   0      0   0    0
-Mirror of Duality          0  0/100    0   0   0    0   0   0   0      0   0    0
-Midnight Rose              0  0/100    0   0   0    0   0   0   0      0   0    0
-Mermaid's Pearl            0  0/100    0   0   0    0   0   0   0      0   0    0
-Mermaid Pearl              0  0/100    0   0   0    0   0   0   0      0   0    0
-Mermaid Crown              0  0/100    0   0   0    0   0   0   0      0   0    0
-Maya's Pick                0  0/100    0   0   0    0   0   0   0      0   0    0
-Matched Pearls             0  0/100    0   0   0    0   0   0   0      0   0    0
-Magic Acorn                0  0/100    0   0   0    0   0   0   0      0   0    0
-Lucky Rabbit Foot          0  0/100    0   0   0    0   0   0   0      0   0    0
-Lucky Penny                0  0/100    0   0   0    0   0   0   0      0   0    0
-Lucky Medallion            0  0/100    0   0   0    0   0   0   0      0   0    0
-Lucky Lure                 0  0/100    0   0   0    0   0   0   0      0   0    0
-Lucky Coin                 0  0/100    0   0   0    0   0   0   0      0   0    0
-Love Potion                0  0/100    0   0   0    0   0   0   0      0   0    0
-Lock De-Icer               0  0/100    0   0   0    0   0   0   0      0   0    0
-Live Fish                  0  0/100    0   0   0    0   0   0   0      0   0    0
-Lighter                    0  0/100    0   0   0    0   0   0   0      0   0    0
-LifeAlert                  0  0/100    0   0   0    0   0   0   0      0   0    0
-Lettuce                    0  0/100    0   0   0    0   0   0   0      0   0    0
-Leather Gloves             0  0/100    0   0   0    0   0   0   0      0   0    0
-Kraken's Memory            0  0/100    0   0   0    0   0   0   0      0   0    0
-Kraken Pearl               0  0/100    0   0   0    0   0   0   0      0   0    0
-Key to the City            0  0/100    0   0   0    0   0   0   0      0   0    0
-Junkyard Crown             0  0/100    0   0   0    0   0   0   0      0   0    0
-Joe's Treasure Map         0  0/100    0   0   0    0   0   0   0      0   0    0
-Invisible Cloak            0  0/100    0   0   0    0   0   0   0      0   0    0
-Hunter's Mark              0  0/100    0   0   0    0   0   0   0      0   0    0
-Hollow Tree Stash          0  0/100    0   0   0    0   0   0   0      0   0    0
-High Roller Keycard        0  0/100    0   0   0    0   0   0   0      0   0    0
-Hero Medal                 0  0/100    0   0   0    0   0   0   0      0   0    0
-Herbal Pouch               0  0/100    0   0   0    0   0   0   0      0   0    0
-Health Manipulator         0  0/100    0   0   0    0   0   0   0      0   0    0
-Health Indicator           0  0/100    0   0   0    0   0   0   0      0   0    0
-Hand Warmers               0  0/100    0   0   0    0   0   0   0      0   0    0
-Gus's Precious Grime       0  0/100    0   0   0    0   0   0   0      0   0    0
-Grandpa's Chili Recipe     0  0/100    0   0   0    0   0   0   0      0   0    0
-Grandma's Scarf            0  0/100    0   0   0    0   0   0   0      0   0    0
-Grandma's Number           0  0/100    0   0   0    0   0   0   0      0   0    0
-Grandfather Clock          0  0/100    0   0   0    0   0   0   0      0   0    0
-Golden Watch               0  0/100    0   0   0    0   0   0   0      0   0    0
-Golden Trident             0  0/100    0   0   0    0   0   0   0      0   0    0
-Golden Shovel              0  0/100    0   0   0    0   0   0   0      0   0    0
-Golden Ring                0  0/100    0   0   0    0   0   0   0      0   0    0
-Golden Compass             0  0/100    0   0   0    0   0   0   0      0   0    0
-Gold Chain                 0  0/100    0   0   0    0   0   0   0      0   0    0
-Giant Oyster               0  0/100    0   0   0    0   0   0   0      0   0    0
-Giant Bear Tooth           0  0/100    0   0   0    0   0   0   0      0   0    0
-Gator Tooth Necklace       0  0/100    0   0   0    0   0   0   0      0   0    0
-Garbage Bag                0  0/100    0   0   0    0   0   0   0      0   0    0
-Gambler's Chalice          0  0/100    0   0   0    0   0   0   0      0   0    0
-Fuel Line Antifreeze       0  0/100    0   0   0    0   0   0   0      0   0    0
-Fuel Filter                0  0/100    0   0   0    0   0   0   0      0   0    0
-Fountain Water             0  0/100    0   0   0    0   0   0   0      0   0    0
-Found Phone                0  0/100    0   0   0    0   0   0   0      0   0    0
-Fishing Line               0  0/100    0   0   0    0   0   0   0      0   0    0
-Fish                       0  0/100    0   0   0    0   0   0   0      0   0    0
-Filled Locket              0  0/100    0   0   0    0   0   0   0      0   0    0
-Fight Champion Belt        0  0/100    0   0   0    0   0   0   0      0   0    0
-Feelgood Pill              0  0/100    0   0   0    0   0   0   0      0   0    0
-Feelgood Bottle            0  0/100    0   0   0    0   0   0   0      0   0    0
-Faulty Insurance           0  0/100    0   0   0    0   0   0   0      0   0    0
-Fancy Pen                  0  0/100    0   0   0    0   0   0   0      0   0    0
-Fancy Cigars               0  0/100    0   0   0    0   0   0   0      0   0    0
-Fairy's Secret Map         0  0/100    0   0   0    0   0   0   0      0   0    0
-Expensive Cologne          0  0/100    0   0   0    0   0   0   0      0   0    0
-Exhaust Tape               0  0/100    0   0   0    0   0   0   0      0   0    0
-Empty Locket               0  0/100    0   0   0    0   0   0   0      0   0    0
-Edgar's List               0  0/100    0   0   0    0   0   0   0      0   0    0
-Edgar's Letter             0  0/100    0   0   0    0   0   0   0      0   0    0
-Earl's Lucky Lure          0  0/100    0   0   0    0   0   0   0      0   0    0
-Dog Whistle                0  0/100    0   0   0    0   0   0   0      0   0    0
-Dog Treat                  0  0/100    0   0   0    0   0   0   0      0   0    0
-Disposable Camera          0  0/100    0   0   0    0   0   0   0      0   0    0
-Dirty Old Hat              0  0/100    0   0   0    0   0   0   0      0   0    0
-Delight Manipulator        0  0/100    0   0   0    0   0   0   0      0   0    0
-Delight Indicator          0  0/100    0   0   0    0   0   0   0      0   0    0
-Deep Stone                 0  0/100    0   0   0    0   0   0   0      0   0    0
-Deck of Cards              0  0/100    0   0   0    0   0   0   0      0   0    0
-Dealer's Mercy             0  0/100    0   0   0    0   0   0   0      0   0    0
-Dealer's Lucky Chips       0  0/100    0   0   0    0   0   0   0      0   0    0
-Dealer's Joker             0  0/100    0   0   0    0   0   0   0      0   0    0
-Dealer's Grudge            0  0/100    0   0   0    0   0   0   0      0   0    0
-Dealer's Coin              0  0/100    0   0   0    0   0   0   0      0   0    0
-Cursed Coin                0  0/100    0   0   0    0   0   0   0      0   0    0
-Crab Racing Trophy         0  0/100    0   0   0    0   0   0   0      0   0    0
-Cowboy Jacket              0  0/100    0   0   0    0   0   0   0      0   0    0
-Council Feather            0  0/100    0   0   0    0   0   0   0      0   0    0
-Cough Drops                0  0/100    0   0   0    0   0   0   0      0   0    0
-Coolant                    0  0/100    0   0   0    0   0   0   0      0   0    0
-Cheap Sunscreen            0  0/100    0   0   0    0   0   0   0      0   0    0
-Championship Medal         0  0/100    0   0   0    0   0   0   0      0   0    0
-Casino VIP Card            0  0/100    0   0   0    0   0   0   0      0   0    0
-Carved Walking Stick       0  0/100    0   0   0    0   0   0   0      0   0    0
-Car Jack                   0  0/100    0   0   0    0   0   0   0      0   0    0
-Captured Fairy             0  0/100    0   0   0    0   0   0   0      0   0    0
-Captain's Compass          0  0/100    0   0   0    0   0   0   0      0   0    0
-Cannon Gem                 0  0/100    0   0   0    0   0   0   0      0   0    0
-Can of Tuna                0  0/100    0   0   0    0   0   0   0      0   0    0
-Bungee Cords               0  0/100    0   0   0    0   0   0   0      0   0    0
-Broken Compass             0  0/100    0   0   0    0   0   0   0      0   0    0
-Breath Mints               0  0/100    0   0   0    0   0   0   0      0   0    0
-Brake Pads                 0  0/100    0   0   0    0   0   0   0      0   0    0
-Brake Fluid                0  0/100    0   0   0    0   0   0   0      0   0    0
-Bodyguard Bruno            0  0/100    0   0   0    0   0   0   0      0   0    0
-Blanket                    0  0/100    0   0   0    0   0   0   0      0   0    0
-Binoculars                 0  0/100    0   0   0    0   0   0   0      0   0    0
-Bear's Gold Coin           0  0/100    0   0   0    0   0   0   0      0   0    0
-Bear King's Respect        0  0/100    0   0   0    0   0   0   0      0   0    0
-Beach Romance Number       0  0/100    0   0   0    0   0   0   0      0   0    0
-Bag of Cocaine             0  0/100    0   0   0    0   0   0   0      0   0    0
-Bag of Acorns              0  0/100    0   0   0    0   0   0   0      0   0    0
-Artisan's Toolkit          0  0/100    0   0   0    0   0   0   0      0   0    0
-Antique Ring               0  0/100    0   0   0    0   0   0   0      0   0    0
-Antique Pocket Watch       0  0/100    0   0   0    0   0   0   0      0   0    0
-Antifreeze                 0  0/100    0   0   0    0   0   0   0      0   0    0
-Ancient Sea Map            0  0/100    0   0   0    0   0   0   0      0   0    0
-Air Freshener              0  0/100    0   0   0    0   0   0   0      0   0    0
-Ace of Spades              0  0/100    0   0   0    0   0   0   0      0   0    0
+item                     got runs used brk fix hits pos neg neu cash hp san
+------------------------ --- ---- ---- --- --- ---- --- --- --- ---- -- ---
+Carrot                     3  3/5    0   0   0    3   1   0   2   -4  4   3
+Worn Map                   1  1/5    0   0   0    1   0   0   1   -4  0   0
+Car                        1  1/5    0   0   0    0   0   0   0    0  0   0
+Dimensional Coin           1  1/5    0   0   0    1   0   1   0  -14  3  -5
+Worry Stone                0  0/5    0   0   0    0   0   0   0    0  0   0
+Worn Gloves                0  0/5    0   0   0    0   0   0   0    0  0   0
+Witch's Ward               0  0/5    0   0   0    0   0   0   0    0  0   0
+Witch's Riddle             0  0/5    0   0   0    0   0   0   0    0  0   0
+White Feather              0  0/5    0   0   0    0   0   0   0    0  0   0
+Welding Goggles            0  0/5    0   0   0    0   0   0   0    0  0   0
+Water Bottles              0  0/5    0   0   0    0   0   0   0    0  0   0
+WD-40                      0  0/5    0   0   0    0   0   0   0    0  0   0
+Voodoo Doll                0  0/5    0   0   0    0   0   0   0    0  0   0
+Vision Map                 0  0/5    0   0   0    0   0   0   0    0  0   0
+Vintage Wine               0  0/5    0   0   0    0   0   0   0    0  0   0
+Veteran's Lucky Chip       0  0/5    0   0   0    0   0   0   0    0  0   0
+Velvet Gloves              0  0/5    0   0   0    0   0   0   0    0  0   0
+VIP Invitation             0  0/5    0   0   0    0   0   0   0    0  0   0
+Unwashed Hair              0  0/5    0   0   0    0   0   0   0    0  0   0
+Underwater Camera          0  0/5    0   0   0    0   0   0   0    0  0   0
+Underground Pass           0  0/5    0   0   0    0   0   0   0    0  0   0
+Umbrella                   0  0/5    0   0   0    0   0   0   0    0  0   0
+Twin's Locket              0  0/5    0   0   0    0   0   0   0    0  0   0
+Treasure Map               0  0/5    0   0   0    0   0   0   0    0  0   0
+Treasure Coordinates       0  0/5    0   0   0    0   0   0   0    0  0   0
+Treasure Chest             0  0/5    0   0   0    0   0   0   0    0  0   0
+Transmission Fluid         0  0/5    0   0   0    0   0   0   0    0  0   0
+Tortoise Trophy            0  0/5    0   0   0    0   0   0   0    0  0   0
+Torn Collar                0  0/5    0   0   0    0   0   0   0    0  0   0
+Tool Kit                   0  0/5    0   0   0    0   0   0   0    0  0   0
+Tony's Gun                 0  0/5    0   0   0    0   0   0   0    0  0   0
+Tom's Wrench               0  0/5    0   0   0    0   0   0   0    0  0   0
+Tire Patch Kit             0  0/5    0   0   0    0   0   0   0    0  0   0
+Tinfoil Hat                0  0/5    0   0   0    0   0   0   0    0  0   0
+Thermostat                 0  0/5    0   0   0    0   0   0   0    0  0   0
+Tattered Cloak             0  0/5    0   0   0    0   0   0   0    0  0   0
+Tanya's Number             0  0/5    0   0   0    0   0   0   0    0  0   0
+Swamp Rune                 0  0/5    0   0   0    0   0   0   0    0  0   0
+Swamp Gold                 0  0/5    0   0   0    0   0   0   0    0  0   0
+Suzy's Gift                0  0/5    0   0   0    0   0   0   0    0  0   0
+Suspicious Package         0  0/5    0   0   0    0   0   0   0    0  0   0
+Super Glue                 0  0/5    0   0   0    0   0   0   0    0  0   0
+Sunglasses                 0  0/5    0   0   0    0   0   0   0    0  0   0
+Stuart's Number            0  0/5    0   0   0    0   0   0   0    0  0   0
+Street Cat Ally            0  0/5    0   0   0    0   0   0   0    0  0   0
+Strange Frequency Dial     0  0/5    0   0   0    0   0   0   0    0  0   0
+Stolen Watch               0  0/5    0   0   0    0   0   0   0    0  0   0
+Stolen Memory              0  0/5    0   0   0    0   0   0   0    0  0   0
+Stolen Marlin              0  0/5    0   0   0    0   0   0   0    0  0   0
+Static Recorder            0  0/5    0   0   0    0   0   0   0    0  0   0
+Stack of Flyers            0  0/5    0   0   0    0   0   0   0    0  0   0
+Squirrely                  0  0/5    0   0   0    0   0   0   0    0  0   0
+Spoon Satellite            0  0/5    0   0   0    0   0   0   0    0  0   0
+Spare Tire                 0  0/5    0   0   0    0   0   0   0    0  0   0
+Spare Spark Plugs          0  0/5    0   0   0    0   0   0   0    0  0   0
+Spare Headlight Bulbs      0  0/5    0   0   0    0   0   0   0    0  0   0
+Spare Fuses                0  0/5    0   0   0    0   0   0   0    0  0   0
+Sneaky Peeky Shades        0  0/5    0   0   0    0   0   0   0    0  0   0
+Sneaky Peeky Goggles       0  0/5    0   0   0    0   0   0   0    0  0   0
+Silver Horseshoe           0  0/5    0   0   0    0   0   0   0    0  0   0
+Silver Flask               0  0/5    0   0   0    0   0   0   0    0  0   0
+Silk Handkerchief          0  0/5    0   0   0    0   0   0   0    0  0   0
+Signal Booster             0  0/5    0   0   0    0   0   0   0    0  0   0
+Serpentine Belt            0  0/5    0   0   0    0   0   0   0    0  0   0
+Secret Route Map           0  0/5    0   0   0    0   0   0   0    0  0   0
+Sea Glass                  0  0/5    0   0   0    0   0   0   0    0  0   0
+Scrap Metal Rose           0  0/5    0   0   0    0   0   0   0    0  0   0
+Scrap Armor                0  0/5    0   0   0    0   0   0   0    0  0   0
+Sapphire Watch             0  0/5    0   0   0    0   0   0   0    0  0   0
+Sailor's Lockbox           0  0/5    0   0   0    0   0   0   0    0  0   0
+Rusty Compass              0  0/5    0   0   0    0   0   0   0    0  0   0
+Rubber Bands               0  0/5    0   0   0    0   0   0   0    0  0   0
+Rope                       0  0/5    0   0   0    0   0   0   0    0  0   0
+Road Warrior Badge         0  0/5    0   0   0    0   0   0   0    0  0   0
+Road Talisman              0  0/5    0   0   0    0   0   0   0    0  0   0
+Road Flares                0  0/5    0   0   0    0   0   0   0    0  0   0
+Ritual Token               0  0/5    0   0   0    0   0   0   0    0  0   0
+Rich Friend's Number       0  0/5    0   0   0    0   0   0   0    0  0   0
+Reunion Photo              0  0/5    0   0   0    0   0   0   0    0  0   0
+Real Insurance             0  0/5    0   0   0    0   0   0   0    0  0   0
+Radio Numbers              0  0/5    0   0   0    0   0   0   0    0  0   0
+Radio Logbook              0  0/5    0   0   0    0   0   0   0    0  0   0
+Radiator Stop Leak         0  0/5    0   0   0    0   0   0   0    0  0   0
+Rabbit's Blessing          0  0/5    0   0   0    0   0   0   0    0  0   0
+Quiet Sneakers             0  0/5    0   0   0    0   0   0   0    0  0   0
+Quiet Bunny Slippers       0  0/5    0   0   0    0   0   0   0    0  0   0
+Professor Bear             0  0/5    0   0   0    0   0   0   0    0  0   0
+Power Steering Fluid       0  0/5    0   0   0    0   0   0   0    0  0   0
+Portable Battery Charger   0  0/5    0   0   0    0   0   0   0    0  0   0
+Pocket Watch               0  0/5    0   0   0    0   0   0   0    0  0   0
+Pocket Knife               0  0/5    0   0   0    0   0   0   0    0  0   0
+Plastic Wrap               0  0/5    0   0   0    0   0   0   0    0  0   0
+Plastic Poncho             0  0/5    0   0   0    0   0   0   0    0  0   0
+Pirate Treasure            0  0/5    0   0   0    0   0   0   0    0  0   0
+Pirate Radio Flyer         0  0/5    0   0   0    0   0   0   0    0  0   0
+Pink Pearl                 0  0/5    0   0   0    0   0   0   0    0  0   0
+Phoenix Feather            0  0/5    0   0   0    0   0   0   0    0  0   0
+Pest Control               0  0/5    0   0   0    0   0   0   0    0  0   0
+Persistent Bottle          0  0/5    0   0   0    0   0   0   0    0  0   0
+Padlock                    0  0/5    0   0   0    0   0   0   0    0  0   0
+Overflowing Goblet         0  0/5    0   0   0    0   0   0   0    0  0   0
+Oswald's Dice              0  0/5    0   0   0    0   0   0   0    0  0   0
+Oracle's Tome              0  0/5    0   0   0    0   0   0   0    0  0   0
+Old Photograph             0  0/5    0   0   0    0   0   0   0    0  0   0
+Oil Stop Leak              0  0/5    0   0   0    0   0   0   0    0  0   0
+Ogre's Gift                0  0/5    0   0   0    0   0   0   0    0  0   0
+Ogre's Gemstone            0  0/5    0   0   0    0   0   0   0    0  0   0
+OBD Scanner                0  0/5    0   0   0    0   0   0   0    0  0   0
+Night Vision Scope         0  0/5    0   0   0    0   0   0   0    0  0   0
+Necronomicon               0  0/5    0   0   0    0   0   0   0    0  0   0
+Mystery Potion             0  0/5    0   0   0    0   0   0   0    0  0   0
+Mysterious Lockbox         0  0/5    0   0   0    0   0   0   0    0  0   0
+Mysterious Key             0  0/5    0   0   0    0   0   0   0    0  0   0
+Mysterious Envelope        0  0/5    0   0   0    0   0   0   0    0  0   0
+Mysterious Code            0  0/5    0   0   0    0   0   0   0    0  0   0
+Motor Oil                  0  0/5    0   0   0    0   0   0   0    0  0   0
+Moon Shard                 0  0/5    0   0   0    0   0   0   0    0  0   0
+Monogrammed Lighter        0  0/5    0   0   0    0   0   0   0    0  0   0
+Mirror of Duality          0  0/5    0   0   0    0   0   0   0    0  0   0
+Midnight Rose              0  0/5    0   0   0    0   0   0   0    0  0   0
+Mermaid's Pearl            0  0/5    0   0   0    0   0   0   0    0  0   0
+Mermaid Pearl              0  0/5    0   0   0    0   0   0   0    0  0   0
+Mermaid Crown              0  0/5    0   0   0    0   0   0   0    0  0   0
+Maya's Pick                0  0/5    0   0   0    0   0   0   0    0  0   0
+Matched Pearls             0  0/5    0   0   0    0   0   0   0    0  0   0
+Martinez's Card            0  0/5    0   0   0    0   0   0   0    0  0   0
+Map                        0  0/5    0   0   0    0   0   0   0    0  0   0
+Magic Acorn                0  0/5    0   0   0    0   0   0   0    0  0   0
+Lucky Rabbit Foot          0  0/5    0   0   0    0   0   0   0    0  0   0
+Lucky Penny                0  0/5    0   0   0    0   0   0   0    0  0   0
+Lucky Medallion            0  0/5    0   0   0    0   0   0   0    0  0   0
+Lucky Lure                 0  0/5    0   0   0    0   0   0   0    0  0   0
+Lucky Coin                 0  0/5    0   0   0    0   0   0   0    0  0   0
+Love Potion                0  0/5    0   0   0    0   0   0   0    0  0   0
+Lockbox                    0  0/5    0   0   0    0   0   0   0    0  0   0
+Lock De-Icer               0  0/5    0   0   0    0   0   0   0    0  0   0
+Live Fish                  0  0/5    0   0   0    0   0   0   0    0  0   0
+Lighter                    0  0/5    0   0   0    0   0   0   0    0  0   0
+LifeAlert                  0  0/5    0   0   0    0   0   0   0    0  0   0
+Lettuce                    0  0/5    0   0   0    0   0   0   0    0  0   0
+Leather Gloves             0  0/5    0   0   0    0   0   0   0    0  0   0
+Kraken Pearl               0  0/5    0   0   0    0   0   0   0    0  0   0
+Key to the City            0  0/5    0   0   0    0   0   0   0    0  0   0
+Junkyard Crown             0  0/5    0   0   0    0   0   0   0    0  0   0
+Jumper Cables              0  0/5    0   0   0    0   0   0   0    0  0   0
+Joe's Treasure Map         0  0/5    0   0   0    0   0   0   0    0  0   0
+Invisible Cloak            0  0/5    0   0   0    0   0   0   0    0  0   0
+Hunter's Mark              0  0/5    0   0   0    0   0   0   0    0  0   0
+Hollow Tree Stash          0  0/5    0   0   0    0   0   0   0    0  0   0
+High Roller Keycard        0  0/5    0   0   0    0   0   0   0    0  0   0
+Hero Medal                 0  0/5    0   0   0    0   0   0   0    0  0   0
+Hermit's Journal           0  0/5    0   0   0    0   0   0   0    0  0   0
+Herbal Pouch               0  0/5    0   0   0    0   0   0   0    0  0   0
+Health Manipulator         0  0/5    0   0   0    0   0   0   0    0  0   0
+Health Indicator           0  0/5    0   0   0    0   0   0   0    0  0   0
+Hand Warmers               0  0/5    0   0   0    0   0   0   0    0  0   0
+Gus's Precious Grime       0  0/5    0   0   0    0   0   0   0    0  0   0
+Granola Bar                0  0/5    0   0   0    0   0   0   0    0  0   0
+Granny's Swamp Nectar      0  0/5    0   0   0    0   0   0   0    0  0   0
+Grandpa's Chili Recipe     0  0/5    0   0   0    0   0   0   0    0  0   0
+Grandma's Scarf            0  0/5    0   0   0    0   0   0   0    0  0   0
+Grandma's Number           0  0/5    0   0   0    0   0   0   0    0  0   0
+Grandfather Clock          0  0/5    0   0   0    0   0   0   0    0  0   0
+Golden Watch               0  0/5    0   0   0    0   0   0   0    0  0   0
+Golden Trident             0  0/5    0   0   0    0   0   0   0    0  0   0
+Golden Shovel              0  0/5    0   0   0    0   0   0   0    0  0   0
+Golden Ring                0  0/5    0   0   0    0   0   0   0    0  0   0
+Golden Compass             0  0/5    0   0   0    0   0   0   0    0  0   0
+Gold Chain                 0  0/5    0   0   0    0   0   0   0    0  0   0
+Giant Oyster               0  0/5    0   0   0    0   0   0   0    0  0   0
+Giant Bear Tooth           0  0/5    0   0   0    0   0   0   0    0  0   0
+Gator Tooth Necklace       0  0/5    0   0   0    0   0   0   0    0  0   0
+Gas Can                    0  0/5    0   0   0    0   0   0   0    0  0   0
+Garbage Bag                0  0/5    0   0   0    0   0   0   0    0  0   0
+Gambler's Grimoire         0  0/5    0   0   0    0   0   0   0    0  0   0
+Gambler's Chalice          0  0/5    0   0   0    0   0   0   0    0  0   0
+Fuel Line Antifreeze       0  0/5    0   0   0    0   0   0   0    0  0   0
+Fuel Filter                0  0/5    0   0   0    0   0   0   0    0  0   0
+Frank's Flask              0  0/5    0   0   0    0   0   0   0    0  0   0
+Found Phone                0  0/5    0   0   0    0   0   0   0    0  0   0
+Flashlight                 0  0/5    0   0   0    0   0   0   0    0  0   0
+Fix-a-Flat                 0  0/5    0   0   0    0   0   0   0    0  0   0
+Fishing Line               0  0/5    0   0   0    0   0   0   0    0  0   0
+Fish                       0  0/5    0   0   0    0   0   0   0    0  0   0
+First Aid Kit              0  0/5    0   0   0    0   0   0   0    0  0   0
+Filled Locket              0  0/5    0   0   0    0   0   0   0    0  0   0
+Fight Champion Belt        0  0/5    0   0   0    0   0   0   0    0  0   0
+Feelgood Pill              0  0/5    0   0   0    0   0   0   0    0  0   0
+Feelgood Bottle            0  0/5    0   0   0    0   0   0   0    0  0   0
+Faulty Insurance           0  0/5    0   0   0    0   0   0   0    0  0   0
+Fancy Pen                  0  0/5    0   0   0    0   0   0   0    0  0   0
+Fancy Cigars               0  0/5    0   0   0    0   0   0   0    0  0   0
+Fake Flower                0  0/5    0   0   0    0   0   0   0    0  0   0
+Fairy's Secret Map         0  0/5    0   0   0    0   0   0   0    0  0   0
+Expensive Cologne          0  0/5    0   0   0    0   0   0   0    0  0   0
+Exhaust Tape               0  0/5    0   0   0    0   0   0   0    0  0   0
+Energy Drink               0  0/5    0   0   0    0   0   0   0    0  0   0
+Empty Locket               0  0/5    0   0   0    0   0   0   0    0  0   0
+Edgar's List               0  0/5    0   0   0    0   0   0   0    0  0   0
+Edgar's Letter             0  0/5    0   0   0    0   0   0   0    0  0   0
+Earl's Lucky Lure          0  0/5    0   0   0    0   0   0   0    0  0   0
+Duct Tape                  0  0/5    0   0   0    0   0   0   0    0  0   0
+Druid's Staff              0  0/5    0   0   0    0   0   0   0    0  0   0
+Dog Whistle                0  0/5    0   0   0    0   0   0   0    0  0   0
+Dog Treat                  0  0/5    0   0   0    0   0   0   0    0  0   0
+Disposable Camera          0  0/5    0   0   0    0   0   0   0    0  0   0
+Dirty Old Hat              0  0/5    0   0   0    0   0   0   0    0  0   0
+Depth Charm                0  0/5    0   0   0    0   0   0   0    0  0   0
+Delight Manipulator        0  0/5    0   0   0    0   0   0   0    0  0   0
+Delight Indicator          0  0/5    0   0   0    0   0   0   0    0  0   0
+Deep Stone                 0  0/5    0   0   0    0   0   0   0    0  0   0
+Deck of Cards              0  0/5    0   0   0    0   0   0   0    0  0   0
+Dealer's Mercy             0  0/5    0   0   0    0   0   0   0    0  0   0
+Dealer's Lucky Chips       0  0/5    0   0   0    0   0   0   0    0  0   0
+Dealer's Joker             0  0/5    0   0   0    0   0   0   0    0  0   0
+Dealer's Grudge            0  0/5    0   0   0    0   0   0   0    0  0   0
+Dealer's Coin              0  0/5    0   0   0    0   0   0   0    0  0   0
+Cursed Coin                0  0/5    0   0   0    0   0   0   0    0  0   0
+Crab Racing Trophy         0  0/5    0   0   0    0   0   0   0    0  0   0
+Cowboy Jacket              0  0/5    0   0   0    0   0   0   0    0  0   0
+Council Feather            0  0/5    0   0   0    0   0   0   0    0  0   0
+Cough Drops                0  0/5    0   0   0    0   0   0   0    0  0   0
+Coolant                    0  0/5    0   0   0    0   0   0   0    0  0   0
+Cheap Sunscreen            0  0/5    0   0   0    0   0   0   0    0  0   0
+Championship Medal         0  0/5    0   0   0    0   0   0   0    0  0   0
+Casino VIP Card            0  0/5    0   0   0    0   0   0   0    0  0   0
+Casino OD Evidence         0  0/5    0   0   0    0   0   0   0    0  0   0
+Carved Walking Stick       0  0/5    0   0   0    0   0   0   0    0  0   0
+Carnival Token             0  0/5    0   0   0    0   0   0   0    0  0   0
+Car Jack                   0  0/5    0   0   0    0   0   0   0    0  0   0
+Captured Fairy             0  0/5    0   0   0    0   0   0   0    0  0   0
+Captain's Compass          0  0/5    0   0   0    0   0   0   0    0  0   0
+Cannon Gem                 0  0/5    0   0   0    0   0   0   0    0  0   0
+Can of Tuna                0  0/5    0   0   0    0   0   0   0    0  0   0
+Bungee Cords               0  0/5    0   0   0    0   0   0   0    0  0   0
+Building Manager Key       0  0/5    0   0   0    0   0   0   0    0  0   0
+Bug Spray                  0  0/5    0   0   0    0   0   0   0    0  0   0
+Broken Compass             0  0/5    0   0   0    0   0   0   0    0  0   0
+Breath Mints               0  0/5    0   0   0    0   0   0   0    0  0   0
+Brake Pads                 0  0/5    0   0   0    0   0   0   0    0  0   0
+Brake Fluid                0  0/5    0   0   0    0   0   0   0    0  0   0
+Bodyguard Bruno            0  0/5    0   0   0    0   0   0   0    0  0   0
+Blanket                    0  0/5    0   0   0    0   0   0   0    0  0   0
+Binoculars                 0  0/5    0   0   0    0   0   0   0    0  0   0
+Bear's Gold Coin           0  0/5    0   0   0    0   0   0   0    0  0   0
+Beach Romance Number       0  0/5    0   0   0    0   0   0   0    0  0   0
+Bandage                    0  0/5    0   0   0    0   0   0   0    0  0   0
+Bag of Cocaine             0  0/5    0   0   0    0   0   0   0    0  0   0
+Bag of Acorns              0  0/5    0   0   0    0   0   0   0    0  0   0
+Artisan's Toolkit          0  0/5    0   0   0    0   0   0   0    0  0   0
+Apartment Key              0  0/5    0   0   0    0   0   0   0    0  0   0
+Antique Ring               0  0/5    0   0   0    0   0   0   0    0  0   0
+Antique Pocket Watch       0  0/5    0   0   0    0   0   0   0    0  0   0
+Antifreeze                 0  0/5    0   0   0    0   0   0   0    0  0   0
+Angel's Number             0  0/5    0   0   0    0   0   0   0    0  0   0
+Ancient Sea Map            0  0/5    0   0   0    0   0   0   0    0  0   0
+Alien Crystal              0  0/5    0   0   0    0   0   0   0    0  0   0
+Air Freshener              0  0/5    0   0   0    0   0   0   0    0  0   0
+Ace of Spades              0  0/5    0   0   0    0   0   0   0    0  0   0
 

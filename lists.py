@@ -240,7 +240,6 @@ class Lists:
             "philanthropist": {"name": "Robin Hood", "description": "Give away $100,000 in total."},
             "cursed_survival": {"name": "Cursed But Alive", "description": "Survive 30 days with a cursed item."},
             "casino_legend": {"name": "Casino Legend", "description": "Visit the casino 200 times."},
-            "all_endings": {"name": "Fate Collector", "description": "Experience all game endings."},
             "speedrunner": {"name": "Speedrunner", "description": "Reach $1,000,000 in under 30 days."},
             
             # Secret/Dark Endings - The Betrayal Path
@@ -287,7 +286,6 @@ class Lists:
             "kyle_regular": {"name": "Kyle's Buddy", "description": "Purchase 10 items from the convenience store."},
             
             # Rare Events
-            "rabbit_chaser": {"name": "Down the Rabbit Hole", "description": "Complete all rabbit chase events."},
             "kraken_encounter": {"name": "Leviathan's Blessing", "description": "Befriend the Kraken."},
             "moon_touched": {"name": "Moonlit", "description": "Experience the moon rabbit event."},
             "mermaid_met": {"name": "Song of the Sea", "description": "Meet the mermaid."},
@@ -300,7 +298,6 @@ class Lists:
             "double_down_king": {"name": "Double Down King", "description": "Win 20 double downs."},
             "surrender_survivor": {"name": "Strategic Retreat", "description": "Surrender 10 hands."},
             "blackjack_natural": {"name": "Natural Talent", "description": "Get 10 natural blackjacks."},
-            "perfect_split": {"name": "Perfect Split", "description": "Get blackjack on both split hands."},
             "high_roller_bet": {"name": "High Roller", "description": "Bet $50,000 on a single hand."},
             "all_in_win": {"name": "All In", "description": "Bet your entire balance and win."},
             "comeback_king": {"name": "The Comeback", "description": "Go from under $100 to over $10,000 in one session."},
@@ -309,7 +306,7 @@ class Lists:
             "penny_pincher": {"name": "Penny Pincher", "description": "Survive 10 days with under $100."},
             "zero_balance": {"name": "Rock Bottom", "description": "Reach exactly $0."},
             "money_hoarder": {"name": "Dragon's Hoard", "description": "Hold $500,000 without spending."},
-            "big_spender": {"name": "Big Spender", "description": "Spend $100,000 at shops in total."},
+            "shop_spender": {"name": "Big Spender", "description": "Spend $100,000 at shops in total."},
             "never_shop": {"name": "Minimalist", "description": "Reach day 50 without buying anything."},
             "debt_collector": {"name": "In the Red", "description": "Owe $100,000 to the loan shark."},
             
@@ -322,21 +319,18 @@ class Lists:
             "lone_wolf": {"name": "Lone Wolf", "description": "Reach day 100 without any companions."},
             
             # Death & Failure
-            "first_death": {"name": "First Blood (Yours)", "description": "Die for the first time."},
-            "death_collector": {"name": "Death Collector", "description": "Die 10 different ways."},
             "quick_death": {"name": "Speed Run (Death%)", "description": "Die within 5 days."},
-            "serial_dier": {"name": "Glutton for Punishment", "description": "Die 50 times total."},
             "loan_shark_victim": {"name": "Sleeping with the Fishes", "description": "Be killed by the loan shark."},
             
             # Location Mastery
             "casino_rat": {"name": "Casino Rat", "description": "Visit the casino 100 times."},
-            "shop_hopper": {"name": "Window Shopping", "description": "Visit all shops in one day."},
+            "shop_hopper": {"name": "Shop Hopper", "description": "Visit all shops in one day."},
             "hermit": {"name": "Hermit", "description": "Stay at camp for 20 days straight."},
             "nomad": {"name": "Nomad", "description": "Visit 5 different locations in one day."},
             
             # Special Card Combinations
             "lucky_sevens": {"name": "Lucky Sevens", "description": "Get three 7s in one hand."},
-            "unlucky_thirteen": {"name": "Unlucky Thirteen", "description": "Bust with exactly 13."},
+            "unlucky_thirteen": {"name": "Unlucky Thirteen", "description": "Lose a hand with exactly 13."},
             "twenty_one_push": {"name": "So Close", "description": "Push with 21 five times."},
             "dealer_bust_streak": {"name": "Dealer's Nightmare", "description": "Win 10 hands in a row by dealer bust."},
             
@@ -356,7 +350,6 @@ class Lists:
             # Time-Based
             "speedrunner_rich": {"name": "Speedrunner", "description": "Reach $100,000 before day 30."},
             "marathon_man": {"name": "Marathon Man", "description": "Survive 200 days."},
-            "centurion": {"name": "Centurion", "description": "Play 100 sessions."},
             "time_loop": {"name": "Déjà Vu", "description": "Experience the same event 3 days in a row."},
             
             # Secret/Meta
@@ -364,7 +357,6 @@ class Lists:
             "completionist": {"name": "Completionist", "description": "Unlock 90% of all achievements."},
             "achievement_hunter": {"name": "Achievement Hunter", "description": "Check your achievements 100 times."},
             "true_ending": {"name": "True Ending", "description": "Find the secret true ending."},
-            "new_game_plus": {"name": "New Game+", "description": "Start a new run after getting all endings."},
             
             # Insane Challenges
             "lose_streak": {"name": "Professional Loser", "description": "Lose 50 hands in a row."},
@@ -383,15 +375,13 @@ class Lists:
             "gift_of_death": {"name": "Gift of Death", "description": "Give the Dealer 5 gifts that lower his happiness."},
             "happiness_rollercoaster": {"name": "Emotional Rollercoaster", "description": "Change Dealer happiness by 100+ points in one day."},
             "all_shops_one_day": {"name": "Shopping Spree", "description": "Buy from every shop in a single day."},
-            "item_hoarder": {"name": "Hoarder", "description": "Own 50 items at once."},
+            "mega_hoarder": {"name": "Hoarder Supreme", "description": "Own 50 items at once."},
             "collector_betrayer": {"name": "Collector Betrayer", "description": "Collect every animal type then sell them all."},
             
             # Dark Humor
-            "meat_cube_connoisseur": {"name": "Meat Cube Connoisseur", "description": "After The Factory ending, eat a meat cube."},
-            "dealer_tormentor": {"name": "Dealer Tormentor", "description": "Lower Dealer happiness to 0 five times."},
+            "dealer_tormentor": {"name": "Dealer Tormentor", "description": "Have Dealer happiness below 5 on 10 different days."},
             "loan_shark_best_friend": {"name": "Vinnie's Soulmate", "description": "Take 50 loans total."},
             "tony_survivor": {"name": "Tony's Punching Bag", "description": "Survive Tony's visits 10 times."},
-            "death_tourist": {"name": "Death Tourist", "description": "Experience all unique death scenes."},
             "suicide_gambler": {"name": "Suicide Gambler", "description": "Bet your last dollar 100 times."},
             
             # Extreme Grinds
@@ -399,12 +389,9 @@ class Lists:
             "millennium_survivor": {"name": "Millennium Bug", "description": "Survive 1,000 days."},
             "every_item": {"name": "Item Encyclopedia", "description": "Own every item in the game at least once."},
             "every_companion": {"name": "Zookeeper Supreme", "description": "Befriend every companion type."},
-            "all_endings_perfect": {"name": "Fate Master", "description": "Get all endings with perfect conditions."},
             "max_everything": {"name": "Perfection", "description": "Max out all stats, relationships, and money."},
             
             # Specific Insanity
-            "split_inception": {"name": "Split Inception", "description": "Win a split where both hands also split."},
-            "twenty_one_loss": {"name": "The Impossible Loss", "description": "Lose with 21 against Dealer's 21 five times."},
             "dealer_blackjack_victim": {"name": "Dealer's Blackjack Victim", "description": "Lose to Dealer blackjack 50 times."},
             "insurance_failure": {"name": "Insurance Scam", "description": "Take insurance when Dealer doesn't have blackjack 20 times."},
             "surrender_addiction": {"name": "Surrender Addiction", "description": "Surrender 100 hands."},
@@ -440,6 +427,33 @@ class Lists:
             "all_chains_done": {"name": "Connected", "description": "Complete all four interconnected storyline chains."},
             "night_vision_used": {"name": "Eyes in the Dark", "description": "Use the Night Vision Scope to see what lurks at night."},
             "scrap_armor_crafted": {"name": "Junkyard Knight", "description": "Craft Scrap Armor on your own at the junkyard."},
+            
+            # Crafting Achievements
+            "first_craft": {"name": "Handyman", "description": "Craft your first item at the workbench."},
+            "craftsman": {"name": "Craftsman", "description": "Craft 30 different items."},
+            "master_craftsman": {"name": "Master Craftsman", "description": "Craft 40 different items."},
+            "inventor": {"name": "Inventor", "description": "Craft 50 different items."},
+            "expert_crafter": {"name": "Expert Crafter", "description": "Complete all Tier 2 recipes."},
+            "artificer": {"name": "Artificer", "description": "Complete all Tier 3 masterworks."},
+            "grand_artificer": {"name": "Grand Artificer", "description": "Craft every recipe in the game."},
+            
+            # Zone Exploration Achievements
+            "road_explorer": {"name": "Road Warrior", "description": "Earn the Road Warrior Badge on your first road adventure."},
+            "woodland_explorer": {"name": "Druid's Chosen", "description": "Earn the Druid's Staff on your first trip to the woodlands."},
+            "swamp_explorer": {"name": "Swamp Walker", "description": "Earn the Swamp Rune on your first trip to the swamp."},
+            "beach_explorer": {"name": "Beachcomber", "description": "Earn the Sea Glass on your first trip to the beach."},
+            "underwater_explorer": {"name": "Deep Diver", "description": "Earn the Depth Charm on your first underwater adventure."},
+            "city_explorer": {"name": "Urban Legend", "description": "Earn the Underground Pass on your first trip to the city."},
+            "zone_collector": {"name": "World Traveler", "description": "Collect all 6 zone reward items."},
+            
+            # Lucky Status Achievements
+            "lucky_charm": {"name": "Lady Luck", "description": "Receive the Lucky status for the first time."},
+            
+            # Pawn Shop Milestones
+            "pawn_shop_regular": {"name": "Gus's Regular", "description": "Sell 10 unique collectibles to Gus."},
+            "pawn_shop_pro": {"name": "Pawn Shop Pro", "description": "Sell 50 unique collectibles to Gus."},
+            "pawn_shop_legend": {"name": "Grime Lord", "description": "Sell 100 unique collectibles to Gus."},
+            "pawn_shop_complete": {"name": "The Complete Collection", "description": "Sell every collectible item to Gus."},
         }
     
     def get_achievement_data(self, achievement_id):
@@ -2129,6 +2143,14 @@ class Lists:
                 "craft_text": "Ritual token feeds the Dark Pact Reliquary. The whispers become a VOICE. Not threatening — negotiating. \"What would you change?\" it asks. \"One moment. One choice. And I'll rewrite it.\" You think of every mistake. Every wrong turn. Every moment you wish you'd chosen differently. The Soul Forge waits. It's patient. It has all the time in the world. It has YOUR time. \"Choose carefully,\" it says. \"This is the only one you get.\"",
                 "tier": 4,
             },
+            "Witch Doctor's Amulet": {
+                "ingredients": ["Twin's Locket", "Gambler's Chalice", "Gambler's Grimoire", "Marvin's Monocle"],
+                "description": "A legendary amulet that fuses the powers of Marvin's items. Grants enhanced versions of all Marvin item abilities.",
+                "pawn_value": 1000,
+                "category": "legendary",
+                "craft_text": "You fuse the four sacred items of Marvin into a single legendary amulet. The power is overwhelming.",
+                "tier": 4,
+            },
         }
 
     def get_crafting_recipes(self):
@@ -2647,6 +2669,9 @@ class Lists:
         a_list.append("whiskers_sixth_sense")
         a_list.append("slick_escape_route")
         a_list.append("hopper_lucky_day")
+        a_list.append("buddy_passive_find")
+        a_list.append("slick_passive_find")
+        a_list.append("hopper_passive_find")
         a_list.append("patches_night_watch")
         a_list.append("squirrelly_stash")
         a_list.append("companion_sick_day")
@@ -2983,6 +3008,9 @@ class Lists:
         a_list.append("whiskers_sixth_sense")
         a_list.append("slick_escape_route")
         a_list.append("hopper_lucky_day")
+        a_list.append("buddy_passive_find")
+        a_list.append("slick_passive_find")
+        a_list.append("hopper_passive_find")
         a_list.append("patches_night_watch")
         a_list.append("squirrelly_stash")
         a_list.append("companion_sick_day")
@@ -3151,6 +3179,7 @@ class Lists:
         a_list.append("wrong_item_bug_spray_campfire")
         a_list.append("wrong_item_road_flares_stealth")
         a_list.append("wrong_item_pest_control_romance")
+        a_list.append("wrong_item_vermin_bomb_romance")
         a_list.append("wrong_item_dog_whistle_bear")
         random.shuffle(a_list)
         return a_list
@@ -3368,6 +3397,9 @@ class Lists:
         a_list.append("whiskers_sixth_sense")
         a_list.append("slick_escape_route")
         a_list.append("hopper_lucky_day")
+        a_list.append("buddy_passive_find")
+        a_list.append("slick_passive_find")
+        a_list.append("hopper_passive_find")
         a_list.append("patches_night_watch")
         a_list.append("squirrelly_stash")
         a_list.append("companion_sick_day")
@@ -3568,13 +3600,17 @@ class Lists:
         a_list.append("wild_fortune_cards_car")
         a_list.append("wild_blackmail_letter_companion")
         a_list.append("lottery_ticket_check")
+        a_list.append("bottle_of_tomorrow_use")
+        a_list.append("blank_check_opportunity")
         # WRONG ITEM COMEDY EVENTS - Modest Tier
         a_list.append("wrong_item_bug_spray_campfire")
         a_list.append("wrong_item_road_flares_stealth")
         a_list.append("wrong_item_pest_control_romance")
+        a_list.append("wrong_item_vermin_bomb_romance")
         a_list.append("wrong_item_dirty_hat_dinner")
         a_list.append("wrong_item_dog_whistle_bear")
         a_list.append("wrong_item_necronomicon_loan_shark")
+        a_list.append("necronomicon_reading")
         random.shuffle(a_list)
         return a_list
     
@@ -3724,6 +3760,9 @@ class Lists:
         a_list.append("whiskers_sixth_sense")
         a_list.append("slick_escape_route")
         a_list.append("hopper_lucky_day")
+        a_list.append("buddy_passive_find")
+        a_list.append("slick_passive_find")
+        a_list.append("hopper_passive_find")
         a_list.append("patches_night_watch")
         a_list.append("squirrelly_stash")
         a_list.append("companion_sick_day")
@@ -3926,8 +3965,11 @@ class Lists:
         a_list.append("wild_fortune_cards_car")
         a_list.append("wild_blackmail_letter_companion")
         a_list.append("lottery_ticket_check")
+        a_list.append("bottle_of_tomorrow_use")
+        a_list.append("blank_check_opportunity")
         # WRONG ITEM COMEDY EVENTS - Rich Tier
         a_list.append("wrong_item_pest_control_romance")
+        a_list.append("wrong_item_vermin_bomb_romance")
         a_list.append("wrong_item_dirty_hat_dinner")
         a_list.append("wrong_item_necronomicon_loan_shark")
         random.shuffle(a_list)
@@ -4087,6 +4129,9 @@ class Lists:
         a_list.append("whiskers_sixth_sense")
         a_list.append("slick_escape_route")
         a_list.append("hopper_lucky_day")
+        a_list.append("buddy_passive_find")
+        a_list.append("slick_passive_find")
+        a_list.append("hopper_passive_find")
         a_list.append("patches_night_watch")
         a_list.append("squirrelly_stash")
         a_list.append("companion_sick_day")
@@ -4285,6 +4330,8 @@ class Lists:
         a_list.append("wild_fortune_cards_car")
         a_list.append("wild_blackmail_letter_companion")
         a_list.append("lottery_ticket_check")
+        a_list.append("bottle_of_tomorrow_use")
+        a_list.append("blank_check_opportunity")
         # WRONG ITEM COMEDY EVENTS - Doughman Tier
         a_list.append("wrong_item_dirty_hat_dinner")
         a_list.append("wrong_item_necronomicon_loan_shark")
@@ -4416,6 +4463,9 @@ class Lists:
         a_list.append("whiskers_sixth_sense")
         a_list.append("slick_escape_route")
         a_list.append("hopper_lucky_day")
+        a_list.append("buddy_passive_find")
+        a_list.append("slick_passive_find")
+        a_list.append("hopper_passive_find")
         a_list.append("patches_night_watch")
         a_list.append("squirrelly_stash")
         a_list.append("companion_sick_day")
@@ -4612,6 +4662,8 @@ class Lists:
         a_list.append("wild_fortune_cards_car")
         a_list.append("wild_blackmail_letter_companion")
         a_list.append("lottery_ticket_check")
+        a_list.append("bottle_of_tomorrow_use")
+        a_list.append("blank_check_opportunity")
         random.shuffle(a_list)
         return a_list
     
@@ -5030,9 +5082,11 @@ class Lists:
         "wrong_item_bug_spray_campfire":      [1, 1, 1, 0, 0, 0],
         "wrong_item_road_flares_stealth":     [1, 1, 1, 0, 0, 0],
         "wrong_item_pest_control_romance":    [0, 1, 1, 1, 0, 0],
+        "wrong_item_vermin_bomb_romance":     [0, 1, 1, 1, 0, 0],
         "wrong_item_dirty_hat_dinner":        [0, 0, 1, 1, 1, 0],
         "wrong_item_dog_whistle_bear":        [1, 1, 1, 0, 0, 0],
         "wrong_item_necronomicon_loan_shark": [0, 0, 1, 1, 1, 0],
+        "necronomicon_reading":               [0, 0, 1, 1, 1, 0],
     }
 
     # ── INVENTORY-AWARE POOL EVENTS ─────────────────────────────────────────────
@@ -5679,82 +5733,48 @@ class Lists:
 
     def make_marvin_inventory(self):
         a_list = []
-        random_chance = random.randrange(5)
-        if (random_chance<=1) and (not self.__player.has_item("Delight Indicator")):
-            a_list.append("Delight Indicator")
-
-        random_chance = random.randrange(5)
-        if (random_chance<=1) and (not self.__player.has_item("Health Indicator")):
-            a_list.append("Health Indicator")
-
-        random_chance = random.randrange(5)
-        if (random_chance<=1) and (not self.__player.has_item("Dirty Old Hat")):
-            a_list.append("Dirty Old Hat")
-        
-        random_chance = random.randrange(5)
-        if (random_chance<=1) and (not self.__player.has_item("Golden Watch")):
-            a_list.append("Golden Watch")
-
-        random_chance = random.randrange(5)
-        if (random_chance<=1) and (not self.__player.has_item("Faulty Insurance")):
-            a_list.append("Faulty Insurance")
-
-        random_chance = random.randrange(5)
-        if (random_chance<=1) and (not self.__player.has_item("Enchanting Silver Bar")):
-            a_list.append("Enchanting Silver Bar")
-
-        random_chance = random.randrange(5)
-        if (random_chance<=1) and (not self.__player.has_item("Sneaky Peeky Shades")):
-            a_list.append("Sneaky Peeky Shades")
-
-        random_chance = random.randrange(5)
-        if (random_chance<=1) and (not self.__player.has_item("Quiet Sneakers")):
-            a_list.append("Quiet Sneakers")
-
-        random_chance = random.randrange(5)
-        if (random_chance<=1) and (not self.__player.has_item("Lucky Coin")):
-            a_list.append("Lucky Coin")
-
-        random_chance = random.randrange(5)
-        if (random_chance<=1) and (not self.__player.has_item("Worn Gloves")):
-            a_list.append("Worn Gloves")
-
-        random_chance = random.randrange(5)
-        if (random_chance<=1) and (not self.__player.has_item("Tattered Cloak")):
-            a_list.append("Tattered Cloak")
-
-        random_chance = random.randrange(5)
-        if (random_chance<=1) and (not self.__player.has_item("Rusty Compass")):
-            a_list.append("Rusty Compass")
-
-        random_chance = random.randrange(5)
-        if (random_chance<=1) and (not self.__player.has_item("Pocket Watch")):
-            a_list.append("Pocket Watch")
-
-        random_chance = random.randrange(5)
-        if (random_chance<=1) and (not self.__player.has_item("Marvin's Monocle")):
-            a_list.append("Marvin's Monocle")
-
-        # New mystical gambling items
-        random_chance = random.randrange(5)
-        if (random_chance<=1) and (not self.__player.has_item("Gambler's Chalice")) and (not self.__player.has_item("Overflowing Goblet")):
-            a_list.append("Gambler's Chalice")
-
-        random_chance = random.randrange(5)
-        if (random_chance<=1) and (not self.__player.has_item("Twin's Locket")) and (not self.__player.has_item("Mirror of Duality")):
-            a_list.append("Twin's Locket")
-
-        random_chance = random.randrange(5)
-        if (random_chance<=1) and (not self.__player.has_item("White Feather")) and (not self.__player.has_item("Phoenix Feather")):
-            a_list.append("White Feather")
-
-        random_chance = random.randrange(5)
-        if (random_chance<=1) and (not self.__player.has_item("Dealer's Grudge")) and (not self.__player.has_item("Dealer's Mercy")):
-            a_list.append("Dealer's Grudge")
-
-        random_chance = random.randrange(5)
-        if (random_chance<=1) and (not self.__player.has_item("Gambler's Grimoire")) and (not self.__player.has_item("Oracle's Tome")):
-            a_list.append("Gambler's Grimoire")
+        # Standard Marvin items, now 3/5 chance
+        marvin_items = [
+            "Delight Indicator",
+            "Health Indicator",
+            "Dirty Old Hat",
+            "Golden Watch",
+            "Faulty Insurance",
+            "Enchanting Silver Bar",
+            "Sneaky Peeky Shades",
+            "Quiet Sneakers",
+            "Lucky Coin",
+            "Worn Gloves",
+            "Tattered Cloak",
+            "Rusty Compass",
+            "Pocket Watch",
+            "Marvin's Monocle",
+            # New mystical gambling items
+            "Gambler's Chalice",
+            "Twin's Locket",
+            "White Feather",
+            "Dealer's Grudge",
+            "Gambler's Grimoire",
+            # High-tier Marvin items
+            "Marvin's Eye",
+            "Bottle of Tomorrow",
+            "Blank Check"
+        ]
+        for item in marvin_items:
+            random_chance = random.randrange(5)
+            if (random_chance<=2) and (not self.__player.has_item(item)):
+                # For fusion items, check for both possible blockers
+                if item == "Gambler's Chalice" and (self.__player.has_item("Overflowing Goblet")):
+                    continue
+                if item == "Twin's Locket" and (self.__player.has_item("Mirror of Duality")):
+                    continue
+                if item == "White Feather" and (self.__player.has_item("Phoenix Feather")):
+                    continue
+                if item == "Dealer's Grudge" and (self.__player.has_item("Dealer's Mercy")):
+                    continue
+                if item == "Gambler's Grimoire" and (self.__player.has_item("Oracle's Tome")):
+                    continue
+                a_list.append(item)
 
         # SECRET ITEM - Animal Whistle (very rare, enables companion secret ending)
         random_chance = random.randrange(10)

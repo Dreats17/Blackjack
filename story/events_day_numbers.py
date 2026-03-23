@@ -56,16 +56,35 @@ class DayNumbersMixin:
         if self.get_balance() != 100:
             self.day_event()
             return
+        if self.has_item("Pocket Watch") or self.has_item("Grandfather Clock"):
+            watch = "Grandfather Clock" if self.has_item("Grandfather Clock") else "Pocket Watch"
+            type.type("You count your money. Exactly " + green(bright("$100")) + ". Then your " + cyan(bright(watch)) + " ticks.")
+            print()
+            if watch == "Grandfather Clock":
+                type.type("The " + cyan(bright("Grandfather Clock")) + " booms a tiny, impossible chime exactly on the hundredth dollar. Benjamin Franklin seems less like a face on paper and more like a witness.")
+                print()
+                type.type(quote("Timing is wealth," ) + " you hear, though nobody around you spoke.")
+                self.restore_sanity(8)
+                self.add_status("Lucky")
+            else:
+                type.type("The " + cyan(bright("Pocket Watch")) + " clicks over as if it had been waiting all day for this number. For one strange second, everything in your life feels exactly on schedule.")
+                print()
+                type.type(quote("Keep going, kid. You're not late yet."))
+                self.restore_sanity(7)
+            self.add_status("Benjamin's Blessing")
+            self.update_pocket_watch_durability()
+            print()
+            return
         type.type("You count your money. Exactly " + green(bright("$100")) + ". One crisp Benjamin Franklin.")
-        print("\n")
+        print()
         type.type("As you hold the bill up to the light, you swear Ben winks at you.")
-        print("\n")
+        print()
         type.type(quote("Keep going, kid. You've got this."))
-        print("\n")
+        print()
         type.type("You blink. The bill is normal. But you feel strangely confident.")
         self.restore_sanity(5)
         self.add_status("Benjamin's Blessing")
-        print("\n")
+        print()
 
     def exactly_420(self):
         # SECRET: Have exactly $420 - the funny number
@@ -73,25 +92,25 @@ class DayNumbersMixin:
             self.day_event()
             return
         type.type("You count your money. Exactly " + green(bright("$420")) + ".")
-        print("\n")
+        print()
         type.type("Nice.")
-        print("\n")
+        print()
         type.type("A nearby stranger looks at your money, then at you, and nods approvingly.")
-        print("\n")
+        print()
         type.type(quote("Nice."))
-        print("\n")
+        print()
         type.type("A bird flies overhead and tweets something that sounds like 'nice.'")
-        print("\n")
+        print()
         type.type("You feel at peace with the universe.")
         self.restore_sanity(4)
         self.heal(20)
         if self.has_item("Silver Flask") or self.has_item("Fancy Cigars"):
             item_name = "Silver Flask" if self.has_item("Silver Flask") else "Fancy Cigars"
-            print("\n")
+            print()
             type.type("You crack open the " + cyan(bright(item_name)) + " to mark the occasion. Some numbers deserve ceremony.")
             self.restore_sanity(5)
             self.heal(10)
-        print("\n")
+        print()
 
     def exactly_1234(self):
         # SECRET: Have exactly $1,234 - sequential numbers
@@ -99,15 +118,15 @@ class DayNumbersMixin:
             self.day_event()
             return
         type.type("You count your money. " + green(bright("$1,234")) + ". One, two, three, four.")
-        print("\n")
+        print()
         type.type("The numbers are in perfect sequence. This feels significant somehow.")
-        print("\n")
+        print()
         type.type("A child walks by counting: " + quote("One, two, three, four, five..."))
-        print("\n")
+        print()
         type.type("Everything feels orderly. Like the universe is counting with you.")
         self.restore_sanity(5)
         self.add_status("Sequential Luck")
-        print("\n")
+        print()
 
     def exactly_7777(self):
         # SECRET: Have exactly $7,777 - lucky 7s
@@ -116,30 +135,30 @@ class DayNumbersMixin:
             return
         if self.has_item("Moonlit Fortune"):
             type.type("The " + cyan(bright("Moonlit Fortune")) + " bends probability. You knew the numbers before you scratched.")
-            print("\n")
+            print()
             self.change_balance(random.randint(500, 2000))
             self.restore_sanity(10)
             return
         if self.has_item("Gambler's Aura"):
             type.type(cyan(bright("Gambler's Aura")) + " — the universe bends. The numbers align.")
-            print("\n")
+            print()
             self.change_balance(random.randint(200, 800))
             self.restore_sanity(5)
             return
         if self.has_item("Fortune's Favor"):
             type.type("The " + cyan(bright("Fortune's Favor")) + " puts your luck into high gear.")
-            print("\n")
+            print()
             self.change_balance(random.randint(100, 400))
             self.restore_sanity(3)
             return
         type.type("You count your money. " + green(bright("$7,777")) + ". Four sevens.")
-        print("\n")
+        print()
         type.type("In the distance, a slot machine hits jackpot. You hear the bells.")
-        print("\n")
+        print()
         type.type("A four-leaf clover blows against your window and sticks there.")
-        print("\n")
+        print()
         type.type("A black cat crosses your path... then turns around and walks WITH you instead.")
-        print("\n")
+        print()
         type.type("Today is your day.")
         self.add_status("Lucky")
         self.heal(20)
@@ -149,13 +168,23 @@ class DayNumbersMixin:
             lucky_item = ("Lucky Medallion" if self.has_item("Lucky Medallion") else
                          "Lucky Charm Bracelet" if self.has_item("Lucky Charm Bracelet") else
                          "Lucky Coin" if self.has_item("Lucky Coin") else "Lucky Penny")
-            print("\n")
+            print()
             type.type("Your " + cyan(bright(lucky_item)) + " vibrates sympathetically. Four sevens and a lucky charm — the universe does not know what to do with this much luck.")
-            print("\n")
+            if lucky_item == "Lucky Penny":
+                evolved = self.track_item_use("Lucky Penny")
+                if evolved:
+                    print()
+                    type.type(cyan(bright(self.get_evolution_text(evolved[0], evolved[1]))))
+            elif lucky_item == "Lucky Coin":
+                evolved = self.track_item_use("Lucky Coin")
+                if evolved:
+                    print()
+                    type.type(cyan(bright(self.get_evolution_text(evolved[0], evolved[1]))))
+            print()
             bonus = random.randint(50, 150)
             type.type("You find an extra " + green(bright("$" + str(bonus))) + " folded under the seat.")
             self.earn_money(bonus)
-        print("\n")
+        print()
 
     def exactly_13(self):
         # SECRET: Have exactly $13 - unlucky number
@@ -164,32 +193,32 @@ class DayNumbersMixin:
             return
         if self.has_item("Third Eye"):
             type.type("The " + cyan(bright("Third Eye")) + " saw this coming. You sidestepped before the bad luck landed.")
-            print("\n")
+            print()
             self.restore_sanity(5)
             return
         if self.has_item("Mind Shield"):
             type.type("The " + cyan(bright("Mind Shield")) + " blocks the psychic weight of the bad luck. Numbers are just numbers.")
-            print("\n")
+            print()
             self.restore_sanity(3)
             return
         type.type("You count your money. " + red(bright("$13")) + ". The unlucky number.")
-        print("\n")
+        print()
         type.type("A black cat hisses at you. You walk under a ladder without noticing.")
-        print("\n")
+        print()
         type.type("A mirror cracks as you walk past it.")
-        print("\n")
+        print()
         type.type("You should probably be careful today.")
         self.lose_sanity(5)
         self.add_status("Cursed")
         if self.has_item("Gambler's Grimoire") or self.has_item("Oracle's Tome"):
             tome = "Oracle's Tome" if self.has_item("Oracle's Tome") else "Gambler's Grimoire"
-            print("\n")
+            print()
             type.type("The " + cyan(bright(tome)) + " falls open to a page about luck and entropy. Thirteen isn't unlucky — it's prime. It's indivisible. The book says bad luck is just unread probability.")
-            print("\n")
+            print()
             type.type("The curse unravels like a bad hand folded before the flop.")
             self.remove_status("Cursed")
             self.restore_sanity(3)
-        print("\n")
+        print()
 
     def exactly_69420(self):
         # SECRET: Have exactly $69,420 - the ultimate meme number
@@ -197,22 +226,22 @@ class DayNumbersMixin:
             self.day_event()
             return
         type.type("You count your money. " + green(bright("$69,420")) + ".")
-        print("\n")
+        print()
         type.type("...")
-        print("\n")
+        print()
         type.type("Nice.")
-        print("\n")
+        print()
         type.type("NICE.")
-        print("\n")
+        print()
         type.type(yellow(bright("N I C E.")))
-        print("\n")
+        print()
         type.type("The universe itself seems to vibrate with approval.")
-        print("\n")
+        print()
         type.type("Somewhere, a choir of angels sings 'nice' in perfect harmony.")
         self.heal(69)
         self.restore_sanity(10)
         self.add_status("Maximum Nice")
-        print("\n")
+        print()
 
     def day_palindrome(self):
         # SECRET: It's a palindrome day (day 11, 22, 33, etc)
@@ -220,15 +249,15 @@ class DayNumbersMixin:
             self.day_event()
             return
         type.type("Sitting in your car, you realize something interesting: it's day " + str(self._day) + ".")
-        print("\n")
+        print()
         type.type("A palindrome. The same forwards and backwards.")
-        print("\n")
+        print()
         type.type("Everything feels balanced today. Symmetrical. Perfect.")
-        print("\n")
+        print()
         type.type("You feel like the universe is in alignment.")
         self.restore_sanity(5)
         self.heal(11)
-        print("\n")
+        print()
 
     def prime_day(self):
         # SECRET: It's a prime number day
@@ -244,12 +273,12 @@ class DayNumbersMixin:
             self.day_event()
             return
         type.type("You're sitting in your car. Day " + str(self._day) + ". A prime number.")
-        print("\n")
+        print()
         type.type("Indivisible. Unique. Like you.")
-        print("\n")
+        print()
         type.type("You feel mathematically superior to yesterday.")
         self.restore_sanity(3)
-        print("\n")
+        print()
 
     def same_as_health(self):
         # SECRET: Balance equals current health
@@ -257,14 +286,14 @@ class DayNumbersMixin:
             self.day_event()
             return
         type.type("Sitting in your car, you realize something strange: you have exactly " + green(bright("$" + str(self.get_balance()))) + "...")
-        print("\n")
+        print()
         type.type("And your health is at exactly " + red(bright(str(self.get_health()))) + ".")
-        print("\n")
+        print()
         type.type("The same number. That's... oddly specific.")
-        print("\n")
+        print()
         type.type("Are you worth exactly one dollar per hit point? Probably not. But it's a weird coincidence.")
         self.restore_sanity(5)
-        print("\n")
+        print()
 
     def full_moon_madness(self):
         # SECRET: Every 28th day (lunar cycle)
@@ -273,24 +302,24 @@ class DayNumbersMixin:
             return
         if self.has_item("Necronomicon"):
             type.type("The " + cyan(bright("Necronomicon")) + " turns its own pages in the moonlight. Something is very interested in this lunar cycle.")
-            print("\n")
+            print()
             type.type("You feel the darkness lean in, curious. Hungry. It knows you carry the book.")
             self.lose_sanity(5)
-            print("\n")
+            print()
         type.type("The morning light hits different today. Something in the air. You feel... different.")
-        print("\n")
+        print()
         type.type("More alive. More reckless. More HUNGRY.")
-        print("\n")
+        print()
         type.type("Not for food. For victory. For money. For the thrill of the game.")
-        print("\n")
+        print()
         type.type("Something inside you howls for action.")
         self.add_status("Lunar Frenzy")
         self.restore_sanity(10)
         if self.has_item("Dream Catcher"):
             type.type("The " + cyan(bright("Dream Catcher")) + "'s web catches the moonlight and holds it. The madness reaches you muffled, filtered, safe.")
-            print("\n")
+            print()
             self.restore_sanity(5)
-        print("\n")
+        print()
 
     # ==========================================
     # NON-NUMBER SECRET EVENTS - CONDITION-BASED
@@ -302,24 +331,35 @@ class DayNumbersMixin:
             self.day_event()
             return
         type.type("An old man approaches you in the parking lot. His eyes are knowing. Tired.")
-        print("\n")
+        print()
         type.type(quote("I can tell. You've been at this a while, haven't you?"))
-        print("\n")
+        print()
         type.type("He sits down next to you uninvited. You don't mind.")
-        print("\n")
+        print()
         type.type(quote("Fifty years. That's how long I played. Won big. Lost bigger. Won again."))
-        print("\n")
+        print()
         type.type(quote("You want to know the secret? There isn't one. It's all just... time. Patience. Survival."))
-        print("\n")
+        print()
         type.type("He presses something into your hand. A worn poker chip.")
-        print("\n")
+        print()
         type.type(quote("My lucky chip. Hasn't been lucky in decades. But maybe for you..."))
-        print("\n")
+        print()
+        if self.has_item("Flask of Imminent Blackjack"):
+            type.type("The " + cyan(bright("Flask of Imminent Blackjack")) + " hums against your ribs like it recognizes the old man's rhythm.")
+            print()
+            type.type("For a second, you can almost see the next three good hands lined up in the air between you.")
+            self.restore_sanity(4)
+        if self.has_item("Flask of Bonus Fortune"):
+            type.type("The " + cyan(bright("Flask of Bonus Fortune")) + " glows gold in your pocket. Even he notices.")
+            print()
+            type.type(quote("There it is. That little tilt in fate. Don't waste it."))
+            self.change_balance(random.randint(60, 160))
+            self.restore_sanity(2)
         type.type("He walks away. You never see him again.")
         self.add_item("Veteran's Lucky Chip")
         self.restore_sanity(15)
         self.meet("The Old Timer")
-        print("\n")
+        print()
 
     def perfect_health_moment(self):
         # SECRET: At exactly 100 health - a moment of perfect physical being
@@ -327,27 +367,27 @@ class DayNumbersMixin:
             self.day_event()
             return
         type.type("You stretch in your car seat. Something feels... different.")
-        print("\n")
+        print()
         type.type("No aches. No pains. No stiffness. Nothing hurts.")
-        print("\n")
+        print()
         type.type("You feel PERFECT. Truly, genuinely perfect.")
-        print("\n")
+        print()
         type.type("When was the last time you felt this good? Years ago? Ever?")
-        print("\n")
+        print()
         type.type("You take a deep breath. The air tastes sweet. The sun is warm but not hot.")
-        print("\n")
+        print()
         type.type("Today is going to be a good day. You can feel it in your bones.")
         self.restore_sanity(10)
         self.add_status("Perfect Condition")
         if self.has_item("Flask of No Bust"):
-            print("\n")
+            print()
             type.type("The " + cyan(bright("Flask of No Bust")) + " hums approval. Your health agrees — no busting today, no busting ever.")
             self.heal(5)
         if self.has_item("First Aid Kit"):
-            print("\n")
+            print()
             type.type("You inventory your " + cyan(bright("First Aid Kit")) + " out of habit. Everything looks good. Everything is good.")
             self.heal(3)
-        print("\n")
+        print()
 
     def rock_bottom(self):
         # SECRET: Health AND sanity both below 20 - hitting absolute rock bottom
@@ -355,22 +395,37 @@ class DayNumbersMixin:
             self.day_event()
             return
         type.type("You sit in your car, staring at nothing. Everything hurts. Inside and out.")
-        print("\n")
+        print()
         type.type("This is rock bottom. You're sure of it. It can't get worse than this.")
-        print("\n")
+        print()
         type.type("...")
-        print("\n")
+        print()
         type.type("And then, strangely, you laugh. A small, broken laugh.")
-        print("\n")
+        print()
         type.type("If this is the bottom, then there's only one way to go: up.")
-        print("\n")
+        print()
         type.type("Something shifts inside you. Not hope, exactly. But... determination.")
-        print("\n")
+        print()
         type.type("You've survived this far. You'll survive further.")
         self.restore_sanity(5)
         self.heal(5)
         self.add_status("Survivor's Resolve")
-        print("\n")
+        if self.has_item("Lottery Ticket"):
+            print()
+            type.type("You find a crumpled " + cyan(bright("Lottery Ticket")) + " in your jacket pocket. Forgot you even had it.")
+            print()
+            type.type("You scratch it with a trembling thumbnail. At this point, why not?")
+            print()
+            if random.randrange(5) == 0:
+                winnings = random.choice([100, 250, 500])
+                type.type("Three matching symbols. " + green(bright("${:,}".format(winnings))) + ". At rock bottom, the universe throws you a rope.")
+                self.change_balance(winnings)
+                self.restore_sanity(10)
+            else:
+                type.type("Nothing. Of course. But the act of scratching it — of still hoping — that's something.")
+                self.restore_sanity(3)
+            self.use_item("Lottery Ticket")
+        print()
 
     def haunted_by_losses(self):
         # SECRET: Lost 10+ times in a row at blackjack - the ghosts of bad hands
@@ -378,21 +433,21 @@ class DayNumbersMixin:
             self.day_event()
             return
         type.type("You sit in your car, staring at the dashboard. The cards won't leave you alone.")
-        print("\n")
+        print()
         type.type("16 against a dealer 10. Hit. Bust.")
         type.type(" 15 against a 7. Stand. Dealer hits 21.")
         type.type(" 20. Dealer blackjack.")
-        print("\n")
+        print()
         type.type("The losses replay in your mind. Over and over. A casino of nightmares.")
-        print("\n")
+        print()
         type.type("You see the dealer's smirk. The cards mocking you. The chips sliding away.")
-        print("\n")
+        print()
         type.type("When you finally open your eyes, you're covered in cold sweat.")
-        print("\n")
+        print()
         type.type("But there's something else. A cold fury. A NEED to win.")
         self.lose_sanity(10)
         self.add_status("Vengeance Mode")
-        print("\n")
+        print()
 
     def first_sunrise(self):
         # SECRET: Day 1 only - watching your first sunrise as a gambler
@@ -400,21 +455,21 @@ class DayNumbersMixin:
             self.day_event()
             return
         type.type("You watch the sun rise over the casino parking lot.")
-        print("\n")
+        print()
         type.type("This is it. Day one. The beginning of everything.")
-        print("\n")
+        print()
         type.type("You have nothing but a dream and whatever's in your pocket.")
-        print("\n")
+        print()
         type.type("A million dollars. That's the goal. It sounds impossible.")
-        print("\n")
+        print()
         type.type("But as the golden light washes over your car, you feel something.")
-        print("\n")
+        print()
         type.type("Hope. Pure, stupid, wonderful hope.")
-        print("\n")
+        print()
         type.type("Let's do this.")
         self.restore_sanity(10)
         self.add_status("Fresh Start")
-        print("\n")
+        print()
 
     def insomniac_revelation(self):
         # SECRET: Have the "Insomnia" status - a 3 AM epiphany
@@ -422,17 +477,17 @@ class DayNumbersMixin:
             self.night_event()
             return
         type.type("You're sitting in your car, wide awake. You haven't slept in... how long? You've lost count.")
-        print("\n")
+        print()
         type.type("Your thoughts are racing. Random. Disconnected. And then—")
-        print("\n")
+        print()
         type.type("Clarity. Perfect, crystalline clarity.")
-        print("\n")
+        print()
         type.type("You suddenly understand something. About the game. About yourself. About everything.")
-        print("\n")
+        print()
         type.type("...")
-        print("\n")
+        print()
         type.type("And then it's gone. You can't remember what you understood.")
-        print("\n")
+        print()
         type.type("But you feel different. Changed somehow.")
         if random.random() < 0.5:
             self.restore_sanity(15)
@@ -440,15 +495,15 @@ class DayNumbersMixin:
         else:
             self.lose_sanity(10)
             type.type(" The revelation terrified you.")
-        print("\n")
+        print()
         if self.has_item("Gambler's Grimoire") or self.has_item("Oracle's Tome"):
             tome = "Oracle's Tome" if self.has_item("Oracle's Tome") else "Gambler's Grimoire"
             type.type("At 3am, you pull out the " + cyan(bright(tome)) + ". The equations make SENSE now. You annotate seventeen pages. When the sun comes up, you can't read your own handwriting — but somehow you feel like you understand probability better.")
-            print("\n")
+            print()
             if not self.has_status("Probability Edge"):
                 self.add_status("Probability Edge")
             self.restore_sanity(5)
-            print("\n")
+            print()
 
     def completely_broke_wisdom(self):
         # SECRET: Have exactly $0 - a moment of zen poverty
@@ -456,21 +511,36 @@ class DayNumbersMixin:
             self.day_event()
             return
         type.type("You sit in your car and check your wallet. Empty. Your pockets. Empty. Your car. Nothing.")
-        print("\n")
+        print()
         type.type("You have exactly " + red(bright("$0")) + ". Not even a penny.")
-        print("\n")
+        print()
         type.type("...")
-        print("\n")
+        print()
         type.type("And somehow, it's freeing.")
-        print("\n")
+        print()
         type.type("You have nothing to lose. Literally nothing. You are at absolute zero.")
-        print("\n")
+        print()
         type.type("The only direction from here is up. The only option is forward.")
-        print("\n")
+        print()
         type.type("A strange calm washes over you. This is the beginning. Again.")
         self.restore_sanity(10)
         self.add_status("Nothing Left to Lose")
-        print("\n")
+        if self.has_item("Lottery Ticket"):
+            print()
+            type.type("Then you feel it. A " + cyan(bright("Lottery Ticket")) + " in your back pocket. Your last $5 purchase.")
+            print()
+            type.type("At zero dollars, this crumpled piece of paper is your entire portfolio.")
+            print()
+            if random.randrange(4) == 0:
+                winnings = random.choice([50, 100, 200])
+                type.type("You scratch it. " + green(bright("${:,}".format(winnings))) + ". From nothing to something. The universe has a sick sense of humor.")
+                self.change_balance(winnings)
+                self.restore_sanity(5)
+            else:
+                type.type("You scratch it. Nothing. You're still at zero. But you're smiling. At zero, even nothing feels familiar.")
+                self.restore_sanity(2)
+            self.use_item("Lottery Ticket")
+        print()
 
     def the_crow_council(self):
         # SECRET: Have the crow companion - crows gather for a meeting
@@ -478,26 +548,26 @@ class DayNumbersMixin:
             self.day_event()
             return
         type.type("Your crow friend lands on your car and caws loudly. Then again. And again.")
-        print("\n")
+        print()
         type.type("From the trees, from the rooftops, from everywhere—crows appear.")
-        print("\n")
+        print()
         type.type("Dozens of them. Maybe a hundred. They perch in a circle around your car.")
-        print("\n")
+        print()
         type.type("They're... having a meeting? About YOU?")
-        print("\n")
+        print()
         type.type("The cawing intensifies. Debates? Arguments? You can't tell.")
-        print("\n")
+        print()
         type.type("Finally, your crow hops forward and drops something at your feet.")
-        print("\n")
+        print()
         if random.random() < 0.5:
             type.type("A shiny button. Then another crow drops a coin. Then another. " + green(bright("+$23")) + " in random shinies.")
             self.change_balance(23)
         else:
             type.type("A small, jet-black feather. It shimmers with an oily iridescence. It feels important.")
             self.add_item("Council Feather")
-        print("\n")
+        print()
         type.type("The crows disperse as suddenly as they gathered. Your crow stays, looking smug.")
-        print("\n")
+        print()
 
     def rain_on_the_roof(self):
         # SECRET: Random 5% chance during any night - just rain, and peace
@@ -505,21 +575,21 @@ class DayNumbersMixin:
             self.night_event()
             return
         type.type("It starts raining. Softly at first, then harder.")
-        print("\n")
+        print()
         type.type("You lie back in your car and listen to the droplets on the roof.")
-        print("\n")
+        print()
         type.type("Tap. Tap-tap. Tap. Tap-tap-tap-tap.")
-        print("\n")
+        print()
         type.type("The rhythm is hypnotic. Peaceful. The world outside blurs into water and light.")
-        print("\n")
+        print()
         type.type("For once, you're not thinking about money. Or cards. Or tomorrow.")
-        print("\n")
+        print()
         type.type("You're just... here. Present. Listening to the rain.")
-        print("\n")
+        print()
         type.type("It's the most peaceful you've felt in a long time.")
         self.restore_sanity(15)
         self.heal(5)
-        print("\n")
+        print()
 
     # ==========================================
     # DRASTIC DOUGHMAN/NEARLY THERE EVENTS

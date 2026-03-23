@@ -187,54 +187,64 @@ def choose_strategic_goal(game_state: GameState) -> StrategicPlan:
         score("blend_fraudulent_cash_safely", 45.0 + min(20.0, game_state.fraudulent_cash / 1000.0))
 
     if game_state.opportunity_flags.get("can_visit_marvin"):
-        score("exploit_marvin", 16.0 + min(40.0, game_state.marvin_affordable_priority * 0.5))
-        if game_state.rank <= 1:
-            score("exploit_marvin", 14.0)
-            if game_state.has_met_vinnie and game_state.loan_debt == 0 and 1000 <= game_state.balance < 8000:
-                score("exploit_marvin", 24.0)
-            if game_state.has_worn_map and not game_state.has_map and game_state.balance >= 1200:
-                score("exploit_marvin", 22.0)
-            if game_state.marvin_affordable_priority >= 56 and game_state.balance >= 1800:
-                score("exploit_marvin", 18.0)
-            if 1200 <= game_state.balance < 10000 and game_state.health >= 62 and game_state.sanity >= 34:
-                score("exploit_marvin", 14.0)
-            if game_state.marvin_candidate_price > game_state.balance and game_state.marvin_candidate_price <= game_state.balance + 5000:
-                score("exploit_marvin", 16.0)
-            if game_state.marvin_future_priority >= 56 and 0 < game_state.marvin_future_shortfall <= 5000 and game_state.balance >= 950:
-                score("exploit_marvin", 24.0)
-                if game_state.has_met_vinnie and game_state.loan_debt == 0:
-                    score("exploit_marvin", 18.0)
-        if fatigue < 72 and sanity >= 32:
-            score("exploit_marvin", 6.0)
-        if game_state.marvin_strong_window and game_state.marvin_candidate_price >= 10_000:
-            score("exploit_marvin", 18.0)
-        if game_state.rank >= 2 and game_state.balance >= 7000 and game_state.marvin_affordable_priority >= 72:
-            score("exploit_marvin", 18.0)
-        if game_state.rank >= 2 and game_state.marvin_future_priority >= 76 and 0 < game_state.marvin_future_shortfall <= 12000 and game_state.balance >= 7000:
-            score("exploit_marvin", 16.0)
-        # Extra boost when the best affordable item is genuinely high-priority (≥84).
-        # Ensures Marvin beats routine store restocking even if marvin_strong_window is
-        # False (e.g. exact $10k balance where condition 3 just barely fails by $100).
-        if game_state.marvin_affordable_priority >= 84:
-            score("exploit_marvin", 14.0)
-        if game_state.rank <= 1 and game_state.marvin_affordable_priority >= 72:
-            score("exploit_marvin", 12.0)
-        # Items reduce blackjack variance and guarantee earnings — prioritize buying
-        # first items when the bot has a car but low edge_score.
-        if game_state.edge_score < 4 and game_state.rank >= 1 and game_state.marvin_affordable_priority >= 56:
-            score("exploit_marvin", 20.0)
-        if game_state.edge_score < 8 and game_state.rank >= 2 and game_state.marvin_affordable_priority >= 60:
-            score("exploit_marvin", 16.0)
-        if growth_push_window:
-            score("exploit_marvin", 18.0)
-            if game_state.marvin_candidate_price > game_state.balance and game_state.marvin_candidate_price <= game_state.balance + 10_000:
-                score("exploit_marvin", 16.0)
+        # Deep run Marvin boost: if balance > $10k and rank >= 2, make Marvin top priority
+        if game_state.rank >= 2 and game_state.balance > 10000:
+            score("exploit_marvin", 120.0 + min(60.0, game_state.marvin_affordable_priority * 0.7))
             if game_state.marvin_affordable_priority >= 72:
-                score("exploit_marvin", 10.0)
-        if game_state.fragile_post_car:
-            score("exploit_marvin", -36.0)
-        if game_state.bankroll_emergency:
-            score("exploit_marvin", -70.0)
+                score("exploit_marvin", 40.0)
+            if game_state.marvin_affordable_priority >= 84:
+                score("exploit_marvin", 30.0)
+            if game_state.marvin_candidate_price > game_state.balance and game_state.marvin_candidate_price <= game_state.balance + 20000:
+                score("exploit_marvin", 24.0)
+        else:
+            score("exploit_marvin", 16.0 + min(40.0, game_state.marvin_affordable_priority * 0.5))
+            if game_state.rank <= 1:
+                score("exploit_marvin", 14.0)
+                if game_state.has_met_vinnie and game_state.loan_debt == 0 and 1000 <= game_state.balance < 8000:
+                    score("exploit_marvin", 24.0)
+                if game_state.has_worn_map and not game_state.has_map and game_state.balance >= 1200:
+                    score("exploit_marvin", 22.0)
+                if game_state.marvin_affordable_priority >= 56 and game_state.balance >= 1800:
+                    score("exploit_marvin", 18.0)
+                if 1200 <= game_state.balance < 10000 and game_state.health >= 62 and game_state.sanity >= 34:
+                    score("exploit_marvin", 14.0)
+                if game_state.marvin_candidate_price > game_state.balance and game_state.marvin_candidate_price <= game_state.balance + 5000:
+                    score("exploit_marvin", 16.0)
+                if game_state.marvin_future_priority >= 56 and 0 < game_state.marvin_future_shortfall <= 5000 and game_state.balance >= 950:
+                    score("exploit_marvin", 24.0)
+                    if game_state.has_met_vinnie and game_state.loan_debt == 0:
+                        score("exploit_marvin", 18.0)
+            if fatigue < 72 and sanity >= 32:
+                score("exploit_marvin", 6.0)
+            if game_state.marvin_strong_window and game_state.marvin_candidate_price >= 10_000:
+                score("exploit_marvin", 18.0)
+            if game_state.rank >= 2 and game_state.balance >= 7000 and game_state.marvin_affordable_priority >= 72:
+                score("exploit_marvin", 18.0)
+            if game_state.rank >= 2 and game_state.marvin_future_priority >= 76 and 0 < game_state.marvin_future_shortfall <= 12000 and game_state.balance >= 7000:
+                score("exploit_marvin", 16.0)
+            # Extra boost when the best affordable item is genuinely high-priority (≥84).
+            # Ensures Marvin beats routine store restocking even if marvin_strong_window is
+            # False (e.g. exact $10k balance where condition 3 just barely fails by $100).
+            if game_state.marvin_affordable_priority >= 84:
+                score("exploit_marvin", 14.0)
+            if game_state.rank <= 1 and game_state.marvin_affordable_priority >= 72:
+                score("exploit_marvin", 12.0)
+            # Items reduce blackjack variance and guarantee earnings — prioritize buying
+            # first items when the bot has a car but low edge_score.
+            if game_state.edge_score < 4 and game_state.rank >= 1 and game_state.marvin_affordable_priority >= 56:
+                score("exploit_marvin", 20.0)
+            if game_state.edge_score < 8 and game_state.rank >= 2 and game_state.marvin_affordable_priority >= 60:
+                score("exploit_marvin", 16.0)
+            if growth_push_window:
+                score("exploit_marvin", 18.0)
+                if game_state.marvin_candidate_price > game_state.balance and game_state.marvin_candidate_price <= game_state.balance + 10_000:
+                    score("exploit_marvin", 16.0)
+                if game_state.marvin_affordable_priority >= 72:
+                    score("exploit_marvin", 10.0)
+            if game_state.fragile_post_car:
+                score("exploit_marvin", -36.0)
+            if game_state.bankroll_emergency:
+                score("exploit_marvin", -70.0)
     elif game_state.has_car and not game_state.has_marvin_access:
         score("unlock_marvin", 22.0)
 

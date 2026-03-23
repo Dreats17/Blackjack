@@ -216,8 +216,23 @@ def _capture_type(self, *args, **kwargs):
 
 
 def _get_recent_menu_options(limit=40):
+    recent_lines = RECENT_TEXT[-limit:]
+    trailing_block = []
+    started = False
+    for line in reversed(recent_lines):
+        match = re.match(r"^(\d+)\.\s+(.*)$", line)
+        if match:
+            trailing_block.append((int(match.group(1)), match.group(2).strip()))
+            started = True
+            continue
+        if started:
+            break
+    trailing_block.reverse()
+    if trailing_block:
+        return trailing_block
+
     options = []
-    for line in RECENT_TEXT[-limit:]:
+    for line in recent_lines:
         match = re.match(r"^(\d+)\.\s+(.*)$", line)
         if match:
             options.append((int(match.group(1)), match.group(2).strip()))
@@ -230,6 +245,53 @@ def _get_recent_menu_options(limit=40):
         unique.append((number, label))
     unique.reverse()
     return unique
+
+
+def _resolve_numeric_menu_options(option_values, limit=40):
+    menu_options = _get_recent_menu_options(limit=limit)
+    allowed_numbers = {int(str(value).strip()) for value in option_values if str(value).strip().isdigit()}
+    if not allowed_numbers:
+        return menu_options
+
+    non_numeric_values = [str(value).strip() for value in option_values if not str(value).strip().isdigit()]
+
+    filtered = [(number, label) for number, label in menu_options if number in allowed_numbers]
+    if non_numeric_values and menu_options:
+        exit_candidates = [entry for entry in menu_options if entry[0] not in allowed_numbers]
+        if len(exit_candidates) == 1:
+            filtered.append(exit_candidates[0])
+    if len(filtered) == len(allowed_numbers):
+        filtered.sort(key=lambda entry: entry[0])
+        return filtered
+
+    if non_numeric_values and len(filtered) == len(allowed_numbers) + 1:
+        filtered.sort(key=lambda entry: entry[0])
+        return filtered
+
+    return [(number, str(number)) for number in sorted(allowed_numbers)]
+
+
+def _looks_like_numeric_menu_prompt(options):
+    if not options:
+        return False
+    normalized = [str(option).strip().lower() for option in options]
+    allowed_tokens = {"leave", "nothing", "none", "cancel"}
+    return all(token.isdigit() or token in allowed_tokens for token in normalized)
+
+
+def _map_numeric_choice_to_option_token(chosen_number, option_values):
+    chosen_text = str(chosen_number)
+    raw_values = [str(value).strip() for value in option_values]
+    if chosen_text in raw_values:
+        return chosen_text
+
+    numeric_values = [int(value) for value in raw_values if value.isdigit()]
+    non_numeric_values = [value for value in raw_values if not value.isdigit()]
+    if non_numeric_values and numeric_values and int(chosen_number) == max(numeric_values) + 1:
+        return non_numeric_values[0]
+    if non_numeric_values and chosen_text not in raw_values:
+        return non_numeric_values[0]
+    return chosen_text
 
 
 def _current_game_state(player, *, menu_options=None, context_tag=None):
@@ -5166,6 +5228,42 @@ def _adapter_yes_no_fallback(prompt_lower, player, cost=None):
     return None
 
 
+def _decide_numbered_menu_choice(menu_options, player, prompt_lower="", recent="", recent_short=""):
+    millionaire_afternoon = (
+        "choose a number" in prompt_lower
+        or "choose a number" in recent_short
+    ) and "drive to the airport" in recent
+    if millionaire_afternoon:
+        return str(_choose_millionaire_afternoon(menu_options, player))
+    if _looks_like_pawn_menu(menu_options):
+        return str(_choose_pawn_menu(menu_options, player))
+    if "who do you want to interact with" in prompt_lower or "after noon with your companions" in recent or "afternoon with your companions" in recent:
+        return str(_choose_companion_interaction(menu_options, player))
+    if _looks_like_store_menu(menu_options):
+        return str(_choose_store_item(menu_options, player))
+    if _looks_like_loan_borrow_menu(menu_options):
+        return str(_choose_loan_borrow_amount(menu_options, player))
+    if _looks_like_loan_repay_menu(menu_options):
+        return str(_choose_loan_repay_amount(menu_options, player))
+    if _looks_like_loan_menu(menu_options):
+        return str(_choose_loan_menu(menu_options, player))
+    if "would you like to spend your day driving somewhere" in recent:
+        return str(_choose_destination(menu_options, player))
+    if "what do you want?" in recent or "what else you want?" in recent:
+        return str(_choose_store_item(menu_options, player))
+    if "flask of" in recent:
+        return str(_choose_witch_flask(menu_options, player))
+    if "mind if i take a look at em" in recent or "is there anything you would like stuart to fix" in recent:
+        return str(_choose_repair_item(menu_options, player))
+    if "which item would you like stuart to upgrade" in recent:
+        return str(_choose_upgrade_item(menu_options, player))
+    if "car workbench" in recent:
+        if "what do you want to craft" in recent.lower():
+            return str(_choose_workbench_craft(menu_options, player))
+        return str(_choose_workbench_menu(menu_options, player))
+    return str(menu_options[-1][0] if menu_options else 1)
+
+
 def _choose_inline_choice(inline_choices, player, prompt=""):
     if not inline_choices:
         return "1"
@@ -5873,13 +5971,13 @@ def _planner_choose_destination(options, player):
     if choice is None:
         trace.metadata["route_outcome"] = "no_choice"
     else:
-        planner_applied = trace.confidence >= 0.55
+        planner_applied = trace.confidence >= 0.40
         trace.metadata["planner_applied"] = planner_applied
         trace.metadata["route_outcome"] = "applied" if planner_applied else "suppressed"
     _record_decision_trace(trace)
     if choice is None:
         return None
-    if trace.confidence < 0.55:
+    if trace.confidence < 0.40:
         return None
     return int(choice.value)
 
@@ -6289,6 +6387,79 @@ def _decide_yes_no(prompt=""):
     if mechanic_answer is not None:
         return finalize(mechanic_answer, "mechanic_intro_offer")
 
+    if (
+        "whaddya say" in recent
+        or "what do you think" in recent
+        or "you buying" in recent
+        or "you interested" in recent
+        or "you buying" in prompt_lower
+        or "you interested" in prompt_lower
+    ):
+        if cost is None or player is None:
+            return finalize("no", "offer_missing_budget_context")
+        marvin_items = {
+            "Pocket Watch", "Lucky Coin", "Gambler's Grimoire", "Faulty Insurance", "Dirty Old Hat", "Golden Watch",
+            "Health Indicator", "Delight Indicator", "Worn Gloves", "Tattered Cloak", "Gambler's Chalice",
+            "White Feather", "Twin's Locket", "Dealer's Grudge", "Rusty Compass", "Quiet Sneakers",
+            "Sneaky Peeky Shades", "Enchanting Silver Bar", "Animal Whistle",
+        }
+        current_offer = _current_offer_name(recent, marvin_items)
+        if current_offer is not None:
+            priority = _marvin_item_priority(current_offer, player)
+            if priority <= 0:
+                return finalize("no", f"marvin_offer_priority_zero:{current_offer}")
+            balance = player.get_balance()
+            conversion_window_items = _marvin_conversion_items()
+            post_purchase_floor = _marvin_post_purchase_floor(player, current_offer)
+            rank = int(player.get_rank()) if hasattr(player, "get_rank") else 0
+            if rank >= 2 and current_offer not in conversion_window_items and priority < 70:
+                return finalize("no", f"marvin_offer_rank2_low_priority:{current_offer}")
+            doctor_res = max(60, _doctor_cash_reserve(player))
+            if (
+                rank >= 2
+                and current_offer in conversion_window_items
+                and priority >= 60
+                and balance >= cost
+                and not _doctor_visit_is_urgent(player)
+                and not _needs_doctor(player)
+                and player.get_health() >= 68
+                and player.get_sanity() >= 40
+            ):
+                conversion_floor = max(doctor_res, post_purchase_floor)
+                if balance - cost >= conversion_floor:
+                    return finalize("yes", f"marvin_offer_conversion_window:{current_offer}", 0.76)
+            if rank >= 2:
+                rank2_post_purchase_floor = 15000
+                if current_offer not in conversion_window_items and balance - cost < rank2_post_purchase_floor and priority < 88:
+                    return finalize("no", f"marvin_offer_rank2_post_purchase_floor:{current_offer}")
+            if rank <= 1 and priority >= 84 and balance >= cost and balance - cost >= doctor_res:
+                return finalize("yes", f"marvin_offer_rank01_high_priority:{current_offer}", 0.82)
+            if rank <= 1 and priority >= 76 and balance >= cost and balance - cost >= doctor_res + 120:
+                return finalize("yes", f"marvin_offer_rank01_edge_window:{current_offer}", 0.76)
+            if _can_afford_optional_purchase(player, cost, priority):
+                return finalize("yes", f"marvin_offer_affordable:{current_offer}", 0.8)
+            if priority >= 88 and balance >= cost:
+                in_push = _in_rank_push_window(player)
+                doctor_res = max(120, _doctor_cash_reserve(player))
+                _rank_thresholds = [0, 1000, 10000, 100000, 400000, 750000]
+                rank_below_floor = _rank_thresholds[max(0, min(rank - 1, 5))]
+                if in_push:
+                    if balance - cost >= max(doctor_res, rank_below_floor):
+                        return finalize("yes", f"marvin_offer_push_window:{current_offer}", 0.72)
+                else:
+                    prot = _rank_protection_floor(player)
+                    if balance - cost >= max(doctor_res, prot):
+                        return finalize("yes", f"marvin_offer_high_priority:{current_offer}", 0.68)
+            return finalize("no", f"marvin_offer_budget_block:{current_offer}")
+        must_have = any(name in recent for name in [
+            "faulty insurance", "health indicator", "delight indicator", "rusty compass",
+            "spare tire", "tire patch kit", "fix-a-flat", "tool kit", "first aid kit",
+        ])
+        affordable = player.get_balance() >= cost
+        conservative = cost <= max(200, int(player.get_balance() * 0.25))
+        answer = "yes" if affordable and (must_have or conservative) else "no"
+        return finalize(answer, "generic_offer_budget_gate")
+
     event_request, event_plan = _build_event_policy_request(
         player,
         request_type="yes_no",
@@ -6381,91 +6552,6 @@ def _decide_yes_no(prompt=""):
             return finalize("no", "stuart_offer_missing_cost")
         answer = "yes" if player.get_balance() >= cost and cost <= max(90000, int(player.get_balance() * 0.55)) else "no"
         return finalize(answer, "stuart_offer_budget_gate")
-    if "whaddya say" in recent or "what do you think" in recent or "you buying" in recent or "you interested" in recent:
-        if cost is None or player is None:
-            return finalize("no", "offer_missing_budget_context")
-        marvin_items = {
-            "Pocket Watch", "Lucky Coin", "Gambler's Grimoire", "Faulty Insurance", "Dirty Old Hat", "Golden Watch",
-            "Health Indicator", "Delight Indicator", "Worn Gloves", "Tattered Cloak", "Gambler's Chalice",
-            "White Feather", "Twin's Locket", "Dealer's Grudge", "Rusty Compass", "Quiet Sneakers",
-            "Sneaky Peeky Shades", "Enchanting Silver Bar", "Animal Whistle",
-        }
-        current_offer = _current_offer_name(recent, marvin_items)
-        if current_offer is not None:
-            priority = _marvin_item_priority(current_offer, player)
-            if priority <= 0:
-                return finalize("no", f"marvin_offer_priority_zero:{current_offer}")
-            balance = player.get_balance()
-            conversion_window_items = _marvin_conversion_items()
-            post_purchase_floor = _marvin_post_purchase_floor(player, current_offer)
-            # At rank 2+, skip low-value items — spending on them wipes out the rank cushion
-            # and leaves the bot vulnerable to gambling variance.  Items like Dirty Old Hat
-            # (priority 62) are not worth the balance dip; only items that meaningfully improve
-            # the edge (priority ≥ 70 base, or high-priority after rank/health adjustments) qualify.
-            rank = int(player.get_rank()) if hasattr(player, "get_rank") else 0
-            if rank >= 2 and current_offer not in conversion_window_items and priority < 70:
-                return finalize("no", f"marvin_offer_rank2_low_priority:{current_offer}")
-            doctor_res = max(60, _doctor_cash_reserve(player))
-            if (
-                rank >= 2
-                and current_offer in conversion_window_items
-                and priority >= 60
-                and balance >= cost
-                and not _doctor_visit_is_urgent(player)
-                and not _needs_doctor(player)
-                and player.get_health() >= 68
-                and player.get_sanity() >= 40
-            ):
-                conversion_floor = max(doctor_res, post_purchase_floor)
-                if balance - cost >= conversion_floor:
-                    return finalize("yes", f"marvin_offer_conversion_window:{current_offer}", 0.76)
-            # At rank 2+, require a bigger post-purchase buffer than just the $10k rank floor
-            # to avoid gambling variance immediately dropping us back to rank 1.  We enforce
-            # an extra $5k cushion: post-purchase balance must stay >= $15k.
-            if rank >= 2:
-                rank2_post_purchase_floor = 15000
-                if current_offer not in conversion_window_items and balance - cost < rank2_post_purchase_floor and priority < 88:
-                    return finalize("no", f"marvin_offer_rank2_post_purchase_floor:{current_offer}")
-            if rank <= 1 and priority >= 84 and balance >= cost and balance - cost >= doctor_res:
-                return finalize("yes", f"marvin_offer_rank01_high_priority:{current_offer}", 0.82)
-            if rank <= 1 and priority >= 76 and balance >= cost and balance - cost >= doctor_res + 120:
-                return finalize("yes", f"marvin_offer_rank01_edge_window:{current_offer}", 0.76)
-            if _can_afford_optional_purchase(player, cost, priority):
-                return finalize("yes", f"marvin_offer_affordable:{current_offer}", 0.8)
-            # High-priority Marvin items are justified exceptions to rank-drop protection
-            # when the bot is actively pushing for a rank-up or win.  The improved edge
-            # score from the item will repay the short-term balance dip much faster than
-            # ordinary grinding would.  Outside a push window we still require the normal
-            # reserve (rank-protection floor) to be satisfied.
-            balance = player.get_balance()
-            if priority >= 88 and balance >= cost:
-                in_push = _in_rank_push_window(player)
-                doctor_res = max(120, _doctor_cash_reserve(player))
-                # Always require at least a minimal post-purchase floor so the bot can't
-                # zero out its balance even during a push window.  Use the rank-below
-                # threshold (rank 2→$1k, rank 3→$10k) as the safety net — reuse
-                # _rank_protection_floor on a synthetic rank-1-lower player would be
-                # complex, so derive it directly from the same thresholds constant.
-                _rank_thresholds = [0, 1000, 10000, 100000, 400000, 750000]
-                rank_below_floor = _rank_thresholds[max(0, min(rank - 1, 5))]
-                if in_push:
-                    # During push: require doctor reserve + 1-rank-below safety net.
-                    if balance - cost >= max(doctor_res, rank_below_floor):
-                        return finalize("yes", f"marvin_offer_push_window:{current_offer}", 0.72)
-                else:
-                    # Outside push: require rank protection floor too.
-                    prot = _rank_protection_floor(player)
-                    if balance - cost >= max(doctor_res, prot):
-                        return finalize("yes", f"marvin_offer_high_priority:{current_offer}", 0.68)
-            return finalize("no", f"marvin_offer_budget_block:{current_offer}")
-        must_have = any(name in recent for name in [
-            "faulty insurance", "health indicator", "delight indicator", "rusty compass",
-            "spare tire", "tire patch kit", "fix-a-flat", "tool kit", "first aid kit",
-        ])
-        affordable = player.get_balance() >= cost
-        conservative = cost <= max(200, int(player.get_balance() * 0.25))
-        answer = "yes" if affordable and (must_have or conservative) else "no"
-        return finalize(answer, "generic_offer_budget_gate")
     if "pay" in prompt_lower and cost is not None and player is not None:
         if player.get_balance() < cost:
             return finalize("no", "cannot_afford_payment")
@@ -6492,6 +6578,16 @@ def _decide_option(prompt, options):
     player = CURRENT_PLAYER
     prompt_lower = (prompt or "").lower()
     recent = _recent_lower(80)
+    recent_short = "\n".join(RECENT_TEXT[-5:]).lower()
+    numeric_option_prompt = _looks_like_numeric_menu_prompt(options)
+
+    if numeric_option_prompt:
+        menu_options = _resolve_numeric_menu_options(options)
+        if menu_options:
+            chosen_number = _decide_numbered_menu_choice(menu_options, player, prompt_lower, recent, recent_short)
+            return _map_numeric_choice_to_option_token(chosen_number, options)
+        if options:
+            return str(options[-1])
 
     def finalize(chosen, reason, confidence=0.55):
         _record_structured_trace(
@@ -6670,40 +6766,7 @@ def _decide_raw_input(prompt=""):
     ):
         return str(options[-1][0] if options else 1)
     if "choose a number" in prompt_lower or "choose a number" in recent_short:
-        if _looks_like_pawn_menu(options):
-            return str(_choose_pawn_menu(options, player))
-        if "who do you want to interact with" in prompt_lower or "after noon with your companions" in recent or "afternoon with your companions" in recent:
-            return str(_choose_companion_interaction(options, player))
-        # Store menu must be detected before the route check: the route-menu text
-        # ("Would you like to spend your day driving somewhere?") stays in the
-        # 120-line recent window well into the store visit, causing the route
-        # handler to mis-dispatch store item menus as destination choices.
-        # Checking option structure (has "I'm not buying anything") is reliable
-        # and specific — no other menu uses that exit label.
-        if _looks_like_store_menu(options):
-            return str(_choose_store_item(options, player))
-        if "would you like to spend your day driving somewhere" in recent:
-            return str(_choose_destination(options, player))
-        if _looks_like_loan_borrow_menu(options):
-            return str(_choose_loan_borrow_amount(options, player))
-        if _looks_like_loan_repay_menu(options):
-            return str(_choose_loan_repay_amount(options, player))
-        if _looks_like_loan_menu(options):
-            return str(_choose_loan_menu(options, player))
-        if "what do you want?" in recent or "what else you want?" in recent:
-            return str(_choose_store_item(options, player))
-        if "flask of" in recent:
-            return str(_choose_witch_flask(options, player))
-        if "mind if i take a look at em" in recent or "is there anything you would like stuart to fix" in recent:
-            return str(_choose_repair_item(options, player))
-        if "which item would you like stuart to upgrade" in recent:
-            return str(_choose_upgrade_item(options, player))
-        if "car workbench" in recent:
-            # Craft sub-menu reached via "choose a number" path
-            if "what do you want to craft" in recent.lower():
-                return str(_choose_workbench_craft(options, player))
-            return str(_choose_workbench_menu(options, player))
-        return str(options[-1][0] if options else 1)
+        return _decide_numbered_menu_choice(options, player, prompt_lower, recent, recent_short)
     if "choose: " in prompt_lower and "who do you want to sell" not in prompt_lower:
         return str(options[-1][0] if options else 1)
     if "you buying" in recent:

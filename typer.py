@@ -326,15 +326,15 @@ class Ask:
                 except ValueError:
                     print("")
                     type.fast(red("That's, like, not a number."))
-                    print("\n")
+                    print()
             if a<=lucky_number<=b:
                 return lucky_number
             elif guess==True:
                 type.type("The number is between " + str(a) + " and " + str(b) + "!")
-                print("\n")
+                print()
             else:
                 type.type("That number isn't in the range!")
-                print("\n")
+                print()
 
     def choose_an_option(self, options, reiterate="What? ", first_letter=True, ):
         while True:
@@ -346,18 +346,45 @@ class Ask:
     
     def option(self, prompt, options):
         """Standardized choice input - takes prompt and list of options"""
+        labels = [str(option).strip() for option in options]
+        option_text = "/".join(labels)
+        prompt_text = prompt.strip()
+
+        if prompt_text:
+            if prompt_text.endswith(":"):
+                rendered_prompt = prompt_text + " [" + option_text + "] "
+            else:
+                rendered_prompt = prompt_text + " [" + option_text + "]: "
+        else:
+            rendered_prompt = "Choose [" + option_text + "]: "
+
         while True:
-            choice = input(prompt).strip().lower()
-            for option in options:
-                if choice == option.lower() or (len(option) > 0 and choice == option[0].lower()):
+            choice = input(rendered_prompt).strip().lower()
+            for option in labels:
+                if choice == option.lower():
                     return option
+            if len(choice) == 1:
+                matches = [option for option in labels if option and option[0].lower() == choice]
+                if len(matches) == 1:
+                    return matches[0]
             # If no match, show options again
-            type.type("Choose: " + "/".join(options))
+            type.type("Choose: " + option_text)
             print()
 
     def yes_or_no(self, reiterate="What? "):
+        prompt_text = reiterate.strip()
+        if prompt_text == "What?":
+            rendered_prompt = "Yes or no? [yes/no]: "
+        elif prompt_text:
+            if prompt_text.endswith(":"):
+                rendered_prompt = prompt_text + " [yes/no] "
+            else:
+                rendered_prompt = prompt_text + " [yes/no]: "
+        else:
+            rendered_prompt = "Yes or no? [yes/no]: "
+
         while True:
-            yes_or_no = input("").lower()
+            yes_or_no = input(rendered_prompt).strip().lower()
             if (yes_or_no == "y") or (yes_or_no == "yes"):
                 print()
                 return "yes"
@@ -365,7 +392,8 @@ class Ask:
                 print()
                 return "no"
             else:
-                type.type(reiterate) # type: ignore
+                type.type("Choose: yes/no")
+                print()
 
     def give_cash(self, total, reiterate="How much? "):
         while True:
@@ -373,11 +401,11 @@ class Ask:
                 value = int(input(""))
                 if value < 0:
                     type.type("You can't give that!")
-                    print("\n")
+                    print()
                     type.type(reiterate)
                 elif value > total:
                     type.type("You don't have that much cash!")
-                    print("\n")
+                    print()
                     type.type(reiterate)
                 else:
                     print("")

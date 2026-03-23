@@ -3,9 +3,13 @@
 
 import re
 
+import os
+script_dir = os.path.dirname(os.path.abspath(__file__))
+lists_path = os.path.join(script_dir, '..', 'lists.py')
+story_path = os.path.join(script_dir, '..', 'story', 'story.py')
 # Fix lists.py
 print("Fixing lists.py...")
-with open('lists.py', 'r', encoding='utf-8') as f:
+with open(lists_path, 'r', encoding='utf-8') as f:
     content = f.read()
 
 # Find and replace the entire problematic function

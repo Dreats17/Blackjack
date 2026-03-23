@@ -69,8 +69,53 @@ def _score_purchase_option(option: DecisionOption, plan: StrategicPlan, request:
 
     if option_meta.get("is_exit") and score < 0.0:
         score += 12.0
-    if price > 0 and balance and price > float(balance):
-        score -= 50.0
+    # If affordable, and blackjack edge is high, nudge up score for high-impact items
+    # Marvin item prioritization: always boost Marvin items, even more for deep runs
+    if category == "marvin":
+        run_peak_balance = int(request_meta.get("run_peak_balance", balance))
+        rank = int(request.game_state.get("rank", 0) or 0)
+        # If run is over 15k, play much safer: only buy Marvin items if they are a clear upgrade or needed for stability
+        if run_peak_balance > 15000:
+            # Only buy if item is not already owned or is a direct upgrade
+            already_owned = option_meta.get("already_owned", False)
+            is_upgrade = option_meta.get("is_upgrade", False)
+            if not already_owned or is_upgrade:
+                score += 60.0
+            else:
+                score -= 40.0
+            # If price is affordable, boost a bit, but avoid loans unless item is critical
+            if price > 0 and balance and price <= float(balance):
+                score += 10.0
+            elif price > 0 and balance and price > float(balance):
+                score -= 30.0
+        else:
+            # Under 15k, be aggressive as before
+            score += 100.0
+            if run_peak_balance > 10000 and rank >= 2:
+                score += 100.0
+            if price > 0 and balance and price <= float(balance):
+                score += 25.0
+            elif price > 0 and balance and price > float(balance):
+                score += 10.0
+    else:
+        if run_peak_balance > 15000:
+            # Over 15k: play safe, avoid unnecessary purchases, penalize risky spending
+            if price > 0 and balance and price > float(balance):
+                score -= 80.0
+            elif price > 0 and balance and price <= float(balance):
+                score -= 10.0
+        else:
+            if price > 0 and balance and price > float(balance):
+                score -= 50.0
+            elif price > 0 and balance and price <= float(balance):
+                # If blackjack edge is high, and item is blackjack/progression, boost score
+                edge_score = int(request_meta.get("edge_score", 0))
+                rank = int(request.game_state.get("rank", 0) or 0)
+                run_peak_balance = int(request_meta.get("run_peak_balance", balance))
+                if edge_score >= 5 and category in {"blackjack", "progression"}:
+                    score += 10.0
+                elif edge_score >= 3 and category in {"blackjack", "progression"}:
+                    score += 5.0
     if item_name in {"LifeAlert", "First Aid Kit", "Faulty Insurance", "No Bust", "Second Chance"}:
         score += 6.0
     return score

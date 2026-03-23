@@ -101,6 +101,20 @@ def choose_blackjack_action(request: DecisionRequest, plan: StrategicPlan) -> tu
     has_no_bust = bool(metadata.get("has_no_bust"))
     has_imminent_blackjack = bool(metadata.get("has_imminent_blackjack"))
 
+    # Marvin item leverage: always use Marvin items when available and advantageous
+    marvin_items = [
+        metadata.get("has_sneaky_peeky_shades", False),
+        metadata.get("has_sneaky_peeky_goggles", False),
+        metadata.get("has_gamblers_chalice", False),
+        metadata.get("has_overflowing_goblet", False),
+        metadata.get("has_twins_locket", False),
+        metadata.get("has_mirror_of_duality", False),
+        metadata.get("has_pocket_watch", False),
+        metadata.get("has_grandfather_clock", False),
+        metadata.get("has_marvins_eye", False)
+    ]
+    has_marvin = any(marvin_items)
+
     action = _recommended_blackjack_action(
         total,
         soft_total,
@@ -110,6 +124,28 @@ def choose_blackjack_action(request: DecisionRequest, plan: StrategicPlan) -> tu
         can_surrender=can_surrender,
         pair_value=pair_value,
     )
+
+    # If Marvin item is available, always use peek/split/double when possible and advantageous
+    run_peak_balance = int(metadata.get("run_peak_balance", balance))
+    # Over 15k: play much safer, avoid risky actions unless odds are overwhelming
+    if has_marvin:
+        if run_peak_balance > 15000:
+            # Only use Marvin items if action is not risky or if it prevents a loss
+            if can_peek and action != "stand" and total >= 15:
+                action = "peek"
+            elif can_split and total >= 16:
+                action = "split"
+            elif can_double and total >= 10 and dealer_upcard <= 6:
+                action = "double"
+            # Otherwise, play standard safe
+        else:
+            # Under 15k, be aggressive
+            if can_peek and action != "stand":
+                action = "peek"
+            elif can_split:
+                action = "split"
+            elif can_double and total >= 9:
+                action = "double"
 
     if can_peek and _should_use_peek(action, total, soft_total, bet, balance) and next_total is not None:
         if action == "surrender":
@@ -240,147 +276,49 @@ def choose_second_chance_option(request: DecisionRequest, plan: StrategicPlan) -
 
 
 def choose_blackjack_bet(request: DecisionRequest, plan: StrategicPlan) -> tuple[int | None, DecisionTrace]:
+    # Dynamically select personality based on current goal
+    try:
+        from tools.autoplay.personality_manager import personality_manager
+        personality = personality_manager.get_personality(plan.goal)
+        # Try to use the personality's choose_blackjack_bet if it exists
+        if hasattr(personality, "choose_blackjack_bet"):
+            # Extract relevant arguments from request and state
+            state = dict(request.game_state)
+            metadata = dict(request.metadata)
+            min_bet = int(metadata.get("min_bet", 1))
+            max_bet = int(metadata.get("max_bet", state.get("balance", 0)))
+            bet = personality.choose_blackjack_bet(state, min_bet, max_bet)
+            trace = DecisionTrace(
+                cycle=request.metadata.get("cycle"),
+                day=metadata.get("day", state.get("day", 0)),
+                context=request.stable_context_id or request.request_type,
+                request_type=request.request_type,
+                strategic_goal=plan.goal,
+                chosen_action=str(bet),
+                reason=f"goal={plan.goal} blackjack_bet (personality: {getattr(personality, 'PERSONALITY_NAME', 'unknown')})",
+                confidence=0.97,
+                options=tuple(option.label for option in request.normalized_options),
+                game_state_summary=state,
+                metadata={"plan": plan.to_dict()},
+            )
+            return bet, trace
+    except Exception as e:
+        # Fallback to default logic if anything fails
+        pass
+
+    # Default logic (original implementation)
     metadata = dict(request.metadata)
     state = dict(request.game_state)
     balance = int(_metadata_number(metadata, "balance", state.get("balance", 0)))
     fake_cash = int(_metadata_number(metadata, "fake_cash"))
     total_available = balance + fake_cash
     min_bet = int(_metadata_number(metadata, "min_bet", 1))
-    target = int(_metadata_number(metadata, "target"))
-    floor = int(_metadata_number(metadata, "floor"))
-    distance = int(_metadata_number(metadata, "distance"))
-    store_budget = int(_metadata_number(metadata, "store_budget"))
     edge_score = int(_metadata_number(metadata, "edge_score"))
     day = int(_metadata_number(metadata, "day", state.get("day", 0)))
-    stall_days = int(_metadata_number(metadata, "stall_days"))
-    pending_marvin_price = int(_metadata_number(metadata, "pending_marvin_price"))
-    pending_marvin_shortfall = int(_metadata_number(metadata, "pending_marvin_shortfall"))
-    tuner_bet_ratio = _metadata_number(metadata, "tuner_bet_ratio")
-    tuner_bet_ratio_safe = _metadata_number(metadata, "tuner_bet_ratio_safe")
-    tuner_max_ratio = _metadata_number(metadata, "tuner_max_ratio")
-    tuner_pressure_factor = _metadata_number(metadata, "tuner_pressure_factor")
-    tuner_surplus_push = _metadata_number(metadata, "tuner_surplus_push")
-    rank = int(_metadata_number(metadata, "rank", state.get("rank", 0)))
-    health = int(_metadata_number(metadata, "health", state.get("health", 0)))
-    sanity = int(_metadata_number(metadata, "sanity", state.get("sanity", 0)))
-    has_car = bool(state.get("has_car"))
-    dealer_happiness = int(_metadata_number(metadata, "dealer_happiness", state.get("dealer_happiness", 0)))
-
-    wants_store = _metadata_bool(metadata, "wants_store")
-    wants_pawn = _metadata_bool(metadata, "wants_pawn")
-    wants_doctor = _metadata_bool(metadata, "wants_doctor")
-    progression_ready = _metadata_bool(metadata, "progression_ready")
-    wants_millionaire_push = _metadata_bool(metadata, "wants_millionaire_push")
-    pending_marvin_active = _metadata_bool(metadata, "pending_marvin_active")
-    early_caution = _metadata_bool(metadata, "early_caution")
-    stranded_no_car = _metadata_bool(metadata, "stranded_no_car")
-    survival_mode = _metadata_bool(metadata, "survival_mode")
-    needs_car = _metadata_bool(metadata, "needs_car")
-    ever_had_car = _metadata_bool(metadata, "ever_had_car")
-    has_extra_round_item = _metadata_bool(metadata, "has_extra_round_item")
-    urgent_doctor = _metadata_bool(metadata, "urgent_doctor")
-    has_met_tom = _metadata_bool(metadata, "has_met_tom")
-    has_met_frank = _metadata_bool(metadata, "has_met_frank")
-    has_met_oswald = _metadata_bool(metadata, "has_met_oswald")
-    has_faulty_insurance = _metadata_bool(metadata, "has_faulty_insurance")
-    wants_map_unlock = _metadata_bool(metadata, "wants_map_unlock")
     run_peak_balance = int(_metadata_number(metadata, "run_peak_balance", balance))
-    loan_debt = int(_metadata_number(metadata, "loan_debt"))
-    loan_warning_level = int(_metadata_number(metadata, "loan_warning_level"))
-    lost_car_progress_run = not has_car and ever_had_car and rank >= 1 and balance >= 1000
-    if lost_car_progress_run:
-        needs_car = False
-    phase = str(metadata.get("phase", ""))
-    bankroll_emergency = _metadata_bool(metadata, "bankroll_emergency") or phase == "bankroll_emergency"
-    fragile_post_car = _metadata_bool(metadata, "fragile_post_car") or phase == "car_recovery"
-    stalled_run = stall_days >= (10 if day <= 30 else 14)
-    next_car_target = 0
-    if needs_car and not has_car:
-        if not has_met_tom:
-            next_car_target = 200
-        elif not has_met_frank:
-            next_car_target = 100
-        elif not has_met_oswald:
-            next_car_target = 850
-    pre_tom_breakout_window = (
-        needs_car
-        and phase == "car_rush"
-        and not has_car
-        and not has_met_tom
-        and not urgent_doctor
-        and not wants_doctor
-        and balance >= 140
-        and balance < 200
-        and health >= 60
-        and sanity >= 34
-    )
-    mechanic_threshold_push_window = (
-        needs_car
-        and phase == "car_rush"
-        and not has_car
-        and not has_met_tom
-        and not urgent_doctor
-        and not wants_doctor
-        and health >= 60
-        and sanity >= 34
-        and balance >= 150
-        and 0 < (200 - balance) <= 30
-    )
-    mechanic_gap = max(0, next_car_target - balance) if next_car_target else 0
-    low_balance_stall_window = (
-        needs_car
-        and phase == "car_rush"
-        and not has_car
-        and ((not has_met_tom and balance < 160) or (has_met_tom and not has_met_frank and balance < 60))
-        and not urgent_doctor
-        and not wants_doctor
-    )
-    midgame_growth_window = (
-        has_car
-        and rank <= 1
-        and progression_ready
-        and phase in ("rank_one_rush", "rank_two_rush")
-        and not wants_store
-        and not wants_pawn
-        and not wants_doctor
-        and not urgent_doctor
-        and not survival_mode
-        and not pending_marvin_active
-        and health >= 62
-        and sanity >= 34
-        and 1200 <= balance < 8000
-    )
-    # Rank 2 → 3 push window: the bot has a car, good health, and enough balance to
-    # aggressively push toward rank 3 ($100k).  Floor protection already ensures the
-    # bot can't lose below $10k in one hand; this window boosts the bet ratio so the
-    # bot grows fast enough to reach rank 3 within the run time limit.
-    rank_three_growth_window = (
-        has_car
-        and rank == 2
-        and progression_ready
-        and phase == "million_rush"
-        and not wants_store
-        and not wants_doctor
-        and not urgent_doctor
-        and not survival_mode
-        and not pending_marvin_active
-        and health >= 58
-        and sanity >= 30
-        and 15000 <= balance < 100000
-    )
-    late_breakout_protection = (
-        rank >= 2
-        and balance >= 10000
-        and (
-            health < 80
-            or sanity < 58
-            or wants_doctor
-            or urgent_doctor
-            or fragile_post_car
-            or loan_debt > 0
-            or loan_warning_level > 0
-        )
-    )
+    starting_balance = int(_metadata_number(metadata, "starting_balance", 50))
+    wants_store = _metadata_bool(metadata, "wants_store")
+    store_budget = int(_metadata_number(metadata, "store_budget"))
 
     if total_available <= 0:
         trace = DecisionTrace(
@@ -398,611 +336,21 @@ def choose_blackjack_bet(request: DecisionRequest, plan: StrategicPlan) -> tuple
         )
         return 0, trace
 
-    if bankroll_emergency:
-        bet = min(total_available, min_bet)
-        trace = DecisionTrace(
-            cycle=request.metadata.get("cycle"),
-            day=day,
-            context=request.stable_context_id or request.request_type,
-            request_type=request.request_type,
-            strategic_goal=plan.goal,
-            chosen_action=str(bet),
-            reason=f"goal={plan.goal} blackjack_bet_bankroll_emergency",
-            confidence=0.94,
-            options=tuple(option.label for option in request.normalized_options),
-            game_state_summary=state,
-            metadata={"plan": plan.to_dict(), "phase": phase},
-        )
-        return bet, trace
-
-    if phase == "car_rush":
-        if balance < 100:
-            ratio = 0.36
-        elif balance < 200:
-            ratio = 0.30
-        elif balance < 350:
-            ratio = 0.22
-        else:
-            ratio = 0.16
-    elif phase == "marvin_push":
-        if balance < 2500:
-            ratio = 0.42
-        elif balance < 6000:
-            ratio = 0.36
-        else:
-            ratio = 0.30
-    elif phase == "million_rush" and wants_millionaire_push:
-        if balance >= 600000 and has_extra_round_item and dealer_happiness >= 85:
-            ratio = max(tuner_bet_ratio, 0.50)
-        else:
-            ratio = max(tuner_bet_ratio, 0.34 if balance < 400000 else 0.28)
+    if run_peak_balance > 0 and balance < run_peak_balance * 0.5:
+        bet = max(min_bet, int(balance * 0.07))
+        reason = "drawdown_protection"
+    elif wants_store and store_budget > 0 and balance >= store_budget and edge_score >= 4:
+        bet = max(min_bet, int(balance * 0.5))
+        reason = "shop_push_high_edge"
     else:
-        ratio = tuner_bet_ratio if progression_ready else tuner_bet_ratio_safe
-    if fragile_post_car:
-        if balance < 150:
-            ratio = min(ratio, 0.10)
-        elif balance < 400:
-            ratio = min(ratio, 0.12)
-        else:
-            ratio = min(ratio, 0.14)
-    if stranded_no_car:
-        if balance < 120:
-            ratio = max(ratio, 0.42)
-        elif balance < 250:
-            ratio = max(ratio, 0.38)
-        elif balance < 600:
-            ratio = max(ratio, 0.34)
-        else:
-            ratio = max(ratio, 0.28)
-    if balance >= 25000 and edge_score >= 6:
-        ratio = min(ratio, 0.30 if balance < 100000 else 0.18)
-    if late_breakout_protection:
-        ratio = min(ratio, 0.10 if balance < 25000 else 0.08)
-    # Rank 2 cushion: cap ratio by balance tier to prevent rank regression.
-    # At $10k-$13k (very close to floor): ultra-conservative.
-    # At $13k-$25k (still in danger zone): moderately conservative.
-    # At $25k-$50k (growth zone): still needs protection vs bad streaks.
-    if rank == 2 and balance < 13000:
-        ratio = min(ratio, 0.08)
-    elif rank == 2 and balance < 25000:
-        ratio = min(ratio, 0.16)
-    elif rank == 2 and balance < 50000:
-        ratio = min(ratio, 0.24)
-    # Rank 3 cushion: cap ratio when balance is within 1.3x of the $100k floor.
-    if rank == 3 and balance < 130000:
-        ratio = min(ratio, 0.14)
-    if stalled_run and not survival_mode:
-        if phase == "car_rush":
-            ratio = max(ratio, 0.26 if balance < 350 else 0.18)
-        elif rank <= 1:
-            ratio = max(ratio, 0.22)
-    if midgame_growth_window:
-        if balance < 2500:
-            ratio = max(ratio, 0.34 if edge_score >= 4 else 0.30)
-        elif balance < 5000:
-            ratio = max(ratio, 0.30 if edge_score >= 4 else 0.26)
-        else:
-            ratio = max(ratio, 0.24)
-    if rank_three_growth_window:
-        # Boost ratio in the rank-2→3 push; floor protection caps actual bet at
-        # balance - $10k so the bot can't lose below rank 2 floor regardless.
-        # Cushion guards above further restrict this boost when near the $10k/$25k/$50k bands.
-        ratio = max(ratio, 0.34 if edge_score >= 5 else 0.30)
-    # Re-apply rank cushions after any growth-window boosts so they remain hard upper bounds.
-    if rank == 2 and balance < 13000:
-        ratio = min(ratio, 0.08)
-    elif rank == 2 and balance < 25000:
-        ratio = min(ratio, 0.16)
-    elif rank == 2 and balance < 50000:
-        ratio = min(ratio, 0.24)
-    if pending_marvin_active and not survival_mode:
-        if pending_marvin_shortfall > 0:
-            ratio = min(ratio, 0.12 if edge_score >= 5 else 0.10)
-        else:
-            ratio = min(ratio, 0.06)
+        edge_factor = min(max(edge_score, 0), 7) / 7.0
+        base_ratio = 0.12 + (0.23 * edge_factor)
+        bet = max(min_bet, int(balance * base_ratio))
+        reason = f"smooth_ramp_edge_{edge_score}"
 
-    if survival_mode:
-        if phase == "car_rush":
-            ratio = min(ratio, 0.18 if balance >= 200 else 0.22)
-        elif balance < 10000:
-            ratio = min(ratio, 0.14)
-        else:
-            ratio = min(ratio, 0.12)
-    elif plan.goal == "restock_supplies" and wants_store:
-        ratio = min(ratio, 0.18 if balance < 1000 else 0.14)
-    elif plan.goal in {"contain_debt_escalation", "reduce_debt_risk"}:
-        ratio = min(ratio, 0.16 if balance < 10000 else 0.12)
-    elif wants_pawn and balance < 500:
-        ratio = min(ratio, 0.18)
-    if stranded_no_car:
-        ratio = max(ratio, 0.22 if balance >= 1000 else 0.28)
-    if low_balance_stall_window:
-        if balance < 80:
-            ratio = min(ratio, 0.30)
-        elif balance < 120:
-            ratio = min(ratio, 0.24)
-        else:
-            ratio = min(ratio, 0.20)
-    if pre_tom_breakout_window:
-        if balance < 80:
-            ratio = max(ratio, 0.52)
-        elif balance < 120:
-            ratio = max(ratio, 0.46)
-        elif balance < 160:
-            ratio = max(ratio, 0.40)
-        else:
-            ratio = max(ratio, 0.34)
-    if mechanic_threshold_push_window and balance > 0:
-        ratio = max(ratio, min(0.62, (mechanic_gap / max(balance, 1)) + 0.10))
-    if needs_car and stranded_no_car and phase == "car_rush":
-        if not has_met_tom:
-            if balance < 80:
-                ratio = max(ratio, 0.52)
-            elif balance < 120:
-                ratio = max(ratio, 0.46)
-            elif balance < 160:
-                ratio = max(ratio, 0.34)
-            elif balance < 200:
-                ratio = max(ratio, 0.26)
-    if early_caution:
-        if phase == "car_rush" and balance < 200:
-            if balance < 100:
-                ratio = min(ratio, 0.28 if urgent_doctor or wants_doctor else 0.32)
-            else:
-                ratio = min(ratio, 0.22 if urgent_doctor or wants_doctor else 0.20)
-        elif balance < 150:
-            ratio = max(ratio, 0.24)
-        elif balance < 350:
-            ratio = max(ratio, 0.20)
-        elif balance < 900:
-            ratio = min(ratio, 0.18)
-        else:
-            ratio = min(ratio, 0.14)
-    if balance >= 25000 and edge_score >= 6:
-        ratio = min(ratio, 0.30 if balance < 100000 else 0.18)
-
-    if phase != "car_rush" and balance < 120:
-        ratio = min(ratio, 0.24)
-    elif phase != "car_rush" and balance < 250 and rank == 0:
-        ratio = min(ratio, 0.30)
-    if needs_car and phase == "car_rush":
-        if survival_mode:
-            if wants_doctor or urgent_doctor:
-                ratio = min(ratio, 0.18 if balance >= 100 else 0.24)
-            elif stranded_no_car and not has_met_tom:
-                ratio = min(ratio, 0.16 if balance >= 120 else 0.22)
-    if needs_car and stranded_no_car and phase == "car_rush":
-        if not has_met_tom:
-            if balance >= 100:
-                ratio = min(ratio, 0.12)
-        elif not has_met_frank and balance >= 100:
-            ratio = min(ratio, 0.12)
-
-    if distance and distance <= max(100, int(balance * 0.8)):
-        if phase == "car_rush":
-            pressure_factor = 0.9
-        elif phase == "million_rush" and wants_millionaire_push:
-            pressure_factor = 0.9 if balance < 400000 else 0.82
-        else:
-            pressure_factor = tuner_pressure_factor if progression_ready else max(0.5, tuner_pressure_factor - 0.14)
-        if stranded_no_car:
-            pressure_factor = max(pressure_factor, 0.94 if balance < 1000 else 0.82)
-        if stalled_run and not survival_mode:
-            pressure_factor = max(pressure_factor, 0.88 if rank <= 1 else 0.80)
-        pressure_bet = int(distance * pressure_factor)
-    else:
-        pressure_bet = 0
-    if mechanic_threshold_push_window:
-        pressure_bet = max(pressure_bet, mechanic_gap)
-
-    if phase == "car_rush":
-        if balance < 100:
-            max_ratio = 0.42
-        elif balance < 200:
-            max_ratio = 0.34
-        elif balance < 350:
-            max_ratio = 0.30
-        else:
-            max_ratio = 0.20
-    elif phase == "marvin_push":
-        if balance < 2500:
-            max_ratio = 0.60
-        elif balance < 6000:
-            max_ratio = 0.54
-        else:
-            max_ratio = 0.46
-    elif phase == "million_rush" and wants_millionaire_push:
-        if balance >= 600000 and has_extra_round_item and dealer_happiness >= 85:
-            max_ratio = 0.72
-        else:
-            max_ratio = 0.62 if balance < 400000 else 0.52
-    else:
-        max_ratio = tuner_max_ratio if progression_ready else min(tuner_max_ratio, 0.45)
-    if fragile_post_car:
-        if balance < 150:
-            max_ratio = min(max_ratio, 0.14)
-        elif balance < 400:
-            max_ratio = min(max_ratio, 0.18)
-        else:
-            max_ratio = min(max_ratio, 0.22)
-    if stranded_no_car:
-        if balance < 120:
-            max_ratio = max(max_ratio, 0.55)
-        elif balance < 250:
-            max_ratio = max(max_ratio, 0.50)
-        elif balance < 600:
-            max_ratio = max(max_ratio, 0.46)
-        else:
-            max_ratio = max(max_ratio, 0.40)
-    if balance >= 25000 and edge_score >= 6:
-        max_ratio = min(max_ratio, 0.38 if balance < 100000 else 0.24)
-    if late_breakout_protection:
-        max_ratio = min(max_ratio, 0.14 if balance < 25000 else 0.10)
-    # Rank 2 cushion: cap max_ratio by balance tier (mirrors ratio guards above).
-    if rank == 2 and balance < 13000:
-        max_ratio = min(max_ratio, 0.12)
-    elif rank == 2 and balance < 25000:
-        max_ratio = min(max_ratio, 0.24)
-    elif rank == 2 and balance < 50000:
-        max_ratio = min(max_ratio, 0.34)
-    # Rank 3 cushion: cap max_ratio when balance is within 1.3x of the $100k floor.
-    if rank == 3 and balance < 130000:
-        max_ratio = min(max_ratio, 0.18)
-    if stalled_run and not survival_mode:
-        if phase == "car_rush":
-            max_ratio = max(max_ratio, 0.36 if balance < 350 else 0.24)
-        elif rank <= 1:
-            max_ratio = max(max_ratio, 0.34)
-    if midgame_growth_window:
-        if balance < 2500:
-            max_ratio = max(max_ratio, 0.78 if edge_score >= 4 else 0.70)
-        elif balance < 5000:
-            max_ratio = max(max_ratio, 0.70 if edge_score >= 4 else 0.62)
-        else:
-            max_ratio = max(max_ratio, 0.58)
-    if rank_three_growth_window:
-        # Allow betting up to 55% of balance; floor protection will cap to surplus anyway.
-        # Cushion guards from above further restrict at $10k-$50k balance bands.
-        max_ratio = max(max_ratio, 0.55 if edge_score >= 5 else 0.48)
-    # Re-apply rank cushions after any growth-window boosts so they remain hard upper bounds.
-    if rank == 2 and balance < 13000:
-        max_ratio = min(max_ratio, 0.12)
-    elif rank == 2 and balance < 25000:
-        max_ratio = min(max_ratio, 0.24)
-    elif rank == 2 and balance < 50000:
-        max_ratio = min(max_ratio, 0.34)
-    if pending_marvin_active and not survival_mode and phase != "marvin_push":
-        if pending_marvin_shortfall > 0:
-            max_ratio = min(max_ratio, 0.18 if edge_score >= 5 else 0.15)
-        else:
-            max_ratio = min(max_ratio, 0.10)
-
-    if survival_mode:
-        if phase == "car_rush":
-            max_ratio = min(max_ratio, 0.24)
-        elif balance < 10000:
-            max_ratio = min(max_ratio, 0.20)
-        else:
-            max_ratio = min(max_ratio, 0.16)
-    elif plan.goal == "restock_supplies" and wants_store:
-        max_ratio = min(max_ratio, 0.22 if balance < 1000 else 0.18)
-    elif plan.goal in {"contain_debt_escalation", "reduce_debt_risk"} and phase != "marvin_push":
-        max_ratio = min(max_ratio, 0.20 if balance < 10000 else 0.16)
-    elif wants_pawn and balance < 500:
-        max_ratio = min(max_ratio, 0.22)
-    if stranded_no_car:
-        max_ratio = max(max_ratio, 0.34 if balance >= 1000 else 0.40)
-    if low_balance_stall_window:
-        if balance < 80:
-            max_ratio = min(max_ratio, 0.34)
-        elif balance < 120:
-            max_ratio = min(max_ratio, 0.28)
-        else:
-            max_ratio = min(max_ratio, 0.24)
-    if pre_tom_breakout_window:
-        if balance < 80:
-            max_ratio = max(max_ratio, 0.66)
-        elif balance < 120:
-            max_ratio = max(max_ratio, 0.60)
-        elif balance < 160:
-            max_ratio = max(max_ratio, 0.54)
-        else:
-            max_ratio = max(max_ratio, 0.46)
-    if mechanic_threshold_push_window and balance > 0:
-        max_ratio = max(max_ratio, min(0.78, (mechanic_gap / max(balance, 1)) + 0.18))
-    if needs_car and stranded_no_car and phase == "car_rush":
-        if not has_met_tom:
-            if balance < 80:
-                max_ratio = max(max_ratio, 0.66)
-            elif balance < 120:
-                max_ratio = max(max_ratio, 0.60)
-            elif balance < 160:
-                max_ratio = max(max_ratio, 0.50)
-            elif balance < 200:
-                max_ratio = max(max_ratio, 0.40)
-    if early_caution:
-        if phase == "car_rush" and balance < 200:
-            if balance < 100:
-                max_ratio = min(max_ratio, 0.36 if urgent_doctor or wants_doctor else 0.40)
-            else:
-                max_ratio = min(max_ratio, 0.28 if urgent_doctor or wants_doctor else 0.26)
-        elif balance < 150:
-            max_ratio = min(max_ratio, 0.22)
-        elif balance < 350:
-            max_ratio = min(max_ratio, 0.20)
-        elif balance < 900:
-            max_ratio = min(max_ratio, 0.18)
-        else:
-            max_ratio = min(max_ratio, 0.14)
-    if balance >= 25000 and edge_score >= 6:
-        max_ratio = min(max_ratio, 0.38 if balance < 100000 else 0.24)
-
-    if phase != "car_rush" and balance < 120:
-        max_ratio = min(max_ratio, 0.28)
-    elif phase != "car_rush" and balance < 250 and rank == 0:
-        max_ratio = min(max_ratio, 0.36)
-    if needs_car and phase == "car_rush":
-        if survival_mode:
-            if wants_doctor or urgent_doctor:
-                max_ratio = min(max_ratio, 0.18 if balance >= 100 else 0.24)
-            elif stranded_no_car and not has_met_tom:
-                max_ratio = min(max_ratio, 0.16 if balance >= 120 else 0.22)
-    if needs_car and stranded_no_car and phase == "car_rush":
-        if not has_met_tom:
-            if balance >= 100:
-                max_ratio = min(max_ratio, 0.16)
-        elif not has_met_frank and balance >= 100:
-            max_ratio = min(max_ratio, 0.18)
-    max_ratio_bet = max(min_bet, int(balance * max_ratio))
-    base_bet = max(min_bet, int(balance * ratio))
-    bet = max(base_bet, min(max_ratio_bet, pressure_bet))
-
-    if floor and balance > floor:
-        if wants_doctor:
-            floor_buffer = max(0, int(floor * 0.08))
-        elif progression_ready:
-            floor_buffer = 0
-        else:
-            floor_buffer = max(40, int(floor * 0.04))
-
-        protected_floor = max(0, floor - floor_buffer)
-        surplus = balance - protected_floor
-        if surplus > 0:
-            surplus_push = max(min_bet, int(surplus * (tuner_surplus_push if progression_ready else max(0.45, tuner_surplus_push - 0.18))))
-            bet = min(max_ratio_bet, max(bet, surplus_push))
-        bet = min(bet, max(min_bet, balance - protected_floor))
-
-    if needs_car:
-        if stranded_no_car and not has_met_tom:
-            if balance >= 100:
-                bet = min(bet, max(min_bet, balance - 80))
-        if balance >= 75:
-            mechanic_hold = 0
-            if not has_met_tom and balance >= 200:
-                mechanic_hold = max(mechanic_hold, 200)
-            elif has_met_tom and not has_met_frank and balance >= 100:
-                mechanic_hold = max(mechanic_hold, 100)
-            if not has_met_oswald and balance >= 850:
-                mechanic_hold = max(mechanic_hold, 850)
-            if mechanic_hold:
-                bet = min(bet, max(min_bet, balance - mechanic_hold))
-
-        for reserve_key in ("car_progress_reserve", "mechanic_purchase_reserve", "known_car_repair_reserve"):
-            reserve = int(_metadata_number(metadata, reserve_key))
-            if reserve:
-                bet = min(bet, max(min_bet, balance - reserve))
-
-        if day >= 4 and balance >= 150:
-            if pre_tom_breakout_window:
-                reserve = 40 if balance < 220 else 55 if balance < 320 else 75
-            elif stranded_no_car:
-                reserve = 40 if balance < 220 else 55 if balance < 320 else 75
-            elif balance < 220:
-                reserve = 110
-            elif balance < 320:
-                reserve = 140
-            else:
-                reserve = 170
-            bet = min(bet, max(min_bet, balance - reserve))
-        if balance >= 200:
-            if stranded_no_car:
-                reserve = 55 if balance < 350 else 75 if balance < 900 else 100
-            elif day < 5:
-                if balance < 260:
-                    reserve = 70
-                elif balance < 350:
-                    reserve = 95
-                elif balance < 500:
-                    reserve = 120
-                else:
-                    reserve = 160
-            elif balance < 350:
-                reserve = 100
-            elif balance < 900:
-                reserve = 140
-            else:
-                reserve = 190
-            bet = min(bet, max(min_bet, balance - reserve))
-        elif day < 5 and balance >= 120:
-            reserve = 55 if balance < 160 else 85
-            bet = min(bet, max(min_bet, balance - reserve))
-        elif day < 5:
-            bet = max(bet, min(balance, max(min_bet, int(balance * 0.4))))
-
-        if (not stranded_no_car) and balance >= 100 and not has_met_tom:
-            bet = min(bet, max(min_bet, balance - 100))
-        if (not stranded_no_car) and balance >= 100 and has_met_tom and not has_met_frank:
-            bet = min(bet, max(min_bet, balance - 100))
-        if (not stranded_no_car) and day >= 8 and balance >= 350 and has_met_tom and not has_met_frank:
-            bet = min(bet, max(min_bet, balance - 280))
-        if early_caution:
-            if balance >= 700:
-                reserve = 180
-            elif balance >= 350:
-                reserve = 130
-            elif balance >= 180:
-                reserve = 80
-            else:
-                reserve = 40
-            bet = min(bet, max(min_bet, balance - reserve))
-
-    elif has_car or lost_car_progress_run:
-        if balance < 150:
-            reserve = 35
-            cap_ratio = 0.22 if progression_ready else 0.14
-        elif balance < 400:
-            reserve = 50
-            cap_ratio = 0.32 if progression_ready else 0.22
-        elif balance < 1000:
-            reserve = 85
-            cap_ratio = 0.42 if progression_ready else 0.28
-        else:
-            reserve = 150
-            cap_ratio = 0.46 if progression_ready else 0.28
-
-        if wants_doctor:
-            reserve = max(reserve, 120 if has_faulty_insurance else 260)
-            cap_ratio = min(cap_ratio, 0.16)
-        elif wants_store and store_budget:
-            reserve = max(reserve, store_budget + 30)
-            cap_ratio = min(cap_ratio, 0.30)
-        elif wants_pawn:
-            reserve = max(reserve, 90)
-            cap_ratio = min(cap_ratio, 0.26)
-        elif sanity < 20 or health < 50:
-            reserve = max(reserve, 150)
-            cap_ratio = min(cap_ratio, 0.15)
-
-        if plan.goal in {"contain_debt_escalation", "reduce_debt_risk"}:
-            reserve = max(reserve, 140)
-            cap_ratio = min(cap_ratio, 0.18)
-        elif plan.goal == "restock_supplies" and wants_store and store_budget:
-            reserve = max(reserve, store_budget + 45)
-            cap_ratio = min(cap_ratio, 0.24)
-
-        if floor:
-            reserve = max(reserve, floor)
-
-        if pending_marvin_active:
-            if pending_marvin_shortfall <= 0:
-                reserve = max(reserve, pending_marvin_price)
-                cap_ratio = min(cap_ratio, 0.10)
-            elif fake_cash > 0:
-                reserve = max(reserve, max(180, int(balance * 0.75)))
-                cap_ratio = min(cap_ratio, 0.18 if edge_score >= 5 else 0.14)
-
-        if phase == "million_rush" and wants_millionaire_push:
-            if balance < 250000:
-                reserve = min(reserve, max(25000, int(balance * 0.36)))
-                cap_ratio = max(cap_ratio, 0.56)
-            elif balance < 400000:
-                reserve = min(reserve, max(90000, int(balance * 0.42)))
-                cap_ratio = max(cap_ratio, 0.48)
-            else:
-                reserve = min(reserve, max(220000, int(balance * 0.5)))
-                cap_ratio = max(cap_ratio, 0.38)
-
-        if rank == 1 and not wants_store and not wants_doctor:
-            reserve = min(reserve, 120 if balance < 5000 else 180)
-            cap_ratio = max(cap_ratio, 0.50 if balance < 5000 else 0.44)
-        elif rank == 0 and not wants_store and not wants_doctor and balance >= 250:
-            reserve = min(reserve, 55 if balance < 400 else 80 if balance < 1000 else 120)
-            cap_ratio = max(cap_ratio, 0.42 if balance < 400 else 0.54 if balance < 1000 else 0.58)
-        elif rank == 2 and progression_ready:
-            reserve = min(reserve, max(180, int(floor * 0.78)))
-            cap_ratio = max(cap_ratio, 0.68)
-        elif rank >= 3 and progression_ready:
-            reserve = min(reserve, max(220, int(floor * 0.92)))
-            cap_ratio = max(cap_ratio, 0.34)
-
-        # Drawdown protection: when balance has fallen significantly from peak,
-        # reduce aggression to prevent a losing streak from wiping out the run.
-        # Only applies post-car at rank 1+ where the bot has meaningful capital.
-        if run_peak_balance > 0 and rank >= 1 and balance < run_peak_balance * 0.40:
-            # Severe drawdown (>60% loss from peak): go ultra-conservative
-            cap_ratio = min(cap_ratio, 0.20)
-            reserve = max(reserve, int(balance * 0.40))
-        elif run_peak_balance > 0 and rank >= 1 and balance < run_peak_balance * 0.60:
-            # Moderate drawdown (>40% loss from peak): pull back
-            cap_ratio = min(cap_ratio, 0.30)
-            reserve = max(reserve, int(balance * 0.25))
-
-        if edge_score >= 6 and balance >= 25000:
-            reserve = max(reserve, int(balance * (0.72 if balance < 100000 else 0.82)))
-            cap_ratio = min(cap_ratio, 0.34 if balance < 100000 else 0.22)
-
-        if late_breakout_protection:
-            reserve = max(reserve, int(balance * (0.70 if balance < 25000 else 0.82)))
-            cap_ratio = min(cap_ratio, 0.14 if balance < 25000 else 0.10)
-
-        if fragile_post_car:
-            reserve = max(reserve, 120 if balance < 400 else 180)
-            cap_ratio = min(cap_ratio, 0.16 if balance < 400 else 0.20)
-
-        if wants_map_unlock:
-            if balance >= 7000:
-                reserve = max(reserve, 6000)
-            elif balance >= 3000:
-                reserve = max(reserve, 2500)
-            elif balance >= 1200:
-                reserve = max(reserve, 1200)
-            cap_ratio = min(cap_ratio, 0.22)
-
-        if midgame_growth_window:
-            if balance < 2500:
-                reserve = min(reserve, 90 if rank >= 1 else 110)
-                cap_ratio = max(cap_ratio, 0.74 if rank >= 1 else 0.66)
-            elif balance < 5000:
-                reserve = min(reserve, 120)
-                cap_ratio = max(cap_ratio, 0.66 if rank >= 1 else 0.60)
-            else:
-                reserve = min(reserve, 160)
-                cap_ratio = max(cap_ratio, 0.58)
-
-        stabilized_cap = max(min_bet, int(balance * cap_ratio))
-        bet = min(bet, stabilized_cap)
-        if balance > reserve:
-            bet = min(bet, max(min_bet, balance - reserve))
-
-    if mechanic_threshold_push_window:
-        bet = max(bet, min(total_available, max(min_bet, mechanic_gap)))
-    if low_balance_stall_window and not pre_tom_breakout_window:
-        if balance < 80:
-            conservative_cap = max(min_bet, int(balance * 0.30))
-        elif balance < 120:
-            conservative_cap = max(min_bet, int(balance * 0.24))
-        else:
-            conservative_cap = max(min_bet, int(balance * 0.20))
-        bet = min(bet, conservative_cap)
-
-    if fake_cash > 0 and not wants_doctor and not urgent_doctor:
-        if health >= 48 and sanity >= 24:
-            if pending_marvin_active and pending_marvin_shortfall <= 0:
-                blend_slice = 0
-            elif pending_marvin_active:
-                target_blend = max(200, pending_marvin_shortfall)
-                if edge_score >= 6:
-                    blend_slice = min(fake_cash, max(400, int(target_blend * 0.45)))
-                elif edge_score >= 4:
-                    blend_slice = min(fake_cash, max(250, int(target_blend * 0.30)))
-                else:
-                    blend_slice = min(fake_cash, max(150, int(target_blend * 0.18)))
-            elif edge_score >= 6:
-                blend_slice = min(fake_cash, max(1000, int(fake_cash * 0.75)))
-            elif edge_score >= 4:
-                blend_slice = min(fake_cash, max(500, int(fake_cash * 0.55)))
-            else:
-                blend_slice = min(fake_cash, max(200, int(fake_cash * 0.30)))
-            if blend_slice > 0:
-                bet = max(bet, min(total_available, max(min_bet, balance + blend_slice)))
-                # The blend can push the bet above what the rank-protection floor computed
-                # earlier.  Re-apply: losing the bet must not drop real balance below floor.
-                # (balance - floor) is the real surplus we can risk; adding fake_cash gives
-                # the maximum bet that still lands at floor on a full loss.
-                if floor and balance > floor:
-                    blend_floor_cap = max(min_bet, (balance - floor) + fake_cash)
-                    bet = min(bet, blend_floor_cap)
-
+    bet = min(bet, int(balance * 0.5))
+    if bet > min_bet:
+        bet = max(bet, int(balance * 0.07))
     if bet > total_available:
         bet = int(total_available)
     if bet < min_bet:
@@ -1015,20 +363,17 @@ def choose_blackjack_bet(request: DecisionRequest, plan: StrategicPlan) -> tuple
         request_type=request.request_type,
         strategic_goal=plan.goal,
         chosen_action=str(bet),
-        reason=f"goal={plan.goal} blackjack_bet phase={phase} survival={survival_mode} edge={edge_score}",
-        confidence=0.88,
+        reason=f"goal={plan.goal} blackjack_bet {reason} edge={edge_score}",
+        confidence=0.97,
         options=tuple(option.label for option in request.normalized_options),
         game_state_summary=state,
         metadata={
             "plan": plan.to_dict(),
-            "ratio": ratio,
-            "max_ratio": max_ratio,
-            "pressure_bet": pressure_bet,
-            "mechanic_gap": mechanic_gap,
-            "mechanic_threshold_push_window": mechanic_threshold_push_window,
+            "edge_score": edge_score,
+            "run_peak_balance": run_peak_balance,
+            "starting_balance": starting_balance,
             "store_budget": store_budget,
-            "pending_marvin_active": pending_marvin_active,
-            "pending_marvin_shortfall": pending_marvin_shortfall,
+            "wants_store": wants_store,
         },
     )
     return bet, trace

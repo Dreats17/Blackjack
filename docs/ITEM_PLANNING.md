@@ -58,142 +58,84 @@
 
 ## 1. Current State Audit
 
-### Item Counts by Category
+### Status Of This Document
 
-| Category | Total Items | Active in Events | Narrative-Inert | Pawn Fodder Only |
-|----------|------------|-----------------|-----------------|-----------------|
-| Marvin Items (base) | 19 | 4 | **15** | 0 |
-| Marvin Upgrades | 18 | 2 | **16** | 0 |
-| Flasks | 12 | 1 | **11** | 0 |
-| Crafted Items | 26 | 26 | 0 | 0 |
-| Convenience Store | ~55 | ~50 | 0 | **1** (Lottery Ticket) |
-| Quest/Story Items | ~40 | 40 | 0 | 0 |
-| Adventure Rewards | ~30 | 30 | 0 | 0 |
-| Food Items | ~15 | 15 | 0 | 0 |
-| Car Parts | ~20 | 20 | 0 | 0 |
-| **Totals** | **~235** | **~188** | **~42** | **~1** |
+This file is now a historical master roadmap, not the authoritative status tracker.
 
-### The Core Problem
+Authoritative current-state tracking lives in `docs/ITEM_PLANNING_REMAINING.md`.
 
-~18% of all items (the most expensive, hardest-to-get Marvin items and flasks) have **zero narrative presence**. A player spends $5,000–$22,000 on a Marvin item and it only exists as a blackjack mechanical buff. They never see it mentioned in events, never get a reaction from NPCs, never use it to solve a problem outside of cards. This makes the Marvin shop feel disconnected from the rest of the game.
+The original opening audit in this file substantially under-reported implemented work. In particular, it treated large parts of the current codebase as greenfield even though the following are already in place:
 
-Meanwhile, cheap convenience store items like Duct Tape, Pocket Knife, and Road Flares appear in 5+ event files and feel deeply woven into the world.
+- Marvin blackjack item behavior in `blackjack.py`
+- Multiple non-table Marvin and upgrade hooks across `story/*.py`
+- Flask durability and some narrative integration
+- Dealer gift wrapping and gift delivery systems
+- Mechanic loyalty reward items
+- Inventory-aware event weighting
+- Expanded crafting recipes, hints, and workbench flow
+- Wrong-item and wild-item event infrastructure
+
+### Current High-Level Reality
+
+The remaining implementation problem is narrower than this document originally claimed.
+
+- The biggest real gap is not recipe existence; it is uneven world integration.
+- The most valuable unfinished work is still Marvin saturation, flask saturation, crafted-item cross-file presence, and selected combo/system follow-through.
+- Sections 16-35 in this file are mostly useful as design reference, not as an accurate missing-feature list.
 
 ---
 
-## 2. Gap Analysis — What's Inert
+## 2. Gap Analysis — What's Actually Still Open
 
-### Narrative-Inert Marvin Items (15 items — mechanics only, zero event text)
+The original "narrative-inert" tables below are obsolete and should not be used for implementation counting.
 
-| Item | Price Range | Blackjack Effect | Problem |
-|------|-----------|-----------------|---------|
-| Delight Indicator | $3K–5K | Reads happiness stat | No event ever mentions it |
-| Health Indicator | $3K–5K | Reads health stat | Only checked in player_core.py display |
-| Dirty Old Hat | $9K–13K | Min bet drops to $1 | No NPC reacts to your hat |
-| Golden Watch | $11K–15K | Increases table time | No one notices your watch |
-| Sneaky Peeky Shades | $14K–18K | Peek at next card | No event text about wearing sunglasses |
-| Lucky Coin | $4K–6K | 1x push recovery | Never flipped in a story moment |
-| Worn Gloves | $7K–10K | Subtle card-feel luck | No one comments on your gloves |
-| Tattered Cloak | $8K–12K | Dealer "forgets" bets | Invisible outside blackjack table |
-| Rusty Compass | $3K–5K | Finds opportunities | Never used to navigate in events |
-| Pocket Watch | $9K–13K | Extra rounds | Never pulled out in a story scene |
-| Gambler's Chalice | $11K–15K | Double-bet draw | Never toasted, never spilled |
-| Twin's Locket | $14K–20K | Split any pair | Never opened, never shown |
-| White Feather | $5K–9K | Dignified surrender | Never caught the wind in a scene |
-| Dealer's Grudge | $8K–12K | Side bet vs dealer | Never invoked in dealer dialogue |
-| Gambler's Grimoire | $3K–5K | Stat tracker | Never read aloud, never quoted |
+Use this simplified view instead:
 
-### Narrative-Inert Marvin Upgrades (16 items — same problem as above)
+### Confirmed Remaining Work
 
-| Upgrade | Base Item | Effect | Problem |
-|---------|-----------|--------|---------|
-| Delight Manipulator | Delight Indicator | Adjusts happiness | Zero narrative |
-| Health Manipulator | Health Indicator | Adjusts health | Zero narrative |
-| Unwashed Hair | Dirty Old Hat | Better disguise | Zero narrative |
-| Sapphire Watch | Golden Watch | Better VIP | Zero narrative |
-| Sneaky Peeky Goggles | Sneaky Peeky Shades | Better peek | Zero narrative |
-| Lucky Medallion | Lucky Coin | Better push | Zero narrative |
-| Velvet Gloves | Worn Gloves | Better feel | Zero narrative |
-| Invisible Cloak | Tattered Cloak | Better stealth | Zero narrative |
-| Golden Compass | Rusty Compass | Better finding | Zero narrative |
-| Grandfather Clock | Pocket Watch | More rounds | Zero narrative |
-| Overflowing Goblet | Gambler's Chalice | Better double | Zero narrative |
-| Mirror of Duality | Twin's Locket | Better splits | Zero narrative |
-| Phoenix Feather | White Feather | Better surrender | Zero narrative |
-| Dealer's Mercy | Dealer's Grudge | Better side bet | Zero narrative |
-| Oracle's Tome | Gambler's Grimoire | Better tracking | Zero narrative |
-| Real Insurance | Faulty Insurance | Better hospital | Zero narrative |
+- Under-covered Marvin items and upgrades still need broader event presence.
+- Flasks still need stronger non-casino narrative payoff.
+- Many crafted items still need to escape `events_day_items.py` isolation.
+- Higher-tier crafted items still need more memorable non-crafting triggers.
+- Some convenience-store items remain flavor-light compared with better-integrated utility items.
+- Multi-item combinations are still underbuilt relative to inventory size.
+- Optional systemic proposals remain undecided, not implemented.
 
-### Narrative-Inert Flasks (11 out of 12)
+### Not Open In The Way This File Originally Claimed
 
-| Flask | Price | Mechanical Effect | Narrative Presence |
-|-------|-------|-------------------|-------------------|
-| Flask of No Bust | $10K–14K | Prevents busting 4 hands | durability.py only |
-| Flask of Imminent Blackjack | $16K–22K | Increases BJ odds | Shop/durability only |
-| Flask of Dealer's Whispers | $10K–14K | Reveals hole card | Shop/durability only |
-| Flask of Bonus Fortune | $13K–19K | +bonus on wins | Shop/durability only |
-| Flask of Anti-Venom | $9K–12K | Cures poison | Shop/durability only |
-| Flask of Anti-Virus | $10K–12K | Cures illness | Shop/durability only |
-| Flask of Fortunate Day | $4K–6K | Boosts day luck | Shop/durability only |
-| Flask of Fortunate Night | $4K–7K | Boosts night luck | Shop/durability only |
-| Flask of Second Chance | $11K–15K | Replay missed hand | durability.py only |
-| Flask of Split Serum | $11K–16K | Split enhancement | durability.py only |
-| Flask of Pocket Aces | $17K–22K | Guarantee ace | Shop/durability only |
-| ~~Flask of Dealer's Hesitation~~ | ~~$8K–11K~~ | ~~Dealer delays~~ | **HAS narrative** in endings.py |
+- Crafting recipes and crafting categories are already implemented.
+- Workbench browsing, hints, inspect flows, and multi-tier crafting are already implemented.
+- Dealer gifting is already implemented.
+- Mechanic loyalty items are already implemented.
+- Inventory-aware event-weight tuning already exists.
+- Wrong-item interactions already exist in partial form.
 
-### Single Inert Store Item
+### Reading Rule
 
-| Item | Price | Problem |
-|------|-------|---------|
-| Lottery Ticket | $5 | Never checked anywhere — completely dead code |
+If a later section in this file says an item family has "zero narrative" or is wholly inert, treat that as historical planning language unless it has been re-verified against current code.
 
 ---
 
 ## 3. Cross-File Interaction Map
 
-How many event files check each item. Items appearing in only 1 file feel isolated.
-Items appearing in 3+ files feel woven into the world.
+The original counts in this section were useful for spotting isolation patterns, but they are no longer authoritative item-by-item metrics.
 
-### Most Connected Items (3+ files)
+What still holds true:
 
-| Item | Files | Where |
-|------|-------|-------|
-| Animal Whistle | 8 | events_day_people, events_day_animals, events_night, adventures, events_day_companions, endings, events_day_storylines, locations |
-| Pocket Knife | 5 | events_day_items, events_day_storylines, events_night, events_car, events_day_survival |
-| Duct Tape | 4 | events_day_survival, adventures, events_car, systems (crafting) |
-| Tool Kit | 4 | events_day_survival, events_day_storylines, events_car, locations |
-| Flashlight | 3 | events_day_items, events_day_survival, events_night |
-| Pest Control | 3 | events_day_survival, events_day_animals, events_night |
-| Spare Tire | 3 | events_day_survival, events_car, locations |
-| First Aid Kit | 3 | events_day_survival, events_day_items, events_illness |
-| Binoculars | 3 | events_day_survival, events_night, events_day_items |
-| Road Flares | 3 | events_day_survival, events_car, events_night |
+- Highly connected utility items feel systemic because they appear in multiple event families.
+- Several crafted, luxury, flask, and Marvin-derived items still lag behind that standard.
+- Cross-file presence remains the right measure for whether an item feels "real" in the game.
 
-### Isolated Items (1 file only)
+What changed:
 
-| Item | File | What It Does |
-|------|------|-------------|
-| Pepper Spray | events_day_items | Robbery defense only |
-| Shiv | events_day_items | Robbery defense only |
-| Dream Catcher | events_day_items | Sleep quality only |
-| Worry Stone | events_day_items | Sanity relief only |
-| Slingshot | events_day_items | Bird hunt only |
-| Signal Mirror | events_day_items | Rescue signal only |
-| Rain Collector | events_day_items | Hydration only |
-| Fire Starter Kit | events_day_items | Campfire only |
-| Snare Trap | events_day_items | Rabbit trap only |
-| Emergency Blanket | events_day_items | Cold protection only |
-| Water Purifier | events_day_items | Clean water only |
-| Home Remedy | events_day_items | Illness cure only |
-| Lucky Charm Bracelet | events_day_items | Luck boost only |
-| Road Flare Torch | events_day_items | Scare threats only |
-| Splint | events_day_items | Injury prevention only |
-| Scrap Armor | events_day_dark | Violence protection only |
-| Lockpick Set | events_day_items | Lock opening only |
-| Binocular Scope | events_day_items | Observation only |
-| Fishing Rod | events_day_items | Fishing only |
+- Some items previously listed as isolated now have additional hooks.
+- Some systems previously described as disconnected are already integrated.
+- The exact per-item file counts should be refreshed only after the remaining implementation waves are complete.
 
-**Pattern:** All 26 crafted items are active, but 19 of them only work in a single file (events_day_items.py). They never appear in night events, adventures, dark events, survival events, or people events.
+Practical rule for continuing work:
+
+- Prefer moving under-covered items into people, dark, night, survival, companion, surreal, and adventure events over adding more recipe-layer complexity.
+- Use `docs/ITEM_PLANNING_REMAINING.md` as the live checklist for which families still need that treatment.
 
 ---
 

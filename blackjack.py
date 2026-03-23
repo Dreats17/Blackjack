@@ -37,7 +37,7 @@ def bright(text):
 
 
 class Blackjack:
-    __slots__=["__balance", "__bet", "__min_bet", "__dealer_happiness", "__deck", "__hand", "__dealer_hand", "__player", "__used_peek", "__dealer_warning", "__free_hand", "__used_second_chance", "__used_pocket_aces", "__lucky_coin_triggered", "__used_double_down", "__used_split", "__split_hand", "__used_surrender", "__insurance_bet", "__bust_streak", "__min_bet_bust_count", "__dealer_forced_min_bet", "__dealer_forced_all_in", "__fraudulent_portion"]
+    __slots__=["__balance", "__bet", "__min_bet", "__dealer_happiness", "__deck", "__hand", "__dealer_hand", "__player", "__used_peek", "__dealer_warning", "__free_hand", "__used_second_chance", "__used_pocket_aces", "__lucky_coin_triggered", "__used_double_down", "__used_split", "__split_hand", "__used_surrender", "__insurance_bet", "__bust_streak", "__min_bet_bust_count", "__dealer_forced_min_bet", "__dealer_forced_all_in", "__fraudulent_portion", "__was_all_in", "__pre_bet_balance"]
 
     def __init__(self, player):
         self.__balance = 50
@@ -63,6 +63,8 @@ class Blackjack:
         self.__bust_streak = 0
         self.__min_bet_bust_count = 0
         self.__fraudulent_portion = 0   # fake-cash portion of the current bet (reset each hand)
+        self.__was_all_in = False
+        self.__pre_bet_balance = 0
 
     def update_player(self):
         self.__balance = self.__player.get_balance()
@@ -112,58 +114,58 @@ class Blackjack:
                 "Everything is fine. Everything is fine. Everything is fine. Is everything fine?"
             ]
             type.fast(red(random.choice(broken_effects)))
-            print("\n")
+            print()
 
         # Tells player that their golden watch is noticed by the Dealer
         if self.__player.has_item("Sapphire Watch"):
             type.fast("Your " + bright(cyan("Sapphire Watch")) + " shimmers brilliantly. The Dealer is mesmerized and lets you play an extra round.")
-            print("\n")
+            print()
         elif self.__player.has_item("Golden Watch"):
             type.fast("Your " + bright(magenta("Golden Watch")) + " glistens in the light hanging above the betting table. The Dealer will let you play an extra round.")
-            print("\n")
+            print()
 
         if self.__player.has_item("Unwashed Hair"):
             type.fast("Your " + bright(cyan("Unwashed Hair")) + " is absolutely revolting. The Dealer lowers minimum bets just to get you out faster.")
-            print("\n")
+            print()
         elif self.__player.has_item("Dirty Old Hat"):
             type.fast("The " + bright(magenta("Dirty Old Hat")) + " on your head sends dust in the air, and reeks of poverty. Minimum bets are lowered.")
-            print("\n")
+            print()
 
         if self.__player.has_item("Grandfather Clock"):
             type.fast("Your " + bright(cyan("Grandfather Clock")) + " chimes ominously. Time bends to your will, guaranteeing an extra round.")
-            print("\n")
+            print()
             self.__player.update_pocket_watch_durability()
         elif self.__player.has_item("Pocket Watch") and self.__player.get_rounds() == 4:
             type.fast("Your " + bright(magenta("Pocket Watch")) + " ticks slowly, buying you extra time. The Dealer lets you play an extra round.")
-            print("\n")
+            print()
             self.__player.update_pocket_watch_durability()
 
         if self.__player.has_item("Velvet Gloves"):
             type.fast("Your " + bright(cyan("Velvet Gloves")) + " feel impossibly soft. The cards practically shuffle themselves into your favor.")
-            print("\n")
+            print()
         elif self.__player.has_item("Worn Gloves"):
             type.fast("Your " + bright(magenta("Worn Gloves")) + " fit snugly on your hands. You feel more in tune with the cards.")
-            print("\n")
+            print()
 
         if self.__player.has_item("Invisible Cloak"):
             type.fast("Your " + bright(cyan("Invisible Cloak")) + " renders you nearly unseen. The Dealer keeps forgetting you're there.")
-            print("\n")
+            print()
         elif self.__player.has_item("Tattered Cloak"):
             type.fast("Your " + bright(magenta("Tattered Cloak")) + " rustles quietly. The Dealer barely notices you.")
-            print("\n")
+            print()
 
         if (self.__player.has_item("Lucky Penny") and self.__player.has_item("Lucky Coin")
                 and self.__player.has_item("Lucky Charm Bracelet")):
             type.fast(yellow(bright("Three lucky charms in your pocket simultaneously.")))
-            print("\n")
+            print()
             type.fast("You feel it before the cards are dealt. The table tilts. Imperceptibly. In your favor.")
-            print("\n")
+            print()
         elif self.__player.has_item("Lucky Medallion"):
             type.fast("Your " + bright(cyan("Lucky Medallion")) + " pulses with ancient fortune. Luck bends around you.")
-            print("\n")
+            print()
         elif self.__player.has_item("Lucky Coin"):
             type.fast("Your " + bright(magenta("Lucky Coin")) + " feels warm in your pocket.")
-            print("\n")
+            print()
 
         # Makes the dealer a bit happier, as a new day has started
         # BUT NOT if he has too much fake cash from the player
@@ -175,24 +177,24 @@ class Blackjack:
                 type.fast("The Dealer has calmed down since you've last seen him!")
                 print()
                 self.delight_indicator()
-                print("\n")
+                print()
             elif self.__player.has_item("Delight Indicator"):
                 type.fast("Your " + bright(magenta("Delight Indicator")) + " begins to flash.")
                 print()
                 type.fast("The Dealer has calmed down since you've last seen him!")
                 print()
                 self.delight_indicator()
-                print("\n")
+                print()
         else:
             type.fast(yellow("The Dealer looks at you strangely. His jade eye narrows."))
             print()
             type.fast(yellow("He does NOT seem pleased to see you tonight."))
-            print("\n")
+            print()
         
         # GIFT DELIVERY SYSTEM - Automatically give gift if player has one
         if self.__player.has_gift_wrapped():
             self.__player.deliver_gift_to_dealer()
-            print("\n")
+            print()
 
         # Tells the player their balance.
         type.fast("You have " + green(bright("${:,}".format(self.__balance))))
@@ -222,7 +224,7 @@ class Blackjack:
                     if self.__dealer_forced_all_in:
                         self.__bet = self.__balance
                         type.slow(red(bright("You push everything to the center. " + green("${:,}".format(self.__bet)) + red(bright(". All of it.")))))
-                        print("\n")
+                        print()
                         self.__dealer_forced_all_in = False  # Only forced once
                     else:
                         player_betting = False
@@ -251,7 +253,7 @@ class Blackjack:
                 if breakloop:
                     break
 
-                print("\n")
+                print()
 
                 self.print_draw("Dealer", "second", self.__dealer_hand.get_card(1))
                 print()
@@ -284,7 +286,7 @@ class Blackjack:
         else:
             self.__dealer_happiness -= value
         if (self.__player.has_item("Delight Indicator") or self.__player.has_item("Delight Manipulator")) and message == True:
-            print("\n")
+            print()
             type.fast("The Dealer has been angered!")
             print()
             self.delight_indicator()
@@ -295,7 +297,7 @@ class Blackjack:
         else:
             self.__dealer_happiness += value
         if (self.__player.has_item("Delight Indicator") or self.__player.has_item("Delight Manipulator")) and message==True:
-            print("\n")
+            print()
             type.fast("The Dealer has calmed down!")
             print()
             self.delight_indicator()
@@ -313,7 +315,7 @@ class Blackjack:
                         hi = max(lo + 1, int(self.__balance/8))
                         self.__bet = random.randrange(lo, hi)
                         type.slow(bright(yellow("The Dealer's in a good mood. Here's a ") + green("${:,}".format(self.__bet)) + yellow(" hand, on the house!")))
-                        print("\n")
+                        print()
                         self.__free_hand = True
                 elif self.__dealer_happiness > 95:
                     random_chance = random.randrange(10)
@@ -322,7 +324,7 @@ class Blackjack:
                         hi = max(lo + 1, int(self.__balance/10))
                         self.__bet = random.randrange(lo, hi)
                         type.slow(bright(yellow("The Dealer's in a good mood. Here's a ") + green("${:,}".format(self.__bet)) + yellow(" hand, on the house!")))
-                        print("\n")
+                        print()
                         self.__free_hand = True
                 elif self.__dealer_happiness > 90:
                     random_chance = random.randrange(10)
@@ -331,7 +333,7 @@ class Blackjack:
                         hi = max(lo + 1, int(self.__balance/15))
                         self.__bet = random.randrange(lo, hi)
                         type.slow(bright(yellow("The Dealer's in a good mood. Here's a ") + green("${:,}".format(self.__bet)) + yellow(" hand, on the house!")))
-                        print("\n")
+                        print()
                         self.__free_hand = True
 
                 # Dealer anger effects
@@ -344,13 +346,13 @@ class Blackjack:
                     if random_chance == 0:
                         # Force all-in instead of outright kill
                         type.slow(red(bright("The Dealer slams his fist on the table. The whole room goes quiet.")))
-                        print("\n")
+                        print()
                         type.slow(red(bright("He leans in close. You can see the veins in his neck pulsing.")))
                         print()
                         type.slow(red(bright('"You think this is a game? ALL. IN. Every last cent. Right now."')))
-                        print("\n")
+                        print()
                         type.slow(red(bright("The Dealer isn\'t asking. He\'s telling.")))
-                        print("\n")
+                        print()
                         self.__dealer_forced_all_in = True
                     elif random_chance == 1:
                         type.slow(red(bright("The Dealer's had it with you. He gets up from his chair, and fires three shots into your chest. You bleed out, and as you fade from reality, you see the Dealer reach into your pockets, and take every last penny from your lifeless body.")))
@@ -358,16 +360,16 @@ class Blackjack:
                     else:
                         type.slow(red(bright("The Dealer's had it with you. He points aggressively towards the door. Scared to question his authority, you scurry out. It seems you just dodged a bullet.")))
                         self.__player.add_danger("Angry Dealer")
-                        print("\n")
+                        print()
                         return
                 elif self.__dealer_happiness < 5:
                     random_chance = random.randrange(6)
                     if random_chance == 0:
                         # Force all-in
                         type.slow(red(bright('The Dealer locks eyes with you. "You know what? Let\'s make this interesting."')))
-                        print("\n")
+                        print()
                         type.slow(red(bright('"Everything. On the table. Now."')))
-                        print("\n")
+                        print()
                         self.__dealer_forced_all_in = True
                     elif random_chance == 1:
                         type.slow(red(bright("The Dealer's had it with you. He gets up from his chair, and fires three shots into your chest. You bleed out, and as you fade from reality, you see the Dealer reach into your pockets, and take every last penny from your lifeless body.")))
@@ -375,7 +377,7 @@ class Blackjack:
                     elif random_chance == 2:
                         type.slow(red(bright("The Dealer's had it with you. He points aggressively towards the door. Scared to question his authority, you scurry out. It seems you just dodged a bullet.")))
                         self.__player.add_danger("Angry Dealer")
-                        print("\n")
+                        print()
                         return
                     else:
                         # Angry min bet increase
@@ -388,7 +390,7 @@ class Blackjack:
                     elif random_chance < 3:
                         type.slow(red(bright("The Dealer's had it with you. He points aggressively towards the door. Scared to question his authority, you scurry out. It seems you just dodged a bullet.")))
                         self.__player.add_danger("Angry Dealer")
-                        print("\n")
+                        print()
                         return
                     elif random_chance < 5:
                         # Angry min bet increase
@@ -447,9 +449,9 @@ class Blackjack:
 
         forced_min = max(int(self.__balance * multiplier), self.__min_bet + 1)
         type.slow(red(bright(random.choice(anger_messages))))
-        print("\n")
+        print()
         type.slow(red("The Dealer sets your minimum bet to " + bright("${:,}".format(forced_min))))
-        print("\n")
+        print()
         return forced_min
 
     def set_min_bet(self, balance):
@@ -483,12 +485,20 @@ class Blackjack:
             except ValueError:
                 print("")
                 type.fast(red("The Dealer looks at you confused. Perhaps he didn't hear you."))
-                print("\n")
+                print()
 
         print("")
 
         if(self.__min_bet<=int(bet)<=total_available):
             self.__bet = bet
+            if bet >= 50000 and not self.__player.has_achievement("high_roller_bet"): self.__player.unlock_achievement("high_roller_bet")
+            if bet >= 1000000 and not self.__player.has_achievement("one_million_bet"): self.__player.unlock_achievement("one_million_bet")
+            self.__was_all_in = (bet == self.__balance)
+            self.__pre_bet_balance = self.__balance
+            if bet > self.__min_bet:
+                self.__player._ever_bet_above_min = True
+            if bet == self.__balance:
+                self.__player._last_dollar_bets += 1
             fake_available = self.__player.get_fraudulent_cash()
             self.__fraudulent_portion = 0
             if fake_available > 0:
@@ -505,11 +515,11 @@ class Blackjack:
                 type.slow(red("The Dealer fires three shots into your chest. You bleed out, and as you fade from reality, you see the Dealer reach into your pockets, and take every last penny from your lifeless body."))
                 self.__player.kill()
             self.anger_dealer(5)
-            print("\n")
+            print()
 
         else:
             type.fast(red("The dealer looks at you confused. You don't have that much money."))
-            print("\n")
+            print()
 
 
     def first_deal(self):
@@ -532,7 +542,7 @@ class Blackjack:
         # Deal first card to Dealer
         card = self.draw(self.__dealer_hand)
         self.print_draw("Dealer", "first", card)
-        print("\n")
+        print()
 
         # Saves dealer hand value, as it's the only card the player sees
         known_value = self.__dealer_hand.value()
@@ -549,7 +559,16 @@ class Blackjack:
         else:
             type.fast(red("The Dealer's second card is face down"))
             time.sleep(PAUSE)
-            if self.__player.has_flask_effect("Dealer's Whispers"):
+            if self.__player.has_item("Dealer's Mirror"):
+                print()
+                type.fast(magenta(bright("Dealer's Mirror")) + " flashes. In its surface, you see the hidden card clearly.")
+                print()
+                if card.value() in [1, 8]:
+                    type.fast(magenta("The hidden card is an " + bright(str(card))))
+                else:
+                    type.fast(magenta("The hidden card is a " + bright(str(card))))
+                print()
+            elif self.__player.has_flask_effect("Dealer's Whispers"):
                 print()
                 type.fast(cyan(bright("Your Dealer's Whispers potion murmurs the hidden truth...")))
                 print()
@@ -558,7 +577,7 @@ class Blackjack:
                 else:
                     type.fast(cyan("The hidden card is a " + bright(str(card))))
                 print()
-        print("\n")
+        print()
 
         # Prints Dealer's starting hand value. This is a special case (known value or 21 with a wink).
         if((self.__dealer_hand.value()!=21) & (known_value==1)):
@@ -692,6 +711,19 @@ class Blackjack:
             type.type(dealer_comment)
             print()
         
+        # Marvin's Eye: reveals optimal play
+        if self.__player.has_item("Marvin's Eye"):
+            hand_val = self.__hand.value()
+            if self.__hand.possible_hands() == 2:
+                hand_val = self.__hand.ace_value()
+            if hand_val >= 17:
+                type.fast(magenta("Marvin's Eye pulses: ") + bright("STAND. You're strong enough."))
+            elif hand_val <= 11:
+                type.fast(magenta("Marvin's Eye pulses: ") + bright("HIT. You can't bust."))
+            elif hand_val >= 12 and hand_val <= 16:
+                type.fast(magenta("Marvin's Eye pulses: ") + bright("DANGER ZONE. Trust your gut."))
+            print()
+        
         type.fast("Would you like to " + options_display + "? ")
         choice = input().lower()
         
@@ -717,11 +749,15 @@ class Blackjack:
                 peek_item = "Sneaky Peeky Goggles"
             else:
                 peek_item = "Sneaky Peeky Shades"
-            if (next_card.value()==1) or (next_card.value()==8):
+            if self.__player.has_item("Witch Doctor's Amulet"):
+                # Enhanced peek: see two cards
+                second_card = self.__deck[len(self.__deck) - 2]
+                type.fast("Using your " + magenta(bright("Witch Doctor's Amulet")) + " enhanced " + magenta(bright(peek_item)) + ", you notice that the top two cards are a " + bright(magenta(str(next_card))) + " and a " + bright(magenta(str(second_card))))
+            elif (next_card.value()==1) or (next_card.value()==8):
                 type.fast("Using your " + magenta(bright(peek_item)) + ", you notice that the top card is an " + bright(magenta(str(next_card))))
             else:
                 type.fast("Using your " + magenta(bright(peek_item)) + ", you notice that the top card is a " + bright(magenta(str(next_card))))
-            print("\n")
+            print()
             self.__player.update_sneaky_peeky_glasses_durability()
             return False  # Continue playing
         
@@ -741,7 +777,7 @@ class Blackjack:
             print()
             type.fast(red("I didn't quite catch that."))
             time.sleep(PAUSE)
-            print("\n")
+            print()
             return False
 
     def double_down(self):
@@ -749,7 +785,7 @@ class Blackjack:
         if self.__balance < self.__bet:
             print()
             type.fast(red("You don't have enough money to double down!"))
-            print("\n")
+            print()
             return False
         
         print()
@@ -825,10 +861,10 @@ class Blackjack:
             type.fast("Your second card is a " + bright(magenta(str(new_card2))))
         print()
         type.fast("Split hand value: " + green(bright(str(self.__split_hand.value()))))
-        print("\n")
+        print()
         
         type.fast(yellow("Playing first hand..."))
-        print("\n")
+        print()
         
         return False  # Continue playing first hand
 
@@ -872,6 +908,25 @@ class Blackjack:
     def hit(self):
         # Hits a player's hand, then types their hand's value
         print()
+
+        # The Last Card: one-time use, guarantees the perfect next card
+        if self.__player.has_item("The Last Card") and not getattr(self, '_used_last_card', False):
+            hard_total = self.__hand.value()
+            soft_total = self.__hand.ace_value() if self.__hand.possible_hands() == 2 else 0
+            target_values = set()
+            for running_total in [hard_total, soft_total]:
+                if running_total <= 0 or running_total >= 21:
+                    continue
+                needed_value = 21 - running_total
+                if 1 <= needed_value <= 10:
+                    target_values.add(needed_value)
+                if running_total == 10:
+                    target_values.add(1)
+            if target_values and self.__deck.find_and_move_value_to_top(target_values):
+                type.fast(magenta(bright("The Last Card")) + " burns in your pocket. The deck obeys. One perfect draw.")
+                print()
+                self._used_last_card = True
+                self.__player.use_item("The Last Card")
 
         if self.__player.has_flask_effect("Imminent Blackjack"):
             hard_total = self.__hand.value()
@@ -1037,7 +1092,7 @@ class Blackjack:
             if choice in ["y", "yes"]:
                 self.__used_second_chance = True
                 type.fast(yellow(bright("Time seems to rewind... The cards dissolve and reform...")))
-                print("\n")
+                print()
                 self.__player.update_second_chance_durability()
                 return False  # Return False to continue playing (replays the hand)
 
@@ -1047,10 +1102,12 @@ class Blackjack:
         has_triple_luck = (self.__player.has_item("Lucky Penny") and has_lucky_coin
                            and self.__player.has_item("Lucky Charm Bracelet"))
         has_oswalds_luck = self.__player.has_status("Oswald's Luck")
-        if (has_lucky_coin or has_lucky_medallion or has_triple_luck or has_oswalds_luck) and status in ["Dealer Wins", "Dealer Blackjack", "Player Bust"]:
-            # Lucky Medallion always works; Triple Luck has 35% chance; Lucky Coin / Oswald's Luck has 20% chance
+        has_beginners_luck = self.__player.has_status("Beginner's Luck")
+        has_lucky_status = self.__player.has_status("Lucky")
+        if (has_lucky_coin or has_lucky_medallion or has_triple_luck or has_oswalds_luck or has_beginners_luck or has_lucky_status) and status in ["Dealer Wins", "Dealer Blackjack", "Player Bust"]:
+            # Lucky Medallion 50% chance; Triple Luck has 35% chance; Lucky Coin / Oswald's Luck / Beginner's Luck / Lucky has 20% chance
             if has_lucky_medallion:
-                triggered = True
+                triggered = random.randrange(100) < 50
             elif has_triple_luck:
                 triggered = random.randrange(100) < 35
             else:
@@ -1062,12 +1119,27 @@ class Blackjack:
                     type.fast(cyan(bright("Your Lucky Medallion blazes with power! The loss turns into a push!")))
                 elif has_oswalds_luck and not has_lucky_coin:
                     type.fast(yellow(bright("Oswald's weighted dice tip the scales — the loss becomes a push!")))
+                elif has_beginners_luck:
+                    type.fast(cyan(bright("Beginner's luck! The cards shift in your favor — the loss becomes a push!")))
+                elif has_lucky_status and not has_lucky_coin:
+                    type.fast(green(bright("Luck is on your side tonight — the loss becomes a push!")))
                 else:
                     type.fast(magenta(bright("Your Lucky Coin glows! The loss turns into a push!")))
-                print("\n")
+                print()
                 self.__player.update_lucky_coin_durability()
                 self.__lucky_coin_triggered = True
                 status = "Tie"
+                # Track usage for evolution
+                if has_lucky_coin:
+                    evolved = self.__player.track_item_use("Lucky Coin")
+                    if evolved:
+                        print()
+                        type.fast(cyan(bright(self.__player.get_evolution_text(evolved[0], evolved[1]))))
+                if self.__player.has_item("Lucky Penny"):
+                    evolved = self.__player.track_item_use("Lucky Penny")
+                    if evolved:
+                        print()
+                        type.fast(cyan(bright(self.__player.get_evolution_text(evolved[0], evolved[1]))))
         
         # Tattered Cloak effect: dealer sometimes forgets to collect losing bet
         tattered_cloak_saved = False
@@ -1079,6 +1151,19 @@ class Blackjack:
             if random.randrange(4) < chance_threshold:
                 tattered_cloak_saved = True
                 self.__player.update_tattered_cloak_durability()
+
+        # Lucky sevens — three 7s making 21
+        if len(self.__hand) == 3 and all(self.__hand.get_card(i).value() == 7 for i in range(3)):
+            if not self.__player.has_achievement("lucky_sevens"):
+                self.__player.unlock_achievement("lucky_sevens")
+
+        # Unlucky thirteen — lose with exactly 13
+        player_value = self.__hand.value()
+        if self.__hand.possible_hands() == 2:
+            player_value = self.__hand.ace_value()
+        if player_value == 13 and status in ["Dealer Wins", "Dealer Blackjack"]:
+            if not self.__player.has_achievement("unlucky_thirteen"):
+                self.__player.unlock_achievement("unlucky_thirteen")
 
         match status:
             case "Player Blackjack": 
@@ -1096,9 +1181,12 @@ class Blackjack:
                     type.fast(yellow(bright("You had " + green("${:,}".format(self.__balance)) + yellow(", and with a free bet of ") + green("${:,}".format(self.__bet)) + yellow(", you've tripled it!"))))
                 else:
                     type.fast(yellow(bright("You had " + green("${:,}".format(self.__balance)) + yellow(", and with a bet of ") + green("${:,}".format(self.__bet)) + yellow(", you've tripled it!"))))
-                print("\n")
+                print()
                 type.fast(yellow(bright("Your new balance is " + green("${:,}".format(self.__balance) + " + ${:,}".format(self.__bet*2) + " = ${:,}".format(self.__balance+self.__bet*2)))))
                 self.__balance += 2*self.__bet
+                if self.__was_all_in and not self.__player.has_achievement("all_in_win"): self.__player.unlock_achievement("all_in_win")
+                if self.__pre_bet_balance < 100 and not self.__player.has_achievement("comeback_kid"): self.__player.unlock_achievement("comeback_kid")
+                if self.__bet * 2 >= 1000000 and not self.__player.has_achievement("win_million_hand"): self.__player.unlock_achievement("win_million_hand")
 
             case "Player Wins":
                 message = random.randrange(8)
@@ -1115,9 +1203,12 @@ class Blackjack:
                     type.fast(magenta(bright("You had " + green("${:,}".format(self.__balance)) + magenta(", and with a free bet of ") + green("${:,}".format(self.__bet)) + magenta(", you've doubled it!"))))
                 else:
                     type.fast(magenta(bright("You had " + green("${:,}".format(self.__balance)) + magenta(", and with a bet of ") + green("${:,}".format(self.__bet)) + magenta(", you've doubled it!"))))
-                print("\n")
+                print()
                 type.fast(magenta(bright("Your new balance is " + green("${:,}".format(self.__balance) + " + ${:,}".format(self.__bet) + " = ${:,}".format(self.__balance+self.__bet)))))
                 self.__balance += self.__bet
+                if self.__was_all_in and not self.__player.has_achievement("all_in_win"): self.__player.unlock_achievement("all_in_win")
+                if self.__pre_bet_balance < 100 and not self.__player.has_achievement("comeback_kid"): self.__player.unlock_achievement("comeback_kid")
+                if self.__bet >= 1000000 and not self.__player.has_achievement("win_million_hand"): self.__player.unlock_achievement("win_million_hand")
 
             case "Dealer Bust":
                 message = random.randrange(8)
@@ -1134,9 +1225,12 @@ class Blackjack:
                     type.fast(magenta(bright("You had " + green("${:,}".format(self.__balance)) + magenta(", and with a free bet of ") + green("${:,}".format(self.__bet)) + magenta(", you've doubled it!"))))
                 else:
                     type.fast(magenta(bright("You had " + green("${:,}".format(self.__balance)) + magenta(", and with a bet of ") + green("${:,}".format(self.__bet)) + magenta(", you've doubled it!"))))
-                print("\n")
+                print()
                 type.fast(magenta(bright("Your new balance is " + green("${:,}".format(self.__balance) + " + ${:,}".format(self.__bet) + " = ${:,}".format(self.__balance+self.__bet)))))
                 self.__balance += self.__bet
+                if self.__was_all_in and not self.__player.has_achievement("all_in_win"): self.__player.unlock_achievement("all_in_win")
+                if self.__pre_bet_balance < 100 and not self.__player.has_achievement("comeback_kid"): self.__player.unlock_achievement("comeback_kid")
+                if self.__bet >= 1000000 and not self.__player.has_achievement("win_million_hand"): self.__player.unlock_achievement("win_million_hand")
 
             case "Dealer Blackjack":
                 message = random.randrange(8)
@@ -1151,16 +1245,16 @@ class Blackjack:
                 print()
                 if self.__free_hand:
                     type.fast(red(bright("You had " + green("${:,}".format(self.__balance)) + red(" and lost your free bet of ") + green("${:,}".format(self.__bet)))))
-                    print("\n")
+                    print()
                     type.fast(red(bright("Your balance is still " + green("${:,}".format(self.__balance)))))
                 elif self.__balance - self.__bet <= 0:
                     type.fast(red(bright("You had " + green("${:,}".format(self.__balance)) + red(" and lost your bet of ") + green("${:,}".format(self.__bet)))))
-                    print("\n")
+                    print()
                     type.fast(red(bright("Your new balance is " + "${:,}".format(self.__balance) + " - ${:,}".format(self.__bet) + " = ${:,}".format(self.__balance-self.__bet))))
                     self.__balance -= self.__bet
                 else:
                     type.fast(red(bright("You had " + green("${:,}".format(self.__balance)) + red(" and lost your bet of ") + green("${:,}".format(self.__bet)))))
-                    print("\n")
+                    print()
                     type.fast(red(bright("Your new balance is " + green("${:,}".format(self.__balance) + red(" - ${:,}".format(self.__bet)) + green(" = ${:,}".format(self.__balance-self.__bet))))))
                     self.__balance -= self.__bet
 
@@ -1177,16 +1271,16 @@ class Blackjack:
                 print()
                 if self.__free_hand:
                     type.fast(red(bright("You had " + green("${:,}".format(self.__balance)) + red(" and lost your free bet of ") + green("${:,}".format(self.__bet)))))
-                    print("\n")
+                    print()
                     type.fast(red(bright("Your balance is still " + green("${:,}".format(self.__balance)))))
                 elif self.__balance - self.__bet <= 0:
                     type.fast(red(bright("You had " + green("${:,}".format(self.__balance)) + red(" and lost your bet of ") + green("${:,}".format(self.__bet)))))
-                    print("\n")
+                    print()
                     type.fast(red(bright("Your new balance is " + "${:,}".format(self.__balance) + " - ${:,}".format(self.__bet) + " = ${:,}".format(self.__balance-self.__bet))))
                     self.__balance -= self.__bet
                 else:
                     type.fast(red(bright("You had " + green("${:,}".format(self.__balance)) + red(" and lost your bet of ") + green("${:,}".format(self.__bet)))))
-                    print("\n")
+                    print()
                     type.fast(red(bright("Your new balance is " + green("${:,}".format(self.__balance) + red(" - ${:,}".format(self.__bet)) + green(" = ${:,}".format(self.__balance-self.__bet))))))
                     self.__balance -= self.__bet
 
@@ -1204,16 +1298,16 @@ class Blackjack:
 
                 if self.__free_hand:
                     type.fast(red(bright("You had " + green("${:,}".format(self.__balance)) + red(" and lost your free bet of ") + green("${:,}".format(self.__bet)))))
-                    print("\n")
+                    print()
                     type.fast(red(bright("Your balance is still " + green("${:,}".format(self.__balance)))))
                 elif self.__balance - self.__bet <= 0:
                     type.fast(red(bright("You had " + green("${:,}".format(self.__balance)) + red(" and lost your bet of ") + green("${:,}".format(self.__bet)))))
-                    print("\n")
+                    print()
                     type.fast(red(bright("Your new balance is " + "${:,}".format(self.__balance) + " - ${:,}".format(self.__bet) + " = ${:,}".format(self.__balance-self.__bet))))
                     self.__balance -= self.__bet
                 else:
                     type.fast(red(bright("You had " + green("${:,}".format(self.__balance)) + red(" and lost your bet of ") + green("${:,}".format(self.__bet)))))
-                    print("\n")
+                    print()
                     type.fast(red(bright("Your new balance is " + green("${:,}".format(self.__balance) + red(" - ${:,}".format(self.__bet)) + green(" = ${:,}".format(self.__balance-self.__bet))))))
                     self.__balance -= self.__bet
 
@@ -1232,10 +1326,11 @@ class Blackjack:
                     type.fast(cyan(bright("You had " + green("${:,}".format(self.__balance)) + cyan(", and since this hand was free, your balance hasn't changed"))))
                 else:
                     type.fast(cyan(bright("You had " + green("${:,}".format(self.__balance)) + cyan(", and you win back your bet of ") + green("${:,}".format(self.__bet)))))
-                print("\n")
+                print()
                 type.fast(cyan(bright("Your balance is still " + green("${:,}".format(self.__balance)))))
 
             case "Tie Blackjack":
+                self.__player._twenty_one_pushes += 1
                 message = random.randrange(8)
                 if message==0: type.fast(cyan(bright("You and the Dealer both got a Blackjack. How boring.")))
                 if message==1: type.fast(cyan(bright("Stalemate with matching Blackjacks! Who coulda guessed?")))
@@ -1250,12 +1345,12 @@ class Blackjack:
                     type.fast(cyan(bright("You had " + green("${:,}".format(self.__balance)) + cyan(", and since this hand was free, your balance hasn't changed"))))
                 else:
                     type.fast(cyan(bright("You had " + green("${:,}".format(self.__balance)) + cyan(", and you win back your bet of ") + green("${:,}".format(self.__bet)))))
-                print("\n")
+                print()
                 type.fast(cyan(bright("Your balance is still " + green("${:,}".format(self.__balance)))))
 
         # Tattered Cloak effect: refund the bet if triggered
         if tattered_cloak_saved and status in ["Dealer Wins", "Dealer Blackjack", "Player Bust"]:
-            print("\n")
+            print()
             if has_invisible_cloak:
                 type.fast(cyan(bright("Your Invisible Cloak shimmers... The Dealer completely forgot you were even playing!")))
             else:
@@ -1272,7 +1367,7 @@ class Blackjack:
             if status == "Dealer Blackjack":
                 payout = self.__insurance_bet * 2
                 self.__balance += self.__insurance_bet + payout  # Return bet + 2:1 payout
-                print("\n")
+                print()
                 if self.__player.has_item("Dealer's Mercy"):
                     type.fast(magenta(bright("Your Dealer's Mercy shines! Insurance pays out " + green("${:,}".format(payout)) + "!")))
                 else:
@@ -1283,11 +1378,12 @@ class Blackjack:
                 stats = self.__player.get_gambling_stats()
                 stats["insurance_won"] = stats.get("insurance_won", 0) + 1
             else:
-                print("\n")
+                print()
                 type.fast(cyan("Your insurance bet of " + red("${:,}".format(self.__insurance_bet)) + cyan(" is lost...")))
                 # Update stats
                 stats = self.__player.get_gambling_stats()
                 stats["insurance_lost"] = stats.get("insurance_lost", 0) + 1
+                self.__player._insurance_failures += 1
 
         self.__player.set_balance(self.__balance)
         self.__player.gambling_result(status, self.__bet)  # Sanity effects from gambling
@@ -1323,7 +1419,7 @@ class Blackjack:
                 self.__min_bet_bust_count += 1
                 if self.__min_bet_bust_count >= 3:
                     # Dealer gets suspicious of cheap throwing
-                    print("\n")
+                    print()
                     suspicious_lines = [
                         '"You keep busting on minimum bets. You think I\'m stupid?"',
                         '"Three min-bet busts in a row. You\'re either terrible or you\'re trying something."',
@@ -1331,7 +1427,7 @@ class Blackjack:
                         '"You\' re tanking on purpose. I can smell it. You reek of strategy."'
                     ]
                     type.slow(red(bright(random.choice(suspicious_lines))))
-                    print("\n")
+                    print()
                     self.anger_dealer(25)
                     self.__min_bet_bust_count = 0  # Reset after punishment
             else:
@@ -1339,7 +1435,7 @@ class Blackjack:
 
             # 10 busts in a row — dealer thinks you're throwing
             if self.__bust_streak == 10:
-                print("\n")
+                print()
                 type.slow(red(bright("The Dealer leans back in his chair and stares at you. Hard.")))
                 print()
                 type.slow(red(bright('"Ten busts. In a row. TEN."')))
@@ -1347,7 +1443,7 @@ class Blackjack:
                 type.slow(red(bright('"You\'re either the worst card player I\'ve ever seen, or you\'re throwing hands on purpose."')))
                 print()
                 type.slow(red(bright('"Either way, I don\'t like it."')))
-                print("\n")
+                print()
                 self.__dealer_happiness = 20
                 if self.__player.has_item("Delight Indicator") or self.__player.has_item("Delight Manipulator"):
                     self.delight_indicator()
@@ -1355,9 +1451,9 @@ class Blackjack:
 
             # 11th bust — dealer snaps
             elif self.__bust_streak >= 11:
-                print("\n")
+                print()
                 type.slow(red(bright('"Eleven. ELEVEN. You know what? I\'m done playing nice."')))
-                print("\n")
+                print()
                 self.__dealer_happiness = 0
                 self.__bust_streak = 0  # Reset streak
                 if self.__player.has_item("Delight Indicator") or self.__player.has_item("Delight Manipulator"):
@@ -1478,6 +1574,7 @@ class Blackjack:
             return  # The Dealer didn't notice — this time.
 
         # --- Dealer noticed ---
+        if not self.__player.has_achievement("caught_red_handed"): self.__player.unlock_achievement("caught_red_handed")
         print()
         severity = random.randrange(3)
 

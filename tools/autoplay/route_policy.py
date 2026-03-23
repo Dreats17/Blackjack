@@ -102,6 +102,14 @@ def _score_route_opportunity(tags: set[str], metadata: dict[str, object]) -> flo
     marvin_future_shortfall = float(metadata.get("marvin_future_shortfall", 0) or 0)
     if "marvin" in tags and metadata.get("wants_marvin"):
         total += 48.0 + min(28.0, marvin_priority / 4.0)
+        if marvin_priority >= 72:
+            total += 18.0
+        elif marvin_priority >= 56:
+            total += 10.0
+        if marvin_future_priority >= 56 and 0 < marvin_future_shortfall <= 5000:
+            total += 16.0
+        elif marvin_future_priority >= 76 and 0 < marvin_future_shortfall <= 12000:
+            total += 14.0
     if "marvin" in tags and metadata.get("catalog_push_active") and catalog_push_kind == "marvin":
         total += 28.0 + min(36.0, catalog_push_spend / 300.0) + min(18.0, catalog_push_count * 6.0)
         total += min(14.0, catalog_push_priority / 6.0)
@@ -162,8 +170,24 @@ def choose_route_option(request: DecisionRequest, plan: StrategicPlan) -> tuple[
     store_spend = float(metadata.get("store_spend", 0) or 0)
     pawn_value = float(metadata.get("pawn_value", 0) or 0)
     balance = float(game_state.get("balance", 0) or 0)
+    health = float(game_state.get("health", 100) or 100)
+    sanity_val = float(game_state.get("sanity", 100) or 100)
     bankroll_emergency = bool(game_state.get("bankroll_emergency")) or balance <= 0
     fragile_post_car = bool(game_state.get("fragile_post_car"))
+    marvin_priority = float(metadata.get("marvin_priority", 0) or 0)
+    marvin_future_priority = float(metadata.get("marvin_future_priority", 0) or 0)
+    marvin_future_shortfall = float(metadata.get("marvin_future_shortfall", 0) or 0)
+    marvin_window = bool(
+        metadata.get("wants_marvin")
+        and not metadata.get("urgent_medical")
+        and health >= 62
+        and sanity_val >= 34
+        and (
+            marvin_priority >= 56
+            or (marvin_future_priority >= 56 and 0 < marvin_future_shortfall <= 5000)
+            or (marvin_future_priority >= 76 and 0 < marvin_future_shortfall <= 12000)
+        )
+    )
 
     for option in request.normalized_options:
         tags = _route_tags(option.label)
@@ -209,8 +233,6 @@ def choose_route_option(request: DecisionRequest, plan: StrategicPlan) -> tuple[
         if metadata.get("urgent_medical"):
             total += 140.0 if "medical" in tags else -80.0
         # Proactive medical: even if not "urgent", boost doctor when injuries or low health/sanity
-        health = float(game_state.get("health", 100) or 100)
-        sanity_val = float(game_state.get("sanity", 100) or 100)
         injury_count = len(tuple(game_state.get("injuries", ()) or ()))
         status_count = len(tuple(game_state.get("statuses", ()) or ()))
         if not metadata.get("urgent_medical"):
@@ -218,6 +240,27 @@ def choose_route_option(request: DecisionRequest, plan: StrategicPlan) -> tuple[
                 total += 60.0
             if "medical" in tags and sanity_val < 40:
                 total += 40.0
+        if marvin_window and "marvin" in tags:
+            total += 46.0
+            if plan.goal in {"exploit_marvin", "push_next_rank"}:
+                total += 18.0
+        if marvin_window and "loan" in tags and marvin_priority <= 0 and marvin_future_priority >= 56:
+            total += 22.0
+        if (
+            metadata.get("wants_marvin")
+            and metadata.get("wants_loan")
+            and marvin_priority <= 0
+            and marvin_future_priority >= 56
+            and 0 < marvin_future_shortfall <= 5000
+        ):
+            if "loan" in tags:
+                total += 36.0
+            if "marvin" in tags:
+                total -= 26.0
+        if marvin_window and "medical" in tags and not metadata.get("wants_doctor"):
+            total -= 38.0
+        if marvin_window and "store" in tags and float(metadata.get("store_spend", 0) or 0) <= 260.0:
+            total -= 16.0
         if metadata.get("needs_recovery_day") and "stay_home" in tags:
             total += 28.0
         if metadata.get("wants_doctor") and option.label == "Doctor's Office":

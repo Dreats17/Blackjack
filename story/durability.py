@@ -62,7 +62,7 @@ class DurabilityMixin:
                 if self._flask_durability[0] <= 0:
                     self._flask_durability[0] = 0
                     self.remove_flask_effect("No Bust")
-                    print("\n")
+                    print()
                     type.slow(red(bright("Your Flask of No Bust effect ran out!")))
 
             # Sets durability when you get the item, or if the item is fixed
@@ -87,7 +87,7 @@ class DurabilityMixin:
                     else:
                         self.break_item("Delight Indicator")
                         type.slow(red(bright("Your Delight Indicator broke!")))
-                    print("\n")
+                    print()
 
             # Sets durability when you get the item, or if the item is fixed
             if (self._item_durability[0] == 0):
@@ -112,7 +112,7 @@ class DurabilityMixin:
                     else:
                         self.break_item("Health Indicator")
                         type.slow(red(bright("Your Health Indicator broke!")))
-                    print("\n")
+                    print()
 
             # Sets durability when you get the item, or if the item is fixed
             if (self._item_durability[1] == 0):
@@ -137,7 +137,7 @@ class DurabilityMixin:
                     else:
                         self.break_item("Dirty Old Hat")
                         type.slow(red(bright("Your Dirty Old Hat broke!")))
-                    print("\n")
+                    print()
 
             # Sets durability when you get the item, or if the item is fixed
             if (self._item_durability[2] == 0):
@@ -162,7 +162,7 @@ class DurabilityMixin:
                     else:
                         self.break_item("Golden Watch")
                         type.slow(red(bright("Your Golden Watch broke!")))
-                    print("\n")
+                    print()
 
             # Sets durability when you get the item, or if the item is fixed
             if (self._item_durability[3] == 0):
@@ -188,7 +188,7 @@ class DurabilityMixin:
                     else:
                         self.break_item("Sneaky Peeky Shades")
                         type.slow(red(bright("Your Sneaky Peeky Shades broke!")))
-                    print("\n")
+                    print()
 
             # Sets durability when you get the item, or if the item is fixed
             if (self._item_durability[5] == 0):
@@ -213,7 +213,7 @@ class DurabilityMixin:
                     else:
                         self.break_item("Quiet Sneakers")
                         type.slow(red(bright("Your Quiet Sneakers broke!")))
-                    print("\n")
+                    print()
 
             # Sets durability when you get the item, or if the item is fixed
             if (self._item_durability[6] == 0):
@@ -238,7 +238,7 @@ class DurabilityMixin:
                     else:
                         self.break_item("Faulty Insurance")
                         type.slow(red(bright("Your Faulty Insurance broke!")))
-                    print("\n")
+                    print()
 
             # Sets durability when you get the item, or if the item is fixed
             if (self._item_durability[7] == 0):
@@ -263,7 +263,7 @@ class DurabilityMixin:
                     else:
                         self.break_item("Lucky Coin")
                         type.slow(red(bright("Your Lucky Coin broke!")))
-                    print("\n")
+                    print()
 
             # Sets durability when you get the item, or if the item is fixed
             if (self._item_durability[8] == 0):
@@ -288,7 +288,7 @@ class DurabilityMixin:
                     else:
                         self.break_item("Worn Gloves")
                         type.slow(red(bright("Your Worn Gloves broke!")))
-                    print("\n")
+                    print()
 
             # Sets durability when you get the item, or if the item is fixed
             if (self._item_durability[9] == 0):
@@ -313,7 +313,7 @@ class DurabilityMixin:
                     else:
                         self.break_item("Tattered Cloak")
                         type.slow(red(bright("Your Tattered Cloak broke!")))
-                    print("\n")
+                    print()
 
             # Sets durability when you get the item, or if the item is fixed
             if (self._item_durability[10] == 0):
@@ -338,7 +338,7 @@ class DurabilityMixin:
                     else:
                         self.break_item("Rusty Compass")
                         type.slow(red(bright("Your Rusty Compass broke!")))
-                    print("\n")
+                    print()
 
             # Sets durability when you get the item, or if the item is fixed
             if (self._item_durability[11] == 0):
@@ -363,7 +363,7 @@ class DurabilityMixin:
                     else:
                         self.break_item("Pocket Watch")
                         type.slow(red(bright("Your Pocket Watch broke!")))
-                    print("\n")
+                    print()
 
             # Sets durability when you get the item, or if the item is fixed
             if (self._item_durability[12] == 0):
@@ -381,7 +381,7 @@ class DurabilityMixin:
                 if self._flask_durability[8] <= 0:
                     self._flask_durability[8] = 0
                     self.remove_flask_effect("Second Chance")
-                    print("\n")
+                    print()
                     type.slow(red(bright("Your Flask of Second Chance effect ran out!")))
 
             # Sets durability when you get the item
@@ -400,7 +400,7 @@ class DurabilityMixin:
                 if self._flask_durability[9] <= 0:
                     self._flask_durability[9] = 0
                     self.remove_flask_effect("Split Serum")
-                    print("\n")
+                    print()
                     type.slow(red(bright("Your Flask of Split Serum effect ran out!")))
 
             # Sets durability when you get the item
@@ -419,7 +419,7 @@ class DurabilityMixin:
                 if self._flask_durability[10] <= 0:
                     self._flask_durability[10] = 0
                     self.remove_flask_effect("Dealer's Hesitation")
-                    print("\n")
+                    print()
                     type.slow(red(bright("Your Flask of Dealer's Hesitation effect ran out!")))
 
             # Sets durability when you get the item
