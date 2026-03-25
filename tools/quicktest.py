@@ -2790,7 +2790,10 @@ def _store_buyout_candidate(player, balance=None):
         return None
 
     rank = int(player.get_rank()) if hasattr(player, "get_rank") else 0
-    balance_gate = 2200 if rank <= 1 else 8000
+    # Lower the early-game balance gate so the store gets "bought out" sooner.
+    # Rank 0 players can trigger a buyout at 700+ (previously 2200) to ensure
+    # multiple items are grabbed in one visit before Marvin becomes the focus.
+    balance_gate = 700 if rank <= 0 else (1800 if rank <= 1 else 8000)
     best_priority = int(bundle[0][0])
     if budget < balance_gate and best_priority < 84:
         return None
@@ -3089,6 +3092,30 @@ def _marvin_essential_items():
         "Worn Gloves",
         "Dealer's Grudge",
     }
+
+
+def _missing_marvin_items_count(player):
+    """Count how many essential Marvin items the player still needs."""
+    if player is None:
+        return 0
+    return sum(1 for item in _marvin_essential_items() if not player.has_item(item))
+
+
+def _rotation_staleness_bonus(player, *location_keys, stale_after=2, bonus_per_day=5, max_bonus=20):
+    """Return a score bonus that encourages visiting locations not recently seen.
+
+    Drives natural rotation: a location untouched for ``stale_after + 1`` days
+    starts accumulating bonus points, capped at ``max_bonus``.  Locations that
+    have never been visited receive the full cap immediately.
+    """
+    if player is None:
+        return 0
+    gap = _days_since_location(player, *location_keys)
+    if gap is None:
+        return max_bonus
+    if gap <= stale_after:
+        return 0
+    return min(max_bonus, (gap - stale_after) * bonus_per_day)
 
 
 def _witch_marvin_pairing_flasks():
@@ -3853,6 +3880,10 @@ def _strong_marvin_route_interrupt(player, labels):
         return None
     if _wants_doctor_visit(player) or _doctor_visit_is_urgent(player) or _needs_recovery_day(player):
         return None
+    # Mirror the 10k balance gate used by _wants_marvin_run so that this
+    # interrupt cannot bypass the rotation before the player is ready.
+    if int(player.get_balance()) < 10000:
+        return None
     pairing_strength = _witch_marvin_pairing_strength(player)
     if player.get_health() < (62 if pairing_strength >= 20 else 66) or player.get_sanity() < (34 if pairing_strength >= 20 else 38):
         return None
@@ -4032,21 +4063,31 @@ def _has_marvin_access(player):
 
 
 def _wants_marvin_run(player):
-    # AGGRESSIVE: Visit Marvin constantly unless in critical danger
     if not _has_marvin_access(player):
         return False
-    if _bankroll_emergency_mode(player):
+    if _bankroll_emergency_mode(player) or _fragile_post_car_recovery_mode(player):
         return False
     if _wants_doctor_visit(player):
         return False
-    # Allow visits with relaxed vitals (below survival thresholds is OK)
-    if player.get_health() < 15 or player.get_sanity() < 5:
+    if player.get_health() < 50 or player.get_sanity() < 26:
         return False
-    # Can't visit same day
     marvin_gap = _days_since_location(player, "shop:marvin")
     if marvin_gap == 0:
         return False
-    # Just visit Marvin. Always.
+    # Only start actively targeting Marvin once the player has built up 10k.
+    # Below that threshold the rotation prioritises the store, crafting and
+    # adventures first; Marvin becomes the focus once there is real spending
+    # power.  Exception: if the player is missing many essential items AND has
+    # enough funds to actually buy one, allow visits at a slightly lower floor
+    # so they can still start collecting.
+    balance = player.get_balance()
+    if balance < 10000:
+        missing = _missing_marvin_items_count(player)
+        affordable = _best_marvin_candidate(player, balance)
+        # Allow an early visit only when genuinely close to 10k AND there is
+        # at least one affordable essential item waiting.
+        if not (missing >= 6 and affordable is not None and balance >= 7000):
+            return False
     return True
 
 
@@ -5725,6 +5766,11 @@ def _progression_chore_choices(labels, options, player):
             score += 18
         if _in_rank_push_window(player):
             score += 12
+        # Prioritise Marvin when the player is still collecting essential items.
+        missing_marvin = _missing_marvin_items_count(player)
+        score += min(24, missing_marvin * 3)
+        # Rotation: bump score when Marvin hasn't been visited recently.
+        score += _rotation_staleness_bonus(player, "shop:marvin", stale_after=2, bonus_per_day=4, max_bonus=16)
         chores.append((score, marvin_choice))
 
     loan_choice = labels.get("Vinnie's Back Alley Loans")
@@ -5753,6 +5799,8 @@ def _progression_chore_choices(labels, options, player):
             score += 10
         if not player.has_met("Car Workbench"):
             score += 18
+        # Rotation: encourage crafting when the workbench hasn't been used recently.
+        score += _rotation_staleness_bonus(player, "shop:car_workbench", stale_after=3, bonus_per_day=5, max_bonus=20)
         chores.append((score, workbench_choice))
 
     store_choice = labels.get("Convenience Store")
@@ -5767,6 +5815,8 @@ def _progression_chore_choices(labels, options, player):
             score += 18
         elif _in_rank_push_window(player) and top_priority < 92 and (top is None or int(top[1]) <= max(260, int(player.get_balance() * 0.10))):
             score -= 12
+        # Rotation: reward the store when it hasn't been visited in a while.
+        score += _rotation_staleness_bonus(player, "shop:convenience_store", stale_after=2, bonus_per_day=5, max_bonus=20)
         chores.append((score, store_choice))
 
     adventure_choice = _choose_adventure_destination(options, player) if _wants_adventure_run(player) else None
@@ -5775,6 +5825,20 @@ def _progression_chore_choices(labels, options, player):
         if _has_adventure_utility(player):
             score += 12
         score += (day % 3) * 2
+        # Rotation: adventures are the fallback rotation filler — give them a
+        # meaningful staleness bonus so they aren't crowded out indefinitely.
+        score += _rotation_staleness_bonus(
+            player,
+            "adventure:road",
+            "adventure:woodlands",
+            "adventure:swamp",
+            "adventure:beach",
+            "adventure:ocean_depths",
+            "adventure:city",
+            stale_after=2,
+            bonus_per_day=6,
+            max_bonus=24,
+        )
         chores.append((score, adventure_choice))
 
     upgrade_choice = labels.get("Oswald's Optimal Outoparts")
