@@ -3880,10 +3880,6 @@ def _strong_marvin_route_interrupt(player, labels):
         return None
     if _wants_doctor_visit(player) or _doctor_visit_is_urgent(player) or _needs_recovery_day(player):
         return None
-    # Mirror the 10k balance gate used by _wants_marvin_run so that this
-    # interrupt cannot bypass the rotation before the player is ready.
-    if int(player.get_balance()) < 10000:
-        return None
     pairing_strength = _witch_marvin_pairing_strength(player)
     if player.get_health() < (62 if pairing_strength >= 20 else 66) or player.get_sanity() < (34 if pairing_strength >= 20 else 38):
         return None
@@ -4065,6 +4061,8 @@ def _has_marvin_access(player):
 def _wants_marvin_run(player):
     if not _has_marvin_access(player):
         return False
+    if not player.has_item("Car"):
+        return False
     if _bankroll_emergency_mode(player) or _fragile_post_car_recovery_mode(player):
         return False
     if _wants_doctor_visit(player):
@@ -4074,20 +4072,23 @@ def _wants_marvin_run(player):
     marvin_gap = _days_since_location(player, "shop:marvin")
     if marvin_gap == 0:
         return False
-    # Only start actively targeting Marvin once the player has built up 10k.
-    # Below that threshold the rotation prioritises the store, crafting and
-    # adventures first; Marvin becomes the focus once there is real spending
-    # power.  Exception: if the player is missing many essential items AND has
-    # enough funds to actually buy one, allow visits at a slightly lower floor
-    # so they can still start collecting.
+    # Allow a visit whenever the player can actually afford an item and has a
+    # basic post-purchase safety cushion.  Once the bankroll reaches 10k the
+    # full list opens up, but even in early-game the player should scout when
+    # a cheap essential is within reach.
     balance = player.get_balance()
+    affordable = _best_marvin_candidate(player, balance)
+    if affordable is not None:
+        _price = affordable[1]
+        # Must have at least a $800 cushion after the purchase.
+        if balance - _price >= 800:
+            return True
+    # Future-item scouting: player is building toward a purchase.
     if balance < 10000:
-        missing = _missing_marvin_items_count(player)
-        affordable = _best_marvin_candidate(player, balance)
-        # Allow an early visit only when genuinely close to 10k AND there is
-        # at least one affordable essential item waiting.
-        if not (missing >= 6 and affordable is not None and balance >= 7000):
-            return False
+        future = _best_future_marvin_candidate(player, balance)
+        if future is not None and future["shortfall"] <= max(4000, int(balance * 0.90)) and balance >= 1200:
+            return True
+        return False
     return True
 
 
@@ -6091,6 +6092,20 @@ def _choose_destination(options, player):
         _record_route_interrupt_trace(player, marvin_interrupt, "rich marvin conversion window", "exploit_marvin", "marvin_conversion_window")
         return marvin_interrupt
 
+    # Direct Marvin gate: if all core conditions pass (access, car, affordability,
+    # basic health) and the planner/interrupt haven't fired yet, go to Marvin.
+    # This catches cases where the planner confidence is low or the interrupt's
+    # strict sanity/health threshold wasn't met.
+    if (
+        "Marvin's Mystical Merchandise" in labels
+        and _wants_marvin_run(player)
+        and not _bankroll_emergency_mode(player)
+        and (player is None or player.get_sanity() >= 26)
+        and (_days_since_location(player, "shop:marvin") or 1) >= 1
+    ):
+        _record_route_interrupt_trace(player, labels["Marvin's Mystical Merchandise"], "direct marvin gate", "exploit_marvin", "marvin_direct_gate")
+        return labels["Marvin's Mystical Merchandise"]
+
     planner_choice = _planner_choose_destination(options, player)
     if planner_choice is not None:
         return planner_choice
@@ -6467,6 +6482,10 @@ def _decide_yes_no(prompt=""):
     if "spend time with your companions" in prompt_lower:
         # Never skip a needed doctor visit to socialise — medical need takes priority.
         if player is not None and (_doctor_visit_is_urgent(player) or _wants_doctor_visit(player)):
+            answer = "no"
+        elif player is not None and _wants_marvin_run(player) and not _bankroll_emergency_mode(player):
+            # Yield companion time when Marvin visit is actively queued so the
+            # player reaches the destination menu and can go to the shop.
             answer = "no"
         else:
             answer = "yes" if player is not None and _wants_companion_time(player) else "no"
