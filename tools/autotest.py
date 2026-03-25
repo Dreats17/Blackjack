@@ -922,12 +922,19 @@ def _apply_json_report(result: RunResult, payload: dict[str, object]) -> None:
     if isinstance(payload.get("marvin_provenance"), dict):
         result.marvin_item_provenance = {
             str(item_name): {
-                key: [
+                dest_key: [
                     (entry.get("day"), str(entry.get("source", "unknown")))
-                    for entry in history.get(key, [])
+                    for entry in history.get(src_key, [])
                     if isinstance(entry, dict)
                 ]
-                for key in ["acquired", "used", "removed", "broken", "fixed", "repairing"]
+                for src_key, dest_key in [
+                    ("acquired", "bought"),
+                    ("used", "used"),
+                    ("removed", "removed"),
+                    ("broken", "broken"),
+                    ("fixed", "fixed"),
+                    ("repairing", "repairing"),
+                ]
             }
             for item_name, history in payload["marvin_provenance"].items()
             if isinstance(history, dict)
