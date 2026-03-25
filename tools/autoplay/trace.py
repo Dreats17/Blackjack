@@ -22,7 +22,10 @@ class DecisionTrace:
     metadata: dict[str, Any] = field(default_factory=dict)
 
     def to_dict(self) -> dict[str, Any]:
-        from tools.autoplay.policies.version import HANDLER_VERSION
+        try:
+            from tools.autoplay.policies.version import HANDLER_VERSION
+        except Exception:
+            HANDLER_VERSION = "unknown"
         meta = dict(self.metadata) if self.metadata else {}
         meta["handler_version"] = HANDLER_VERSION
         return {

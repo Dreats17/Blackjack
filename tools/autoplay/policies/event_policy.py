@@ -38,11 +38,27 @@ def _option_trace(
         options=tuple(option.label for option in options),
         game_state_summary=dict(request.game_state),
         score_breakdown=score_breakdown,
-        metadata={"plan": plan.to_dict()},
+        metadata={
+            "plan": plan.to_dict(),
+            "reason_code": reason,
+            "expected_value_estimate": 1.0,
+            "candidate_actions": [
+                {
+                    "option_id": option.option_id,
+                    "selected": idx == chosen_index,
+                }
+                for idx, option in enumerate(options)
+            ],
+        },
     )
 
 
-def _choose_generic_option(options: list[DecisionOption], request: DecisionRequest) -> tuple[int | None, str | None, float]:
+def _choose_generic_option(
+    options: list[DecisionOption],
+    request: DecisionRequest,
+    *,
+    prefer_safe: bool = False,
+) -> tuple[int | None, str | None, float]:
     normalized = [str(option.label).strip().lower() for option in options]
     prompt_lower = str(request.metadata.get("prompt_lower", "") or "")
     balance = int(request.game_state.get("balance", 0) or 0)
@@ -70,7 +86,8 @@ def _choose_generic_option(options: list[DecisionOption], request: DecisionReque
     low_resources = health < 50 or sanity < 25 or balance < 50
     preserving_run = balance >= 1000 or rank >= 1
 
-    if low_resources:
+    # prefer_safe widens the conservative choice window to all situations
+    if low_resources or prefer_safe:
         for keyword in [
             "leave", "walk", "observe", "watch", "decline", "refuse", "ignore", "save",
             "wait", "talk", "comply", "call", "call_911", "ask", "ask_questions", "ask_advice",
@@ -78,7 +95,8 @@ def _choose_generic_option(options: list[DecisionOption], request: DecisionReque
         ]:
             for index, choice in enumerate(normalized):
                 if _choice_matches(choice, keyword):
-                    return index, f"generic_low_resource_choice:{keyword}", 0.5
+                    reason_tag = "prefer_safe" if (prefer_safe and not low_resources) else "generic_low_resource"
+                    return index, f"{reason_tag}_choice:{keyword}", 0.5
 
     if preserving_run:
         for keyword in [
@@ -109,7 +127,7 @@ def _choose_generic_option(options: list[DecisionOption], request: DecisionReque
     return 0, "first_option_fallback", 0.25
 
 
-def _choose_generic_inline(request: DecisionRequest) -> tuple[str | None, str | None, float]:
+def _choose_generic_inline(request: DecisionRequest, *, prefer_safe: bool = False) -> tuple[str | None, str | None, float]:
     prompt_lower = str(request.metadata.get("prompt_lower", "") or "")
     balance = int(request.game_state.get("balance", 0) or 0)
     health = int(request.game_state.get("health", 0) or 0)
@@ -135,7 +153,7 @@ def _choose_generic_inline(request: DecisionRequest) -> tuple[str | None, str | 
     low_resources = health < 50 or sanity < 25 or balance < 50
     preserving_run = balance >= 1000 or rank >= 1
 
-    if low_resources:
+    if low_resources or prefer_safe:
         for keyword in [
             "leave", "walk", "observe", "watch", "decline", "refuse", "ignore", "save",
             "wait", "talk", "comply", "call", "call_911", "ask", "ask_questions", "ask_advice",
@@ -143,7 +161,8 @@ def _choose_generic_inline(request: DecisionRequest) -> tuple[str | None, str | 
         ]:
             for choice in choices:
                 if _choice_matches(choice, keyword):
-                    return choice, f"generic_inline_low_resource_choice:{keyword}", 0.42
+                    reason_tag = "prefer_safe" if (prefer_safe and not low_resources) else "generic_inline_low_resource"
+                    return choice, f"{reason_tag}_choice:{keyword}", 0.42
 
     if preserving_run:
         for keyword in [
@@ -186,7 +205,15 @@ def _yes_no_trace(request: DecisionRequest, plan: StrategicPlan, chosen: str, re
         confidence=confidence,
         options=tuple(option.label for option in request.normalized_options),
         game_state_summary=dict(request.game_state),
-        metadata={"plan": plan.to_dict()},
+        metadata={
+            "plan": plan.to_dict(),
+            "reason_code": reason,
+            "expected_value_estimate": 1.0 if chosen == "yes" else 0.0,
+            "candidate_actions": [
+                {"option": "yes", "selected": chosen == "yes"},
+                {"option": "no", "selected": chosen == "no"},
+            ],
+        },
     )
 
 
@@ -202,7 +229,15 @@ def _inline_trace(request: DecisionRequest, plan: StrategicPlan, chosen: str, re
         confidence=confidence,
         options=tuple(option.label for option in request.normalized_options),
         game_state_summary=dict(request.game_state),
-        metadata={"plan": plan.to_dict()},
+        metadata={
+            "plan": plan.to_dict(),
+            "reason_code": reason,
+            "expected_value_estimate": 1.0,
+            "candidate_actions": [
+                {"option": option.label, "selected": str(option.label).lower() == str(chosen).lower()}
+                for option in request.normalized_options
+            ],
+        },
     )
 
 
@@ -581,7 +616,9 @@ def choose_event_option(request: DecisionRequest, plan: StrategicPlan) -> tuple[
                     break
 
     if chosen_index is None:
-        chosen_index, reason, confidence = _choose_generic_option(options, request)
+        chosen_index, reason, confidence = _choose_generic_option(
+            options, request, prefer_safe=plan.personality.prefer_safe_events
+        )
         if chosen_index is None:
             return None, None
         return options[chosen_index], _option_trace(request, plan, options, chosen_index, reason or "event_option_policy", confidence)
@@ -728,7 +765,7 @@ def choose_event_inline_choice(request: DecisionRequest, plan: StrategicPlan) ->
         if "someone in trouble" in recent and "1. drive over and help" in recent:
             return "1", _inline_trace(request, plan, "1", "drive_over_and_help", 0.8)
 
-    chosen, reason, confidence = _choose_generic_inline(request)
+    chosen, reason, confidence = _choose_generic_inline(request, prefer_safe=plan.personality.prefer_safe_events)
     if chosen is None:
         return None, None
     return chosen, _inline_trace(request, plan, chosen, reason or "event_inline_policy", confidence)

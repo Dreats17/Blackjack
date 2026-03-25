@@ -75,16 +75,16 @@ class DayCycleMixin:
             self._previous_balance = self._balance
             self.heal(random.choice([1, 3, 5]))
             # Show the dream instead of the summary
-            print()
+            print("\n")
             dream()
             ask.press_continue("Press a key to continue: ")
             return
 
         # Normal day summary
-        print()
-        type.fast(bright(green("═" * 50)))
-        type.fast(bright(green("            ~ ~ ~ Day Summary ~ ~ ~")))
-        type.fast(bright(green("═" * 50)))
+        print("\n")
+        type.fast(bright(green("═" * 10)))
+        type.fast(bright(green(" ~ ~ ~ Day Summary ~ ~ ~ ")))
+        type.fast(bright(green("═" * 10)))
         print()
 
         # Starting cheer (eg. Yippee!)
@@ -93,11 +93,11 @@ class DayCycleMixin:
         # Tells day count and previous day's balance
         if self._day == 1:
             type.type(" You've survived " + yellow(bright(str(self._day) + " day")) + "!")
-            print()
+            print("\n")
             type.type("You started your journey with just " + green(bright("$" + str(self._previous_balance))) + ". ")
         else:
             type.type(" You've survived " + yellow(bright(str(self._day) + " days")) + "!")
-            print()
+            print("\n")
             type.type("Yesterday, at this time, you had " + green(bright("$" + str(self._previous_balance))) + ". ")
         # increments day
         self._day += 1
@@ -122,12 +122,12 @@ class DayCycleMixin:
 
         type.type(self._lists.get_rank_comment(self._rank))
 
-        print()
+        print("\n")
 
         # Gives a little personal advice, support, etc
         type.type(self._lists.get_advice())
 
-        print()
+        print("\n")
 
         # Gives one last quote before starting the next day
         type.type(self._lists.get_quote_setup())
@@ -233,26 +233,26 @@ class DayCycleMixin:
         type.type("Stranded on the road again, but this time, your money has gone dry. ")
         type.type("All but your 50 dollar bill that Grandma gave you on her last Christmas. ")
         type.type("You've been saving it for when you needed it most, but surely, it won't be enough.")
-        print()
+        print("\n")
 
         type.type("The door creaks open, and you step out into the night sky, coughing up the smoke from your fried vehicle. ")
         type.type("After pushing your car off the road and between the trees, there isn't much else left for you to do, ")
         type.type("so you begin to wander down the dark, lonely street.")
-        print()
+        print("\n")
 
         type.type("But at the end of the road, where concrete turned to stone turned to dirt, you notice a light up ahead, on the top of a hill. ")
-        print()
+        print("\n")
 
         type.type("As you waltz into the old, wooden shack, your eyes begin to light up with the fire of a thousand suns. ")
         type.type("Roulette wheels! Poker tables! And in a dark corner of the abandoned casino, sits a dealer, shuffling cards for a new round of Blackjack. ")
         type.type("That 50 dollars might just come in handy after all. Thanks, Grandma!")
-        print()
+        print("\n")
 
         type.type("As you go to sit down at the table, you hear the Dealer cough, then watch as he sits up.")
-        print()
+        print("\n")
 
         type.type("In a deep, and yet strained voice, the Dealer, cloaked in darkness, poses a question to you.")
-        print()
+        print("\n")
         self.start_night()
 
     # End Days
@@ -289,6 +289,8 @@ class DayCycleMixin:
             self.start_night_1()
         elif self.has_travel_restriction("Wind"):
             self.end_day_wind()
+        elif self.has_travel_restriction("Motel Strip Night"):
+            self.start_night_motel_strip()
         elif self.get_tanya_skip_night():
             self.start_night_tanya_skip()
         elif(not self.has_item("Car")):
@@ -299,7 +301,6 @@ class DayCycleMixin:
     def start_night_1(self):
         type.slow(red("Would you like to play a game of Blackjack? "))
         yes_or_no = ask.yes_or_no("")
-        print()
         if yes_or_no == "no":
             type.slow(red(bright("Well that's just too bad, isn't it. ")))
             type.slow(red("The Dealer fires three shots into your chest. You bleed out, and as you fade from reality, you see the Dealer reach into your pockets, and take the last 50 dollars from your lifeless body."))
@@ -338,6 +339,18 @@ class DayCycleMixin:
             type.slow("You feel something unfamiliar. It takes you a minute to place it.")
             print()
             type.slow(cyan("Peace. That's what this is."))
+
+    def start_night_motel_strip(self):
+        self.remove_travel_restriction("Motel Strip Night")
+        self._skip_blackjack_tonight = True
+
+        print()
+        type.type("The casino lights glow somewhere down the highway, but tonight you don't follow them.")
+        print()
+        type.type("Instead, you stay on the Motel Strip, listening to ice machines rattle, televisions bleed through thin walls, and distant arguments rise and fade like bad weather.")
+        print()
+        type.type("It's not peace. But it is a different kind of ruin. Tonight, that's enough.")
+        print()
         
         print()
         type.type("No blackjack tonight. You just... rest.")

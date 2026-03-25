@@ -108,6 +108,11 @@ class RunResult:
     decision_trace_counts: dict[str, int] = field(default_factory=dict)
     decision_trace_context_counts: dict[str, int] = field(default_factory=dict)
     decision_goal_counts: dict[str, int] = field(default_factory=dict)
+    decision_personality_counts: dict[str, int] = field(default_factory=dict)
+    decision_reason_code_counts: dict[str, int] = field(default_factory=dict)
+    decision_expected_value_avg: float | None = None
+    decision_expected_value_max: float | None = None
+    decision_expected_value_min: float | None = None
     route_outcome_counts: dict[str, int] = field(default_factory=dict)
     route_interrupt_kind_counts: dict[str, int] = field(default_factory=dict)
     route_interrupted_goal_counts: dict[str, int] = field(default_factory=dict)
@@ -934,6 +939,9 @@ def _apply_json_report(result: RunResult, payload: dict[str, object]) -> None:
         trace_request_counts = decision_summary.get("trace_request_counts")
         trace_context_counts = decision_summary.get("trace_context_counts")
         goal_counts = decision_summary.get("goal_counts")
+        personality_counts = decision_summary.get("personality_counts")
+        reason_code_counts = decision_summary.get("reason_code_counts")
+        expected_value_summary = decision_summary.get("expected_value_summary")
         route_outcome_counts = decision_summary.get("route_outcome_counts")
         route_interrupt_kind_counts = decision_summary.get("route_interrupt_kind_counts")
         route_interrupted_goal_counts = decision_summary.get("route_interrupted_goal_counts")
@@ -950,6 +958,20 @@ def _apply_json_report(result: RunResult, payload: dict[str, object]) -> None:
             result.decision_trace_context_counts = {str(name): int(count) for name, count in trace_context_counts.items()}
         if isinstance(goal_counts, dict):
             result.decision_goal_counts = {str(name): int(count) for name, count in goal_counts.items()}
+        if isinstance(personality_counts, dict):
+            result.decision_personality_counts = {str(name): int(count) for name, count in personality_counts.items()}
+        if isinstance(reason_code_counts, dict):
+            result.decision_reason_code_counts = {str(name): int(count) for name, count in reason_code_counts.items()}
+        if isinstance(expected_value_summary, dict):
+            ev_avg = expected_value_summary.get("avg")
+            ev_max = expected_value_summary.get("max")
+            ev_min = expected_value_summary.get("min")
+            if isinstance(ev_avg, (int, float)):
+                result.decision_expected_value_avg = float(ev_avg)
+            if isinstance(ev_max, (int, float)):
+                result.decision_expected_value_max = float(ev_max)
+            if isinstance(ev_min, (int, float)):
+                result.decision_expected_value_min = float(ev_min)
         if isinstance(route_outcome_counts, dict):
             result.route_outcome_counts = {str(name): int(count) for name, count in route_outcome_counts.items()}
         if isinstance(route_interrupt_kind_counts, dict):
@@ -1454,9 +1476,12 @@ def _clear_report_artifacts() -> None:
 def run_seed(cycles: int, seed: int, timeout_seconds: int = 90) -> tuple[RunResult | None, bool]:
     started_at = time.perf_counter()
     _clear_report_artifacts()
+    child_env = os.environ.copy()
+    child_env["QUICKTEST_CYCLES"] = str(cycles)
     process = subprocess.Popen(
-            [sys.executable, QUICKTEST, str(cycles), str(seed)],
+            [sys.executable, "-m", "tools.quicktest", str(seed)],
             cwd=ROOT,
+            env=child_env,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
             text=True,
@@ -4267,6 +4292,12 @@ def _render_summary_lines(results: list[RunResult], cycles: int, seed_label: str
     trace_counts = Counter()
     trace_context_counts = Counter()
     goal_counts = Counter()
+    personality_counts = Counter()
+    reason_code_counts = Counter()
+    ev_weighted_total = 0.0
+    ev_weighted_count = 0
+    ev_global_max: float | None = None
+    ev_global_min: float | None = None
     route_outcome_counts = Counter()
     route_interrupt_kind_counts = Counter()
     route_interrupted_goal_counts = Counter()
@@ -4279,6 +4310,16 @@ def _render_summary_lines(results: list[RunResult], cycles: int, seed_label: str
         trace_counts.update(result.decision_trace_counts)
         trace_context_counts.update(result.decision_trace_context_counts)
         goal_counts.update(result.decision_goal_counts)
+        personality_counts.update(result.decision_personality_counts)
+        reason_code_counts.update(result.decision_reason_code_counts)
+        result_trace_total = sum(result.decision_trace_counts.values())
+        if result_trace_total > 0 and result.decision_expected_value_avg is not None:
+            ev_weighted_total += result.decision_expected_value_avg * result_trace_total
+            ev_weighted_count += result_trace_total
+        if result.decision_expected_value_max is not None:
+            ev_global_max = result.decision_expected_value_max if ev_global_max is None else max(ev_global_max, result.decision_expected_value_max)
+        if result.decision_expected_value_min is not None:
+            ev_global_min = result.decision_expected_value_min if ev_global_min is None else min(ev_global_min, result.decision_expected_value_min)
         route_outcome_counts.update(result.route_outcome_counts)
         route_interrupt_kind_counts.update(result.route_interrupt_kind_counts)
         route_interrupted_goal_counts.update(result.route_interrupted_goal_counts)
@@ -4301,6 +4342,18 @@ def _render_summary_lines(results: list[RunResult], cycles: int, seed_label: str
             lines.append("Contexts " + " ".join(f"{name}={count}" for name, count in request_context_counts.most_common(8)))
         if goal_counts:
             lines.append("Goals    " + " ".join(f"{name}={count}" for name, count in goal_counts.most_common(8)))
+        if personality_counts:
+            lines.append("Personalities " + " ".join(f"{name}={count}" for name, count in personality_counts.most_common(8)))
+        if reason_code_counts:
+            lines.append("Reason codes " + " ".join(f"{name}={count}" for name, count in reason_code_counts.most_common(10)))
+        if ev_weighted_count > 0:
+            ev_weighted_avg = ev_weighted_total / ev_weighted_count
+            ev_max_text = f"{ev_global_max:.2f}" if ev_global_max is not None else "n/a"
+            ev_min_text = f"{ev_global_min:.2f}" if ev_global_min is not None else "n/a"
+            lines.append(
+                "Expected value "
+                + f"avg={ev_weighted_avg:.2f} max={ev_max_text} min={ev_min_text} samples={ev_weighted_count}"
+            )
         if route_outcome_counts:
             lines.append("Route outcomes " + " ".join(f"{name}={count}" for name, count in route_outcome_counts.most_common(6)))
         if route_interrupt_kind_counts:

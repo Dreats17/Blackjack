@@ -135,6 +135,9 @@ Flat tire, dead battery, engine overheating, oil leak, broken window, damaged mi
 | Lucky Dog | 4 | Scarred stray → loyalty |
 | Gerald | 5 | Mime's hidden identity |
 | Stuart | 4 | Oswald's apprentice side hustle |
+| Rosa | 4 | Laundromat drifter and her sister's suitcase |
+| Eli | 4 | Revival-tent mercy and practical faith |
+| Rex | 4 | Pawned luck and a gambler's last lesson |
 
 ### Danger Arcs
 

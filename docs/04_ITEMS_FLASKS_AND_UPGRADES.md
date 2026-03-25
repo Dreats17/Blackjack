@@ -25,7 +25,6 @@ The convenience store restocks between visits. Inventory depends on your **wealt
 | Cheap Sunscreen | $8 | Prevents sunburn damage |
 | Plastic Poncho | $6 | Prevents cold/sickness from rain |
 | Breath Mints | $3 | Freshens breath for social events |
-| Worn Map | $8 | **KEY ITEM** — unlocks Witch Doctor and Marvin |
 | Matches | $2 | Fire-starting; crafting ingredient |
 | Birdseed | $4 | Attract birds; minor event use |
 | Baking Soda | $3 | Cleaning / crafting ingredient |
@@ -47,6 +46,7 @@ The convenience store restocks between visits. Inventory depends on your **wealt
 | Running Shoes | $45 | Improves escape/chase outcomes |
 | Cheese | $6 | Food / crafting ingredient |
 | Premium Sunscreen | $15 | Better sunburn prevention |
+| Worn Map | $8 | **KEY ITEM** — unlocks Witch Doctor and Marvin |
 
 ### Rank 2 — Modest
 
@@ -59,7 +59,7 @@ The convenience store restocks between visits. Inventory depends on your **wealt
 | Super Glue | $12 | Field repairs |
 | Welding Goggles | $40 | Safety / event protection |
 | Spare Tire | $50 | Fixes flat tire events |
-| Tool Kit | $75 | **KEY ITEM** — unlocks Car Workbench |
+| Tool Kit | $85 | **KEY ITEM** — unlocks Car Workbench |
 | First Aid Kit | $35 | Heals HP; crafting ingredient |
 | Umbrella | $20 | Prevents cold from rain |
 
@@ -171,7 +171,7 @@ Notable world-reactive Marvin items in the current build include `Pocket Watch` 
 
 ## Crafting System
 
-> **Requires:** Tool Kit ($75) + Car Workbench unlocked.
+> **Requires:** Tool Kit ($85) + Car Workbench unlocked.
 
 **50+ recipes** across 7 categories.
 
@@ -258,7 +258,7 @@ Items degrade with use. At zero durability, items **break** and lose all effects
 | Item | Source | Unlocks |
 |------|--------|---------|
 | Worn Map | Store ($8) | Witch Doctor + Marvin |
-| Tool Kit | Store ($75) | Car Workbench crafting |
+| Tool Kit | Store ($85) | Car Workbench crafting |
 | Animal Whistle | Adventures | Recruit companions |
 | High Roller Keycard | Casino/events | VIP casino access |
 

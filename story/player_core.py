@@ -7,7 +7,7 @@ import msvcrt
 from colorama import Fore, Back, Style, init
 init(convert=True)
 
-PAR = "\n\n"
+PAR = "\n"
 
 """
 Below are all of the typing/color functions, used
@@ -527,6 +527,14 @@ class Player(
         self._round_count = value
 
     def add_item(self, item):
+        # Items sold to Gus have been garbled into grime — they can't exist again.
+        if self.has_sold_to_gus(item):
+            print()
+            type.type(yellow("The ") + magenta(bright(item)) + yellow(" crumbles to ash in your hands before you can hold it."))
+            print()
+            type.type(italic("It was already garbled. Some things can't come back."))
+            print()
+            return
         self._inventory.add(item)
         self._items_ever_owned.add(item)
 
