@@ -988,6 +988,137 @@ def run_all_scenarios() -> list[ScenarioResult]:
 
     results.append(
         _run_route_scenario(
+            "no_car_low_health_prefers_recovery_specialist",
+            "startup_stability",
+            GameState(
+                day=7,
+                balance=140,
+                rank=0,
+                health=42,
+                sanity=33,
+                fatigue=20,
+                alive=True,
+                current_context_tag="afternoon_destination",
+                has_car=False,
+                current_progress_goal_candidates=("acquire_car", "stabilize_health", "survive_emergency"),
+            ),
+            ("Doctor's Office", "Trusty Tom's Trucks and Tires", "Stay Home"),
+            {
+                "urgent_medical": True,
+                "wants_doctor": True,
+                "needs_recovery_day": False,
+                "has_car": False,
+                "store_spend": 0,
+                "pawn_value": 0,
+            },
+            _assert_goal_and_route("survive_emergency", "Doctor's Office"),
+        )
+    )
+
+    results.append(
+        _run_route_scenario(
+            "bankroll_emergency_prefers_liquidity_routes",
+            "startup_stability",
+            GameState(
+                day=9,
+                balance=0,
+                rank=1,
+                health=70,
+                sanity=56,
+                fatigue=22,
+                alive=True,
+                current_context_tag="afternoon_destination",
+                has_car=True,
+                bankroll_emergency=True,
+                current_progress_goal_candidates=("contain_debt_escalation", "push_next_rank"),
+            ),
+            ("Vinnie's Back Alley Loans", "Grimy Gus's Pawn Emporium", "Drive to Airport", "Stay Home"),
+            {
+                "wants_loan": True,
+                "loan_pressure": 64,
+                "wants_pawn": True,
+                "pawn_value": 220,
+                "store_spend": 0,
+                "wants_doctor": False,
+                "urgent_medical": False,
+            },
+            _assert_goal_and_route("contain_debt_escalation", "Vinnie's Back Alley Loans"),
+        )
+    )
+
+    results.append(
+        _run_route_scenario(
+            "early_unlock_delay_prioritizes_store_or_loan",
+            "startup_stability",
+            GameState(
+                day=11,
+                balance=180,
+                rank=0,
+                health=72,
+                sanity=52,
+                fatigue=16,
+                alive=True,
+                current_context_tag="afternoon_destination",
+                has_car=False,
+                has_met_vinnie=True,
+                marvin_future_priority=72,
+                marvin_future_shortfall=3200,
+                opportunity_flags={
+                    "can_borrow_to_bootstrap": True,
+                    "can_visit_marvin": False,
+                },
+                current_progress_goal_candidates=("push_next_rank", "acquire_car", "bootstrap_blackjack_edge"),
+            ),
+            ("Vinnie's Back Alley Loans", "Convenience Store", "Trusty Tom's Trucks and Tires", "Stay Home"),
+            {
+                "wants_loan": True,
+                "loan_pressure": 55,
+                "wants_store": True,
+                "store_spend": 40,
+                "wants_marvin": False,
+                "wants_pawn": False,
+                "urgent_medical": False,
+            },
+            _assert_goal_and_route("push_next_rank", "Vinnie's Back Alley Loans"),
+        )
+    )
+
+    results.append(
+        _run_route_scenario(
+            "fragile_post_car_avoids_adventure_branch",
+            "startup_stability",
+            GameState(
+                day=13,
+                balance=210,
+                rank=1,
+                health=66,
+                sanity=41,
+                fatigue=28,
+                alive=True,
+                current_context_tag="afternoon_destination",
+                has_car=True,
+                fragile_post_car=True,
+                opportunity_flags={
+                    "can_adventure_safely": True,
+                    "can_restock_supplies": True,
+                },
+                current_progress_goal_candidates=("push_next_rank", "reduce_fatigue_pressure", "restock_supplies"),
+            ),
+            ("Drive to Abandoned Airport", "Convenience Store", "Stay Home"),
+            {
+                "wants_adventure": True,
+                "adventure_readiness": 70,
+                "needs_recovery_day": True,
+                "wants_store": False,
+                "store_spend": 0,
+                "wants_doctor": False,
+            },
+            _assert_goal_and_route("reduce_fatigue_pressure", "Stay Home"),
+        )
+    )
+
+    results.append(
+        _run_route_scenario(
             "car_trouble_interruption_case",
             "route",
             GameState(
@@ -1692,6 +1823,74 @@ def run_all_scenarios() -> list[ScenarioResult]:
                 "wants_map_unlock": False,
             },
             _assert_max_bet(96),
+        )
+    )
+
+    warning_two_rank_one_state = GameState(
+        day=20,
+        balance=1200,
+        rank=1,
+        health=78,
+        sanity=58,
+        fatigue=16,
+        alive=True,
+        current_context_tag="blackjack_bet",
+        has_car=True,
+        loan_debt=8500,
+        loan_warning_level=2,
+        dealer_happiness=58,
+        current_progress_goal_candidates=("contain_debt_escalation", "reduce_debt_risk", "push_next_rank"),
+    )
+    results.append(
+        _run_bet_scenario(
+            "warning_two_rank_one_avoids_debt_gambler",
+            "startup_stability",
+            warning_two_rank_one_state,
+            {
+                "cycle": 0,
+                "rank": 1,
+                "health": 78,
+                "sanity": 58,
+                "dealer_happiness": 58,
+                "balance": 1200,
+                "fake_cash": 0,
+                "min_bet": 10,
+                "target": 10000,
+                "floor": 500,
+                "distance": 8800,
+                "store_budget": 0,
+                "wants_store": False,
+                "wants_pawn": True,
+                "wants_doctor": False,
+                "progression_ready": False,
+                "phase": "car_ready",
+                "tuner_bet_ratio": 0.17,
+                "tuner_bet_ratio_safe": 0.12,
+                "tuner_max_ratio": 0.26,
+                "tuner_pressure_factor": 0.62,
+                "tuner_surplus_push": 0.42,
+                "edge_score": 3,
+                "pending_marvin_active": False,
+                "pending_marvin_price": 0,
+                "pending_marvin_shortfall": 0,
+                "stall_days": 0,
+                "early_caution": False,
+                "stranded_no_car": False,
+                "survival_mode": False,
+                "needs_car": False,
+                "wants_millionaire_push": False,
+                "has_extra_round_item": False,
+                "urgent_doctor": False,
+                "has_met_tom": True,
+                "has_met_frank": False,
+                "has_met_oswald": False,
+                "car_progress_reserve": 0,
+                "mechanic_purchase_reserve": 0,
+                "known_car_repair_reserve": 0,
+                "has_faulty_insurance": False,
+                "wants_map_unlock": False,
+            },
+            _assert_max_bet(132),
         )
     )
 

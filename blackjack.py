@@ -253,7 +253,7 @@ class Blackjack:
                 if breakloop:
                     break
 
-                print()
+                print("\n")
 
                 self.print_draw("Dealer", "second", self.__dealer_hand.get_card(1))
                 print()
@@ -345,11 +345,11 @@ class Blackjack:
                     random_chance = random.randrange(3)
                     if random_chance == 0:
                         # Force all-in instead of outright kill
-                        type.slow(red(bright("The Dealer slams his fist on the table. The whole room goes quiet.")))
+                        type.slow(red(bright("The Dealer slams his fist on the table. You take a big ol' gulp.")))
                         print()
-                        type.slow(red(bright("He leans in close. You can see the veins in his neck pulsing.")))
+                        type.slow(red(bright("The Dealer leans in close. You can see the veins in his neck pulsing.")))
                         print()
-                        type.slow(red(bright('"You think this is a game? ALL. IN. Every last cent. Right now."')))
+                        type.slow(red(bright('\"You think this is a game? ALL. IN. Every last cent. Right now.\"')))
                         print()
                         type.slow(red(bright("The Dealer isn\'t asking. He\'s telling.")))
                         print()
@@ -542,7 +542,7 @@ class Blackjack:
         # Deal first card to Dealer
         card = self.draw(self.__dealer_hand)
         self.print_draw("Dealer", "first", card)
-        print()
+        print("\n")
 
         # Saves dealer hand value, as it's the only card the player sees
         known_value = self.__dealer_hand.value()
@@ -560,24 +560,22 @@ class Blackjack:
             type.fast(red("The Dealer's second card is face down"))
             time.sleep(PAUSE)
             if self.__player.has_item("Dealer's Mirror"):
-                print()
+                print("\n")
                 type.fast(magenta(bright("Dealer's Mirror")) + " flashes. In its surface, you see the hidden card clearly.")
                 print()
                 if card.value() in [1, 8]:
                     type.fast(magenta("The hidden card is an " + bright(str(card))))
                 else:
                     type.fast(magenta("The hidden card is a " + bright(str(card))))
-                print()
             elif self.__player.has_flask_effect("Dealer's Whispers"):
-                print()
+                print("\n")
                 type.fast(cyan(bright("Your Dealer's Whispers potion murmurs the hidden truth...")))
                 print()
                 if card.value() in [1, 8]:
                     type.fast(cyan("The hidden card is an " + bright(str(card))))
                 else:
                     type.fast(cyan("The hidden card is a " + bright(str(card))))
-                print()
-        print()
+        print("\n")
 
         # Prints Dealer's starting hand value. This is a special case (known value or 21 with a wink).
         if((self.__dealer_hand.value()!=21) & (known_value==1)):
@@ -1027,14 +1025,14 @@ class Blackjack:
                         ". His hand hovers over the deck for just a moment too long before drawing.",
                         ". Living dangerously. You almost respect it.",
                     ]
-                    type.type(random.choice(comments))
+                    type.type(red(random.choice(comments)))
                 else:
                     comments = [
                         " — no hesitation.",
                         ". Mechanical. Practiced. He's done this a million times.",
                         ". The card slides off the deck like it was waiting for him.",
                     ]
-                    type.type(random.choice(comments))
+                    type.type(red(random.choice(comments)))
             time.sleep(PAUSE)
         else:
             type.fast(red("The Dealer's hand has a value under 17 so they hit"))

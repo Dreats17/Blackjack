@@ -279,6 +279,43 @@ def _looks_like_numeric_menu_prompt(options):
     return all(token.isdigit() or token in allowed_tokens for token in normalized)
 
 
+def _looks_like_afternoon_destination_menu(menu_options, prompt_lower="", recent="", recent_short=""):
+    if not menu_options:
+        return False
+
+    labels = [str(label).strip().lower() for _number, label in menu_options]
+    has_stay_home = "stay home" in labels
+    route_labels = {
+        "doctor's office",
+        "witch doctor's tower",
+        "trusty tom's trucks and tires",
+        "filthy frank's flawless fixtures",
+        "oswald's optimal outoparts",
+        "convenience store",
+        "marvin's mystical merchandise",
+        "grimy gus's pawn emporium",
+        "vinnie's back alley loans",
+        "airport",
+        "make a phone call",
+        "tanya's office",
+        "car workbench",
+        "wander off",
+    }
+    has_route_label = any(label in route_labels or label.startswith("drive to ") for label in labels)
+
+    if has_stay_home and has_route_label:
+        return True
+
+    afternoon_markers = (
+        "how do you want to spend the rest of your afternoon",
+        "your wagon isn't road-ready",
+        "places you can reach before sundown",
+        "would you like to spend your day driving somewhere",
+    )
+    combined_text = "\n".join((prompt_lower, recent, recent_short))
+    return any(marker in combined_text for marker in afternoon_markers) and has_route_label
+
+
 def _map_numeric_choice_to_option_token(chosen_number, option_values):
     chosen_text = str(chosen_number)
     raw_values = [str(value).strip() for value in option_values]
@@ -1286,6 +1323,54 @@ def _gift_run_ready(player):
     )
 
 
+def _dealer_gift_recovery_mode(player):
+    if player is None or not _gift_run_ready(player):
+        return False
+    happiness = _dealer_happiness(player)
+    return (
+        happiness <= 84
+        or (
+            happiness <= 88
+            and player.get_balance() >= 400
+            and player.get_health() >= 66
+            and player.get_sanity() >= 36
+        )
+    )
+
+
+def _gift_unlock_push_mode(player):
+    if player is None:
+        return False
+    if not hasattr(player, "is_gift_system_unlocked"):
+        return False
+    if player.is_gift_system_unlocked():
+        return False
+    if _dealer_happiness(player) >= GIFT_WRAP_HAPPINESS_THRESHOLD:
+        return False
+    if _needs_car(player) or _doctor_visit_is_urgent(player):
+        return False
+
+    purchases = int(getattr(player, "_convenience_store_purchases", 0) or 0)
+    return (
+        purchases < 5
+        and player.get_balance() >= 140
+        and player.get_health() >= 60
+        and player.get_sanity() >= 32
+    )
+
+
+def _wealth_lock_mode(player):
+    if player is None or _needs_car(player):
+        return False
+    if _doctor_visit_is_urgent(player):
+        return False
+    return (
+        player.get_balance() >= 20000
+        and player.get_health() >= 62
+        and player.get_sanity() >= 32
+    )
+
+
 def _is_companion_food_item(item_name, player):
     if player is None or not hasattr(player, "get_food_data"):
         return False
@@ -2178,6 +2263,8 @@ def _progression_phase(player):
         return "bankroll_emergency"
     if _fragile_post_car_recovery_mode(player):
         return "car_recovery"
+    if _wealth_lock_mode(player):
+        return "wealth_lock"
     if _needs_car(player):
         return "car_rush"
     if _marvin_push_window(player):
@@ -2357,37 +2444,20 @@ def _in_rank_push_window(player):
 
 
 def _needs_recovery_day(player):
+    # AGGRESSIVE: Never force recovery - let route policy handle it
+    # Only return True in absolute life-threatening emergencies
     if player is None:
         return False
     if _doctor_visit_is_urgent(player):
         return False
-    defer_for_marvin = _should_defer_doctor_for_marvin_window(player)
+    
     health = player.get_health()
     sanity = player.get_sanity()
-    day = getattr(player, "_day", 1)
-    rank = int(player.get_rank()) if hasattr(player, "get_rank") else 0
-    balance = int(player.get_balance()) if hasattr(player, "get_balance") else 0
-    statuses = _status_names(player)
-    injuries = _injury_names(player)
-    if _needs_doctor(player) and not _wants_doctor_visit(player) and not defer_for_marvin:
+    
+    # Only if literally about to die
+    if health <= 10 or sanity <= 5:
         return True
-    if health < (52 if defer_for_marvin else 62) or sanity < (20 if defer_for_marvin else 24):
-        return True
-    if player.has_item("Car") and day >= 35 and sanity < 38:
-        return True
-    if player.has_item("Car") and day >= 45 and (statuses or injuries) and sanity < 44:
-        return True
-    if health < (58 if defer_for_marvin else 72) and (statuses or injuries):
-        return True
-    if sanity < (24 if defer_for_marvin else 32) and len(statuses) >= 2:
-        return True
-    if player.has_item("Car") and balance >= (3000 if rank <= 1 else 12000):
-        if injuries and health < (76 if defer_for_marvin else 82):
-            return True
-        if statuses and health < (72 if defer_for_marvin else 78):
-            return True
-        if (injuries or statuses) and sanity < (34 if defer_for_marvin else 40):
-            return True
+    
     return False
 
 
@@ -2508,6 +2578,38 @@ def _can_afford_store_purchase(player, price, priority, item_name):
     return False
 
 
+def _item_happiness_value(item_name):
+    """Return the dealer happiness delta for gifting this item. Used to prioritize happiness-boosting items."""
+    ITEM_HAPPINESS_MAP = {
+        "Dealer's Joker": 30,
+        "Ace of Spades": 25,
+        "Vintage Wine": 22,
+        "Golden Compass": 20,
+        "Antique Pocket Watch": 18,
+        "Leather Gloves": 17,
+        "Fancy Pen": 16,
+        "Silver Flask": 15,
+        "Moon Shard": 15,
+        "Mirror of Duality": 15,
+        "Lucky Rabbit Foot": 14,
+        "Mysterious Envelope": 13,
+        "Deck of Cards": 12,
+        "Old Photograph": 12,
+        "Gambler's Grimoire": 10,
+        "Mysterious Lockbox": 8,
+        "Pocket Watch": 5,
+        "Sandwich": 3,
+        "Energy Drink": 2,
+        "Lucky Coin": 0,
+        "Cursed Coin": -15,
+        "Necronomicon": -20,
+        "Voodoo Doll": -25,
+        "Stolen Watch": -50,
+        "Dealer's Grudge": -40,
+    }
+    return ITEM_HAPPINESS_MAP.get(item_name, 5)  # Default +5 for unlisted items
+
+
 def _available_store_inventory(player):
     if player is None:
         return []
@@ -2526,9 +2628,21 @@ def _store_item_priority(item_name, player):
 
     food_priority = _store_food_priority(item_name, player)
     priority = max(food_priority, get_store_base_priority(item_name))
-    if item_name in GIFT_WORTHY_ITEMS and _gift_run_ready(player):
-        priority = max(priority, 78)
-        priority += 18 if _dealer_happiness(player) < 82 else 12
+
+    # When dealer happiness is low, boost high-value gift items proportionally
+    # This encourages strategic gift purchases to recover happiness while still buying
+    # aggressively for other utility items.
+    dealer_happiness = _dealer_happiness(player)
+    if dealer_happiness < 78 and _gift_run_ready(player):
+        item_happiness = _item_happiness_value(item_name)
+        if item_happiness >= 10:
+            # Scale boost based on how low happiness is: at dh=0, boost is +24 for +22 items
+            happiness_deficit = max(0, 78 - dealer_happiness)
+            base_boost = min(24, int(item_happiness * 1.0))
+            deficit_modifier = (happiness_deficit / 78.0)
+            happiness_boost = int(base_boost * (0.5 + deficit_modifier * 0.5))
+            priority = max(priority, 76 + happiness_boost)
+
     if item_name == "LifeAlert" and player.get_health() < 95:
         priority += 10
     if item_name == "Worn Map" and player.has_item("Car") and not player.has_item("Map"):
@@ -2676,11 +2790,11 @@ def _store_buyout_candidate(player, balance=None):
         return None
 
     rank = int(player.get_rank()) if hasattr(player, "get_rank") else 0
-    balance_gate = 4500 if rank <= 1 else 10000
+    balance_gate = 2200 if rank <= 1 else 8000
     best_priority = int(bundle[0][0])
     if budget < balance_gate and best_priority < 84:
         return None
-    if budget < balance_gate and target_spend < max(220, int(budget * 0.18)):
+    if budget < balance_gate and target_spend < max(120, int(budget * 0.12)):
         return None
 
     return {
@@ -2702,8 +2816,6 @@ def _wants_store_run(player):
     dealer_happiness = _dealer_happiness(player)
     store_gap = _days_since_location(player, "shop:convenience_store")
     buyout_candidate = _store_buyout_candidate(player)
-    if _gift_run_ready(player) and store_gap != 0 and (store_gap is None or store_gap > 1):
-        return True
     if buyout_candidate is not None and store_gap != 0 and (store_gap is None or store_gap > 1):
         return True
     if dealer_happiness >= 96:
@@ -3920,105 +4032,22 @@ def _has_marvin_access(player):
 
 
 def _wants_marvin_run(player):
+    # AGGRESSIVE: Visit Marvin constantly unless in critical danger
     if not _has_marvin_access(player):
         return False
-    if _bankroll_emergency_mode(player) or _fragile_post_car_recovery_mode(player):
+    if _bankroll_emergency_mode(player):
         return False
     if _wants_doctor_visit(player):
         return False
-    if player.get_health() < 50 or player.get_sanity() < 26:
+    # Allow visits with relaxed vitals (below survival thresholds is OK)
+    if player.get_health() < 15 or player.get_sanity() < 5:
         return False
-    balance = player.get_balance()
-    floor = _rank_floor(balance)
-    tuner = _rank_tuner(player)
+    # Can't visit same day
     marvin_gap = _days_since_location(player, "shop:marvin")
-    has_only_worn_map_access = player.has_item("Worn Map") and not player.has_item("Map")
-    affordable_priority = _best_marvin_affordable_priority(player)
-    stall_days = _progress_stall_days(player)
-    catalog_candidate = _marvin_catalog_candidate(player)
-    future_candidate = _best_future_marvin_candidate(player, balance)
-    essential_items = _marvin_essential_items()
-    leverage_targets = essential_items | _marvin_late_game_leverage_items()
     if marvin_gap == 0:
         return False
-    if _marvin_push_window(player):
-        return True
-    if catalog_candidate is not None and (marvin_gap is None or marvin_gap >= 1):
-        return True
-    if (
-        future_candidate is not None
-        and future_candidate["item"] in essential_items
-        and future_candidate["priority"] >= 66
-        and future_candidate["shortfall"] <= max(5000 if player.get_rank() <= 1 else 16000, int(balance * (1.00 if player.get_rank() <= 1 else 0.85)))
-        and player.get_health() >= 58
-        and player.get_sanity() >= 30
-        and (marvin_gap is None or marvin_gap >= 1)
-    ):
-        return True
-    if (
-        player.get_rank() >= 2
-        and balance >= 9000
-        and future_candidate is not None
-        and future_candidate["item"] in leverage_targets
-        and future_candidate["shortfall"] <= (22000 if _witch_drives_marvin_followup(player) else 18000)
-        and player.get_health() >= 60
-        and player.get_sanity() >= 32
-    ):
-        return True
-    if (
-        player.get_rank() >= 2
-        and affordable_priority >= 72
-        and balance >= 12000
-        and player.get_health() >= 62
-        and player.get_sanity() >= 34
-        and (marvin_gap is None or marvin_gap >= 1)
-    ):
-        return True
-    if marvin_gap is not None and marvin_gap <= 1 and player.get_rank() < 2 and balance < 5000:
-        return False
-    if (
-        player.get_rank() <= 1
-        and affordable_priority >= 56
-        and balance >= 1200
-        and player.get_health() >= 56
-        and player.get_sanity() >= 30
-        and (marvin_gap is None or marvin_gap >= 3)
-    ):
-        return True
-    if (
-        player.get_rank() >= 1
-        and balance >= 2200
-        and player.get_health() >= 60
-        and player.get_sanity() >= 34
-        and stall_days >= 8
-        and (marvin_gap is None or marvin_gap >= 4)
-    ):
-        return True
-    if stall_days >= 12 and affordable_priority >= 56 and balance >= 1000:
-        return True
-    if stall_days >= 8 and affordable_priority >= 50 and balance >= 1200:
-        return True
-    if stall_days >= 18 and affordable_priority >= 44 and balance >= 1400:
-        return True
-    if player.get_rank() < 2 and has_only_worn_map_access and affordable_priority >= 50:
-        return balance >= max(1500, floor - 400 if floor else 1500)
-    if player.get_rank() < 2 and has_only_worn_map_access and balance >= 7000 and affordable_priority >= 50:
-        return True
-    if player.get_rank() < 2 and balance < (1200 if affordable_priority >= 44 else 1600):
-        return False
-    if player.get_rank() < 2 and affordable_priority >= 44:
-        return True
-    if player.get_rank() < 2 and balance >= 3500 and player.get_health() >= 56 and player.get_sanity() >= 30:
-        return True
-    if _witch_drives_marvin_followup(player) and balance >= 9000 and affordable_priority >= 72:
-        return True
-    if affordable_priority >= 84:
-        return balance >= max(8000, floor - 1000 if floor else 8000)
-    if player.get_rank() >= 2 and balance >= 25000 and affordable_priority >= 68:
-        return True
-    if player.get_rank() >= 2 and _blackjack_edge_score(player) < 5:
-        return balance >= max(6000, floor)
-    return balance >= max(tuner["marvin_min_balance"], floor + tuner["marvin_floor_buffer"])
+    # Just visit Marvin. Always.
+    return True
 
 
 def _marvin_bootstrap_window(player):
@@ -4256,17 +4285,25 @@ def _wants_workbench_craft_run(player):
     """
     if player is None or not player.has_item("Car") or not player.has_item("Tool Kit"):
         return False
-    if _wants_doctor_visit(player) or _doctor_visit_is_urgent(player):
+    if _doctor_visit_is_urgent(player):
         return False
+    if _wants_doctor_visit(player):
+        risk = _doctor_risk_profile(player)
+        if risk["margin"] <= 8 or risk["health"] < 58 or risk["sanity"] < 24:
+            return False
     if not player.has_met("Car Workbench"):
         return player.get_health() >= 58 and player.get_sanity() >= 30
     workbench_gap = _days_since_location(player, "shop:car_workbench")
     if workbench_gap == 0:
         return False
-    # Don't return for crafting more than every 2 days (low opportunity cost when nothing new is ready)
-    if workbench_gap is not None and workbench_gap <= 2:
+    candidate = _workbench_best_craft_candidate(player)
+    if candidate is None:
         return False
-    return _workbench_best_craft_candidate(player) is not None
+    _recipe_name, recipe_priority = candidate
+    # Don't return for crafting more than every 2 days (low opportunity cost when nothing new is ready)
+    if workbench_gap is not None and workbench_gap <= 1 and recipe_priority < 94:
+        return False
+    return True
 
 
 def _choose_workbench_menu(options, player):
@@ -5247,7 +5284,7 @@ def _decide_numbered_menu_choice(menu_options, player, prompt_lower="", recent="
         return str(_choose_loan_repay_amount(menu_options, player))
     if _looks_like_loan_menu(menu_options):
         return str(_choose_loan_menu(menu_options, player))
-    if "would you like to spend your day driving somewhere" in recent:
+    if _looks_like_afternoon_destination_menu(menu_options, prompt_lower, recent, recent_short):
         return str(_choose_destination(menu_options, player))
     if "what do you want?" in recent or "what else you want?" in recent:
         return str(_choose_store_item(menu_options, player))
@@ -5396,9 +5433,9 @@ def _wants_pawn_cashout(player):
         return False
 
     if player.has_item("Car") and player.get_health() >= 60 and player.get_sanity() >= 30:
-        if _wants_marvin_run(player):
+        if _wants_marvin_run(player) and sell_value < 220 and balance >= 1200:
             return False
-        if _wants_adventure_run(player):
+        if _wants_adventure_run(player) and sell_value < 180 and balance >= 1000:
             return False
 
     balance = player.get_balance()
@@ -5490,6 +5527,8 @@ def _wants_loan_shark_run(player):
     balance = player.get_balance()
     debt = int(player.get_loan_shark_debt())
     warning = int(player.get_loan_shark_warning_level()) if hasattr(player, "get_loan_shark_warning_level") else 0
+    if _wealth_lock_mode(player) and debt <= 0:
+        return False
     fake_cash = _fraudulent_cash_amount(player)
     wants_doctor = _wants_doctor_visit(player)
     reserve = _cash_safety_reserve(player, 88)
@@ -5498,7 +5537,7 @@ def _wants_loan_shark_run(player):
     loan_gap = _days_since_location(player, "shop:loan_shark")
     if loan_gap == 0:
         return False
-    if loan_gap is not None and loan_gap <= (1 if aggressive_debt_cleanup else (2 if debt > 0 else 4)):
+    if loan_gap is not None and loan_gap <= (1 if aggressive_debt_cleanup else (1 if debt > 0 else 2)):
         return False
 
     if _bankroll_emergency_mode(player):
@@ -5530,7 +5569,7 @@ def _wants_loan_shark_run(player):
     # the bot is gambling at the raw house edge, and 20%/wk interest compounds faster
     # than the expected win rate.  (Exception: repaying existing debt is always allowed.
     # Exception 2: Marvin access at low balance — the first purchase provides edge.)
-    if edge_score < 1 and not bootstrap_window:
+    if edge_score < 1 and not bootstrap_window and balance >= 1600:
         return False
 
     if bootstrap_window and balance < 2600:
@@ -5547,14 +5586,16 @@ def _wants_loan_shark_run(player):
         return False
     if wants_doctor:
         if player.has_item("Real Insurance"):
-            if balance >= 800 and edge_score >= 2:
+            if balance >= 900 and edge_score >= 1:
                 return True
             return False
         if player.has_item("Faulty Insurance"):
-            if balance >= 700 and edge_score >= 3:
+            if balance >= 850 and edge_score >= 2:
                 return True
             return False
         if balance >= max(120, _doctor_heal_cost_estimate(player)):
+            if balance < 1800 and edge_score >= 2 and player.get_health() >= 50 and player.get_sanity() >= 28:
+                return True
             return False
         if edge_score < 4:
             return False
@@ -5616,33 +5657,19 @@ def _loan_bootstrap_window(player):
 
 
 def _wants_adventure_run(player):
+    # AGGRESSIVE: Do adventures constantly
     if not _adventure_ready(player):
         return False
-    if _bankroll_emergency_mode(player) or _fragile_post_car_recovery_mode(player):
+    if _bankroll_emergency_mode(player):
         return False
-
-    # Doctor visits always block adventures (health/safety first).
     if _wants_doctor_visit(player):
         return False
-    # Store blocks adventures at rank 0-1: gathering edge items is more important than
-    # spending the afternoon on a low-yield adventure.  At rank 2+ the player has already
-    # made it past the critical progression bottleneck, so only truly urgent supply runs
-    # (Tool Kit, Spare Tire, Road Flares, First Aid Kit — all priority >= 90) block adventures.
+    
     rank_val = int(player.get_rank())
-    if _wants_store_run(player):
-        if rank_val < 2:
-            return False
-        # At rank 2+ only block if the store trip is truly urgent.
-        store_cands = _store_purchase_candidates(player)
-        if store_cands and store_cands[0][0] >= 90:
-            return False
-
-    balance = player.get_balance()
-    floor = _rank_floor(balance)
-    rank = rank_val
-
-    if rank <= 0:
+    if rank_val < 0:
         return False
+    
+    # Can't revisit same day
     adventure_gap = _days_since_location(
         player,
         "adventure:road",
@@ -5654,26 +5681,9 @@ def _wants_adventure_run(player):
     )
     if adventure_gap == 0:
         return False
-    utility_push = _has_adventure_utility(player)
-    if adventure_gap is not None and adventure_gap <= 1:
-        return False
-    if adventure_gap is not None and adventure_gap <= 2 and rank < 4 and not utility_push:
-        return False
-    whistle_push = player.has_item("Animal Whistle") and _companion_count(player) < 5
-    if rank == 1 and not whistle_push:
-        if not utility_push:
-            return False
-        return balance >= max(850, floor - 250) and player.get_health() >= 60 and player.get_sanity() >= 30
-    if rank == 1 and whistle_push:
-        return balance >= max(750, floor - 300) and player.get_health() >= 60 and player.get_sanity() >= 30
-    if rank == 2:
-        if utility_push:
-            return balance >= max(600, floor - 650) and player.get_health() >= 58 and player.get_sanity() >= 26
-        # No utility items at rank 2: The Road is the bootstrap adventure.
-        # Allow a first trip with a modest cushion so the bot can actually start the
-        # adventure economy once rank 2 is reached.
-        return balance >= max(3000, floor - 5000) and player.get_health() >= 55 and player.get_sanity() >= 26
-    return balance >= floor + 1000 and player.get_health() >= 68 and player.get_sanity() >= 36
+    
+    # Just do the adventure. Always.
+    return True
 
 
 def _wants_map_unlock_window(player):
@@ -5795,9 +5805,6 @@ def _legacy_choose_destination(options, player):
     if medical_choice in labels and _doctor_visit_is_urgent(player):
         return labels[medical_choice]
 
-    if medical_choice in labels and (_wants_doctor_visit(player) or _wants_witch_heal(player)):
-        return labels[medical_choice]
-
     if _needs_recovery_day(player) and "Stay Home" in labels:
         return labels["Stay Home"]
 
@@ -5820,6 +5827,9 @@ def _legacy_choose_destination(options, player):
     # Placed after pawn shop and progression so it doesn't override Marvin/adventure.
     if "Witch Doctor's Tower" in labels and _wants_witch_flask_only_run(player):
         return labels["Witch Doctor's Tower"]
+
+    if medical_choice in labels and (_wants_doctor_visit(player) or _wants_witch_heal(player)):
+        return labels[medical_choice]
 
     if medical_choice in labels:
         return labels[medical_choice]
@@ -5874,8 +5884,10 @@ def _planner_choose_destination(options, player):
     marvin_priority = 0
     marvin_future_priority = 0
     marvin_future_shortfall = 0
-    if _wants_marvin_run(player):
-        marvin_priority = _best_marvin_affordable_priority(player)
+    wants_marvin_raw = _wants_marvin_run(player)
+    if wants_marvin_raw:
+        # AGGRESSIVE: If bot wants Marvin, give it high priority in routing
+        marvin_priority = 100
         future_candidate = _best_future_marvin_candidate(player, game_state.balance) if _has_marvin_access(player) else None
         if future_candidate is not None:
             marvin_future_priority = int(future_candidate["priority"])
@@ -5883,26 +5895,8 @@ def _planner_choose_destination(options, player):
     adventure_readiness = 0
     if _wants_adventure_run(player):
         adventure_readiness = min(100, max(30, int(player.get_rank()) * 20 + max(0, player.get_health() - 60) // 2 + max(0, player.get_sanity() - 35) // 2))
-    wants_store = (
-        plan.goal in {
-        "restock_supplies",
-        "preserve_companion_roster",
-        "reduce_fatigue_pressure",
-        "stabilize_health",
-        "bootstrap_blackjack_edge",
-        }
-        or store_goal_score >= max(58.0, plan_top_score - 12.0)
-    ) and game_state.store_candidate_count > 0
-    wants_pawn = (
-        plan.goal in {
-        "cashout_pawn_inventory",
-        "reduce_debt_risk",
-        "contain_debt_escalation",
-        "acquire_car",
-        "stabilize_health",
-        }
-        or pawn_goal_score >= max(60.0, plan_top_score - 12.0)
-    ) and game_state.pawn_planned_sale_value > 0
+    wants_store = game_state.store_candidate_count > 0
+    wants_pawn = game_state.pawn_planned_sale_value > 0
     route_labels = {label for _number, label in menu_options}
     defer_doctor = _defer_doctor_for_no_car_progression(player, route_labels, planned_goal=plan.goal)
     normalized_options = tuple(
@@ -6015,91 +6009,15 @@ def _choose_destination(options, player):
         )
         return labels["Vinnie's Back Alley Loans"]
 
-    allow_recovery_override = True
-    if _needs_recovery_day(player) and player is not None:
-        recovery_state = _current_game_state(player, menu_options=options, context_tag="recovery_override_check")
-        recovery_plan = choose_strategic_goal(recovery_state)
-        recovery_injuries = _injury_names(player)
-        recovery_statuses = _status_names(player)
-        severe_recovery_injuries = {"ruptured spleen", "concussion", "broken ribs", "broken leg", "fractured spine", "punctured lung"}
-        severe_recovery_statuses = {
-            "appendicitis", "anaphylaxis", "blood pressure crisis", "dvt", "gangrene", "heat stroke",
-            "hypothermia", "kidney stones", "needle exposure", "pancreatitis", "pneumonia",
-            "possible rabies", "seizure disorder", "sepsis", "severe asthma", "severe dehydration",
-            "staph infection", "tetanus", "uncontrolled diabetes", "waterborne illness",
-        }
-        mild_recovery_pressure = (
-            player.get_health() >= 60
-            and player.get_sanity() >= 28
-            and len(recovery_injuries) <= 2
-            and len(recovery_statuses) <= 2
-            and not any(injury in severe_recovery_injuries for injury in recovery_injuries)
-            and not any(status in severe_recovery_statuses for status in recovery_statuses)
-            and _doctor_need_score(player) < 84
-        )
-        store_window_open = (
-            recovery_plan.goal == "restock_supplies"
-            and "Convenience Store" in labels
-            and recovery_state.store_target_spend > 0
-        )
-        pawn_window_open = (
-            recovery_plan.goal == "cashout_pawn_inventory"
-            and "Grimy Gus's Pawn Emporium" in labels
-            and recovery_state.pawn_planned_sale_value > 0
-        )
-        marvin_window_open = (
-            recovery_plan.goal == "exploit_marvin"
-            and "Marvin's Mystical Merchandise" in labels
-            and recovery_state.has_marvin_access
-            and _best_marvin_affordable_priority(player) > 0
-        )
-        loan_window_open = (
-            recovery_plan.goal in {"acquire_car", "reduce_debt_risk", "contain_debt_escalation"}
-            and "Vinnie's Back Alley Loans" in labels
-            and player.get_health() >= 50
-            and player.get_sanity() >= 30
-        )
-        # Loan shark visits are an economic activity with no physical risk; allow them
-        # through recovery pressure when mild conditions are met.
-        loan_recovery_bypass = (
-            "Vinnie's Back Alley Loans" in labels
-            and _wants_loan_shark_run(player)
-            and player.get_health() >= 55
-            and player.get_sanity() >= 32
-            and len(recovery_injuries) <= 1
-            and not any(injury in severe_recovery_injuries for injury in recovery_injuries)
-            and not any(status in severe_recovery_statuses for status in recovery_statuses)
-        )
-        # NOTE: mechanic_window_open, mild_no_car_medical_clutter, and
-        # no_car_recovery_push have been removed.  There is no on-foot travel
-        # in this game, so the afternoon route menu is never shown without a
-        # car.  Mechanics drive to the player via random day events; their
-        # shops only appear in the menu AFTER the player has bought a car
-        # from them.  Any route logic conditioned on "no car AND in the menu"
-        # is dead code.
-        if mild_recovery_pressure and (store_window_open or pawn_window_open or marvin_window_open):
-            allow_recovery_override = False
-        if mild_recovery_pressure and loan_recovery_bypass:
-            allow_recovery_override = False
-
-    if allow_recovery_override and _needs_recovery_day(player) and "Stay Home" in labels:
-        _record_route_interrupt_trace(player, labels["Stay Home"], "recovery-day override -> Stay Home", "stabilize_health", "recovery_day")
-        return labels["Stay Home"]
-
     # Loan shark bootstrap interrupt: when Vinnie is met, no debt, and the player is
     # cash-poor (rank 0 < $900, rank 1 no-map < $3k), borrowing from Vinnie is almost
-    # always the best available move.  Without this interrupt the route scorer ranks the
-    # convenience store above the loan shark because push_next_rank's store bonus slightly
-    # exceeds the loan bonus in edge cases (store_spend high, loan_pressure=0 first visit).
-    # This mirrors the medical/flask interrupts — it fires after all safety checks so it
-    # never overrides doctor, recovery day, or urgent cases.
+    # always the best available move.
     if "Vinnie's Back Alley Loans" in labels and _poverty_escape_loan_mode(player):
         _record_route_interrupt_trace(player, labels["Vinnie's Back Alley Loans"], "poverty-escape loan bootstrap", "push_next_rank", "poverty_loan_bootstrap")
         return labels["Vinnie's Back Alley Loans"]
 
     # Flask-only witch visit: inserted before the planner so it isn't buried
-    # by the planner's store bias.  It's deliberately after medical/recovery
-    # overrides so it never interferes with urgent healing or rest.
+    # by the planner's store bias.
     if "Witch Doctor's Tower" in labels and _wants_witch_flask_only_run(player):
         _record_route_interrupt_trace(player, labels["Witch Doctor's Tower"], "witch flask-only visit", "exploit_witch_flask", "witch_flask_only")
         return labels["Witch Doctor's Tower"]
@@ -6953,6 +6871,45 @@ def _choose_blackjack_bet_amount(self):
             "loan_debt": int(player.get_loan_shark_debt()) if hasattr(player, "get_loan_shark_debt") else 0,
             "loan_warning_level": int(player.get_loan_shark_warning_level()) if hasattr(player, "get_loan_shark_warning_level") else 0,
             "run_peak_balance": RUN_PEAK_BALANCE,
+            # ── Item/flask-specific bet multiplier flags ─────────────────────────
+            # These let the policy respond to each item's direct EV impact
+            # rather than only seeing the blunt aggregate edge_score.
+            # Catastrophic-opportunity flasks
+            "bet_has_imminent_blackjack": (
+                hasattr(player, "has_flask_effect") and player.has_flask_effect("Imminent Blackjack")
+            ),
+            "bet_has_no_bust": (
+                hasattr(player, "has_flask_effect") and player.has_flask_effect("No Bust")
+            ),
+            "bet_has_dealers_whispers": (
+                hasattr(player, "has_flask_effect") and player.has_flask_effect("Dealer's Whispers")
+            ),
+            "bet_has_second_chance": (
+                hasattr(player, "has_flask_effect") and player.has_flask_effect("Second Chance")
+                and not getattr(self, "_Blackjack__used_second_chance", True)
+            ),
+            "bet_has_dealers_hesitation": (
+                hasattr(player, "has_flask_effect") and player.has_flask_effect("Dealer's Hesitation")
+            ),
+            # Luck / protection items (stochastic EV per hand)
+            "bet_has_lucky_medallion": _has_active_item(player, "Lucky Medallion"),
+            "bet_has_lucky_coin": _has_active_item(player, "Lucky Coin"),
+            "bet_has_invisible_cloak": _has_active_item(player, "Invisible Cloak"),
+            "bet_has_tattered_cloak": _has_active_item(player, "Tattered Cloak"),
+            "bet_has_velvet_gloves": _has_active_item(player, "Velvet Gloves"),
+            "bet_has_worn_gloves": _has_active_item(player, "Worn Gloves"),
+            # Action-expanding items (double / split / surrender changes bet leverage)
+            "bet_has_chalice": (
+                _has_active_item(player, "Gambler's Chalice")
+                or _has_active_item(player, "Overflowing Goblet")
+                or (hasattr(player, "has_flask_effect") and player.has_flask_effect("Bonus Fortune"))
+            ),
+            "bet_has_locket": (
+                _has_active_item(player, "Twin's Locket")
+                or _has_active_item(player, "Mirror of Duality")
+                or (hasattr(player, "has_flask_effect") and player.has_flask_effect("Split Serum"))
+            ),
+            "bet_has_phoenix_feather": _has_active_item(player, "Phoenix Feather"),
         },
     )
     _record_decision_request(request)
@@ -6982,6 +6939,10 @@ def _should_take_insurance(self):
         metadata={
             "can_afford": True,
             "has_dealers_whispers": player.has_flask_effect("Dealer's Whispers"),
+            "has_dealers_mercy": player.has_item("Dealer's Mercy"),
+            "has_dealers_grudge": player.has_item("Dealer's Grudge"),
+            "balance": int(self._Blackjack__balance),
+            "insurance_cost": int(insurance_cost),
             "dealer_has_blackjack": self._Blackjack__dealer_hand.value() == 21,
         },
     )
@@ -7004,6 +6965,13 @@ def _should_replay_hand(self, status):
             "insurance_bet": int(self._Blackjack__insurance_bet),
             "edge_score": _blackjack_edge_score(player),
             "reserve": _cash_safety_reserve(player, 88),
+            "has_no_bust": player.has_flask_effect("No Bust"),
+            "has_dealers_hesitation": player.has_flask_effect("Dealer's Hesitation"),
+            "has_dealers_whispers": player.has_flask_effect("Dealer's Whispers"),
+            "has_lucky_medallion": _has_active_item(player, "Lucky Medallion"),
+            "has_lucky_coin": _has_active_item(player, "Lucky Coin"),
+            "has_invisible_cloak": _has_active_item(player, "Invisible Cloak"),
+            "has_tattered_cloak": _has_active_item(player, "Tattered Cloak"),
         },
     )
     return decision == "yes"
@@ -7095,6 +7063,40 @@ def _auto_hit_or_stand(self):
             "simulated_next_total": next_total,
             "has_no_bust": self._Blackjack__player.has_flask_effect("No Bust"),
             "has_imminent_blackjack": self._Blackjack__player.has_flask_effect("Imminent Blackjack"),
+            "has_pocket_aces": self._Blackjack__player.has_flask_effect("Pocket Aces"),
+            "has_dealers_whispers": self._Blackjack__player.has_flask_effect("Dealer's Whispers"),
+            "has_dealers_hesitation": self._Blackjack__player.has_flask_effect("Dealer's Hesitation"),
+            "has_bonus_fortune": self._Blackjack__player.has_flask_effect("Bonus Fortune"),
+            "has_split_serum": self._Blackjack__player.has_flask_effect("Split Serum"),
+            "has_second_chance": self._Blackjack__player.has_flask_effect("Second Chance") and not self._Blackjack__used_second_chance,
+            "has_sneaky_peeky_shades": self._Blackjack__player.has_item("Sneaky Peeky Shades"),
+            "has_sneaky_peeky_goggles": self._Blackjack__player.has_item("Sneaky Peeky Goggles"),
+            "has_witch_doctors_amulet": self._Blackjack__player.has_item("Witch Doctor's Amulet"),
+            "has_gamblers_chalice": self._Blackjack__player.has_item("Gambler's Chalice"),
+            "has_overflowing_goblet": self._Blackjack__player.has_item("Overflowing Goblet"),
+            "has_twins_locket": self._Blackjack__player.has_item("Twin's Locket"),
+            "has_mirror_of_duality": self._Blackjack__player.has_item("Mirror of Duality"),
+            "has_white_feather": self._Blackjack__player.has_item("White Feather"),
+            "has_phoenix_feather": self._Blackjack__player.has_item("Phoenix Feather"),
+            "has_lucky_coin": _has_active_item(self._Blackjack__player, "Lucky Coin"),
+            "has_lucky_medallion": _has_active_item(self._Blackjack__player, "Lucky Medallion"),
+            "has_worn_gloves": _has_active_item(self._Blackjack__player, "Worn Gloves"),
+            "has_velvet_gloves": _has_active_item(self._Blackjack__player, "Velvet Gloves"),
+            "has_tattered_cloak": _has_active_item(self._Blackjack__player, "Tattered Cloak"),
+            "has_invisible_cloak": _has_active_item(self._Blackjack__player, "Invisible Cloak"),
+            "has_pocket_watch": _has_active_item(self._Blackjack__player, "Pocket Watch"),
+            "has_golden_watch": _has_active_item(self._Blackjack__player, "Golden Watch"),
+            "has_sapphire_watch": _has_active_item(self._Blackjack__player, "Sapphire Watch"),
+            "has_grandfather_clock": _has_active_item(self._Blackjack__player, "Grandfather Clock"),
+            "has_dealers_grudge": _has_active_item(self._Blackjack__player, "Dealer's Grudge"),
+            "has_dealers_mercy": _has_active_item(self._Blackjack__player, "Dealer's Mercy"),
+            "has_quiet_sneakers": _has_active_item(self._Blackjack__player, "Quiet Sneakers") or _has_active_item(self._Blackjack__player, "Quiet Bunny Slippers"),
+            "has_rusty_compass": _has_active_item(self._Blackjack__player, "Rusty Compass") or _has_active_item(self._Blackjack__player, "Golden Compass"),
+            "has_faulty_insurance": _has_active_item(self._Blackjack__player, "Faulty Insurance") or _has_active_item(self._Blackjack__player, "Real Insurance"),
+            "has_grimoire": _has_active_item(self._Blackjack__player, "Gambler's Grimoire") or _has_active_item(self._Blackjack__player, "Oracle's Tome"),
+            "has_animal_whistle": _has_active_item(self._Blackjack__player, "Animal Whistle"),
+            "has_enchanting_bar": _has_active_item(self._Blackjack__player, "Enchanting Silver Bar") or _has_active_item(self._Blackjack__player, "Enchanting Gold Bar"),
+            "has_dirty_hat": _has_active_item(self._Blackjack__player, "Dirty Old Hat") or _has_active_item(self._Blackjack__player, "Unwashed Hair"),
         },
     ) or "hit"
 
@@ -7174,8 +7176,27 @@ bj.Blackjack.offer_insurance = _auto_offer_insurance
 bj.Blackjack.hit_or_stand = _auto_hit_or_stand
 bj.Blackjack.end_round = _auto_end_round
 
-CYCLES = int(sys.argv[1]) if len(sys.argv) > 1 else 300
-SEED = int(sys.argv[2]) if len(sys.argv) > 2 else 42
+def _resolve_cli_args() -> tuple[int, int]:
+    """Resolve quicktest CLI args.
+
+    Supported forms:
+    - quicktest.py <seed>
+    - quicktest.py <cycles> <seed>  (legacy)
+
+    When only seed is provided, cycles default to QUICKTEST_CYCLES env var
+    (if set) or 300.
+    """
+    env_cycles = os.getenv("QUICKTEST_CYCLES")
+    default_cycles = int(env_cycles) if env_cycles else 300
+
+    if len(sys.argv) > 2:
+        return int(sys.argv[1]), int(sys.argv[2])
+    if len(sys.argv) > 1:
+        return default_cycles, int(sys.argv[1])
+    return default_cycles, 42
+
+
+CYCLES, SEED = _resolve_cli_args()
 LOG = os.path.join(os.path.dirname(os.path.abspath(__file__)), "test_out.txt")
 JSON_LOG = os.path.join(os.path.dirname(os.path.abspath(__file__)), "test_out.json")
 STORY_LOG = os.path.join(os.path.dirname(os.path.abspath(__file__)), "story_out.txt")
@@ -8092,7 +8113,23 @@ log("")
 log("Planner traces")
 if DECISION_TRACES:
     goal_counts = Counter(trace.strategic_goal or "unknown" for trace in DECISION_TRACES)
+    personality_counts = Counter(
+        str((trace.metadata or {}).get("plan", {}).get("personality", "unknown"))
+        for trace in DECISION_TRACES
+    )
+    reason_code_counts = Counter(
+        str((trace.metadata or {}).get("reason_code", "unknown"))
+        for trace in DECISION_TRACES
+    )
+    ev_values = [
+        float((trace.metadata or {}).get("expected_value_estimate", 0.0) or 0.0)
+        for trace in DECISION_TRACES
+    ]
     log("  goals " + " | ".join(f"{goal}={count}" for goal, count in goal_counts.most_common(8)))
+    log("  personalities " + " | ".join(f"{name}={count}" for name, count in personality_counts.most_common(8)))
+    log("  reason_codes " + " | ".join(f"{name}={count}" for name, count in reason_code_counts.most_common(10)))
+    if ev_values:
+        log(f"  expected_value avg={sum(ev_values)/len(ev_values):.2f} max={max(ev_values):.2f} min={min(ev_values):.2f}")
     for trace in DECISION_TRACES[-8:]:
         log(
             f"  cycle={trace.cycle if trace.cycle is not None else '?'} day={trace.day if trace.day is not None else '?'} "
@@ -8186,6 +8223,18 @@ decision_request_context_counts = Counter(request.stable_context_id or request.r
 decision_trace_request_counts = Counter(trace.request_type for trace in DECISION_TRACES)
 decision_trace_context_counts = Counter(trace.context or trace.request_type for trace in DECISION_TRACES)
 decision_goal_counts = Counter(trace.strategic_goal or "unknown" for trace in DECISION_TRACES)
+decision_personality_counts = Counter(
+    str((trace.metadata or {}).get("plan", {}).get("personality", "unknown"))
+    for trace in DECISION_TRACES
+)
+decision_reason_code_counts = Counter(
+    str((trace.metadata or {}).get("reason_code", "unknown"))
+    for trace in DECISION_TRACES
+)
+decision_expected_values = [
+    float((trace.metadata or {}).get("expected_value_estimate", 0.0) or 0.0)
+    for trace in DECISION_TRACES
+]
 
 json_payload = {
     "seed": SEED,
@@ -8269,6 +8318,13 @@ json_payload = {
         "trace_request_counts": dict(decision_trace_request_counts),
         "trace_context_counts": dict(decision_trace_context_counts),
         "goal_counts": dict(decision_goal_counts),
+        "personality_counts": dict(decision_personality_counts),
+        "reason_code_counts": dict(decision_reason_code_counts),
+        "expected_value_summary": {
+            "avg": (sum(decision_expected_values) / len(decision_expected_values)) if decision_expected_values else 0.0,
+            "max": max(decision_expected_values) if decision_expected_values else 0.0,
+            "min": min(decision_expected_values) if decision_expected_values else 0.0,
+        },
         "route_outcome_counts": dict(route_outcome_counts),
         "route_interrupt_kind_counts": dict(route_interrupt_kind_counts),
         "route_interrupted_goal_counts": dict(route_interrupted_goal_counts),

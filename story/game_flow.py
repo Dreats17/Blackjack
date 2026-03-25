@@ -6,7 +6,7 @@ import msvcrt
 from colorama import Fore, Back, Style, init
 init(convert=True)
 
-PAR = "\n\n"
+PAR = "\n"
 
 type = typer.Type()
 ask = typer.Ask()
@@ -51,14 +51,39 @@ def space_quote(text):
 class GameFlowMixin:
     """Game flow: start_day, pest control, car trouble checks, day marking, status updates, adventure areas"""
 
+    def _format_sleep_text_for_morning_context(self, text):
+        """Trim repetitive wake-up lead-ins so morning event text flows naturally."""
+        if not text:
+            return ""
+
+        normalized = text.strip()
+        replacements = [
+            ("You wake up and ", "You "),
+            ("You wake up with ", "With "),
+            ("You wake up to ", "To "),
+            ("You wake up feeling ", "Feeling "),
+            ("You wake up ", ""),
+            ("Woke up on ", "On "),
+            ("Woke up ", ""),
+            ("You open your eyes and ", "You "),
+            ("You open your eyes ", ""),
+        ]
+
+        for old, new in replacements:
+            if normalized.startswith(old):
+                normalized = new + normalized[len(old):]
+                break
+
+        return normalized
+
     def start_day(self):
         # Record how much was won since the previous morning (casino + any balance events)
         self._today_winnings = max(0, self.get_balance() - self._balance_at_day_start)
         self._balance_at_day_start = self.get_balance()
-        print()
-        type.slow(bright(yellow("═" * 50)))
-        type.typeover("Press a key to continue:", bright(yellow("~ ~ ~ Morning, Day " + str(self._day) + " ~ ~ ~ ")), True)
-        type.slow(bright(yellow("═" * 50)))
+        print("\n")
+        type.slow(bright(yellow("═" * 10)))
+        type.type(bright(yellow(" ~ ~ ~ Morning, Day " + str(self._day) + " ~ ~ ~ ")))
+        type.slow(bright(yellow("═" * 10)))
         print()
 
         # ============================================
@@ -66,20 +91,20 @@ class GameFlowMixin:
         # ============================================
 
         # EARLY GAME ASSISTS
-        if self._day <= 3 and not self.has_status("Beginner's Luck"):
+        if (self._day <= 3) and (not self.has_status("Beginner's Luck")):
             self.add_status("Beginner's Luck")
             if self._day == 1:
                 type.type("Something about tonight feels different. The cards haven't been dealt yet, but you've got a feeling.")
                 print()
                 type.type(cyan("Beginner's Luck") + " — the universe gives newcomers a break. For now.")
                 print()
-        if self._day > 3 and self.has_status("Beginner's Luck"):
+        if (self._day > 3) and (self.has_status("Beginner's Luck")):
             self.remove_status("Beginner's Luck")
             type.type("The warm feeling in your gut fades. " + yellow("Beginner's Luck") + " has worn off.")
             print()
             type.type("You're on your own now. The real game starts here.")
             print()
-        if self._day <= 5 and self.get_balance() <= 5:
+        if (self._day <= 5) and (self.get_balance() <= 5):
             mercy = random.randint(15, 30)
             type.type("You check your pockets and find a crumpled bill you forgot about. " + green(bright("${:,}".format(mercy))) + ".")
             print()
@@ -94,7 +119,7 @@ class GameFlowMixin:
         self.update_loan_shark_daily()
         
         # Check for loan shark random encounter if debt is severe
-        if self.get_loan_shark_debt() > 0 and self.get_loan_shark_warning_level() >= 2:
+        if (self.get_loan_shark_debt() > 0) and (self.get_loan_shark_warning_level() >= 2):
             if self.check_loan_shark_event():
                 self.loan_shark_encounter()
         
@@ -113,7 +138,7 @@ class GameFlowMixin:
         self._dealer_happiness_day_start = self._dealer_happiness
         
         # Consecutive condition counters
-        if self._is_injured or len(self._injuries) > 0:
+        if (self._is_injured) or (len(self._injuries) > 0):
             self._consecutive_injury_days += 1
         else:
             self._consecutive_injury_days = 0
@@ -138,68 +163,18 @@ class GameFlowMixin:
             self._days_with_cursed += 1
         
         # Hermit tracking (increment if player stayed home yesterday, reset otherwise)
-        if len(self._shops_visited_today) == 0 and self._day > 1:
+        if (len(self._shops_visited_today) == 0) and (self._day > 1):
             self._days_at_camp += 1
         else:
             self._days_at_camp = 0
         # Money hoarder tracking
-        if self._balance >= 500000:
+        if (self._balance >= 500000):
             self._days_not_spending += 1
         else:
             self._days_not_spending = 0
         
         # Check achievements
         self.check_achievements()
-
-        # ============================================
-        # DAILY ITEM EFFECTS (Passive triggers)
-        # ============================================
-        
-        # Suzy's Gift - Slow sanity restoration from her kindness
-        if self.apply_suzys_gift_effects():
-            type.slow(cyan("You hold Suzy's Gift close. It's warm. Comforting. You feel a little more like yourself."))
-            print()
-        
-        # Necronomicon - Corrupts the soul
-        if self.apply_necronomicon_effects():
-            if random.randrange(3) == 0:  # Sometimes show a hint
-                type.slow(red("The whispers in your skull are louder this morning. The book pulses in your bag."))
-                print()
-        
-        # Cursed Coin - Random misfortune
-        if self.apply_cursed_coin_effects():
-            cursed_effect = random.choice([
-                "You stub your toe getting out of the car. Hard. The coin in your pocket feels warm.",
-                "A bird poops directly on your windshield. Then another. Then five more. The coin jingles.",
-                "You feel a strange sense of dread wash over you. The cursed coin seems to glow faintly.",
-                "Your coffee was somehow already cold. You didn't even have coffee. Where did this cold coffee come from?"
-            ])
-            type.type(cursed_effect)
-            print()
-            if random.randrange(5) == 0:
-                small_loss = random.randint(5, 25)
-                type.type("You realize you've lost " + red(bright("${:,}".format(small_loss))) + " somewhere. Weird.")
-                self.change_balance(-small_loss)
-
-        # Passive Item Flavor - ~1-in-3 days, one quiet moment from something you're carrying
-        item_flavor = self.apply_daily_item_flavor()
-        if item_flavor:
-            item_name, text = item_flavor
-            type.slow(cyan(text.replace("{item}", bright(item_name))))
-            print()
-
-        # Broken state effects at start of day
-        if self._is_broken:
-            print()
-            self.sanity_indicator()
-            if random.randrange(3) == 0:
-                effect = self.get_broken_effect()
-                type.slow(red(effect))
-                print()
-        # Display sanity status at start of day
-        elif self._sanity <= 75:
-            print()
-            self.sanity_indicator()
         
         self.update_rank()
         # ============================================
@@ -207,9 +182,11 @@ class GameFlowMixin:
         # ============================================
         self.process_sleep()
         sleep_quality = self.get_sleep_quality()
-        sleep_text = self._lists.get_sleep_text(sleep_quality)
+        sleep_text = self._format_sleep_text_for_morning_context(
+            self._lists.get_sleep_text(sleep_quality)
+        )
         type.type(sleep_text)
-        print()
+        print("\n")
 
         # MILLIONAIRE MORNING - Special visitor when you've hit $1M and still have it
         if self.is_millionaire() and self._balance >= 1000000 and not self.was_millionaire_visited():
@@ -229,7 +206,6 @@ class GameFlowMixin:
             return
 
         self.day_event()
-
         self.update_rank()
 
     def has_pests(self):
@@ -1214,71 +1190,74 @@ class GameFlowMixin:
                 self.restore_sanity(total_sanity_restore)
                 print()
 
+        # ============================================
+        # DAILY ITEM EFFECTS (Passive triggers)
+        # ============================================
+        
+        # Suzy's Gift - Slow sanity restoration from her kindness
+        if self.apply_suzys_gift_effects():
+            type.slow(cyan("You hold Suzy's Gift close. It's warm. Comforting. You feel a little more like yourself."))
+            print()
+        
+        # Necronomicon - Corrupts the soul
+        if self.apply_necronomicon_effects():
+            if random.randrange(3) == 0:  # Sometimes show a hint
+                type.slow(red("The whispers in your skull are louder this morning. The book pulses in your bag."))
+                print()
+        
+        # Cursed Coin - Random misfortune
+        if self.apply_cursed_coin_effects():
+            cursed_effect = random.choice([
+                "You stub your toe getting out of the car. Hard. The coin in your pocket feels warm.",
+                "A bird poops directly on your windshield. Then another. Then five more. The coin jingles.",
+                "You feel a strange sense of dread wash over you. The cursed coin seems to glow faintly.",
+                "Your coffee was somehow already cold. You didn't even have coffee. Where did this cold coffee come from?"
+            ])
+            type.type(cursed_effect)
+            print()
+            if random.randrange(5) == 0:
+                small_loss = random.randint(5, 25)
+                type.type("You realize you've lost " + red(bright("${:,}".format(small_loss))) + " somewhere. Weird.")
+                self.change_balance(-small_loss)
+
+        # Passive Item Flavor - ~1-in-3 days, one quiet moment from something you're carrying
+        item_flavor = self.apply_daily_item_flavor()
+        if item_flavor:
+            item_name, text = item_flavor
+            type.slow(cyan(text.replace("{item}", bright(item_name))))
+            print()
+
+        # Broken state effects at start of day
+        if self._is_broken:
+            print()
+            self.sanity_indicator()
+            if random.randrange(3) == 0:
+                effect = self.get_broken_effect()
+                type.slow(red(effect))
+                print()
+        # Display sanity status at start of day
+        elif self._sanity <= 75:
+            print()
+            self.sanity_indicator()
+
     def get_unlocked_adventure_areas(self):
         """Returns a list of adventure areas the player can walk to.
-        
-        Unlock requirements:
-        - The Road: Always available at rank 2+. No prerequisite events.
-        - Woodlands: All 3 woodlands events (path, river, field) OR woodlands_adventure. Rank 3+ to walk.
-        - Swamp: All 3 swamp events (stroll, wade, swim) OR swamp_adventure. Rank 4+ to walk.
-        - Beach: All 3 beach events (stroll, swim, dive) OR beach_adventure. Rank 4+ to walk.
-        - City: All 3 city events (streets, stroll, park) OR city_adventure. Rank 5 to walk.
-        - Underwater: beach_adventure OR underwater_adventure. Rank 5 to walk.
-        
-        At rank 5, all adventures are available even if not yet visited."""
+
+        The Road remains a standard unlock at rank 1+.
+        Wander tracks unlock by rank 1-5; after seeing all three track events,
+        the area's adventure becomes available as the special fourth unlock.
+        """
         areas = []
         rank = self.get_rank()
-        
-        # The Road - rank 2+ to walk, always available (no prerequisite events)
-        if rank >= 2:
+
+        # The Road - rank 1+ to walk, always available (no prerequisite events)
+        if rank >= 1:
             areas.append(("The Road", "road_adventure"))
-        
-        # Check if player has completed all 3 events for each area
-        all_woodlands_events = (self.has_met("Woodlands Path Event") and 
-                                 self.has_met("Woodlands River Event") and 
-                                 self.has_met("Woodlands Field Event"))
-        
-        all_swamp_events = (self.has_met("Swamp Stroll Event") and
-                            self.has_met("Swamp Wade Event") and
-                            self.has_met("Swamp Swim Event"))
-        
-        all_beach_events = (self.has_met("Beach Stroll Event") and
-                            self.has_met("Beach Swim Event") and
-                            self.has_met("Beach Dive Event"))
-        
-        all_city_events = (self.has_met("City Streets Event") and
-                           self.has_met("City Stroll Event") and
-                           self.has_met("City Park Event"))
-        
-        # Woodlands - rank 3+ to walk, must have done all 3 woodlands events OR woodlands_adventure
-        if rank >= 3:
-            if all_woodlands_events or self.has_met("Woodlands Adventure Event"):
-                areas.append(("The Woodlands", "woodlands_adventure"))
-        
-        # Swamp - rank 4+ to walk, must have done all 3 swamp events OR swamp_adventure
-        if rank >= 4:
-            if all_swamp_events or self.has_met("Swamp Adventure Event"):
-                areas.append(("The Swamp", "swamp_adventure"))
-        
-        # Beach - rank 4+ to walk, must have done all 3 beach events OR beach_adventure
-        if rank >= 4:
-            if all_beach_events or self.has_met("Beach Adventure Event"):
-                areas.append(("The Beach", "beach_adventure"))
-        
-        # At rank 5, all adventures are available even if not visited yet
-        if rank >= 5:
-            # Add any not already in the list
-            if ("The Woodlands", "woodlands_adventure") not in areas:
-                areas.append(("The Woodlands", "woodlands_adventure"))
-            if ("The Swamp", "swamp_adventure") not in areas:
-                areas.append(("The Swamp", "swamp_adventure"))
-            if ("The Beach", "beach_adventure") not in areas:
-                areas.append(("The Beach", "beach_adventure"))
-            # City - rank 5 to walk, must have done all 3 city events OR city_adventure
-            if all_city_events or self.has_met("City Adventure Event"):
-                areas.append(("The City", "city_adventure"))
-            # Underwater - rank 5 to walk, unlocked by beach_adventure OR underwater_adventure
-            if self.has_met("Beach Adventure Event") or self.has_met("Underwater Adventure Event"):
-                areas.append(("The Ocean Depths", "underwater_adventure"))
-        
+
+        for track in self.get_available_wander_tracks():
+            area_name, area_func, adventure_met_name = track["adventure"]
+            all_events_seen = all(self.has_met(met_name) for _, met_name in track["events"])
+            if all_events_seen or self.has_met(adventure_met_name):
+                areas.append((area_name, area_func))
+
         return areas

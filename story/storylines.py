@@ -394,6 +394,36 @@ class StorylineSystem:
                 "base_chance": 0.15,
                 "escalation": 0.10,
             },
+
+            "rosa": {
+                "stage": 0,  # 0=not started, 1=quarters, 2=folding_table, 3=suitcase, 4=bus_ticket
+                "day_started": 0,
+                "completed": False,
+                "failed": False,
+                "min_gap": 3,
+                "base_chance": 0.14,
+                "escalation": 0.10,
+            },
+
+            "eli": {
+                "stage": 0,  # 0=not started, 1=tent, 2=chairs, 3=storm, 4=sunrise
+                "day_started": 0,
+                "completed": False,
+                "failed": False,
+                "min_gap": 3,
+                "base_chance": 0.12,
+                "escalation": 0.08,
+            },
+
+            "rex": {
+                "stage": 0,  # 0=not started, 1=pawn_ticket, 2=meet_rex, 3=second_chance, 4=coin_flip
+                "day_started": 0,
+                "completed": False,
+                "failed": False,
+                "min_gap": 4,
+                "base_chance": 0.10,
+                "escalation": 0.08,
+            },
             
             "tanya": {
                 "stage": 0,  # 0=not started, 1=met_tanya (got number), 2=completed (ending triggered)
@@ -863,6 +893,15 @@ class StorylineSystem:
             
             case "lockbox":
                 return True
+
+            case "rosa":
+                return True
+
+            case "eli":
+                return True
+
+            case "rex":
+                return True
             
             case "tanya":
                 return p.has_item("Tanya's Number")
@@ -1200,6 +1239,33 @@ class StorylineSystem:
                                  _wrap(storyline_lockbox_who_left_it)]
                 if stage < len(lockbox_events):
                     return lockbox_events[stage]
+
+            case "rosa":
+                # Stage 0: Rosa appears when money is tight and the basics feel expensive.
+                if stage == 0 and (day < 4 or p.get_balance() > 750 or random.random() > 0.10):
+                    return None
+                rosa_events = [_wrap(storyline_rosa_quarters), _wrap(storyline_rosa_folding_table),
+                               _wrap(storyline_rosa_suitcase), _wrap(storyline_rosa_bus_ticket)]
+                if stage < len(rosa_events):
+                    return rosa_events[stage]
+
+            case "eli":
+                # Stage 0: The revival tent matters most when the player is worn down.
+                if stage == 0 and (day < 7 or (p.get_health() >= 90 and p.get_sanity() >= 75) or random.random() > 0.10):
+                    return None
+                eli_events = [_wrap(storyline_eli_tent), _wrap(storyline_eli_chairs),
+                              _wrap(storyline_eli_storm), _wrap(storyline_eli_sunrise)]
+                if stage < len(eli_events):
+                    return eli_events[stage]
+
+            case "rex":
+                # Stage 0: Rex surfaces only after the player has spent real time gambling.
+                if stage == 0 and (day < 9 or p.get_gambling_stat("total_hands") < 15 or random.random() > 0.08):
+                    return None
+                rex_events = [_wrap(storyline_rex_ticket), _wrap(storyline_rex_meet),
+                              _wrap(storyline_rex_second_chance), _wrap(storyline_rex_coin_flip)]
+                if stage < len(rex_events):
+                    return rex_events[stage]
 
             case "tanya":
                 # Stage 0: Very low odds encounter with a therapist - requires met Tom, day 12+
@@ -4934,6 +5000,458 @@ def storyline_lockbox_who_left_it(p, sl):
     
     type.type("You fold the letter and put it in your pocket. Maybe one day you'll pass it on too.")
     p.remove_item("Lockbox")
+    print()
+
+
+# =====================================================================
+# ROSA - THE LAUNDROMAT DRIFTER
+# A practical, human arc about small acts of help when everything costs quarters.
+# Stage 0: Quarters
+# Stage 1: Folding table
+# Stage 2: Suitcase retrieval
+# Stage 3: Bus ticket goodbye
+# =====================================================================
+
+
+def storyline_rosa_quarters(p, sl):
+    """Rosa Part 1: A woman at the laundromat comes up short on quarters."""
+    p.meet("Rosa")
+    sl.advance("rosa")
+
+    type.type("You duck into a laundromat to kill time and warm up. Rows of machines rattle like bad teeth. ")
+    type.type("The air smells like detergent, hot metal, and somebody else's bad week.")
+    print()
+    type.type("At the change machine, a woman in a denim jacket is counting nickels into her palm like she's trying to multiply them by force of will.")
+    print()
+    type.type("She looks up when she notices you watching. Her eyes are tired, but not soft.")
+    print()
+    type.type(quote("You got six bucks in quarters I can borrow? Dryer ate one of my loads and I'm not letting it win."))
+    print()
+
+    can_help = p.get_balance() >= 6
+    if can_help:
+        answer = ask.yes_or_no("Spot her $6 for the wash? ")
+        if answer == "yes":
+            p.change_balance(-6)
+            p.meet("Rosa Helped")
+            p.restore_sanity(3)
+            type.type("You feed the change machine and hand her the warm stack of quarters.")
+            print()
+            type.type("She stares at them like they might disappear, then nods once.")
+            print()
+            type.type(quote("Thanks. Name's Rosa. I pay people back. I don't care what the universe says about me."))
+        else:
+            type.type("You keep your money. Rosa shrugs like she expected that.")
+            print()
+            type.type(quote("Fair. These days six dollars is basically a trust fall."))
+    else:
+        type.type("You pat your pockets and come up with sympathy and lint.")
+        print()
+        type.type(quote("Yeah,"))
+        type.type(" Rosa says, eyeing your car keys. ")
+        type.type(quote("You got that look too."))
+    print()
+
+
+def storyline_rosa_folding_table(p, sl):
+    """Rosa Part 2: Rosa opens up while folding clothes."""
+    sl.advance("rosa")
+
+    type.type("Rosa spots you the next time you're near the laundromat and waves you over to a folding table stacked with clean clothes and a single blue suitcase.")
+    print()
+    if p.has_met("Rosa Helped"):
+        type.type(quote("Knew you'd come back. Decent people always circle the same sad little planets."))
+        print()
+    else:
+        type.type(quote("Hey, car-liver. I remember faces. Especially the honest ones."))
+        print()
+    type.type("She smooths a little girl's yellow sweater with both hands before setting it in the suitcase.")
+    print()
+    type.type(quote("It's my sister's stuff. Elena skipped town fast and left half her life with me. ") +
+             quote("Bus depot locker says I need the claim tag. Claim tag says it disappeared into history."))
+    print()
+    answer = ask.yes_or_no("Offer to help if she finds the locker? ")
+    if answer == "yes":
+        p.meet("Rosa Promised")
+        p.restore_sanity(2)
+        type.type("Rosa gives you a look like she isn't used to people volunteering for inconvenient kindness.")
+        print()
+        type.type(quote("Alright. If I find the locker number, you're carrying the heavy end."))
+    else:
+        type.type("You nod without volunteering. Rosa doesn't take it personally.")
+        print()
+        type.type(quote("Smart. Helping people usually means lifting something ugly."))
+    print()
+
+
+def storyline_rosa_suitcase(p, sl):
+    """Rosa Part 3: The bus depot locker finally opens."""
+    sl.advance("rosa")
+
+    type.type("Rosa is waiting by your car with a receipt stub and a look that says she hasn't slept.")
+    print()
+    type.type(quote("Found the locker. Bus depot basement. Twenty-four dollar hold fee because apparently grief has service charges."))
+    print()
+
+    paid_fee = False
+    if p.get_balance() >= 24:
+        answer = ask.yes_or_no("Cover the $24 locker fee? ")
+        if answer == "yes":
+            paid_fee = True
+            p.change_balance(-24)
+            p.meet("Rosa Paid Fee")
+            type.type("You pay the fee. The clerk buzzes you through without looking up from his crossword.")
+            print()
+        else:
+            type.type("Rosa grimaces, then peels a few emergency bills out of her sock and pays it herself.")
+            print()
+            type.type(quote("Was saving that for food. Guess closure wins today."))
+    else:
+        type.type("You can't cover it. Rosa sighs, fishes crumpled bills from a hidden pocket, and pays in exact change.")
+        print()
+
+    type.type("The locker holds more than clothes: letters tied in twine, a cheap stuffed rabbit, and a sturdy ")
+    type.type(item("Flashlight"))
+    type.type(" with fresh batteries still taped to the handle.")
+    print()
+    type.type("Rosa reads one letter, presses it to her mouth, then laughs once through tears.")
+    print()
+    type.type(quote("Elena always packed like the power grid was personal. Here."))
+    print()
+
+    if not (p.has_item("Flashlight") or p.has_item("Lantern") or p.has_item("Eternal Light")):
+        p.add_item("Flashlight")
+        type.type("She hands you the flashlight. ")
+        type.type(quote("You look like somebody who should not be depending on streetlights."))
+        print()
+    else:
+        p.change_balance(40)
+        type.type("You already have enough light, so Rosa digs out a folded ")
+        type.type(green(bright("$40")))
+        type.type(" from the letters and insists you take it for the trouble.")
+        print()
+
+    if paid_fee:
+        p.restore_sanity(4)
+    else:
+        p.restore_sanity(2)
+    p.heal(2)
+    print()
+
+
+def storyline_rosa_bus_ticket(p, sl):
+    """Rosa Part 4: Rosa leaves town with her sister's things."""
+    sl.advance("rosa")
+    sl.complete("rosa")
+
+    type.type("You find Rosa at the station with the blue suitcase, a paper cup of coffee, and a bus ticket pinched between two fingers.")
+    print()
+    type.type(quote("Found Elena. Or found the town she's hiding in, anyway. That's close enough to count."))
+    print()
+    type.type("A bus hisses at the curb. Rosa doesn't move yet.")
+    print()
+
+    if p.has_met("Rosa Helped") or p.has_met("Rosa Promised") or p.has_met("Rosa Paid Fee"):
+        type.type(quote("Most people treat broke strangers like weather. You didn't. I noticed."))
+        print()
+        type.type("She presses a folded bill into your hand. ")
+        type.type(green(bright("$120")))
+        type.type(" and a look that won't accept refusal.")
+        print()
+        type.type(quote("Buy gas. Buy food. Buy one less problem, if they sell those where you are."))
+        p.change_balance(120)
+        p.restore_sanity(6)
+    else:
+        type.type(quote("You weren't cruel. That's rarer than people think."))
+        print()
+        p.restore_sanity(3)
+
+    type.type("She shoulders the suitcase, boards the bus, and taps the window once before taking a seat.")
+    print()
+    type.type("When the bus pulls away, the station feels louder and emptier at the same time.")
+    print()
+
+
+# =====================================================================
+# ELI - THE REVIVAL TENT
+# A small faith-and-survival arc centered on practical mercy rather than miracles.
+# Stage 0: Tent meeting
+# Stage 1: Folding chairs
+# Stage 2: Storm night
+# Stage 3: Sunrise goodbye
+# =====================================================================
+
+
+def storyline_eli_tent(p, sl):
+    """Eli Part 1: A roadside revival tent offers warmth and soup."""
+    p.meet("Eli")
+    sl.advance("eli")
+
+    type.type("On an empty lot just off the highway, a white tent flaps in the wind beside a plywood sign: ")
+    type.type(bright(yellow("REVIVAL TONIGHT - COFFEE FREE, SALVATION OPTIONAL")))
+    print()
+    type.type("Inside are folding chairs, a coffee urn, and a man in shirtsleeves ladling soup into paper cups.")
+    print()
+    type.type("He notices you, smiles like he's seen worse, and lifts the ladle in greeting.")
+    print()
+    type.type(quote("Pastor Eli. You hungry, tired, guilty, or all three? Doesn't matter. We got enough soup for all categories."))
+    print()
+    answer = ask.yes_or_no("Step into the tent? ")
+    if answer == "yes":
+        type.type("You take the soup. It's too salty and exactly what you needed.")
+        print()
+        type.type("Eli doesn't preach at you. He just sits on an overturned milk crate and talks like a man who learned compassion the expensive way.")
+        print()
+        p.restore_sanity(4)
+        p.heal(4)
+        p.meet("Eli Took Soup")
+    else:
+        type.type("You stay near the flap and let the steam from the soup drift your way without committing to anything holy.")
+        print()
+        type.type(quote("That's alright,"))
+        type.type(" Eli says. ")
+        type.type(quote("I've seen people heal from doorways before."))
+    print()
+
+
+def storyline_eli_chairs(p, sl):
+    """Eli Part 2: Eli asks for help setting up before the service."""
+    sl.advance("eli")
+
+    type.type("You pass the revival lot again and see Eli wrestling a tower of folding chairs by himself.")
+    print()
+    type.type(quote("I used to have volunteers,"))
+    type.type(" he says, kicking one chair open with his heel. ")
+    type.type(quote("Now I have lower back pain and optimism."))
+    print()
+    answer = ask.yes_or_no("Help him set up chairs? ")
+    if answer == "yes":
+        type.type("You spend twenty minutes setting neat rows on the dirt while Eli talks about rain, rent, and how hope has terrible timing.")
+        print()
+        type.type("When you're done, he disappears into a supply crate and comes back holding a ")
+        type.type(item("First Aid Kit"))
+        type.type(" wrapped in brown paper.")
+        print()
+        if not p.has_item("First Aid Kit"):
+            p.add_item("First Aid Kit")
+            type.type(quote("Church donation shelf,"))
+            type.type(" Eli says. ")
+            type.type(quote("Take it. The Lord helps those who stop bleeding."))
+        else:
+            p.change_balance(25)
+            type.type(quote("You already look supplied, so take the donation cash instead."))
+        print()
+        p.restore_sanity(3)
+        p.meet("Helped Eli")
+    else:
+        type.type("You keep moving. Behind you, Eli mutters something that sounds like a prayer directed at cheap aluminum furniture.")
+        print()
+    print()
+
+
+def storyline_eli_storm(p, sl):
+    """Eli Part 3: A storm turns the tent into work."""
+    sl.advance("eli")
+
+    type.type("By dusk, the sky over the revival tent has gone the color of a bruise. Eli is outside tying extra rope to the support poles.")
+    print()
+    type.type(quote("Knew the weather was coming. Didn't know it'd come mad."))
+    print()
+    answer = ask.yes_or_no("Stay and help before the storm hits? ")
+    if answer == "yes":
+        type.type("You grab a line and lean your weight into it as the wind slams the canvas like a giant hand.")
+        print()
+        type.type("For ten ugly minutes it's just you, Eli, rain, mud, and stubbornness. Then the worst of it passes.")
+        print()
+        type.type("Eli wipes rain from his face and laughs once, breathless.")
+        print()
+        type.type(quote("People think faith is about certainty. Most days it's just deciding not to let go of the rope."))
+        print()
+        p.restore_sanity(5)
+        p.heal(3)
+        p.meet("Held Eli Tent")
+    else:
+        type.type("You drive off before the rain gets heavy. In your mirror you watch the tent bow against the wind and feel a little smaller than before.")
+        print()
+        p.lose_sanity(2)
+    print()
+
+
+def storyline_eli_sunrise(p, sl):
+    """Eli Part 4: Eli packs up and leaves you with practical kindness."""
+    sl.advance("eli")
+    sl.complete("eli")
+
+    type.type("At sunrise the tent is half-packed. Eli stands by an old church van, sleeves rolled up, sorting boxes with the calm of a man who has made peace with temporary things.")
+    print()
+    if p.has_met("Held Eli Tent") or p.has_met("Helped Eli"):
+        type.type(quote("You showed up,"))
+        type.type(" he says. ")
+        type.type(quote("That's the whole sermon, really."))
+        print()
+    else:
+        type.type(quote("No hard feelings. Everybody's carrying weather you can't see."))
+        print()
+
+    if not p.has_item("Road Flares"):
+        p.add_item("Road Flares")
+        type.type("He hands you a pack of ")
+        type.type(item("Road Flares"))
+        type.type(" from the van's emergency bin.")
+        print()
+        type.type(quote("For the roadside, not the apocalypse. Though I suppose they're useful for both."))
+    else:
+        p.change_balance(40)
+        type.type("You already have emergency gear, so Eli presses ")
+        type.type(green(bright("$40")))
+        type.type(" into your hand from the donation jar instead.")
+        print()
+
+    p.restore_sanity(6)
+    p.heal(4)
+    type.type("The van pulls onto the highway a few minutes later. The lot is empty again, but not quite as bleak as it used to feel.")
+    print()
+
+
+# =====================================================================
+# REX - THE PAWN TICKET GAMBLER
+# A washed-up gambler's last lesson about luck, debt, and what gets passed on.
+# Stage 0: Pawn ticket found
+# Stage 1: Meet Rex
+# Stage 2: Second chance talk
+# Stage 3: Lucky coin finale
+# =====================================================================
+
+
+def storyline_rex_ticket(p, sl):
+    """Rex Part 1: A pawn ticket turns up under the wiper."""
+    p.meet("Rex")
+    sl.advance("rex")
+
+    type.type("A damp pawn ticket is tucked under your windshield wiper when you come back to your car.")
+    print()
+    type.type("Item listed: ")
+    type.type(item("Lucky Coin"))
+    type.type(". Name on ticket: ")
+    type.type(cyan(bright("REX CALDER")))
+    type.type(". Redemption deadline: tomorrow.")
+    print()
+    type.type("Someone scrawled a note across the back in blue pen: ")
+    type.type(italic("If you're still playing, meet me by the pawn sign at noon."))
+    print()
+    type.type("You don't know Rex Calder. But whoever left the ticket knew enough about you to assume the word ")
+    type.type(italic("playing"))
+    type.type(" would land.")
+    print()
+
+
+def storyline_rex_meet(p, sl):
+    """Rex Part 2: Rex asks for help reclaiming the coin."""
+    sl.advance("rex")
+
+    type.type("At noon, under the flickering pawn sign, a man in a thrift-store sport coat lifts two fingers in greeting.")
+    print()
+    type.type("He looks like a former professional at something that no longer pays. Sharp jaw, ruined shoes, casino eyes.")
+    print()
+    type.type(quote("Rex Calder. Used to count cards. Now I count mistakes. Higher volume business."))
+    print()
+    type.type("He taps the pawn ticket.")
+    print()
+    type.type(quote("That coin belonged to my daughter before it belonged to my bad decisions. Pawn shop wants fifty to release it. ") +
+             quote("I'm forty-eight short and out of charm."))
+    print()
+
+    if p.get_balance() >= 50:
+        answer = ask.yes_or_no("Lend Rex $50 to get the coin back? ")
+        if answer == "yes":
+            p.change_balance(-50)
+            p.meet("Helped Rex")
+            p.restore_sanity(2)
+            type.type("You hand him the money. Rex closes his fingers around it slowly, like he doesn't trust good turns either.")
+            print()
+            type.type(quote("That's dangerous kindness. Appreciate it anyway."))
+        else:
+            type.type("You keep your money. Rex nods once, not offended.")
+            print()
+            type.type(quote("Good instinct. Most gamblers confuse pity with a system."))
+    else:
+        type.type("You don't have fifty to spare. Rex studies your face, then the car, and doesn't press.")
+        print()
+        type.type(quote("Fair enough. Survival first. Philosophy later."))
+    print()
+
+
+def storyline_rex_second_chance(p, sl):
+    """Rex Part 3: Rex talks honestly about luck and loss."""
+    sl.advance("rex")
+
+    type.type("Rex finds you outside the casino a few days later, leaning against the railing with a styrofoam cup of terrible coffee.")
+    print()
+    if p.has_met("Helped Rex"):
+        type.type(quote("Got the coin out."))
+        type.type(" He pats his breast pocket. ")
+        type.type(quote("Almost sold it again on instinct. That's how habits talk."))
+        print()
+    else:
+        type.type(quote("Managed to scrape the money together. Day labor, two blisters, one lecture from a cousin. Still counts."))
+        print()
+    type.type("He stares through the casino glass toward the tables inside.")
+    print()
+    type.type(quote("Here's the trick nobody tells you: luck isn't a ladder. It's weather. Shows up, leaves, doesn't care what you deserve."))
+    print()
+    answer = ask.option("What do you tell Rex?", ["need", "agree", "nothing"])
+    if answer == "need":
+        type.type(quote("Yeah,"))
+        type.type(" Rex says. ")
+        type.type(quote("Sometimes weather is all that's keeping the roof on."))
+        p.meet("Rex Needs Luck")
+    elif answer == "agree":
+        type.type(quote("Then maybe stop calling yourself unlucky and start calling yourself alive."))
+        p.restore_sanity(2)
+    else:
+        type.type("You let the silence do the work. Rex seems to respect that.")
+    print()
+
+
+def storyline_rex_coin_flip(p, sl):
+    """Rex Part 4: Rex passes the coin on."""
+    sl.advance("rex")
+    sl.complete("rex")
+
+    type.type("Rex is waiting on your hood the next afternoon, turning a coin across his knuckles with practiced ease.")
+    print()
+    type.type("He catches it and holds it out. Tarnished metal. Clover on one side. Wear pattern from a thousand anxious thumbs.")
+    print()
+    type.type(quote("My daughter used to say a lucky thing only stays lucky if it keeps moving."))
+    print()
+    if p.has_met("Helped Rex"):
+        type.type(quote("You helped me buy back one decent memory. That's more than I expected out of this town."))
+        print()
+        p.change_balance(75)
+        type.type("He also slips ")
+        type.type(green(bright("$75")))
+        type.type(" onto the hood. ")
+        type.type(quote("Loan repaid. With interest. Don't get used to it."))
+        print()
+
+    if not (p.has_item("Lucky Coin") or p.has_item("Lucky Medallion") or p.has_item("Fortune's Token")):
+        p.add_item("Lucky Coin")
+        type.type("Rex drops the ")
+        type.type(item("Lucky Coin"))
+        type.type(" into your palm.")
+        print()
+        type.type(quote("Take it. You still believe the next hand means something. That's when a coin can still do some work."))
+    else:
+        p.change_balance(200)
+        type.type(quote("Looks like you've already got all the superstition you can carry."))
+        print()
+        type.type("Instead, Rex hands you ")
+        type.type(green(bright("$200")))
+        type.type(" and keeps the coin moving somewhere else.")
+
+    p.restore_sanity(5)
+    print()
+    type.type("He straightens his coat, salutes the casino with two fingers, and walks away without looking back.")
     print()
 
 

@@ -6,7 +6,7 @@ import msvcrt
 from colorama import Fore, Back, Style, init
 init(convert=True)
 
-PAR = "\n\n"
+PAR = "\n"
 
 type = typer.Type()
 ask = typer.Ask()
@@ -59,28 +59,34 @@ class CarEventsMixin:
         """Pick a rank-appropriate car problem at random and trigger it."""
         if self.has_item("War Wagon"):
             type.type("The " + cyan(bright("War Wagon")) + "'s engine is alive — really alive. It diagnosed the problem before you even started the car.")
-            print()
+            print(PAR)
             type.type("Self-repair complete. The car rumbles contentedly. Not a scratch. Not a squeak.")
             self.restore_sanity(5)
             return
         if self.has_item("Immortal Vehicle"):
             type.type("The " + cyan(bright("Immortal Vehicle")) + " self-diagnoses. Self-repairs. Your car is more reliable than gravity.")
-            print()
+            print(PAR)
             type.type("Problem solved before it was a problem.")
             self.restore_sanity(3)
             return
         rank = self.get_rank()
         if self.has_item("Auto Mechanic") and random.randrange(5) == 0:
             type.type("You run your daily check with the " + magenta(bright("Auto Mechanic")) + " kit before anything can go wrong.")
-            print()
+            print(PAR)
             type.type("A loose connection — caught and re-tightened before the car even noticed. Car trouble averted.")
             self.restore_sanity(3)
-            print()
+            print(PAR)
             return
         if self.has_item("Roadside Shield") and random.randrange(3) == 0:
             type.type("The " + magenta(bright("Roadside Shield")) + "'s pre-wired systems flag an issue before it becomes a problem. Minor adjustment. No event needed.")
             self.restore_sanity(2)
-            print()
+            print(PAR)
+            return
+
+        # 60% of the time the car holds together fine — trouble is possible, not guaranteed.
+        if random.random() < 0.60:
+            type.type("The engine runs rough for a moment, then smooths out. Whatever it was, it passes.")
+            print(PAR)
             return
 
         cheap = [
@@ -134,149 +140,157 @@ class CarEventsMixin:
     # ==========================================
 
     # === BATTERY ISSUES ===
+        print(PAR)
+        return
     def dead_battery_afternoon(self):
         type.type("You try to start your car to head somewhere. Click. Click. Click. Nothing.")
-        print()
+        print(PAR)
         type.type("The battery is dead. Completely dead.")
-        print()
+        print(PAR)
         if self.has_item("Jumper Cables"):
             type.type("But wait - you have " + magenta(bright("Jumper Cables")) + "!")
-            print()
+            print(PAR)
             type.type("You flag down a passing driver who agrees to give you a jump.")
             type.type(" After a few minutes, your engine roars back to life.")
-            print()
+            print(PAR)
             type.type("Crisis averted. But you should probably get that battery looked at.")
             self.restore_sanity(3)
         elif self.has_item("Portable Battery Charger"):
             type.type("Luckily, you have a " + magenta(bright("Portable Battery Charger")) + "!")
-            print()
+            print(PAR)
             type.type("You hook it up and wait. After twenty minutes, your car starts.")
-            print()
+            print(PAR)
             type.type("Thank God for preparation.")
             self.restore_sanity(5)
         elif self.has_item("Power Grid"):
             type.type("You unclip the " + magenta(bright("Power Grid")) + " from your bag and press it to the dead battery.")
-            print()
+            print(PAR)
             type.type("It kicks the battery back to life with contempt. Engine roars. First try.")
-            print()
+            print(PAR)
             type.type("You didn't even need to pop the hood all the way.")
             self.restore_sanity(7)
         else:
             type.type("You have no way to jump it. You're stuck.")
-            print()
+            print(PAR)
             type.type("You spend the entire afternoon trying to flag someone down for help.")
-            print()
+            print(PAR)
             type.type("By the time someone finally helps, " + yellow("the sun is setting") + ".")
-            print()
+            print(PAR)
             type.type("You've wasted the whole day.")
             self.add_travel_restriction("Wasted Afternoon")
             self.lose_sanity(8)
-        print()
+        print(PAR)
 
+        print(PAR)
+        return
     def corroded_battery_terminals(self):
         type.type("Your car starts sluggishly. The engine sounds weak, struggling.")
-        print()
+        print(PAR)
         type.type("You pop the hood and see the problem - the battery terminals are covered in white-green corrosion.")
-        print()
+        print(PAR)
         if self.has_item("Battery Terminal Cleaner") or self.has_item("Baking Soda"):
             item = "Battery Terminal Cleaner" if self.has_item("Battery Terminal Cleaner") else "Baking Soda"
             type.type("Good thing you have " + magenta(bright(item)) + ".")
-            print()
+            print(PAR)
             type.type("You clean off the corrosion and the car starts perfectly.")
-            print()
+            print(PAR)
             type.type("Preventive maintenance pays off.")
             if item == "Baking Soda":
                 self.use_item("Baking Soda")
         else:
             type.type("You try scraping it off with a rock, but it's caked on thick.")
-            print()
+            print(PAR)
             type.type("The car barely runs. You limp to a mechanic who charges you " + red("$75") + " for a five-minute fix.")
             self.change_balance(-75)
             type.type("Afternoon wasted.")
             self.add_travel_restriction("Wasted Afternoon")
-        print()
+        print(PAR)
 
+        print(PAR)
+        return
     def battery_acid_leak(self):
         type.type("There's a strange smell coming from under your hood. Acidic. Burning.")
-        print()
+        print(PAR)
         type.type("You open it up and see battery acid dripping. The battery casing is cracked.")
-        print()
+        print(PAR)
         type.type("This is dangerous. The acid could damage your engine components.")
-        print()
+        print(PAR)
         if self.get_balance() >= 150:
             type.type("You rush to an auto shop. New battery: " + red("$150") + ".")
-            print()
+            print(PAR)
             type.type("Expensive, but necessary. Your afternoon is gone.")
             self.change_balance(-150)
             self.add_travel_restriction("Wasted Afternoon")
         else:
             type.type("You can't afford a new battery. You try to contain the leak with duct tape.")
-            print()
+            print(PAR)
             type.type("It's a temporary fix at best. And dangerous.")
             self.add_danger("Leaking Battery")
             self.lose_sanity(10)
-        print()
+        print(PAR)
 
     # === ENGINE PROBLEMS ===
+        print(PAR)
+        return
     def engine_overheating(self):
         if self.has_item("All-Weather Armor"):
             type.type("Car broke down in the heat. The " + magenta(bright("All-Weather Armor")) + " keeps you comfortable until help arrives.")
-            print()
+            print(PAR)
             type.type("Stranded in weather? Not a problem for you.")
             self.restore_sanity(5)
             return
         if self.has_item("War Wagon"):
             type.type("The " + cyan(bright("War Wagon")) + "'s thermal management kicks in. Engine temp drops instantly.")
-            print()
+            print(PAR)
             type.type("Your car has opinions about its own maintenance. They are correct opinions.")
             self.restore_sanity(5)
             return
         if self.has_item("Immortal Vehicle"):
             type.type("The " + cyan(bright("Immortal Vehicle")) + " has redundant cooling. This problem was solved in the design phase.")
-            print()
+            print(PAR)
             self.restore_sanity(3)
             return
         if self.has_item("Roadside Shield"):
             type.type("The " + cyan(bright("Roadside Shield")) + " kit includes coolant. Crisis averted in minutes.")
-            print()
+            print(PAR)
             self.restore_sanity(3)
             return
         if self.has_item("Oracle's Tome") or self.has_item("Gambler's Grimoire"):
             tome = "Oracle's Tome" if self.has_item("Oracle's Tome") else "Gambler's Grimoire"
             type.type("This morning, your " + cyan(bright(tome)) + " fell open to a dog-eared page. Two words underlined in red: " + italic("'CHECK COOLANT.'"))
-            print()
+            print(PAR)
             type.type("So you did. You topped off the reservoir before you left. The engine runs smooth. No steam. No crisis. No lost afternoon.")
-            print()
+            print(PAR)
             type.type("It's not magic. It's just reading.")
             self.restore_sanity(5)
-            print()
+            print(PAR)
             return
         type.type("Steam billows from under your hood. Your temperature gauge is in the red.")
-        print()
+        print(PAR)
         type.type("The engine is overheating. You pull over immediately.")
-        print()
+        print(PAR)
         if self.has_item("Coolant") or self.has_item("Antifreeze"):
             item = "Coolant" if self.has_item("Coolant") else "Antifreeze"
             type.type("You have " + magenta(bright(item)) + ". Smart.")
-            print()
+            print(PAR)
             type.type("You wait for the engine to cool, add the fluid, and you're back on the road.")
-            print()
+            print(PAR)
             type.type("Lost an hour, but could have been much worse.")
             self.use_item(item)
             self.restore_sanity(5)
         elif self.has_item("Water Bottles"):
             type.type("You pour your " + magenta(bright("Water Bottles")) + " into the radiator as an emergency fix.")
-            print()
+            print(PAR)
             type.type("It's not ideal, but it'll get you somewhere.")
-            print()
+            print(PAR)
             type.type("The engine makes concerning noises, but holds.")
             self.use_item("Water Bottles")
             self.add_danger("Cooling System Damage")
         elif self.has_item("Cool Down Kit"):
             type.type("You crack open the " + magenta(bright("Cool Down Kit")) + " and dump it on the engine block.")
-            print()
+            print(PAR)
             type.type("Steam erupts like a geyser. The temperature gauge drops from red to somewhere reasonable.")
-            print()
+            print(PAR)
             type.type("There's always a risk with rapid cooling — could crack a gasket, or could actually seal better under pressure.")
             self.use_item("Cool Down Kit")
             if random.randrange(4) == 0:
@@ -288,9 +302,9 @@ class CarEventsMixin:
                 self.restore_sanity(5)
         else:
             type.type("You have nothing to cool it down. You sit and wait.")
-            print()
+            print(PAR)
             type.type("And wait. And wait. Hours pass.")
-            print()
+            print(PAR)
             type.type("Eventually the engine cools enough to limp to a mechanic. " + red("$200") + " for repairs.")
             if self.get_balance() >= 200:
                 self.change_balance(-200)
@@ -299,16 +313,18 @@ class CarEventsMixin:
                 self.add_danger("Unpaid Mechanic Debt")
             self.add_travel_restriction("Wasted Afternoon")
             self.lose_sanity(10)
-        print()
+        print(PAR)
 
+        print(PAR)
+        return
     def check_engine_light_on(self):
         type.type("The check engine light comes on. That ominous orange glow.")
-        print()
+        print(PAR)
         type.type("Could be nothing. Could be catastrophic. No way to know without a diagnostic.")
-        print()
+        print(PAR)
         if self.has_item("OBD Scanner"):
             type.type("You have an " + magenta(bright("OBD Scanner")) + ". You plug it in.")
-            print()
+            print(PAR)
             codes = random.choice([
                 ("loose gas cap", 0, True),
                 ("oxygen sensor failing", 85, True),
@@ -317,7 +333,7 @@ class CarEventsMixin:
                 ("mass airflow sensor", 120, True)
             ])
             type.type("Code reads: " + codes[0] + ".")
-            print()
+            print(PAR)
             if codes[1] == 0:
                 type.type("You tighten your gas cap. Light goes off. Crisis averted.")
                 self.restore_sanity(6)
@@ -330,50 +346,52 @@ class CarEventsMixin:
                 self.add_danger("Serious Engine Issue")
         elif self.has_item("Fortune Cards"):
             type.type("You lay the " + magenta(bright("Fortune Cards")) + " on the dashboard.")
-            print()
+            print(PAR)
             type.type("THE TOWER on the brake pedal. DEATH near the exhaust. Then a card labeled THE JOURNEY slides under the seat.")
-            print()
+            print(PAR)
             type.type("Your car hums something that sounds almost like approval. The cards say: the next car problem will be minor. Consider this your warning.")
             self.add_status("Car Prediction")
             self.restore_sanity(4)
         else:
             type.type("You have no way to read the code. You just have to hope it's nothing serious.")
-            print()
+            print(PAR)
             chance = random.randrange(5)
             if chance == 0:
                 type.type("Your car suddenly dies in the middle of the road.")
-                print()
+                print(PAR)
                 type.type("It was serious. Very serious. You spend the afternoon getting towed.")
                 self.add_travel_restriction("Wasted Afternoon")
                 self.add_danger("Major Engine Failure")
                 self.lose_sanity(15)
             else:
                 type.type("For now, the car keeps running. But that light haunts you.")
-        print()
+        print(PAR)
 
+        print(PAR)
+        return
     def engine_wont_turn_over(self):
         type.type("You turn the key. The engine tries to catch but fails. Again and again.")
-        print()
+        print(PAR)
         type.type("It's not the battery - you can hear it trying. Something else is wrong.")
-        print()
+        print(PAR)
         problem = random.choice(["starter motor", "fuel pump", "ignition coil", "spark plugs"])
         type.type("After some investigation, you suspect it's the " + problem + ".")
-        print()
+        print(PAR)
         if self.has_item("Mobile Workshop"):
             type.type("You pop the trunk and open the " + magenta(bright("Mobile Workshop")) + " case.")
-            print()
+            print(PAR)
             type.type("It has exactly what you need for a failing " + problem + ". Five minutes later, the engine roars to life.")
-            print()
+            print(PAR)
             type.type("You didn't even get your hands that dirty.")
             self.restore_sanity(8)
         elif problem == "spark plugs" and self.has_item("Spare Spark Plugs"):
             type.type("Good thing you have " + magenta(bright("Spare Spark Plugs")) + "!")
-            print()
+            print(PAR)
             type.type("You swap them out. The engine roars to life.")
             self.use_item("Spare Spark Plugs")
         elif self.has_item("Tool Kit"):
             type.type("With your " + magenta(bright("Tool Kit")) + ", you attempt a DIY fix.")
-            print()
+            print(PAR)
             if random.randrange(3) == 0:
                 type.type("You actually fix it! You surprise yourself.")
                 self.restore_sanity(5)
@@ -384,35 +402,37 @@ class CarEventsMixin:
                 self.lose_sanity(12)
         else:
             type.type("You have no tools, no knowledge. Just frustration.")
-            print()
+            print(PAR)
             type.type("You call for help. The afternoon evaporates waiting for a mechanic.")
             self.add_travel_restriction("Wasted Afternoon")
             self.lose_sanity(8)
-        print()
+        print(PAR)
 
+        print(PAR)
+        return
     def strange_engine_noise(self):
         if self.has_item("Lucky Medallion") or self.has_item("Lucky Coin"):
             coin = "Lucky Medallion" if self.has_item("Lucky Medallion") else "Lucky Coin"
             type.type("Your engine is making a noise. A bad noise. Grinding? Clicking? Whining?")
-            print()
+            print(PAR)
             type.type("You reach into your pocket and close your hand around the " + cyan(bright(coin)) + ".")
-            print()
+            print(PAR)
             type.type("The noise changes pitch. Then fades. Then stops.")
-            print()
+            print(PAR)
             type.type("You sit in puzzled silence. The engine purrs like nothing happened. You stop asking questions.")
             self.restore_sanity(5)
-            print()
+            print(PAR)
             return
         type.type("Your engine is making a noise. A bad noise. Grinding? Clicking? Whining?")
-        print()
+        print(PAR)
         noise = random.choice(["grinding", "clicking", "whining", "knocking", "squealing"])
         type.type("It's " + noise + ". Definitely " + noise + ".")
-        print()
+        print(PAR)
         if noise == "squealing":
             type.type("Probably a belt. Could snap at any moment.")
             if self.has_item("Serpentine Belt"):
                 type.type(" But you have a spare " + magenta(bright("Serpentine Belt")) + "!")
-                print()
+                print(PAR)
                 type.type("You swap it out. Noise gone. You're a genius.")
                 self.use_item("Serpentine Belt")
             else:
@@ -420,7 +440,7 @@ class CarEventsMixin:
                 self.add_danger("Failing Belt")
         elif noise == "knocking":
             type.type("That's bad. Really bad. That's internal engine damage.")
-            print()
+            print(PAR)
             type.type("You might be looking at a complete engine rebuild. Or a new car.")
             self.add_danger("Engine Knock")
             self.lose_sanity(15)
@@ -431,23 +451,25 @@ class CarEventsMixin:
             else:
                 type.type(" You ignore it. The noise gets worse. Much worse.")
                 self.add_danger("Mysterious Engine Problem")
-        print()
+        print(PAR)
 
+        print(PAR)
+        return
     def engine_oil_empty(self):
         type.type("You check your oil level. The dipstick comes up bone dry.")
-        print()
+        print(PAR)
         type.type("No oil. None. How long have you been driving like this?")
-        print()
+        print(PAR)
         if self.has_item("Motor Oil"):
             type.type("Thank God you have " + magenta(bright("Motor Oil")) + ".")
-            print()
+            print(PAR)
             type.type("You pour it in. The engine sounds happier immediately.")
             self.use_item("Motor Oil")
         else:
             type.type("You need to get oil immediately or your engine will seize.")
-            print()
+            print(PAR)
             type.type("You walk to the nearest gas station. It takes two hours.")
-            print()
+            print(PAR)
             type.type("Oil: " + red("$30") + ". Time lost: priceless.")
             if self.get_balance() >= 30:
                 self.change_balance(-30)
@@ -455,74 +477,80 @@ class CarEventsMixin:
                 type.type("You can't even afford oil. You beg. Someone takes pity.")
             self.add_travel_restriction("Wasted Afternoon")
             self.lose_sanity(5)
-        print()
+        print(PAR)
 
+        print(PAR)
+        return
     def oil_leak_spotted(self):
         type.type("There's a dark puddle under your car. You touch it. Oil. Thick and black.")
-        print()
+        print(PAR)
         type.type("You have an oil leak. Could be a gasket, could be worse.")
-        print()
+        print(PAR)
         if self.has_item("Oil Stop Leak"):
             type.type("You add your " + magenta(bright("Oil Stop Leak")) + " and hope for the best.")
-            print()
+            print(PAR)
             type.type("The leak slows. Not fixed, but manageable.")
             self.use_item("Oil Stop Leak")
         else:
             type.type("You'll need to keep adding oil until you can afford a real fix.")
             self.add_danger("Oil Leak")
             type.type(" Every day you don't fix this costs you more.")
-        print()
+        print(PAR)
 
     # === TIRE PROBLEMS ===
+        print(PAR)
+        return
     def slow_tire_leak(self):
         type.type("Your steering feels off. You get out and check - one tire is low. Not flat, but definitely losing air.")
-        print()
+        print(PAR)
         if self.has_item("Tire Patch Kit"):
             type.type("You have a " + magenta(bright("Tire Patch Kit")) + ". You find the nail, pull it, patch the hole.")
-            print()
+            print(PAR)
             type.type("Good as new. Well, good enough.")
             self.use_item("Tire Patch Kit")
         elif self.has_item("Fix-a-Flat"):
             type.type("You use your " + magenta(bright("Fix-a-Flat")) + " to seal it temporarily.")
-            print()
+            print(PAR)
             type.type("Should hold for a while. Maybe.")
             self.use_item("Fix-a-Flat")
         else:
             type.type("You have to keep stopping to put air in. Every gas station. Every hour.")
-            print()
+            print(PAR)
             type.type("Your afternoon becomes a series of air pump visits.")
             self.add_travel_restriction("Wasted Afternoon")
             self.add_danger("Slow Tire Leak")
-        print()
+        print(PAR)
 
+        print(PAR)
+        return
     def tire_blowout(self):
         type.type("BANG! Your car jerks violently to one side. A tire just blew out.")
-        print()
+        print(PAR)
         type.type("You fight the wheel, heart pounding, and manage to pull to the shoulder.")
-        print()
+        print(PAR)
         if self.has_item("Tire Ready Kit"):
             type.type("You open the trunk. The " + magenta(bright("Tire Ready Kit")) + " is already assembled, sitting right there.")
-            print()
+            print(PAR)
             type.type("Thirty seconds. You're back on the road before the adrenaline even fades.")
-            print()
+            print(PAR)
             type.type("Preparation is its own kind of luck.")
             self.use_item("Tire Ready Kit")
             self.restore_sanity(10)
         elif self.has_item("Spare Tire") and self.has_item("Car Jack"):
             type.type("You have a " + magenta(bright("Spare Tire")) + " and a " + magenta(bright("Car Jack")) + ".")
-            print()
+            print(PAR)
             type.type("You change the tire yourself. It takes an hour, but you're back on the road.")
             self.use_item("Spare Tire")
             self.restore_sanity(10)
         elif self.has_item("Spare Tire"):
             type.type("You have a spare, but no jack. You spend hours flagging down help.")
-            print()
+            print(PAR)
             type.type("A trucker finally stops and helps. Afternoon gone.")
             self.use_item("Spare Tire")
             self.add_travel_restriction("Wasted Afternoon")
         else:
             type.type("No spare. No jack. You're completely stranded.")
-            print()
+            print(PAR)
             type.type("You call a tow truck. " + red("$150") + " and four hours later, you have a new tire.")
             if self.get_balance() >= 150:
                 self.change_balance(-150)
@@ -531,37 +559,41 @@ class CarEventsMixin:
                 self.add_danger("Stranded")
             self.add_travel_restriction("Wasted Afternoon")
             self.lose_sanity(15)
-        print()
+        print(PAR)
 
+        print(PAR)
+        return
     def bald_tires_noticed(self):
         type.type("You look at your tires and wince. The tread is almost gone. Bald spots everywhere.")
-        print()
+        print(PAR)
         type.type("These tires are dangerous. One good rain and you'll hydroplane.")
-        print()
+        print(PAR)
         type.type("New tires cost around " + red("$400") + " minimum. You don't have that.")
-        print()
+        print(PAR)
         type.type("You'll have to risk it. But every drive is now a gamble.")
         self.add_danger("Bald Tires")
         self.lose_sanity(5)
-        print()
+        print(PAR)
 
+        print(PAR)
+        return
     def nail_in_tire(self):
         type.type("Thump. Thump. Thump. Something's wrong with one of your tires.")
-        print()
+        print(PAR)
         type.type("You pull over and find it - a nail, embedded deep in the rubber.")
-        print()
+        print(PAR)
         type.type("The tire is holding for now, but if you pull it out, it'll go flat instantly.")
-        print()
+        print(PAR)
         answer = ask.option("What do you do? ", ["pull it out", "leave it", "drive to shop"])
         if answer == "pull it out":
             if self.has_item("Tire Patch Kit"):
                 type.type("You pull the nail and quickly apply your " + magenta(bright("Tire Patch Kit")) + ".")
-                print()
+                print(PAR)
                 type.type("The patch holds. Nice save.")
                 self.use_item("Tire Patch Kit")
             else:
                 type.type("PSSSSSSS. The air rushes out. You have a flat tire now.")
-                print()
+                print(PAR)
                 if self.has_item("Spare Tire"):
                     type.type("Time to put on that spare.")
                     self.use_item("Spare Tire")
@@ -582,17 +614,19 @@ class CarEventsMixin:
                 type.type("You can't afford it. You leave with the nail still in.")
                 self.add_danger("Nail in Tire")
             self.add_travel_restriction("Wasted Afternoon")
-        print()
+        print(PAR)
 
     # === ELECTRICAL ISSUES ===
+        print(PAR)
+        return
     def headlights_burned_out(self):
         type.type("Your headlights flicker and die. Both of them. At the same time.")
-        print()
+        print(PAR)
         type.type("You can't drive at night without headlights. That's illegal and suicidal.")
-        print()
+        print(PAR)
         if self.has_item("Spare Headlight Bulbs"):
             type.type("You have " + magenta(bright("Spare Headlight Bulbs")) + ". Smart thinking.")
-            print()
+            print(PAR)
             type.type("You replace them in the parking lot. You're back in business.")
             self.use_item("Spare Headlight Bulbs")
         else:
@@ -604,24 +638,26 @@ class CarEventsMixin:
                 type.type("You can't afford them. You'll have to stay put until you can.")
                 self.add_travel_restriction("No Headlights")
                 self.add_danger("No Headlights")
-        print()
+        print(PAR)
 
+        print(PAR)
+        return
     def alternator_failing(self):
         type.type("Your dashboard dims. Your headlights flicker. Your radio cuts out.")
-        print()
+        print(PAR)
         type.type("The alternator is dying. Without it, your battery won't charge.")
-        print()
+        print(PAR)
         type.type("You might have 30 minutes of driving left. Maybe less.")
-        print()
+        print(PAR)
         
         if self.has_item("Power Grid"):
             type.type("You click open the Power Grid system. Diagnostic complete: failing alternator detected.")
-            print()
+            print(PAR)
             type.type("Electrical bypass engaged. The dashboard glows. The car runs perfectly.")
-            print()
+            print(PAR)
             self.use_item("Power Grid")
             self.restore_sanity(5)
-            print()
+            print(PAR)
             return
         
         if self.get_balance() >= 350:
@@ -630,144 +666,158 @@ class CarEventsMixin:
             self.add_travel_restriction("Wasted Afternoon")
         else:
             type.type("You can't afford a new alternator. Your car dies in a parking lot.")
-            print()
+            print(PAR)
             type.type("You're stuck here until you can afford repairs.")
             self.add_travel_restriction("Dead Alternator")
             self.add_danger("Dead Alternator")
             self.lose_sanity(15)
-        print()
+        print(PAR)
 
+        print(PAR)
+        return
     def fuse_blown(self):
         type.type("Something electrical stopped working. Radio? Wipers? Power windows? Something.")
-        print()
+        print(PAR)
         type.type("You check the fuse box and find a blown fuse.")
-        print()
+        print(PAR)
         if self.has_item("Spare Fuses"):
             type.type("You pop in a spare from your " + magenta(bright("Spare Fuses")) + " kit. Fixed in seconds.")
             self.use_item("Spare Fuses")
         else:
             type.type("You don't have a spare. You drive to an auto shop.")
-            print()
+            print(PAR)
             type.type("$5 for a fuse, but an hour of your life wasted.")
             if self.get_balance() >= 5:
                 self.change_balance(-5)
             self.add_travel_restriction("Wasted Afternoon")
-        print()
+        print(PAR)
 
+        print(PAR)
+        return
     def car_alarm_malfunction(self):
         type.type("Your car alarm starts going off. For no reason. At 2 PM.")
-        print()
+        print(PAR)
         type.type("BEEP BEEP BEEP BEEP BEEP BEEP BEEP BEEP")
-        print()
+        print(PAR)
         type.type("You try the remote. Nothing. You try starting the car. Nothing. It just keeps screaming.")
-        print()
+        print(PAR)
         type.type("People are staring. Someone calls the cops. This is a nightmare.")
-        print()
+        print(PAR)
         if self.has_item("Tool Kit"):
             type.type("You grab your " + magenta(bright("Tool Kit")) + " and disconnect the battery to stop the noise.")
-            print()
+            print(PAR)
             type.type("Silence. Sweet silence. But now you need to figure out the real problem.")
             self.restore_sanity(8)
             self.add_travel_restriction("Wasted Afternoon")
         elif self.has_item("EMP Device"):
             type.type("You aim the " + magenta(bright("EMP Device")) + " at the alarm box. One pulse.")
-            print()
+            print(PAR)
             type.type("Silence. The car alarm is dead. The radio is also dead. Your phone needs a reboot.")
-            print()
+            print(PAR)
             type.type("Worth it.")
             self.use_item("EMP Device")
             self.add_danger("EMP Side Effects")
             self.restore_sanity(10)
         else:
             type.type("You have no way to disable it. The alarm runs until the battery dies.")
-            print()
+            print(PAR)
             type.type("Three hours. Three hours of beeping. Your sanity doesn't survive intact.")
             self.add_travel_restriction("Wasted Afternoon")
             self.lose_sanity(20)
-        print()
+        print(PAR)
 
+        print(PAR)
+        return
     def starter_motor_grinding(self):
         type.type("When you turn the key, there's a horrible grinding noise from under the hood.")
-        print()
+        print(PAR)
         type.type("The starter motor is dying. Every start could be its last.")
-        print()
+        print(PAR)
         type.type("Starter motors cost around " + red("$200-400") + " to replace.")
-        print()
+        print(PAR)
         type.type("For now, it still works. Barely. Loudly. Worryingly.")
         self.add_danger("Failing Starter Motor")
         self.lose_sanity(5)
-        print()
+        print(PAR)
 
     # === BRAKE PROBLEMS ===
+        print(PAR)
+        return
     def brakes_squealing(self):
         type.type("Your brakes are squealing. That metal-on-metal sound that means trouble.")
-        print()
+        print(PAR)
         type.type("The brake pads are worn. If you don't replace them, you'll damage the rotors.")
-        print()
+        print(PAR)
         if self.has_item("Brake Pads"):
             type.type("You have spare " + magenta(bright("Brake Pads")) + " and the knowledge to install them.")
-            print()
+            print(PAR)
             type.type("An hour of work later, your brakes are like new.")
             self.use_item("Brake Pads")
         else:
             type.type("New brake pads: " + red("$150-300") + " at a shop. Money you don't have.")
-            print()
+            print(PAR)
             type.type("You drive carefully, knowing your brakes could fail.")
             self.add_danger("Worn Brake Pads")
-        print()
+        print(PAR)
 
+        print(PAR)
+        return
     def brake_fluid_leak(self):
         type.type("You press the brake pedal. It goes all the way to the floor. Almost no resistance.")
-        print()
+        print(PAR)
         type.type("That's brake fluid leaking. That's extremely dangerous.")
-        print()
+        print(PAR)
         if self.has_item("Brake Fluid"):
             type.type("You add " + magenta(bright("Brake Fluid")) + " to the reservoir. It's a temporary fix.")
-            print()
+            print(PAR)
             type.type("The leak will continue. You need real repairs.")
             self.use_item("Brake Fluid")
             self.add_danger("Brake Fluid Leak")
         else:
             type.type("You cannot drive this car. Not safely. Not at all.")
-            print()
+            print(PAR)
             type.type("You're stuck until you can fix this.")
             self.add_travel_restriction("Brake Failure")
             self.add_danger("Brake Failure")
             self.lose_sanity(15)
-        print()
+        print(PAR)
 
+        print(PAR)
+        return
     def abs_light_on(self):
         type.type("The ABS warning light comes on. Your anti-lock brakes have a problem.")
-        print()
+        print(PAR)
         type.type("Regular brakes still work. Probably. But in an emergency...")
-        print()
+        print(PAR)
         type.type("You add it to the list of things wrong with your car.")
         self.add_danger("ABS Malfunction")
         self.lose_sanity(3)
-        print()
+        print(PAR)
 
     # === FUEL SYSTEM ISSUES ===
+        print(PAR)
+        return
     def ran_out_of_gas(self):
         type.type("Your car sputters. Coughs. Dies. You coast to a stop.")
-        print()
+        print(PAR)
         type.type("Out of gas. Completely out. How did you not notice?")
-        print()
+        print(PAR)
         if self.has_item("SOS Kit"):
             type.type("The " + magenta(bright("SOS Kit")) + "'s smoke and mirrors flag down three passing cars in ten minutes.")
-            print()
+            print(PAR)
             type.type("Fastest roadside help you've ever had.")
             self.use_item("SOS Kit")
             self.restore_sanity(5)
-            print()
+            print(PAR)
             return
         if self.has_item("Gas Can"):
             type.type("You have an emergency " + magenta(bright("Gas Can")) + ". Enough to get to a station.")
-            print()
+            print(PAR)
             type.type("Crisis averted by preparation.")
             self.use_item("Gas Can")
         else:
             type.type("You have to walk to a gas station. Buy a can. Fill it. Walk back.")
-            print()
+            print(PAR)
             type.type("Two hours of your life, gone. Plus the cost of the can and gas: " + red("$35") + ".")
             if self.get_balance() >= 35:
                 self.change_balance(-35)
@@ -776,28 +826,32 @@ class CarEventsMixin:
                 type.type("You can't even afford gas. You beg strangers. Someone eventually helps.")
                 self.lose_sanity(10)
             self.add_travel_restriction("Wasted Afternoon")
-        print()
+        print(PAR)
 
+        print(PAR)
+        return
     def fuel_pump_whining(self):
         type.type("There's a whining noise when your car runs. Coming from the fuel tank area.")
-        print()
+        print(PAR)
         type.type("The fuel pump is failing. When it goes completely, your car won't run at all.")
-        print()
+        print(PAR)
         type.type("Fuel pumps cost " + red("$400-600") + " to replace. Plus labor.")
-        print()
+        print(PAR)
         type.type("Every time you start your car, you wonder if this is the last time.")
         self.add_danger("Failing Fuel Pump")
         self.lose_sanity(8)
-        print()
+        print(PAR)
 
+        print(PAR)
+        return
     def clogged_fuel_filter(self):
         type.type("Your car hesitates when accelerating. Stutters. Struggles.")
-        print()
+        print(PAR)
         type.type("Could be a clogged fuel filter. Cheap fix if you catch it early.")
-        print()
+        print(PAR)
         if self.has_item("Fuel Filter"):
             type.type("You have a spare " + magenta(bright("Fuel Filter")) + ". You swap it out.")
-            print()
+            print(PAR)
             type.type("The car runs smoother immediately.")
             self.use_item("Fuel Filter")
         else:
@@ -805,42 +859,46 @@ class CarEventsMixin:
             if self.get_balance() >= 30:
                 self.change_balance(-30)
             self.add_travel_restriction("Wasted Afternoon")
-        print()
+        print(PAR)
 
     # === TRANSMISSION PROBLEMS ===
+        print(PAR)
+        return
     def transmission_slipping(self):
         type.type("Your car revs high but barely accelerates. The transmission is slipping.")
-        print()
+        print(PAR)
         type.type("This is bad. Transmission repairs are the most expensive fixes there are.")
-        print()
+        print(PAR)
         if self.has_item("Miracle Lube"):
             type.type("You pop the hood and squeeze one shot of " + magenta(bright("Miracle Lube")) + " into the transmission.")
-            print()
+            print(PAR)
             type.type("The grinding stops instantly. The gears shift smooth as silk.")
-            print()
+            print(PAR)
             type.type("You don't know how it works. You don't care.")
             self.use_item("Miracle Lube")
             self.restore_sanity(8)
         elif self.has_item("Transmission Fluid"):
             type.type("You check the fluid level. Low. You add " + magenta(bright("Transmission Fluid")) + ".")
-            print()
+            print(PAR)
             type.type("It helps. Temporarily. The damage is already done.")
             self.use_item("Transmission Fluid")
         else:
             type.type("You don't even want to know what this costs to fix. Thousands. Easily.")
-            print()
+            print(PAR)
             type.type("You drive gently and pray.")
             self.add_danger("Transmission Damage")
             self.lose_sanity(20)
-        print()
+        print(PAR)
 
+        print(PAR)
+        return
     def stuck_in_gear(self):
         type.type("Your car is stuck in second gear. It won't shift up or down.")
-        print()
+        print(PAR)
         type.type("You can drive, technically, but not fast. And not well.")
-        print()
+        print(PAR)
         type.type("Every other car on the road is passing you, honking angrily.")
-        print()
+        print(PAR)
         type.type("You limp to a mechanic. " + red("$300") + " to fix a linkage issue.")
         if self.get_balance() >= 300:
             self.change_balance(-300)
@@ -849,21 +907,23 @@ class CarEventsMixin:
             type.type(" You can't afford it. You'll have to drive like this.")
             self.add_danger("Stuck In Second")
         self.add_travel_restriction("Wasted Afternoon")
-        print()
+        print(PAR)
 
     # === COOLING SYSTEM ===
+        print(PAR)
+        return
     def radiator_leak(self):
         type.type("Green fluid is pooling under your car. Antifreeze. Your radiator is leaking.")
-        print()
+        print(PAR)
         if self.has_item("Radiator Stop Leak"):
             type.type("You pour in " + magenta(bright("Radiator Stop Leak")) + " and cross your fingers.")
-            print()
+            print(PAR)
             type.type("The leak slows. Not stopped, but manageable.")
             self.use_item("Radiator Stop Leak")
             self.add_danger("Radiator Damage")
         else:
             type.type("Without coolant, your engine will overheat. And die.")
-            print()
+            print(PAR)
             type.type("Radiator repair: " + red("$200-400") + ". Time to start begging.")
             if self.get_balance() >= 200:
                 self.change_balance(-200)
@@ -873,16 +933,18 @@ class CarEventsMixin:
                 self.add_travel_restriction("Radiator Failure")
                 self.add_danger("Radiator Failure")
             self.lose_sanity(10)
-        print()
+        print(PAR)
 
+        print(PAR)
+        return
     def thermostat_stuck(self):
         type.type("Your temperature gauge is acting weird. Too cold. Too hot. Wildly swinging.")
-        print()
+        print(PAR)
         type.type("The thermostat is stuck. It's not regulating properly.")
-        print()
+        print(PAR)
         if self.has_item("Thermostat"):
             type.type("You have a spare " + magenta(bright("Thermostat")) + ". You swap it out.")
-            print()
+            print(PAR)
             type.type("Temperature stable again. Good catch.")
             self.use_item("Thermostat")
         else:
@@ -890,15 +952,17 @@ class CarEventsMixin:
             if self.get_balance() >= 50:
                 self.change_balance(-50)
             self.add_travel_restriction("Wasted Afternoon")
-        print()
+        print(PAR)
 
+        print(PAR)
+        return
     def water_pump_failing(self):
         type.type("There's a grinding noise from your water pump. And your car is starting to overheat.")
-        print()
+        print(PAR)
         type.type("When the water pump goes completely, your engine will follow.")
-        print()
+        print(PAR)
         type.type("Water pump replacement: " + red("$300-500") + ". Not optional.")
-        print()
+        print(PAR)
         if self.get_balance() >= 300:
             type.type("You get it fixed immediately. Afternoon gone, but car saved.")
             self.change_balance(-300)
@@ -907,35 +971,39 @@ class CarEventsMixin:
             type.type("You can't afford it. You drive with one eye on the temperature gauge.")
             self.add_danger("Failing Water Pump")
             self.lose_sanity(12)
-        print()
+        print(PAR)
 
     # === STEERING/SUSPENSION ===
+        print(PAR)
+        return
     def power_steering_failure(self):
         type.type("The steering wheel suddenly becomes incredibly hard to turn.")
-        print()
+        print(PAR)
         type.type("Power steering is out. Driving is now an arm workout.")
-        print()
+        print(PAR)
         if self.has_item("Power Steering Fluid"):
             type.type("You check the reservoir. Empty. You add " + magenta(bright("Power Steering Fluid")) + ".")
-            print()
+            print(PAR)
             type.type("Steering returns to normal. There's probably a leak though.")
             self.use_item("Power Steering Fluid")
             self.add_danger("Power Steering Leak")
         else:
             type.type("You can technically still drive. It just takes all your strength.")
-            print()
+            print(PAR)
             type.type("Your arms are going to be very sore tomorrow.")
             self.add_danger("No Power Steering")
             self.hurt(10)
-        print()
+        print(PAR)
 
+        print(PAR)
+        return
     def wheel_alignment_off(self):
         type.type("Your car pulls hard to one side. You have to fight the wheel to go straight.")
-        print()
+        print(PAR)
         type.type("Alignment is off. Probably from all those potholes.")
-        print()
+        print(PAR)
         type.type("Alignment service: " + red("$75-100") + ". Plus the time.")
-        print()
+        print(PAR)
         if self.get_balance() >= 75:
             type.type("You get it done. Afternoon spent, but car drives straight again.")
             self.change_balance(-75)
@@ -943,27 +1011,31 @@ class CarEventsMixin:
         else:
             type.type("You'll have to live with it. Your tires will wear unevenly.")
             self.add_danger("Bad Alignment")
-        print()
+        print(PAR)
 
+        print(PAR)
+        return
     def suspension_creaking(self):
         type.type("Every bump makes your car creak and groan like an old house.")
-        print()
+        print(PAR)
         type.type("The suspension is worn. Shocks, struts, something.")
-        print()
+        print(PAR)
         type.type("Suspension work is expensive. " + red("$500-1000") + " or more.")
-        print()
+        print(PAR)
         type.type("You add it to the list of things you can't afford to fix.")
         self.add_danger("Worn Suspension")
         self.lose_sanity(5)
-        print()
+        print(PAR)
 
+        print(PAR)
+        return
     def broken_ball_joint(self):
         type.type("There's a terrifying clunk from your front wheel when you turn.")
-        print()
+        print(PAR)
         type.type("Ball joint. If that breaks while driving, you lose the wheel. Literally.")
-        print()
+        print(PAR)
         type.type("This isn't optional. This is fix-now-or-die territory.")
-        print()
+        print(PAR)
         if self.get_balance() >= 200:
             type.type("You get it fixed immediately. " + red("$200") + ". Afternoon gone.")
             self.change_balance(-200)
@@ -972,19 +1044,21 @@ class CarEventsMixin:
             type.type("You can't afford it. You drive at 10 mph, praying with every turn.")
             self.add_danger("Broken Ball Joint")
             self.lose_sanity(15)
-        print()
+        print(PAR)
 
     # === EXHAUST SYSTEM ===
+        print(PAR)
+        return
     def exhaust_leak_loud(self):
         type.type("Your car sounds like a motorcycle. Or a tractor. Incredibly loud.")
-        print()
+        print(PAR)
         type.type("Exhaust leak. Could be a hole in the pipe or a bad muffler.")
-        print()
+        print(PAR)
         type.type("Everyone stares at you. Cops give you looks.")
-        print()
+        print(PAR)
         if self.has_item("Exhaust Tape"):
             type.type("You use " + magenta(bright("Exhaust Tape")) + " to patch the hole temporarily.")
-            print()
+            print(PAR)
             type.type("It's quieter. Mostly. Still louder than normal.")
             self.use_item("Exhaust Tape")
             self.add_danger("Patched Exhaust")
@@ -996,167 +1070,181 @@ class CarEventsMixin:
             else:
                 type.type("You'll have to drive loud and proud. Or ashamed. Mostly ashamed.")
                 self.add_danger("Loud Exhaust")
-        print()
+        print(PAR)
 
+        print(PAR)
+        return
     def catalytic_converter_stolen(self):
         if self.has_item("Rolling Fortress"):
             type.type("You check under the car. Someone tried to get at your catalytic converter.")
-            print()
+            print(PAR)
             type.type("The " + magenta(bright("Rolling Fortress")) + "'s layered underbody defenses triggered. They got a screwdriver stuck in the shield plating and fled.")
-            print()
+            print(PAR)
             type.type("One less repair bill. The fortress earns its name.")
             self.restore_sanity(5)
-            print()
+            print(PAR)
             return
         if self.has_item("Fortified Perimeter"):
             type.type("The " + cyan(bright("Fortified Perimeter")) + "'s trip-sensors activated. Thief ran.")
-            print()
+            print(PAR)
             self.restore_sanity(3)
             return
         type.type("You start your car and it sounds like a dragster. Way too loud.")
-        print()
+        print(PAR)
         type.type("You look under the car. Your catalytic converter is GONE. Someone stole it.")
-        print()
+        print(PAR)
         type.type("Catalytic converters contain precious metals. Thieves love them.")
-        print()
+        print(PAR)
         type.type("Replacement: " + red("$1000-2500") + ". You're going to be loud for a while.")
         self.add_danger("Missing Catalytic Converter")
         self.lose_sanity(20)
         type.type(" You feel violated. Someone was under your car while you slept.")
         if self.has_item("Security Bypass"):
-            print()
+            print(PAR)
             type.type("You use the " + magenta(bright("Security Bypass")) + " to trace the thief's route. You find their car parked a block away — and their radio is far nicer than yours.")
-            print()
+            print(PAR)
             type.type("Poetic justice. You pocket their stereo and call it even.")
             self.change_balance(50)
-        print()
+        print(PAR)
 
     # === WEATHER DAMAGE ===
+        print(PAR)
+        return
     def hail_damage(self):
         type.type("Last night's storm left your car covered in dents. Hail damage.")
-        print()
+        print(PAR)
         type.type("Your hood, roof, and trunk look like a golf ball. Dimpled everywhere.")
-        print()
+        print(PAR)
         type.type("Cosmetic damage. Car still runs. But your pride took a hit.")
         self.add_danger("Hail Damage")
         self.lose_sanity(8)
-        print()
+        print(PAR)
 
+        print(PAR)
+        return
     def flooded_engine(self):
         type.type("You drove through a deep puddle. Your engine sputtered and died.")
-        print()
+        print(PAR)
         type.type("Water got into the intake. The engine is hydrolocked.")
-        print()
+        print(PAR)
         type.type("This could be catastrophic or just need time to dry out.")
-        print()
+        print(PAR)
         chance = random.randrange(5)
         if chance == 0:
             type.type("The engine is destroyed. Water doesn't compress. Pistons bent.")
-            print()
+            print(PAR)
             type.type("Your car is dead. You need a new engine or a new car.")
             self.add_danger("Hydrolocked Engine")
             self.add_travel_restriction("Destroyed Engine")
             self.lose_sanity(30)
         else:
             type.type("After a few hours of drying, the engine starts again. Lucky.")
-            print()
+            print(PAR)
             type.type("There might be lingering damage. Time will tell.")
             self.add_travel_restriction("Wasted Afternoon")
             self.lose_sanity(10)
-        print()
+        print(PAR)
 
+        print(PAR)
+        return
     def windshield_cracked(self):
         type.type("A rock kicked up by a truck just hit your windshield. CRACK.")
-        print()
+        print(PAR)
         type.type("A spiderweb of cracks spreads across your field of vision.")
-        print()
+        print(PAR)
         type.type("Windshield replacement: " + red("$200-400") + ". You can't afford that.")
-        print()
+        print(PAR)
         type.type("You'll drive with cracks. It'll get worse in the cold.")
         self.add_danger("Cracked Windshield")
         self.lose_sanity(5)
-        print()
+        print(PAR)
 
+        print(PAR)
+        return
     def frozen_door_locks(self):
         if self.has_danger("It's Summer"):
             return  # Skip in summer
         type.type("The temperature dropped overnight. Your door locks are frozen solid.")
-        print()
+        print(PAR)
         type.type("You can't get into your own car.")
-        print()
+        print(PAR)
         if self.has_item("Lock De-Icer"):
             type.type("You spray " + magenta(bright("Lock De-Icer")) + " into the keyhole. A minute later, you're in.")
             self.use_item("Lock De-Icer")
         elif self.has_item("Lighter"):
             type.type("You heat your key with your " + magenta(bright("Lighter")) + " and carefully thaw the lock.")
-            print()
+            print(PAR)
             type.type("Primitive, but effective.")
             self.restore_sanity(3)
         else:
             type.type("You spend an hour breathing on the lock, rubbing it with your hands.")
-            print()
+            print(PAR)
             type.type("Eventually it thaws. But you've lost precious time.")
             self.add_travel_restriction("Wasted Afternoon")
             self.hurt(5)  # Cold damage
-        print()
+        print(PAR)
 
+        print(PAR)
+        return
     def frozen_fuel_line(self):
         if self.has_danger("It's Summer"):
             return
         type.type("Your car won't start. The fuel line is frozen.")
-        print()
+        print(PAR)
         type.type("This happens when there's water in the fuel system and it freezes.")
-        print()
+        print(PAR)
         if self.has_item("Fuel Line Antifreeze"):
             type.type("You add " + magenta(bright("Fuel Line Antifreeze")) + " and wait for it to work.")
-            print()
+            print(PAR)
             type.type("After twenty minutes, the car starts.")
             self.use_item("Fuel Line Antifreeze")
         else:
             type.type("You have to wait for it to thaw naturally. Hours pass.")
-            print()
+            print(PAR)
             type.type("Your entire day is spent huddled in your cold, non-running car.")
             self.add_travel_restriction("Wasted Afternoon")
             self.hurt(15)
             self.lose_sanity(10)
-        print()
+        print(PAR)
 
     # === RANDOM BREAKDOWNS ===
+        print(PAR)
+        return
     def mystery_breakdown(self):
         if self.has_item("War Wagon"):
             type.type("The " + cyan(bright("War Wagon")) + " predicts potholes and avoids them. It self-diagnoses. The 'breakdown' resolves before it becomes one.")
-            print()
+            print(PAR)
             type.type("The car rumbles. Satisfied.")
             self.restore_sanity(8)
             return
         if self.has_item("Immortal Vehicle"):
             type.type(cyan(bright("Immortal Vehicle")) + " — self-repairing, self-defending. Whatever was about to break fixed itself.")
-            print()
+            print(PAR)
             self.restore_sanity(5)
             return
         if self.has_item("Auto Mechanic"):
             type.type("The " + cyan(bright("Auto Mechanic")) + " kit has the part. Of course it does.")
-            print()
+            print(PAR)
             type.type("Fifteen minutes. Good as new.")
             self.restore_sanity(3)
             return
         if self.has_item("Vermin Bomb"):
             self.use_item("Vermin Bomb")
             type.type("Your car just... stops. You pop the hood. Mice. Mice have chewed through half your wiring harness.")
-            print()
+            print(PAR)
             type.type("You detonate the " + magenta(bright("Vermin Bomb")) + " in the back seat. The fumigation is immediate, total, and almost certainly illegal.")
-            print()
+            print(PAR)
             type.type("The smell will last three days. But the car is CLEAN. And mice, unlike electrical gremlins, don't come back twice.")
             self.restore_sanity(5)
             self.add_danger("Chewed Wiring")
-            print()
+            print(PAR)
             return
         type.type("Your car just... stops. No warning. No sound. Just dead.")
-        print()
+        print(PAR)
         type.type("You try everything. Key. Lights. Radio. Nothing responds.")
-        print()
+        print(PAR)
         type.type("It's like the entire electrical system died at once.")
-        print()
+        print(PAR)
         chance = random.randrange(5)
         if chance == 0:
             type.type("After sitting for an hour, it mysteriously starts again. Cars are weird.")
@@ -1170,64 +1258,72 @@ class CarEventsMixin:
             self.add_travel_restriction("Wasted Afternoon")
             self.add_danger("Mystery Electrical Problem")
             self.lose_sanity(15)
-        print()
+        print(PAR)
 
+        print(PAR)
+        return
     def key_wont_turn(self):
         type.type("You put your key in the ignition. It won't turn. At all.")
-        print()
+        print(PAR)
         type.type("You wiggle it, jiggle it, curse at it. Nothing.")
-        print()
+        print(PAR)
         if self.has_item("WD-40"):
             type.type("You spray " + magenta(bright("WD-40")) + " into the ignition. After some working, it turns.")
             self.use_item("WD-40")
         else:
             type.type("Ignition cylinder is worn. This is going to be an expensive fix.")
-            print()
+            print(PAR)
             type.type("After an hour of trying, it finally turns. But this will happen again.")
             self.add_danger("Worn Ignition")
             self.add_travel_restriction("Wasted Afternoon")
-        print()
+        print(PAR)
 
+        print(PAR)
+        return
     def car_wont_go_in_reverse(self):
         type.type("You try to back out of a parking spot. The car won't go in reverse.")
-        print()
+        print(PAR)
         type.type("Forward? Fine. Reverse? Absolutely not.")
-        print()
+        print(PAR)
         type.type("This is going to make parking very interesting.")
-        print()
+        print(PAR)
         type.type("Transmission linkage or cable. " + red("$150-300") + " to fix.")
-        print()
+        print(PAR)
         type.type("For now, you Austin Powers your way out of the spot.")
         self.add_danger("No Reverse Gear")
         self.add_travel_restriction("Wasted Afternoon")
-        print()
+        print(PAR)
 
+        print(PAR)
+        return
     def window_wont_roll_up(self):
         type.type("You roll down your window. It won't roll back up.")
-        print()
+        print(PAR)
         type.type("The motor is dead. Your window is stuck down.")
-        print()
+        print(PAR)
         if self.has_item("Plastic Wrap") or self.has_item("Garbage Bag"):
             item = "Plastic Wrap" if self.has_item("Plastic Wrap") else "Garbage Bag"
             type.type("You tape " + magenta(bright(item)) + " over the opening as a temporary fix.")
-            print()
+            print(PAR)
             type.type("You look homeless. More homeless than usual. But it's sealed.")
             self.use_item(item)
             self.restore_sanity(3)
             self.add_danger("Broken Window")
         else:
             type.type("Rain, bugs, thieves - everything can get in now.")
-            print()
+            print(PAR)
             type.type("Window motor replacement: " + red("$150-250") + ". Another thing you can't afford.")
             self.add_danger("Open Window")
             self.lose_sanity(8)
-        print()
+        print(PAR)
 
+        print(PAR)
+        return
     def trunk_wont_close(self):
         type.type("Your trunk latch is broken. The trunk won't stay closed.")
-        print()
+        print(PAR)
         type.type("It bounces open every time you hit a bump.")
-        print()
+        print(PAR)
         if self.has_item("Bungee Cords") or self.has_item("Rope"):
             item = "Bungee Cords" if self.has_item("Bungee Cords") else "Rope"
             type.type("You tie it shut with " + magenta(bright(item)) + ". Ghetto, but it works.")
@@ -1235,19 +1331,21 @@ class CarEventsMixin:
             self.add_danger("Broken Trunk Latch")
         else:
             type.type("You drive holding the trunk with one arm out the window.")
-            print()
+            print(PAR)
             type.type("This is not sustainable.")
             self.add_travel_restriction("Wasted Afternoon")
             self.add_danger("Open Trunk")
-        print()
+        print(PAR)
 
+        print(PAR)
+        return
     def gas_pedal_sticking(self):
         type.type("Your gas pedal is sticking. When you push it, it doesn't always come back up.")
-        print()
+        print(PAR)
         type.type("That's absolutely terrifying.")
-        print()
+        print(PAR)
         type.type("You're essentially driving a weapon that doesn't always respond to your commands.")
-        print()
+        print(PAR)
         if self.has_item("WD-40"):
             type.type("You spray " + magenta(bright("WD-40")) + " on the linkage. It helps. Mostly.")
             self.use_item("WD-40")
@@ -1256,18 +1354,20 @@ class CarEventsMixin:
             type.type("You drive with your foot ready to yank the pedal up at any moment.")
             self.add_danger("Sticky Gas Pedal")
             self.lose_sanity(15)
-        print()
+        print(PAR)
 
+        print(PAR)
+        return
     def parking_brake_stuck(self):
         type.type("You release the parking brake. Nothing happens. It's stuck on.")
-        print()
+        print(PAR)
         type.type("Your wheels barely turn. You can hear the grinding.")
-        print()
+        print(PAR)
         type.type("Something is seized in the mechanism.")
-        print()
+        print(PAR)
         if self.has_item("Tool Kit"):
             type.type("With your " + magenta(bright("Tool Kit")) + ", you manually release the mechanism.")
-            print()
+            print(PAR)
             type.type("The parking brake might not work normally anymore, but you can drive.")
             self.add_danger("Broken Parking Brake")
         else:
@@ -1275,16 +1375,18 @@ class CarEventsMixin:
             self.add_travel_restriction("Wasted Afternoon")
             self.add_danger("Stuck Parking Brake")
             self.lose_sanity(10)
-        print()
+        print(PAR)
 
     # === FOLLOW-UP DANGER EVENTS ===
+        print(PAR)
+        return
     def leaking_battery_worsens(self):
         if not self.has_danger("Leaking Battery"):
             return
         type.type("That battery leak you've been ignoring? It got worse.")
-        print()
+        print(PAR)
         type.type("Acid has eaten through your battery cables. No power. No start.")
-        print()
+        print(PAR)
         type.type("New battery plus cables: " + red("$200") + ".")
         if self.get_balance() >= 200:
             self.change_balance(-200)
@@ -1294,48 +1396,52 @@ class CarEventsMixin:
             type.type(" You can't afford it. You're stranded again.")
             self.add_travel_restriction("Dead Battery")
         self.add_travel_restriction("Wasted Afternoon")
-        print()
+        print(PAR)
 
+        print(PAR)
+        return
     def bald_tires_hydroplane(self):
         if not self.has_danger("Bald Tires"):
             return
         type.type("It's raining. And your bald tires finally betray you.")
-        print()
+        print(PAR)
         type.type("Your car hydroplanes, spinning out of control.")
-        print()
+        print(PAR)
         chance = random.randrange(5)
         if chance == 0:
             type.type("You crash into a ditch. The car is damaged but driveable.")
-            print()
+            print(PAR)
             type.type("You're shaken but alive.")
             self.hurt(20)
             self.add_danger("Crash Damage")
             self.lose_sanity(15)
         elif chance < 3:
             type.type("You somehow regain control. Your heart is pounding.")
-            print()
+            print(PAR)
             type.type("That was close. Too close.")
             self.lose_sanity(10)
         else:
             type.type("You slide into another car. Minor collision.")
-            print()
+            print(PAR)
             type.type("The other driver is furious. You exchange information.")
             self.hurt(10)
             self.add_danger("Insurance Claim")
             self.add_travel_restriction("Wasted Afternoon")
-        print()
+        print(PAR)
 
+        print(PAR)
+        return
     def engine_knock_worsens(self):
         if not self.has_danger("Engine Knock"):
             return
         type.type("That knocking from your engine? It's getting louder. Much louder.")
-        print()
+        print(PAR)
         type.type("The engine is dying. Every mile could be its last.")
-        print()
+        print(PAR)
         chance = random.randrange(5)
         if chance == 0:
             type.type("BANG. The engine seizes. Smoke pours from under the hood.")
-            print()
+            print(PAR)
             type.type("Your car is dead. Completely dead.")
             self.remove_danger("Engine Knock")
             self.add_danger("Seized Engine")
@@ -1343,15 +1449,17 @@ class CarEventsMixin:
             self.lose_sanity(25)
         else:
             type.type("Still running. Barely. Loudly. Terrifyingly.")
-        print()
+        print(PAR)
 
+        print(PAR)
+        return
     def nail_in_tire_blows(self):
         if not self.has_danger("Nail in Tire"):
             return
         type.type("Remember that nail you left in your tire? It finally won.")
-        print()
+        print(PAR)
         type.type("The tire is flat. Completely flat. You woke up to it.")
-        print()
+        print(PAR)
         self.remove_danger("Nail in Tire")
         if self.has_item("Spare Tire"):
             type.type("Time to use that spare.")
@@ -1360,17 +1468,19 @@ class CarEventsMixin:
             type.type("No spare. You're stuck until you can get this fixed.")
             self.add_travel_restriction("Flat Tire")
             self.lose_sanity(10)
-        print()
+        print(PAR)
 
+        print(PAR)
+        return
     def failing_fuel_pump_dies(self):
         if not self.has_danger("Failing Fuel Pump"):
             return
         chance = random.randrange(5)
         if chance == 0:
             type.type("Your fuel pump finally gave up the ghost.")
-            print()
+            print(PAR)
             type.type("Your car is dead in the middle of nowhere.")
-            print()
+            print(PAR)
             type.type("Fuel pump replacement: " + red("$500") + " minimum. Plus towing.")
             self.remove_danger("Failing Fuel Pump")
             self.add_danger("Dead Fuel Pump")
@@ -1378,17 +1488,19 @@ class CarEventsMixin:
             self.lose_sanity(20)
         else:
             type.type("Your fuel pump is still whining. Still working. For now.")
-        print()
+        print(PAR)
 
+        print(PAR)
+        return
     def broken_ball_joint_breaks(self):
         if not self.has_danger("Broken Ball Joint"):
             return
         chance = random.randrange(10)
         if chance == 0:
             type.type("The ball joint snapped while you were driving.")
-            print()
+            print(PAR)
             type.type("Your wheel literally fell off the car.")
-            print()
+            print(PAR)
             type.type("You crash. Hard.")
             self.hurt(40)
             self.add_injury("Whiplash")
@@ -1398,15 +1510,17 @@ class CarEventsMixin:
             self.lose_sanity(25)
         else:
             type.type("The ball joint is hanging on by a thread. Every turn is terrifying.")
-        print()
+        print(PAR)
 
+        print(PAR)
+        return
     def failing_starter_dies(self):
         if not self.has_danger("Failing Starter Motor"):
             return
         chance = random.randrange(5)
         if chance == 0:
             type.type("Your starter motor has finally died. No more grinding. Just silence.")
-            print()
+            print(PAR)
             type.type("Starter replacement: " + red("$300") + ". You're stuck until then.")
             self.remove_danger("Failing Starter Motor")
             self.add_danger("Dead Starter")
@@ -1414,5 +1528,7 @@ class CarEventsMixin:
             self.lose_sanity(15)
         else:
             type.type("The starter still works. Barely. The grinding is ear-splitting.")
-        print()
+        print(PAR)
 
+        print(PAR)
+        return

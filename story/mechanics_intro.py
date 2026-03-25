@@ -6,7 +6,7 @@ import msvcrt
 from colorama import Fore, Back, Style, init
 init(convert=True)
 
-PAR = "\n\n"
+PAR = "\n"
 
 type = typer.Type()
 ask = typer.Ask()

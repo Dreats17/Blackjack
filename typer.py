@@ -357,7 +357,8 @@ class Ask:
                 rendered_prompt = prompt_text + " [" + option_text + "]: "
         else:
             rendered_prompt = "Choose [" + option_text + "]: "
-
+            
+        attempts = 0
         while True:
             choice = input(rendered_prompt).strip().lower()
             for option in labels:
@@ -368,31 +369,31 @@ class Ask:
                 if len(matches) == 1:
                     return matches[0]
             # If no match, show options again
+            attempts += 1
+            if attempts >= 3:
+                labels.append(random.choice(["I can't choose", "You can't make me pick one", "I'm stalling because I won't play", "I don't wanna pick"]))
             type.type("Choose: " + option_text)
             print()
 
     def yes_or_no(self, reiterate="What? "):
-        prompt_text = reiterate.strip()
-        if prompt_text == "What?":
-            rendered_prompt = "Yes or no? [yes/no]: "
-        elif prompt_text:
-            if prompt_text.endswith(":"):
-                rendered_prompt = prompt_text + " [yes/no] "
-            else:
-                rendered_prompt = prompt_text + " [yes/no]: "
-        else:
-            rendered_prompt = "Yes or no? [yes/no]: "
-
         while True:
-            yes_or_no = input(rendered_prompt).strip().lower()
-            if (yes_or_no == "y") or (yes_or_no == "yes"):
+            yes_or_no = input("").strip().lower()
+            if (yes_or_no in ["y", "yes", "yup", "yeah", "yep", "sure", "ok", "okay", "yay", "do it", "go for it"]):
                 print()
                 return "yes"
-            elif (yes_or_no == "n") or (yes_or_no == "no"):
+            elif (yes_or_no in ["n", "no", "nah", "nope", "nay", "not", "never"]):
                 print()
                 return "no"
+            elif (yes_or_no in ["maybe", "idk", "not sure", "unsure"]):
+                print()
+                type.type(random.choice(["Maybe...Maybe not...", "Hmmmmm...I just can't make up my goddamn mind.", "Whew, all this thinking is making me dizzy!", "I suck at making decisions.", "Momma didn't raise no risk-taker..."]))
+                print("\n")
+                if(random.choice([True, False])):
+                    return "yes"
+                else:
+                    return "no"
             else:
-                type.type("Choose: yes/no")
+                type.type(reiterate)
                 print()
 
     def give_cash(self, total, reiterate="How much? "):

@@ -6,7 +6,7 @@ import msvcrt
 from colorama import Fore, Back, Style, init
 init(convert=True)
 
-PAR = "\n\n"
+PAR = "\n"
 
 type = typer.Type()
 ask = typer.Ask()
@@ -81,6 +81,8 @@ class DaySurrealMixin:
 
     # WEIRD EVENTS
 
+        print(PAR)
+        return
     def time_loop(self):
         # EVENT: Experience the same morning 3 times, must break the loop
         # EFFECTS: Save bird = +$50, meet "Time Bird"; Ignore phone = +5 sanity; Scream = -5 sanity
@@ -187,12 +189,14 @@ class DaySurrealMixin:
             self.lose_sanity(5)
         print(PAR)
 
+        print(PAR)
+        return
     def mirror_stranger(self):
         # EVENT: Your reflection acts independently and holds up a sign saying "SOON"
         # EFFECTS: 30% find encouraging note from reflection (+5 sanity); 70% avoid mirrors all day (-8 sanity)
         if self.has_item("Seer's Chronicle"):
             type.type("The " + cyan(bright("Seer's Chronicle")) + "'s pages turn to this moment. The stranger in the mirror — you've already read this part.")
-            print()
+            print(PAR)
             type.type("You wave. They wave. You know exactly what they are: a future self. A warning.")
             type.type(" You heed it.")
             self.restore_sanity(10)
@@ -200,7 +204,7 @@ class DaySurrealMixin:
             return
         if self.has_item("Third Eye"):
             type.type("The " + cyan(bright("Third Eye")) + " opens. You see what's really happening.")
-            print()
+            print(PAR)
             type.type("The stranger isn't a stranger. It's a probability wave — one version of you that took a different turn.")
             type.type(" You acknowledge it, and it disperses.")
             self.restore_sanity(8)
@@ -212,9 +216,9 @@ class DaySurrealMixin:
         type.type("You blink. The reflection is normal again — just you, looking the way a person looks when they've seen something they cannot explain.")
         print(PAR)
         if self.has_item("Flask of Split Serum"):
-            print()
+            print(PAR)
             type.type("The " + cyan(bright("Flask of Split Serum")) + " fizzes in your pocket. For a moment you see TWO of everything — two roads, two choices, two versions of yourself.")
-            print()
+            print(PAR)
             type.type("Both of them are you. Neither of them is sure which is real.")
             self.restore_sanity(1)
             print(PAR)
@@ -267,6 +271,8 @@ class DaySurrealMixin:
             self.lose_sanity(8)
         print(PAR)
 
+        print(PAR)
+        return
     def the_glitch(self):
         # EVENT: Reality glitches around you (low sanity only)
         # CONDITION: Sanity < 50
@@ -276,21 +282,21 @@ class DaySurrealMixin:
             return
         if self.has_item("Smelling Salts"):
             type.type("Reality stutters. Colors shift. Your vision swims.")
-            print()
+            print(PAR)
             type.type("You crack the " + cyan(bright("Smelling Salts")) + " under your nose. One whiff and reality snaps back into focus.")
-            print()
+            print(PAR)
             type.type("The glitch dissolves. Your brain reboots. Whatever that was, it's over.")
             self.restore_sanity(3)
-            print()
+            print(PAR)
             return
         type.type("Sitting in your car, reality... stutters.")
-        print()
+        print(PAR)
         type.type("The colors around you shift. Blue becomes green. Green becomes screaming.")
-        print()
+        print(PAR)
         type.type("Wait, that's not right.")
-        print()
+        print(PAR)
         type.type("You look at your hands. You have seven fingers. No, six. No, the normal amount. Maybe.")
-        print()
+        print(PAR)
         glitch = random.choice(["money", "health", "time", "identity"])
         if glitch == "money":
             change = random.randint(-100, 200)
@@ -315,42 +321,44 @@ class DaySurrealMixin:
             type.type("For a moment, you forget who you are. Then it comes back, but... different.")
             type.type(" Were you always left-handed? You don't remember.")
             self.lose_sanity(10)
-        print()
+        print(PAR)
         type.type("Reality snaps back. Everything is normal. Everything is fine.")
-        print()
+        print(PAR)
         type.type("Is it?")
-        print()
+        print(PAR)
 
+        print(PAR)
+        return
     def wrong_universe(self):
         # EVENT: Slip into alternate dimension with purple sky and floating cars
         # EFFECTS: Meet alternate rich self, get Dimensional Coin item (50%) or $100-300 (50%), -10 sanity
         if self.has_item("Third Eye"):
             type.type("The " + cyan(bright("Third Eye")) + " sees through the illusion. The wrong universe is just a probability fold — a glitch in local reality.")
-            print()
+            print(PAR)
             type.type("You step back into the right one with the grace of someone who does this regularly.")
             self.restore_sanity(8)
             return
         if self.has_item("Fate Reader"):
             type.type("The " + cyan(bright("Fate Reader")) + " showed this in the cards. You recognized the fold the moment it started.")
-            print()
+            print(PAR)
             type.type("The universe corrects itself. You barely notice.")
             self.restore_sanity(5)
             return
         type.type("You step out of your car and around a corner. The world changes.")
-        print()
+        print(PAR)
         type.type("The sky is purple. The buildings are organic, pulsing like living things.")
         type.type(" Cars float. People have too many eyes. A dog speaks fluent French.")
-        print()
+        print(PAR)
         type.type("This is not your world.")
-        print()
+        print(PAR)
         type.type("A version of yourself approaches. They're taller, more confident. Richer, clearly.")
-        print()
+        print(PAR)
         type.type(quote("Ah, another me. Let me guess - you're from a world where you're still struggling?"))
-        print()
+        print(PAR)
         type.type("You nod, dumbstruck.")
-        print()
+        print(PAR)
         type.type(quote("Pathetic. Well, take this. It won't help much, but it's something."))
-        print()
+        print(PAR)
         if random.random() < 0.5:
             type.type("They hand you a strange coin. It hums with otherworldly energy.")
             self.add_item("Dimensional Coin")
@@ -360,89 +368,95 @@ class DaySurrealMixin:
             type.type("They hand you a wad of bills. The denominations don't exist in your world, but...")
             type.type(" Somehow they translate to " + green(bright("$" + str(amount))) + "!")
             self.change_balance(amount)
-        print()
+        print(PAR)
         type.type("The world flickers. Shifts. You're back in the normal universe.")
-        print()
+        print(PAR)
         type.type("Was any of that real?")
         self.lose_sanity(10)
-        print()
+        print(PAR)
 
+        print(PAR)
+        return
     def fourth_wall_break(self):
         # EVENT: A stranger becomes aware they're in a game, breaks the fourth wall
         # EFFECTS: -15 sanity from existential dread
         type.type("A stranger approaches your car. They look... worried.")
-        print()
+        print(PAR)
         type.type(quote("Hey. You. Can you keep a secret?"))
-        print()
+        print(PAR)
         type.type("Before you can answer, they lean in close.")
-        print()
+        print(PAR)
         type.type(quote("I think... I think none of this is real. I think we're in some kind of... game. Or story."))
-        print()
+        print(PAR)
         type.type("You laugh nervously. " + quote("That's crazy talk."))
-        print()
+        print(PAR)
         type.type(quote("Is it? Think about it. The same things happen over and over. There's a PATTERN. And you..."))
-        print()
+        print(PAR)
         type.type(quote("You're the main character, aren't you? Everyone else is just... background."))
-        print()
+        print(PAR)
         type.type("The stranger starts crying.")
-        print()
+        print(PAR)
         type.type(quote("Am I even real? Do I exist when you're not looking at me?"))
-        print()
+        print(PAR)
         type.type("They walk away, still crying. You stand there, deeply unsettled.")
-        print()
+        print(PAR)
         type.type("...")
-        print()
+        print(PAR)
         type.type("You glance at the 'player.' The one reading this. Just for a second.")
-        print()
+        print(PAR)
         self.lose_sanity(15)
         self.unlock_achievement("fourth_wall")
-        print()
+        print(PAR)
 
     # DARK EVENTS
 
+        print(PAR)
+        return
     def the_collector(self):
         # EVENT: Man in black suit collects debts, favors, and "souls"
         # EFFECTS: Meet "The Collector", various sanity loss based on choice
         type.type("You look up from your car. A man in a black suit steps out of the shadows. His smile doesn't reach his eyes.")
-        print()
+        print(PAR)
         type.type(quote("You've been making moves. Big moves. People notice."))
-        print()
+        print(PAR)
         type.type("He produces a small notebook and flips through it.")
-        print()
+        print(PAR)
         type.type(quote("According to my records, you owe... well, you don't owe ME anything. Yet."))
-        print()
+        print(PAR)
         type.type(quote("But I'm here to offer a service. I collect things. Debts. Favors. Souls, sometimes."))
-        print()
+        print(PAR)
         type.type("He chuckles. It's not a friendly sound.")
-        print()
+        print(PAR)
         answer = ask.option("What do you say? ", ["not interested", "what are you offering", "souls?"])
         if answer == "not interested":
             type.type("He shrugs. " + quote("Everyone says that at first. I'll be around."))
-            print()
+            print(PAR)
             type.type("He vanishes into the shadows. You didn't see him go. He was just... gone.")
             self.meet("The Collector")
         elif answer == "what are you offering":
             type.type(quote("Information. Protection. Future knowledge. Whatever you need, I can provide."))
-            print()
+            print(PAR)
             type.type(quote("My price is... flexible. Sometimes money. Sometimes favors. Sometimes..."))
-            print()
+            print(PAR)
             type.type("He leans in close. " + quote("...years."))
-            print()
+            print(PAR)
             type.type("You step back. He laughs.")
-            print()
+            print(PAR)
             type.type(quote("Not ready yet. That's fine. When you are, I'll know."))
             self.meet("The Collector")
             self.lose_sanity(10)
         else:
             type.type(quote("Souls? Oh, that's mostly a metaphor. Mostly."))
-            print()
+            print(PAR)
             type.type("His smile widens just a bit too far.")
-            print()
+            print(PAR)
             type.type(quote("Don't worry about souls. You've still got yours. For now."))
             self.meet("The Collector")
             self.lose_sanity(15)
-        print()
+        print(PAR)
 
+        print(PAR)
+        return
     def the_empty_room(self):
         # EVENT: Find a door that shouldn't exist, leads to infinite white void with creature
         # CONDITION: Sanity < 40
@@ -451,43 +465,45 @@ class DaySurrealMixin:
             self.day_event()
             return
         type.type("You step out of your car and notice a door you've never seen before. It's in a wall that shouldn't have a door.")
-        print()
+        print(PAR)
         type.type("Something tells you not to open it. Something screams at you to run.")
-        print()
+        print(PAR)
         type.type("You open it anyway. Of course you do.")
-        print()
+        print(PAR)
         type.type("Inside is... empty. Completely, perfectly empty. No floor, no walls, no ceiling.")
         type.type(" Just white. Endless white in every direction.")
-        print()
+        print(PAR)
         type.type("You step inside. Your footsteps make no sound. You are nowhere.")
-        print()
+        print(PAR)
         type.type("And then you see it.")
-        print()
+        print(PAR)
         type.type("In the distance. Getting closer. Something that has too many limbs and not enough face.")
-        print()
+        print(PAR)
         type.type("You run. Back through the door. SLAM it shut.")
-        print()
+        print(PAR)
         type.type("When you turn around, the door is gone. The wall is smooth. Like the door never existed.")
-        print()
+        print(PAR)
         type.type("But you can still hear scratching from inside the wall.")
         if self.has_item("Delight Indicator") or self.has_item("Delight Manipulator"):
             gauge = "Delight Manipulator" if self.has_item("Delight Manipulator") else "Delight Indicator"
-            print()
+            print(PAR)
             type.type("Your " + cyan(bright(gauge)) + " displays a reading you've never seen before: " + yellow("'UNDEFINED.'"))
-            print()
+            print(PAR)
             type.type("Some feelings don't have names. The device wasn't built for this.")
         self.lose_sanity(20)
         self.add_status("Glimpsed the Void")
-        print()
+        print(PAR)
 
+        print(PAR)
+        return
     def blood_moon_bargain(self):
         # EVENT: On a blood red moon, dark forces offer one night of perfect luck for one year of life
         # EFFECTS: Accept = "Blood Moon Luck" + "Year Shorter" status, -20 sanity; Reject = +5 sanity
         if self.has_item("Soul Forge"):
             type.type("The " + cyan(bright("Soul Forge")) + " glows in the blood-moon light. The entity recognizes it.")
-            print()
+            print(PAR)
             type.type(quote("You've brought the rewriting tool,") + " it whispers. " + quote("The pact is unnecessary. Name what you want changed."))
-            print()
+            print(PAR)
             if not self.has_met("Soul Forge Used"):
                 self.mark_met("Soul Forge Used")
                 type.type("You name it. Whatever it was. The past rewrites. The blood moon fades.")
@@ -500,9 +516,9 @@ class DaySurrealMixin:
             return
         if self.has_item("Dark Pact Reliquary"):
             type.type("The " + cyan(bright("Dark Pact Reliquary")) + " glows. The entity recognizes the toolkit.")
-            print()
+            print(PAR)
             type.type(quote("You've done your homework,") + " it says. The terms shift heavily in your favor.")
-            print()
+            print(PAR)
             type.type("You walk away with more than you asked for. Somehow, you feel like you still lost something small.")
             self.heal(20)
             self.restore_sanity(10)
@@ -510,139 +526,141 @@ class DaySurrealMixin:
             return
         if self.has_item("Mind Shield"):
             type.type("The " + magenta(bright("Mind Shield")) + " holds your sanity together. Reality warps but you don't.")
-            print()
+            print(PAR)
             type.type("The blood moon's whispers crash against your mental walls and shatter.")
             self.restore_sanity(10)
             return
         type.type("Through your windshield, the sky is wrong. The light filtering in is red. Blood red. The color of things that shouldn't be.")
-        print()
+        print(PAR)
         type.type("You hear a voice inside your car. It comes from nowhere and everywhere.")
-        print()
+        print(PAR)
         type.type(cyan(quote("GAMBLER. WE HAVE WATCHED YOU.")))
-        print()
+        print(PAR)
         type.type("You look around. There's no one there. Just shadows that move wrong.")
-        print()
+        print(PAR)
         type.type(cyan(quote("WE OFFER A BARGAIN. ONE NIGHT OF PERFECT LUCK. EVERY HAND A WINNER.")))
-        print()
+        print(PAR)
         type.type(cyan(quote("IN EXCHANGE... ONE YEAR OF YOUR LIFE. BURNED FROM THE END. GONE FOREVER.")))
-        print()
+        print(PAR)
         if self.has_item("Oracle's Tome") or self.has_item("Gambler's Grimoire"):
             tome = "Oracle's Tome" if self.has_item("Oracle's Tome") else "Gambler's Grimoire"
             type.type("Your " + cyan(bright(tome)) + " thrashes in your bag, pages turning in a violent frenzy.")
-            print()
+            print(PAR)
             type.type("Every page reads the same thing: " + italic("DO NOT ACCEPT. DO NOT ACCEPT. DO NOT ACCEPT."))
-            print()
+            print(PAR)
             type.type("You close it. It falls open again. Your hands won't stop shaking.")
             self.restore_sanity(5)
-            print()
+            print(PAR)
         if self.has_item("Dealer's Grudge") or self.has_item("Dealer's Mercy"):
             item_name = "Dealer's Grudge" if self.has_item("Dealer's Grudge") else "Dealer's Mercy"
             type.type("The " + cyan(bright(item_name)) + " burns white-hot against your leg.")
-            print()
+            print(PAR)
             type.type("From somewhere behind the red light, another voice cuts through — familiar, cold, and possessive.")
-            print()
+            print(PAR)
             type.type(quote("Not this one. They're mine."))
-            print()
+            print(PAR)
             type.type("The shadows recoil. The entity that made the offer goes very quiet.")
-            print()
+            print(PAR)
             type.type(cyan(quote("...ANOTHER TIME, THEN.")))
-            print()
+            print(PAR)
             type.type("The red moon fades before you can accept or refuse. The Dealer's claim supersedes even blood moon bargains.")
             self.restore_sanity(15)
-            print()
+            print(PAR)
             return
         if self.has_item("Necronomicon"):
             type.type("The " + cyan(bright("Necronomicon")) + " opens itself. The blood moon's light reflects off the pages.")
-            print()
+            print(PAR)
             type.type("Whatever entity is making the offer sees the book and recalibrates. The shadows go very quiet for a moment.")
-            print()
+            print(PAR)
             type.type(cyan(quote("...YOU CARRY THAT BOOK. THE DEAL... CHANGES.")))
-            print()
+            print(PAR)
             type.type("The contract burns itself into the air — revised. Better terms. Much better terms.")
-            print()
+            print(PAR)
             type.type("One night of perfect luck. No years burned. Just a debt you'll feel in your bones someday.")
-            print()
+            print(PAR)
             type.type("You take it. The book snaps shut, satisfied.")
             self.add_status("Blood Moon Luck")
             self.restore_sanity(25)
             self.change_balance(500)
-            print()
+            print(PAR)
             return
         if self.has_item("Eldritch Candle") and self.has_item("Fortune Cards"):
             type.type("The " + cyan(bright("Eldritch Candle")) + " lights on its own. You didn't touch it. The flame is green.")
-            print()
+            print(PAR)
             type.type("Your " + cyan(bright("Fortune Cards")) + " spread themselves across the car seat. The red light catches them at an angle that reveals cards that aren't in any normal deck.")
-            print()
+            print(PAR)
             type.type(italic("THE PLAYER. THE ENGINE. THE SAVE FILE."))
-            print()
+            print(PAR)
             type.type("One card shows tomorrow. Not in metaphor. Literally — there you are, standing somewhere you haven't been yet, doing something you haven't decided to do yet. The image is clear and terrible.")
-            print()
+            print(PAR)
             type.type("The blood moon dims, unsettled. Even the entity that made the bargain has gone quiet. This is above its pay grade.")
-            print()
+            print(PAR)
             type.type("The green flame goes out. The cards are face-down. You already know what tomorrow looks like. You wish you didn't.")
             self.lose_sanity(5)
             self.add_status("Saw Tomorrow")
-            print()
+            print(PAR)
             return
         if self.has_item("Flask of Dealer's Whispers"):
             type.type("The " + cyan(bright("Flask of Dealer's Whispers")) + " grows cold in your pocket. A whisper, barely audible over the entity's offer: " + italic("Do not accept. The house always wins.") + " Or is it " + italic("Accept. The shadows play fair.") + "?")
-            print()
+            print(PAR)
             type.type("The flask's advice is contradictory. The Dealer speaks in riddles, even here.")
             self.restore_sanity(2)
-            print()
+            print(PAR)
         answer = ask.yes_or_no("Accept the blood moon bargain? ")
         if answer == "yes":
             type.type("You speak into the darkness. " + quote("I accept."))
-            print()
+            print(PAR)
             type.type("The shadows LAUGH. A contract burns itself into your arm. It's painless, somehow worse than pain.")
-            print()
+            print(PAR)
             type.type(cyan(quote("DONE. TONIGHT, YOU CANNOT LOSE. BUT TOMORROW, YOU WILL FEEL IT. THE MISSING TIME.")))
-            print()
+            print(PAR)
             type.type("The red moon seems to glow brighter. You feel different. Powerful. Cursed.")
             self.add_status("Blood Moon Luck")
             self.add_status("Year Shorter")
             self.lose_sanity(20)
         else:
             type.type("You shake your head. " + quote("No. I'll take my chances the normal way."))
-            print()
+            print(PAR)
             type.type("The shadows hiss in displeasure.")
-            print()
+            print(PAR)
             type.type(cyan(quote("FOOLISH. BUT BRAVE. WE WILL WATCH. WE ARE ALWAYS WATCHING.")))
-            print()
+            print(PAR)
             type.type("The red moon fades to normal. You've made an enemy tonight. Or escaped one.")
             self.restore_sanity(5)
             self.meet("Rejected the Shadows")
-        print()
+        print(PAR)
 
     # GOOFY EVENTS
 
+        print(PAR)
+        return
     def alien_abduction(self):
         # EVENT: Briefly abducted by aliens at 2 AM, returned with missing time
         # EFFECTS: Random - money (+$50-200), health (+30 HP, +10 sanity), Alien Crystal item, or nothing (-10 sanity)
         type.type("A bright light floods your car. You float up. Through the roof. This shouldn't be possible.")
-        print()
+        print(PAR)
         type.type("Everything goes white.")
-        print()
+        print(PAR)
         type.type("...")
-        print()
+        print(PAR)
         type.type("You wake up three hours later in your car. You don't remember anything.")
-        print()
+        print(PAR)
         type.type("But there's a new mark on your arm: a tiny UFO tattoo that wasn't there before.")
-        print()
+        print(PAR)
         if self.has_item("Mobile Workshop") and random.randrange(5) == 0:
             type.type("You look around. Something is different. Outside your car, partially unfolded on the asphalt, is a structure you have no memory of building.")
-            print()
+            print(PAR)
             type.type("It looks like a satellite dish. Made entirely of spoons. Hundreds of spoons, welded and bent and somehow perfectly functional.")
-            print()
+            print(PAR)
             type.type("Your " + cyan(bright("Mobile Workshop")) + " is folded back beside it, its tools warm to the touch. Whatever happened, the workshop was involved.")
-            print()
+            print(PAR)
             type.type("You put your ear near the dish. It's receiving a signal. A weather forecast for a city whose name you don't recognize and can't quite pronounce.")
-            print()
+            print(PAR)
             type.type(italic("'...mostly cloudy over Vorthenne, with a 40% chance of lateral rain. Current temperature: seventeen degrees in the wrong direction.'"))
-            print()
+            print(PAR)
             self.add_item("Spoon Satellite")
             type.type("You got a " + cyan(bright("Spoon Satellite")) + "!")
-            print()
+            print(PAR)
             self.add_status("Builds Things")
             if random.randrange(2) == 0:
                 type.type(green("Something about this feels right. In a deeply wrong way."))
@@ -650,7 +668,7 @@ class DaySurrealMixin:
             else:
                 type.type(red("You will never be able to explain this. Not to anyone."))
                 self.lose_sanity(1)
-            print()
+            print(PAR)
             return
         effect = random.choice(["money", "health", "item", "nothing"])
         if effect == "money":
@@ -669,19 +687,21 @@ class DaySurrealMixin:
         else:
             type.type("Nothing seems different. But you can't shake the feeling you've been... studied.")
             self.lose_sanity(10)
-        print()
+        print(PAR)
 
+        print(PAR)
+        return
     def dance_battle(self):
         # EVENT: Street gang challenges you to a dance-off
         # EFFECTS: Win (score >= 2) = +$25-75, +5 sanity; Tie = pass with respect; Lose = -$15, -3 sanity
         type.type("You step out of your car and a group of teenagers blocks your path. Their leader steps forward.")
-        print()
+        print(PAR)
         type.type(quote("Yo! This is our turf. You wanna pass? You gotta DANCE."))
-        print()
+        print(PAR)
         type.type("A boombox appears. Music starts playing. The crowd forms a circle.")
-        print()
+        print(PAR)
         type.type("It's dance battle time. What's your move?")
-        print()
+        print(PAR)
         moves = ["worm", "robot", "spin move", "moonwalk", "interpretive dance"]
         move = ask.option("Your opening move: ", moves)
         score = 0
@@ -708,27 +728,29 @@ class DaySurrealMixin:
         else:
             type.type("You... interpret. Dance? The crowd is confused but intrigued.")
             score += random.choice([-1, 0, 1, 2, 3])
-        print()
+        print(PAR)
         if score >= 2:
             type.type("You WIN the dance battle! The gang cheers!")
-            print()
+            print(PAR)
             reward = random.randint(25, 75)
             type.type("They shower you with singles. You collect " + green(bright("$" + str(reward))) + "!")
             self.change_balance(reward)
             self.restore_sanity(5)
         elif score >= 0:
             type.type("It's a TIE! The gang respects your effort.")
-            print()
+            print(PAR)
             type.type(quote("You got moves, old timer. You can pass."))
         else:
             type.type("You LOSE. The gang boos you mercilessly.")
-            print()
+            print(PAR)
             type.type("They take your lunch money. Literally. " + red("(-$15)"))
             self.change_balance(-15)
             self.lose_sanity(3)
-        print()
+        print(PAR)
 
     # ==========================================
     # NEW SECRET EVENTS - HIDDEN TRIGGERS
     # ==========================================
 
+        print(PAR)
+        return

@@ -51,6 +51,71 @@ def space_quote(text):
 class EventDispatchMixin:
     """Event dispatch: day_event() and night_event() random event dispatchers"""
 
+    _RANKED_WANDER_TRACKS = (
+        {
+            "rank": 1,
+            "label": "The Woodlands",
+            "events": (
+                ("woodlands_path", "Woodlands Path Event"),
+                ("woodlands_river", "Woodlands River Event"),
+                ("woodlands_field", "Woodlands Field Event"),
+            ),
+            "adventure": ("The Woodlands", "woodlands_adventure", "Woodlands Adventure Event"),
+        },
+        {
+            "rank": 2,
+            "label": "The Swamp",
+            "events": (
+                ("swamp_stroll", "Swamp Stroll Event"),
+                ("swamp_wade", "Swamp Wade Event"),
+                ("swamp_swim", "Swamp Swim Event"),
+            ),
+            "adventure": ("The Swamp", "swamp_adventure", "Swamp Adventure Event"),
+        },
+        {
+            "rank": 3,
+            "label": "The Beach",
+            "events": (
+                ("beach_stroll", "Beach Stroll Event"),
+                ("beach_boardwalk", "Beach Boardwalk Event"),
+                ("beach_bonfire", "Beach Bonfire Event"),
+            ),
+            "adventure": ("The Beach", "beach_adventure", "Beach Adventure Event"),
+        },
+        {
+            "rank": 4,
+            "label": "The Ocean Depths",
+            "events": (
+                ("beach_swim", "Beach Swim Event"),
+                ("beach_dive", "Beach Dive Event"),
+                ("ocean_jetty", "Ocean Jetty Event"),
+            ),
+            "adventure": ("The Ocean Depths", "underwater_adventure", "Underwater Adventure Event"),
+        },
+        {
+            "rank": 5,
+            "label": "The City",
+            "events": (
+                ("city_streets", "City Streets Event"),
+                ("city_stroll", "City Stroll Event"),
+                ("city_park", "City Park Event"),
+            ),
+            "adventure": ("The City", "city_adventure", "City Adventure Event"),
+        },
+    )
+
+    def get_available_wander_tracks(self):
+        if not self.has_item("Car"):
+            return []
+        rank = self.get_rank()
+        return [track for track in self._RANKED_WANDER_TRACKS if rank >= track["rank"]]
+
+    def get_wander_event_pool(self):
+        pool = []
+        for track in self.get_available_wander_tracks():
+            pool.extend(event_name for event_name, _ in track["events"])
+        return pool
+
     def day_event(self):
         self.update_rank()
         

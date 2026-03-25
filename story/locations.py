@@ -6,7 +6,7 @@ import msvcrt
 from colorama import Fore, Back, Style, init
 init(convert=True)
 
-PAR = "\n\n"
+PAR = "\n"
 
 type = typer.Type()
 ask = typer.Ask()
@@ -72,6 +72,363 @@ _MARVIN_UPGRADE_MAP = {
 
 class LocationsMixin:
     """Locations: Afternoon choices, doctor, witch doctor, mechanics, convenience store, Marvin, pawn shop, loan shark"""
+
+    def _is_sunday(self):
+        return self.get_day() != 0 and (self.get_day() % 7) == 0
+
+    def _maybe_hear_about_fairgrounds(self):
+        if self.has_met("Heard About Fairgrounds"):
+            return
+        if not self.has_item("Car") or self.get_rank() < 1 or self.get_day() < 5:
+            return
+        if random.randrange(6) != 0:
+            return
+
+        self.meet("Heard About Fairgrounds")
+        type.type("At a red light, a battered pickup rolls up beside you with its radio too loud. ")
+        type.type("Between static and farm reports, you catch a local ad for the county fairgrounds - rides on Sunday, food, and low-stakes gambling under the livestock pavilion.")
+        print()
+        type.type(yellow(bright("You heard about a new Sunday destination: County Fairgrounds")))
+        print()
+
+    def _should_offer_motel_strip(self):
+        if not self.has_item("Car") or self._is_sunday():
+            return False
+        if self.get_car_mechanic() != "Frank":
+            return False
+        return random.randrange(4) == 0
+
+    def _get_special_afternoon_locations(self):
+        special_locations = []
+        if self.get_rank() >= 1:
+            special_locations.append(("Industrial Park", self.visit_industrial_park))
+        if self._should_offer_motel_strip():
+            special_locations.append(("Motel Strip", self.visit_motel_strip))
+        if self._is_sunday() and self.has_met("Heard About Fairgrounds"):
+            special_locations.append(("County Fairgrounds", self.visit_county_fairgrounds))
+        if self._is_sunday() and self.is_religious():
+            special_locations.append(("Church Soup Kitchen", self.visit_church_soup_kitchen))
+        return special_locations
+
+    def _choose_wander_event(self, track):
+        unseen_events = [event_name for event_name, met_name in track["events"] if not self.has_met(met_name)]
+        if unseen_events:
+            return random.choice(unseen_events)
+        return random.choice([event_name for event_name, _ in track["events"]])
+
+    def wander_off(self):
+        tracks = self.get_available_wander_tracks()
+        if not tracks:
+            type.type("You think about wandering off, but nothing nearby feels open to you yet.")
+            print()
+            self.start_night()
+            return
+
+        options = []
+        type.type("You point the wagon somewhere unwise and decide to wander.")
+        print()
+
+        for track in tracks:
+            options.append(("wander", track["label"], self._choose_wander_event(track)))
+            type.type(str(len(options)) + ". Wander " + track["label"])
+            print()
+            all_seen = all(self.has_met(met_name) for _, met_name in track["events"])
+            if all_seen:
+                area_name, area_func, _ = track["adventure"]
+                options.append(("adventure", area_name, area_func))
+                type.type(str(len(options)) + ". Go deeper into " + area_name)
+                print()
+
+        choice = ask.option("Choose a number", [str(i) for i in range(1, len(options) + 1)])
+        selected_kind, selected_name, target = options[int(choice) - 1]
+        print()
+
+        if selected_kind == "adventure":
+            if self.has_danger("Busted Kneecaps"):
+                type.type("You take two steps toward " + selected_name + ", feel Tony's work in both knees, and immediately reconsider.")
+                print()
+                type.type(quote("Yeah, no. You can't walk that much right now."))
+                print()
+                self.start_night()
+                return
+            type.type("You keep driving until the road stops making sense and " + selected_name + " takes over.")
+            print()
+            getattr(self, target)()
+        else:
+            type.type("You kill the engine, step out, and let " + selected_name + " decide what kind of night this will be.")
+            print()
+            getattr(self, target)()
+
+        self.update_rank()
+        self.start_night()
+
+    def visit_industrial_park(self):
+        type.type("You drive past the last gas station and end up in the industrial park - chain-link fences, loading bays, sodium lights, and acres of concrete that feel abandoned even when they're not.")
+        print()
+        type.type("Do you search the warehouse edge, the loading dock, or the drainage cut behind the machine shop?")
+        choice = ask.option("Your choice?", ["warehouse", "dock", "drain"])
+        print()
+
+        if choice == "warehouse":
+            if self.has_item("Lockpick Set") and random.random() < 0.6:
+                found = random.choice(["First Aid Kit", "Pocket Knife", "Hand Warmers"])
+                type.type("The " + cyan(bright("Lockpick Set")) + " gets you through a side door. Inside: dust, old pallets, and one useful thing - " + magenta(bright(found)) + ".")
+                self.add_item(found)
+                self.restore_sanity(2)
+            else:
+                type.type("You squeeze through torn fencing and slice yourself on something rusty you never actually see.")
+                self.hurt(random.randint(6, 12))
+                self.lose_sanity(2)
+        elif choice == "dock":
+            outcome = random.choice(["cash", "toolbox", "guard"])
+            if outcome == "cash":
+                found_cash = random.randint(25, 110)
+                type.type("Under a pallet jack you find a rain-soaked envelope with " + green(bright("$" + str(found_cash))) + " still inside.")
+                self.change_balance(found_cash)
+            elif outcome == "toolbox":
+                found = random.choice(["Lighter", "Matches", "Rubber Bands", "Worn Map"])
+                type.type("A busted red toolbox coughs up " + magenta(bright(found)) + ". Good enough.")
+                self.add_item(found)
+            else:
+                type.type("A security truck turns the corner and its headlights wash over you. You run before anyone asks questions.")
+                self.lose_sanity(3)
+        else:
+            if self.has_item("Gas Mask"):
+                type.type("The " + cyan(bright("Gas Mask")) + " lets you crawl into the drainage cut without gagging on chemical runoff and dead air.")
+                found = random.choice(["Can of Tuna", "First Aid Kit", "Pocket Knife"])
+                type.type("You come back out with " + magenta(bright(found)) + " and a deeply questionable smell clinging to your clothes.")
+                self.add_item(found)
+            else:
+                type.type("The drainage cut smells like wet concrete, oil, and cancer. You don't stay long, but it's long enough to make you regret having lungs.")
+                self.hurt(random.randint(4, 9))
+                self.lose_sanity(random.randint(2, 4))
+
+        print()
+        self.start_night()
+
+    def visit_motel_strip(self):
+        type.type("You drift onto the Motel Strip, where vacancy signs buzz like dying insects and every parking lot looks one police visit away from a documentary.")
+        print()
+        type.type("A truck with a filthy hand-painted flame job is parked outside one of the rooms. You don't have to see the sticker on the bumper to know who it belongs to.")
+        print()
+        type.type("Do you rent a room, linger by the vending machines, or just cruise the strip and leave it at that?")
+        choice = ask.option("Your choice?", ["room", "vending", "cruise"])
+        print()
+
+        if choice == "room":
+            cost = random.randint(35, 70)
+            if self.get_balance() >= cost:
+                self.change_balance(-cost)
+                type.type("The clerk barely looks up. The sheets smell like bleach losing a fight. Still, it's four walls, a door, and one night of pretending your life has edges.")
+                self.heal(12)
+                self.restore_sanity(4)
+            else:
+                type.type("You count your money twice, realize the room isn't happening, and pretend that was always the plan.")
+                self.lose_sanity(2)
+        elif choice == "vending":
+            type.type("You buy stale crackers and stand under a dead bug graveyard of fluorescent light while two men argue three doors down about a catalytic converter.")
+            print()
+            type.type("On the curb nearby: a miniature bourbon bottle and a motel key snapped clean in half. Frank energy everywhere.")
+            self.restore_sanity(2)
+        else:
+            type.type("You roll slow past flickering signs, watch silhouettes cross curtains, and decide there are some stories you don't need to enter physically to understand.")
+            self.lose_sanity(1)
+
+        self.meet("Motel Strip")
+        self.add_travel_restriction("Motel Strip Night")
+        print()
+        self.start_night()
+
+    def visit_county_fairgrounds(self):
+        type.type("You follow hand-painted signs and bad directions until the county fairgrounds rise out of a field in a mess of lights, livestock smells, and fried sugar.")
+        print()
+        type.type("Under one corrugated pavilion, locals are running tiny gambling games like state law is more of a rumor than a rule.")
+        print()
+        type.type("Pick a stake: $10, $15, or $25.")
+        stake_choice = ask.option("Your choice?", ["10", "15", "25", "leave"])
+        print()
+
+        if stake_choice == "leave":
+            type.type("You spend the rest of the afternoon walking past rigged games and children with blue tongues from shaved ice. Fair enough.")
+            self.restore_sanity(3)
+            print()
+            self.start_night()
+            return
+
+        stake = int(stake_choice)
+        if self.get_balance() < stake:
+            type.type("You don't have enough cash for even the baby table. Humbling.")
+            print()
+            self.start_night()
+            return
+
+        self.change_balance(-stake)
+
+        if random.randrange(10000) == 0:
+            type.type(green(bright("The whole wheel hits wrong, then right, then impossibly right.")))
+            print()
+            type.type(green(bright("Jackpot. $1,000,000.")))
+            self.change_balance(1000000)
+            self.meet("Fairgrounds Jackpot")
+            print()
+            self.start_night()
+            return
+
+        roll = random.random()
+        if roll < 0.45:
+            type.type("The carnie rakes in your money with the expression of a man who's done this to church ladies and drunks all afternoon.")
+        elif roll < 0.72:
+            winnings = stake * 2
+            type.type("A small win. Enough to make the loss feel possible next time.")
+            self.change_balance(winnings)
+        elif roll < 0.90:
+            winnings = stake * 3
+            type.type("Now that's more like it. A little crowd noise, a little adrenaline, a little stupidity reinforced.")
+            self.change_balance(winnings)
+        elif roll < 0.985:
+            winnings = random.randint(120, 500)
+            type.type("You hit one of the weird side games and suddenly you're holding a fistful of crumpled cash and three strangers are mad at you.")
+            self.change_balance(winnings)
+        else:
+            winnings = random.randint(2000, 12000)
+            type.type(green(bright("A rare fairgrounds heater.")))
+            print()
+            type.type("Word spreads fast under the pavilion when somebody turns a tiny bet into " + green(bright("$" + str(winnings))) + ".")
+            self.change_balance(winnings)
+
+        print()
+        self.start_night()
+
+    def visit_church_soup_kitchen(self):
+        type.type("You pull into the church lot just as folding tables are coming out and volunteers start carrying silver pots toward the fellowship hall.")
+        print()
+        type.type("Nobody interrogates you. Nobody asks for a testimony. Somebody just points you toward food and says there's plenty.")
+        print()
+        type.type("Do you eat, volunteer, or leave a donation?")
+        choice = ask.option("Your choice?", ["eat", "volunteer", "donate"])
+        print()
+
+        if choice == "eat":
+            type.type("The soup is hot. The bread is soft. For fifteen quiet minutes, your life feels less like an emergency.")
+            self.heal(15)
+            self.restore_sanity(8)
+        elif choice == "volunteer":
+            type.type("You spend an hour stacking chairs, wiping tables, and carrying crates from the church van. Honest work. It makes your head quieter.")
+            self.restore_sanity(10)
+            self.heal(5)
+            if random.random() < 0.35:
+                type.type("One of the volunteers presses a paper sack into your hands on the way out. Inside: crackers, canned soup, and a bottle of water.")
+                self.add_item("Can of Tuna")
+        else:
+            amount = min(self.get_balance(), random.choice([10, 15, 25]))
+            if amount > 0:
+                self.change_balance(-amount)
+                type.type("You leave " + green(bright("$" + str(amount))) + " in the little wooden box by the door. It isn't much. It still counts.")
+                self.restore_sanity(6)
+            else:
+                type.type("You check your pockets, come up empty, and settle for helping carry a pot to the serving line.")
+                self.restore_sanity(4)
+
+        print()
+        self.start_night()
+
+    def visit_phone_call(self):
+        available_calls = []
+
+        if self.has_item("Grandma's Number"):
+            available_calls.append(("Call Grandma", "grandma"))
+        if self.has_item("Beach Romance Number") and not self.has_met("Beach Romance Called"):
+            available_calls.append(("Call your beach romance", "beach_romance"))
+        if self.has_item("Rich Friend's Number") and not self.has_met("Rich Friend Called"):
+            available_calls.append(("Call your rich friend", "rich_friend"))
+        if self.has_item("Angel's Number"):
+            available_calls.append(("Call the bridge angel", "angel"))
+
+        if len(available_calls) == 0:
+            type.type("You scroll through your contacts, but there's nobody left to call who would change tonight.")
+            print()
+            self.start_night()
+            return
+
+        type.type("You sit in the driver's seat with your phone in your hand. Some numbers feel heavier than others.")
+        print()
+        type.type("Who do you call?")
+        print()
+
+        for i, (label, _) in enumerate(available_calls, 1):
+            type.type(str(i) + ". " + label)
+            print()
+        type.type(str(len(available_calls) + 1) + ". Hang up")
+        print()
+
+        choice = ask.option("Choose a number", [str(i) for i in range(1, len(available_calls) + 2)])
+        if int(choice) == len(available_calls) + 1:
+            type.type("You put the phone back down. Maybe another day.")
+            print()
+            self.start_night()
+            return
+
+        selected = available_calls[int(choice) - 1][1]
+        print()
+
+        if selected == "grandma":
+            from story.storylines import (
+                storyline_grandma_bad_news,
+                storyline_grandma_first_call,
+                storyline_grandma_gift,
+                storyline_grandma_last_call,
+                storyline_grandma_recipe,
+            )
+
+            grandma_events = [
+                storyline_grandma_first_call,
+                storyline_grandma_recipe,
+                storyline_grandma_bad_news,
+                storyline_grandma_gift,
+                storyline_grandma_last_call,
+            ]
+            stage = self._storyline_system.get_stage("grandma")
+            if stage < len(grandma_events):
+                grandma_events[stage](self, self._storyline_system)
+            else:
+                type.type("You stare at Grandma's number for a while. There's nothing left to say that wasn't already said.")
+                print()
+                self.restore_sanity(4)
+        elif selected == "beach_romance":
+            self.beach_romance_call()
+        elif selected == "angel":
+            self.call_bridge_angel()
+        else:
+            self.meet("Rich Friend Called")
+            type.type("You call the number. It rings once before someone answers over soft music and the clink of expensive glassware.")
+            print()
+            type.type(quote("Hey. You actually called.") + " They sound amused, not surprised.")
+            print()
+            type.type("You talk longer than you expected. About the road, money, what it feels like to get lucky and still feel terrified.")
+            print()
+            result = random.randrange(3)
+            if result == 0:
+                amount = random.randint(400, 1200)
+                type.type(quote("I'm sending you a little something. Don't make it weird."))
+                print()
+                type.type("A transfer hits your account before the call even ends: " + green(bright("$" + str(amount))) + ".")
+                self.change_balance(amount)
+                self.restore_sanity(12)
+            elif result == 1:
+                type.type(quote("You need better people around you. Start with not treating yourself like a lost cause."))
+                print()
+                type.type("The call doesn't fix your life, but it does quiet your head.")
+                self.restore_sanity(18)
+            else:
+                type.type(quote("If you're ever near the city again, call first. I'll get you into somewhere with tablecloths."))
+                print()
+                type.type("You hang up smiling despite yourself.")
+                self.restore_sanity(10)
+                self.add_status("Connected")
+            self.use_item("Rich Friend's Number")
+
+        self.update_rank()
+        self.start_night()
 
     def afternoon(self):
         self.update_status()
@@ -228,10 +585,13 @@ class LocationsMixin:
                         return
                     print()
 
+            self._maybe_hear_about_fairgrounds()
             shops = self._lists.make_shop_list()
+            special_locations = self._get_special_afternoon_locations()
+            can_wander_off = len(self.get_available_wander_tracks()) > 0
             adventure_areas = self.get_unlocked_adventure_areas()
 
-            type.type("Would you like to spend your day driving somewhere? ")
+            type.type("How do you want to spend the rest of your afternoon? ")
             print()
 
             for i in range(len(shops)):
@@ -239,7 +599,20 @@ class LocationsMixin:
                 time.sleep(0.5)
                 print()
 
-            adventure_start = len(shops)
+            special_start = len(shops)
+            if len(special_locations) > 0:
+                for i, (location_name, _) in enumerate(special_locations):
+                    type.type(str(special_start + i + 1) + ". " + location_name)
+                    time.sleep(0.5)
+                    print()
+
+            wander_index = len(shops) + len(special_locations)
+            if can_wander_off:
+                type.type(str(wander_index + 1) + ". Wander Off")
+                time.sleep(0.5)
+                print()
+
+            adventure_start = len(shops) + len(special_locations) + (1 if can_wander_off else 0)
             if len(adventure_areas) > 0:
                 type.type(yellow("--- Adventure Destinations ---"))
                 print()
@@ -248,7 +621,7 @@ class LocationsMixin:
                     time.sleep(0.5)
                     print()
 
-            stay_home_num = len(shops) + len(adventure_areas) + 1
+            stay_home_num = len(shops) + len(special_locations) + len(adventure_areas) + (1 if can_wander_off else 0) + 1
             type.type(str(stay_home_num) + ". Stay Home")
             time.sleep(0.5)
             print()
@@ -259,8 +632,18 @@ class LocationsMixin:
                 if 1 <= choice_num <= len(shops):
                     shop = shops[choice_num-1]
                     break
-                if len(shops) < choice_num <= len(shops) + len(adventure_areas):
-                    area_index = choice_num - len(shops) - 1
+                if len(shops) < choice_num <= len(shops) + len(special_locations):
+                    location_index = choice_num - len(shops) - 1
+                    special_name, special_handler = special_locations[location_index]
+                    self._locations_visited_today.add(special_name)
+                    special_handler()
+                    return
+                if can_wander_off and choice_num == wander_index + 1:
+                    self._locations_visited_today.add("Wander Off")
+                    self.wander_off()
+                    return
+                if adventure_start < choice_num <= adventure_start + len(adventure_areas):
+                    area_index = choice_num - adventure_start - 1
                     area_name, area_func = adventure_areas[area_index]
                     if self.has_danger("Busted Kneecaps"):
                         type.type("You take two steps toward " + area_name + ", feel Tony's work in both knees, and immediately reconsider.")
@@ -307,7 +690,7 @@ class LocationsMixin:
 
             type.type("Your wagon isn't road-ready, but there are still places you can reach before sundown.")
             print()
-            type.type("Would you like to spend your day driving somewhere? ")
+            type.type("How do you want to spend the rest of your afternoon? ")
             print()
 
             for i in range(len(shops)):
@@ -2985,7 +3368,9 @@ class LocationsMixin:
         items_bought = 0
         while True:
             choice = None
-            items = self._convenience_store_inventory
+            # Only show items the player doesn't already own (food is always fine to buy again)
+            items = [i for i in self._convenience_store_inventory
+                     if self.is_food_item(i[0]) or not self.has_item(i[0])]
             if items_bought == 0:
                 type.type("What do you want?")
             else:

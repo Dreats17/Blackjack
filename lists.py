@@ -50,6 +50,7 @@ class Lists:
         self.__rich_day_events = self.make_rich_day_events_list()
         self.__doughman_day_events = self.make_doughman_day_events_list()
         self.__nearly_day_events = self.make_nearly_day_events_list()
+        self.__unified_day_events = []  # Single master pool; rebuilt on demand
         self.__poor_night_events = self.make_poor_night_events_list()
         self.__cheap_night_events = self.make_cheap_night_events_list()
         self.__modest_night_events = self.make_modest_night_events_list()
@@ -2204,7 +2205,7 @@ class Lists:
             "Road Flare Torch": "A blazing torch that lights dark areas and terrifies nocturnal threats. Doubles as a weapon. +25% chance to scare off night attackers. Burns out after 3 uses.",
             "Pepper Spray": "Homemade pepper spray. Guarantees escape from any non-boss combat encounter. Single use, but what a use it is.",
             # Traps
-            "Improvised Trap": "Trip wire alarm around your car. +40% chance to prevent theft events. Gives you early warning during night encounters.",
+            "Improvised Trap": "Trip wire alarm around your car. Chance to prevent theft events. Gives you early warning during night encounters.",
             "Car Alarm Rigging": "Jury-rigged car alarm. Prevents the 'car_break_in' event entirely. Also wakes you up during night attacks, giving you first-strike advantage.",
             "Snare Trap": "A snare that catches small animals. During adventures, +20% chance to find food. Can also trip pursuers in chase events.",
             # Remedies
@@ -5237,6 +5238,75 @@ class Lists:
             pool.extend(additions)
             random.shuffle(pool)
 
+    def _effective_tone_rank(self, rank):
+        """Map gameplay ranks to tone-table indices (tone table is 0..5)."""
+        return max(0, min(rank, 5))
+
+    def _tone_profile_for_event(self, event_name):
+        profile = self._DAY_EVENT_TONE.get(event_name)
+        if profile is None:
+            return None
+        return profile
+
+    def _tone_weight_for_event(self, event_name, rank):
+        profile = self._tone_profile_for_event(event_name)
+        if profile is None:
+            return 1
+        tone_rank = self._effective_tone_rank(rank)
+        if tone_rank >= len(profile):
+            return profile[-1]
+        return profile[tone_rank]
+
+    def _passes_rank_chaos_gate(self, event_name, rank):
+        """Additional rank-based widening so high ranks trend toward full chaos.
+
+        Rank targets:
+        - 0: strongly easy/fair (about 80-90% easy events)
+        - 1: harder but still manageable
+        - 2: difficult
+        - 3: mostly everything
+        - 4: mostly chaos
+        - 5: nearly everything
+        - 6: literally everything
+        """
+        if rank >= 6:
+            return True
+
+        profile = self._tone_profile_for_event(event_name)
+        if profile is None:
+            return True
+
+        def profile_weight(index):
+            if index < len(profile):
+                return profile[index]
+            return profile[-1]
+
+        tone_rank = self._effective_tone_rank(rank)
+        base_weight = profile_weight(tone_rank)
+
+        # Ranks 3-5 progressively allow events even when tone table says 0.
+        if base_weight <= 0:
+            unblock_chance = {3: 0.65, 4: 0.82, 5: 0.95}.get(rank, 0.0)
+            return random.random() < unblock_chance
+
+        # Rank 0-2 smoothness curve: preserve easy/fair early feel.
+        if rank == 0:
+            if profile_weight(0) >= 3:
+                return True
+            if profile_weight(0) == 2:
+                return random.random() < 0.90
+            return random.random() < 0.35
+        if rank == 1:
+            if profile_weight(1) >= 2:
+                return True
+            return random.random() < 0.65
+        if rank == 2:
+            if profile_weight(2) >= 2:
+                return True
+            return random.random() < 0.80
+
+        return True
+
     def make_weighted_day_pool(self, rank):
         """Build a shuffled and tonally weighted event pool for the given rank.
 
@@ -5258,24 +5328,26 @@ class Lists:
             self.make_doughman_day_events_list,
             self.make_nearly_day_events_list,
         ]
+        tone_rank = self._effective_tone_rank(rank)
         has_car = self.__player.has_item("Car")
         base_events = [
-            e for e in builders[rank]()
+            e for e in builders[tone_rank]()
             if e not in self._ILLNESS_NAMES
             and e not in self._CAR_TROUBLE_NAMES
             and (has_car or e not in self._CAR_DEPENDENT_DAY_NAMES)
         ]
-        default = [1, 1, 1, 1, 1, 1]
         pool = []
         for e in base_events:
-            copies = self._DAY_EVENT_TONE.get(e, default)[rank]
+            copies = self._tone_weight_for_event(e, rank)
+            if rank >= 6:
+                copies = max(1, copies)
             if copies > 0:
                 pool.extend([e] * copies)
         # Illness: rich tier drops to 3 — they can afford doctors.
         # Doughman spikes back to 5; stress and dark money take their toll.
         # Car: rich drops to 1 — valet, good mechanics, it's handled.
-        illness_copies = [2, 2, 3, 3, 5, 5][rank]
-        car_copies     = [3, 3, 3, 1, 2, 1][rank]
+        illness_copies = [2, 2, 3, 3, 5, 6, 8][min(rank, 6)]
+        car_copies     = [3, 3, 3, 1, 2, 2, 3][min(rank, 6)]
         pool += ["random_illness"] * illness_copies
         if has_car:
             pool += ["random_car_trouble"] * car_copies
@@ -5283,38 +5355,82 @@ class Lists:
         self._apply_inventory_pool_weights(pool, is_night=False)
         return pool
 
+    def make_unified_day_pool(self):
+        """Build ONE master shuffled event pool drawn from ALL rank lists.
+
+        Every unique event name appears exactly once (after inventory-weight
+        bonuses may add extra copies for items the player carries).  Illness
+        and car-trouble names are stripped and replaced by their dispatcher
+        names ('random_illness', 'random_car_trouble') which are also present
+        once each.
+
+        At draw time the caller checks _DAY_EVENT_TONE[event][rank] >= 1 as a
+        binary gate — weight 0 means the event is skipped at that rank, any
+        positive value means it is allowed.  This gives every event a chance to
+        surface while still respecting the tonal design.
+        """
+        builders = [
+            self.make_poor_day_events_list,
+            self.make_cheap_day_events_list,
+            self.make_modest_day_events_list,
+            self.make_rich_day_events_list,
+            self.make_doughman_day_events_list,
+            self.make_nearly_day_events_list,
+        ]
+        has_car = self.__player.has_item("Car")
+        seen = set()
+        pool = []
+        for factory in builders:
+            for e in factory():
+                if e in seen:
+                    continue
+                seen.add(e)
+                if e in self._ILLNESS_NAMES:
+                    continue
+                if e in self._CAR_TROUBLE_NAMES:
+                    continue
+                if not has_car and e in self._CAR_DEPENDENT_DAY_NAMES:
+                    continue
+                pool.append(e)
+        # Dispatchers are always eligible (no tone-table entry → default gate 1)
+        pool.append("random_illness")
+        if has_car:
+            pool.append("random_car_trouble")
+        self._apply_inventory_pool_weights(pool, is_night=False)
+        random.shuffle(pool)
+        return pool
+
 # Get Event
     def get_day_event(self):
+        """Draw from the single unified day-event pool.
+
+        Events are only allowed to fire if their tonal weight at the current
+        rank is >= 1 (weight 0 = excluded).  Events with no entry in
+        _DAY_EVENT_TONE default to allowed at every rank.
+        """
         rank = self.__player.get_rank()
-        match rank:
-            case 0:
-                if len(self.__poor_day_events) == 0:
-                    self.__poor_day_events = self.make_weighted_day_pool(0)
-                return self.__poor_day_events.pop()
-            case 1:
-                if len(self.__cheap_day_events) == 0:
-                    self.__cheap_day_events = self.make_weighted_day_pool(1)
-                return self.__cheap_day_events.pop()
-            case 2:
-                if len(self.__modest_day_events) == 0:
-                    self.__modest_day_events = self.make_weighted_day_pool(2)
-                return self.__modest_day_events.pop()
-            case 3:
-                if len(self.__rich_day_events) == 0:
-                    self.__rich_day_events = self.make_weighted_day_pool(3)
-                return self.__rich_day_events.pop()
-            case 4:
-                if len(self.__doughman_day_events) == 0:
-                    self.__doughman_day_events = self.make_weighted_day_pool(4)
-                return self.__doughman_day_events.pop()
-            case 5:
-                if len(self.__nearly_day_events) == 0:
-                    self.__nearly_day_events = self.make_weighted_day_pool(5)
-                return self.__nearly_day_events.pop()
+        tries = 0
+        while True:
+            if not self.__unified_day_events:
+                self.__unified_day_events = self.make_unified_day_pool()
+            if not self.__unified_day_events:
+                return None
+            event = self.__unified_day_events.pop()
+            gate = self._tone_weight_for_event(event, rank)
+            if gate >= 1 and self._passes_rank_chaos_gate(event, rank):
+                return event
+            if rank >= 3 and gate <= 0 and self._passes_rank_chaos_gate(event, rank):
+                return event
+            tries += 1
+            if tries >= 600:
+                # Very unlikely: all remaining events blocked at this rank.
+                # Rebuild and return whatever is on top regardless.
+                self.__unified_day_events = self.make_unified_day_pool()
+                return self.__unified_day_events.pop() if self.__unified_day_events else None
     
 
     def get_night_event(self):
-        rank = self.__player.get_rank()
+        rank = self._effective_tone_rank(self.__player.get_rank())
         match rank:
             case 0:
                 return self._pull_night_event("_Lists__poor_night_events", self.make_poor_night_events_list)
@@ -5326,7 +5442,7 @@ class Lists:
                 return self._pull_night_event("_Lists__rich_night_events", self.make_rich_night_events_list)
             case 4:
                 return self._pull_night_event("_Lists__doughman_night_events", self.make_doughman_night_events_list)
-            case 5:
+            case _:
                 return self._pull_night_event("_Lists__nearly_night_events", self.make_nearly_night_events_list)
 
     def make_shop_list(self, on_foot=False):
@@ -5358,7 +5474,8 @@ class Lists:
         # Phone calls - only show if you have at least one number
         if(self.__player.has_item("Grandma's Number") or 
            self.__player.has_item("Beach Romance Number") or 
-           self.__player.has_item("Rich Friend's Number")):
+              self.__player.has_item("Rich Friend's Number") or
+              self.__player.has_item("Angel's Number")):
             a_list.append("Make a Phone Call")
         # Tanya's therapy office - unlocked by getting her number
         if(self.__player.has_item("Tanya's Number")):
@@ -5428,8 +5545,6 @@ class Lists:
                 a_list.append(("Breath Mints", 3))
             if random.randrange(4) == 0 and not self.__player.has_item("Rubber Bands"):
                 a_list.append(("Rubber Bands", 2))
-            if random.randrange(6) == 0 and not self.__player.has_item("Worn Map"):
-                a_list.append(("Worn Map", 8))
             if random.randrange(4) == 0 and not self.__player.has_item("Matches"):
                 a_list.append(("Matches", 2))
             if random.randrange(4) == 0 and not self.__player.has_item("Birdseed"):
@@ -5441,6 +5556,8 @@ class Lists:
         if rank == 1:
             if random.randrange(3) == 0 and not self.__player.has_item("Bag of Acorns"):
                 a_list.append(("Bag of Acorns", 10))
+            if random.randrange(6) == 0 and not self.__player.has_item("Worn Map"):
+                a_list.append(("Worn Map", 8))
             if random.randrange(5) == 0 and not self.__player.has_item("Necronomicon"):
                 a_list.append(("Necronomicon", 666))  # TRAP ITEM
             if random.randrange(4) == 0 and not self.__player.has_item("Can of Tuna"):
@@ -6772,30 +6889,38 @@ class Lists:
             a_list.append("You've got a cushion now. A very small, uncomfortable cushion.")
             a_list.append("Middle class in a wagon. Living the dream.")
             a_list.append("You're doing okay. And okay is honestly pretty good these days.")
-        elif rank == 2:  # Well-off ($10,001-100,000)
+        elif rank == 2:  # Building ($10,000-49,999)
             a_list.append("You've amassed significant earnings. Nicely done.")
             a_list.append("Look at you, making money moves. Actual money. Not just coins.")
             a_list.append("You're starting to look like someone who's got their life together. Don't worry, it's an illusion.")
             a_list.append("Five figures. Not bad for someone living in a car.")
             a_list.append("You've got 'treat yourself to gas station sushi' money now.")
-        elif rank == 3:  # Rich ($100,001-500,000)
+        elif rank == 3:  # Ascending ($50,000-99,999)
+            a_list.append("Fifty grand changes a person. Or at least changes your snack choices.")
+            a_list.append("You're in that dangerous zone where confidence starts cashing checks.")
+            a_list.append("You've got momentum now. Keep your foot on the gas.")
+            a_list.append("People are starting to assume you know what you're doing.")
+            a_list.append("This is where luck starts feeling like strategy.")
+        elif rank == 4:  # Rich ($100,000-399,999)
             a_list.append("You must have some heavy pockets, huh.")
             a_list.append("Six figures. In a wagon. The duality of man.")
             a_list.append("You're rich enough to fix the car. But you won't. Because you're you.")
             a_list.append("This is 'I could stay at a hotel but I won't' money.")
             a_list.append("Wealthy and homeless. An interesting combination.")
-        elif rank == 4:  # Very Rich ($500,001-899,999)
+        elif rank == 5:  # Very Rich ($400,000-749,999)
             a_list.append("Where do you even keep all that?")
             a_list.append("That's a down payment on a house. Too bad you live in a car.")
             a_list.append("Half a million dollars. Still sleeping in a wagon. Fascinating life choices.")
             a_list.append("You're basically Scrooge McDuck, but with worse real estate.")
             a_list.append("This is 'the car is a choice, not a necessity' money. Right? ...Right?")
-        elif rank == 5:  # Almost Millionaire ($900,000-999,999)
+        elif rank == 6:  # Almost Millionaire ($750,000+)
             a_list.append("So close to being a millionaire! Can you do it?")
             a_list.append("The millionaire's club is within reach. You can almost taste it.")
             a_list.append("Nine hundred thousand. One more good night and you've made it.")
             a_list.append("You're knocking on the millionaire's door. Will it open?")
             a_list.append("This is it. This is the home stretch. Don't blow it now.")
+        else:
+            a_list.append("You're in uncharted money territory now. Good luck.")
         random.shuffle(a_list)
         return a_list
     
@@ -7057,6 +7182,24 @@ class Lists:
                 "happiness": 5,
                 "kills_you": False
             },
+            "Antique Pocket Watch": {
+                "dialogue": [
+                    "\"An old clock that still breathes.\"",
+                    "He turns it over in his hand and listens to the ticking.",
+                    "\"You brought me a memory.\""
+                ],
+                "happiness": 18,
+                "kills_you": False
+            },
+            "Deck of Cards": {
+                "dialogue": [
+                    "\"A fresh deck. Respectful.\"",
+                    "He fans the cards with precise, practiced hands.",
+                    "\"The language I prefer.\""
+                ],
+                "happiness": 12,
+                "kills_you": False
+            },
             "Gambler's Grimoire": {
                 "dialogue": [
                     "\"A book of statistics. How quaint.\"",
@@ -7153,6 +7296,69 @@ class Lists:
                     "\"The moon sees everything. Even this place.\""
                 ],
                 "happiness": 15,
+                "kills_you": False
+            },
+            "Vintage Wine": {
+                "dialogue": [
+                    "\"A bottle with age and patience. Rare.\"",
+                    "He studies the label for a long moment.",
+                    "\"You chose well.\""
+                ],
+                "happiness": 22,
+                "kills_you": False
+            },
+            "Fancy Pen": {
+                "dialogue": [
+                    "\"Ink is a promise.\"",
+                    "He twirls the pen once, then sets it by the shoe.",
+                    "\"Some debts begin on paper.\""
+                ],
+                "happiness": 16,
+                "kills_you": False
+            },
+            "Leather Gloves": {
+                "dialogue": [
+                    "\"Good grip. Good feel.\"",
+                    "He slips one on and flexes his fingers.",
+                    "\"Practical. I like practical.\""
+                ],
+                "happiness": 17,
+                "kills_you": False
+            },
+            "Lucky Rabbit Foot": {
+                "dialogue": [
+                    "\"Luck carved from someone else's loss.\"",
+                    "His jade eye narrows, then softens.",
+                    "\"A fitting tribute.\""
+                ],
+                "happiness": 14,
+                "kills_you": False
+            },
+            "Silver Flask": {
+                "dialogue": [
+                    "\"Polished. Quiet. Useful.\"",
+                    "He taps it once against the table edge.",
+                    "\"Elegant, in a brutal sort of way.\""
+                ],
+                "happiness": 15,
+                "kills_you": False
+            },
+            "Mysterious Envelope": {
+                "dialogue": [
+                    "\"A sealed message? You tempt me.\"",
+                    "He does not open it. He smiles instead.",
+                    "\"Mystery has value.\""
+                ],
+                "happiness": 13,
+                "kills_you": False
+            },
+            "Old Photograph": {
+                "dialogue": [
+                    "\"Faces fade. Promises fade slower.\"",
+                    "He studies the picture in silence.",
+                    "\"You brought me a ghost.\""
+                ],
+                "happiness": 12,
                 "kills_you": False
             },
             
