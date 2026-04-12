@@ -258,6 +258,78 @@ def _blackjack_combo_profile(metadata: dict[str, object], can_peek: bool, next_t
     }, tags
 
 
+def _apply_item_specific_overrides(
+    action: str,
+    metadata: dict[str, object],
+    *,
+    total: int,
+    soft_total: int,
+    dealer_upcard: int,
+    can_double: bool,
+    can_split: bool,
+    can_surrender: bool,
+    pair_value: int | None,
+    next_total: int | None,
+    info_advantage: float,
+    safety_net: float,
+) -> str:
+    leverage_support = info_advantage + safety_net
+    has_double_suite = bool(
+        metadata.get("has_gamblers_chalice")
+        or metadata.get("has_overflowing_goblet")
+        or metadata.get("has_bonus_fortune")
+    )
+    has_split_suite = bool(
+        metadata.get("has_twins_locket")
+        or metadata.get("has_mirror_of_duality")
+        or metadata.get("has_split_serum")
+    )
+    has_surrender_suite = bool(
+        metadata.get("has_white_feather")
+        or metadata.get("has_phoenix_feather")
+    )
+
+    if can_surrender and has_surrender_suite and not soft_total:
+        if total == 16 and dealer_upcard >= 8:
+            return "surrender"
+        if total == 15 and dealer_upcard >= 10:
+            return "surrender"
+        if total == 14 and dealer_upcard == 11 and leverage_support < 2.2:
+            return "surrender"
+
+    if can_double and has_double_suite:
+        if not soft_total:
+            if total == 11:
+                return "double"
+            if total == 10 and dealer_upcard <= 10:
+                return "double"
+            if total == 9 and dealer_upcard <= 6 and leverage_support >= 1.4:
+                return "double"
+            if total == 8 and dealer_upcard <= 6 and next_total is not None and next_total >= 18 and leverage_support >= 2.4:
+                return "double"
+        else:
+            if soft_total == 18 and dealer_upcard in {3, 4, 5, 6}:
+                return "double"
+            if soft_total == 17 and dealer_upcard in {4, 5, 6} and leverage_support >= 1.8:
+                return "double"
+
+    if can_split and has_split_suite and pair_value is not None:
+        if pair_value in {8, 11}:
+            return "split"
+        if pair_value == 9 and dealer_upcard not in {7, 10, 11}:
+            return "split"
+        if pair_value == 7 and dealer_upcard <= 7 and leverage_support >= 1.0:
+            return "split"
+        if pair_value in {2, 3} and dealer_upcard <= 7 and leverage_support >= 1.4:
+            return "split"
+        if pair_value == 6 and dealer_upcard <= 6 and safety_net >= 1.0:
+            return "split"
+        if pair_value == 4 and dealer_upcard in {5, 6} and info_advantage >= 1.8:
+            return "split"
+
+    return action
+
+
 def choose_blackjack_action(request: DecisionRequest, plan: StrategicPlan) -> tuple[DecisionOption | None, DecisionTrace]:
     metadata = dict(request.metadata)
     total = int(_metadata_number(metadata, "total"))
@@ -324,6 +396,21 @@ def choose_blackjack_action(request: DecisionRequest, plan: StrategicPlan) -> tu
     if action == "stand" and can_split and pair_value is not None and pair_value in {8, 11} and (safety_net + leverage) >= 3.0:
         action = "split"
 
+    action = _apply_item_specific_overrides(
+        action,
+        metadata,
+        total=total,
+        soft_total=soft_total,
+        dealer_upcard=dealer_upcard,
+        can_double=can_double,
+        can_split=can_split,
+        can_surrender=can_surrender,
+        pair_value=pair_value,
+        next_total=next_total,
+        info_advantage=info_advantage,
+        safety_net=safety_net,
+    )
+
     # Conservative override when vulnerable and no combo support.
     vulnerability = float(max(0.0, 26.0 - balance / max(1, bet)))
     vulnerability_threshold = _tfloat("blackjack.action.vulnerability_threshold", 14.0)
@@ -336,10 +423,18 @@ def choose_blackjack_action(request: DecisionRequest, plan: StrategicPlan) -> tu
     combo_intensity = info_advantage + safety_net + leverage + latent_utility
     combo_intensity_threshold = _tfloat("blackjack.action.combo_intensity_threshold", 5.0)
     if combo_intensity >= combo_intensity_threshold:
-        if can_double and total in {9, 10, 11} and dealer_upcard <= 9:
+        leverage_support = info_advantage + safety_net
+        if can_double and total in {10, 11} and dealer_upcard <= 9:
             action = "double"
-        elif can_split and pair_value is not None and pair_value in {2, 3, 6, 7, 8, 9, 11}:
-            action = "split"
+        elif can_double and total == 9 and dealer_upcard <= 6 and leverage_support >= 2.0:
+            action = "double"
+        elif can_split and pair_value is not None:
+            if pair_value in {8, 11}:
+                action = "split"
+            elif pair_value == 9 and dealer_upcard not in {7, 10, 11} and leverage_support >= 2.2:
+                action = "split"
+            elif pair_value in {2, 3, 6, 7} and dealer_upcard <= 7 and leverage_support >= 2.6:
+                action = "split"
 
     action = _coerce_action(action, request, fallback="hit")
 
@@ -584,6 +679,7 @@ def choose_blackjack_bet(request: DecisionRequest, plan: StrategicPlan) -> tuple
     day = int(_metadata_number(metadata, "day", state.get("day", 0)))
     run_peak_balance = int(_metadata_number(metadata, "run_peak_balance", balance))
     starting_balance = int(_metadata_number(metadata, "starting_balance", 50))
+    dealer_happiness = int(_metadata_number(metadata, "dealer_happiness", 45))
     wants_store = _metadata_bool(metadata, "wants_store")
     store_budget = int(_metadata_number(metadata, "store_budget"))
     needs_car = _metadata_bool(metadata, "needs_car")
@@ -601,6 +697,9 @@ def choose_blackjack_bet(request: DecisionRequest, plan: StrategicPlan) -> tuple
     car_progress_reserve = int(_metadata_number(metadata, "car_progress_reserve"))
     mechanic_purchase_reserve = int(_metadata_number(metadata, "mechanic_purchase_reserve"))
     known_car_repair_reserve = int(_metadata_number(metadata, "known_car_repair_reserve"))
+    has_unbought_marvin_items = _metadata_bool(metadata, "has_unbought_marvin_items")
+    is_millionaire = _metadata_bool(metadata, "is_millionaire")
+    marvin_remaining_spend = int(_metadata_number(metadata, "marvin_remaining_spend"))
 
     if total_available <= 0:
         trace = DecisionTrace(
@@ -652,7 +751,10 @@ def choose_blackjack_bet(request: DecisionRequest, plan: StrategicPlan) -> tuple
         p.drawdown_protection
         and run_peak_balance > 0
         and balance < run_peak_balance * p.drawdown_threshold
+        and not needs_car
+        and balance >= 350
     )
+    drawdown_min_peak = int(_tfloat("blackjack.drawdown.min_peak", 8000.0))
 
     reason_code = "bet:score_ramp_with_constraints"
 
@@ -662,9 +764,9 @@ def choose_blackjack_bet(request: DecisionRequest, plan: StrategicPlan) -> tuple
         mechanic_purchase_reserve,
         known_car_repair_reserve,
     )
-    critical_balance_cap = int(_tfloat("blackjack.bootstrap.critical_balance_cap", 75.0))
-    critical_cash_buffer = int(_tfloat("blackjack.bootstrap.critical_cash_buffer", 16.0))
-    critical_bet_ratio = _tfloat("blackjack.bootstrap.critical_bet_ratio", 0.18)
+    critical_balance_cap = int(_tfloat("blackjack.bootstrap.critical_balance_cap", 55.0))
+    critical_cash_buffer = int(_tfloat("blackjack.bootstrap.critical_cash_buffer", 12.0))
+    critical_bet_ratio = _tfloat("blackjack.bootstrap.critical_bet_ratio", 0.24)
     stability_health_floor = int(_tfloat("blackjack.bootstrap.stability_health_floor", 72.0))
     stability_sanity_floor = int(_tfloat("blackjack.bootstrap.stability_sanity_floor", 40.0))
     cautious_push_ratio = _tfloat("blackjack.bootstrap.cautious_push_ratio", 0.24)
@@ -672,8 +774,8 @@ def choose_blackjack_bet(request: DecisionRequest, plan: StrategicPlan) -> tuple
     steady_push_ratio_edge_weight = _tfloat("blackjack.bootstrap.push_ratio_edge_weight", 0.028)
     steady_push_ratio_cap = _tfloat("blackjack.bootstrap.push_ratio_cap", 0.42)
 
-    post_car_growth_floor = int(_tfloat("blackjack.post_car.growth_floor", 850.0))
-    post_car_growth_ceiling = int(_tfloat("blackjack.post_car.growth_ceiling", 12000.0))
+    post_car_growth_floor = int(_tfloat("blackjack.post_car.growth_floor", 350.0))
+    post_car_growth_ceiling = int(_tfloat("blackjack.post_car.growth_ceiling", 25000.0))
     post_car_health_floor = int(_tfloat("blackjack.post_car.health_floor", 70.0))
     post_car_sanity_floor = int(_tfloat("blackjack.post_car.sanity_floor", 36.0))
     post_car_warning_cap = int(_tfloat("blackjack.post_car.warning_cap", 2.0))
@@ -696,10 +798,37 @@ def choose_blackjack_bet(request: DecisionRequest, plan: StrategicPlan) -> tuple
     wealth_lock_ratio_cap = _tfloat("blackjack.wealth_lock.ratio_cap", 0.16)
     wealth_lock_ratio_floor = _tfloat("blackjack.wealth_lock.ratio_floor", 0.06)
 
-    in_no_car_bootstrap = needs_car and run_peak_balance < bootstrap_reserve_target
+    millionaire_push_balance_floor = int(_tfloat("blackjack.millionaire_push.balance_floor", 100000.0))
+    millionaire_push_health_floor = int(_tfloat("blackjack.millionaire_push.health_floor", 74.0))
+    millionaire_push_sanity_floor = int(_tfloat("blackjack.millionaire_push.sanity_floor", 42.0))
+    millionaire_push_warning_cap = int(_tfloat("blackjack.millionaire_push.warning_cap", 0.0))
+    millionaire_push_debt_cap = int(_tfloat("blackjack.millionaire_push.debt_cap", 0.0))
+    millionaire_push_base_ratio = _tfloat("blackjack.millionaire_push.base_ratio", 0.18)
+    millionaire_push_edge_weight = _tfloat("blackjack.millionaire_push.edge_weight", 0.022)
+    millionaire_push_rank_bonus = _tfloat("blackjack.millionaire_push.rank_bonus", 0.02)
+    millionaire_push_extra_round_bonus = _tfloat("blackjack.millionaire_push.extra_round_bonus", 0.05)
+    millionaire_push_surge_balance_floor = int(_tfloat("blackjack.millionaire_push.surge_balance_floor", 400000.0))
+    millionaire_push_surge_bonus = _tfloat("blackjack.millionaire_push.surge_bonus", 0.05)
+    millionaire_push_ratio_cap = _tfloat("blackjack.millionaire_push.ratio_cap", 0.40)
+    millionaire_push_ratio_floor = _tfloat("blackjack.millionaire_push.ratio_floor", 0.16)
+
+    in_no_car_bootstrap = needs_car and (run_peak_balance < bootstrap_reserve_target or balance < bootstrap_reserve_target)
+    in_millionaire_push = (
+        ever_had_car
+        and (not needs_car)
+        and wants_millionaire_push
+        and balance >= millionaire_push_balance_floor
+        and health >= millionaire_push_health_floor
+        and sanity >= millionaire_push_sanity_floor
+        and loan_warning_level <= millionaire_push_warning_cap
+        and loan_debt <= millionaire_push_debt_cap
+        and not survival_mode
+        and not (in_drawdown and balance < millionaire_push_balance_floor)
+    )
     in_wealth_lock = (
         ever_had_car
         and (not needs_car)
+        and not in_millionaire_push
         and balance >= wealth_lock_balance_floor
         and health >= wealth_lock_health_floor
         and sanity >= wealth_lock_sanity_floor
@@ -707,7 +836,37 @@ def choose_blackjack_bet(request: DecisionRequest, plan: StrategicPlan) -> tuple
         and loan_debt <= wealth_lock_debt_cap
         and not survival_mode
     )
-    if in_wealth_lock:
+    # ── Marvin-first mode: at $40k+ with unbought Marvin items, bet minimum ──
+    # Bot preserves capital for Marvin purchases rather than risking it gambling.
+    marvin_first_balance_floor = int(_tfloat("blackjack.marvin_first.balance_floor", 40000.0))
+    in_marvin_first = (
+        ever_had_car
+        and (not needs_car)
+        and not in_millionaire_push
+        and balance >= marvin_first_balance_floor
+        and has_unbought_marvin_items
+        and not survival_mode
+    )
+    if in_millionaire_push:
+        push_ratio = (
+            millionaire_push_base_ratio
+            + edge_score * millionaire_push_edge_weight
+            + max(0, rank - 3) * millionaire_push_rank_bonus
+            + (millionaire_push_extra_round_bonus if has_extra_round_item else 0.0)
+        )
+        if balance >= millionaire_push_surge_balance_floor:
+            push_ratio += millionaire_push_surge_bonus
+        if run_peak_balance > 0 and balance >= int(run_peak_balance * 0.75):
+            push_ratio += 0.03
+        push_ratio = max(millionaire_push_ratio_floor, min(millionaire_push_ratio_cap, push_ratio))
+        bet = max(min_bet, int(balance * push_ratio))
+        reason = f"millionaire_push({p.name})"
+        reason_code = "bet:millionaire_push"
+    elif in_marvin_first:
+        bet = min_bet
+        reason = f"marvin_first_min_bet({p.name},remaining={marvin_remaining_spend})"
+        reason_code = "bet:marvin_first_min_bet"
+    elif in_wealth_lock:
         lock_ratio = wealth_lock_base_ratio + edge_score * wealth_lock_edge_weight
         lock_ratio = max(wealth_lock_ratio_floor, min(wealth_lock_ratio_cap, lock_ratio))
         bet = max(min_bet, int(balance * lock_ratio))
@@ -720,7 +879,6 @@ def choose_blackjack_bet(request: DecisionRequest, plan: StrategicPlan) -> tuple
                 bet = min_bet
             else:
                 bet = max(min_bet, int(spendable * critical_bet_ratio))
-                bet = min(bet, spendable)
             reason = f"no_car_bootstrap_survival({p.name})"
             reason_code = "bet:no_car_bootstrap_survival"
         else:
@@ -743,17 +901,34 @@ def choose_blackjack_bet(request: DecisionRequest, plan: StrategicPlan) -> tuple
         and loan_debt <= post_car_debt_cap
         and not survival_mode
     ):
-        growth_ratio = (
-            post_car_base_ratio
-            + edge_score * post_car_edge_weight
-            + max(0, rank - 1) * post_car_rank_bonus
-            + (post_car_extra_round_bonus if has_extra_round_item else 0.0)
-            + (post_car_millionaire_bonus if wants_millionaire_push else 0.0)
-        )
-        growth_ratio = max(post_car_ratio_floor, min(post_car_ratio_cap, growth_ratio))
-        bet = max(min_bet, int(balance * growth_ratio))
-        reason = f"post_car_growth_push({p.name})"
-        reason_code = "bet:post_car_growth_push"
+        # Drawdown override: when the run has had a significant peak and
+        # balance has crashed below the drawdown threshold, switch to the
+        # wealth-lock bet sizing even though balance is below
+        # wealth_lock_balance_floor.  This prevents the 27-50% growth-push
+        # bets from bleeding a run from $33k to $0 over 80 days.
+        if in_drawdown and run_peak_balance >= drawdown_min_peak:
+            lock_ratio = wealth_lock_base_ratio + edge_score * wealth_lock_edge_weight
+            lock_ratio = max(wealth_lock_ratio_floor, min(wealth_lock_ratio_cap, lock_ratio))
+            bet = max(min_bet, int(balance * lock_ratio))
+            reason = f"drawdown_protection({p.name})"
+            reason_code = "bet:drawdown_protection"
+        else:
+            growth_ratio = (
+                post_car_base_ratio
+                + edge_score * post_car_edge_weight
+                + max(0, rank - 1) * post_car_rank_bonus
+                + (post_car_extra_round_bonus if has_extra_round_item else 0.0)
+                + (post_car_millionaire_bonus if wants_millionaire_push else 0.0)
+            )
+            # Taper the ratio cap as balance climbs: full cap at floor, 20% at ceiling.
+            # Prevents catastrophic 50% bets at $10k+ that can wipe a run in 3 hands.
+            growth_range = max(1, post_car_growth_ceiling - post_car_growth_floor)
+            balance_fraction = max(0.0, min(1.0, (balance - post_car_growth_floor) / growth_range))
+            scaled_cap = post_car_ratio_cap - balance_fraction * (post_car_ratio_cap - post_car_ratio_floor)
+            growth_ratio = max(post_car_ratio_floor, min(scaled_cap, growth_ratio))
+            bet = max(min_bet, int(balance * growth_ratio))
+            reason = f"post_car_growth_push({p.name})"
+            reason_code = "bet:post_car_growth_push"
     elif in_drawdown:
         bet = max(min_bet, int(balance * p.drawdown_bet_fraction))
         reason = f"drawdown_protection({p.name})"
@@ -777,7 +952,24 @@ def choose_blackjack_bet(request: DecisionRequest, plan: StrategicPlan) -> tuple
         bet = max(min_bet, int(bet * item_multiplier))
         reason = f"{reason}+items[{','.join(item_tags)}]x{item_multiplier:.2f}"
 
-    bet = min(bet, int(balance * 0.5))
+    # ── Dealer happiness floor: bet ≥30% of balance when dealer is angry ──
+    # At bet_ratio < 0.3, wins give minimal calm (+2) while losses can
+    # outpace gains. At ≥0.3, calm values double/triple, preventing death.
+    if dealer_happiness < 25 and balance > 0:
+        angry_floor = max(min_bet, int(balance * 0.30))
+        if bet < angry_floor:
+            bet = angry_floor
+            reason = f"{reason}+dealer_anger_floor(dh={dealer_happiness})"
+            reason_code = "bet:dealer_anger_floor"
+
+    bet = min(bet, int(balance * 0.50))
+    # ── Millionaire protection: preserve $1.05M floor once flagged ──────
+    # Prevents gambling back below $1M before the morning ending triggers.
+    if is_millionaire and balance >= 1050000:
+        max_millionaire_bet = max(min_bet, balance - 1050000)
+        if bet > max_millionaire_bet:
+            bet = max_millionaire_bet
+            reason = f"{reason}+millionaire_floor_cap"
     if bet > min_bet:
         bet = max(bet, int(balance * 0.07))
     if bet > total_available:

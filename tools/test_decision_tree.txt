@@ -1,0 +1,2290 @@
+╔══════════════════════════════════════════════════════════════════════════════════════════════════╗
+║ DECISION TREE — seed=1963591775  cycles=1000                                                     ║
+║ Generated 2026-04-12 02:41:48                                                                    ║
+╚══════════════════════════════════════════════════════════════════════════════════════════════════╝
+
+┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
+│ PRE-GAME SETUP                                                                                   │
+└──────────────────────────────────────────────────────────────────────────────────────────────────┘
+  yes_no_prompt: yes | car_repair_required
+
+╔══════════════════════════════════════════════════════════════════════════════════════════════════╗
+║ Day   2 | $      50 → $      62 (+12) | HP:100→95(-5) SAN:100→97(-3) | R:0 Car:N                 ║
+╚══════════════════════════════════════════════════════════════════════════════════════════════════╝
+  ┌─ EVENTS ─────────────────────────────────────
+  │ ▸ day:buddy_dog_whistle_synergy
+  │
+  │ ▸ day:the_warning
+  │
+  │ ▸ met:The Warning
+  │
+  │ ▸ night:insomnia_night
+  └──────────────────────────────────────────────
+
+  ┌─ BLACKJACK SESSION (3 hands) ─────────────
+  │
+  │ Hand 1: Bet $9 / $50 [bet:no_car_bootstrap_survival] edge=0
+  │   Player: Seven of Diamonds, Three of Diamonds, Seven of Hearts = 17
+  │   Dealer: Two of Hearts, Seven of Spades, Queen of Spades = 19
+  │   Result: Dealer Wins          -9  ✗ LOSS
+  │   Actions: hit (vs blackjack_action:0:1,blackjack_action:1:0) → stand (vs blackjack_action:1:1,blackjack_action:0:0)
+  │
+  │ Hand 2: Bet $6 / $41 [bet:no_car_bootstrap_survival] edge=0
+  │   Player: Ace of Clubs, Ten of Spades              = 21
+  │   Dealer: Jack of Clubs, King of Diamonds          = 20
+  │   Result: Player Blackjack     +12  ✓ WIN
+  │   Actions: stand (vs blackjack_action:1:1,blackjack_action:0:0)
+  │
+  │ Hand 3: Bet $9 / $53 [bet:no_car_bootstrap_survival] edge=0
+  │   Player: Eight of Hearts, Jack of Diamonds        = 18
+  │   Dealer: Six of Clubs, Eight of Clubs, Eight of Spades = 22
+  │   Result: Dealer Bust          +9  ✓ WIN
+  │
+  └─ Session: 3 hands, net +12
+
+  +STAT  Beginner's Luck
+
+╔══════════════════════════════════════════════════════════════════════════════════════════════════╗
+║ Day   3 | $      62 → $      88 (+26) | HP:95→100(+5) SAN:97→90(-7) | R:0 Car:N                  ║
+╚══════════════════════════════════════════════════════════════════════════════════════════════════╝
+  ┌─ EVENTS ─────────────────────────────────────
+  │ ▸ storyline:jameson:stage0
+  │
+  │ ▸ met:Cowboy
+  │
+  │ ▸ night:nightmare
+  └──────────────────────────────────────────────
+
+  ┌─ BLACKJACK SESSION (3 hands) ─────────────
+  │
+  │ Hand 1: Bet $12 / $62 [bet:no_car_bootstrap_survival] edge=0
+  │   Player: King of Spades, Two of Clubs, Five of Diamonds = 17
+  │   Dealer: Nine of Spades, Ten of Hearts            = 19
+  │   Result: Dealer Wins          +0  ✗ LOSS
+  │   Actions: hit (vs blackjack_action:0:1,blackjack_action:1:0) → stand (vs blackjack_action:1:1,blackjack_action:0:0)
+  │
+  │ Hand 2: Bet $12 / $62 [bet:no_car_bootstrap_survival] edge=0
+  │   Player: Seven of Hearts, Ace of Diamonds, Two of Diamonds = 20
+  │   Dealer: Ace of Hearts, Six of Diamonds           = 17
+  │   Result: Player Wins          +12  ✓ WIN
+  │   Actions: hit (vs blackjack_action:0:1,blackjack_action:1:0) → stand (vs blackjack_action:1:1,blackjack_action:0:0)
+  │
+  │ Hand 3: Bet $14 / $74 [bet:no_car_bootstrap_survival] edge=0
+  │   Player: Queen of Spades, King of Hearts          = 20
+  │   Dealer: Eight of Spades, Queen of Hearts         = 18
+  │   Result: Player Wins          +14  ✓ WIN
+  │   Actions: stand (vs blackjack_action:1:1,blackjack_action:0:0)
+  │
+  └─ Session: 3 hands, net +26
+
+  +ITEM  Carrot
+  +STORY jameson
+
+╔══════════════════════════════════════════════════════════════════════════════════════════════════╗
+║ Day   4 | $      88 → $     100 (+12) | HP:100→92(-8) SAN:90→93(+3) | R:0 Car:N                  ║
+╚══════════════════════════════════════════════════════════════════════════════════════════════════╝
+  ┌─ EVENTS ─────────────────────────────────────
+  │ ▸ day:brass_knuckles_brawl
+  │
+  │ ▸ night:midnight_walk
+  └──────────────────────────────────────────────
+
+  ┌─ BLACKJACK SESSION (3 hands) ─────────────
+  │
+  │ Hand 1: Bet $18 / $88 [bet:no_car_bootstrap_survival] edge=0
+  │   Player: Nine of Hearts, Four of Hearts, Ace of Hearts, Jack of Spades = 24
+  │   Dealer: Ten of Spades, Two of Hearts             = 12
+  │   Result: Player Bust          -18  ✗ LOSS
+  │   Actions: hit (vs blackjack_action:0:1,blackjack_action:1:0) → hit (vs blackjack_action:0:1,blackjack_action:1:0) → stand (vs blackjack_action:1:1,blackjack_action:0:0)
+  │
+  │ Hand 2: Bet $13 / $70 [bet:no_car_bootstrap_survival] edge=0
+  │   Player: Queen of Clubs, King of Spades           = 20
+  │   Dealer: Five of Clubs, Ten of Clubs, Seven of Spades = 22
+  │   Result: Dealer Bust          +13  ✓ WIN
+  │   Actions: hit (vs blackjack_action:0:1,blackjack_action:1:0) → stand (vs blackjack_action:1:1,blackjack_action:0:0)
+  │
+  │ Hand 3: Bet $17 / $83 [bet:no_car_bootstrap_survival] edge=0
+  │   Player: Five of Spades, Nine of Spades, Six of Diamonds = 20
+  │   Dealer: Ace of Diamonds, Eight of Diamonds       = 19
+  │   Result: Player Wins          +17  ✓ WIN
+  │
+  └─ Session: 3 hands, net +12
+
+  -STAT  Beginner's Luck
+
+╔══════════════════════════════════════════════════════════════════════════════════════════════════╗
+║ Day   5 | $     100 → $      45 (-55) | HP:92→97(+5) SAN:93→73(-20) | R:0 Car:N  ◄ DAMAGE        ║
+╚══════════════════════════════════════════════════════════════════════════════════════════════════╝
+  ┌─ EVENTS ─────────────────────────────────────
+  │ ▸ storyline:gas_station_hero:stage0
+  │   You're browsing the chips when the door slams open.
+  │   "EVERYBODY ON THE GROUND! NOW!"
+  │   A man with a shotgun. Ski mask. Shaking hands. This is really happening.
+  │   The cashier freezes. A mother clutches her child. An old man drops his coffee.
+  │   The robber swings the gun around, wild-eyed.
+  │   ? What do you do?
+  │   → chose 'hide' [gas_station_hide] [conf=0.85]
+  │     (other: comply, hero)
+  │
+  │ ▸ night:woodlands_path
+  │
+  │ ▸ met:Woodlands Path Event
+  └──────────────────────────────────────────────
+
+  ┌─ BLACKJACK SESSION (3 hands) ─────────────
+  │
+  │ Hand 1: Bet $24 / $100 [bet:no_car_bootstrap_push] edge=0
+  │   Player: King of Clubs, Eight of Diamonds         = 18
+  │   Dealer: Six of Clubs, Five of Spades, King of Diamonds = 21
+  │   Result: Dealer Blackjack     -24  ✗ LOSS
+  │   Actions: stand (vs blackjack_action:1:1,blackjack_action:0:0)
+  │
+  │ Hand 2: Bet $18 / $76 [bet:no_car_bootstrap_push] edge=0
+  │   Player: Nine of Hearts, Six of Diamonds          = 15
+  │   Dealer: Three of Diamonds, Ace of Diamonds, Seven of Clubs = 21
+  │   Result: Dealer Blackjack     -18  ✗ LOSS
+  │   Actions: stand (vs blackjack_action:1:1,blackjack_action:0:0)
+  │
+  │ Hand 3: Bet $13 / $58 [bet:no_car_bootstrap_push] edge=0
+  │   Player: Ace of Clubs, Six of Spades, Queen of Spades = 17
+  │   Dealer: Jack of Diamonds, Five of Hearts, Four of Diamonds = 19
+  │   Result: Dealer Wins          -13  ✗ LOSS
+  │   Actions: hit (vs blackjack_action:0:1,blackjack_action:1:0) → stand (vs blackjack_action:1:1,blackjack_action:0:0)
+  │
+  └─ Session: 3 hands, net -55
+
+  +STORY gas_station_hero
+
+╔══════════════════════════════════════════════════════════════════════════════════════════════════╗
+║ Day   6 | $      45 → $      32 (-13) | HP:97→100(+3) SAN:73→73(+0) | R:0 Car:N                  ║
+╚══════════════════════════════════════════════════════════════════════════════════════════════════╝
+  ┌─ EVENTS ─────────────────────────────────────
+  │ ▸ day:found_gift_card
+  │
+  │ ▸ night:went_jogging
+  └──────────────────────────────────────────────
+
+  ┌─ BLACKJACK SESSION (3 hands) ─────────────
+  │
+  │ Hand 1: Bet $7 / $45 [bet:no_car_bootstrap_survival] edge=0
+  │   Player: Eight of Spades, Nine of Hearts          = 17
+  │   Dealer: Seven of Hearts, King of Diamonds        = 17
+  │   Result: Tie                  +0  = TIE
+  │   Actions: stand (vs blackjack_action:1:1,blackjack_action:0:0)
+  │
+  │ Hand 2: Bet $7 / $45 [bet:no_car_bootstrap_survival] edge=0
+  │   Player: Jack of Clubs, Three of Hearts, Ten of Diamonds = 23
+  │   Dealer: Ten of Clubs, Ten of Hearts              = 20
+  │   Result: Player Bust          -7  ✗ LOSS
+  │   Actions: hit (vs blackjack_action:0:1,blackjack_action:1:0) → hit (vs blackjack_action:0:1,blackjack_action:1:0)
+  │
+  │ Hand 3: Bet $6 / $38 [bet:no_car_bootstrap_survival] edge=0
+  │   Player: Eight of Hearts, Four of Spades, King of Hearts = 22
+  │   Dealer: Seven of Diamonds, King of Spades        = 17
+  │   Result: Player Bust          -6  ✗ LOSS
+  │
+  └─ Session: 3 hands, net -13
+
+
+╔══════════════════════════════════════════════════════════════════════════════════════════════════╗
+║ Day   7 | $      32 → $       8 (-24) | HP:100→100(+0) SAN:73→75(+2) | R:0 Car:N                 ║
+╚══════════════════════════════════════════════════════════════════════════════════════════════════╝
+  ┌─ EVENTS ─────────────────────────────────────
+  │ ▸ day:mysterious_key_lockbox_open
+  │
+  │ ▸ day:herbal_pouch_remedy
+  │
+  │ ▸ day:signal_mirror_rescue
+  │
+  │ ▸ night:dream_of_winning
+  └──────────────────────────────────────────────
+
+  ┌─ BLACKJACK SESSION (3 hands) ─────────────
+  │
+  │ Hand 1: Bet $2 / $32 [bet:no_car_bootstrap_survival] edge=0
+  │   Player: Queen of Spades, Jack of Spades          = 20
+  │   Dealer: Ace of Hearts, Six of Hearts             = 17
+  │   Result: Player Wins          +2 (free hand)  ✓ WIN
+  │   Actions: stand (vs blackjack_action:1:1,blackjack_action:0:0)
+  │
+  │ Hand 2: Bet $5 / $34 [bet:no_car_bootstrap_survival] edge=0
+  │   Player: Eight of Spades, Three of Spades, Eight of Hearts = 19
+  │   Dealer: King of Diamonds, King of Spades         = 20
+  │   Result: Dealer Wins          -5  ✗ LOSS
+  │   Actions: hit (vs blackjack_action:0:1,blackjack_action:1:0) → stand (vs blackjack_action:1:1,blackjack_action:0:0)
+  │
+  │ Hand 3: Bet $4 / $29 
+  │   Player: Jack of Diamonds, Jack of Clubs          = 20
+  │   Dealer: Two of Clubs, Three of Diamonds, Three of Hearts, Five of Diamonds, Nine of Hearts = 22
+  │   Result: Dealer Bust          +4  ✓ WIN
+  │   Actions: stand (vs blackjack_action:1:1,blackjack_action:0:0)
+  │
+  └─ Session: 3 hands, net +1
+
+
+╔══════════════════════════════════════════════════════════════════════════════════════════════════╗
+║ Day   8 | $       8 → $     106 (+98) | HP:100→100(+0) SAN:75→75(+0) | R:0 Car:N                 ║
+╚══════════════════════════════════════════════════════════════════════════════════════════════════╝
+  ┌─ EVENTS ─────────────────────────────────────
+  │ ▸ day:windblown_worn_map
+  │
+  │ ▸ day:feeding_station_morning
+  │
+  │ ▸ night:ditched_wallet
+  └──────────────────────────────────────────────
+
+  ┌─ BLACKJACK SESSION (3 hands) ─────────────
+  │
+  │ Hand 1: Bet $1 / $8 [bet:no_car_bootstrap_survival] edge=0
+  │   Player: Four of Spades, Queen of Hearts, Nine of Hearts = 23
+  │   Dealer: King of Hearts, Two of Clubs             = 12
+  │   Result: Player Bust          +0 (free hand)  ✗ LOSS
+  │   Actions: hit (vs blackjack_action:0:1,blackjack_action:1:0) → stand (vs blackjack_action:1:1,blackjack_action:0:0)
+  │
+  │ Hand 2: Bet $1 / $8 
+  │   Player: Ten of Diamonds, Jack of Diamonds        = 20
+  │   Dealer: Two of Diamonds, Queen of Spades, Jack of Spades = 22
+  │   Result: Dealer Bust          +1 (free hand)  ✓ WIN
+  │   Actions: stand (vs blackjack_action:1:1,blackjack_action:0:0)
+  │
+  │ Hand 3: Bet $1 / $9 
+  │   Player: Ten of Hearts, Seven of Diamonds         = 17
+  │   Dealer: Eight of Hearts, Four of Hearts, Four of Diamonds, Ten of Clubs = 26
+  │   Result: Dealer Bust          +1  ✓ WIN
+  │
+  └─ Session: 3 hands, net +2
+
+
+╔══════════════════════════════════════════════════════════════════════════════════════════════════╗
+║ Day   9 | $     106 → $     147 (+41) | HP:100→100(+0) SAN:75→74(-1) | R:0 Car:N                 ║
+╚══════════════════════════════════════════════════════════════════════════════════════════════════╝
+  ┌─ EVENTS ─────────────────────────────────────
+  │ ▸ day:strong_winds
+  └──────────────────────────────────────────────
+
+  ┌─ BLACKJACK SESSION (3 hands) ─────────────
+  │
+  │ Hand 1: Bet $25 / $106 [bet:no_car_bootstrap_push] edge=0
+  │   Player: Six of Hearts, Ace of Spades, Four of Spades = 21
+  │   Dealer: Jack of Diamonds, Four of Diamonds       = 14
+  │   Result: Player Blackjack     +50  ✓ WIN
+  │   Actions: hit (vs blackjack_action:0:1,blackjack_action:1:0) → hit (vs blackjack_action:0:1,blackjack_action:1:0) → stand (vs blackjack_action:1:1,blackjack_action:0:0)
+  │
+  │ Hand 2: Bet $37 / $156 [bet:no_car_bootstrap_push] edge=0
+  │   Player: Ace of Clubs, Six of Clubs, Seven of Clubs = 14
+  │   Dealer: Five of Spades, Nine of Clubs, Ten of Diamonds = 24
+  │   Result: Dealer Bust          +37  ✓ WIN
+  │   Actions: hit (vs blackjack_action:0:1,blackjack_action:1:0) → hit (vs blackjack_action:0:1,blackjack_action:1:0) → hit (vs blackjack_action:0:1,blackjack_action:1:0)
+  │
+  │ Hand 3: Bet $46 / $193 [bet:no_car_bootstrap_push] edge=0
+  │   Player: Five of Diamonds, Three of Hearts, Four of Hearts, Two of Diamonds, King of Clubs = 24
+  │   Dealer: Nine of Hearts, Queen of Diamonds        = 19
+  │   Result: Player Bust          -46  ✗ LOSS
+  │
+  └─ Session: 3 hands, net +41
+
+
+╔══════════════════════════════════════════════════════════════════════════════════════════════════╗
+║ Day  10 | $     147 → $     106 (-41) | HP:100→100(+0) SAN:74→72(-2) | R:0 Car:N                 ║
+╚══════════════════════════════════════════════════════════════════════════════════════════════════╝
+  ┌─ EVENTS ─────────────────────────────────────
+  │ ▸ storyline:jameson:stage1
+  │   Jameson dismounts with effort. He looks ten years older than last time.
+  │   The old cowboy's voice cracks. This horse is his whole world.
+  │   He takes off his hat and holds it to his chest.
+  │   Jameson leads Thunder away on foot. The horse nuzzles against his shoulder.
+  │   Even sick, they trust each other completely.
+  │   ? Give Jameson $100 for vet bills?
+  │   → Y/N: no | jameson_vet_bill_refusal [conf=0.82]
+  └──────────────────────────────────────────────
+
+  ┌─ BLACKJACK SESSION (3 hands) ─────────────
+  │
+  │ Hand 1: Bet $35 / $147 [bet:no_car_bootstrap_push] edge=0
+  │   Player: Six of Clubs, Ace of Diamonds, Nine of Spades, King of Diamonds = 26
+  │   Dealer: King of Hearts, Ten of Diamonds          = 20
+  │   Result: Player Bust          -35  ✗ LOSS
+  │   Actions: hit (vs blackjack_action:0:1,blackjack_action:1:0) → hit (vs blackjack_action:0:1,blackjack_action:1:0) → stand (vs blackjack_action:1:1,blackjack_action:0:0)
+  │
+  │ Hand 2: Bet $26 / $112 [bet:no_car_bootstrap_push] edge=0
+  │   Player: Three of Hearts, Nine of Hearts          = 12
+  │   Dealer: Four of Spades, Two of Clubs, Seven of Clubs, Four of Clubs = 17
+  │   Result: Dealer Wins          -26  ✗ LOSS
+  │   Actions: stand (vs blackjack_action:1:1,blackjack_action:0:0)
+  │
+  │ Hand 3: Bet $20 / $86 [bet:no_car_bootstrap_push] edge=0
+  │   Player: Ten of Spades, Jack of Hearts            = 20
+  │   Dealer: Seven of Diamonds, Ace of Clubs          = 18
+  │   Result: Player Wins          +20  ✓ WIN
+  │
+  └─ Session: 3 hands, net -41
+
+
+╔══════════════════════════════════════════════════════════════════════════════════════════════════╗
+║ Day  11 | $     106 → $     100 (-6) | HP:100→100(+0) SAN:72→70(-2) | R:0 Car:N                  ║
+╚══════════════════════════════════════════════════════════════════════════════════════════════════╝
+  ┌─ EVENTS ─────────────────────────────────────
+  │ ▸ day:mysterious_note
+  └──────────────────────────────────────────────
+
+  ┌─ BLACKJACK SESSION (3 hands) ─────────────
+  │
+  │ Hand 1: Bet $25 / $106 [bet:no_car_bootstrap_push] edge=0
+  │   Player: Five of Diamonds, Three of Hearts, Nine of Clubs = 17
+  │   Dealer: Two of Spades, Four of Hearts, Seven of Diamonds, Ace of Clubs, Queen of Hearts = 24
+  │   Result: Dealer Bust          +25  ✓ WIN
+  │   Actions: hit (vs blackjack_action:0:1,blackjack_action:1:0) → stand (vs blackjack_action:1:1,blackjack_action:0:0)
+  │
+  │ Hand 2: Bet $31 / $131 [bet:no_car_bootstrap_push] edge=0
+  │   Player: Ten of Clubs, Ten of Diamonds            = 20
+  │   Dealer: Ten of Hearts, King of Diamonds          = 20
+  │   Result: Tie                  +0  = TIE
+  │   Actions: stand (vs blackjack_action:1:1,blackjack_action:0:0)
+  │
+  │ Hand 3: Bet $31 / $131 [bet:no_car_bootstrap_push] edge=0
+  │   Player: King of Clubs, Six of Hearts, Seven of Spades = 23
+  │   Dealer: Ten of Spades, Five of Clubs             = 15
+  │   Result: Player Bust          -31  ✗ LOSS
+  │   Actions: hit (vs blackjack_action:0:1,blackjack_action:1:0)
+  │
+  └─ Session: 3 hands, net -6
+
+
+╔══════════════════════════════════════════════════════════════════════════════════════════════════╗
+║ Day  12 | $     100 → $     190 (+90) | HP:100→100(+0) SAN:70→70(+0) | R:0 Car:N                 ║
+╚══════════════════════════════════════════════════════════════════════════════════════════════════╝
+  ┌─ EVENTS ─────────────────────────────────────
+  │ ▸ storyline:rosa:stage0
+  │
+  │ ▸ met:Rosa
+  │   That might have been the best sleep of your life. You feel incredible.
+  │   You duck into a laundromat to kill time and warm up. Rows of machines rattle like bad teeth.
+  │   The air smells like detergent, hot metal, and somebody else's bad week.
+  │   At the change machine, a woman in a denim jacket is counting nickels into her palm like she's trying to multip
+  │   She looks up when she notices you watching. Her eyes are tired, but not soft.
+  │   ? Spot her $6 for the wash?
+  │   → Y/N: no | threat_context_refusal [conf=0.88]
+  └──────────────────────────────────────────────
+
+  ┌─ BLACKJACK SESSION (3 hands) ─────────────
+  │
+  │ Hand 1: Bet $26 / $100 [bet:no_car_bootstrap_push] edge=0
+  │   Player: Ace of Diamonds, Three of Diamonds, Six of Spades = 20
+  │   Dealer: King of Clubs, Ten of Hearts             = 20
+  │   Result: Tie                  +0  = TIE
+  │   Actions: hit (vs blackjack_action:0:1,blackjack_action:1:0) → stand (vs blackjack_action:1:1,blackjack_action:0:0)
+  │
+  │ Hand 2: Bet $26 / $100 [bet:no_car_bootstrap_push] edge=0
+  │   Player: Nine of Clubs, Queen of Clubs            = 19
+  │   Dealer: Seven of Spades, Three of Spades, Four of Spades, Ten of Clubs = 24
+  │   Result: Dealer Bust          +26  ✓ WIN
+  │   Actions: stand (vs blackjack_action:1:1,blackjack_action:0:0)
+  │
+  │ Hand 3: Bet $32 / $126 [bet:no_car_bootstrap_push] edge=0
+  │   Player: Ace of Clubs, Ten of Diamonds            = 21
+  │   Dealer: Four of Hearts, Ace of Spades            = 15
+  │   Result: Player Blackjack     +64  ✓ WIN
+  │
+  └─ Session: 3 hands, net +90
+
+  +STORY rosa
+
+╔══════════════════════════════════════════════════════════════════════════════════════════════════╗
+║ Day  13 | $     190 → $     120 (-70) | HP:100→100(+0) SAN:70→65(-5) | R:0 Car:N                 ║
+╚══════════════════════════════════════════════════════════════════════════════════════════════════╝
+  ┌─ EVENTS ─────────────────────────────────────
+  │ ▸ day:patches_night_watch
+  │
+  │ ▸ day:lockpick_opportunity
+  └──────────────────────────────────────────────
+
+  ┌─ BLACKJACK SESSION (3 hands) ─────────────
+  │
+  │ Hand 1: Bet $49 / $190 [bet:no_car_bootstrap_push] edge=0
+  │   Player: Six of Clubs, Nine of Clubs, Seven of Spades = 22
+  │   Dealer: Ten of Spades, Nine of Hearts            = 19
+  │   Result: Player Bust          -49  ✗ LOSS
+  │   Actions: hit (vs blackjack_action:0:1,blackjack_action:1:0) → hit (vs blackjack_action:0:1,blackjack_action:1:0)
+  │
+  │ Hand 2: Bet $10 / $141 [bet:no_car_bootstrap_push] edge=0
+  │   Player: Seven of Clubs, Eight of Hearts, Six of Spades = 21
+  │   Dealer: Jack of Spades, Two of Hearts            = 12
+  │   Result: Player Blackjack     +20 (free hand)  ✓ WIN
+  │
+  │ Hand 3: Bet $41 / $161 
+  │   Player: Three of Clubs, Six of Diamonds          = 9
+  │   Dealer: Ace of Clubs, Jack of Hearts             = 21
+  │   Result: Dealer Blackjack     -41  ✗ LOSS
+  │
+  └─ Session: 3 hands, net -70
+
+
+╔══════════════════════════════════════════════════════════════════════════════════════════════════╗
+║ Day  14 | $     120 → $     141 (+21) | HP:100→100(+0) SAN:65→69(+4) | R:0 Car:N                 ║
+╚══════════════════════════════════════════════════════════════════════════════════════════════════╝
+  ┌─ EVENTS ─────────────────────────────────────
+  │ ▸ storyline:stray_cat:stage0
+  │   If there's one thing I've learned, it's that you must never back down, and never give up.
+  │   This one's straight from the fortune cookie in my lunch:
+  │   You had a dream about winning at Blackjack. Then you woke up. But you still feel great.
+  │   A scraggly stray cat jumps onto your hood and stares at you through the windshield.
+  │   It meows. Loudly. Insistently. Like it's judging your entire existence.
+  │   ? Feed it some of your food?
+  │   → Y/N: yes | event_yes:storyline:stray_cat:stage0 [conf=0.82]
+  │
+  │ ▸ met:Stray Cat Friend
+  └──────────────────────────────────────────────
+
+  ┌─ BLACKJACK SESSION (3 hands) ─────────────
+  │
+  │ Hand 1: Bet $31 / $120 [bet:no_car_bootstrap_push] edge=0
+  │   Player: Six of Clubs, Eight of Hearts            = 14
+  │   Dealer: Three of Clubs, Six of Spades, Two of Hearts, Four of Diamonds, King of Clubs = 25
+  │   Result: Dealer Bust          +31  ✓ WIN
+  │   Actions: stand (vs blackjack_action:1:1,blackjack_action:0:0)
+  │
+  │ Hand 2: Bet $39 / $151 [bet:no_car_bootstrap_push] edge=0
+  │   Player: Queen of Clubs, Nine of Hearts           = 19
+  │   Dealer: Nine of Clubs, Eight of Diamonds         = 17
+  │   Result: Player Wins          +39  ✓ WIN
+  │   Actions: stand (vs blackjack_action:1:1,blackjack_action:0:0)
+  │
+  │ Hand 3: Bet $49 / $190 [bet:no_car_bootstrap_push] edge=0
+  │   Player: Two of Diamonds, Jack of Hearts          = 12
+  │   Dealer: Four of Spades, Two of Clubs, Four of Clubs, Queen of Hearts = 20
+  │   Result: Dealer Wins          -49  ✗ LOSS
+  │   Actions: stand (vs blackjack_action:1:1,blackjack_action:0:0)
+  │
+  └─ Session: 3 hands, net +21
+
+  +COMP  Whiskers
+  +STORY stray_cat
+
+╔══════════════════════════════════════════════════════════════════════════════════════════════════╗
+║ Day  15 | $     141 → $     140 (-1) | HP:100→90(-10) SAN:69→68(-1) | R:0 Car:N                  ║
+╚══════════════════════════════════════════════════════════════════════════════════════════════════╝
+  ┌─ EVENTS ─────────────────────────────────────
+  │ ▸ day:slick_escape_route
+  │
+  │ ▸ day:lucky_lure_fishing
+  │
+  │ ▸ day:mosquito_bite_infection
+  └──────────────────────────────────────────────
+
+  ┌─ BLACKJACK SESSION (3 hands) ─────────────
+  │
+  │ Hand 1: Bet $36 / $141 [bet:no_car_bootstrap_push] edge=0
+  │   Player: Jack of Spades, Three of Hearts          = 13
+  │   Dealer: Two of Spades, Six of Hearts, Seven of Hearts, Jack of Hearts = 25
+  │   Result: Dealer Bust          +36  ✓ WIN
+  │   Actions: stand (vs blackjack_action:1:1,blackjack_action:0:0)
+  │
+  │ Hand 2: Bet $46 / $177 [bet:no_car_bootstrap_push] edge=0
+  │   Player: Four of Clubs, Two of Clubs, Six of Clubs, Jack of Diamonds = 22
+  │   Dealer: Eight of Clubs, Ten of Clubs             = 18
+  │   Result: Player Bust          -46  ✗ LOSS
+  │   Actions: hit (vs blackjack_action:0:1,blackjack_action:1:0) → hit (vs blackjack_action:0:1,blackjack_action:1:0) → stand (vs blackjack_action:1:1,blackjack_action:0:0)
+  │
+  │ Hand 3: Bet $9 / $131 
+  │   Player: Queen of Clubs, Nine of Hearts           = 19
+  │   Dealer: Ten of Hearts, Five of Diamonds, Two of Diamonds = 17
+  │   Result: Player Wins          +9 (free hand)  ✓ WIN
+  │
+  └─ Session: 3 hands, net -1
+
+
+╔══════════════════════════════════════════════════════════════════════════════════════════════════╗
+║ Day  16 | $     140 → $     194 (+54) | HP:90→95(+5) SAN:68→68(+0) | R:0 Car:N                   ║
+╚══════════════════════════════════════════════════════════════════════════════════════════════════╝
+  ┌─ EVENTS ─────────────────────────────────────
+  │ ▸ storyline:dealer_past:stage0
+  │
+  │ ▸ met:Dealer Photo
+  │   The Dealer snatches it up fast, but you've already seen it: a woman and a little girl
+  │   standing in front of a yellow house. The woman is laughing. The girl is blowing out candles
+  │   on a birthday cake.
+  │   The Dealer tucks the photo into his vest pocket without a word. His hands,
+  │   always perfectly steady, have the faintest tremor.
+  │   ? Ask about the photo?
+  │   → Y/N: no | threat_context_refusal [conf=0.88]
+  └──────────────────────────────────────────────
+
+  ┌─ BLACKJACK SESSION (3 hands) ─────────────
+  │
+  │ Hand 1: Bet $11 / $140 [bet:no_car_bootstrap_push] edge=0
+  │   Player: Eight of Diamonds, Six of Hearts, Nine of Spades = 23
+  │   Dealer: Queen of Diamonds, Queen of Hearts       = 20
+  │   Result: Player Bust          +0 (free hand)  ✗ LOSS
+  │   Actions: hit (vs blackjack_action:0:1,blackjack_action:1:0) → hit (vs blackjack_action:0:1,blackjack_action:1:0) → hit (vs blackjack_action:0:1,blackjack_action:1:0)
+  │
+  │ Hand 2: Bet $7 / $140 
+  │   Player: Seven of Diamonds, Ace of Clubs, Three of Diamonds = 21
+  │   Dealer: Ten of Clubs, Jack of Diamonds           = 20
+  │   Result: Player Blackjack     +14 (free hand)  ✓ WIN
+  │   Actions: hit (vs blackjack_action:0:1,blackjack_action:1:0) → stand (vs blackjack_action:1:1,blackjack_action:0:0)
+  │
+  │ Hand 3: Bet $40 / $154 
+  │   Player: Five of Clubs, Four of Clubs, Five of Diamonds, Four of Diamonds = 18
+  │   Dealer: Ten of Hearts, Five of Spades, Queen of Clubs = 25
+  │   Result: Dealer Bust          +40  ✓ WIN
+  │
+  └─ Session: 3 hands, net +54
+
+  +STORY dealer_past
+
+╔══════════════════════════════════════════════════════════════════════════════════════════════════╗
+║ Day  17 | $     194 → $     107 (-87) | HP:95→98(+3) SAN:68→70(+2) | R:0 Car:N                   ║
+╚══════════════════════════════════════════════════════════════════════════════════════════════════╝
+  ┌─ EVENTS ─────────────────────────────────────
+  │ ▸ day:car_compliment
+  └──────────────────────────────────────────────
+
+  ┌─ BLACKJACK SESSION (3 hands) ─────────────
+  │
+  │ Hand 1: Bet $19 / $194 [bet:no_car_bootstrap_push] edge=0
+  │   Player: Five of Clubs, Ten of Hearts, King of Diamonds = 25
+  │   Dealer: Ace of Clubs, Ace of Hearts              = 12
+  │   Result: Player Bust          +0 (free hand)  ✗ LOSS
+  │   Actions: hit (vs blackjack_action:0:1,blackjack_action:1:0) → hit (vs blackjack_action:0:1,blackjack_action:1:0) → hit (vs blackjack_action:0:1,blackjack_action:1:0)
+  │
+  │ Hand 2: Bet $50 / $194 [bet:no_car_bootstrap_push] edge=0
+  │   Player: Jack of Spades, Two of Clubs, Jack of Diamonds = 22
+  │   Dealer: Ten of Diamonds, Seven of Spades         = 17
+  │   Result: Player Bust          -50  ✗ LOSS
+  │   Actions: hit (vs blackjack_action:0:1,blackjack_action:1:0) → stand (vs blackjack_action:1:1,blackjack_action:0:0)
+  │
+  │ Hand 3: Bet $37 / $144 
+  │   Player: Ace of Spades, Three of Clubs, Ace of Diamonds, Queen of Hearts = 15
+  │   Dealer: Six of Spades, Seven of Hearts, Six of Clubs = 19
+  │   Result: Dealer Wins          -37  ✗ LOSS
+  │
+  └─ Session: 3 hands, net -87
+
+
+╔══════════════════════════════════════════════════════════════════════════════════════════════════╗
+║ Day  18 | $     107 → $     120 (+13) | HP:98→100(+2) SAN:70→67(-3) | R:0 Car:N                  ║
+╚══════════════════════════════════════════════════════════════════════════════════════════════════╝
+  ┌─ EVENTS ─────────────────────────────────────
+  │ ▸ storyline:phil:stage0
+  │
+  │ ▸ met:Interrogator
+  │   Through your windshield, there's a car parked right in front of you. That wasn't there before.
+  │   Confused, and dazed, you sit up. As you open the door and get out of your car,
+  │   you notice a man, in a bright red suit, peering into your trunk.
+  │   The man sees you, and walks up to you.
+  │   "Do you know this?"
+  │   ? "Do you? Know this?"
+  │   → Y/N: no | threat_context_refusal [conf=0.88]
+  └──────────────────────────────────────────────
+
+  ┌─ BLACKJACK SESSION (3 hands) ─────────────
+  │
+  │ Hand 1: Bet $7 / $107 [bet:no_car_bootstrap_push] edge=0
+  │   Player: Two of Clubs, Four of Hearts, Jack of Clubs = 16
+  │   Dealer: Four of Clubs, Ace of Hearts, Seven of Clubs, Two of Spades, Six of Clubs = 20
+  │   Result: Dealer Wins          +0 (free hand)  ✗ LOSS
+  │   Actions: hit (vs blackjack_action:0:1,blackjack_action:1:0) → stand (vs blackjack_action:1:1,blackjack_action:0:0)
+  │
+  │ Hand 2: Bet $27 / $107 [bet:no_car_bootstrap_push] edge=0
+  │   Player: Three of Spades, Eight of Diamonds, Ten of Diamonds = 21
+  │   Dealer: Five of Spades, Eight of Hearts          = 13
+  │   Result: Player Blackjack     +54  ✓ WIN
+  │   Actions: hit (vs blackjack_action:0:1,blackjack_action:1:0) → hit (vs blackjack_action:0:1,blackjack_action:1:0) → hit (vs blackjack_action:0:1,blackjack_action:1:0)
+  │
+  │ Hand 3: Bet $41 / $161 
+  │   Player: Queen of Clubs, Four of Spades, Ace of Diamonds, Seven of Spades = 22
+  │   Dealer: King of Diamonds, Three of Hearts        = 13
+  │   Result: Player Bust          -41  ✗ LOSS
+  │
+  └─ Session: 3 hands, net +13
+
+  +STORY phil
+
+╔══════════════════════════════════════════════════════════════════════════════════════════════════╗
+║ Day  19 | $     120 → $      98 (-22) | HP:100→100(+0) SAN:67→65(-2) | R:0 Car:N                 ║
+╚══════════════════════════════════════════════════════════════════════════════════════════════════╝
+  ┌─ EVENTS ─────────────────────────────────────
+  │ ▸ day:the_mime
+  │
+  │ ▸ met:Mime
+  │   The mime stares at you. You stare back.
+  │   Without a word (obviously), the mime begins to act out a scene. He's pretending to be trapped in a box. Classi
+  │   Then he mimes... crying? Counting money? Losing at cards?
+  │   Wait. Is he acting out YOUR life?
+  │   The mime finishes with a dramatic death scene, tongue out and everything, then springs back up and takes a bow
+  │   ? Do you applaud?
+  │   → Y/N: no | threat_context_refusal [conf=0.88]
+  └──────────────────────────────────────────────
+
+  ┌─ BLACKJACK SESSION (3 hands) ─────────────
+  │
+  │ Hand 1: Bet $12 / $120 [bet:no_car_bootstrap_push] edge=0
+  │   Player: Ace of Diamonds, Two of Spades, Three of Diamonds, Three of Clubs = 19
+  │   Dealer: Ace of Hearts, Four of Diamonds, Queen of Diamonds, Ten of Clubs = 25
+  │   Result: Dealer Bust          +12 (free hand)  ✓ WIN
+  │   Actions: hit (vs blackjack_action:0:1,blackjack_action:1:0) → hit (vs blackjack_action:0:1,blackjack_action:1:0) → stand (vs blackjack_action:1:1,blackjack_action:0:0)
+  │
+  │ Hand 2: Bet $34 / $132 [bet:no_car_bootstrap_push] edge=0
+  │   Player: Six of Spades, Three of Spades, Eight of Diamonds = 17
+  │   Dealer: Two of Diamonds, Eight of Spades, Seven of Clubs = 17
+  │   Result: Tie                  +0  = TIE
+  │   Actions: hit (vs blackjack_action:0:1,blackjack_action:1:0) → stand (vs blackjack_action:1:1,blackjack_action:0:0)
+  │
+  │ Hand 3: Bet $34 / $132 
+  │   Player: Jack of Hearts, Four of Hearts, Queen of Hearts = 24
+  │   Dealer: Nine of Hearts, Eight of Hearts          = 17
+  │   Result: Player Bust          -34  ✗ LOSS
+  │   Actions: hit (vs blackjack_action:0:1,blackjack_action:1:0)
+  │
+  └─ Session: 3 hands, net -22
+
+
+╔══════════════════════════════════════════════════════════════════════════════════════════════════╗
+║ Day  20 | $      98 → $      92 (-6) | HP:100→100(+0) SAN:65→65(+0) | R:0 Car:N                  ║
+╚══════════════════════════════════════════════════════════════════════════════════════════════════╝
+  ┌─ EVENTS ─────────────────────────────────────
+  │ ▸ storyline:rosa:stage1
+  │   Congrats on all the hard work so far. It's nice to know you're still alive.
+  │   You know what you need right now? A quote, from the heart:
+  │   That was some quality sleep. Five stars. Would sleep again.
+  │   Rosa spots you the next time you're near the laundromat and waves you over to a folding table stacked with cle
+  │   She smooths a little girl's yellow sweater with both hands before setting it in the suitcase.
+  │   ? Offer to help if she finds the locker?
+  │   → Y/N: yes | event_yes:storyline:rosa:stage1 [conf=0.82]
+  │
+  │ ▸ met:Rosa Promised
+  └──────────────────────────────────────────────
+
+  ┌─ BLACKJACK SESSION (3 hands) ─────────────
+  │
+  │ Hand 1: Bet $8 / $98 [bet:no_car_bootstrap_push] edge=0
+  │   Player: Eight of Clubs, Five of Spades, Queen of Diamonds = 23
+  │   Dealer: King of Hearts, Six of Hearts            = 16
+  │   Result: Player Bust          +0 (free hand)  ✗ LOSS
+  │   Actions: hit (vs blackjack_action:0:1,blackjack_action:1:0) → stand (vs blackjack_action:1:1,blackjack_action:0:0)
+  │
+  │ Hand 2: Bet $25 / $98 [bet:no_car_bootstrap_push] edge=0
+  │   Player: Nine of Spades, Jack of Hearts           = 19
+  │   Dealer: Three of Diamonds, Four of Hearts, Six of Clubs, Ace of Spades, Two of Clubs, Jack of Spades = 26
+  │   Result: Dealer Bust          +25  ✓ WIN
+  │   Actions: stand (vs blackjack_action:1:1,blackjack_action:0:0)
+  │
+  │ Hand 3: Bet $31 / $123 
+  │   Player: Nine of Clubs, Nine of Diamonds          = 18
+  │   Dealer: Ace of Diamonds, Eight of Diamonds       = 19
+  │   Result: Dealer Wins          -31  ✗ LOSS
+  │
+  └─ Session: 3 hands, net -6
+
+  +STORY mime
+
+╔══════════════════════════════════════════════════════════════════════════════════════════════════╗
+║ Day  21 | $      92 → $      52 (-40) | HP:100→100(+0) SAN:65→71(+6) | R:0 Car:N                 ║
+╚══════════════════════════════════════════════════════════════════════════════════════════════════╝
+  ┌─ EVENTS ─────────────────────────────────────
+  │ ▸ day:vision_map_navigate
+  │
+  │ ▸ day:whiskers_sixth_sense
+  └──────────────────────────────────────────────
+
+  ┌─ BLACKJACK SESSION (3 hands) ─────────────
+  │
+  │ Hand 1: Bet $23 / $92 [bet:no_car_bootstrap_push] edge=0
+  │   Player: Six of Spades, Queen of Clubs, King of Diamonds = 26
+  │   Dealer: Ten of Spades, Eight of Hearts           = 18
+  │   Result: Player Bust          -23  ✗ LOSS
+  │   Actions: hit (vs blackjack_action:0:1,blackjack_action:1:0) → hit (vs blackjack_action:0:1,blackjack_action:1:0) → hit (vs blackjack_action:0:1,blackjack_action:1:0)
+  │
+  │ Hand 2: Bet $17 / $69 [bet:no_car_bootstrap_push] edge=0
+  │   Player: Five of Hearts, Seven of Spades, Two of Spades, Four of Spades = 18
+  │   Dealer: Nine of Diamonds, Nine of Hearts         = 18
+  │   Result: Tie                  +0  = TIE
+  │   Actions: stand (vs blackjack_action:1:1,blackjack_action:0:0)
+  │
+  │ Hand 3: Bet $17 / $69 [bet:no_car_bootstrap_push] edge=0
+  │   Player: Ten of Hearts, Nine of Spades            = 19
+  │   Dealer: Jack of Hearts, Ace of Diamonds          = 21
+  │   Result: Dealer Blackjack     -17  ✗ LOSS
+  │
+  └─ Session: 3 hands, net -40
+
+
+╔══════════════════════════════════════════════════════════════════════════════════════════════════╗
+║ Day  22 | $      52 → $      47 (-5) | HP:100→100(+0) SAN:71→69(-2) | R:0 Car:N                  ║
+╚══════════════════════════════════════════════════════════════════════════════════════════════════╝
+  ┌─ EVENTS ─────────────────────────────────────
+  │ ▸ storyline:martinez:stage0
+  │
+  │ ▸ met:Martinez
+  │   You hear a knock on your window. Cop knock. The heavy, authoritative kind.
+  │   You sit up and see a police officer standing outside your car. He's stocky, late 40s,
+  │   with a thick mustache and a name tag that reads MARTINEZ.
+  │   "License and registration, please."
+  │   You fumble around. You don't actually have a registration. You're not even sure where your license is.
+  │   ? Do you try to explain your situation?
+  │   → Y/N: no | threat_context_refusal [conf=0.88]
+  └──────────────────────────────────────────────
+
+  ┌─ BLACKJACK SESSION (3 hands) ─────────────
+  │
+  │ Hand 1: Bet $5 / $52 [bet:no_car_bootstrap_push] edge=0
+  │   Player: King of Clubs, Two of Hearts, Seven of Hearts = 19
+  │   Dealer: Queen of Spades, Three of Clubs, Ace of Spades, Eight of Clubs = 22
+  │   Result: Dealer Bust          +5 (free hand)  ✓ WIN
+  │   Actions: hit (vs blackjack_action:0:1,blackjack_action:1:0) → stand (vs blackjack_action:1:1,blackjack_action:0:0)
+  │
+  │ Hand 2: Bet $14 / $57 
+  │   Player: Ten of Hearts, Four of Spades            = 14
+  │   Dealer: Two of Clubs, Queen of Diamonds, Nine of Spades = 21
+  │   Result: Dealer Blackjack     -14  ✗ LOSS
+  │   Actions: stand (vs blackjack_action:1:1,blackjack_action:0:0)
+  │
+  │ Hand 3: Bet $4 / $43 
+  │   Player: Jack of Clubs, Two of Spades, Ace of Hearts, Seven of Spades = 20
+  │   Dealer: King of Spades, Five of Diamonds, Four of Hearts = 19
+  │   Result: Player Wins          +4 (free hand)  ✓ WIN
+  │   Actions: hit (vs blackjack_action:0:1,blackjack_action:1:0) → hit (vs blackjack_action:0:1,blackjack_action:1:0) → stand (vs blackjack_action:1:1,blackjack_action:0:0)
+  │
+  └─ Session: 3 hands, net -5
+
+  +STORY martinez
+
+╔══════════════════════════════════════════════════════════════════════════════════════════════════╗
+║ Day  23 | $      47 → $      65 (+18) | HP:100→100(+0) SAN:69→68(-1) | R:0 Car:N                 ║
+╚══════════════════════════════════════════════════════════════════════════════════════════════════╝
+  ┌─ EVENTS ─────────────────────────────────────
+  │ ▸ day:scrap_armor_event
+  │
+  │ ▸ day:trap_night_thief
+  └──────────────────────────────────────────────
+
+  ┌─ BLACKJACK SESSION (3 hands) ─────────────
+  │
+  │ Hand 1: Bet $8 / $47 [bet:no_car_bootstrap_survival] edge=0
+  │   Player: Four of Hearts, Nine of Clubs            = 13
+  │   Dealer: Two of Spades, Seven of Diamonds, Three of Diamonds, King of Spades = 22
+  │   Result: Dealer Bust          +8  ✓ WIN
+  │   Actions: stand (vs blackjack_action:1:1,blackjack_action:0:0)
+  │
+  │ Hand 2: Bet $10 / $55 [bet:no_car_bootstrap_survival] edge=0
+  │   Player: Eight of Spades, Two of Hearts, Seven of Clubs = 17
+  │   Dealer: Nine of Spades, Four of Clubs, Three of Clubs, Ace of Clubs = 17
+  │   Result: Tie                  +0  = TIE
+  │   Actions: hit (vs blackjack_action:0:1,blackjack_action:1:0) → stand (vs blackjack_action:1:1,blackjack_action:0:0)
+  │
+  │ Hand 3: Bet $10 / $55 [bet:no_car_bootstrap_survival] edge=0
+  │   Player: Ace of Spades, Nine of Diamonds          = 20
+  │   Dealer: Six of Diamonds, Four of Diamonds, Five of Clubs, Three of Spades = 18
+  │   Result: Player Wins          +10  ✓ WIN
+  │   Actions: stand (vs blackjack_action:1:1,blackjack_action:0:0)
+  │
+  └─ Session: 3 hands, net +18
+
+
+╔══════════════════════════════════════════════════════════════════════════════════════════════════╗
+║ Day  24 | $      65 → $      71 (+6) | HP:100→100(+0) SAN:68→69(+1) | R:0 Car:N                  ║
+╚══════════════════════════════════════════════════════════════════════════════════════════════════╝
+  ┌─ EVENTS ─────────────────────────────────────
+  │ ▸ day:got_a_tan
+  └──────────────────────────────────────────────
+
+  ┌─ BLACKJACK SESSION (3 hands) ─────────────
+  │
+  │ Hand 1: Bet $16 / $65 [bet:no_car_bootstrap_push] edge=0
+  │   Player: Four of Diamonds, Eight of Diamonds, Ace of Spades, King of Clubs = 23
+  │   Dealer: Queen of Spades, Eight of Spades         = 18
+  │   Result: Player Bust          -16  ✗ LOSS
+  │   Actions: hit (vs blackjack_action:0:1,blackjack_action:1:0) → hit (vs blackjack_action:0:1,blackjack_action:1:0) → hit (vs blackjack_action:0:1,blackjack_action:1:0) → stand (vs blackjack_action:1:1,blackjack_action:0:0)
+  │
+  │ Hand 2: Bet $8 / $49 [bet:no_car_bootstrap_survival] edge=0
+  │   Player: Two of Spades, Eight of Hearts, Five of Clubs = 15
+  │   Dealer: Six of Diamonds, Seven of Spades, King of Hearts = 23
+  │   Result: Dealer Bust          +8  ✓ WIN
+  │   Actions: stand (vs blackjack_action:1:1,blackjack_action:0:0)
+  │
+  │ Hand 3: Bet $14 / $57 [bet:no_car_bootstrap_push] edge=0
+  │   Player: Six of Clubs, Eight of Clubs             = 14
+  │   Dealer: Three of Spades, Three of Hearts, Ten of Hearts, Queen of Hearts = 26
+  │   Result: Dealer Bust          +14  ✓ WIN
+  │
+  └─ Session: 3 hands, net +6
+
+
+╔══════════════════════════════════════════════════════════════════════════════════════════════════╗
+║ Day  25 | $      71 → $     112 (+41) | HP:100→100(+0) SAN:69→66(-3) | R:0 Car:N                 ║
+╚══════════════════════════════════════════════════════════════════════════════════════════════════╝
+  ┌─ EVENTS ─────────────────────────────────────
+  │ ▸ day:the_glitch
+  │
+  │ ▸ day:grace_dream_catcher_synergy
+  │
+  │ ▸ day:midnight_radio_frequency
+  │
+  │ ▸ day:threw_out_old_photo
+  │
+  │ ▸ day:dropped_ice_cream
+  └──────────────────────────────────────────────
+
+  ┌─ BLACKJACK SESSION (3 hands) ─────────────
+  │
+  │ Hand 1: Bet $18 / $71 [bet:no_car_bootstrap_push] edge=0
+  │   Player: Eight of Spades, Ten of Spades           = 18
+  │   Dealer: Jack of Clubs, Three of Spades, Queen of Clubs = 23
+  │   Result: Dealer Bust          +18  ✓ WIN
+  │   Actions: stand (vs blackjack_action:1:1,blackjack_action:0:0)
+  │
+  │ Hand 2: Bet $23 / $89 [bet:no_car_bootstrap_push] edge=0
+  │   Player: Ten of Clubs, Seven of Diamonds          = 17
+  │   Dealer: Seven of Clubs, Jack of Diamonds         = 17
+  │   Result: Tie                  +0  = TIE
+  │   Actions: stand (vs blackjack_action:1:1,blackjack_action:0:0)
+  │
+  │ Hand 3: Bet $23 / $89 [bet:no_car_bootstrap_push] edge=0
+  │   Player: King of Spades, Two of Hearts            = 12
+  │   Dealer: Four of Spades, Four of Clubs, Six of Hearts, Ten of Hearts = 24
+  │   Result: Dealer Bust          +23  ✓ WIN
+  │   Actions: stand (vs blackjack_action:1:1,blackjack_action:0:0)
+  │
+  └─ Session: 3 hands, net +41
+
+
+╔══════════════════════════════════════════════════════════════════════════════════════════════════╗
+║ Day  26 | $     112 → $      94 (-18) | HP:100→100(+0) SAN:66→63(-3) | R:0 Car:N                 ║
+╚══════════════════════════════════════════════════════════════════════════════════════════════════╝
+  ┌─ EVENTS ─────────────────────────────────────
+  │ ▸ storyline:phil:stage1
+  │   You begin to read the paper on the clipboard. It's a message, written in Comic Sans.
+  │   It reads 'This offical message from the government and the military and the army says that you can't be here.
+  │   That's right, you, the person reading this message right now, living on this land right here.
+  │   It's not for you. It won't ever be for you. So, you can't live here. You need to move right now, or I'll be ve
+  │   "Did you read it?"
+  │   ? "Did you? Read it?"
+  │   → Y/N: yes | event_yes:storyline:phil:stage1 [conf=0.82]
+  └──────────────────────────────────────────────
+
+  ┌─ BLACKJACK SESSION (3 hands) ─────────────
+  │
+  │ Hand 1: Bet $29 / $112 [bet:no_car_bootstrap_push] edge=0
+  │   Player: Eight of Clubs, Two of Hearts, Eight of Hearts = 18
+  │   Dealer: Queen of Spades, King of Hearts          = 20
+  │   Result: Dealer Wins          -29  ✗ LOSS
+  │   Actions: hit (vs blackjack_action:0:1,blackjack_action:1:0) → stand (vs blackjack_action:1:1,blackjack_action:0:0)
+  │
+  │ Hand 2: Bet $21 / $83 [bet:no_car_bootstrap_push] edge=0
+  │   Player: Seven of Spades, Nine of Hearts, Eight of Diamonds = 24
+  │   Dealer: Seven of Clubs, Six of Spades            = 13
+  │   Result: Player Bust          -21  ✗ LOSS
+  │   Actions: hit (vs blackjack_action:0:1,blackjack_action:1:0)
+  │
+  │ Hand 3: Bet $16 / $62 [bet:no_car_bootstrap_push] edge=0
+  │   Player: Ace of Spades, Ten of Diamonds           = 21
+  │   Dealer: Two of Diamonds, Four of Diamonds        = 6
+  │   Result: Player Blackjack     +32  ✓ WIN
+  │
+  └─ Session: 3 hands, net -18
+
+
+╔══════════════════════════════════════════════════════════════════════════════════════════════════╗
+║ Day  27 | $      94 → $     104 (+10) | HP:100→100(+0) SAN:63→64(+1) | R:0 Car:N                 ║
+╚══════════════════════════════════════════════════════════════════════════════════════════════════╝
+  ┌─ EVENTS ─────────────────────────────────────
+  │ ▸ day:tax_man
+  │
+  │ ▸ day:the_food_truck
+  │
+  │ ▸ met:Food Truck
+  └──────────────────────────────────────────────
+
+  ┌─ BLACKJACK SESSION (3 hands) ─────────────
+  │
+  │ Hand 1: Bet $10 / $94 [bet:no_car_bootstrap_push] edge=0
+  │   Player: Eight of Spades, Queen of Spades         = 18
+  │   Dealer: Eight of Clubs, Five of Hearts, King of Spades = 23
+  │   Result: Dealer Bust          +10 (free hand)  ✓ WIN
+  │   Actions: stand (vs blackjack_action:1:1,blackjack_action:0:0)
+  │
+  │ Hand 2: Bet $27 / $104 [bet:no_car_bootstrap_push] edge=0
+  │   Player: Eight of Hearts, Ace of Hearts           = 19
+  │   Dealer: Jack of Clubs, Three of Diamonds, Six of Clubs = 19
+  │   Result: Tie                  +0  = TIE
+  │   Actions: stand (vs blackjack_action:1:1,blackjack_action:0:0)
+  │
+  │ Hand 3: Bet $27 / $104 
+  │   Player: Jack of Hearts, Nine of Spades           = 19
+  │   Dealer: Five of Spades, Five of Clubs, Nine of Diamonds = 19
+  │   Result: Tie                  +0  = TIE
+  │   Actions: stand (vs blackjack_action:1:1,blackjack_action:0:0)
+  │
+  └─ Session: 3 hands, net +10
+
+
+╔══════════════════════════════════════════════════════════════════════════════════════════════════╗
+║ Day  28 | $     104 → $     143 (+39) | HP:100→100(+0) SAN:64→64(+0) | R:0 Car:N                 ║
+╚══════════════════════════════════════════════════════════════════════════════════════════════════╝
+  ┌─ EVENTS ─────────────────────────────────────
+  │ ▸ storyline:lockbox:stage0
+  │
+  │ ▸ met:Lockbox
+  │   They clink against each other like glass or metal.
+  │   This wasn't here yesterday. You'd have noticed. Which means someone put it
+  │   in your car while you were sleeping.
+  │   On the bottom, scratched into the metal with something sharp:
+  │   "DON'T OPEN UNTIL READY"
+  │   ? Try to force it open?
+  │   → Y/N: no | threat_context_refusal [conf=0.88]
+  └──────────────────────────────────────────────
+
+  ┌─ BLACKJACK SESSION (3 hands) ─────────────
+  │
+  │ Hand 1: Bet $11 / $104 [bet:no_car_bootstrap_push] edge=0
+  │   Player: Five of Spades, Queen of Hearts, Ace of Diamonds, Jack of Diamonds = 26
+  │   Dealer: Queen of Spades, Ten of Clubs            = 20
+  │   Result: Player Bust          +0 (free hand)  ✗ LOSS
+  │   Actions: hit (vs blackjack_action:0:1,blackjack_action:1:0) → hit (vs blackjack_action:0:1,blackjack_action:1:0) → hit (vs blackjack_action:0:1,blackjack_action:1:0) → stand (vs blackjack_action:1:1,blackjack_action:0:0)
+  │
+  │ Hand 2: Bet $10 / $104 
+  │   Player: Two of Hearts, Eight of Hearts, King of Clubs = 20
+  │   Dealer: Three of Clubs, Queen of Clubs, Jack of Hearts = 23
+  │   Result: Dealer Bust          +10 (free hand)  ✓ WIN
+  │   Actions: hit (vs blackjack_action:0:1,blackjack_action:1:0) → stand (vs blackjack_action:1:1,blackjack_action:0:0)
+  │
+  │ Hand 3: Bet $29 / $114 
+  │   Player: Four of Diamonds, Four of Clubs, Ace of Clubs = 19
+  │   Dealer: Nine of Hearts, Eight of Clubs           = 17
+  │   Result: Player Wins          +29  ✓ WIN
+  │
+  └─ Session: 3 hands, net +39
+
+  +ITEM  Lockbox
+  +STORY lockbox
+
+╔══════════════════════════════════════════════════════════════════════════════════════════════════╗
+║ Day  29 | $     143 → $      88 (-55) | HP:100→100(+0) SAN:64→61(-3) | R:0 Car:N                 ║
+╚══════════════════════════════════════════════════════════════════════════════════════════════════╝
+  ┌─ EVENTS ─────────────────────────────────────
+  │ ▸ day:car_wont_start
+  └──────────────────────────────────────────────
+
+  ┌─ BLACKJACK SESSION (3 hands) ─────────────
+  │
+  │ Hand 1: Bet $37 / $143 [bet:no_car_bootstrap_push] edge=0
+  │   Player: Three of Diamonds, Ace of Spades, Queen of Hearts, Ace of Hearts, Jack of Clubs = 25
+  │   Dealer: Seven of Hearts, Ace of Diamonds         = 18
+  │   Result: Player Bust          -37  ✗ LOSS
+  │   Actions: hit (vs blackjack_action:0:1,blackjack_action:1:0) → hit (vs blackjack_action:0:1,blackjack_action:1:0) → hit (vs blackjack_action:0:1,blackjack_action:1:0) → stand (vs blackjack_action:1:1,blackjack_action:0:0)
+  │
+  │ Hand 2: Bet $12 / $106 [bet:no_car_bootstrap_push] edge=0
+  │   Player: Nine of Hearts, King of Spades           = 19
+  │   Dealer: Five of Hearts, King of Clubs, King of Hearts = 25
+  │   Result: Dealer Bust          +12 (free hand)  ✓ WIN
+  │   Actions: stand (vs blackjack_action:1:1,blackjack_action:0:0)
+  │
+  │ Hand 3: Bet $30 / $118 
+  │   Player: Nine of Clubs, Three of Spades           = 12
+  │   Dealer: Five of Spades, Three of Clubs, Eight of Spades, Four of Hearts = 20
+  │   Result: Dealer Wins          -30  ✗ LOSS
+  │
+  └─ Session: 3 hands, net -55
+
+
+╔══════════════════════════════════════════════════════════════════════════════════════════════════╗
+║ Day  30 | $      88 → $      65 (-23) | HP:100→100(+0) SAN:61→63(+2) | R:0 Car:N                 ║
+╚══════════════════════════════════════════════════════════════════════════════════════════════════╝
+  ┌─ EVENTS ─────────────────────────────────────
+  │ ▸ storyline:rosa:stage2
+  │   You're in the 'ramen noodle' tax bracket.
+  │   Oh, look at you, making small changes like you're actually going to finish something. Adorable.
+  │   I'll leave you with a quote:
+  │   You actually want to get out of the car. This is a historic moment.
+  │   Rosa is waiting by your car with a receipt stub and a look that says she hasn't slept.
+  │   ? Cover the $24 locker fee?
+  │   → Y/N: yes | rosa_locker_fee_gate [conf=0.70]
+  │
+  │ ▸ met:Rosa Paid Fee
+  └──────────────────────────────────────────────
+
+  ┌─ BLACKJACK SESSION (3 hands) ─────────────
+  │
+  │ Hand 1: Bet $4 / $88 [bet:no_car_bootstrap_push] edge=0
+  │   Player: Nine of Hearts, Five of Clubs, Seven of Hearts = 21
+  │   Dealer: King of Diamonds, Five of Hearts         = 15
+  │   Result: Player Blackjack     +8 (free hand)  ✓ WIN
+  │   Actions: hit (vs blackjack_action:0:1,blackjack_action:1:0) → hit (vs blackjack_action:0:1,blackjack_action:1:0) → hit (vs blackjack_action:0:1,blackjack_action:1:0)
+  │
+  │ Hand 2: Bet $24 / $96 [bet:no_car_bootstrap_push] edge=0
+  │   Player: Seven of Diamonds, Four of Hearts, Ace of Hearts, Ace of Diamonds, Five of Diamonds = 18
+  │   Dealer: Ten of Clubs, Three of Clubs, King of Clubs = 23
+  │   Result: Dealer Bust          +24  ✓ WIN
+  │   Actions: hit (vs blackjack_action:0:1,blackjack_action:1:0) → stand (vs blackjack_action:1:1,blackjack_action:0:0)
+  │
+  │ Hand 3: Bet $31 / $120 
+  │   Player: Three of Spades, Queen of Clubs          = 13
+  │   Dealer: Three of Hearts, Ace of Clubs, Four of Clubs = 18
+  │   Result: Dealer Wins          -31  ✗ LOSS
+  │   Actions: stand (vs blackjack_action:1:1,blackjack_action:0:0)
+  │
+  └─ Session: 3 hands, net +1
+
+  +ITEM  Flashlight
+
+╔══════════════════════════════════════════════════════════════════════════════════════════════════╗
+║ Day  31 | $      65 → $      75 (+10) | HP:100→100(+0) SAN:63→61(-2) | R:0 Car:N                 ║
+╚══════════════════════════════════════════════════════════════════════════════════════════════════╝
+  ┌─ EVENTS ─────────────────────────────────────
+  │ ▸ day:book_club_invite
+  │   Take a moment to reflect on this:
+  │   Your body feels like it got a factory reset overnight. Joints? Smooth. Back? Fine. Mood? Immaculate.
+  │   You feel anxious.
+  │   You step out of your car and a woman hands you a flyer. 'JOIN OUR BOOK CLUB! Free snacks!'
+  │   You haven't read a book since high school. But free snacks...
+  │   ? Attend the book club?
+  │   → Y/N: no | book_club_sanity_gate ◄ UNCERTAIN conf=0.68
+  └──────────────────────────────────────────────
+
+  ┌─ BLACKJACK SESSION (3 hands) ─────────────
+  │
+  │ Hand 1: Bet $16 / $65 [bet:no_car_bootstrap_push] edge=0
+  │   Player: Five of Spades, Four of Spades, Eight of Hearts = 17
+  │   Dealer: Two of Hearts, King of Diamonds, Ten of Clubs = 22
+  │   Result: Dealer Bust          +16  ✓ WIN
+  │   Actions: hit (vs blackjack_action:0:1,blackjack_action:1:0) → stand (vs blackjack_action:1:1,blackjack_action:0:0)
+  │
+  │ Hand 2: Bet $21 / $81 [bet:no_car_bootstrap_push] edge=0
+  │   Player: Jack of Clubs, Nine of Spades            = 19
+  │   Dealer: King of Hearts, Ace of Hearts            = 21
+  │   Result: Dealer Blackjack     -21  ✗ LOSS
+  │   Actions: hit (vs blackjack_action:0:1,blackjack_action:1:0) → hit (vs blackjack_action:0:1,blackjack_action:1:0)
+  │
+  │ Hand 3: Bet $15 / $60 [bet:no_car_bootstrap_push] edge=0
+  │   Player: Seven of Hearts, Seven of Spades, Two of Diamonds, Four of Clubs = 20
+  │   Dealer: Seven of Diamonds, Nine of Clubs, Eight of Clubs = 24
+  │   Result: Dealer Bust          +15  ✓ WIN
+  │   Actions: stand (vs blackjack_action:1:1,blackjack_action:0:0)
+  │
+  └─ Session: 3 hands, net +10
+
+
+╔══════════════════════════════════════════════════════════════════════════════════════════════════╗
+║ Day  32 | $      75 → $      42 (-33) | HP:100→100(+0) SAN:61→49(-12) | R:0 Car:N  ◄ DAMAGE      ║
+╚══════════════════════════════════════════════════════════════════════════════════════════════════╝
+  ┌─ EVENTS ─────────────────────────────────────
+  │ ▸ storyline:mime:stage1
+  │   Wait, is he doing Jameson? He's pretending to ride a horse. That's definitely Jameson.
+  │   Oh no. He's straightening an invisible tie. That's the red suit guy. Phil. He nails the judgmental stare.
+  │   The mime finishes with a new bit: he pulls an invisible rope and lifts himself off the ground,
+  │   dangling in the air. Then he falls, catches himself, and takes a bow.
+  │   He's sweating under the face paint. This guy takes his craft seriously.
+  │   ? Applaud the performance?
+  │   → Y/N: no | threat_context_refusal [conf=0.88]
+  └──────────────────────────────────────────────
+
+  ┌─ BLACKJACK SESSION (3 hands) ─────────────
+  │
+  │ Hand 1: Bet $19 / $75 [bet:no_car_bootstrap_push] edge=0
+  │   Player: Ten of Spades, Five of Clubs, Nine of Diamonds = 24
+  │   Dealer: King of Clubs, Seven of Clubs            = 17
+  │   Result: Player Bust          -19  ✗ LOSS
+  │   Actions: hit (vs blackjack_action:0:1,blackjack_action:1:0) → stand (vs blackjack_action:1:1,blackjack_action:0:0)
+  │
+  │ Hand 2: Bet $6 / $56 [bet:no_car_bootstrap_push] edge=0
+  │   Player: Four of Hearts, Ten of Diamonds          = 14
+  │   Dealer: Three of Hearts, King of Diamonds, Six of Hearts = 19
+  │   Result: Dealer Wins          +0 (free hand)  ✗ LOSS
+  │   Actions: stand (vs blackjack_action:1:1,blackjack_action:0:0)
+  │
+  │ Hand 3: Bet $14 / $56 
+  │   Player: Three of Spades, Jack of Diamonds        = 13
+  │   Dealer: Two of Spades, Nine of Hearts, Ten of Hearts = 21
+  │   Result: Dealer Blackjack     -14  ✗ LOSS
+  │
+  └─ Session: 3 hands, net -33
+
+
+╔══════════════════════════════════════════════════════════════════════════════════════════════════╗
+║ Day  33 | $      42 → $      30 (-12) | HP:100→100(+0) SAN:49→49(+0) | R:0 Car:N                 ║
+╚══════════════════════════════════════════════════════════════════════════════════════════════════╝
+  ┌─ EVENTS ─────────────────────────────────────
+  │ ▸ day:another_spider_bite
+  │
+  │ ▸ day:the_rival
+  │
+  │ ▸ met:The Rival
+  └──────────────────────────────────────────────
+
+  ┌─ BLACKJACK SESSION (3 hands) ─────────────
+  │
+  │ Hand 1: Bet $7 / $42 [bet:no_car_bootstrap_survival] edge=0
+  │   Player: Three of Hearts, Ten of Spades, Five of Diamonds = 18
+  │   Dealer: Ten of Clubs, Three of Diamonds, Eight of Hearts = 21
+  │   Result: Dealer Blackjack     -7  ✗ LOSS
+  │   Actions: hit (vs blackjack_action:0:1,blackjack_action:1:0) → stand (vs blackjack_action:1:1,blackjack_action:0:0)
+  │
+  │ Hand 2: Bet $5 / $35 [bet:no_car_bootstrap_survival] edge=0
+  │   Player: Seven of Spades, Five of Clubs, Six of Hearts = 18
+  │   Dealer: Three of Clubs, Ace of Spades, King of Diamonds, Five of Hearts = 19
+  │   Result: Dealer Wins          -5  ✗ LOSS
+  │   Actions: hit (vs blackjack_action:0:1,blackjack_action:1:0) → stand (vs blackjack_action:1:1,blackjack_action:0:0)
+  │
+  │ Hand 3: Bet $1 / $30 
+  │   Player: Eight of Diamonds, Four of Hearts, King of Hearts = 22
+  │   Dealer: Jack of Clubs, Nine of Diamonds          = 19
+  │   Result: Player Bust          +0 (free hand)  ✗ LOSS
+  │   Actions: hit (vs blackjack_action:0:1,blackjack_action:1:0)
+  │
+  └─ Session: 3 hands, net -12
+
+
+╔══════════════════════════════════════════════════════════════════════════════════════════════════╗
+║ Day  34 | $      30 → $      40 (+10) | HP:100→95(-5) SAN:49→45(-4) | R:0 Car:N                  ║
+╚══════════════════════════════════════════════════════════════════════════════════════════════════╝
+  ┌─ EVENTS ─────────────────────────────────────
+  │ ▸ storyline:sleep_paralysis:stage0
+  │
+  │ ▸ met:Sleep Paralysis
+  └──────────────────────────────────────────────
+
+  ┌─ BLACKJACK SESSION (3 hands) ─────────────
+  │
+  │ Hand 1: Bet $1 / $30 [bet:no_car_bootstrap_survival] edge=0
+  │   Player: Nine of Hearts, King of Diamonds         = 19
+  │   Dealer: Six of Diamonds, Ace of Diamonds         = 17
+  │   Result: Player Wins          +1 (free hand)  ✓ WIN
+  │   Actions: stand (vs blackjack_action:1:1,blackjack_action:0:0)
+  │
+  │ Hand 2: Bet $4 / $31 [bet:no_car_bootstrap_survival] edge=0
+  │   Player: Nine of Spades, Jack of Spades           = 19
+  │   Dealer: Eight of Hearts, Two of Hearts, Eight of Spades = 18
+  │   Result: Player Wins          +4  ✓ WIN
+  │   Actions: stand (vs blackjack_action:1:1,blackjack_action:0:0)
+  │
+  │ Hand 3: Bet $5 / $35 
+  │   Player: Nine of Clubs, Jack of Hearts            = 19
+  │   Dealer: Four of Hearts, Three of Diamonds, Nine of Diamonds, King of Spades = 26
+  │   Result: Dealer Bust          +5  ✓ WIN
+  │   Actions: stand (vs blackjack_action:1:1,blackjack_action:0:0)
+  │
+  └─ Session: 3 hands, net +10
+
+  +STORY sleep_paralysis, victoria
+
+╔══════════════════════════════════════════════════════════════════════════════════════════════════╗
+║ Day  35 | $      40 → $      38 (-2) | HP:95→96(+1) SAN:45→45(+0) | R:0 Car:N                    ║
+╚══════════════════════════════════════════════════════════════════════════════════════════════════╝
+  ┌─ EVENTS ─────────────────────────────────────
+  │ ▸ day:companion_nightmare
+  └──────────────────────────────────────────────
+
+  ┌─ BLACKJACK SESSION (3 hands) ─────────────
+  │
+  │ Hand 1: Bet $6 / $40 [bet:no_car_bootstrap_survival] edge=0
+  │   Player: Eight of Clubs, Queen of Hearts          = 18
+  │   Dealer: Two of Clubs, Seven of Spades, Two of Diamonds, Six of Clubs = 17
+  │   Result: Player Wins          +6  ✓ WIN
+  │   Actions: stand (vs blackjack_action:1:1,blackjack_action:0:0)
+  │
+  │ Hand 2: Bet $8 / $46 [bet:no_car_bootstrap_survival] edge=0
+  │   Player: King of Diamonds, Five of Spades         = 15
+  │   Dealer: Three of Clubs, Seven of Hearts, Two of Spades, Nine of Diamonds = 21
+  │   Result: Dealer Blackjack     -8  ✗ LOSS
+  │   Actions: stand (vs blackjack_action:1:1,blackjack_action:0:0)
+  │
+  │ Hand 3: Bet $2 / $38 
+  │   Player: Two of Hearts, Jack of Spades            = 12
+  │   Dealer: Ace of Spades, Jack of Clubs             = 21
+  │   Result: Dealer Blackjack     +0 (free hand)  ✗ LOSS
+  │
+  └─ Session: 3 hands, net -2
+
+
+╔══════════════════════════════════════════════════════════════════════════════════════════════════╗
+║ Day  36 | $      38 → $      40 (+2) | HP:96→100(+4) SAN:45→48(+3) | R:0 Car:N                   ║
+╚══════════════════════════════════════════════════════════════════════════════════════════════════╝
+  ┌─ EVENTS ─────────────────────────────────────
+  │ ▸ storyline:martinez:stage1
+  │   That might have been the best sleep of your life. You feel incredible.
+  │   Officer Martinez's cruiser pulls up next to your car. But this time, he's not in uniform.
+  │   He's wearing a flannel shirt and jeans. He's holding two cups of coffee.
+  │   He knocks gently this time.
+  │   He holds up a coffee cup.
+  │   ? Accept the coffee?
+  │   → Y/N: yes | event_yes:storyline:martinez:stage1 [conf=0.82]
+  │
+  │ ▸ met:Martinez Coffee
+  └──────────────────────────────────────────────
+
+  ┌─ BLACKJACK SESSION (3 hands) ─────────────
+  │
+  │ Hand 1: Bet $6 / $38 [bet:no_car_bootstrap_survival] edge=0
+  │   Player: Five of Spades, Seven of Hearts, Ace of Diamonds, Seven of Diamonds = 20
+  │   Dealer: Ace of Clubs, Four of Spades, Five of Hearts = 20
+  │   Result: Tie                  +0  = TIE
+  │   Actions: hit (vs blackjack_action:0:1,blackjack_action:1:0) → hit (vs blackjack_action:0:1,blackjack_action:1:0) → stand (vs blackjack_action:1:1,blackjack_action:0:0)
+  │
+  │ Hand 2: Bet $6 / $38 [bet:no_car_bootstrap_survival] edge=0
+  │   Player: Nine of Diamonds, Eight of Clubs         = 17
+  │   Dealer: King of Spades, Six of Spades, Three of Diamonds = 19
+  │   Result: Dealer Wins          -6  ✗ LOSS
+  │   Actions: stand (vs blackjack_action:1:1,blackjack_action:0:0)
+  │
+  │ Hand 3: Bet $4 / $32 [bet:no_car_bootstrap_survival] edge=0
+  │   Player: Three of Hearts, Two of Clubs, Six of Hearts, Ten of Spades = 21
+  │   Dealer: Six of Clubs, Ace of Spades              = 17
+  │   Result: Player Blackjack     +8  ✓ WIN
+  │   Actions: hit (vs blackjack_action:0:1,blackjack_action:1:0) → hit (vs blackjack_action:0:1,blackjack_action:1:0)
+  │
+  └─ Session: 3 hands, net +2
+
+
+╔══════════════════════════════════════════════════════════════════════════════════════════════════╗
+║ Day  37 | $      40 → $      35 (-5) | HP:100→100(+0) SAN:48→58(+10) | R:0 Car:N                 ║
+╚══════════════════════════════════════════════════════════════════════════════════════════════════╝
+  ┌─ EVENTS ─────────────────────────────────────
+  │ ▸ day:stray_cat_has_kittens
+  │
+  │ ▸ day:hollow_tree_stash_find
+  │
+  │ ▸ day:motivational_raccoon
+  └──────────────────────────────────────────────
+
+  ┌─ BLACKJACK SESSION (3 hands) ─────────────
+  │
+  │ Hand 1: Bet $6 / $40 [bet:no_car_bootstrap_survival] edge=0
+  │   Player: Eight of Spades, Queen of Diamonds       = 18
+  │   Dealer: Jack of Spades, Ten of Spades            = 20
+  │   Result: Dealer Wins          -6  ✗ LOSS
+  │   Actions: stand (vs blackjack_action:1:1,blackjack_action:0:0)
+  │
+  │ Hand 2: Bet $5 / $34 [bet:no_car_bootstrap_survival] edge=0
+  │   Player: Jack of Diamonds, King of Hearts         = 20
+  │   Dealer: Two of Clubs, Five of Hearts, Nine of Diamonds, Four of Clubs = 20
+  │   Result: Tie                  +0  = TIE
+  │   Actions: stand (vs blackjack_action:1:1,blackjack_action:0:0)
+  │
+  │ Hand 3: Bet $1 / $34 
+  │   Player: Queen of Spades, Seven of Spades         = 17
+  │   Dealer: Three of Hearts, Jack of Clubs, Queen of Clubs = 23
+  │   Result: Dealer Bust          +1 (free hand)  ✓ WIN
+  │   Actions: stand (vs blackjack_action:1:1,blackjack_action:0:0)
+  │
+  └─ Session: 3 hands, net -5
+
+
+╔══════════════════════════════════════════════════════════════════════════════════════════════════╗
+║ Day  38 | $      35 → $      54 (+19) | HP:100→100(+0) SAN:58→58(+0) | R:0 Car:N                 ║
+╚══════════════════════════════════════════════════════════════════════════════════════════════════╝
+  ┌─ EVENTS ─────────────────────────────────────
+  │ ▸ storyline:dealer_past:stage1
+  │   Poor? Yes. Defeated? Not yet.
+  │   I'll leave you with a quote:
+  │   You actually want to get out of the car. This is a historic moment.
+  │   A folded piece of paper floats to the ground.
+  │   He doesn't notice. You do.
+  │   ? Pick it up?
+  │   → Y/N: yes | event_yes:storyline:dealer_past:stage1 [conf=0.82]
+  │
+  │ ▸ met:Read Journal
+  └──────────────────────────────────────────────
+
+  ┌─ BLACKJACK SESSION (3 hands) ─────────────
+  │
+  │ Hand 1: Bet $5 / $35 [bet:no_car_bootstrap_survival] edge=0
+  │   Player: Five of Clubs, Five of Hearts, Jack of Hearts = 20
+  │   Dealer: Five of Diamonds, Jack of Clubs, Queen of Diamonds = 25
+  │   Result: Dealer Bust          +5  ✓ WIN
+  │   Actions: hit (vs blackjack_action:0:1,blackjack_action:1:0) → stand (vs blackjack_action:1:1,blackjack_action:0:0)
+  │
+  │ Hand 2: Bet $6 / $40 [bet:no_car_bootstrap_survival] edge=0
+  │   Player: Seven of Clubs, Ace of Clubs             = 18
+  │   Dealer: Two of Clubs, Ten of Hearts, Jack of Spades = 22
+  │   Result: Dealer Bust          +6  ✓ WIN
+  │   Actions: stand (vs blackjack_action:1:1,blackjack_action:0:0)
+  │
+  │ Hand 3: Bet $8 / $46 [bet:no_car_bootstrap_survival] edge=0
+  │   Player: Six of Clubs, Ten of Spades              = 16
+  │   Dealer: Six of Spades, Jack of Diamonds, Ten of Clubs = 26
+  │   Result: Dealer Bust          +8  ✓ WIN
+  │   Actions: stand (vs blackjack_action:1:1,blackjack_action:0:0)
+  │
+  └─ Session: 3 hands, net +19
+
+
+╔══════════════════════════════════════════════════════════════════════════════════════════════════╗
+║ Day  39 | $      54 → $     112 (+58) | HP:100→100(+0) SAN:58→62(+4) | R:0 Car:N                 ║
+╚══════════════════════════════════════════════════════════════════════════════════════════════════╝
+  ┌─ EVENTS ─────────────────────────────────────
+  │ ▸ day:crossover_artisan_rose_gift
+  │
+  │ ▸ day:dance_battle
+  │   Here's a quote my dad used to say:
+  │   refreshed and optimistic. The optimism will probably wear off by noon, but for now, you bask in it.
+  │   You step out of your car and a group of teenagers blocks your path. Their leader steps forward.
+  │   A boombox appears. Music starts playing. The crowd forms a circle.
+  │   It's dance battle time. What's your move?
+  │   ? Your opening move:
+  │   → chose 'moonwalk' [moonwalk] [conf=0.70]
+  │     (other: worm, robot, spin move, interpretive dance)
+  └──────────────────────────────────────────────
+
+  ┌─ BLACKJACK SESSION (3 hands) ─────────────
+  │
+  │ Hand 1: Bet $10 / $54 [bet:no_car_bootstrap_survival] edge=0
+  │   Player: Jack of Diamonds, Three of Hearts, Nine of Hearts = 22
+  │   Dealer: Queen of Diamonds, Eight of Hearts       = 18
+  │   Result: Player Bust          -10  ✗ LOSS
+  │   Actions: hit (vs blackjack_action:0:1,blackjack_action:1:0) → hit (vs blackjack_action:0:1,blackjack_action:1:0) → hit (vs blackjack_action:0:1,blackjack_action:1:0)
+  │
+  │ Hand 2: Bet $7 / $44 [bet:no_car_bootstrap_survival] edge=0
+  │   Player: Jack of Clubs, Five of Spades, Eight of Spades = 23
+  │   Dealer: Seven of Spades, Six of Spades           = 13
+  │   Result: Player Bust          -7  ✗ LOSS
+  │   Actions: stand (vs blackjack_action:1:1,blackjack_action:0:0)
+  │
+  │ Hand 3: Bet $6 / $37 [bet:no_car_bootstrap_survival] edge=0
+  │   Player: Ace of Clubs, Six of Diamonds, Eight of Clubs = 15
+  │   Dealer: Three of Diamonds, Four of Clubs, Three of Spades, Five of Clubs, Queen of Clubs = 25
+  │   Result: Dealer Bust          +6  ✓ WIN
+  │
+  └─ Session: 3 hands, net -11
+
+
+╔══════════════════════════════════════════════════════════════════════════════════════════════════╗
+║ Day  40 | $     112 → $     115 (+3) | HP:100→100(+0) SAN:62→61(-1) | R:0 Car:N                  ║
+╚══════════════════════════════════════════════════════════════════════════════════════════════════╝
+  ┌─ EVENTS ─────────────────────────────────────
+  │ ▸ storyline:victoria:stage1
+  │
+  │ ▸ met:Victoria Confrontation
+  │   The motorcycle pulls up. Victoria removes her helmet, but she's not smirking this time.
+  │   She leans against her bike, studying you.
+  │   She shakes her head.
+  │   She extends her hand.
+  │   "No hard feelings?"
+  │   ? Shake her hand?
+  │   → Y/N: no | threat_context_refusal [conf=0.88]
+  └──────────────────────────────────────────────
+
+  ┌─ BLACKJACK SESSION (3 hands) ─────────────
+  │
+  │ Hand 1: Bet $12 / $112 [bet:no_car_bootstrap_push] edge=0
+  │   Player: Ten of Spades, King of Diamonds          = 20
+  │   Dealer: Ten of Hearts, Eight of Diamonds         = 18
+  │   Result: Player Wins          +12 (free hand)  ✓ WIN
+  │   Actions: stand (vs blackjack_action:1:1,blackjack_action:0:0)
+  │
+  │ Hand 2: Bet $32 / $124 [bet:no_car_bootstrap_push] edge=0
+  │   Player: Three of Diamonds, Queen of Hearts, Four of Spades = 17
+  │   Dealer: Ten of Clubs, Eight of Hearts            = 18
+  │   Result: Dealer Wins          -32  ✗ LOSS
+  │   Actions: hit (vs blackjack_action:0:1,blackjack_action:1:0) → stand (vs blackjack_action:1:1,blackjack_action:0:0)
+  │
+  │ Hand 3: Bet $23 / $92 
+  │   Player: Five of Diamonds, Six of Hearts, Five of Spades = 16
+  │   Dealer: Four of Diamonds, Jack of Diamonds, Jack of Clubs = 24
+  │   Result: Dealer Bust          +23  ✓ WIN
+  │   Actions: hit (vs blackjack_action:0:1,blackjack_action:1:0) → stand (vs blackjack_action:1:1,blackjack_action:0:0)
+  │
+  └─ Session: 3 hands, net +3
+
+
+╔══════════════════════════════════════════════════════════════════════════════════════════════════╗
+║ Day  41 | $     115 → $     129 (+14) | HP:100→100(+0) SAN:61→58(-3) | R:0 Car:N                 ║
+╚══════════════════════════════════════════════════════════════════════════════════════════════════╝
+  ┌─ EVENTS ─────────────────────────────────────
+  │ ▸ day:lottery_scratch
+  └──────────────────────────────────────────────
+
+  ┌─ BLACKJACK SESSION (3 hands) ─────────────
+  │
+  │ Hand 1: Bet $29 / $115 [bet:no_car_bootstrap_push] edge=0
+  │   Player: Six of Spades, Eight of Diamonds, Three of Clubs = 17
+  │   Dealer: Eight of Hearts, Two of Clubs, Five of Diamonds, Nine of Clubs = 24
+  │   Result: Dealer Bust          +29  ✓ WIN
+  │   Actions: hit (vs blackjack_action:0:1,blackjack_action:1:0) → stand (vs blackjack_action:1:1,blackjack_action:0:0)
+  │
+  │ Hand 2: Bet $37 / $144 [bet:no_car_bootstrap_push] edge=0
+  │   Player: Six of Hearts, Ten of Hearts             = 16
+  │   Dealer: Two of Diamonds, Nine of Diamonds, Five of Clubs, Nine of Hearts = 25
+  │   Result: Dealer Bust          +37  ✓ WIN
+  │   Actions: stand (vs blackjack_action:1:1,blackjack_action:0:0)
+  │
+  │ Hand 3: Bet $47 / $181 [bet:no_car_bootstrap_push] edge=0
+  │   Player: Six of Clubs, Seven of Clubs             = 13
+  │   Dealer: Three of Diamonds, Four of Diamonds, Queen of Diamonds = 17
+  │   Result: Dealer Wins          -47  ✗ LOSS
+  │   Actions: stand (vs blackjack_action:1:1,blackjack_action:0:0)
+  │
+  └─ Session: 3 hands, net +19
+
+
+╔══════════════════════════════════════════════════════════════════════════════════════════════════╗
+║ Day  42 | $     129 → $      54 (-75) | HP:100→100(+0) SAN:58→54(-4) | R:0 Car:N                 ║
+╚══════════════════════════════════════════════════════════════════════════════════════════════════╝
+  ┌─ EVENTS ─────────────────────────────────────
+  │ ▸ storyline:phil:stage2
+  │   Not this again. As you open the door and get out of your car,
+  │   you notice the man in his bright red suit, once again peering into your trunk.
+  │   The man sees you, and walks up to you, with a badge in his hand.
+  │   You look at the badge. It's a piece of paper, colored gold, with the letters 'FBI' and 'CIA' written in pencil
+  │   "Are you gonna leave?"
+  │   ? "Are you? Gonna leave?"
+  │   → Y/N: yes | event_yes:storyline:phil:stage2 [conf=0.82]
+  └──────────────────────────────────────────────
+
+  ┌─ BLACKJACK SESSION (3 hands) ─────────────
+  │
+  │ Hand 1: Bet $33 / $129 [bet:no_car_bootstrap_push] edge=0
+  │   Player: Ten of Spades, Six of Hearts             = 16
+  │   Dealer: Six of Spades, Three of Spades, Ace of Clubs = 20
+  │   Result: Dealer Wins          -33  ✗ LOSS
+  │   Actions: stand (vs blackjack_action:1:1,blackjack_action:0:0)
+  │
+  │ Hand 2: Bet $24 / $96 [bet:no_car_bootstrap_push] edge=0
+  │   Player: Eight of Diamonds, Three of Diamonds, Four of Spades = 15
+  │   Dealer: Three of Hearts, Jack of Hearts, Five of Spades = 18
+  │   Result: Dealer Wins          -24  ✗ LOSS
+  │   Actions: hit (vs blackjack_action:0:1,blackjack_action:1:0) → stand (vs blackjack_action:1:1,blackjack_action:0:0)
+  │
+  │ Hand 3: Bet $18 / $72 [bet:no_car_bootstrap_push] edge=0
+  │   Player: Six of Clubs, Four of Clubs, Seven of Hearts = 17
+  │   Dealer: Two of Spades, Two of Clubs, Jack of Clubs, Seven of Diamonds = 21
+  │   Result: Dealer Blackjack     -18  ✗ LOSS
+  │   Actions: hit (vs blackjack_action:0:1,blackjack_action:1:0) → stand (vs blackjack_action:1:1,blackjack_action:0:0)
+  │
+  └─ Session: 3 hands, net -75
+
+
+╔══════════════════════════════════════════════════════════════════════════════════════════════════╗
+║ Day  43 | $      54 → $      71 (+17) | HP:100→100(+0) SAN:54→54(+0) | R:0 Car:N                 ║
+╚══════════════════════════════════════════════════════════════════════════════════════════════════╝
+  ┌─ EVENTS ─────────────────────────────────────
+  │ ▸ day:roadside_breakdown
+  └──────────────────────────────────────────────
+
+  ┌─ BLACKJACK SESSION (3 hands) ─────────────
+  │
+  │ Hand 1: Bet $5 / $54 [bet:no_car_bootstrap_push] edge=0
+  │   Player: Five of Spades, Ace of Clubs, Ace of Diamonds, Jack of Diamonds = 17
+  │   Dealer: Nine of Clubs, Queen of Spades           = 19
+  │   Result: Dealer Wins          +0 (free hand)  ✗ LOSS
+  │   Actions: hit (vs blackjack_action:0:1,blackjack_action:1:0) → hit (vs blackjack_action:0:1,blackjack_action:1:0) → stand (vs blackjack_action:1:1,blackjack_action:0:0)
+  │
+  │ Hand 2: Bet $3 / $54 
+  │   Player: Seven of Hearts, Four of Diamonds, Six of Diamonds = 17
+  │   Dealer: Three of Hearts, Five of Diamonds, Four of Spades, Queen of Clubs = 22
+  │   Result: Dealer Bust          +3 (free hand)  ✓ WIN
+  │   Actions: hit (vs blackjack_action:0:1,blackjack_action:1:0) → stand (vs blackjack_action:1:1,blackjack_action:0:0)
+  │
+  │ Hand 3: Bet $14 / $57 
+  │   Player: Nine of Spades, King of Clubs            = 19
+  │   Dealer: Eight of Diamonds, Ten of Hearts         = 18
+  │   Result: Player Wins          +14  ✓ WIN
+  │   Actions: stand (vs blackjack_action:1:1,blackjack_action:0:0)
+  │
+  └─ Session: 3 hands, net +17
+
+
+╔══════════════════════════════════════════════════════════════════════════════════════════════════╗
+║ Day  44 | $      71 → $      83 (+12) | HP:100→100(+0) SAN:54→53(-1) | R:0 Car:N                 ║
+╚══════════════════════════════════════════════════════════════════════════════════════════════════╝
+  ┌─ EVENTS ─────────────────────────────────────
+  │ ▸ storyline:martinez:stage2
+  │   That was some quality sleep. Five stars. Would sleep again.
+  │   Martinez is back. This time he's in uniform and he's all business.
+  │   He pulls out his phone and shows you a photo of a man in a red suit.
+  │   You recognize him immediately. That's the man who interrogated you. The red suit guy.
+  │   He hands you a card with his personal number on it.
+  │   ? Take the card?
+  │   → Y/N: yes | event_yes:storyline:martinez:stage2 [conf=0.82]
+  │
+  │ ▸ met:Martinez Favor
+  └──────────────────────────────────────────────
+
+  ┌─ BLACKJACK SESSION (3 hands) ─────────────
+  │
+  │ Hand 1: Bet $18 / $71 [bet:no_car_bootstrap_push] edge=0
+  │   Player: Five of Diamonds, Five of Clubs, Three of Diamonds, Seven of Spades = 20
+  │   Dealer: Nine of Clubs, Jack of Clubs             = 19
+  │   Result: Player Wins          +18  ✓ WIN
+  │   Actions: hit (vs blackjack_action:0:1,blackjack_action:1:0) → hit (vs blackjack_action:0:1,blackjack_action:1:0) → stand (vs blackjack_action:1:1,blackjack_action:0:0)
+  │
+  │ Hand 2: Bet $23 / $89 [bet:no_car_bootstrap_push] edge=0
+  │   Player: Eight of Diamonds, Ace of Hearts         = 19
+  │   Dealer: Seven of Diamonds, Jack of Diamonds      = 17
+  │   Result: Player Wins          +23  ✓ WIN
+  │   Actions: stand (vs blackjack_action:1:1,blackjack_action:0:0)
+  │
+  │ Hand 3: Bet $29 / $112 [bet:no_car_bootstrap_push] edge=0
+  │   Player: Two of Spades, Queen of Diamonds, Four of Spades, Ten of Diamonds = 26
+  │   Dealer: Ace of Diamonds, Four of Diamonds        = 15
+  │   Result: Player Bust          -29  ✗ LOSS
+  │   Actions: hit (vs blackjack_action:0:1,blackjack_action:1:0) → hit (vs blackjack_action:0:1,blackjack_action:1:0)
+  │
+  └─ Session: 3 hands, net +12
+
+  +ITEM  Martinez's Card
+
+╔══════════════════════════════════════════════════════════════════════════════════════════════════╗
+║ Day  45 | $      83 → $      46 (-37) | HP:100→100(+0) SAN:53→51(-2) | R:0 Car:N                 ║
+╚══════════════════════════════════════════════════════════════════════════════════════════════════╝
+  ┌─ EVENTS ─────────────────────────────────────
+  │ ▸ day:prime_day
+  │
+  │ ▸ day:nail_in_tire_blows
+  └──────────────────────────────────────────────
+
+  ┌─ BLACKJACK SESSION (3 hands) ─────────────
+  │
+  │ Hand 1: Bet $21 / $83 [bet:no_car_bootstrap_push] edge=0
+  │   Player: Queen of Diamonds, Eight of Diamonds     = 18
+  │   Dealer: Six of Spades, Three of Clubs, Queen of Spades = 19
+  │   Result: Dealer Wins          -21  ✗ LOSS
+  │   Actions: stand (vs blackjack_action:1:1,blackjack_action:0:0)
+  │
+  │ Hand 2: Bet $3 / $62 [bet:no_car_bootstrap_push] edge=0
+  │   Player: Three of Spades, Four of Diamonds, Ten of Diamonds = 17
+  │   Dealer: Six of Clubs, Three of Hearts, Ace of Diamonds = 20
+  │   Result: Dealer Wins          +0 (free hand)  ✗ LOSS
+  │   Actions: hit (vs blackjack_action:0:1,blackjack_action:1:0) → stand (vs blackjack_action:1:1,blackjack_action:0:0)
+  │
+  │ Hand 3: Bet $16 / $62 
+  │   Player: Jack of Clubs, Eight of Spades           = 18
+  │   Dealer: Five of Hearts, Six of Diamonds, Ten of Spades = 21
+  │   Result: Dealer Blackjack     -16  ✗ LOSS
+  │   Actions: stand (vs blackjack_action:1:1,blackjack_action:0:0)
+  │
+  └─ Session: 3 hands, net -37
+
+
+╔══════════════════════════════════════════════════════════════════════════════════════════════════╗
+║ Day  46 | $      46 → $      35 (-11) | HP:100→95(-5) SAN:51→50(-1) | R:0 Car:N                  ║
+╚══════════════════════════════════════════════════════════════════════════════════════════════════╝
+  ┌─ EVENTS ─────────────────────────────────────
+  │ ▸ storyline:victoria:stage1
+  │
+  │ ▸ day:construction_noise
+  └──────────────────────────────────────────────
+
+  ┌─ BLACKJACK SESSION (3 hands) ─────────────
+  │
+  │ Hand 1: Bet $4 / $46 [bet:no_car_bootstrap_survival] edge=0
+  │   Player: Eight of Clubs, King of Hearts           = 18
+  │   Dealer: Seven of Spades, King of Diamonds        = 17
+  │   Result: Player Wins          +4 (free hand)  ✓ WIN
+  │   Actions: stand (vs blackjack_action:1:1,blackjack_action:0:0)
+  │
+  │ Hand 2: Bet $9 / $50 [bet:no_car_bootstrap_survival] edge=0
+  │   Player: Eight of Hearts, Queen of Spades         = 18
+  │   Dealer: Ten of Clubs, Nine of Spades             = 19
+  │   Result: Dealer Wins          -9  ✗ LOSS
+  │   Actions: stand (vs blackjack_action:1:1,blackjack_action:0:0)
+  │
+  │ Hand 3: Bet $6 / $41 
+  │   Player: Five of Spades, Jack of Hearts, Seven of Hearts = 22
+  │   Dealer: Ten of Diamonds, Two of Spades           = 12
+  │   Result: Player Bust          -6  ✗ LOSS
+  │   Actions: hit (vs blackjack_action:0:1,blackjack_action:1:0)
+  │
+  └─ Session: 3 hands, net -11
+
+
+╔══════════════════════════════════════════════════════════════════════════════════════════════════╗
+║ Day  47 | $      35 → $      39 (+4) | HP:95→98(+3) SAN:50→65(+15) | R:0 Car:N                   ║
+╚══════════════════════════════════════════════════════════════════════════════════════════════════╝
+  ┌─ EVENTS ─────────────────────────────────────
+  │ ▸ day:sock_puppet_therapist
+  │   Hey, at least you can afford... some things. Not many things. But some.
+  │   I mean, you could definitely make more money, but hey it's a good start.
+  │   Best night's sleep in a long time. You even folded your blanket. Who are you?
+  │   You feel unstable.
+  │   You step out of your car and a man sits down next to you on the curb. He has a sock puppet on his hand — tiny 
+  │   ? Talk to... Dr. Socksworth?
+  │   → Y/N: yes | event_yes:day:sock_puppet_therapist [conf=0.82]
+  └──────────────────────────────────────────────
+
+  ┌─ BLACKJACK SESSION (3 hands) ─────────────
+  │
+  │ Hand 1: Bet $5 / $35 [bet:no_car_bootstrap_survival] edge=0
+  │   Player: Five of Spades, Seven of Diamonds, Seven of Hearts = 19
+  │   Dealer: Ten of Hearts, Seven of Clubs            = 17
+  │   Result: Player Wins          +5  ✓ WIN
+  │   Actions: hit (vs blackjack_action:0:1,blackjack_action:1:0) → stand (vs blackjack_action:1:1,blackjack_action:0:0)
+  │
+  │ Hand 2: Bet $6 / $40 [bet:no_car_bootstrap_survival] edge=0
+  │   Player: Four of Diamonds, Queen of Diamonds, Queen of Clubs = 24
+  │   Dealer: Ace of Diamonds, Four of Spades          = 15
+  │   Result: Player Bust          -6  ✗ LOSS
+  │   Actions: hit (vs blackjack_action:0:1,blackjack_action:1:0) → hit (vs blackjack_action:0:1,blackjack_action:1:0) → stand (vs blackjack_action:1:1,blackjack_action:0:0)
+  │
+  │ Hand 3: Bet $5 / $34 [bet:no_car_bootstrap_survival] edge=0
+  │   Player: Six of Clubs, Six of Hearts, Two of Diamonds = 14
+  │   Dealer: Three of Hearts, King of Diamonds, Queen of Spades = 23
+  │   Result: Dealer Bust          +5  ✓ WIN
+  │
+  └─ Session: 3 hands, net +4
+
+
+╔══════════════════════════════════════════════════════════════════════════════════════════════════╗
+║ Day  48 | $      39 → $      32 (-7) | HP:98→100(+2) SAN:65→65(+0) | R:0 Car:N                   ║
+╚══════════════════════════════════════════════════════════════════════════════════════════════════╝
+  ┌─ EVENTS ─────────────────────────────────────
+  │ ▸ storyline:victoria:stage1
+  │
+  │ ▸ day:swamp_gold_attention
+  │
+  │ ▸ day:power_outage_area
+  └──────────────────────────────────────────────
+
+  ┌─ BLACKJACK SESSION (3 hands) ─────────────
+  │
+  │ Hand 1: Bet $6 / $39 [bet:no_car_bootstrap_survival] edge=0
+  │   Player: Ace of Diamonds, Ace of Spades, Four of Spades, Nine of Diamonds = 15
+  │   Dealer: Two of Hearts, Two of Clubs, Eight of Diamonds, King of Hearts = 22
+  │   Result: Dealer Bust          +6  ✓ WIN
+  │   Actions: hit (vs blackjack_action:0:1,blackjack_action:1:0) → hit (vs blackjack_action:0:1,blackjack_action:1:0) → stand (vs blackjack_action:1:1,blackjack_action:0:0)
+  │
+  │ Hand 2: Bet $7 / $45 [bet:no_car_bootstrap_survival] edge=0
+  │   Player: Three of Hearts, Six of Hearts, Four of Clubs = 13
+  │   Dealer: Five of Clubs, Nine of Clubs, Seven of Clubs = 21
+  │   Result: Dealer Blackjack     -7  ✗ LOSS
+  │   Actions: hit (vs blackjack_action:0:1,blackjack_action:1:0) → stand (vs blackjack_action:1:1,blackjack_action:0:0)
+  │
+  │ Hand 3: Bet $6 / $38 [bet:no_car_bootstrap_survival] edge=0
+  │   Player: Ten of Spades, Five of Diamonds, Two of Diamonds = 17
+  │   Dealer: Queen of Diamonds, Nine of Hearts        = 19
+  │   Result: Dealer Wins          -6  ✗ LOSS
+  │   Actions: hit (vs blackjack_action:0:1,blackjack_action:1:0) → stand (vs blackjack_action:1:1,blackjack_action:0:0)
+  │
+  └─ Session: 3 hands, net -7
+
+
+╔══════════════════════════════════════════════════════════════════════════════════════════════════╗
+║ Day  49 | $      32 → $      41 (+9) | HP:100→100(+0) SAN:65→63(-2) | R:0 Car:N                  ║
+╚══════════════════════════════════════════════════════════════════════════════════════════════════╝
+  ┌─ EVENTS ─────────────────────────────────────
+  │ ▸ day:midnight_radio_pole
+  │
+  │ ▸ day:wild_fortune_cards_car
+  └──────────────────────────────────────────────
+
+  ┌─ BLACKJACK SESSION (3 hands) ─────────────
+  │
+  │ Hand 1: Bet $2 / $32 [bet:no_car_bootstrap_survival] edge=0
+  │   Player: Two of Clubs, Ace of Diamonds            = 13
+  │   Dealer: Ace of Spades, Ten of Clubs              = 21
+  │   Result: Dealer Blackjack     +0 (free hand)  ✗ LOSS
+  │   Actions: stand (vs blackjack_action:1:1,blackjack_action:0:0)
+  │
+  │ Hand 2: Bet $4 / $32 [bet:no_car_bootstrap_survival] edge=0
+  │   Player: Ten of Diamonds, Seven of Diamonds       = 17
+  │   Dealer: Nine of Hearts, Seven of Clubs, Nine of Clubs = 25
+  │   Result: Dealer Bust          +4  ✓ WIN
+  │   Actions: hit (vs blackjack_action:0:1,blackjack_action:1:0) → stand (vs blackjack_action:1:1,blackjack_action:0:0)
+  │
+  │ Hand 3: Bet $5 / $36 
+  │   Player: Eight of Clubs, Seven of Hearts, Five of Clubs = 20
+  │   Dealer: King of Spades, Six of Clubs, Eight of Diamonds = 24
+  │   Result: Dealer Bust          +5  ✓ WIN
+  │
+  └─ Session: 3 hands, net +9
+
+
+╔══════════════════════════════════════════════════════════════════════════════════════════════════╗
+║ Day  50 | $      41 → $      65 (+24) | HP:100→100(+0) SAN:63→64(+1) | R:0 Car:N                 ║
+╚══════════════════════════════════════════════════════════════════════════════════════════════════╝
+  ┌─ EVENTS ─────────────────────────────────────
+  │ ▸ storyline:victoria:stage1
+  │
+  │ ▸ day:heart_condition_flare
+  │
+  │ ▸ day:suspicious_package_open
+  │
+  │ ▸ day:voodoo_doll_temptation
+  │
+  │ ▸ day:the_photographer
+  │
+  │ ▸ met:The Photographer
+  │   You know what you need right now? A quote, from the heart:
+  │   Your eyes pop open and you're ready to go. Did someone slip you a good dream? Because that was chef's kiss.
+  │   For a moment, you could have sworn the shadows moved.
+  │   A woman with a professional camera approaches your car, clearly excited.
+  │   She's practically bouncing with enthusiasm.
+  │   ? Allow the photoshoot?
+  │   → Y/N: no | threat_context_refusal [conf=0.88]
+  └──────────────────────────────────────────────
+
+  ┌─ BLACKJACK SESSION (3 hands) ─────────────
+  │
+  │ Hand 1: Bet $6 / $41 [bet:no_car_bootstrap_survival] edge=0
+  │   Player: Six of Clubs, Three of Diamonds, Jack of Hearts = 19
+  │   Dealer: Ace of Diamonds, Two of Hearts, Five of Hearts = 18
+  │   Result: Player Wins          +6  ✓ WIN
+  │   Actions: hit (vs blackjack_action:0:1,blackjack_action:1:0) → stand (vs blackjack_action:1:1,blackjack_action:0:0)
+  │
+  │ Hand 2: Bet $8 / $47 [bet:no_car_bootstrap_survival] edge=0
+  │   Player: Four of Hearts, Jack of Diamonds         = 14
+  │   Dealer: Two of Spades, King of Diamonds, Ten of Spades = 22
+  │   Result: Dealer Bust          +8  ✓ WIN
+  │   Actions: stand (vs blackjack_action:1:1,blackjack_action:0:0)
+  │
+  │ Hand 3: Bet $10 / $55 [bet:no_car_bootstrap_survival] edge=0
+  │   Player: King of Clubs, Ten of Hearts             = 20
+  │   Dealer: Five of Diamonds, Eight of Spades, King of Hearts = 23
+  │   Result: Dealer Bust          +10  ✓ WIN
+  │   Actions: stand (vs blackjack_action:1:1,blackjack_action:0:0)
+  │
+  └─ Session: 3 hands, net +24
+
+
+╔══════════════════════════════════════════════════════════════════════════════════════════════════╗
+║ Day  51 | $      65 → $      47 (-18) | HP:100→100(+0) SAN:64→63(-1) | R:0 Car:N                 ║
+╚══════════════════════════════════════════════════════════════════════════════════════════════════╝
+  ┌─ EVENTS ─────────────────────────────────────
+  │ ▸ day:morning_stretch
+  └──────────────────────────────────────────────
+
+  ┌─ BLACKJACK SESSION (3 hands) ─────────────
+  │
+  │ Hand 1: Bet $16 / $65 [bet:no_car_bootstrap_push] edge=0
+  │   Player: Two of Diamonds, Three of Spades, Ten of Clubs, Queen of Hearts = 25
+  │   Dealer: Nine of Hearts, Six of Hearts            = 15
+  │   Result: Player Bust          -16  ✗ LOSS
+  │   Actions: hit (vs blackjack_action:0:1,blackjack_action:1:0) → hit (vs blackjack_action:0:1,blackjack_action:1:0) → stand (vs blackjack_action:1:1,blackjack_action:0:0)
+  │
+  │ Hand 2: Bet $8 / $49 [bet:no_car_bootstrap_survival] edge=0
+  │   Player: Seven of Clubs, Eight of Spades          = 15
+  │   Dealer: Three of Diamonds, Ten of Diamonds, Ace of Hearts, Seven of Diamonds = 21
+  │   Result: Dealer Blackjack     -8  ✗ LOSS
+  │   Actions: stand (vs blackjack_action:1:1,blackjack_action:0:0)
+  │
+  │ Hand 3: Bet $6 / $41 [bet:no_car_bootstrap_survival] edge=0
+  │   Player: Three of Clubs, Ten of Spades            = 13
+  │   Dealer: Five of Hearts, Ace of Diamonds, Queen of Clubs, Nine of Clubs = 25
+  │   Result: Dealer Bust          +6  ✓ WIN
+  │
+  └─ Session: 3 hands, net -18
+
+
+╔══════════════════════════════════════════════════════════════════════════════════════════════════╗
+║ Day  52 | $      47 → $      38 (-9) | HP:100→100(+0) SAN:63→63(+0) | R:0 Car:N                  ║
+╚══════════════════════════════════════════════════════════════════════════════════════════════════╝
+  ┌─ EVENTS ─────────────────────────────────────
+  │ ▸ storyline:phil:stage3
+  │   You can feel your blood start to boil. What's this guy's problem?
+  │   As you open the door and get out of your car, you notice the man in his bright red suit, once again peering in
+  │   The man sees you, and walks up to you, with a pistol holstered to his waist.
+  │   You look down at the gun on his waist. It looks fancy, and certainly deadly.
+  │   "Will you leave?"
+  │   ? "Answer me. "
+  │   → Y/N: yes | event_yes:storyline:phil:stage3 [conf=0.82]
+  └──────────────────────────────────────────────
+
+  ┌─ BLACKJACK SESSION (3 hands) ─────────────
+  │
+  │ Hand 1: Bet $8 / $47 [bet:no_car_bootstrap_survival] edge=0
+  │   Player: Nine of Hearts, Two of Hearts, Four of Diamonds = 15
+  │   Dealer: Four of Hearts, Ace of Clubs, Two of Spades = 17
+  │   Result: Dealer Wins          -8  ✗ LOSS
+  │   Actions: hit (vs blackjack_action:0:1,blackjack_action:1:0) → stand (vs blackjack_action:1:1,blackjack_action:0:0)
+  │
+  │ Hand 2: Bet $6 / $39 [bet:no_car_bootstrap_survival] edge=0
+  │   Player: Ten of Hearts, Nine of Diamonds          = 19
+  │   Dealer: Queen of Spades, Seven of Clubs          = 17
+  │   Result: Player Wins          +6  ✓ WIN
+  │   Actions: stand (vs blackjack_action:1:1,blackjack_action:0:0)
+  │
+  │ Hand 3: Bet $7 / $45 [bet:no_car_bootstrap_survival] edge=0
+  │   Player: Ace of Hearts, Three of Clubs, Three of Spades, Jack of Diamonds = 17
+  │   Dealer: Five of Hearts, Four of Spades, Ten of Clubs = 19
+  │   Result: Dealer Wins          -7  ✗ LOSS
+  │   Actions: hit (vs blackjack_action:0:1,blackjack_action:1:0) → hit (vs blackjack_action:0:1,blackjack_action:1:0) → stand (vs blackjack_action:1:1,blackjack_action:0:0)
+  │
+  └─ Session: 3 hands, net -9
+
+
+╔══════════════════════════════════════════════════════════════════════════════════════════════════╗
+║ Day  53 | $      38 → $      51 (+13) | HP:100→80(-20) SAN:63→63(+0) | R:0 Car:N  ◄ DAMAGE       ║
+╚══════════════════════════════════════════════════════════════════════════════════════════════════╝
+  ┌─ EVENTS ─────────────────────────────────────
+  │ ▸ day:exactly_420
+  │
+  │ ▸ day:scorching_sun
+  └──────────────────────────────────────────────
+
+  ┌─ BLACKJACK SESSION (3 hands) ─────────────
+  │
+  │ Hand 1: Bet $2 / $38 [bet:no_car_bootstrap_survival] edge=0
+  │   Player: Nine of Hearts, Four of Hearts, Ten of Spades = 23
+  │   Dealer: Nine of Diamonds, Jack of Spades         = 19
+  │   Result: Player Bust          +0 (free hand)  ✗ LOSS
+  │   Actions: hit (vs blackjack_action:0:1,blackjack_action:1:0) → stand (vs blackjack_action:1:1,blackjack_action:0:0)
+  │
+  │ Hand 2: Bet $6 / $38 [bet:no_car_bootstrap_survival] edge=0
+  │   Player: King of Diamonds, Ten of Hearts          = 20
+  │   Dealer: King of Hearts, Five of Clubs, Two of Clubs = 17
+  │   Result: Player Wins          +6  ✓ WIN
+  │   Actions: hit (vs blackjack_action:0:1,blackjack_action:1:0) → hit (vs blackjack_action:0:1,blackjack_action:1:0)
+  │
+  │ Hand 3: Bet $7 / $44 
+  │   Player: Five of Spades, Eight of Clubs, Two of Hearts, Ace of Clubs, Four of Clubs = 20
+  │   Dealer: Nine of Clubs, Five of Diamonds, Queen of Hearts = 24
+  │   Result: Dealer Bust          +7  ✓ WIN
+  │   Actions: hit (vs blackjack_action:0:1,blackjack_action:1:0) → stand (vs blackjack_action:1:1,blackjack_action:0:0)
+  │
+  └─ Session: 3 hands, net +13
+
+
+╔══════════════════════════════════════════════════════════════════════════════════════════════════╗
+║ Day  54 | $      51 → $      35 (-16) | HP:80→78(-2) SAN:63→55(-8) | R:0 Car:N                   ║
+╚══════════════════════════════════════════════════════════════════════════════════════════════════╝
+  ┌─ EVENTS ─────────────────────────────────────
+  │ ▸ storyline:sleep_paralysis:stage1
+  │
+  │ ▸ met:Shadow Spoke
+  └──────────────────────────────────────────────
+
+  ┌─ BLACKJACK SESSION (3 hands) ─────────────
+  │
+  │ Hand 1: Bet $9 / $51 [bet:no_car_bootstrap_survival] edge=0
+  │   Player: Five of Clubs, Ten of Spades, Three of Spades = 18
+  │   Dealer: Jack of Diamonds, King of Clubs          = 20
+  │   Result: Dealer Wins          -9  ✗ LOSS
+  │   Actions: hit (vs blackjack_action:0:1,blackjack_action:1:0) → stand (vs blackjack_action:1:1,blackjack_action:0:0)
+  │
+  │ Hand 2: Bet $2 / $42 [bet:no_car_bootstrap_survival] edge=0
+  │   Player: Seven of Diamonds, Ten of Hearts         = 17
+  │   Dealer: Five of Spades, Nine of Diamonds, Four of Diamonds = 18
+  │   Result: Dealer Wins          +0 (free hand)  ✗ LOSS
+  │   Actions: stand (vs blackjack_action:1:1,blackjack_action:0:0)
+  │
+  │ Hand 3: Bet $7 / $42 
+  │   Player: Four of Spades, Eight of Hearts, Jack of Hearts = 22
+  │   Dealer: Jack of Clubs, Eight of Spades           = 18
+  │   Result: Player Bust          -7  ✗ LOSS
+  │   Actions: hit (vs blackjack_action:0:1,blackjack_action:1:0)
+  │
+  └─ Session: 3 hands, net -16
+
+
+╔══════════════════════════════════════════════════════════════════════════════════════════════════╗
+║ Day  55 | $      35 → $      26 (-9) | HP:78→81(+3) SAN:55→54(-1) | R:0 Car:N                    ║
+╚══════════════════════════════════════════════════════════════════════════════════════════════════╝
+  ┌─ EVENTS ─────────────────────────────────────
+  │ ▸ day:caught_fishing
+  └──────────────────────────────────────────────
+
+  ┌─ BLACKJACK SESSION (3 hands) ─────────────
+  │
+  │ Hand 1: Bet $3 / $35 [bet:no_car_bootstrap_survival] edge=0
+  │   Player: Seven of Hearts, Six of Diamonds, Four of Clubs = 17
+  │   Dealer: Queen of Spades, Eight of Spades         = 18
+  │   Result: Dealer Wins          +0 (free hand)  ✗ LOSS
+  │   Actions: hit (vs blackjack_action:0:1,blackjack_action:1:0) → stand (vs blackjack_action:1:1,blackjack_action:0:0)
+  │
+  │ Hand 2: Bet $5 / $35 [bet:no_car_bootstrap_survival] edge=0
+  │   Player: Queen of Clubs, Nine of Diamonds         = 19
+  │   Dealer: Four of Spades, Two of Spades, Five of Diamonds, Ten of Spades = 21
+  │   Result: Dealer Blackjack     -5  ✗ LOSS
+  │   Actions: stand (vs blackjack_action:1:1,blackjack_action:0:0)
+  │
+  │ Hand 3: Bet $4 / $30 
+  │   Player: Eight of Clubs, Ace of Spades            = 19
+  │   Dealer: Ten of Clubs, Jack of Spades             = 20
+  │   Result: Dealer Wins          -4  ✗ LOSS
+  │   Actions: stand (vs blackjack_action:1:1,blackjack_action:0:0)
+  │
+  └─ Session: 3 hands, net -9
+
+
+╔══════════════════════════════════════════════════════════════════════════════════════════════════╗
+║ Day  56 | $      26 → $      26 (+0) | HP:81→86(+5) SAN:54→54(+0) | R:0 Car:N                    ║
+╚══════════════════════════════════════════════════════════════════════════════════════════════════╝
+  ┌─ EVENTS ─────────────────────────────────────
+  │ ▸ storyline:dealer_past:stage2
+  │   His eyes keep drifting to the empty passenger seat of his car —
+  │   wait, does the Dealer have a car? You've never seen him arrive or leave.
+  │   You've been carrying what you read in that journal entry. The daughter.
+  │   The candles. You can't un-read it.
+  │   The silence between hands stretches. It fills with things unsaid.
+  │   ? Ask the Dealer about his past?
+  │   → Y/N: yes | event_yes:storyline:dealer_past:stage2 [conf=0.82]
+  │
+  │ ▸ met:Dealer Asked
+  └──────────────────────────────────────────────
+
+  ┌─ BLACKJACK SESSION (3 hands) ─────────────
+  │
+  │ Hand 1: Bet $1 / $26 [bet:no_car_bootstrap_survival] edge=0
+  │   Player: Queen of Hearts, Queen of Spades         = 20
+  │   Dealer: Two of Diamonds, Jack of Diamonds, Jack of Spades = 22
+  │   Result: Dealer Bust          +1 (free hand)  ✓ WIN
+  │   Actions: stand (vs blackjack_action:1:1,blackjack_action:0:0)
+  │
+  │ Hand 2: Bet $3 / $27 [bet:no_car_bootstrap_survival] edge=0
+  │   Player: King of Clubs, Nine of Clubs             = 19
+  │   Dealer: Seven of Clubs, Six of Diamonds, Eight of Spades = 21
+  │   Result: Dealer Blackjack     -3  ✗ LOSS
+  │   Actions: stand (vs blackjack_action:1:1,blackjack_action:0:0)
+  │
+  │ Hand 3: Bet $2 / $24 
+  │   Player: Five of Diamonds, Four of Clubs, Eight of Hearts = 17
+  │   Dealer: Nine of Hearts, Four of Hearts, King of Spades = 23
+  │   Result: Dealer Bust          +2  ✓ WIN
+  │   Actions: hit (vs blackjack_action:0:1,blackjack_action:1:0) → stand (vs blackjack_action:1:1,blackjack_action:0:0)
+  │
+  └─ Session: 3 hands, net +0
+
+
+╔══════════════════════════════════════════════════════════════════════════════════════════════════╗
+║ Day  57 | $      26 → $      21 (-5) | HP:86→84(-2) SAN:54→50(-4) | R:0 Car:N                    ║
+╚══════════════════════════════════════════════════════════════════════════════════════════════════╝
+  ┌─ EVENTS ─────────────────────────────────────
+  │ ▸ day:stink_bomb_escape
+  └──────────────────────────────────────────────
+
+  ┌─ BLACKJACK SESSION (3 hands) ─────────────
+  │
+  │ Hand 1: Bet $3 / $26 [bet:no_car_bootstrap_survival] edge=0
+  │   Player: Four of Diamonds, Nine of Clubs          = 13
+  │   Dealer: Four of Clubs, Six of Spades, Ten of Clubs = 20
+  │   Result: Dealer Wins          -3  ✗ LOSS
+  │   Actions: stand (vs blackjack_action:1:1,blackjack_action:0:0)
+  │
+  │ Hand 2: Bet $2 / $23 [bet:no_car_bootstrap_survival] edge=0
+  │   Player: Three of Clubs, King of Spades, Two of Spades, Two of Diamonds = 17
+  │   Dealer: King of Hearts, Ten of Hearts            = 20
+  │   Result: Dealer Wins          -2  ✗ LOSS
+  │   Actions: hit (vs blackjack_action:0:1,blackjack_action:1:0) → hit (vs blackjack_action:0:1,blackjack_action:1:0) → stand (vs blackjack_action:1:1,blackjack_action:0:0)
+  │
+  │ Hand 3: Bet $1 / $21 
+  │   Player: Six of Clubs, Queen of Spades            = 16
+  │   Dealer: Four of Spades, Seven of Clubs, Ace of Hearts, Nine of Diamonds = 21
+  │   Result: Dealer Blackjack     +0 (free hand)  ✗ LOSS
+  │   Actions: stand (vs blackjack_action:1:1,blackjack_action:0:0)
+  │
+  └─ Session: 3 hands, net -5
+
+
+╔══════════════════════════════════════════════════════════════════════════════════════════════════╗
+║ Day  58 | $      21 → $     141 (+120) | HP:84→85(+1) SAN:50→56(+6) | R:0 Car:N                  ║
+╚══════════════════════════════════════════════════════════════════════════════════════════════════╝
+  ┌─ EVENTS ─────────────────────────────────────
+  │ ▸ storyline:rosa:stage3
+  └──────────────────────────────────────────────
+
+  ┌─ BLACKJACK SESSION (3 hands) ─────────────
+  │
+  │ Hand 1: Bet $2 / $21 [bet:no_car_bootstrap_survival] edge=0
+  │   Player: Four of Hearts, Eight of Spades, Six of Spades = 18
+  │   Dealer: Ten of Diamonds, Eight of Clubs          = 18
+  │   Result: Tie                  +0  = TIE
+  │   Actions: hit (vs blackjack_action:0:1,blackjack_action:1:0) → stand (vs blackjack_action:1:1,blackjack_action:0:0)
+  │
+  │ Hand 2: Bet $2 / $21 [bet:no_car_bootstrap_survival] edge=0
+  │   Player: Queen of Hearts, Ten of Hearts           = 20
+  │   Dealer: Jack of Hearts, Two of Clubs, King of Spades = 22
+  │   Result: Dealer Bust          +2  ✓ WIN
+  │   Actions: stand (vs blackjack_action:1:1,blackjack_action:0:0)
+  │
+  │ Hand 3: Bet $2 / $23 [bet:no_car_bootstrap_survival] edge=0
+  │   Player: Seven of Hearts, Eight of Diamonds, Seven of Clubs = 22
+  │   Dealer: Jack of Spades, Two of Spades            = 12
+  │   Result: Player Bust          -2  ✗ LOSS
+  │   Actions: hit (vs blackjack_action:0:1,blackjack_action:1:0)
+  │
+  └─ Session: 3 hands, net +0
+
+
+╔══════════════════════════════════════════════════════════════════════════════════════════════════╗
+║ Day  59 | $     141 → $      98 (-43) | HP:85→80(-5) SAN:56→54(-2) | R:0 Car:N                   ║
+╚══════════════════════════════════════════════════════════════════════════════════════════════════╝
+  ┌─ EVENTS ─────────────────────────────────────
+  │ ▸ day:splint_injury_event
+  └──────────────────────────────────────────────
+
+  ┌─ BLACKJACK SESSION (3 hands) ─────────────
+  │
+  │ Hand 1: Bet $36 / $141 [bet:no_car_bootstrap_push] edge=0
+  │   Player: Ace of Diamonds, Three of Spades         = 14
+  │   Dealer: Ace of Clubs, King of Diamonds           = 21
+  │   Result: Dealer Blackjack     -36  ✗ LOSS
+  │   Actions: hit (vs blackjack_action:0:1,blackjack_action:1:0) → stand (vs blackjack_action:1:1,blackjack_action:0:0)
+  │
+  │ Hand 2: Bet $27 / $105 [bet:no_car_bootstrap_push] edge=0
+  │   Player: Queen of Diamonds, Five of Spades, Eight of Clubs = 23
+  │   Dealer: Nine of Spades, Ace of Hearts            = 20
+  │   Result: Player Bust          -27  ✗ LOSS
+  │
+  │ Hand 3: Bet $20 / $78 [bet:no_car_bootstrap_push] edge=0
+  │   Player: Ten of Spades, Six of Hearts             = 16
+  │   Dealer: Four of Hearts, Seven of Clubs, Five of Diamonds, Six of Spades = 22
+  │   Result: Dealer Bust          +20  ✓ WIN
+  │
+  └─ Session: 3 hands, net -43
+
+
+╔══════════════════════════════════════════════════════════════════════════════════════════════════╗
+║ Day  60 | $      98 → $      55 (-43) | HP:80→83(+3) SAN:54→48(-6) | R:0 Car:N                   ║
+╚══════════════════════════════════════════════════════════════════════════════════════════════════╝
+  ┌─ EVENTS ─────────────────────────────────────
+  │ ▸ storyline:mime:stage2
+  │
+  │ ▸ met:Gerald
+  └──────────────────────────────────────────────
+
+  ┌─ BLACKJACK SESSION (3 hands) ─────────────
+  │
+  │ Hand 1: Bet $25 / $98 [bet:no_car_bootstrap_push] edge=0
+  │   Player: Three of Spades, Four of Hearts, Six of Hearts, Ten of Diamonds = 23
+  │   Dealer: Ten of Hearts, Six of Spades             = 16
+  │   Result: Player Bust          -25  ✗ LOSS
+  │   Actions: hit (vs blackjack_action:0:1,blackjack_action:1:0) → hit (vs blackjack_action:0:1,blackjack_action:1:0) → stand (vs blackjack_action:1:1,blackjack_action:0:0)
+  │
+  │ Hand 2: Bet $18 / $73 [bet:no_car_bootstrap_push] edge=0
+  │   Player: Ace of Clubs, Eight of Hearts            = 19
+  │   Dealer: Two of Hearts, Queen of Clubs, Seven of Diamonds = 19
+  │   Result: Tie                  +0  = TIE
+  │   Actions: hit (vs blackjack_action:0:1,blackjack_action:1:0) → hit (vs blackjack_action:0:1,blackjack_action:1:0)
+  │
+  │ Hand 3: Bet $18 / $73 [bet:no_car_bootstrap_push] edge=0
+  │   Player: Five of Diamonds, Five of Clubs, Three of Clubs, Nine of Diamonds = 22
+  │   Dealer: Jack of Hearts, Four of Diamonds         = 14
+  │   Result: Player Bust          -18  ✗ LOSS
+  │
+  └─ Session: 3 hands, net -43
+
+
+╔══════════════════════════════════════════════════════════════════════════════════════════════════╗
+║ Day  61 | $      55 → $       0 (-55) | HP:83→86(+3) SAN:48→48(+0) | R:0 Car:N                   ║
+╚══════════════════════════════════════════════════════════════════════════════════════════════════╝
+  ┌─ EVENTS ─────────────────────────────────────
+  │ ▸ day:gift_from_suzy
+  │
+  │ ▸ day:raccoon_gang_raid
+  └──────────────────────────────────────────────
+
+  ┌─ BLACKJACK SESSION (3 hands) ─────────────
+  │
+  │ Hand 1: Bet $3 / $55 [bet:no_car_bootstrap_push] edge=0
+  │   Player: Ace of Spades, Six of Hearts, Four of Clubs = 21
+  │   Dealer: Eight of Spades, Jack of Clubs           = 18
+  │   Result: Player Blackjack     +6 (free hand)  ✓ WIN
+  │   Actions: hit (vs blackjack_action:0:1,blackjack_action:1:0) → stand (vs blackjack_action:1:1,blackjack_action:0:0)
+  │
+  │ Hand 2: Bet $3 / $61 
+  │   Player: Seven of Hearts, Queen of Spades         = 17
+  │   Dealer: Ten of Diamonds, Jack of Spades          = 20
+  │   Result: Dealer Wins          +0 (free hand)  ✗ LOSS
+  │   Actions: hit (vs blackjack_action:0:1,blackjack_action:1:0) → hit (vs blackjack_action:0:1,blackjack_action:1:0)
+  │
+  │ Hand 3: Bet $15 / $61 
+  │   Player: Three of Diamonds, Three of Spades, Four of Spades, King of Clubs = 20
+  │   Dealer: King of Hearts, Ten of Hearts            = 20
+  │   Result: Tie                  +0  = TIE
+  │   Actions: stand (vs blackjack_action:1:1,blackjack_action:0:0)
+  │
+  └─ Session: 3 hands, net +6
+
+
+╔══════════════════════════════════════════════════════════════════════════════════════════════════╗
+║ DECISION TREE SUMMARY                                                                            ║
+╚══════════════════════════════════════════════════════════════════════════════════════════════════╝
+
+  Final State:
+    Balance: $0  |  HP: 86  |  SAN: 48  |  Rank: 0
+    Peak balance: $194
+    Days survived: 61
+    Total decisions traced: 427
+
+  Blackjack Statistics:
+    Hands played: 180  |  Won: 79  |  Lost: 87  |  Tied: 14
+    Win rate: 43.9%
+    Total wagered: $2,735
+    Total won: $1,151  |  Total lost: $1,371  |  Net: $-220
+    Average bet: $15
+
+  Events (119 total, 116 unique):
+    Day events (62):
+      day:buddy_dog_whistle_synergy                           ×1
+      day:the_warning                                         ×1
+      day:brass_knuckles_brawl                                ×1
+      day:found_gift_card                                     ×1
+      day:mysterious_key_lockbox_open                         ×1
+      day:herbal_pouch_remedy                                 ×1
+      day:signal_mirror_rescue                                ×1
+      day:windblown_worn_map                                  ×1
+      day:feeding_station_morning                             ×1
+      day:strong_winds                                        ×1
+      day:mysterious_note                                     ×1
+      day:patches_night_watch                                 ×1
+      day:lockpick_opportunity                                ×1
+      day:slick_escape_route                                  ×1
+      day:lucky_lure_fishing                                  ×1
+      day:mosquito_bite_infection                             ×1
+      day:car_compliment                                      ×1
+      day:the_mime                                            ×1
+      day:vision_map_navigate                                 ×1
+      day:whiskers_sixth_sense                                ×1
+      day:scrap_armor_event                                   ×1
+      day:trap_night_thief                                    ×1
+      day:got_a_tan                                           ×1
+      day:the_glitch                                          ×1
+      day:grace_dream_catcher_synergy                         ×1
+      day:midnight_radio_frequency                            ×1
+      day:threw_out_old_photo                                 ×1
+      day:dropped_ice_cream                                   ×1
+      day:tax_man                                             ×1
+      day:the_food_truck                                      ×1
+    Night events (7):
+      night:insomnia_night                                    ×1
+      night:nightmare                                         ×1
+      night:midnight_walk                                     ×1
+      night:woodlands_path                                    ×1
+      night:went_jogging                                      ×1
+      night:dream_of_winning                                  ×1
+      night:ditched_wallet                                    ×1
+    People met (23):
+      met:The Warning                                         ×1
+      met:Cowboy                                              ×1
+      met:Woodlands Path Event                                ×1
+      met:Rosa                                                ×1
+      met:Stray Cat Friend                                    ×1
+      met:Dealer Photo                                        ×1
+      met:Interrogator                                        ×1
+      met:Mime                                                ×1
+      met:Rosa Promised                                       ×1
+      met:Martinez                                            ×1
+      met:Food Truck                                          ×1
+      met:Lockbox                                             ×1
+      met:Rosa Paid Fee                                       ×1
+      met:The Rival                                           ×1
+      met:Sleep Paralysis                                     ×1
+      met:Martinez Coffee                                     ×1
+      met:Read Journal                                        ×1
+      met:Victoria Confrontation                              ×1
+      met:Martinez Favor                                      ×1
+      met:The Photographer                                    ×1
+      met:Shadow Spoke                                        ×1
+      met:Dealer Asked                                        ×1
+      met:Gerald                                              ×1
+    Storylines (24):
+      storyline:victoria:stage1                               ×4
+      storyline:jameson:stage0                                ×1
+      storyline:gas_station_hero:stage0                       ×1
+      storyline:jameson:stage1                                ×1
+      storyline:rosa:stage0                                   ×1
+      storyline:stray_cat:stage0                              ×1
+      storyline:dealer_past:stage0                            ×1
+      storyline:phil:stage0                                   ×1
+      storyline:rosa:stage1                                   ×1
+      storyline:martinez:stage0                               ×1
+      storyline:phil:stage1                                   ×1
+      storyline:lockbox:stage0                                ×1
+      storyline:rosa:stage2                                   ×1
+      storyline:mime:stage1                                   ×1
+      storyline:sleep_paralysis:stage0                        ×1
+      storyline:martinez:stage1                               ×1
+      storyline:dealer_past:stage1                            ×1
+      storyline:phil:stage2                                   ×1
+      storyline:martinez:stage2                               ×1
+      storyline:phil:stage3                                   ×1
+      storyline:sleep_paralysis:stage1                        ×1
+      storyline:dealer_past:stage2                            ×1
+      storyline:rosa:stage3                                   ×1
+      storyline:mime:stage2                                   ×1
+
+  Pure RNG Events (no player decision, 66 total):
+    Day  17 | day:car_compliment                       | $-87 | HP:+3 | SAN:+2
+    Day  13 | day:patches_night_watch                  | $-70 | SAN:-5
+    Day  13 | day:lockpick_opportunity                 | $-70 | SAN:-5
+    Day  29 | day:car_wont_start                       | $-55 | SAN:-3
+    Day  61 | day:gift_from_suzy                       | $-55 | HP:+3
+    Day  61 | day:raccoon_gang_raid                    | $-55 | HP:+3
+    Day  59 | day:splint_injury_event                  | $-43 | HP:-5 | SAN:-2
+    Day  60 | storyline:mime:stage2                    | $-43 | HP:+3 | SAN:-6
+    Day  21 | day:vision_map_navigate                  | $-40 | SAN:+6
+    Day  21 | day:whiskers_sixth_sense                 | $-40 | SAN:+6
+    Day  45 | day:prime_day                            | $-37 | SAN:-2
+    Day  45 | day:nail_in_tire_blows                   | $-37 | SAN:-2
+    Day   7 | day:mysterious_key_lockbox_open          | $-24 | SAN:+2
+    Day   7 | day:herbal_pouch_remedy                  | $-24 | SAN:+2
+    Day   7 | day:signal_mirror_rescue                 | $-24 | SAN:+2
+    Day   7 | night:dream_of_winning                   | $-24 | SAN:+2
+    Day  51 | day:morning_stretch                      | $-18 | SAN:-1
+    Day  54 | storyline:sleep_paralysis:stage1         | $-16 | HP:-2 | SAN:-8
+    Day   6 | day:found_gift_card                      | $-13 | HP:+3
+    Day   6 | night:went_jogging                       | $-13 | HP:+3
+    Day  33 | day:another_spider_bite                  | $-12
+    Day  33 | day:the_rival                            | $-12
+    Day  46 | storyline:victoria:stage1                | $-11 | HP:-5 | SAN:-1
+    Day  46 | day:construction_noise                   | $-11 | HP:-5 | SAN:-1
+    Day  55 | day:caught_fishing                       | $-9 | HP:+3 | SAN:-1
+    Day  48 | storyline:victoria:stage1                | $-7 | HP:+2
+    Day  48 | day:swamp_gold_attention                 | $-7 | HP:+2
+    Day  48 | day:power_outage_area                    | $-7 | HP:+2
+    Day  11 | day:mysterious_note                      | $-6 | SAN:-2
+    Day  37 | day:stray_cat_has_kittens                | $-5 | SAN:+10
+    Day  37 | day:hollow_tree_stash_find               | $-5 | SAN:+10
+    Day  37 | day:motivational_raccoon                 | $-5 | SAN:+10
+    Day  57 | day:stink_bomb_escape                    | $-5 | HP:-2 | SAN:-4
+    Day  35 | day:companion_nightmare                  | $-2 | HP:+1
+    Day  15 | day:slick_escape_route                   | $-1 | HP:-10 | SAN:-1
+    Day  15 | day:lucky_lure_fishing                   | $-1 | HP:-10 | SAN:-1
+    Day  15 | day:mosquito_bite_infection              | $-1 | HP:-10 | SAN:-1
+    Day  24 | day:got_a_tan                            | $+6 | SAN:+1
+    Day  49 | day:midnight_radio_pole                  | $+9 | SAN:-2
+    Day  49 | day:wild_fortune_cards_car               | $+9 | SAN:-2
+    Day  27 | day:tax_man                              | $+10 | SAN:+1
+    Day  27 | day:the_food_truck                       | $+10 | SAN:+1
+    Day  34 | storyline:sleep_paralysis:stage0         | $+10 | HP:-5 | SAN:-4
+    Day   2 | day:buddy_dog_whistle_synergy            | $+12 | HP:-5 | SAN:-3
+    Day   2 | day:the_warning                          | $+12 | HP:-5 | SAN:-3
+    Day   2 | night:insomnia_night                     | $+12 | HP:-5 | SAN:-3
+    Day   4 | day:brass_knuckles_brawl                 | $+12 | HP:-8 | SAN:+3
+    Day   4 | night:midnight_walk                      | $+12 | HP:-8 | SAN:+3
+    Day  53 | day:exactly_420                          | $+13 | HP:-20
+    Day  53 | day:scorching_sun                        | $+13 | HP:-20
+    Day  41 | day:lottery_scratch                      | $+14 | SAN:-3
+    Day  43 | day:roadside_breakdown                   | $+17
+    Day  23 | day:scrap_armor_event                    | $+18 | SAN:-1
+    Day  23 | day:trap_night_thief                     | $+18 | SAN:-1
+    Day   3 | storyline:jameson:stage0                 | $+26 | HP:+5 | SAN:-7
+    Day   3 | night:nightmare                          | $+26 | HP:+5 | SAN:-7
+    Day   9 | day:strong_winds                         | $+41 | SAN:-1
+    Day  25 | day:the_glitch                           | $+41 | SAN:-3
+    Day  25 | day:grace_dream_catcher_synergy          | $+41 | SAN:-3
+    Day  25 | day:midnight_radio_frequency             | $+41 | SAN:-3
+    Day  25 | day:threw_out_old_photo                  | $+41 | SAN:-3
+    Day  25 | day:dropped_ice_cream                    | $+41 | SAN:-3
+    Day   8 | day:windblown_worn_map                   | $+98
+    Day   8 | day:feeding_station_morning              | $+98
+    Day   8 | night:ditched_wallet                     | $+98
+    Day  58 | storyline:rosa:stage3                    | $+120 | HP:+1 | SAN:+6
+
+  Bet/Action Reason Codes:
+    blackjack_action:combo_policy                        258
+    bet:no_car_bootstrap_push                             77
+    bet:no_car_bootstrap_survival                         67
+    gas_station_hide                                       1
+    jameson_vet_bill_refusal                               1
+    event_yes:storyline:stray_cat:stage0                   1
+    event_yes:storyline:rosa:stage1                        1
+    event_yes:storyline:phil:stage1                        1
+    rosa_locker_fee_gate                                   1
+    book_club_sanity_gate                                  1
+    event_yes:storyline:martinez:stage1                    1
+    event_yes:storyline:dealer_past:stage1                 1
+    moonwalk                                               1
+    event_yes:storyline:phil:stage2                        1
+    event_yes:storyline:martinez:stage2                    1
+    event_yes:day:sock_puppet_therapist                    1
+    event_yes:storyline:phil:stage3                        1
+    event_yes:storyline:dealer_past:stage2                 1
+
+  Marvin Opportunities: 0 missed
+
+  Low Confidence Decisions (0, conf < 0.50 = bot was guessing):
+
+  Critical Turning Points (2, balance swing ≥$2k or severe injury):
+    Day   5 | $     100 → $      45 (-55)
+    Day  53 | $      38 → $      51 (+13)
+

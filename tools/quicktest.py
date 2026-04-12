@@ -39,6 +39,8 @@ colorama.deinit = lambda: None
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
+STORY_ROOT = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "story")
+
 warning_messages = []
 
 
@@ -94,6 +96,9 @@ CURRENT_PLAYER = None
 RECENT_TEXT = []
 LAST_INPUT_FINGERPRINT = None
 REPEATED_INPUT_COUNT = 0
+_BLANK_PROMPT_STREAK = 0
+_YN_FALLBACK_STREAK = 0
+_YN_FALLBACK_LABEL = None
 ANSI_RE = re.compile(r"\x1b\[[0-9;]*[A-Za-z]")
 MECHANIC_DECISIONS = []
 EARLY_MECHANIC_DAY_LIMIT = 10
@@ -106,6 +111,23 @@ GIFT_DELIVERIES = []
 DEALER_FREE_HANDS = []
 DECISION_REQUESTS = []
 DECISION_TRACES = []
+FUNNEL_METRIC_DEFAULTS = {
+    "store_buyout_ready_count": 0,
+    "store_buyout_trigger_count": 0,
+    "store_same_day_return_count": 0,
+    "gift_unlock_push_count": 0,
+    "gift_unlock_day": 0,
+    "workbench_ready_count": 0,
+    "workbench_trigger_count": 0,
+    "craft_attempt_count": 0,
+    "marvin_ready_count": 0,
+    "marvin_route_present_count": 0,
+    "marvin_direct_gate_count": 0,
+    "marvin_conversion_window_count": 0,
+    "debt_growth_override_count": 0,
+    "loan_growth_override_count": 0,
+    "pawn_growth_override_count": 0,
+}
 ITEM_PROVENANCE = defaultdict(lambda: {
     "acquired": [],
     "used": [],
@@ -127,6 +149,38 @@ def _infer_death_cause_from_recent_text():
         if any(pattern in lowered for pattern in patterns):
             return line.strip().rstrip(".")
     return "Unknown"
+
+
+def _ensure_funnel_metrics(player):
+    if player is None:
+        return dict(FUNNEL_METRIC_DEFAULTS)
+    metrics = getattr(player, "_autoplay_funnel_metrics", None)
+    if not isinstance(metrics, dict):
+        metrics = dict(FUNNEL_METRIC_DEFAULTS)
+        player._autoplay_funnel_metrics = metrics
+    else:
+        for name, default in FUNNEL_METRIC_DEFAULTS.items():
+            metrics.setdefault(name, default)
+    return metrics
+
+
+def _bump_funnel_metric(player, name, amount=1):
+    metrics = _ensure_funnel_metrics(player)
+    metrics[name] = int(metrics.get(name, 0) or 0) + int(amount)
+
+
+def _set_funnel_day_once(player, name):
+    if player is None:
+        return
+    metrics = _ensure_funnel_metrics(player)
+    if int(metrics.get(name, 0) or 0) > 0:
+        return
+    metrics[name] = max(0, int(getattr(player, "_day", 0) or 0))
+
+
+def _snapshot_funnel_metrics(player):
+    metrics = dict(_ensure_funnel_metrics(player))
+    return {name: int(metrics.get(name, 0) or 0) for name in FUNNEL_METRIC_DEFAULTS}
 
 
 def _remember_text(*parts):
@@ -215,6 +269,15 @@ def _capture_type(self, *args, **kwargs):
         _story_file.flush()
 
 
+def _is_menu_separator_line(line):
+    stripped = str(line or "").strip().lower()
+    if not stripped:
+        return True
+    if stripped.startswith("---") and stripped.endswith("---"):
+        return True
+    return "adventure destinations" in stripped
+
+
 def _get_recent_menu_options(limit=40):
     recent_lines = RECENT_TEXT[-limit:]
     trailing_block = []
@@ -226,6 +289,8 @@ def _get_recent_menu_options(limit=40):
             started = True
             continue
         if started:
+            if _is_menu_separator_line(line):
+                continue
             break
     trailing_block.reverse()
     if trailing_block:
@@ -343,8 +408,47 @@ def _current_game_state(player, *, menu_options=None, context_tag=None):
     )
 
 
+def _current_story_prompt_source():
+    stack = inspect.stack()
+    try:
+        for frame_info in stack[1:]:
+            filename = os.path.abspath(frame_info.filename)
+            if not filename.startswith(STORY_ROOT):
+                continue
+            self_obj = frame_info.frame.f_locals.get("self")
+            class_name = self_obj.__class__.__name__ if self_obj is not None else ""
+            return {
+                "story_source_function": frame_info.function,
+                "story_source_file": os.path.basename(filename),
+                "story_source_class": class_name,
+            }
+    finally:
+        del stack
+    return {}
+
+
+def _request_metadata(*parts):
+    merged = dict(_current_story_prompt_source())
+    for part in parts:
+        if part:
+            merged.update(part)
+    return merged
+
+
 def _record_decision_trace(trace):
     if trace is not None:
+        # Enrich trace with game text context for the decision tree.
+        # metadata dict is mutable even on a frozen dataclass.
+        meta = trace.metadata
+        if meta is None:
+            meta = {}
+        if "raw_recent_text" not in meta:
+            meta["raw_recent_text"] = tuple(RECENT_TEXT[-20:])
+        if "raw_prompt_text" not in meta and DECISION_REQUESTS:
+            last_req = DECISION_REQUESTS[-1]
+            req_cycle = last_req.metadata.get("cycle") if last_req.metadata else None
+            if req_cycle == CURRENT_CYCLE:
+                meta["raw_prompt_text"] = last_req.raw_prompt_text or ""
         DECISION_TRACES.append(trace)
 
 
@@ -384,10 +488,9 @@ def _build_event_policy_request(
         normalized_options=_structured_options(tuple(options), prefix=request_type),
         raw_prompt_text=prompt or "",
         raw_recent_text=tuple(RECENT_TEXT[-20:]),
-        metadata={
+        metadata=_request_metadata({
             "cycle": CURRENT_CYCLE,
-            **(metadata or {}),
-        },
+        }, metadata),
     )
     plan = choose_strategic_goal(snapshot)
     return request, plan
@@ -413,11 +516,10 @@ def _record_structured_trace(
         normalized_options=_structured_options(options, prefix=request_type),
         raw_prompt_text=prompt or "",
         raw_recent_text=tuple(RECENT_TEXT[-20:]),
-        metadata={
+        metadata=_request_metadata({
             "cycle": CURRENT_CYCLE,
             "day": game_state.day,
-            **(metadata or {}),
-        },
+        }, metadata),
     )
     _record_decision_request(request)
     plan = choose_strategic_goal(game_state)
@@ -470,11 +572,10 @@ def _record_numeric_menu_trace(
         normalized_options=normalized_options,
         raw_prompt_text=prompt or "",
         raw_recent_text=tuple(RECENT_TEXT[-20:]),
-        metadata={
+        metadata=_request_metadata({
             "cycle": CURRENT_CYCLE,
             "day": game_state.day,
-            **(metadata or {}),
-        },
+        }, metadata),
     )
     _record_decision_request(request)
     plan = choose_strategic_goal(game_state)
@@ -528,16 +629,22 @@ def _choose_policy_numeric_option(
         normalized_options=normalized_options,
         raw_prompt_text=prompt or "",
         raw_recent_text=tuple(RECENT_TEXT[-20:]),
-        metadata={
+        metadata=_request_metadata({
             "cycle": CURRENT_CYCLE,
             "day": game_state.day,
             "balance": game_state.balance,
             "rank": game_state.rank,
-            **(metadata or {}),
-        },
+        }, metadata),
     )
     _record_decision_request(request)
     plan = choose_strategic_goal(game_state)
+    if player is not None and hasattr(player, "request_progress_goal"):
+        player.request_progress_goal(
+            plan.goal,
+            reason=plan.reason,
+            source=f"planner:{request_type}",
+            sticky=plan.goal in {"acquire_car", "unlock_marvin", "reach_adventure_threshold"},
+        )
 
     if request_type == "purchase_select":
         choice, trace = choose_purchase_option(request, plan)
@@ -557,6 +664,13 @@ def _choose_policy_numeric_option(
 def _record_route_interrupt_trace(player, chosen_action, reason, strategic_goal, interrupt_kind):
     snapshot = _current_game_state(player, context_tag="route_interrupt")
     interrupt_plan = choose_strategic_goal(snapshot)
+    if player is not None and hasattr(player, "request_progress_goal"):
+        player.request_progress_goal(
+            strategic_goal,
+            reason=reason,
+            source=f"interrupt:{interrupt_kind}",
+            sticky=strategic_goal in {"acquire_car", "unlock_marvin", "reach_adventure_threshold"},
+        )
     _record_decision_trace(
         DecisionTrace(
             cycle=CURRENT_CYCLE,
@@ -788,12 +902,17 @@ def _injury_names(player):
     return {injury.lower() for injury in getattr(player, "_injuries", [])}
 
 
+def _is_protected_pawn_item(item_name):
+    # Keep long-run progression intact: do not pawn Marvin/workbench unlock items.
+    return item_name in {"Map", "Worn Map", "Tool Kit"}
+
+
 def _sellable_collectibles(player):
     if player is None or not hasattr(player, "get_collectible_prices"):
         return []
     sellable = []
     for item in player.get_collectible_prices().keys():
-        if player.has_item(item):
+        if player.has_item(item) and not _is_protected_pawn_item(item):
             sellable.append(item)
     return sellable
 
@@ -804,7 +923,7 @@ def _planned_pawn_sales(player):
 
     owned = []
     for item_name, price in player.get_collectible_prices().items():
-        if player.has_item(item_name):
+        if player.has_item(item_name) and not _is_protected_pawn_item(item_name):
             owned.append((item_name, price))
     if not owned:
         return []
@@ -908,26 +1027,28 @@ def _structured_economy_hints(player):
             or (
                 rank <= 1
                 and marvin_candidate[0] >= 60
-                and player.get_balance() >= max(1800, marvin_candidate_price + max(300, int(tuner["marvin_floor_buffer"] * 0.3)))
+                and player.get_balance() >= max(1400, marvin_candidate_price + max(200, int(tuner["marvin_floor_buffer"] * 0.2)))
             )
             or (
                 rank <= 1
                 and marvin_candidate[0] >= 44
-                and player.get_balance() >= max(1400, marvin_candidate_price + 100)
+                and player.get_balance() >= max(1050, marvin_candidate_price + 50)
             )
             or (
                 rank <= 1
                 and has_only_worn_map_access
                 and marvin_candidate[0] >= 50
-                and player.get_balance() >= max(1600, marvin_candidate_price + 200)
+                and player.get_balance() >= max(1200, marvin_candidate_price + 100)
             )
         )
     )
+    craft_candidate = _workbench_best_craft_candidate(player)
     return {
         "store_candidate_count": int(store_summary["count"]),
         "store_best_priority": int(store_summary["top"][0]) if store_summary["top"] else 0,
         "store_target_spend": int(store_summary["top"][1]) if store_summary["top"] else 0,
         "store_actionable_count": int(store_summary["actionable_count"]),
+        "crafting_best_priority": int(craft_candidate[1]) if craft_candidate else 0,
         "pawn_sellable_value": _sellable_collectible_value(player),
         "pawn_planned_sale_count": len(planned_sales),
         "pawn_planned_sale_value": pawn_planned_sale_value,
@@ -1313,13 +1434,15 @@ def _gift_run_ready(player):
         return False
     if not hasattr(player, "is_gift_system_unlocked") or not hasattr(player, "has_gift_wrapped"):
         return False
+    if player.is_gift_system_unlocked():
+        _set_funnel_day_once(player, "gift_unlock_day")
     return (
         player.is_gift_system_unlocked()
         and not player.has_gift_wrapped()
-        and _dealer_happiness(player) < GIFT_WRAP_HAPPINESS_THRESHOLD
-        and player.get_balance() >= 120
-        and player.get_health() >= 60
-        and player.get_sanity() >= 35
+        and _dealer_happiness(player) < (GIFT_WRAP_HAPPINESS_THRESHOLD + 8)
+        and player.get_balance() >= 100
+        and player.get_health() >= 56
+        and player.get_sanity() >= 32
     )
 
 
@@ -1344,19 +1467,23 @@ def _gift_unlock_push_mode(player):
     if not hasattr(player, "is_gift_system_unlocked"):
         return False
     if player.is_gift_system_unlocked():
+        _set_funnel_day_once(player, "gift_unlock_day")
         return False
-    if _dealer_happiness(player) >= GIFT_WRAP_HAPPINESS_THRESHOLD:
+    if _dealer_happiness(player) >= GIFT_WRAP_HAPPINESS_THRESHOLD + 4:
         return False
     if _needs_car(player) or _doctor_visit_is_urgent(player):
         return False
 
     purchases = int(getattr(player, "_convenience_store_purchases", 0) or 0)
-    return (
-        purchases < 5
-        and player.get_balance() >= 140
-        and player.get_health() >= 60
-        and player.get_sanity() >= 32
+    ready = (
+        purchases < 3
+        and player.get_balance() >= 120
+        and player.get_health() >= 56
+        and player.get_sanity() >= 30
     )
+    if ready:
+        _bump_funnel_metric(player, "gift_unlock_push_count")
+    return ready
 
 
 def _wealth_lock_mode(player):
@@ -1458,6 +1585,57 @@ def _mark_location_visit(player, label):
     last_days, counts = _location_history(player)
     last_days[label] = getattr(player, "_day", 1)
     counts[label] = counts.get(label, 0) + 1
+
+
+def _route_location_key(label):
+    lowered = (label or "").strip().lower()
+    if not lowered:
+        return None
+    if lowered == "doctor's office":
+        return "doctor"
+    if lowered == "witch doctor's tower":
+        return "doctor:witch"
+    if "marvin" in lowered:
+        return "shop:marvin"
+    if "convenience store" in lowered:
+        return "shop:convenience_store"
+    if "pawn" in lowered or "gus" in lowered:
+        return "shop:pawn_shop"
+    if "vinnie" in lowered or "loan" in lowered:
+        return "shop:loan_shark"
+    if "workbench" in lowered:
+        return "shop:car_workbench"
+    if "trusty tom" in lowered:
+        return "mechanic:tom"
+    if "frank" in lowered:
+        return "mechanic:frank"
+    if "oswald" in lowered or "outoparts" in lowered:
+        return "mechanic:oswald"
+    if lowered.startswith("drive to "):
+        return f"route:{lowered}"
+    if "stay home" in lowered:
+        return "stay_home"
+    return f"route:{lowered}"
+
+
+def _route_circulation_metadata(player, menu_options):
+    if player is None:
+        return {}
+    last_days, counts = _location_history(player)
+    current_day = getattr(player, "_day", 1)
+    circulation = {}
+    for number, label in menu_options:
+        option_id = f"route:{number}"
+        location_key = _route_location_key(label)
+        last_day = None if location_key is None else last_days.get(location_key)
+        days_since = None if last_day is None else max(0, current_day - int(last_day))
+        visits = 0 if location_key is None else int(counts.get(location_key, 0) or 0)
+        circulation[option_id] = {
+            "location_key": location_key,
+            "days_since": days_since,
+            "visits": visits,
+        }
+    return circulation
 
 
 def _days_since_location(player, *labels):
@@ -2380,11 +2558,12 @@ def _rank_protection_floor(player):
         return 0
     rank = int(player.get_rank())
     # Balance thresholds per rank (index = rank): 0→$0, 1→$1k, 2→$10k, 3→$100k, 4→$400k, 5→$750k.
+    # Rank 6+ shares the $750k protection floor until the millionaire ending resolves.
     # Must stay in sync with _rank_from_balance() and usage in Marvin buy decision.
     thresholds = [0, 1000, 10000, 100000, 400000, 750000]
     if rank <= 1:
         return 0
-    return thresholds[rank]
+    return thresholds[min(rank, len(thresholds) - 1)]
 
 
 def _in_rank_push_window(player):
@@ -2647,6 +2826,8 @@ def _store_item_priority(item_name, player):
         priority += 10
     if item_name == "Worn Map" and player.has_item("Car") and not player.has_item("Map"):
         priority += 34 if rank <= 1 else 16
+        if not _has_marvin_access(player) and rank <= 1:
+            priority = max(priority, 96)
     if item_name == "Tool Kit" and player.has_item("Car") and not player.has_item("Tool Kit"):
         priority += 22 if rank <= 1 else 12
     if item_name == "First Aid Kit" and (player.get_health() < 90 or _needs_doctor(player)):
@@ -2680,13 +2861,10 @@ def _store_item_priority(item_name, player):
     # ingredient recipe would ever be bought because the other wasn't present first.
     # Two tiers:
     #   - "completing" boost: all other ingredients present → recipe_priority + 16
-    #     (+16 brings Emergency Blanket from 74 → 90, crossing the midgame-growth-
-    #     window gate of >=90 that otherwise suppresses cheap low-impact store items)
+    #     Applies at ALL ranks — a permanent crafted item is always worth a store trip.
     #   - "starting" boost:   no other ingredients yet       → recipe_priority + 6
-    #     (+6 brings Emergency Blanket from 74 → 80, which crosses the rank-0 threshold
-    #     of 80 so the first ingredient gets bought at rank 0 too)
-    # Capped at rank <= 1 (rank 2+ blocks non-survival store trips anyway).
-    if player.has_item("Tool Kit") and (rank <= 1 or (rank == 2 and balance < 15000)):
+    #     Applies up to rank 2 (or rank 3+ when balance < 50k) to seed ingredient chains.
+    if player.has_item("Tool Kit"):
         try:
             for recipe_name, recipe in player._lists.get_crafting_recipes().items():
                 if player.has_item(recipe_name):
@@ -2699,9 +2877,9 @@ def _store_item_priority(item_name, player):
                     continue
                 others = [ing for ing in ingredients if ing != item_name]
                 if all(player.has_item(ing) for ing in others):
-                    # Completing boost: buying this finishes the recipe (crosses 90 gate)
+                    # Completing boost: buying this finishes the recipe — always worth it
                     priority = max(priority, recipe_priority + 16)
-                else:
+                elif rank <= 2 or balance < 50000:
                     # Starting boost: buying this makes progress toward the recipe
                     priority = max(priority, recipe_priority + 6)
                 break
@@ -2800,6 +2978,8 @@ def _store_buyout_candidate(player, balance=None):
     if budget < balance_gate and target_spend < max(120, int(budget * 0.12)):
         return None
 
+    _bump_funnel_metric(player, "store_buyout_ready_count")
+
     return {
         "count": len(bundle),
         "priority": best_priority,
@@ -2819,7 +2999,9 @@ def _wants_store_run(player):
     dealer_happiness = _dealer_happiness(player)
     store_gap = _days_since_location(player, "shop:convenience_store")
     buyout_candidate = _store_buyout_candidate(player)
+    gift_unlock_push = _gift_unlock_push_mode(player)
     if buyout_candidate is not None and store_gap != 0 and (store_gap is None or store_gap > 1):
+        _bump_funnel_metric(player, "store_buyout_trigger_count")
         return True
     if dealer_happiness >= 96:
         return False
@@ -2863,16 +3045,23 @@ def _wants_store_run(player):
         player.get_rank() >= 2
         and 10000 <= balance < 100000
         and buyout_candidate is None
+        and not gift_unlock_push
         and not companion_emergency_item
+        and best_priority < 90
         and _best_item not in {"LifeAlert", "First Aid Kit", "Road Flares", "Spare Tire", "Tool Kit"}
     ):
         return False
 
     if store_gap == 0:
+        if buyout_candidate is not None or gift_unlock_push or _best_item == "Tool Kit":
+            _bump_funnel_metric(player, "store_same_day_return_count")
+            if buyout_candidate is not None:
+                _bump_funnel_metric(player, "store_buyout_trigger_count")
+            return True
         return False
-    if store_gap is not None and store_gap <= 2 and _best_item not in STORE_MUST_HAVE_ITEMS and not companion_emergency_item:
+    if store_gap is not None and store_gap <= 1 and _best_item not in STORE_MUST_HAVE_ITEMS and not companion_emergency_item and not gift_unlock_push:
         return False
-    if store_gap is not None and store_gap <= 4 and best_priority < 90 and not companion_emergency_item:
+    if store_gap is not None and store_gap <= 2 and best_priority < 84 and not companion_emergency_item and not gift_unlock_push:
         return False
     if _best_item == "Tool Kit" and store_gap != 0 and (store_gap is None or store_gap >= 2):
         if player.get_health() >= 58 and player.get_sanity() >= 30:
@@ -2894,6 +3083,9 @@ def _wants_store_run(player):
         and player.get_health() >= 55
         and player.get_sanity() >= 28
     ):
+        return True
+
+    if gift_unlock_push and player.get_balance() >= max(120, min(best_price, 180)):
         return True
 
     if (
@@ -3339,6 +3531,25 @@ def _best_marvin_affordable_priority(player):
             continue
         best_priority = max(best_priority, _marvin_item_priority(item_name, player))
     return best_priority
+
+
+def _has_unbought_marvin_items(player):
+    if player is None or not _has_marvin_access(player):
+        return False
+    for item_name in MARVIN_ITEM_ORDER:
+        if _marvin_item_priority(item_name, player) > 0:
+            return True
+    return False
+
+
+def _marvin_remaining_spend(player):
+    if player is None:
+        return 0
+    total = 0
+    for item_name in MARVIN_ITEM_ORDER:
+        if _marvin_item_priority(item_name, player) > 0:
+            total += _marvin_price_estimate(item_name)
+    return total
 
 
 def _best_marvin_candidate(player, budget):
@@ -3872,11 +4083,43 @@ def _marvin_purchase_push_candidate(player, balance=None):
     }
 
 
+def _should_suspend_marvin_pressure(player, planner_goal=None):
+    if player is None:
+        return False
+
+    recovery_goals = {
+        "survive_emergency",
+        "stabilize_health",
+        "stabilize_sanity",
+        "reduce_fatigue_pressure",
+        "reduce_debt_risk",
+        "contain_debt_escalation",
+    }
+    if planner_goal in recovery_goals:
+        return True
+    if _doctor_visit_is_urgent(player) or _wants_doctor_visit(player):
+        return True
+
+    health = int(player.get_health()) if hasattr(player, "get_health") else 0
+    sanity = int(player.get_sanity()) if hasattr(player, "get_sanity") else 0
+    debt = int(player.get_loan_shark_debt()) if hasattr(player, "get_loan_shark_debt") else 0
+    warning = int(player.get_loan_shark_warning_level()) if hasattr(player, "get_loan_shark_warning_level") else 0
+    if health < 64 or sanity < 38:
+        return True
+    if debt > 0 and warning >= 1:
+        return True
+    if warning >= 2:
+        return True
+    return False
+
+
 def _strong_marvin_route_interrupt(player, labels):
     if player is None:
         return None
     marvin_choice = labels.get("Marvin's Mystical Merchandise")
     if marvin_choice is None or not _has_marvin_access(player) or not player.has_item("Car"):
+        return None
+    if _should_suspend_marvin_pressure(player):
         return None
     if _wants_doctor_visit(player) or _doctor_visit_is_urgent(player) or _needs_recovery_day(player):
         return None
@@ -4007,6 +4250,26 @@ def _strong_marvin_route_interrupt(player, labels):
     return None
 
 
+def _force_marvin_buy_interrupt(player, labels):
+    if player is None:
+        return None
+    marvin_choice = labels.get("Marvin's Mystical Merchandise")
+    if marvin_choice is None or not _has_marvin_access(player) or not player.has_item("Car"):
+        return None
+    balance = int(player.get_balance())
+    if balance < 10000:
+        return None
+    if _days_since_location(player, "shop:marvin") == 0:
+        return None
+    if _should_suspend_marvin_pressure(player):
+        return None
+    reserve = max(500, _cash_safety_reserve(player, 88))
+    budget = max(0, balance - reserve)
+    if _best_marvin_candidate(player, budget) is None:
+        return None
+    return marvin_choice
+
+
 def _catalog_push_candidate(player, balance=None):
     marvin_candidate = _marvin_catalog_candidate(player, balance=balance)
     store_candidate = _store_buyout_candidate(player, balance=balance)
@@ -4063,7 +4326,7 @@ def _wants_marvin_run(player):
         return False
     if not player.has_item("Car"):
         return False
-    if _bankroll_emergency_mode(player) or _fragile_post_car_recovery_mode(player):
+    if _bankroll_emergency_mode(player):
         return False
     if _wants_doctor_visit(player):
         return False
@@ -4082,13 +4345,26 @@ def _wants_marvin_run(player):
         _price = affordable[1]
         # Must have at least a $800 cushion after the purchase.
         if balance - _price >= 800:
+            _bump_funnel_metric(player, "marvin_ready_count")
             return True
     # Future-item scouting: player is building toward a purchase.
+    future = _best_future_marvin_candidate(player, balance)
+    if _fragile_post_car_recovery_mode(player):
+        if future is None:
+            return False
+        if player.get_health() < 62 or player.get_sanity() < 34:
+            return False
+        if balance < 400 or future["shortfall"] > 5000:
+            return False
+        _bump_funnel_metric(player, "marvin_ready_count")
+        return True
+
     if balance < 10000:
-        future = _best_future_marvin_candidate(player, balance)
-        if future is not None and future["shortfall"] <= max(4000, int(balance * 0.90)) and balance >= 1200:
+        if future is not None and future["shortfall"] <= 5000 and balance >= 400:
+            _bump_funnel_metric(player, "marvin_ready_count")
             return True
         return False
+    _bump_funnel_metric(player, "marvin_ready_count")
     return True
 
 
@@ -4333,18 +4609,23 @@ def _wants_workbench_craft_run(player):
         risk = _doctor_risk_profile(player)
         if risk["margin"] <= 8 or risk["health"] < 58 or risk["sanity"] < 24:
             return False
-    if not player.has_met("Car Workbench"):
-        return player.get_health() >= 58 and player.get_sanity() >= 30
-    workbench_gap = _days_since_location(player, "shop:car_workbench")
-    if workbench_gap == 0:
-        return False
     candidate = _workbench_best_craft_candidate(player)
     if candidate is None:
         return False
+    _bump_funnel_metric(player, "workbench_ready_count")
+    if not player.has_met("Car Workbench"):
+        return player.get_health() >= 54 and player.get_sanity() >= 28
+    workbench_gap = _days_since_location(player, "shop:car_workbench")
     _recipe_name, recipe_priority = candidate
-    # Don't return for crafting more than every 2 days (low opportunity cost when nothing new is ready)
-    if workbench_gap is not None and workbench_gap <= 1 and recipe_priority < 94:
+    if workbench_gap == 0:
+        if recipe_priority >= 96 and player.get_health() >= 60 and player.get_sanity() >= 30:
+            _bump_funnel_metric(player, "workbench_trigger_count")
+            return True
         return False
+    # Don't return for crafting more than every 2 days (low opportunity cost when nothing new is ready)
+    if workbench_gap is not None and workbench_gap <= 1 and recipe_priority < 88:
+        return False
+    _bump_funnel_metric(player, "workbench_trigger_count")
     return True
 
 
@@ -4362,6 +4643,7 @@ def _choose_workbench_menu(options, player):
     candidate = _workbench_best_craft_candidate(player)
     if candidate is not None and craft_choice is not None:
         name, priority = candidate
+        _bump_funnel_metric(player, "craft_attempt_count")
         return _record_numeric_menu_trace(
             player,
             request_type="menu_select",
@@ -4421,6 +4703,7 @@ def _choose_workbench_craft(options, player):
             best_number = number
 
     if best_number is not None:
+        _bump_funnel_metric(player, "craft_attempt_count")
         return _record_numeric_menu_trace(
             player,
             request_type="menu_select",
@@ -4481,7 +4764,7 @@ def _medical_destination_label(player):
         stable_context_id="medical_destination",
         game_state=game_state.to_dict(),
         normalized_options=tuple(options),
-        metadata={
+        metadata=_request_metadata({
             "doctor_need_score": _doctor_need_score(player),
             "urgent_medical": _doctor_visit_is_urgent(player),
             "wants_doctor": wants_doctor,
@@ -4498,7 +4781,7 @@ def _medical_destination_label(player):
             "flask_count": _flask_count(player),
             "has_real_insurance": player.has_item("Real Insurance"),
             "has_faulty_insurance": player.has_item("Faulty Insurance"),
-        },
+        }),
     )
     plan = choose_strategic_goal(game_state)
     choice, _trace = choose_medical_option(request, plan)
@@ -4700,7 +4983,7 @@ def _wants_millionaire_push(player):
     if _wants_doctor_visit(player) or _doctor_visit_is_urgent(player):
         return False
     balance = player.get_balance()
-    return balance >= 100000 and balance < 1000000 and player.get_health() >= 65 and player.get_sanity() >= 40
+    return balance >= 50000 and balance < 1000000 and player.get_health() >= 55 and player.get_sanity() >= 32
 
 
 def _choose_millionaire_afternoon(options, player):
@@ -4863,8 +5146,8 @@ def _choose_loan_menu(options, player):
     edge_score = _blackjack_edge_score(player)
     reserve = _cash_safety_reserve(player, 88) if player is not None else 0
     balance = 0 if player is None else player.get_balance()
+    marvin_plan = _marvin_loan_plan(player) if player is not None and debt <= 0 else None
     repayment_capacity = max(0, balance - reserve)
-    marvin_loan_plan = _marvin_loan_plan(player)
     bootstrap_window = _loan_bootstrap_window(player)
     leave_choice = None
     option_metadata_by_number = {}
@@ -4884,9 +5167,18 @@ def _choose_loan_menu(options, player):
                 option_metadata_by_number[number]["actionable"] = True
         if "borrow money" in lowered and debt == 0 and player is not None:
             option_metadata_by_number[number] = {"action_kind": "borrow", "base_score": 0.0, "actionable": False}
-            if marvin_loan_plan is not None:
-                option_metadata_by_number[number]["base_score"] = 108.0
-                option_metadata_by_number[number]["actionable"] = True
+            if marvin_plan is not None:
+                marvin_score = 102.0 + min(18.0, float(marvin_plan["priority"]) / 8.0)
+                if marvin_plan["mode"] in {"buy_enable", "marvin_push"}:
+                    marvin_score += 8.0
+                option_metadata_by_number[number].update(
+                    {
+                        "base_score": max(option_metadata_by_number[number]["base_score"], marvin_score),
+                        "actionable": True,
+                        "desired_amount": float(marvin_plan["borrow"]),
+                        "target_item": marvin_plan["item"],
+                    }
+                )
             if bootstrap_window:
                 option_metadata_by_number[number]["base_score"] = max(option_metadata_by_number[number]["base_score"], 96.0)
                 option_metadata_by_number[number]["actionable"] = True
@@ -4977,27 +5269,12 @@ def _choose_loan_borrow_amount(options, player):
     target = _rank_target(0 if player is None else player.get_balance())
     balance = 0 if player is None else player.get_balance()
     edge_score = _blackjack_edge_score(player)
-    marvin_loan_plan = _marvin_loan_plan(player)
     bootstrap_window = _loan_bootstrap_window(player)
-    future_marvin_candidate = _best_future_marvin_candidate(player, balance) if _has_marvin_access(player) else None
-    future_marvin_push = bool(
-        player is not None
-        and int(player.get_rank()) <= 1
-        and balance >= 1000
-        and future_marvin_candidate is not None
-        and future_marvin_candidate["priority"] >= 56
-        and 0 < future_marvin_candidate["shortfall"] <= 5000
-    )
-    if marvin_loan_plan is not None:
-        desired = marvin_loan_plan["borrow"]
-    elif future_marvin_push:
-        desired = 5000
-    elif _marvin_push_window(player):
-        desired = 5000
+    marvin_plan = _marvin_loan_plan(player) if player is not None else None
+    if marvin_plan is not None:
+        desired = int(marvin_plan["borrow"])
     elif bootstrap_window:
-        if player is not None and int(player.get_rank()) == 1 and _has_marvin_access(player):
-            desired = 5000
-        elif player is not None and not player.has_item("Tool Kit"):
+        if player is not None and not player.has_item("Tool Kit"):
             desired = 2500
         else:
             desired = 1000
@@ -5216,9 +5493,9 @@ def _choose_adventure_destination(options, player):
         ]
     elif player.get_rank() <= 2 or player.get_health() < 80 or player.get_sanity() < 50:
         priorities = [
-            "Drive to The Road",
             "Drive to The Woodlands",
             "Drive to The Beach",
+            "Drive to The Road",
             "Drive to The Swamp",
             "Drive to The City",
             "Drive to The Ocean Depths",
@@ -5308,6 +5585,19 @@ def _adapter_yes_no_fallback(prompt_lower, player, cost=None):
 
 
 def _decide_numbered_menu_choice(menu_options, player, prompt_lower="", recent="", recent_short=""):
+    # ── Madness confrontation quiz: pick best answers for guaranteed survival ──
+    # Options are ["1","2","3","4"] so they look like a numeric menu.
+    # Check in reverse order (Q3→Q2→Q1) because earlier question text persists in recent.
+    # Q3: "would you walk away?" → 1 "Yes. I would walk away" = +2
+    if ("walk away" in recent or "first walked" in recent) and "fifty dollars" in recent and len(menu_options) == 4:
+        return "1"
+    # Q2: "What do you see when you look at the Dealer?" → 3 "Nothing. He's just a man" = +3
+    if "what do you see" in recent and "dealer" in recent and len(menu_options) == 4:
+        return "3"
+    # Q1: "Why do you gamble?" → 4 "I don't know anymore" = +3
+    if "why do you gamble" in recent and len(menu_options) == 4:
+        return "4"
+
     millionaire_afternoon = (
         "choose a number" in prompt_lower
         or "choose a number" in recent_short
@@ -5349,20 +5639,22 @@ def _choose_inline_choice(inline_choices, player, prompt=""):
 
     prompt_lower = (prompt or "").lower()
     recent = _recent_lower(80)
+    event_label = _latest_cycle_event_label() or "inline_choice_prompt"
     event_request = DecisionRequest(
         request_type="event_inline",
-        stable_context_id="inline_choice_prompt",
-        game_state=_current_game_state(player, context_tag="inline_choice_prompt").to_dict(),
+        stable_context_id=event_label,
+        game_state=_current_game_state(player, context_tag=event_label).to_dict(),
         normalized_options=_structured_options(tuple(inline_choices), prefix="event_inline"),
         raw_prompt_text=prompt or "",
         raw_recent_text=tuple(RECENT_TEXT[-20:]),
-        metadata={
+        metadata=_request_metadata({
             "cycle": CURRENT_CYCLE,
             "prompt_lower": prompt_lower,
             "recent_lower": recent,
-        },
+            "event_name": event_label,
+        }),
     )
-    event_plan = choose_strategic_goal(_current_game_state(player, context_tag="inline_choice_prompt"))
+    event_plan = choose_strategic_goal(_current_game_state(player, context_tag=event_label))
     event_choice, event_trace = choose_event_inline_choice(event_request, event_plan)
     if event_choice is not None and event_trace is not None:
         _record_decision_request(event_request)
@@ -5474,14 +5766,15 @@ def _wants_pawn_cashout(player):
     if pawn_gap == 0:
         return False
 
+    balance = player.get_balance()
+    sell_value = _sellable_collectible_value(player)
+
     if player.has_item("Car") and player.get_health() >= 60 and player.get_sanity() >= 30:
         if _wants_marvin_run(player) and sell_value < 220 and balance >= 1200:
             return False
         if _wants_adventure_run(player) and sell_value < 180 and balance >= 1000:
             return False
 
-    balance = player.get_balance()
-    sell_value = _sellable_collectible_value(player)
     target = _rank_target(balance)
     marvin_priority = _best_marvin_affordable_priority(player) if _has_marvin_access(player) else 0
     if _wants_doctor_visit(player) and balance + sell_value >= _doctor_cash_reserve(player):
@@ -5535,22 +5828,21 @@ def _poverty_escape_loan_mode(player):
     rank = int(player.get_rank())
     bootstrap_window = _loan_bootstrap_window(player)
 
+    # Refuse loans when the bot already peaked high and crashed — borrowing
+    # at this point is throwing good money after bad.
+    if RUN_PEAK_BALANCE >= 5000 and balance < max(500, int(RUN_PEAK_BALANCE * 0.10)):
+        return False
+
     if player.get_health() < 48 or player.get_sanity() < 26:
         return False
     # Require at least one edge item even at very low balance.
     # Borrowing with edge_score=0 (no useful items) means gambling with borrowed money
     # at a raw house edge — the 20%/week interest will compound faster than the expected
     # win rate.  At rank 0 edge_score>=1 is a reasonable floor; edge_score>=2 for rank 1+.
-    # Exception: when Marvin access exists, the first purchase provides immediate edge,
-    # so borrowing at edge_score 0 is viable if the bot can buy an item right away.
-    has_marvin = _has_marvin_access(player)
     if rank == 0 and edge_score < 1 and not bootstrap_window:
         return False
     if rank >= 1 and edge_score < 2 and not bootstrap_window:
         return False
-
-    if _marvin_push_window(player):
-        return True
     if rank == 0:
         return balance < 1400
     if rank == 1 and not player.has_item("Map"):
@@ -5569,7 +5861,8 @@ def _wants_loan_shark_run(player):
     balance = player.get_balance()
     debt = int(player.get_loan_shark_debt())
     warning = int(player.get_loan_shark_warning_level()) if hasattr(player, "get_loan_shark_warning_level") else 0
-    if _wealth_lock_mode(player) and debt <= 0:
+    marvin_plan = _marvin_loan_plan(player) if debt <= 0 else None
+    if _wealth_lock_mode(player) and debt <= 0 and marvin_plan is None:
         return False
     fake_cash = _fraudulent_cash_amount(player)
     wants_doctor = _wants_doctor_visit(player)
@@ -5587,18 +5880,16 @@ def _wants_loan_shark_run(player):
             return max(0, balance - _cash_safety_reserve(player, 88)) > 0
         return warning > 0 or balance <= 0
 
-    if _marvin_push_window(player) and debt == 0 and balance < 6000:
+    if _poverty_escape_loan_mode(player):
         return True
 
-    if _poverty_escape_loan_mode(player):
+    if marvin_plan is not None:
         return True
 
     if debt > 0:
         if repayment_capacity >= debt:
             return True
-        if warning >= 2 and repayment_capacity >= min(100, debt):
-            return True
-        if warning >= 1 and repayment_capacity >= max(100, debt // 2):
+        if warning >= 1 and repayment_capacity >= min(100, debt):
             return True
         return False
 
@@ -5641,8 +5932,6 @@ def _wants_loan_shark_run(player):
             return False
         if edge_score < 4:
             return False
-    if _marvin_loan_plan(player) is not None:
-        return True
     if _has_marvin_access(player) and _best_marvin_affordable_priority(player) < 90 and balance < 10000 and edge_score >= 3:
         return True
     if player.get_rank() == 0:
@@ -5699,18 +5988,39 @@ def _loan_bootstrap_window(player):
 
 
 def _wants_adventure_run(player):
-    # AGGRESSIVE: Do adventures constantly
     if not _adventure_ready(player):
         return False
     if _bankroll_emergency_mode(player):
         return False
     if _wants_doctor_visit(player):
         return False
-    
+    if _needs_recovery_day(player):
+        return False
+
     rank_val = int(player.get_rank())
     if rank_val < 0:
         return False
-    
+
+    balance = int(player.get_balance())
+    has_utility = _has_adventure_utility(player)
+
+    if rank_val <= 1:
+        if not has_utility and balance < 9000:
+            return False
+        if not has_utility and not player.has_item("Map") and balance < 12000:
+            return False
+        if not has_utility and (player.get_health() < 66 or player.get_sanity() < 34):
+            return False
+        if not has_utility and (
+            _in_rank_push_window(player)
+            or _wants_loan_shark_run(player)
+            or _wants_marvin_run(player)
+            or _wants_workbench_craft_run(player)
+        ):
+            return False
+    elif rank_val == 2 and not has_utility and balance < 14000 and _wants_upgrade_run(player):
+        return False
+
     # Can't revisit same day
     adventure_gap = _days_since_location(
         player,
@@ -5723,8 +6033,7 @@ def _wants_adventure_run(player):
     )
     if adventure_gap == 0:
         return False
-    
-    # Just do the adventure. Always.
+
     return True
 
 
@@ -5761,8 +6070,6 @@ def _progression_chore_choices(labels, options, player):
     marvin_choice = labels.get("Marvin's Mystical Merchandise")
     if marvin_choice is not None and _wants_marvin_run(player):
         score = 82 + min(32, _best_marvin_affordable_priority(player) // 2)
-        if marvin_loan_plan is not None:
-            score += 30
         if _marvin_bootstrap_window(player):
             score += 18
         if _in_rank_push_window(player):
@@ -5777,12 +6084,14 @@ def _progression_chore_choices(labels, options, player):
     loan_choice = labels.get("Vinnie's Back Alley Loans")
     if loan_choice is not None and _wants_loan_shark_run(player):
         score = 82
-        if marvin_loan_plan is not None:
-            score += 44
         if _poverty_escape_loan_mode(player):
             score += 40
         elif _loan_bootstrap_window(player):
             score += 28
+        if marvin_loan_plan is not None:
+            score += 42 + min(18, int(marvin_loan_plan["priority"]) // 6)
+            if marvin_loan_plan["mode"] in {"buy_enable", "marvin_push"}:
+                score += 10
         if _in_rank_push_window(player):
             score += 14
         warning = int(player.get_loan_shark_warning_level()) if hasattr(player, "get_loan_shark_warning_level") else 0
@@ -5864,14 +6173,19 @@ def _choose_progression_destination(labels, options, player):
 
 
 def _legacy_choose_destination(options, player):
+    _mark_afternoon_menu_presented(player, options)
+
+    def finalize(choice):
+        return _record_route_choice_flow(player, choice, options)
+
     labels = {label: number for number, label in options}
 
     medical_choice = _medical_destination_label(player)
     if medical_choice in labels and _doctor_visit_is_urgent(player):
-        return labels[medical_choice]
+        return finalize(labels[medical_choice])
 
     if _needs_recovery_day(player) and "Stay Home" in labels:
-        return labels["Stay Home"]
+        return finalize(labels["Stay Home"])
 
     progression_choice = _choose_progression_destination(labels, options, player)
     if progression_choice is not None:
@@ -5883,32 +6197,59 @@ def _legacy_choose_destination(options, player):
             # same priority bypass so it isn't blocked by the pawn/store guards below.
             or ("Vinnie's Back Alley Loans" == progression_label and _poverty_escape_loan_mode(player))
         ):
-            return progression_choice
+            return finalize(progression_choice)
 
     if "Grimy Gus's Pawn Emporium" in labels and _wants_pawn_cashout(player):
-        return labels["Grimy Gus's Pawn Emporium"]
+        return finalize(labels["Grimy Gus's Pawn Emporium"])
 
     # Flask-only witch visit: healthy player with affordable flask at rank 2+.
     # Placed after pawn shop and progression so it doesn't override Marvin/adventure.
     if "Witch Doctor's Tower" in labels and _wants_witch_flask_only_run(player):
-        return labels["Witch Doctor's Tower"]
+        return finalize(labels["Witch Doctor's Tower"])
 
     if medical_choice in labels and (_wants_doctor_visit(player) or _wants_witch_heal(player)):
-        return labels[medical_choice]
+        return finalize(labels[medical_choice])
 
     if medical_choice in labels:
-        return labels[medical_choice]
+        return finalize(labels[medical_choice])
 
     if progression_choice is not None:
-        return progression_choice
+        return finalize(progression_choice)
 
     if "Convenience Store" in labels and _wants_store_run(player):
-        return labels["Convenience Store"]
+        return finalize(labels["Convenience Store"])
 
     if "Stay Home" in labels:
-        return labels["Stay Home"]
+        return finalize(labels["Stay Home"])
 
-    return options[-1][0] if options else 1
+    return finalize(options[-1][0] if options else 1)
+
+
+def _quicktest_route_tags(label):
+    lowered = str(label or "").lower()
+    tags = set()
+    if "doctor" in lowered:
+        tags.add("medical")
+    if "witch" in lowered:
+        tags.add("witch")
+        tags.add("medical")
+    if "marvin" in lowered:
+        tags.add("marvin")
+    if "vinnie" in lowered or "loan" in lowered:
+        tags.add("loan")
+    if "pawn" in lowered or "gus" in lowered:
+        tags.add("pawn")
+    if "convenience" in lowered:
+        tags.add("store")
+    if "workbench" in lowered or "outoparts" in lowered:
+        tags.add("upgrade")
+    if "tom" in lowered or "frank" in lowered or "oswald" in lowered:
+        tags.add("mechanic")
+    if label.startswith("Drive to "):
+        tags.add("adventure")
+    if "stay home" in lowered:
+        tags.add("stay_home")
+    return tags
 
 
 def _planner_choose_destination(options, player):
@@ -5919,6 +6260,13 @@ def _planner_choose_destination(options, player):
     store_summary = _store_chore_summary(player)
     game_state = _current_game_state(player, menu_options=menu_options, context_tag="route_select")
     plan = choose_strategic_goal(game_state)
+    if player is not None and hasattr(player, "request_progress_goal"):
+        player.request_progress_goal(
+            plan.goal,
+            reason=plan.reason,
+            source="planner:route_select",
+            sticky=plan.goal in {"acquire_car", "unlock_marvin", "reach_adventure_threshold"},
+        )
     plan_top_score = max(plan.scores.values(), default=0.0)
     store_goal_score = float(plan.scores.get("restock_supplies", 0.0) or 0.0)
     pawn_goal_score = float(plan.scores.get("cashout_pawn_inventory", 0.0) or 0.0)
@@ -5950,7 +6298,8 @@ def _planner_choose_destination(options, player):
     marvin_future_priority = 0
     marvin_future_shortfall = 0
     wants_marvin_raw = _wants_marvin_run(player)
-    if wants_marvin_raw:
+    wants_marvin = wants_marvin_raw and not _should_suspend_marvin_pressure(player, plan.goal)
+    if wants_marvin:
         # AGGRESSIVE: If bot wants Marvin, give it high priority in routing
         marvin_priority = 100
         future_candidate = _best_future_marvin_candidate(player, game_state.balance) if _has_marvin_access(player) else None
@@ -5962,7 +6311,11 @@ def _planner_choose_destination(options, player):
         adventure_readiness = min(100, max(30, int(player.get_rank()) * 20 + max(0, player.get_health() - 60) // 2 + max(0, player.get_sanity() - 35) // 2))
     wants_store = game_state.store_candidate_count > 0
     wants_pawn = game_state.pawn_planned_sale_value > 0
+    workbench_craft_candidate = _workbench_best_craft_candidate(player) if _wants_workbench_craft_run(player) else None
+    workbench_craft_priority = workbench_craft_candidate[1] if workbench_craft_candidate else 0
     route_labels = {label for _number, label in menu_options}
+    if "Marvin's Mystical Merchandise" in route_labels:
+        _bump_funnel_metric(player, "marvin_route_present_count")
     defer_doctor = _defer_doctor_for_no_car_progression(player, route_labels, planned_goal=plan.goal)
     normalized_options = tuple(
         DecisionOption(
@@ -5979,7 +6332,7 @@ def _planner_choose_destination(options, player):
         game_state=game_state.to_dict(),
         normalized_options=normalized_options,
         raw_recent_text=tuple(RECENT_TEXT[-20:]),
-        metadata={
+        metadata=_request_metadata({
             "cycle": CURRENT_CYCLE,
             "day": game_state.day,
             "urgent_medical": _doctor_visit_is_urgent(player),
@@ -5989,11 +6342,13 @@ def _planner_choose_destination(options, player):
             "wants_witch": _wants_witch_heal(player),
             "wants_witch_flask_only": _wants_witch_flask_only_run(player),
             "wants_workbench_craft": _wants_workbench_craft_run(player),
-            "wants_marvin": _wants_marvin_run(player),
+            "workbench_craft_priority": workbench_craft_priority,
+            "wants_marvin": wants_marvin,
             "wants_loan": _wants_loan_shark_run(player),
             "poverty_loan_mode": poverty_loan_mode,
             "wants_store": wants_store,
             "wants_adventure": _wants_adventure_run(player),
+            "has_adventure_utility": _has_adventure_utility(player),
             "wants_upgrade": _wants_upgrade_run(player),
             "wants_mechanic": _wants_mechanic_progression_run(player),
             "wants_pawn": wants_pawn,
@@ -6023,7 +6378,8 @@ def _planner_choose_destination(options, player):
             "rank": game_state.rank,
             "bankroll_emergency": game_state.bankroll_emergency,
             "fragile_post_car": game_state.fragile_post_car,
-        },
+            "location_circulation": _route_circulation_metadata(player, menu_options),
+        }),
     )
     _record_decision_request(request)
     choice, trace = choose_route_option(request, plan)
@@ -6036,34 +6392,56 @@ def _planner_choose_destination(options, player):
     _record_decision_trace(trace)
     if choice is None:
         return None
+    chosen_tags = _quicktest_route_tags(choice.label)
+    if plan.goal in {"push_next_rank", "exploit_marvin", "restock_supplies", "reach_adventure_threshold"}:
+        if "loan" in chosen_tags:
+            _bump_funnel_metric(player, "debt_growth_override_count")
+            _bump_funnel_metric(player, "loan_growth_override_count")
+        if "pawn" in chosen_tags:
+            _bump_funnel_metric(player, "debt_growth_override_count")
+            _bump_funnel_metric(player, "pawn_growth_override_count")
     if trace.confidence < 0.40:
         return None
     return int(choice.value)
 
 
 def _choose_destination(options, player):
+    _mark_afternoon_menu_presented(player, options)
+
+    def finalize(choice):
+        return _record_route_choice_flow(player, choice, options)
+
     labels = {label: number for number, label in options}
     medical_choice = _medical_destination_label(player)
-    defer_doctor = _defer_doctor_for_no_car_progression(player, labels.keys())
+    balance = 0 if player is None else int(player.get_balance())
+    warning = 0 if player is None or not hasattr(player, "get_loan_shark_warning_level") else int(player.get_loan_shark_warning_level())
+    debt = 0 if player is None or not hasattr(player, "get_loan_shark_debt") else int(player.get_loan_shark_debt())
+    debt_cleanup_payment = max(0, balance - (_cash_safety_reserve(player, 88) if player is not None else 0))
     debt_cleanup_ready = (
         player is not None
         and "Vinnie's Back Alley Loans" in labels
-        and int(player.get_loan_shark_debt()) > 0
+        and debt > 0
         and _wants_loan_shark_run(player)
         and player.get_health() >= 42
         and player.get_sanity() >= 24
-        and max(0, player.get_balance() - _cash_safety_reserve(player, 88)) >= max(100, int(player.get_loan_shark_debt()) // 2)
+        and debt_cleanup_payment >= (min(100, debt) if warning >= 1 else max(100, debt // 2))
     )
 
+    # ── PRIORITY 1: Urgent medical (life-threatening) ──
     if medical_choice in labels and _doctor_visit_is_urgent(player):
         _record_route_interrupt_trace(player, labels[medical_choice], f"urgent medical override -> {medical_choice}", "survive_emergency", "urgent_medical")
-        return labels[medical_choice]
+        return finalize(labels[medical_choice])
 
-    if medical_choice in labels and not defer_doctor and (_wants_doctor_visit(player) or _wants_witch_heal(player)):
-        forced_goal = "stabilize_health" if medical_choice == "Doctor's Office" else "stabilize_sanity"
-        _record_route_interrupt_trace(player, labels[medical_choice], f"medical stabilization override -> {medical_choice}", forced_goal, "medical_stabilization")
-        return labels[medical_choice]
+    # ── PRIORITY 2: Marvin force-buy ($10k+ with access and unbought items) ──
+    # Marvin is the single highest-leverage location once affordable.  Route here
+    # every day it's available until completely bought out.
+    forced_marvin = _force_marvin_buy_interrupt(player, labels)
+    if forced_marvin is not None:
+        _bump_funnel_metric(player, "marvin_direct_gate_count")
+        _record_route_interrupt_trace(player, forced_marvin, "hard marvin 10k force-buy", "exploit_marvin", "marvin_force_buy_10k")
+        return finalize(forced_marvin)
 
+    # ── PRIORITY 3: Debt cleanup (loan warning level high) ──
     if debt_cleanup_ready:
         _record_route_interrupt_trace(
             player,
@@ -6072,43 +6450,37 @@ def _choose_destination(options, player):
             "reduce_debt_risk",
             "debt_cleanup_window",
         )
-        return labels["Vinnie's Back Alley Loans"]
+        return finalize(labels["Vinnie's Back Alley Loans"])
 
-    # Loan shark bootstrap interrupt: when Vinnie is met, no debt, and the player is
-    # cash-poor (rank 0 < $900, rank 1 no-map < $3k), borrowing from Vinnie is almost
-    # always the best available move.
-    if "Vinnie's Back Alley Loans" in labels and _poverty_escape_loan_mode(player):
-        _record_route_interrupt_trace(player, labels["Vinnie's Back Alley Loans"], "poverty-escape loan bootstrap", "push_next_rank", "poverty_loan_bootstrap")
-        return labels["Vinnie's Back Alley Loans"]
-
-    # Flask-only witch visit: inserted before the planner so it isn't buried
-    # by the planner's store bias.
-    if "Witch Doctor's Tower" in labels and _wants_witch_flask_only_run(player):
-        _record_route_interrupt_trace(player, labels["Witch Doctor's Tower"], "witch flask-only visit", "exploit_witch_flask", "witch_flask_only")
-        return labels["Witch Doctor's Tower"]
-
-    marvin_interrupt = _strong_marvin_route_interrupt(player, labels)
-    if marvin_interrupt is not None:
-        _record_route_interrupt_trace(player, marvin_interrupt, "rich marvin conversion window", "exploit_marvin", "marvin_conversion_window")
-        return marvin_interrupt
-
-    # Direct Marvin gate: if all core conditions pass (access, car, affordability,
-    # basic health) and the planner/interrupt haven't fired yet, go to Marvin.
-    # This catches cases where the planner confidence is low or the interrupt's
-    # strict sanity/health threshold wasn't met.
+    # ── PRIORITY 4: Pawn cashout (broke / needs cash for a specific goal) ──
+    # At low balances (≤ $1000), no gap enforcement — survival-critical.
+    # Above $1000, require 2-day gap to prevent hogging the rotation.
+    pawn_gap = _days_since_location(player, "shop:pawn_shop") if player is not None else None
+    pawn_gap_ok = True if balance <= 1000 else (pawn_gap is None or pawn_gap >= 2)
     if (
-        "Marvin's Mystical Merchandise" in labels
-        and _wants_marvin_run(player)
-        and not _bankroll_emergency_mode(player)
-        and (player is None or player.get_sanity() >= 26)
-        and (_days_since_location(player, "shop:marvin") or 1) >= 1
+        "Grimy Gus's Pawn Emporium" in labels
+        and _wants_pawn_cashout(player)
+        and pawn_gap_ok
     ):
-        _record_route_interrupt_trace(player, labels["Marvin's Mystical Merchandise"], "direct marvin gate", "exploit_marvin", "marvin_direct_gate")
-        return labels["Marvin's Mystical Merchandise"]
+        _record_route_interrupt_trace(player, labels["Grimy Gus's Pawn Emporium"], "pawn cashout interrupt", "cashout_pawn_inventory", "pawn_cashout_interrupt")
+        return finalize(labels["Grimy Gus's Pawn Emporium"])
 
+    # ── PRIORITY 5: Planner (goal-based scoring across all locations) ──
     planner_choice = _planner_choose_destination(options, player)
     if planner_choice is not None:
-        return planner_choice
+        return finalize(planner_choice)
+
+    # ── PRIORITY 6: Loan shark bootstrap (broke, no debt, need cash injection) ──
+    if "Vinnie's Back Alley Loans" in labels and _poverty_escape_loan_mode(player):
+        _record_route_interrupt_trace(player, labels["Vinnie's Back Alley Loans"], "poverty-escape loan bootstrap", "push_next_rank", "poverty_loan_bootstrap")
+        return finalize(labels["Vinnie's Back Alley Loans"])
+
+    # ── PRIORITY 7: Witch flask purchase (healthy player, affordable flask) ──
+    if "Witch Doctor's Tower" in labels and _wants_witch_flask_only_run(player):
+        _record_route_interrupt_trace(player, labels["Witch Doctor's Tower"], "witch flask-only visit", "exploit_witch_flask", "witch_flask_only")
+        return finalize(labels["Witch Doctor's Tower"])
+
+    # ── PRIORITY 8: Legacy fallback (progression, store, stay home) ──
     return _legacy_choose_destination(options, player)
 
 
@@ -6302,6 +6674,8 @@ def _choose_pawn_sale_item(options, player):
         matched_name = None
         matched_price = 0
         for item_name, price in prices.items():
+            if _is_protected_pawn_item(item_name):
+                continue
             if item_name.lower() in lowered and price >= matched_price:
                 matched_name = item_name
                 matched_price = price
@@ -6362,12 +6736,13 @@ def _decide_yes_no(prompt=""):
     recent = _recent_lower(80)
     recent_mechanic = _recent_lower(20)
     cost = _extract_cash_amount(prompt, recent)
+    event_label = _latest_cycle_event_label() or "yes_no_prompt"
 
     def finalize(answer, reason, confidence=0.62):
         _record_structured_trace(
             player,
             request_type="yes_no",
-            stable_context_id="yes_no_prompt",
+            stable_context_id=event_label,
             chosen_action=answer,
             reason=reason,
             confidence=confidence,
@@ -6376,9 +6751,21 @@ def _decide_yes_no(prompt=""):
             metadata={
                 "cost": cost,
                 "prompt_lower": prompt_lower,
+                "event_name": event_label,
             },
         )
         return answer
+
+    if player is not None and hasattr(player, "was_millionaire_visited") and player.was_millionaire_visited():
+        millionaire_endgame_prompts = {
+            "take the phone call?": "millionaire_tom_take_call",
+            '"will you come back home?"': "millionaire_tom_go_home",
+            "put on the jacket?": "millionaire_frank_accept",
+            "accept oswald's offer?": "millionaire_oswald_accept",
+        }
+        millionaire_reason = millionaire_endgame_prompts.get(prompt_lower)
+        if millionaire_reason is not None:
+            return finalize("yes", millionaire_reason, 0.96)
 
     mechanic_answer = _decide_mechanic_intro_response(player, recent_mechanic, prompt, source="yesno")
     if mechanic_answer is not None:
@@ -6406,6 +6793,8 @@ def _decide_yes_no(prompt=""):
             if priority <= 0:
                 return finalize("no", f"marvin_offer_priority_zero:{current_offer}")
             balance = player.get_balance()
+            if balance >= 10000 and balance >= cost and not _doctor_visit_is_urgent(player):
+                return finalize("yes", f"marvin_offer_forced_10k:{current_offer}", 0.95)
             conversion_window_items = _marvin_conversion_items()
             post_purchase_floor = _marvin_post_purchase_floor(player, current_offer)
             rank = int(player.get_rank()) if hasattr(player, "get_rank") else 0
@@ -6460,13 +6849,14 @@ def _decide_yes_no(prompt=""):
     event_request, event_plan = _build_event_policy_request(
         player,
         request_type="yes_no",
-        stable_context_id="yes_no_prompt",
+        stable_context_id=event_label,
         options=("yes", "no"),
         prompt=prompt,
         metadata={
             "prompt_lower": prompt_lower,
             "recent_lower": recent,
             "cost": cost,
+            "event_name": event_label,
         },
     )
     event_answer, event_trace = choose_event_yes_no(event_request, event_plan)
@@ -6490,6 +6880,10 @@ def _decide_yes_no(prompt=""):
         else:
             answer = "yes" if player is not None and _wants_companion_time(player) else "no"
         return finalize(answer, "companion_recovery_gate")
+    # Phil / final interrogation: "yes" = 25% death, "no" = 33% death.
+    # Answer yes for better survival odds.
+    if "will you leave" in recent and "answer me" in prompt_lower:
+        return finalize("yes", "interrogation_better_odds", 0.95)
     if any(
         re.search(rf"\b{re.escape(phrase)}\b", recent)
         for phrase in [
@@ -6515,6 +6909,9 @@ def _decide_yes_no(prompt=""):
     if prompt_lower.startswith("sell ") or prompt_lower.startswith("sell the "):
         if "sell whiskers" in prompt_lower or "sell lucky" in prompt_lower:
             return finalize("no", "protect_companion_sale_block")
+        protected_sale_tokens = ("sell map", "sell the map", "sell worn map", "sell the worn map", "sell tool kit", "sell the tool kit")
+        if any(token in prompt_lower for token in protected_sale_tokens):
+            return finalize("no", "protect_progression_sale_block")
         planned_sales = {item_name.lower() for item_name in _planned_pawn_sales(player)}
         for item_name in planned_sales:
             if item_name in prompt_lower:
@@ -6568,6 +6965,19 @@ def _decide_yes_no(prompt=""):
         reserve = max(20, int(player.get_balance() * 0.2))
         answer = "yes" if player.get_balance() - cost >= reserve else "no"
         return finalize(answer, "payment_reserve_gate")
+    # Track consecutive fallback hits for the same event label — crash if stuck.
+    global _YN_FALLBACK_STREAK, _YN_FALLBACK_LABEL
+    if event_label == _YN_FALLBACK_LABEL:
+        _YN_FALLBACK_STREAK += 1
+        if _YN_FALLBACK_STREAK > 20:
+            raise RuntimeError(
+                f"yes/no fallback loop: {_YN_FALLBACK_STREAK}x for "
+                f"{event_label!r}, cycle={CURRENT_CYCLE}"
+            )
+    else:
+        _YN_FALLBACK_LABEL = event_label
+        _YN_FALLBACK_STREAK = 1
+
     if player is not None and (player.get_balance() >= 1000 or int(player.get_rank()) >= 1):
         _record_fallback_decision("yesno", prompt, recent, source="high-resource-default")
         return finalize("no", "fallback_high_resource_default", 0.35)
@@ -6580,6 +6990,7 @@ def _decide_option(prompt, options):
     prompt_lower = (prompt or "").lower()
     recent = _recent_lower(80)
     recent_short = "\n".join(RECENT_TEXT[-5:]).lower()
+    event_label = _latest_cycle_event_label() or "option_prompt"
     numeric_option_prompt = _looks_like_numeric_menu_prompt(options)
 
     if numeric_option_prompt:
@@ -6594,7 +7005,7 @@ def _decide_option(prompt, options):
         _record_structured_trace(
             player,
             request_type="event_branch",
-            stable_context_id="option_prompt",
+            stable_context_id=event_label,
             chosen_action=chosen,
             reason=reason,
             confidence=confidence,
@@ -6602,6 +7013,7 @@ def _decide_option(prompt, options):
             options=tuple(options),
             metadata={
                 "prompt_lower": prompt_lower,
+                "event_name": event_label,
             },
         )
         return chosen
@@ -6609,12 +7021,13 @@ def _decide_option(prompt, options):
     event_request, event_plan = _build_event_policy_request(
         player,
         request_type="event_branch",
-        stable_context_id="option_prompt",
+        stable_context_id=event_label,
         options=tuple(options),
         prompt=prompt,
         metadata={
             "prompt_lower": prompt_lower,
             "recent_lower": recent,
+            "event_name": event_label,
         },
     )
     event_choice, event_trace = choose_event_option(event_request, event_plan)
@@ -6638,7 +7051,22 @@ def _decide_cash(total, prompt=""):
 
 
 def _decide_raw_input(prompt=""):
-    global LAST_INPUT_FINGERPRINT, REPEATED_INPUT_COUNT
+    global LAST_INPUT_FINGERPRINT, REPEATED_INPUT_COUNT, _BLANK_PROMPT_STREAK
+
+    # Crash safety: detect infinite blank-prompt loops.  ask.yes_or_no() calls
+    # input("") in a while-True loop; if our routing returns something it doesn't
+    # recognise, each "What? " reiteration changes the fingerprint so the
+    # REPEATED_INPUT_COUNT safety never fires.  This hard counter does.
+    if not (prompt or "").strip():
+        _BLANK_PROMPT_STREAK += 1
+        if _BLANK_PROMPT_STREAK > 50:
+            hint = "\n".join(RECENT_TEXT[-5:])[:200] if RECENT_TEXT else "(empty)"
+            raise RuntimeError(
+                f"Input loop: {_BLANK_PROMPT_STREAK} consecutive blank prompts | "
+                f"cycle={CURRENT_CYCLE} | recent={hint!r}"
+            )
+    else:
+        _BLANK_PROMPT_STREAK = 0
 
     player = CURRENT_PLAYER
     prompt_lower = (prompt or "").lower()
@@ -6649,6 +7077,7 @@ def _decide_raw_input(prompt=""):
     inline_choices = _extract_inline_choices(prompt, *RECENT_TEXT[-12:])
     fingerprint = (prompt_lower.strip(), "\n".join(RECENT_TEXT[-10:]).lower())
     raw_override = None
+    event_label = _latest_cycle_event_label() or "raw_input_prompt"
     witch_numeric_menu_visible = (
         "choose a number" in recent_short
         and "flask of" in recent
@@ -6659,12 +7088,13 @@ def _decide_raw_input(prompt=""):
         event_request, event_plan = _build_event_policy_request(
             player,
             request_type="event_inline",
-            stable_context_id="raw_input_prompt",
+            stable_context_id=event_label,
             options=tuple(inline_choices),
             prompt=prompt,
             metadata={
                 "prompt_lower": prompt_lower,
                 "recent_lower": recent,
+                "event_name": event_label,
             },
         )
         event_choice, event_trace = choose_event_inline_choice(event_request, event_plan)
@@ -6701,6 +7131,13 @@ def _decide_raw_input(prompt=""):
         return _decide_mechanic_intro_response(player, recent_mechanic, prompt, source="blank") or "no"
 
     if "yes/no" in prompt_lower:
+        return _decide_yes_no(prompt)
+    # Detect yes/no reiteration: ask.yes_or_no() prints "What? " when it gets
+    # unrecognised input.  Catch this BEFORE numbered-menu heuristics below
+    # intercept the blank prompt via stale "choose a number" text in recent.
+    if not prompt_lower and any(
+        rt.strip().lower().startswith("what?") for rt in RECENT_TEXT[-3:]
+    ):
         return _decide_yes_no(prompt)
     if not prompt_lower and any(
         phrase in recent for phrase in [
@@ -6857,11 +7294,10 @@ def _choose_blackjack_policy_option(player, *, stable_context_id, options, metad
         game_state=game_state.to_dict(),
         normalized_options=_structured_options(options, prefix=stable_context_id),
         raw_recent_text=tuple(RECENT_TEXT[-20:]),
-        metadata={
+        metadata=_request_metadata({
             "cycle": CURRENT_CYCLE,
             "day": game_state.day,
-            **metadata,
-        },
+        }, metadata),
     )
     _record_decision_request(request)
     plan = choose_strategic_goal(game_state)
@@ -6921,6 +7357,8 @@ def _choose_blackjack_bet_amount(self):
             "pending_marvin_active": pending_marvin is not None,
             "pending_marvin_price": 0 if pending_marvin is None else int(pending_marvin["price"]),
             "pending_marvin_shortfall": 0 if pending_marvin is None else int(pending_marvin["shortfall"]),
+            "has_unbought_marvin_items": _has_unbought_marvin_items(player),
+            "marvin_remaining_spend": _marvin_remaining_spend(player),
             "purchase_push_active": marvin_purchase_push is not None,
             "purchase_push_kind": "marvin" if marvin_purchase_push is not None else "",
             "purchase_push_price": 0 if marvin_purchase_push is None else int(marvin_purchase_push["price"]),
@@ -6938,6 +7376,7 @@ def _choose_blackjack_bet_amount(self):
             "needs_car": _needs_car(player),
             "ever_had_car": EVER_HAD_CAR or player.has_item("Car"),
             "wants_millionaire_push": _wants_millionaire_push(player),
+            "is_millionaire": bool(player.is_millionaire()) if hasattr(player, "is_millionaire") else False,
             "has_extra_round_item": _has_extra_round_item(player),
             "urgent_doctor": _doctor_visit_is_urgent(player),
             "bankroll_emergency": strategic_state.bankroll_emergency,
@@ -7232,7 +7671,31 @@ def _auto_offer_insurance(self):
 _ORIGINAL_END_ROUND = bj.Blackjack.end_round
 
 
+def _extract_hand_cards(hand):
+    """Extract card strings from a Hand object."""
+    cards = []
+    for i in range(len(hand)):
+        try:
+            cards.append(str(hand.get_card(i)))
+        except (IndexError, AttributeError):
+            break
+    return cards
+
+
 def _auto_end_round(self, status):
+    # Capture hand snapshot BEFORE end_round modifies anything
+    _hand_snapshot = {
+        "cycle": CURRENT_CYCLE,
+        "bet": int(self._Blackjack__bet),
+        "player_cards": _extract_hand_cards(self._Blackjack__hand),
+        "dealer_cards": _extract_hand_cards(self._Blackjack__dealer_hand),
+        "player_total": self._Blackjack__hand.ace_value() if self._Blackjack__hand.possible_hands() == 2 and self._Blackjack__hand.ace_value() <= 21 else self._Blackjack__hand.value(),
+        "dealer_total": self._Blackjack__dealer_hand.ace_value() if self._Blackjack__dealer_hand.possible_hands() == 2 and self._Blackjack__dealer_hand.ace_value() <= 21 else self._Blackjack__dealer_hand.value(),
+        "outcome": status,
+        "balance_before": int(self._Blackjack__balance),
+        "free_hand": bool(self._Blackjack__free_hand),
+    }
+
     if (
         self._Blackjack__player.has_flask_effect("Second Chance")
         and not self._Blackjack__used_second_chance
@@ -7243,15 +7706,23 @@ def _auto_end_round(self, status):
             bj.type.fast(bj.yellow(bj.bright("Your Flask of Second Chance glimmers. You replay the hand.")))
             print("\n")
             self._Blackjack__player.update_second_chance_durability()
+            _hand_snapshot["second_chance"] = True
+            HAND_LOG.append(_hand_snapshot)
             return False
 
         self._Blackjack__used_second_chance = True
         try:
-            return _ORIGINAL_END_ROUND(self, status)
+            result = _ORIGINAL_END_ROUND(self, status)
         finally:
             self._Blackjack__used_second_chance = False
+        _hand_snapshot["balance_after"] = int(self._Blackjack__balance)
+        HAND_LOG.append(_hand_snapshot)
+        return result
 
-    return _ORIGINAL_END_ROUND(self, status)
+    result = _ORIGINAL_END_ROUND(self, status)
+    _hand_snapshot["balance_after"] = int(self._Blackjack__balance)
+    HAND_LOG.append(_hand_snapshot)
+    return result
 
 
 bj.Blackjack.bet = _auto_bet
@@ -7283,12 +7754,27 @@ CYCLES, SEED = _resolve_cli_args()
 LOG = os.path.join(os.path.dirname(os.path.abspath(__file__)), "test_out.txt")
 JSON_LOG = os.path.join(os.path.dirname(os.path.abspath(__file__)), "test_out.json")
 STORY_LOG = os.path.join(os.path.dirname(os.path.abspath(__file__)), "story_out.txt")
+DTREE_LOG = os.path.join(os.path.dirname(os.path.abspath(__file__)), "test_decision_tree.txt")
+ARTIFACT_KIND = "quicktest_report"
+ARTIFACT_SCHEMA_VERSION = 2
+ARTIFACT_RUN_ID = f"seed{SEED}-cycles{CYCLES}-pid{os.getpid()}-{int(time.time() * 1000)}"
+LOG_TMP = f"{LOG}.tmp.{ARTIFACT_RUN_ID}"
+JSON_LOG_TMP = f"{JSON_LOG}.tmp.{ARTIFACT_RUN_ID}"
+STORY_LOG_TMP = f"{STORY_LOG}.tmp.{ARTIFACT_RUN_ID}"
+DTREE_LOG_TMP = f"{DTREE_LOG}.tmp.{ARTIFACT_RUN_ID}"
 
 CURRENT_CYCLE = None
 CURRENT_EVENTS = []
 ALL_EVENTS = []
+CURRENT_CYCLE_FLOW = None
+CYCLE_FLOW_REPORTS = []
 RUN_PEAK_BALANCE = 50
+CYCLE_SNAPSHOTS = []
+HAND_LOG = []          # Each entry: {cycle, bet, player_cards, dealer_cards, player_total, dealer_total, outcome, balance_before, balance_after, items_active}
+CYCLE_TEXT = {}         # cycle_number → list of text lines from that cycle
+CYCLE_EVENTS = {}       # cycle_number → list of event labels from that cycle
 errs = []
+_ARTIFACTS_PUBLISHED = False
 
 TRACKED_STATS = [
     "days_survived",
@@ -7345,18 +7831,723 @@ def fake_input(_prompt=""):
     return response
 
 
-_log_file = open(LOG, "w", encoding="utf-8")
-_story_file = open(STORY_LOG, "w", encoding="utf-8")
+_log_file = open(LOG_TMP, "w", encoding="utf-8", newline="\n")
+_story_file = open(STORY_LOG_TMP, "w", encoding="utf-8", newline="\n")
 
 
-def _close_log_file():
+def _cleanup_unpublished_artifacts():
     if not _log_file.closed:
         _log_file.close()
     if not _story_file.closed:
         _story_file.close()
 
+    if _ARTIFACTS_PUBLISHED:
+        return
 
-atexit.register(_close_log_file)
+    for temp_path in (LOG_TMP, STORY_LOG_TMP, JSON_LOG_TMP, DTREE_LOG_TMP):
+        try:
+            os.remove(temp_path)
+        except FileNotFoundError:
+            continue
+        except OSError:
+            continue
+
+
+def _extract_decision_context(trace):
+    """Extract meaningful game text context lines from a trace's raw_recent_text.
+
+    Returns (prompt_text, context_lines) where:
+    - prompt_text: the direct question / prompt shown to the player (if available)
+    - context_lines: condensed event narrative leading up to the decision
+    """
+    meta = trace.metadata or {}
+    raw_lines = meta.get("raw_recent_text", ())
+    prompt = meta.get("raw_prompt_text", "")
+
+    # BJ-related noise patterns to skip
+    _bj_noise = {
+        "your hand has a value", "the dealer's hand has a value",
+        "dealer's second card", "press enter", "your balance is",
+        "minimum bet is", "the dealer deals", "the dealer draws",
+        "the dealer hits", "the dealer stands", "the dealer's next card",
+        "the dealer's first card", "the dealer's known value", "known value of",
+        "dealer's hand has a known", "your first card", "your second card",
+        "your next card", "you draw", "you hit", "you stand",
+        "player busts", "dealer busts", "you have a blackjack",
+        "the dealer has a blackjack", "card is face down", "bet amount:",
+        "your bet is", "you have $", "you had $", "your new balance",
+        "new balance is", "with a bet of", "you've doubled it",
+        "since they have an ace", "since you have an ace",
+        "you win back your bet", "the house always wins",
+        "close, but close only", "you topple the dealer", "your bet of $",
+        "you lost your bet", "dealer hand goes bust", "you simply got outplayed",
+        "is a draw", "one lucky lucy", "witnessing a heist", "beginner's luck!",
+        "the cards shift", "the dealer points to the door",
+        "without questioning his word", "making it back to your car",
+        "eager to get some sleep", "you scurry to the door",
+        "sit. let's see what fate", "you keep coming back",
+        "walk to the casino", "eager to play more blackjack",
+        "as the sun begins to set", "day summary", "you've survived",
+        "you started your journey", "since then, you've managed",
+        "that brings you to a grand total", "let's not get too far ahead",
+        "you've got a unique path", "here's a little bit of inspiration",
+        "~ ~ ~ morning", "~ ~ ~ day", "you slept",
+    }
+    _decorative = {"══════════", "──────────", "==========", "----------",
+                   "yippee!", "yessir!", "nice!", "impressive!"}
+
+    context_lines = []
+    for raw in raw_lines:
+        line = str(raw).strip()
+        if not line or len(line) <= 3:
+            continue
+        lower = line.lower()
+        if any(pat in lower for pat in _bj_noise):
+            continue
+        if line in _decorative:
+            continue
+        if lower in _decorative:
+            continue
+        # Skip quoted inspirational lines
+        if line.startswith('"') and line.endswith('"') and len(line) > 40:
+            continue
+        context_lines.append(line)
+
+    return prompt.strip(), context_lines
+
+
+def _write_decision_tree():
+    """Write a comprehensive decision tree showing every hand, event, and decision."""
+
+    # ── Index all data by cycle ──────────────────────────────────────────────
+    traces_by_cycle = defaultdict(list)
+    for trace in DECISION_TRACES:
+        traces_by_cycle[trace.cycle or 0].append(trace)
+
+    snapshots_by_cycle = {}
+    for cycle_num, before, after in CYCLE_SNAPSHOTS:
+        snapshots_by_cycle[cycle_num] = (before, after)
+
+    flows_by_cycle = {}
+    for flow in CYCLE_FLOW_REPORTS:
+        flows_by_cycle[int(flow.get("cycle", 0))] = flow
+
+    hands_by_cycle = defaultdict(list)
+    for hand in HAND_LOG:
+        hands_by_cycle[hand.get("cycle") or 0].append(hand)
+
+    all_cycles = sorted(
+        set(traces_by_cycle.keys())
+        | set(snapshots_by_cycle.keys())
+    )
+
+    lines = []
+    w = lines.append
+
+    w("╔" + "═" * 98 + "╗")
+    w("║" + f" DECISION TREE — seed={SEED}  cycles={CYCLES}".ljust(98) + "║")
+    w("║" + f" Generated {time.strftime('%Y-%m-%d %H:%M:%S')}".ljust(98) + "║")
+    w("╚" + "═" * 98 + "╝")
+    w("")
+
+    # ── Accumulators ─────────────────────────────────────────────────────────
+    missed_marvin_cycles = []
+    total_damage_events = 0
+    total_hands = 0
+    total_wins = 0
+    total_losses = 0
+    total_ties = 0
+    total_bet_amount = 0
+    total_won_amount = 0
+    total_lost_amount = 0
+    low_confidence_decisions = []
+    turning_points = []
+    unhandled_events = []  # events with no traced decisions
+    all_event_labels = []
+
+    for cycle_num in all_cycles:
+        if cycle_num == 0:
+            pre_traces = traces_by_cycle.get(0, [])
+            if pre_traces:
+                w("┌" + "─" * 98 + "┐")
+                w("│ PRE-GAME SETUP" + " " * 83 + "│")
+                w("└" + "─" * 98 + "┘")
+                for trace in pre_traces:
+                    ctx = trace.context or trace.request_type or "?"
+                    action = trace.chosen_action or "?"
+                    reason = trace.reason or ""
+                    w(f"  {ctx}: {action} | {reason[:80]}")
+                w("")
+            continue
+
+        before, after = snapshots_by_cycle.get(cycle_num, ({}, {}))
+        b_bal = int(before.get("balance", 0))
+        a_bal = int(after.get("balance", 0))
+        b_hp = int(before.get("health", 0))
+        a_hp = int(after.get("health", 0))
+        b_san = int(before.get("sanity", 0))
+        a_san = int(after.get("sanity", 0))
+        rank = int(after.get("rank", before.get("rank", 0)))
+        has_car = "Y" if after.get("has_car") else "N"
+        day = int(after.get("day", before.get("day", cycle_num)))
+        alive = after.get("alive", True)
+        d_bal = a_bal - b_bal
+        d_hp = a_hp - b_hp
+        d_san = a_san - b_san
+
+        # Status flags
+        flags = []
+        if d_hp < -10 or d_san < -10:
+            flags.append("DAMAGE")
+        if not alive:
+            flags.append("DEATH")
+        if d_bal < -500:
+            flags.append("BIG LOSS")
+        if d_bal > 2000:
+            flags.append("BIG WIN")
+        flag_str = "  ◄ " + ", ".join(flags) if flags else ""
+
+        # ── Day header ───────────────────────────────────────────────────────
+        w("╔" + "═" * 98 + "╗")
+        header = f" Day {day:3d} | ${b_bal:>8,} → ${a_bal:>8,} ({d_bal:+,}) | HP:{b_hp}→{a_hp}({d_hp:+d}) SAN:{b_san}→{a_san}({d_san:+d}) | R:{rank} Car:{has_car}{flag_str}"
+        w("║" + header.ljust(98) + "║")
+        w("╚" + "═" * 98 + "╝")
+
+        # ── Events that fired this cycle (enriched with narrative + decisions) ─
+        events = CYCLE_EVENTS.get(cycle_num, [])
+        if events:
+            all_event_labels.extend(events)
+
+        # Group event-type AND location-type traces by their event label
+        _event_decision_types = frozenset(("event_branch", "event_inline", "yes_no"))
+        _location_trace_types = frozenset((
+            "purchase_select", "loan_decision", "repair_select",
+            "upgrade_select", "medical_select", "menu_select",
+        ))
+        # Map location trace context IDs → location event labels
+        _ctx_to_location = {
+            "convenience_store_menu": "location:shop:convenience_store",
+            "loan_menu": "location:shop:loan_shark",
+            "loan_borrow_amount": "location:shop:loan_shark",
+            "loan_repay_amount": "location:shop:loan_shark",
+            "repair_menu": "location:shop:tom",
+            "upgrade_menu": "location:shop:tom",
+            "workbench_menu": "location:workbench",
+            "workbench_craft_menu": "location:workbench",
+            "pawn_menu": "location:shop:pawn",
+            "pawn_sale_menu": "location:shop:pawn",
+            "witch_flask_menu": "location:doctor:witch",
+            "medical_destination": "location:doctor",
+            "companion_menu": "location:companion",
+        }
+        cycle_traces_all = traces_by_cycle.get(cycle_num, [])
+        non_bj_traces_pre = [t for t in cycle_traces_all if t.request_type not in ("blackjack_bet", "blackjack_action")]
+        event_trace_map: dict[str, list] = {}  # event_label → list of traces
+        other_traces: list = []  # non-event traces (routes, insurance, etc.)
+        for t in non_bj_traces_pre:
+            if t.request_type in _event_decision_types:
+                key = t.context or "unknown_event"
+                event_trace_map.setdefault(key, []).append(t)
+            elif t.request_type in _location_trace_types:
+                ctx = t.context or ""
+                # Try exact match first, then prefix match against event labels
+                loc_label = _ctx_to_location.get(ctx)
+                if loc_label is None:
+                    # Fuzzy: check if any location event in this cycle matches
+                    for ev in events:
+                        if ev.startswith("location:") and any(
+                            part in ctx for part in ev.split(":")[1:]
+                        ):
+                            loc_label = ev
+                            break
+                if loc_label:
+                    event_trace_map.setdefault(loc_label, []).append(t)
+                else:
+                    other_traces.append(t)
+            else:
+                other_traces.append(t)
+
+        if events or event_trace_map:
+            w("  ┌─ EVENTS ─────────────────────────────────────")
+            # Merge: show all events from CYCLE_EVENTS + any that only appear in traces
+            seen_labels = set()
+            all_labels = list(events)
+            for k in event_trace_map:
+                if k not in all_labels:
+                    all_labels.append(k)
+
+            for ev in all_labels:
+                seen_labels.add(ev)
+                ev_traces = event_trace_map.get(ev, [])
+                w(f"  │ ▸ {ev}")
+
+                # Extract narrative context from the first trace for this event
+                if ev_traces:
+                    prompt_text, ctx_lines = _extract_decision_context(ev_traces[0])
+                    # Show up to 5 key narrative lines
+                    for cl in ctx_lines[-5:]:
+                        w(f"  │   {cl[:110]}")
+                    if prompt_text and prompt_text not in [cl[:110] for cl in ctx_lines[-5:]]:
+                        w(f"  │   ? {prompt_text[:110]}")
+
+                # Show decisions made during this event
+                for tr in ev_traces:
+                    action = tr.chosen_action or "?"
+                    reason = tr.reason or ""
+                    opts = tr.options or ()
+                    meta = tr.metadata or {}
+                    reason_code = meta.get("reason_code", "")
+                    conf = tr.confidence if tr.confidence is not None else -1.0
+                    if conf < 0 or conf >= 0.90:
+                        conf_tag = ""
+                    elif conf >= 0.70:
+                        conf_tag = f" [conf={conf:.2f}]"
+                    elif conf >= 0.50:
+                        conf_tag = f" ◄ UNCERTAIN conf={conf:.2f}"
+                    else:
+                        conf_tag = f" ◄◄ GUESSING conf={conf:.2f}"
+
+                    if tr.request_type == "yes_no":
+                        reason_short = reason[:80] if reason else ""
+                        w(f"  │   → Y/N: {action} | {reason_short}{conf_tag}")
+                    elif tr.request_type == "event_branch":
+                        alt_opts = [str(o) for o in opts[:6] if str(o) != str(action)]
+                        w(f"  │   → chose '{action}' [{reason_code}]{conf_tag}")
+                        if alt_opts:
+                            w(f"  │     (other: {', '.join(alt_opts)})")
+                    elif tr.request_type == "event_inline":
+                        alt_opts = [str(o) for o in opts[:6] if str(o) != str(action)]
+                        w(f"  │   → '{action}' [{reason_code}]{conf_tag}")
+                        if alt_opts:
+                            w(f"  │     (other: {', '.join(alt_opts)})")
+                    elif tr.request_type == "purchase_select":
+                        alt_opts = [str(o) for o in opts[:8] if str(o) != str(action)]
+                        w(f"  │   → PURCHASE: {action} [{reason_code}]{conf_tag}")
+                        if alt_opts:
+                            w(f"  │     (other: {', '.join(alt_opts)})")
+                    elif tr.request_type == "loan_decision":
+                        w(f"  │   → LOAN: {action} [{reason_code}]{conf_tag}")
+                    elif tr.request_type == "repair_select":
+                        w(f"  │   → REPAIR: {action} [{reason_code}]{conf_tag}")
+                    elif tr.request_type == "upgrade_select":
+                        w(f"  │   → UPGRADE: {action} [{reason_code}]{conf_tag}")
+                    elif tr.request_type == "medical_select":
+                        w(f"  │   → MEDICAL: {action} [{reason_code}]{conf_tag}")
+                    elif tr.request_type == "menu_select":
+                        w(f"  │   → MENU: {action} [{reason_code}]{conf_tag}")
+                    else:
+                        w(f"  │   → {action} [{reason_code}]{conf_tag}")
+
+                    # Track low-confidence
+                    if 0 <= conf < 0.50:
+                        low_confidence_decisions.append((
+                            cycle_num, day, tr.request_type or ev, action, conf,
+                            reason_code or reason[:40], list(opts[:6])
+                        ))
+                if ev != all_labels[-1]:
+                    w("  │")
+            w("  └──────────────────────────────────────────────")
+
+        # ── Afternoon route (from flow report) ───────────────────────────────
+        flow = flows_by_cycle.get(cycle_num, {})
+        if flow.get("afternoon_menu_presented"):
+            menu_opts = flow.get("menu_options", [])
+            route_choice = flow.get("route_choice")
+            menu_labels = list(menu_opts) if menu_opts else []
+            if menu_labels:
+                chosen_str = route_choice or "none"
+                other_opts = [lbl for lbl in menu_labels if lbl != chosen_str]
+                w(f"  ROUTE    chose: {chosen_str}")
+                if other_opts:
+                    w(f"           avail: {', '.join(other_opts)}")
+                if "Marvin's Mystical Merchandise" in menu_labels and route_choice != "Marvin's Mystical Merchandise":
+                    missed_marvin_cycles.append(cycle_num)
+                    w(f"           ⚠ MARVIN AVAILABLE BUT NOT VISITED")
+
+        # ── Blackjack hands ──────────────────────────────────────────────────
+        cycle_hands = hands_by_cycle.get(cycle_num, [])
+        # Get bet/action traces for this cycle
+        cycle_traces = traces_by_cycle.get(cycle_num, [])
+        bet_traces = [t for t in cycle_traces if t.request_type == "blackjack_bet"]
+        action_traces = [t for t in cycle_traces if t.request_type == "blackjack_action"]
+        non_bj_traces = [t for t in cycle_traces if t.request_type not in ("blackjack_bet", "blackjack_action")]
+
+        if cycle_hands:
+            w("")
+            w(f"  ┌─ BLACKJACK SESSION ({len(cycle_hands)} hand{'s' if len(cycle_hands) != 1 else ''}) ─────────────")
+
+            # Match each hand with its corresponding bet trace
+            action_idx = 0
+            for h_idx, hand in enumerate(cycle_hands):
+                total_hands += 1
+                outcome = hand["outcome"]
+                bet = hand["bet"]
+                p_cards = hand["player_cards"]
+                d_cards = hand["dealer_cards"]
+                p_total = hand["player_total"]
+                d_total = hand["dealer_total"]
+                bal_before = hand["balance_before"]
+                bal_after = hand.get("balance_after", bal_before)
+                free = hand.get("free_hand", False)
+                second_chance = hand.get("second_chance", False)
+                delta = bal_after - bal_before
+
+                # Classify outcome
+                is_win = outcome in ("Player Blackjack", "Player Wins", "Dealer Bust")
+                is_loss = outcome in ("Dealer Blackjack", "Dealer Wins", "Player Bust")
+                is_tie = outcome in ("Tie", "Tie Blackjack")
+
+                if is_win:
+                    total_wins += 1
+                    total_won_amount += abs(delta)
+                    result_marker = "  ✓ WIN"
+                elif is_loss:
+                    total_losses += 1
+                    total_lost_amount += abs(delta)
+                    result_marker = "  ✗ LOSS"
+                else:
+                    total_ties += 1
+                    result_marker = "  = TIE"
+                total_bet_amount += bet
+
+                if second_chance:
+                    result_marker += " (2nd Chance → replayed)"
+
+                # Show the bet decision
+                bet_reason = ""
+                if h_idx < len(bet_traces):
+                    bt = bet_traces[h_idx]
+                    bt_meta = bt.metadata or {}
+                    bet_reason = bt_meta.get("reason_code", "")
+                    edge = int(bt_meta.get("edge_score", 0))
+                    bet_reason = f"[{bet_reason}] edge={edge}"
+
+                w(f"  │")
+                w(f"  │ Hand {h_idx + 1}: Bet ${bet:,} / ${bal_before:,} {bet_reason}")
+                w(f"  │   Player: {', '.join(p_cards):40s} = {p_total}")
+                w(f"  │   Dealer: {', '.join(d_cards):40s} = {d_total}")
+                w(f"  │   Result: {outcome:20s} {delta:+,}{' (free hand)' if free else ''}{result_marker}")
+
+                # Show hit/stand/double/split decisions for this hand
+                # Count action traces that belong to this hand
+                hand_actions = []
+                while action_idx < len(action_traces):
+                    at = action_traces[action_idx]
+                    hand_actions.append(at)
+                    action_idx += 1
+                    # If the action was "stand", "double", or "surrender", the hand is over
+                    if at.chosen_action in ("stand", "double", "surrender"):
+                        break
+                    # If we've consumed more actions than cards drawn, stop
+                    if len(hand_actions) >= len(p_cards):
+                        break
+
+                if hand_actions:
+                    action_strs = []
+                    for at in hand_actions:
+                        at_meta = at.metadata or {}
+                        candidates = at_meta.get("candidate_actions", [])
+                        alt_list = [f"{c.get('option_id','?')}:{c.get('score',0):.0f}" for c in candidates if str(c.get('option_id','')) != str(at.chosen_action)] if candidates else []
+                        alts = f"(vs {','.join(alt_list)})" if alt_list else ""
+                        action_strs.append(f"{at.chosen_action} {alts}".strip())
+                    w(f"  │   Actions: {' → '.join(action_strs)}")
+
+            session_delta = sum(
+                (h.get("balance_after", h["balance_before"]) - h["balance_before"])
+                for h in cycle_hands if not h.get("second_chance")
+            )
+            w(f"  │")
+            w(f"  └─ Session: {len(cycle_hands)} hands, net {session_delta:+,}")
+            w("")
+
+        # ── Non-event decisions (routes, purchases, loans, insurance, etc.) ──
+        if other_traces:
+            for trace in other_traces:
+                ctx = trace.context or trace.request_type or "?"
+                action = trace.chosen_action or "?"
+                reason = trace.reason or ""
+                opts = trace.options or ()
+                meta = trace.metadata or {}
+                reason_code = meta.get("reason_code", "")
+                conf = trace.confidence if trace.confidence is not None else -1.0
+
+                # Confidence grade
+                if conf < 0 or conf >= 0.90:
+                    conf_tag = ""
+                elif conf >= 0.70:
+                    conf_tag = f" [conf={conf:.2f}]"
+                elif conf >= 0.50:
+                    conf_tag = f" ◄ UNCERTAIN conf={conf:.2f}"
+                else:
+                    conf_tag = f" ◄◄ GUESSING conf={conf:.2f}"
+
+                if ctx == "afternoon_destination" or trace.request_type == "route_select":
+                    goal = trace.strategic_goal or "?"
+                    alt_opts = [str(o) for o in opts if str(o) != str(action)]
+                    w(f"  ROUTE    → {action}")
+                    w(f"             goal={goal}  conf={conf:.2f}  [{reason_code}]")
+                    if alt_opts:
+                        w(f"             rejected: {', '.join(alt_opts)}")
+
+                elif "purchase" in ctx or trace.request_type == "purchase_select":
+                    alt_opts = [str(o) for o in opts[:8] if str(o) != str(action)]
+                    w(f"  PURCHASE → {action} [{reason_code}]{conf_tag}")
+                    if alt_opts:
+                        w(f"             other items: {', '.join(alt_opts)}")
+
+                elif trace.request_type == "upgrade_select":
+                    w(f"  UPGRADE  → {action} [{reason_code}]{conf_tag}")
+
+                elif trace.request_type == "repair_select":
+                    w(f"  REPAIR   → {action} [{reason_code}]{conf_tag}")
+
+                elif "loan" in ctx or trace.request_type == "loan_decision":
+                    w(f"  LOAN     → {action} [{reason_code}]{conf_tag}")
+
+                elif trace.request_type == "menu_select" or trace.request_type == "medical_select":
+                    label = "MEDICAL" if trace.request_type == "medical_select" else "MENU"
+                    w(f"  {label:8s} → {action} [{reason_code}] opts={','.join(str(o) for o in opts[:6])}{conf_tag}")
+
+                elif trace.request_type in ("insurance_decision",):
+                    w(f"  INSURE   → {action} [{reason_code}]{conf_tag}")
+
+                elif trace.request_type in ("second_chance_decision",):
+                    w(f"  2ndCHANC → {action} [{reason_code}]{conf_tag}")
+
+                else:
+                    reason_short = reason[:60] if reason else ""
+                    w(f"  DECIDE   {ctx}: {action} | {reason_short}{conf_tag}")
+
+                # Track low-confidence
+                if 0 <= conf < 0.50:
+                    low_confidence_decisions.append((
+                        cycle_num, day, trace.request_type or ctx, action, conf,
+                        reason_code or reason[:40], list(opts[:6])
+                    ))
+
+        # ── State changes ────────────────────────────────────────────────────
+        inv_before = set(before.get("inventory", set()))
+        inv_after = set(after.get("inventory", set()))
+        added = inv_after - inv_before
+        removed = inv_before - inv_after
+        if added:
+            w(f"  +ITEM  {', '.join(sorted(added))}")
+        if removed:
+            w(f"  -ITEM  {', '.join(sorted(removed))}")
+
+        comp_before = set(before.get("companions", set()))
+        comp_after = set(after.get("companions", set()))
+        comp_added = comp_after - comp_before
+        comp_removed = comp_before - comp_after
+        if comp_added:
+            w(f"  +COMP  {', '.join(sorted(comp_added))}")
+        if comp_removed:
+            w(f"  -COMP  {', '.join(sorted(comp_removed))}")
+
+        inj_before = set(before.get("injuries", set()))
+        inj_after = set(after.get("injuries", set()))
+        inj_added = inj_after - inj_before
+        inj_removed = inj_before - inj_after
+        if inj_added:
+            w(f"  +INJ   {', '.join(sorted(inj_added))}")
+            total_damage_events += 1
+        if inj_removed:
+            w(f"  -INJ   {', '.join(sorted(inj_removed))}")
+
+        stat_before = set(before.get("statuses", set()))
+        stat_after = set(after.get("statuses", set()))
+        stat_added = stat_after - stat_before
+        stat_removed = stat_before - stat_after
+        if stat_added:
+            w(f"  +STAT  {', '.join(sorted(stat_added))}")
+        if stat_removed:
+            w(f"  -STAT  {', '.join(sorted(stat_removed))}")
+
+        story_before = set(before.get("active_storylines", set()))
+        story_after = set(after.get("active_storylines", set()))
+        story_added = story_after - story_before
+        if story_added:
+            w(f"  +STORY {', '.join(sorted(story_added))}")
+
+        broken_before = set(before.get("broken_items", set()))
+        broken_after = set(after.get("broken_items", set()))
+        broken_added = broken_after - broken_before
+        if broken_added:
+            w(f"  BROKE  {', '.join(sorted(broken_added))}")
+
+        # Check for events that had NO traced decisions (pure RNG events)
+        if events and not non_bj_traces:
+            for ev in events:
+                if not ev.startswith("location:") and not ev.startswith("met:"):
+                    unhandled_events.append((day, ev, d_bal, d_hp, d_san))
+
+        # Death
+        if not alive:
+            death = after.get("death_cause") or before.get("death_cause") or "Unknown"
+            w(f"  ╔══════════════════════════════════════════════")
+            w(f"  ║ ☠ DIED: {death}")
+            w(f"  ╚══════════════════════════════════════════════")
+            turning_points.append((day, d_bal, b_bal, a_bal, death))
+        elif abs(d_bal) >= 2000 or d_hp <= -20 or d_san <= -20:
+            turning_points.append((day, d_bal, b_bal, a_bal, None))
+
+        w("")
+
+    # ══════════════════════════════════════════════════════════════════════════
+    # SUMMARY
+    # ══════════════════════════════════════════════════════════════════════════
+    w("╔" + "═" * 98 + "╗")
+    w("║" + " DECISION TREE SUMMARY".ljust(98) + "║")
+    w("╚" + "═" * 98 + "╝")
+    w("")
+
+    final = snapshots_by_cycle.get(all_cycles[-1], ({}, {})) if all_cycles else ({}, {})
+    final_after = final[1] if final else {}
+    w(f"  Final State:")
+    w(f"    Balance: ${int(final_after.get('balance', 0)):,}  |  HP: {int(final_after.get('health', 0))}  |  SAN: {int(final_after.get('sanity', 0))}  |  Rank: {int(final_after.get('rank', 0))}")
+    w(f"    Peak balance: ${RUN_PEAK_BALANCE:,}")
+    w(f"    Days survived: {int(final_after.get('day', 0))}")
+    w(f"    Total decisions traced: {len(DECISION_TRACES)}")
+    w("")
+
+    # ── Blackjack Statistics ─────────────────────────────────────────────────
+    w("  Blackjack Statistics:")
+    w(f"    Hands played: {total_hands}  |  Won: {total_wins}  |  Lost: {total_losses}  |  Tied: {total_ties}")
+    win_rate = f"{total_wins / total_hands * 100:.1f}%" if total_hands else "N/A"
+    w(f"    Win rate: {win_rate}")
+    w(f"    Total wagered: ${total_bet_amount:,}")
+    w(f"    Total won: ${total_won_amount:,}  |  Total lost: ${total_lost_amount:,}  |  Net: ${total_won_amount - total_lost_amount:+,}")
+    avg_bet = total_bet_amount // total_hands if total_hands else 0
+    w(f"    Average bet: ${avg_bet:,}")
+    w("")
+
+    # ── Event Statistics ─────────────────────────────────────────────────────
+    event_counts = Counter(all_event_labels)
+    day_events = [(ev, c) for ev, c in event_counts.most_common() if ev.startswith("day:")]
+    night_events = [(ev, c) for ev, c in event_counts.most_common() if ev.startswith("night:")]
+    location_events = [(ev, c) for ev, c in event_counts.most_common() if ev.startswith("location:")]
+    meet_events = [(ev, c) for ev, c in event_counts.most_common() if ev.startswith("met:")]
+    storyline_events = [(ev, c) for ev, c in event_counts.most_common() if ev.startswith("storyline:")]
+
+    w(f"  Events ({len(all_event_labels)} total, {len(event_counts)} unique):")
+    if day_events:
+        w(f"    Day events ({len(day_events)}):")
+        for ev, c in day_events[:30]:
+            w(f"      {ev:55s} ×{c}")
+    if night_events:
+        w(f"    Night events ({len(night_events)}):")
+        for ev, c in night_events[:20]:
+            w(f"      {ev:55s} ×{c}")
+    if location_events:
+        w(f"    Location visits ({len(location_events)}):")
+        for ev, c in location_events:
+            w(f"      {ev:55s} ×{c}")
+    if meet_events:
+        w(f"    People met ({len(meet_events)}):")
+        for ev, c in meet_events:
+            w(f"      {ev:55s} ×{c}")
+    if storyline_events:
+        w(f"    Storylines ({len(storyline_events)}):")
+        for ev, c in storyline_events:
+            w(f"      {ev:55s} ×{c}")
+    w("")
+
+    # ── Damage events: random events with no decisions ───────────────────────
+    if unhandled_events:
+        w(f"  Pure RNG Events (no player decision, {len(unhandled_events)} total):")
+        for _day, _ev, _dbal, _dhp, _dsan in sorted(unhandled_events, key=lambda x: x[2]):
+            impact = []
+            if _dbal:
+                impact.append(f"${_dbal:+,}")
+            if _dhp:
+                impact.append(f"HP:{_dhp:+d}")
+            if _dsan:
+                impact.append(f"SAN:{_dsan:+d}")
+            impact_str = " | ".join(impact) if impact else "no impact"
+            w(f"    Day {_day:3d} | {_ev:40s} | {impact_str}")
+        w("")
+
+    # ── Reason Code Distribution ─────────────────────────────────────────────
+    reason_codes = Counter()
+    for trace in DECISION_TRACES:
+        rc = (trace.metadata or {}).get("reason_code", "")
+        if rc:
+            reason_codes[rc] += 1
+    w("  Bet/Action Reason Codes:")
+    for rc, count in reason_codes.most_common(30):
+        w(f"    {rc:50s} {count:5d}")
+    w("")
+
+    # ── Missed Marvin ────────────────────────────────────────────────────────
+    w(f"  Marvin Opportunities: {len(missed_marvin_cycles)} missed")
+    if missed_marvin_cycles:
+        for mc in missed_marvin_cycles:
+            snap = snapshots_by_cycle.get(mc, ({}, {}))
+            b = snap[0]
+            flow = flows_by_cycle.get(mc, {})
+            route = flow.get("route_choice", "?")
+            w(f"    Day {int(b.get('day', mc)):3d} | ${int(b.get('balance', 0)):>8,} | Chose: {route}")
+    w("")
+
+    # ── Low-confidence decisions ─────────────────────────────────────────────
+    w(f"  Low Confidence Decisions ({len(low_confidence_decisions)}, conf < 0.50 = bot was guessing):")
+    if low_confidence_decisions:
+        for _cyc, _day, _type, _act, _conf, _reason, _opts in sorted(low_confidence_decisions, key=lambda x: x[4]):
+            alt_str = f" alts=[{','.join(str(o) for o in _opts if str(o) != str(_act))}]" if _opts else ""
+            w(f"    Day {_day:3d} | {_type:20s} → {str(_act):15s} conf={_conf:.2f} | {_reason}{alt_str}")
+    w("")
+
+    # ── Critical turning points ──────────────────────────────────────────────
+    w(f"  Critical Turning Points ({len(turning_points)}, balance swing ≥$2k or severe injury):")
+    if turning_points:
+        for _day, _dbal, _bbal, _abal, _death in sorted(turning_points, key=lambda x: x[1]):
+            if _death:
+                w(f"    Day {_day:3d} | ${_bbal:>8,} → ${_abal:>8,} ({_dbal:+,}) ☠ {_death[:80]}")
+            else:
+                w(f"    Day {_day:3d} | ${_bbal:>8,} → ${_abal:>8,} ({_dbal:+,})")
+    w("")
+
+    # Write to file
+    with open(DTREE_LOG_TMP, "w", encoding="utf-8", newline="\n") as f:
+        f.write("\n".join(lines))
+        f.write("\n")
+        f.flush()
+        try:
+            os.fsync(f.fileno())
+        except OSError:
+            pass
+
+
+def _write_json_artifact(payload):
+    with open(JSON_LOG_TMP, "w", encoding="utf-8", newline="\n") as json_handle:
+        json.dump(payload, json_handle, indent=2, sort_keys=True)
+        json_handle.write("\n")
+        json_handle.flush()
+        try:
+            os.fsync(json_handle.fileno())
+        except OSError:
+            pass
+
+
+def _publish_artifacts():
+    global _ARTIFACTS_PUBLISHED
+    if _ARTIFACTS_PUBLISHED:
+        return
+
+    if not _log_file.closed:
+        _log_file.close()
+    if not _story_file.closed:
+        _story_file.close()
+
+    os.replace(LOG_TMP, LOG)
+    os.replace(STORY_LOG_TMP, STORY_LOG)
+    os.replace(JSON_LOG_TMP, JSON_LOG)
+    if os.path.exists(DTREE_LOG_TMP):
+        os.replace(DTREE_LOG_TMP, DTREE_LOG)
+    _ARTIFACTS_PUBLISHED = True
+
+
+atexit.register(_cleanup_unpublished_artifacts)
 
 
 def log(message=""):
@@ -7370,6 +8561,152 @@ def record_event(kind, name):
     label = f"{kind}:{name}"
     CURRENT_EVENTS.append(label)
     ALL_EVENTS.append((CURRENT_CYCLE, kind, name))
+
+
+def _new_cycle_flow(player=None):
+    day = None
+    if player is not None:
+        day = int(getattr(player, "_day", 0) or 0)
+    return {
+        "cycle": CURRENT_CYCLE,
+        "day": day,
+        "afternoon_menu_presented": False,
+        "menu_kind": None,
+        "menu_options": [],
+        "route_choice": None,
+        "route_choice_number": None,
+        "route_choice_reason": None,
+        "route_choice_confidence": None,
+        "route_outcome": None,
+        "night_handoff": None,
+        "night_caller": None,
+        "night_mode": None,
+    }
+
+
+def _ensure_cycle_flow(player=None):
+    global CURRENT_CYCLE_FLOW
+    if CURRENT_CYCLE is None:
+        return None
+    if CURRENT_CYCLE_FLOW is None or CURRENT_CYCLE_FLOW.get("cycle") != CURRENT_CYCLE:
+        CURRENT_CYCLE_FLOW = _new_cycle_flow(player)
+    elif player is not None and CURRENT_CYCLE_FLOW.get("day") is None:
+        CURRENT_CYCLE_FLOW["day"] = int(getattr(player, "_day", 0) or 0)
+    return CURRENT_CYCLE_FLOW
+
+
+def _latest_cycle_route_trace():
+    for trace in reversed(DECISION_TRACES):
+        if trace.request_type == "route_select" and trace.cycle == CURRENT_CYCLE:
+            return trace
+    return None
+
+
+def _mark_afternoon_menu_presented(player, menu_options, menu_kind="afternoon_destination"):
+    flow = _ensure_cycle_flow(player)
+    if flow is None:
+        return
+    flow["afternoon_menu_presented"] = True
+    flow["menu_kind"] = str(menu_kind)
+    flow["menu_options"] = [str(label) for _number, label in menu_options]
+
+
+def _record_route_choice_flow(player, chosen_number, menu_options, menu_kind="afternoon_destination"):
+    flow = _ensure_cycle_flow(player)
+    if flow is None:
+        return chosen_number
+    _mark_afternoon_menu_presented(player, menu_options, menu_kind=menu_kind)
+    choice_label = next((label for number, label in menu_options if number == chosen_number), str(chosen_number))
+    flow["route_choice_number"] = int(chosen_number)
+    flow["route_choice"] = str(choice_label)
+    trace = _latest_cycle_route_trace()
+    if trace is not None:
+        trace_number = str(trace.chosen_action or "")
+        trace_label = str(trace.metadata.get("chosen_label", "") or "")
+        if trace_number == str(chosen_number) or trace_label == str(choice_label):
+            flow["route_choice_reason"] = str(trace.reason or "") or None
+            flow["route_choice_confidence"] = float(trace.confidence)
+            flow["route_outcome"] = str(trace.metadata.get("route_outcome", "") or "") or None
+    return chosen_number
+
+
+def _recent_text_contains(*phrases):
+    recent_text = "\n".join(RECENT_TEXT[-20:]).lower()
+    return any(str(phrase).lower() in recent_text for phrase in phrases)
+
+
+def _latest_cycle_event_label(prefix=None):
+    for label in reversed(CURRENT_EVENTS):
+        if prefix is None or label.startswith(prefix):
+            return label
+    return None
+
+
+def _latest_non_night_event_label():
+    for prefix in ("location:", "storyline:", "day:", "met:"):
+        label = _latest_cycle_event_label(prefix)
+        if label is not None:
+            return label
+    return None
+
+
+def _classify_night_handoff(player, caller_name):
+    flow = _ensure_cycle_flow(player)
+    if flow is None:
+        return None
+    route_choice = flow.get("route_choice")
+    if route_choice:
+        if caller_name == "night_event":
+            night_label = _latest_cycle_event_label("night:")
+            if night_label:
+                return f"after route {route_choice} -> {night_label}"
+        return f"after route {route_choice}"
+
+    if caller_name == "night_event":
+        night_label = _latest_cycle_event_label("night:")
+        if night_label:
+            return f"night event handoff via {night_label}"
+        return "night event handoff"
+
+    if _recent_text_contains(
+        "you lose the afternoon to car trouble and head straight to the casino at dusk",
+        "your car trouble eats up the whole afternoon",
+        "hoping for better luck at the tables than you had with your car",
+    ):
+        return "afternoon skipped by car trouble"
+
+    if caller_name == "afternoon":
+        event_label = _latest_non_night_event_label()
+        if event_label:
+            return f"afternoon auto-handoff after {event_label}"
+        return "afternoon auto-handoff"
+
+    if caller_name.startswith("visit_"):
+        return f"after {caller_name[6:].replace('_', ' ')}"
+
+    if "adventure" in caller_name:
+        return f"after {caller_name.replace('_', ' ')}"
+
+    return f"via {caller_name}"
+
+
+def _format_cycle_flow(flow):
+    if not flow:
+        return "untracked"
+    parts = [f"menu={'shown' if flow.get('afternoon_menu_presented') else 'skipped'}"]
+    route_choice = flow.get("route_choice")
+    if route_choice:
+        route_text = str(route_choice)
+        route_outcome = flow.get("route_outcome")
+        if route_outcome:
+            route_text += f" ({route_outcome})"
+        parts.append(f"route={route_text}")
+    else:
+        parts.append("route=none")
+    parts.append(f"handoff={flow.get('night_handoff') or 'unknown'}")
+    if flow.get("night_mode"):
+        parts.append(f"night={flow['night_mode']}")
+    return " | ".join(parts)
 
 
 def _wrap_storyline_get_stage_event():
@@ -7582,6 +8919,63 @@ def _wrap_dealer_systems():
         setattr(bj.Blackjack, "dealer_status", wrapped_dealer_status)
 
 
+def _wrap_afternoon_night_flow():
+    original_afternoon = getattr(story.Player, "afternoon", None)
+    if original_afternoon is not None:
+        def wrapped_afternoon(self, *args, **kwargs):
+            if CURRENT_CYCLE is not None:
+                _ensure_cycle_flow(self)
+            result = original_afternoon(self, *args, **kwargs)
+            if CURRENT_CYCLE is not None:
+                flow = _ensure_cycle_flow(self)
+                if flow is not None:
+                    if flow.get("night_handoff") is None:
+                        flow["night_caller"] = "afternoon"
+                        flow["night_handoff"] = _classify_night_handoff(self, "afternoon")
+                    if flow.get("night_mode") is None:
+                        flow["night_mode"] = "drive" if self.has_item("Car") else "walk"
+            return result
+
+        setattr(story.Player, "afternoon", wrapped_afternoon)
+
+    original_start_night = getattr(story.Player, "start_night", None)
+    if original_start_night is not None:
+        def wrapped_start_night(self, *args, **kwargs):
+            if CURRENT_CYCLE is not None:
+                flow = _ensure_cycle_flow(self)
+                caller = inspect.currentframe().f_back.f_code.co_name
+                if flow is not None:
+                    flow["night_caller"] = caller
+                    if flow.get("night_handoff") is None:
+                        flow["night_handoff"] = _classify_night_handoff(self, caller)
+            return original_start_night(self, *args, **kwargs)
+
+        setattr(story.Player, "start_night", wrapped_start_night)
+
+    for method_name, mode in [
+        ("start_night_1", "intro"),
+        ("start_night_car", "walk"),
+        ("start_night_car_fixed", "drive"),
+        ("start_night_tanya_skip", "skip"),
+        ("start_night_motel_strip", "motel_strip"),
+    ]:
+        original = getattr(story.Player, method_name, None)
+        if original is None:
+            continue
+
+        def make_wrapper(fn, night_mode):
+            def wrapped(self, *args, **kwargs):
+                if CURRENT_CYCLE is not None:
+                    flow = _ensure_cycle_flow(self)
+                    if flow is not None:
+                        flow["night_mode"] = night_mode
+                return fn(self, *args, **kwargs)
+
+            return wrapped
+
+        setattr(story.Player, method_name, make_wrapper(original, mode))
+
+
 def install_tracking_hooks():
     _wrap_storyline_get_stage_event()
     _wrap_day_and_night_selection()
@@ -7590,6 +8984,7 @@ def install_tracking_hooks():
     _wrap_location_visits()
     _wrap_item_mutations()
     _wrap_dealer_systems()
+    _wrap_afternoon_night_flow()
 
 
 def run(fn, label):
@@ -7619,6 +9014,8 @@ def snapshot_player(player):
     failed_storylines = sorted(
         name for name, data in player._storyline_system.storylines.items() if data.get("failed")
     )
+    if hasattr(player, "is_gift_system_unlocked") and player.is_gift_system_unlocked():
+        _set_funnel_day_once(player, "gift_unlock_day")
     return {
         "day": int(player._day),
         "balance": int(player._balance),
@@ -7646,6 +9043,10 @@ def snapshot_player(player):
             "car_mechanic": str(player.get_car_mechanic()) if hasattr(player, "get_car_mechanic") and player.get_car_mechanic() not in {None, "", "None"} else "",
             "chosen": str(player.get_chosen_mechanic()) if hasattr(player, "get_chosen_mechanic") and player.get_chosen_mechanic() else "",
         },
+        "active_progress_goals": tuple(player.get_active_progress_goals()) if hasattr(player, "get_active_progress_goals") else (),
+        "completed_progress_goals": tuple(player.get_completed_progress_goals()) if hasattr(player, "get_completed_progress_goals") else (),
+        "recent_progress_requests": list(player.get_recent_progress_requests()) if hasattr(player, "get_recent_progress_requests") else [],
+        "funnel_metrics": _snapshot_funnel_metrics(player),
         "inventory": set(player._inventory),
         "injuries": set(player._injuries),
         "statuses": set(player._status_effects),
@@ -7890,6 +9291,11 @@ with patch("builtins.input", fake_input):
     early_peak_days = [int(p.get_day())] if hasattr(p, "get_day") else [1]
     early_balance_end = int(p.get_balance())
     EVER_HAD_CAR = bool(p.has_item("Car"))
+    CURRENT_CYCLE_FLOW = None
+    CYCLE_FLOW_REPORTS = []
+    HAND_LOG.clear()
+    CYCLE_TEXT.clear()
+    CYCLE_EVENTS.clear()
     run(p.opening_lines, "opening")
     if RUN_TERMINATION is not None:
         ending_name = _extract_terminal_ending_name(RECENT_TEXT, RUN_TERMINATION)
@@ -7904,6 +9310,7 @@ with patch("builtins.input", fake_input):
             break
         CURRENT_CYCLE = cycle_number
         CURRENT_EVENTS = []
+        CURRENT_CYCLE_FLOW = _new_cycle_flow(p)
         before = snapshot_player(p)
         recent_start = len(RECENT_TEXT)
 
@@ -7913,7 +9320,12 @@ with patch("builtins.input", fake_input):
                     run(p.afternoon, f"c{cycle_number}.aftern")
 
         after = snapshot_player(p)
+        CYCLE_SNAPSHOTS.append((cycle_number, before, after))
+        if CURRENT_CYCLE_FLOW is not None:
+            CURRENT_CYCLE_FLOW["day"] = int(after["day"])
         cycle_recent_lines = RECENT_TEXT[recent_start:]
+        CYCLE_TEXT[cycle_number] = list(cycle_recent_lines)
+        CYCLE_EVENTS[cycle_number] = list(CURRENT_EVENTS)
         EVER_HAD_CAR = EVER_HAD_CAR or after["has_car"]
         max_rank_seen = max(max_rank_seen, after["rank"])
         if after["balance"] > max_balance_seen:
@@ -7963,6 +9375,7 @@ with patch("builtins.input", fake_input):
         log(f"State   {format_state(before, after)}")
         log(f"Events  {', '.join(events) if events else 'none captured'}")
         log(f"Polarity {polarity}")
+        log(f"Flow    {_format_cycle_flow(CURRENT_CYCLE_FLOW)}")
 
         change_lines = [
             format_change_line("items", inventory_added, inventory_removed),
@@ -7981,6 +9394,22 @@ with patch("builtins.input", fake_input):
         log(f"Changes {' | '.join(change_lines) if change_lines else 'none'}")
         log(f"Stats   {', '.join(stat_changes) if stat_changes else 'no tracked stat changes'}")
         log(f"Gamble  {', '.join(gambling_changes) if gambling_changes else 'no gambling stat changes'}")
+        if CURRENT_CYCLE_FLOW is not None:
+            CYCLE_FLOW_REPORTS.append({
+                "cycle": int(CURRENT_CYCLE_FLOW.get("cycle") or cycle_number),
+                "day": int(CURRENT_CYCLE_FLOW.get("day") or after["day"]),
+                "afternoon_menu_presented": bool(CURRENT_CYCLE_FLOW.get("afternoon_menu_presented")),
+                "menu_kind": CURRENT_CYCLE_FLOW.get("menu_kind"),
+                "menu_options": list(CURRENT_CYCLE_FLOW.get("menu_options") or []),
+                "route_choice": CURRENT_CYCLE_FLOW.get("route_choice"),
+                "route_choice_number": CURRENT_CYCLE_FLOW.get("route_choice_number"),
+                "route_choice_reason": CURRENT_CYCLE_FLOW.get("route_choice_reason"),
+                "route_choice_confidence": CURRENT_CYCLE_FLOW.get("route_choice_confidence"),
+                "route_outcome": CURRENT_CYCLE_FLOW.get("route_outcome"),
+                "night_handoff": CURRENT_CYCLE_FLOW.get("night_handoff"),
+                "night_caller": CURRENT_CYCLE_FLOW.get("night_caller"),
+                "night_mode": CURRENT_CYCLE_FLOW.get("night_mode"),
+            })
 
         if RUN_TERMINATION is not None:
             if not after["alive"]:
@@ -8059,6 +9488,7 @@ if RUN_RESULT_NOTE is None:
 log("")
 log("#" * 88)
 log(f"Run Summary | cycles_requested={CYCLES} | seed={SEED}")
+log(f"Artifact | kind={ARTIFACT_KIND} | schema={ARTIFACT_SCHEMA_VERSION} | run_id={ARTIFACT_RUN_ID} | complete=True")
 log(
     f"Final    Day {final_state['day']} | $ {final_state['balance']:,} | HP {final_state['health']} | "
     f"SAN {final_state['sanity']} | Rank {final_state['rank']} | Alive={final_state['alive']}"
@@ -8320,6 +9750,16 @@ decision_expected_values = [
 ]
 
 json_payload = {
+    "artifact": {
+        "kind": ARTIFACT_KIND,
+        "schema_version": ARTIFACT_SCHEMA_VERSION,
+        "run_id": ARTIFACT_RUN_ID,
+        "seed": SEED,
+        "cycles_requested": CYCLES,
+        "complete": True,
+        "generated_at_utc": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
+        "pythonhashseed": os.getenv("PYTHONHASHSEED", ""),
+    },
     "seed": SEED,
     "cycles_requested": CYCLES,
     "run_summary": {
@@ -8354,6 +9794,10 @@ json_payload = {
         "gus_items_sold_count": final_state["gus_items_sold_count"],
         "gus_total_collectibles": final_state["gus_total_collectibles"],
         "mechanic_dreams": dict(final_state["mechanic_dreams"]),
+        "active_progress_goals": sorted(final_state["active_progress_goals"]),
+        "completed_progress_goals": sorted(final_state["completed_progress_goals"]),
+        "recent_progress_requests": list(final_state["recent_progress_requests"]),
+        "funnel_metrics": dict(final_state["funnel_metrics"]),
         "injuries": sorted(final_state["injuries"]),
         "statuses": sorted(final_state["statuses"]),
         "pawned_items": sorted(final_state["pawned_items"]),
@@ -8415,6 +9859,7 @@ json_payload = {
         "route_applied_goal_counts": dict(route_applied_goal_counts),
         "route_suppressed_goal_counts": dict(route_suppressed_goal_counts),
     },
+    "cycle_flows": list(CYCLE_FLOW_REPORTS),
     "decision_requests": [request.to_dict() for request in DECISION_REQUESTS],
     "decision_traces": [trace.to_dict() for trace in DECISION_TRACES],
     "event_distribution": {
@@ -8429,12 +9874,13 @@ json_payload = {
     "warnings": list(warning_messages),
 }
 
-with open(JSON_LOG, "w", encoding="utf-8") as json_handle:
-    json.dump(json_payload, json_handle, indent=2, sort_keys=True)
+_write_json_artifact(json_payload)
+_write_decision_tree()
 
 # Restore real print before closing so final messages are visible
 _builtins.print = _real_print
-_close_log_file()
+_publish_artifacts()
 print(f"Results -> {LOG}")
 print(f"Story   -> {STORY_LOG}")
+print(f"Tree    -> {DTREE_LOG}")
 print(f"Errors: {len(errs)}")

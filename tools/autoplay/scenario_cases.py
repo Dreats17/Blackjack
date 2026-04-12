@@ -1048,6 +1048,39 @@ def run_all_scenarios() -> list[ScenarioResult]:
 
     results.append(
         _run_route_scenario(
+            "stabilize_sanity_rejects_marvin_browse",
+            "route",
+            GameState(
+                day=44,
+                balance=8200,
+                rank=1,
+                health=74,
+                sanity=34,
+                fatigue=18,
+                alive=True,
+                current_context_tag="afternoon_destination",
+                has_car=True,
+                has_worn_map=True,
+                has_marvin_access=True,
+                opportunity_flags={"can_visit_marvin": True, "can_visit_doctor": True},
+                current_progress_goal_candidates=("stabilize_sanity", "exploit_marvin"),
+            ),
+            ("Marvin", "Doctor's Office", "Stay Home"),
+            {
+                "has_car": True,
+                "has_marvin_access": True,
+                "wants_marvin": True,
+                "marvin_priority": 92,
+                "wants_doctor": True,
+                "medical_choice": "Doctor's Office",
+                "store_spend": 0,
+            },
+            _assert_goal_and_route("stabilize_sanity", "Doctor's Office"),
+        )
+    )
+
+    results.append(
+        _run_route_scenario(
             "early_unlock_delay_prioritizes_store_or_loan",
             "startup_stability",
             GameState(
@@ -1267,6 +1300,28 @@ def run_all_scenarios() -> list[ScenarioResult]:
             ("Trusty Tom's Trucks and Tires", "Doctor's Office", "Stay Home"),
             # No car means no on-foot travel; compound conditions but can't afford doctor ($190).
             "Stay Home",
+        )
+    )
+
+    results.append(
+        _run_quicktest_destination_scenario(
+            "debt_cleanup_interrupt_prefers_vinnie_over_store",
+            "route_interrupt",
+            FakeScenarioPlayer(
+                day=107,
+                balance=1800,
+                rank=1,
+                health=70,
+                sanity=52,
+                fatigue=16,
+                inventory=("Car",),
+                met=("Vinnie",),
+                loan_debt=2160,
+                loan_warning_level=1,
+                store_inventory=(("Turkey Sandwich", 15), ("Pocket Knife", 35)),
+            ),
+            ("Doctor's Office", "Vinnie's Back Alley Loans", "Convenience Store", "Stay Home"),
+            "Vinnie's Back Alley Loans",
         )
     )
 
@@ -2916,6 +2971,124 @@ def run_all_scenarios() -> list[ScenarioResult]:
                 "recent_lower": "would you like to gift wrap an item for the dealer?",
             },
             "no",
+        )
+    )
+
+    results.append(
+        _run_event_yes_no_scenario(
+            "witch_heal_prompt_is_accepted",
+            "event_yes_no",
+            GameState(
+                day=64,
+                balance=6400,
+                rank=2,
+                health=28,
+                sanity=44,
+                fatigue=18,
+                alive=True,
+                current_context_tag="yes_no_prompt",
+                has_car=True,
+                current_progress_goal_candidates=("survive_emergency", "stabilize_health"),
+            ),
+            "Would you like me to HEAL you, HUMAN?",
+            (
+                "Muahahahahaha, hahahahahaha, HAHAHAHAHA!",
+                "Would you like me to HEAL you, HUMAN?",
+            ),
+            {
+                "prompt_lower": "would you like me to heal you, human?",
+                "recent_lower": "muahahahahaha. would you like me to heal you, human?",
+            },
+            "yes",
+        )
+    )
+
+    results.append(
+        _run_event_yes_no_scenario(
+            "betsy_hungry_prefers_survival_over_cash",
+            "event_yes_no",
+            GameState(
+                day=133,
+                balance=75,
+                rank=2,
+                health=60,
+                sanity=55,
+                fatigue=10,
+                alive=True,
+                current_context_tag="yes_no_prompt",
+                has_car=True,
+                current_progress_goal_candidates=("push_next_rank",),
+            ),
+            "Moo?",
+            (
+                "This is Betsy. Betsy gets hungry. Please feed Betsy.",
+                "Do you feed Betsy?",
+            ),
+            {
+                "prompt_lower": "moo?",
+                "recent_lower": "this is betsy. betsy gets hungry. please feed betsy. do you feed betsy?",
+            },
+            "yes",
+        )
+    )
+
+    results.append(
+        _run_event_yes_no_scenario(
+            "betsy_tractor_prefers_survival_over_cash",
+            "event_yes_no",
+            GameState(
+                day=150,
+                balance=4500,
+                rank=2,
+                health=70,
+                sanity=62,
+                fatigue=10,
+                alive=True,
+                current_context_tag="yes_no_prompt",
+                has_car=True,
+                current_progress_goal_candidates=("restore_blackjack_edge_after_breakage",),
+            ),
+            "Moo?",
+            (
+                "The sound of a tractor barrels closer.",
+                "Do you feed Betsy?",
+            ),
+            {
+                "prompt_lower": "moo?",
+                "recent_lower": "the sound of a tractor barrels closer. do you feed betsy?",
+            },
+            "yes",
+        )
+    )
+
+    results.append(
+        _run_event_yes_no_scenario(
+            "betsy_army_detected_from_her_friends_text",
+            "event_yes_no",
+            GameState(
+                day=164,
+                balance=55285,
+                rank=3,
+                health=100,
+                sanity=100,
+                fatigue=10,
+                alive=True,
+                current_context_tag="yes_no_prompt",
+                has_car=True,
+                current_progress_goal_candidates=("restore_blackjack_edge_after_breakage",),
+            ),
+            "Moo?",
+            (
+                "Thousands of hoofsteps are getting closer to your wagon.",
+                "Betsy, and the rest of the cows, all stare into your soul, then look over at the seat next to you.",
+                "It appears Betsy and her friends are interested in your pile of money.",
+                "Do you feed Betsy and her friends?",
+            ),
+            {
+                "prompt_lower": "moo?",
+                "recent_lower": "thousands of hoofsteps are getting closer to your wagon. betsy and the rest of the cows stare into your soul. it appears betsy and her friends are interested in your pile of money. do you feed betsy and her friends?",
+            },
+            "yes",
         )
     )
 

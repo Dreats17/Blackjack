@@ -65,9 +65,27 @@ class Blackjack:
         self.__fraudulent_portion = 0   # fake-cash portion of the current bet (reset each hand)
         self.__was_all_in = False
         self.__pre_bet_balance = 0
+        if hasattr(self.__player, "get_dealer_happiness"):
+            try:
+                self.__dealer_happiness = int(self.__player.get_dealer_happiness())
+            except Exception:
+                self.__dealer_happiness = 45
+
+    def _set_dealer_happiness(self, value):
+        self.__dealer_happiness = max(0, min(100, int(value)))
+        if hasattr(self.__player, "_dealer_happiness"):
+            self.__player._dealer_happiness = self.__dealer_happiness
+
+    def _sync_dealer_happiness_from_player(self):
+        if hasattr(self.__player, "get_dealer_happiness"):
+            try:
+                self._set_dealer_happiness(self.__player.get_dealer_happiness())
+            except Exception:
+                pass
 
     def update_player(self):
         self.__balance = self.__player.get_balance()
+        self._sync_dealer_happiness_from_player()
         self.__player.update_rank()
         if self.__player.has_item("Golden Watch") or self.__player.has_item("Sapphire Watch") or self.__player.has_item("Grandfather Clock"):
             self.__player.set_rounds(4)
@@ -282,9 +300,9 @@ class Blackjack:
 
     def anger_dealer(self, value, message=True):
         if(self.__dealer_happiness - value <= 0):
-            self.__dealer_happiness = 0
+            self._set_dealer_happiness(0)
         else:
-            self.__dealer_happiness -= value
+            self._set_dealer_happiness(self.__dealer_happiness - value)
         if (self.__player.has_item("Delight Indicator") or self.__player.has_item("Delight Manipulator")) and message == True:
             print()
             type.fast("The Dealer has been angered!")
@@ -293,9 +311,9 @@ class Blackjack:
 
     def calm_dealer(self, value, message=True):
         if(self.__dealer_happiness + value >= 100):
-            self.__dealer_happiness = 100
+            self._set_dealer_happiness(100)
         else:
-            self.__dealer_happiness += value
+            self._set_dealer_happiness(self.__dealer_happiness + value)
         if (self.__player.has_item("Delight Indicator") or self.__player.has_item("Delight Manipulator")) and message==True:
             print()
             type.fast("The Dealer has calmed down!")
@@ -1394,18 +1412,7 @@ class Blackjack:
 
     def end_round_dealer_happiness(self, status):
         bet_ratio = self.__bet / max(self.__balance, 1)
-        if self.__player.get_rank() == 0:
-            modifier = 0
-        elif self.__player.get_rank() == 1:
-            modifier = 1
-        elif self.__player.get_rank() == 2:
-            modifier = 2
-        elif self.__player.get_rank() == 3:
-            modifier = 3
-        elif self.__player.get_rank() == 4:
-            modifier = 4
-        elif self.__player.get_rank() == 5:
-            modifier = 5
+        modifier = min(max(int(self.__player.get_rank()), 0), 5)
 
         # === BUST STREAK DETECTION ===
         if status == "Player Bust":
@@ -1442,7 +1449,7 @@ class Blackjack:
                 print()
                 type.slow(red(bright('"Either way, I don\'t like it."')))
                 print()
-                self.__dealer_happiness = 20
+                self._set_dealer_happiness(20)
                 if self.__player.has_item("Delight Indicator") or self.__player.has_item("Delight Manipulator"):
                     self.delight_indicator()
                     print()
@@ -1452,7 +1459,7 @@ class Blackjack:
                 print()
                 type.slow(red(bright('"Eleven. ELEVEN. You know what? I\'m done playing nice."')))
                 print()
-                self.__dealer_happiness = 0
+                self._set_dealer_happiness(0)
                 self.__bust_streak = 0  # Reset streak
                 if self.__player.has_item("Delight Indicator") or self.__player.has_item("Delight Manipulator"):
                     self.delight_indicator()

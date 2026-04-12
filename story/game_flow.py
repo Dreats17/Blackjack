@@ -361,6 +361,12 @@ class GameFlowMixin:
         if time == "night":
             self._counting_days[i] = self._day-1
 
+    def has_met_today(self, mark):
+        try:
+            return self.get_days_elapsed(mark) == 0
+        except ValueError:
+            return False
+
     def get_days_elapsed(self, mark):
         i = self.get_mark_index(mark)
         return self._day - self._counting_days[i]

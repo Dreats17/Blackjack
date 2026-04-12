@@ -35,6 +35,31 @@ def _route_tags(label: str) -> set[str]:
     return tags
 
 
+def _adventure_route_adjustment(label: str, metadata: dict[str, object], rank: int, balance: float) -> float:
+    if not label.startswith("Drive to "):
+        return 0.0
+
+    lowered = label.lower()
+    has_utility = bool(metadata.get("has_adventure_utility"))
+    adjustment = 0.0
+
+    if rank <= 1 and balance < 12000:
+        if "the road" in lowered:
+            adjustment -= 34.0 if not has_utility else 16.0
+        elif "the city" in lowered or "the ocean depths" in lowered:
+            adjustment -= 20.0
+        elif "the woodlands" in lowered:
+            adjustment += 14.0
+        elif "the beach" in lowered:
+            adjustment += 10.0
+
+    if bool(metadata.get("wants_adventure")) and rank <= 2 and balance < 10000 and not has_utility:
+        if "the road" in lowered:
+            adjustment -= 14.0
+
+    return adjustment
+
+
 def _score_goal_alignment(goal: str, tags: set[str]) -> float:
     mapping = {
         "survive_emergency": {"medical": 100.0, "stay_home": 60.0, "loan": -40.0, "adventure": -60.0},
@@ -42,7 +67,7 @@ def _score_goal_alignment(goal: str, tags: set[str]) -> float:
         "stabilize_sanity": {"medical": 55.0, "stay_home": 40.0, "adventure": -20.0},
         "reduce_fatigue_pressure": {"stay_home": 88.0, "store": 22.0, "adventure": -45.0, "loan": -18.0},
         "preserve_companion_roster": {"store": 70.0, "stay_home": 24.0, "pawn": -28.0, "adventure": -20.0},
-        "restock_supplies": {"store": 102.0, "stay_home": 18.0, "pawn": -16.0, "loan": -12.0, "adventure": -24.0},
+        "restock_supplies": {"store": 102.0, "upgrade": 28.0, "stay_home": 18.0, "pawn": -16.0, "loan": -12.0, "adventure": -24.0},
         "acquire_car": {"mechanic": 85.0, "loan": 28.0, "store": 10.0, "marvin": -18.0, "adventure": -25.0},
         # bootstrap_blackjack_edge: borrowing from Vinnie buys edge items we couldn't afford yet.
         "bootstrap_blackjack_edge": {"store": 14.0, "loan": 22.0, "stay_home": 18.0, "adventure": -18.0},
@@ -86,6 +111,11 @@ def _score_route_opportunity(tags: set[str], metadata: dict[str, object]) -> flo
     pawn_value = float(metadata.get("pawn_value", 0) or 0)
     if "pawn" in tags and metadata.get("wants_pawn"):
         total += 50.0 + min(36.0, pawn_value / 18.0)
+        planner_goal = str(metadata.get("planner_goal", "") or "")
+        if planner_goal in {"push_next_rank", "exploit_marvin", "restock_supplies"}:
+            total -= 20.0
+        if metadata.get("wants_store") or metadata.get("wants_workbench_craft"):
+            total -= 12.0
 
     loan_pressure = float(metadata.get("loan_pressure", 0) or 0)
     if "loan" in tags and metadata.get("wants_loan"):
@@ -132,12 +162,19 @@ def _score_route_opportunity(tags: set[str], metadata: dict[str, object]) -> flo
     if "upgrade" in tags and metadata.get("wants_upgrade"):
         total += 46.0 + min(28.0, upgrade_urgency / 4.0)
     if "upgrade" in tags and metadata.get("wants_workbench_craft"):
-        total += 54.0
+        craft_prio = float(metadata.get("workbench_craft_priority", 0) or 0)
+        total += 78.0
+        if craft_prio >= 80:
+            total += 28.0
+        elif craft_prio >= 60:
+            total += 14.0
 
     planner_goal = str(metadata.get("planner_goal", "") or "")
     if planner_goal == "push_next_rank":
         if "loan" in tags:
             total += 22.0
+            if metadata.get("wants_store"):
+                total -= 10.0
         if "marvin" in tags:
             total += 18.0
         if "upgrade" in tags:
@@ -149,6 +186,8 @@ def _score_route_opportunity(tags: set[str], metadata: dict[str, object]) -> flo
             total += 18.0
             if marvin_priority <= 0 and marvin_future_priority >= 56 and 0 < marvin_future_shortfall <= 5000:
                 total += 16.0
+            if marvin_priority > 0:
+                total -= 18.0
         if "upgrade" in tags and metadata.get("wants_workbench_craft"):
             total += 10.0
 
@@ -160,6 +199,31 @@ def _score_route_opportunity(tags: set[str], metadata: dict[str, object]) -> flo
         total += 8.0
 
     return total
+
+
+def _circulation_snapshot(metadata: dict[str, object], option_id: str) -> tuple[bool, int, int]:
+    circulation = metadata.get("location_circulation")
+    if not isinstance(circulation, dict):
+        return False, -1, 0
+    option_meta = circulation.get(option_id)
+    if not isinstance(option_meta, dict):
+        return False, -1, 0
+    days_since = option_meta.get("days_since")
+    visits = int(option_meta.get("visits", 0) or 0)
+    if days_since is None:
+        return True, 9999, visits
+    return False, int(days_since), visits
+
+
+def _circulation_sort_key(metadata: dict[str, object], option_id: str, score: float, label: str) -> tuple[int, int, int, float, str]:
+    never_visited, days_since, visits = _circulation_snapshot(metadata, option_id)
+    return (
+        -int(round(score * 1000.0)),
+        0 if never_visited else 1,
+        -days_since,
+        visits,
+        label,
+    )
 
 
 def choose_route_option(request: DecisionRequest, plan: StrategicPlan) -> tuple[DecisionOption | None, DecisionTrace]:
@@ -196,6 +260,17 @@ def choose_route_option(request: DecisionRequest, plan: StrategicPlan) -> tuple[
             or (marvin_future_priority >= 76 and 0 < marvin_future_shortfall <= 12000)
         )
     )
+    early_marvin_future_window = bool(
+        metadata.get("has_car")
+        and metadata.get("has_marvin_access")
+        and not metadata.get("urgent_medical")
+        and health >= 62
+        and sanity_val >= 34
+        and marvin_priority <= 0
+        and marvin_future_priority >= 56
+        and 0 < marvin_future_shortfall <= 5000
+        and balance >= 400
+    )
     economy_growth_window = bool(
         has_car
         and not metadata.get("urgent_medical")
@@ -205,14 +280,30 @@ def choose_route_option(request: DecisionRequest, plan: StrategicPlan) -> tuple[
         and rank <= 2
         and 350 <= balance <= 16000
     )
+    recovery_goal = plan.goal in {
+        "survive_emergency",
+        "stabilize_health",
+        "stabilize_sanity",
+        "reduce_fatigue_pressure",
+        "reduce_debt_risk",
+        "contain_debt_escalation",
+    }
 
+    option_lookup: dict[str, DecisionOption] = {}
     for option in request.normalized_options:
+        option_lookup[option.option_id] = option
         tags = _route_tags(option.label)
         total = _score_goal_alignment(plan.goal, tags)
         total += _score_route_opportunity(tags, metadata)
         # Personality bias: adventure_bias adjusts how willing the bot is to take road trips
         if "adventure" in tags:
             total += plan.personality.adventure_bias
+            total += _adventure_route_adjustment(option.label, metadata, rank, balance)
+
+        if recovery_goal and "marvin" in tags:
+            total -= 140.0
+        if plan.goal == "stabilize_sanity" and "store" in tags and store_spend <= 120.0:
+            total -= 18.0
 
         if startup_cash_floor_unmet:
             if "loan" in tags:
@@ -265,7 +356,10 @@ def choose_route_option(request: DecisionRequest, plan: StrategicPlan) -> tuple[
             if "mechanic" in tags and not metadata.get("wants_mechanic"):
                 total -= float(tval("route.fragile.mechanic_penalty", 72.0))
             if "marvin" in tags:
-                total -= float(tval("route.fragile.marvin_penalty", 58.0))
+                marvin_penalty = float(tval("route.fragile.marvin_penalty", 58.0))
+                if marvin_window or early_marvin_future_window:
+                    marvin_penalty = min(marvin_penalty, 18.0)
+                total -= marvin_penalty
             if "adventure" in tags:
                 total -= float(tval("route.fragile.adventure_penalty", 64.0))
             if "store" in tags and store_spend <= 0:
@@ -281,6 +375,8 @@ def choose_route_option(request: DecisionRequest, plan: StrategicPlan) -> tuple[
                 total += 60.0
             if "medical" in tags and sanity_val < 40:
                 total += 40.0
+        if early_marvin_future_window and "marvin" in tags:
+            total += 28.0
         if marvin_window and "marvin" in tags:
             total += 46.0
             if plan.goal in {"exploit_marvin", "push_next_rank"}:
@@ -295,9 +391,9 @@ def choose_route_option(request: DecisionRequest, plan: StrategicPlan) -> tuple[
             and 0 < marvin_future_shortfall <= 5000
         ):
             if "loan" in tags:
-                total += 36.0
+                total += 20.0
             if "marvin" in tags:
-                total -= 26.0
+                total -= 10.0
         if marvin_window and "medical" in tags and not metadata.get("wants_doctor"):
             total -= 38.0
         if marvin_window and "store" in tags and float(metadata.get("store_spend", 0) or 0) <= 260.0:
@@ -381,19 +477,50 @@ def choose_route_option(request: DecisionRequest, plan: StrategicPlan) -> tuple[
         )
         return None, trace
 
-    sorted_scores = sorted(score_by_option.values(), reverse=True)
-    margin = sorted_scores[0] - sorted_scores[1] if len(sorted_scores) > 1 else sorted_scores[0]
-    confidence = min(1.0, max(0.05, 0.45 + margin / 100.0))
-    reason_code = "route:best_score"
-    reason = (
-        f"goal={plan.goal} selected {best_option.label} score={best_total:.1f} margin={margin:.1f} "
-        f"risk={plan.personality.risk_tolerance}"
-    )
-    ranked = sorted(score_by_option.items(), key=lambda item: item[1], reverse=True)
+    viable_option_ids = [option_id for option_id, score in score_by_option.items() if score > 0]
+    if viable_option_ids:
+        viable_options = [option_lookup[option_id] for option_id in viable_option_ids if option_id in option_lookup]
+        viable_options.sort(
+            key=lambda option: _circulation_sort_key(metadata, option.option_id, score_by_option.get(option.option_id, 0.0), option.label)
+        )
+        best_option = viable_options[0]
+        best_total = score_by_option.get(best_option.option_id, best_total)
+        reason_code = "route:circulation"
+        runner_up_key = None
+        if len(viable_options) > 1:
+            runner_up = viable_options[1]
+            runner_up_key = _circulation_sort_key(metadata, runner_up.option_id, score_by_option.get(runner_up.option_id, 0.0), runner_up.label)
+        selected_key = _circulation_sort_key(metadata, best_option.option_id, best_total, best_option.label)
+        confidence = 0.78 if runner_up_key != selected_key else 0.62
+        never_visited, days_since, visits = _circulation_snapshot(metadata, best_option.option_id)
+        reason = (
+            f"goal={plan.goal} selected {best_option.label} via circulation score={best_total:.1f} "
+            f"never={str(never_visited).lower()} days_since={days_since} visits={visits} risk={plan.personality.risk_tolerance}"
+        )
+        ranked = [
+            (option.option_id, score_by_option.get(option.option_id, 0.0))
+            for option in viable_options
+        ]
+    else:
+        sorted_scores = sorted(score_by_option.values(), reverse=True)
+        margin = sorted_scores[0] - sorted_scores[1] if len(sorted_scores) > 1 else sorted_scores[0]
+        confidence = min(1.0, max(0.05, 0.45 + margin / 100.0))
+        reason_code = "route:best_score"
+        reason = (
+            f"goal={plan.goal} selected {best_option.label} score={best_total:.1f} margin={margin:.1f} "
+            f"risk={plan.personality.risk_tolerance}"
+        )
+        ranked = sorted(score_by_option.items(), key=lambda item: item[1], reverse=True)
     candidate_actions = [
         {
             "option_id": option_id,
             "score": round(score, 3),
+            "circulation": dict(
+                zip(
+                    ("never_visited", "days_since", "visits"),
+                    _circulation_snapshot(metadata, option_id),
+                )
+            ),
         }
         for option_id, score in ranked[:6]
     ]
@@ -403,7 +530,7 @@ def choose_route_option(request: DecisionRequest, plan: StrategicPlan) -> tuple[
         context=request.stable_context_id or request.request_type,
         request_type=request.request_type,
         strategic_goal=plan.goal,
-        chosen_action=str(best_option.value if best_option.value is not None else best_option.option_id),
+        chosen_action=best_option.label,
         reason=reason,
         confidence=confidence,
         options=tuple(option.label for option in request.normalized_options),

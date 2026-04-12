@@ -5850,7 +5850,8 @@ class Lists:
 
     def make_marvin_inventory(self):
         a_list = []
-        # Standard Marvin items, now 3/5 chance
+        # Standard Marvin items, now 3/5 chance. Back-room exclusives stay in
+        # story.locations._offer_back_room() and should not appear here.
         marvin_items = [
             "Delight Indicator",
             "Health Indicator",
@@ -5872,10 +5873,6 @@ class Lists:
             "White Feather",
             "Dealer's Grudge",
             "Gambler's Grimoire",
-            # High-tier Marvin items
-            "Marvin's Eye",
-            "Bottle of Tomorrow",
-            "Blank Check"
         ]
         for item in marvin_items:
             random_chance = random.randrange(5)

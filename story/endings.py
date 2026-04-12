@@ -167,9 +167,15 @@ class EndingsMixin:
             print()
 
         choice = ask.option("Choose a number", [str(i) for i in range(1, len(choices) + 1)])
-        
+
         print()
-        selected = choices[int(choice)-1][1]
+        try:
+            selected_index = int(choice) - 1
+        except (TypeError, ValueError):
+            selected_index = -1
+        if selected_index < 0 or selected_index >= len(choices):
+            selected_index = next((index for index, (_text, action) in enumerate(choices) if action != "continue"), len(choices) - 1)
+        selected = choices[selected_index][1]
         
         if selected == "tom_ending":
             self.goodbye_tom()
@@ -855,6 +861,19 @@ class EndingsMixin:
             print()
             type.slow("That's not a bad legacy to leave behind.")
             print()
+
+        time.sleep(2)
+
+        self.display_final_achievements()
+
+        type.slow(bright(green("~ ~ ~ ENDING: SALVATION ~ ~ ~")))
+        print()
+        type.slow(green("You went home. You made it back to the people who loved you."))
+        print()
+        type.slow(green("The tables did not get the last word."))
+        print()
+        type.slow("Thank you for playing.")
+        quit()
 
     # ============================================
     # SALVATION (HEALED) - THE BEST ENDING

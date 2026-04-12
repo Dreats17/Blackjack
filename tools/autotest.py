@@ -42,6 +42,7 @@ REPORT = os.path.join(ROOT, "tools", "test_out.txt")
 REPORT_JSON = os.path.join(ROOT, "tools", "test_out.json")
 STORY_OUT = os.path.join(ROOT, "tools", "story_out.txt")
 CUMULATIVE_REPORT = os.path.join(ROOT, "tools", "cumulative_test_out.txt")
+QUICKTEST_ARTIFACT_KIND = "quicktest_report"
 STOP_KEY = "s"
 STOP_POLL_SECONDS = 0.1
 
@@ -96,6 +97,11 @@ class RunResult:
     error_count: int | None = None
     warning_count: int | None = None
     result_note: str = ""
+    json_artifact_status: str = "missing"
+    text_artifact_status: str = "missing"
+    artifact_run_id: str = ""
+    artifact_schema_version: int | None = None
+    artifact_complete: bool = False
     mechanic_decisions: list[dict[str, object]] = field(default_factory=list)
     fallback_decisions: dict[str, int] = field(default_factory=dict)
     event_polarity: dict[str, int] = field(default_factory=dict)
@@ -156,6 +162,7 @@ class RunResult:
     dealer_free_hands: list[dict[str, object]] = field(default_factory=list)
     mechanic_dreams: dict[str, object] = field(default_factory=dict)
     companion_details: dict[str, dict[str, object]] = field(default_factory=dict)
+    funnel_metrics: dict[str, int] = field(default_factory=dict)
 
     @property
     def reached_location(self) -> bool:
@@ -285,12 +292,22 @@ class RunResult:
         }
         return bool(_known_crafted.intersection(self.inventory))
 
+    # Mechanic-gated terminal ending names (millionaire afternoon path bypasses
+    # normal location routing, so location_hits may not contain mechanic:X).
+    _MECHANIC_ENDING_NAMES = frozenset({
+        "bliss", "sanctuary", "the_shepherd", "salvation", "salvation_healed",  # Tom
+        "destruction", "retribution",  # Frank
+        "transcendence", "eternity",  # Oswald
+    })
+
     @property
     def won_mechanic_ending(self) -> bool:
-        """True if the player reached the millionaire state and visited their mechanic."""
+        """True if the player reached the millionaire state and completed a mechanic ending."""
         if not self.millionaire_reached:
             return False
-        return self.visited_tom or self.visited_frank or self.visited_oswald
+        if self.visited_tom or self.visited_frank or self.visited_oswald:
+            return True
+        return self.terminal_ending_name in self._MECHANIC_ENDING_NAMES
 
     @property
     def won_any_ending(self) -> bool:
@@ -528,7 +545,14 @@ FINAL_RE = re.compile(
     r"\| SAN\s+(?P<sanity>-?\d+) \| Rank\s+(?P<rank>\d+) \| Alive=(?P<alive>True|False)$",
     re.MULTILINE,
 )
-RUN_SUMMARY_SEED_RE = re.compile(r"^Run Summary \| cycles_requested=\d+ \| seed=(?P<seed>\d+)$", re.MULTILINE)
+RUN_SUMMARY_RE = re.compile(
+    r"^Run Summary \| cycles_requested=(?P<cycles>\d+) \| seed=(?P<seed>\d+)$",
+    re.MULTILINE,
+)
+ARTIFACT_RE = re.compile(
+    r"^Artifact \| kind=(?P<kind>[a-z0-9_]+) \| schema=(?P<schema>\d+) \| run_id=(?P<run_id>[^|]+) \| complete=(?P<complete>True|False)$",
+    re.MULTILINE,
+)
 PEAK_RE = re.compile(r"^Peak\s+\$\s*(?P<balance>[0-9,]+) \| Rank (?P<rank>\d+)$", re.MULTILINE)
 PEAK_DAYS_RE = re.compile(r"^Peak days\s+(?P<days>.+)$", re.MULTILINE)
 INVENTORY_RE = re.compile(r"^Inventory\s+(?P<items>.+)$", re.MULTILINE)
@@ -809,11 +833,19 @@ def _parse_history_entries(raw_value: str) -> list[tuple[int | None, str]]:
 
 
 def _apply_json_report(result: RunResult, payload: dict[str, object]) -> None:
+    artifact = payload.get("artifact", {}) if isinstance(payload, dict) else {}
     run_summary = payload.get("run_summary", {}) if isinstance(payload, dict) else {}
     final_state = payload.get("final_state", {}) if isinstance(payload, dict) else {}
     event_distribution = payload.get("event_distribution", {}) if isinstance(payload, dict) else {}
     decision_summary = payload.get("decision_summary", {}) if isinstance(payload, dict) else {}
     early_mechanic_funnel = payload.get("early_mechanic_funnel", {}) if isinstance(payload, dict) else {}
+
+    if isinstance(artifact, dict):
+        result.artifact_run_id = str(artifact.get("run_id", result.artifact_run_id) or "")
+        schema_version = artifact.get("schema_version", result.artifact_schema_version)
+        if isinstance(schema_version, (int, float)):
+            result.artifact_schema_version = int(schema_version)
+        result.artifact_complete = bool(artifact.get("complete", result.artifact_complete))
 
     if isinstance(run_summary, dict):
         result.day = run_summary.get("day", result.day)
@@ -1025,6 +1057,8 @@ def _apply_json_report(result: RunResult, payload: dict[str, object]) -> None:
             result.gus_items_sold_count = int(fs["gus_items_sold_count"])
         if isinstance(fs.get("gus_total_collectibles"), (int, float)):
             result.gus_total_collectibles = int(fs["gus_total_collectibles"])
+        if isinstance(fs.get("funnel_metrics"), dict):
+            result.funnel_metrics = {str(k): int(v) for k, v in fs["funnel_metrics"].items() if isinstance(v, (int, float))}
 
     if isinstance(payload.get("flask_purchases"), dict):
         result.flask_purchases = {str(k): int(v) for k, v in payload["flask_purchases"].items()}
@@ -1202,22 +1236,82 @@ def parse_args() -> tuple[int, list[int], str]:
     return cycles, seeds, f"{start_seed}-{end_seed}"
 
 
-def parse_report(seed: int, return_code: int) -> RunResult:
-    result = RunResult(seed=seed, return_code=return_code)
-
+def _load_json_report(seed: int, expected_cycles: int | None = None) -> tuple[dict[str, object] | None, str]:
     try:
         with open(REPORT_JSON, "r", encoding="utf-8") as json_handle:
-            payload = json.load(json_handle)
-        if isinstance(payload, dict):
-            payload_seed = payload.get("seed")
-            if payload_seed != seed:
-                payload = None
-            else:
-                _apply_json_report(result, payload)
+            raw_text = json_handle.read()
     except FileNotFoundError:
-        payload = None
-    except (json.JSONDecodeError, OSError, ValueError):
-        payload = None
+        return None, "missing"
+    except OSError:
+        return None, "unreadable"
+
+    stripped = raw_text.lstrip()
+    if not stripped:
+        return None, "empty"
+
+    decoder = json.JSONDecoder()
+    try:
+        payload, end_index = decoder.raw_decode(stripped)
+    except json.JSONDecodeError:
+        return None, "invalid"
+
+    if stripped[end_index:].strip():
+        return None, "trailing-data"
+    if not isinstance(payload, dict):
+        return None, "not-object"
+
+    artifact = payload.get("artifact")
+    if not isinstance(artifact, dict):
+        return None, "missing-metadata"
+    if str(artifact.get("kind", "") or "") != QUICKTEST_ARTIFACT_KIND:
+        return None, "wrong-kind"
+    if not bool(artifact.get("complete")):
+        return None, "incomplete"
+
+    try:
+        payload_seed = int(artifact.get("seed", payload.get("seed")))
+    except (TypeError, ValueError):
+        return None, "missing-seed"
+    if payload_seed != seed:
+        return None, "seed-mismatch"
+
+    if expected_cycles is not None:
+        try:
+            payload_cycles = int(artifact.get("cycles_requested", payload.get("cycles_requested")))
+        except (TypeError, ValueError):
+            return None, "missing-cycles"
+        if payload_cycles != expected_cycles:
+            return None, "cycle-mismatch"
+
+    return cast(dict[str, object], payload), "ok"
+
+
+def _validate_text_report(text: str, seed: int, expected_cycles: int | None = None) -> tuple[re.Match[str] | None, str]:
+    summary_match = RUN_SUMMARY_RE.search(text)
+    if summary_match is None:
+        return None, "missing-summary"
+    if int(summary_match.group("seed")) != seed:
+        return summary_match, "seed-mismatch"
+    if expected_cycles is not None and int(summary_match.group("cycles")) != expected_cycles:
+        return summary_match, "cycle-mismatch"
+
+    artifact_match = ARTIFACT_RE.search(text)
+    if artifact_match is None:
+        return summary_match, "missing-metadata"
+    if artifact_match.group("kind") != QUICKTEST_ARTIFACT_KIND:
+        return summary_match, "wrong-kind"
+    if artifact_match.group("complete") != "True":
+        return summary_match, "incomplete"
+    return summary_match, "ok"
+
+
+def parse_report(seed: int, return_code: int, expected_cycles: int | None = None) -> RunResult:
+    result = RunResult(seed=seed, return_code=return_code)
+
+    payload, json_status = _load_json_report(seed, expected_cycles)
+    result.json_artifact_status = json_status
+    if payload is not None:
+        _apply_json_report(result, payload)
 
     if return_code not in (0, None):
         result.result_note = f"runner exited with code {return_code}"
@@ -1227,12 +1321,20 @@ def parse_report(seed: int, return_code: int) -> RunResult:
         with open(REPORT, "r", encoding="utf-8") as handle:
             text = handle.read()
     except FileNotFoundError:
+        result.text_artifact_status = "missing"
         result.result_note = "missing report"
         return result
 
-    report_seed_match = RUN_SUMMARY_SEED_RE.search(text)
-    if report_seed_match is not None and int(report_seed_match.group("seed")) != seed:
+    report_summary_match, text_status = _validate_text_report(text, seed, expected_cycles)
+    result.text_artifact_status = text_status
+    if text_status == "seed-mismatch":
         result.result_note = f"stale report seed mismatch (expected {seed})"
+        return result
+    if text_status == "cycle-mismatch":
+        result.result_note = f"stale report cycle mismatch (expected {expected_cycles})"
+        return result
+    if report_summary_match is None and payload is None:
+        result.result_note = "missing report summary"
         return result
 
     final_match = FINAL_RE.search(text)
@@ -1509,7 +1611,7 @@ def run_seed(cycles: int, seed: int, timeout_seconds: int = 90) -> tuple[RunResu
                         result_note=(stderr.strip() or stdout.strip() or f"runner exited with code {process.returncode}"),
                     )
                     return result, False
-                result = parse_report(seed, process.returncode)
+                result = parse_report(seed, process.returncode, cycles)
                 result.elapsed_seconds = time.perf_counter() - started_at
                 return result, False
             except subprocess.TimeoutExpired:
@@ -1764,6 +1866,8 @@ def _collect_summary(results: list[RunResult]) -> dict[str, int]:
         "workbench_unlock": sum(1 for result in results if result.has_tool_kit),
         "workbench_visit": sum(1 for result in results if result.visited_car_workbench),
         "crafting": sum(1 for result in results if result.crafting_used),
+        "store_buyout": sum(1 for result in results if int(result.funnel_metrics.get("store_buyout_trigger_count", 0) or 0) > 0),
+        "marvin_ready": sum(1 for result in results if int(result.funnel_metrics.get("marvin_ready_count", 0) or 0) > 0),
         "companion": sum(1 for result in results if result.companion_acquired),
         "companion_roster": sum(1 for result in results if bool(result.companions_list)),
         "adventure": sum(1 for result in results if result.visited_adventure),
@@ -1771,6 +1875,15 @@ def _collect_summary(results: list[RunResult]) -> dict[str, int]:
         "doctor_missed": sum(1 for result in results if result.doctor_likely_saveable and not result.visited_doctor),
         "timeouts": sum(1 for result in results if result.outcome == "timeout"),
         "clean": sum(1 for result in results if result.error_count == 0 and result.warning_count == 0 and not result.timed_out),
+        "json_ok": sum(1 for result in results if result.json_artifact_status == "ok"),
+        "json_bad": sum(1 for result in results if result.json_artifact_status != "ok"),
+        "text_ok": sum(1 for result in results if result.text_artifact_status == "ok"),
+        "text_bad": sum(1 for result in results if result.text_artifact_status != "ok"),
+        "contract_ok": sum(
+            1
+            for result in results
+            if result.json_artifact_status == "ok" and result.text_artifact_status == "ok" and result.artifact_complete
+        ),
     }
 
 
@@ -4167,6 +4280,48 @@ def _system_presence_lines(results: list[RunResult]) -> list[str]:
     return lines
 
 
+def _funnel_metrics_lines(results: list[RunResult]) -> list[str]:
+    if not results:
+        return []
+
+    total = len(results)
+
+    def runs_with_metric(name: str) -> int:
+        return sum(1 for result in results if int(result.funnel_metrics.get(name, 0) or 0) > 0)
+
+    def total_metric(name: str) -> int:
+        return sum(int(result.funnel_metrics.get(name, 0) or 0) for result in results)
+
+    gift_unlock_days = [
+        int(result.funnel_metrics.get("gift_unlock_day", 0) or 0)
+        for result in results
+        if int(result.funnel_metrics.get("gift_unlock_day", 0) or 0) > 0
+    ]
+    avg_unlock_day = (sum(gift_unlock_days) / len(gift_unlock_days)) if gift_unlock_days else 0.0
+
+    return [
+        "Funnel "
+        + f"store_ready={runs_with_metric('store_buyout_ready_count')}/{total} "
+        + f"store_trigger={runs_with_metric('store_buyout_trigger_count')}/{total} "
+        + f"store_same_day={runs_with_metric('store_same_day_return_count')}/{total} "
+        + f"gift_push={runs_with_metric('gift_unlock_push_count')}/{total} "
+        + f"gift_unlock_avg_day={avg_unlock_day:.1f}",
+        "Funnel "
+        + f"workbench_ready={runs_with_metric('workbench_ready_count')}/{total} "
+        + f"workbench_trigger={runs_with_metric('workbench_trigger_count')}/{total} "
+        + f"craft_attempt={runs_with_metric('craft_attempt_count')}/{total} "
+        + f"marvin_ready={runs_with_metric('marvin_ready_count')}/{total} "
+        + f"marvin_route={runs_with_metric('marvin_route_present_count')}/{total}",
+        "Funnel "
+        + f"marvin_direct={total_metric('marvin_direct_gate_count')} "
+        + f"marvin_window={total_metric('marvin_conversion_window_count')} "
+        + f"debt_override={total_metric('debt_growth_override_count')} "
+        + f"loan_override={total_metric('loan_growth_override_count')} "
+        + f"pawn_override={total_metric('pawn_growth_override_count')}",
+        "",
+    ]
+
+
 def _mechanic_repair_lines(results: list[RunResult]) -> list[str]:
     """Which items were fixed at mechanics and how often mechanics visited."""
     if not results:
@@ -4218,12 +4373,33 @@ def _named_ending_line(results: list[RunResult]) -> str:
     return "Named endings " + " ".join(f"{name}={count}" for name, count in counts.most_common())
 
 
-def _render_summary_lines(results: list[RunResult], cycles: int, seed_label: str) -> list[str]:
+def _seed_order_lines(seeds: list[int], per_line: int = 12) -> list[str]:
+    if not seeds:
+        return ["Seed order", "  none"]
+
+    lines = ["Seed order"]
+    for start in range(0, len(seeds), per_line):
+        chunk = seeds[start:start + per_line]
+        lines.append("  " + ", ".join(str(seed) for seed in chunk))
+    return lines
+
+
+def _render_summary_lines(results: list[RunResult], cycles: int, seed_label: str, seeds: list[int]) -> list[str]:
     metrics = _collect_summary(results)
     total = metrics["total"]
+    python_hash_seed = os.environ.get("PYTHONHASHSEED") or "(unset)"
 
     lines = [
         f"AUTOTEST cycles={cycles} seeds={seed_label} total={total}",
+        f"Provenance python={sys.executable} pythonhashseed={python_hash_seed} quicktest_contract={QUICKTEST_ARTIFACT_KIND}",
+        (
+            "Artifacts "
+            f"contract_ok={metrics['contract_ok']}/{total} "
+            f"json_ok={metrics['json_ok']}/{total} "
+            f"json_bad={metrics['json_bad']}/{total} "
+            f"text_ok={metrics['text_ok']}/{total} "
+            f"text_bad={metrics['text_bad']}/{total}"
+        ),
         (
             "Outcomes "
             f"win={metrics['win']}/{total} "
@@ -4280,6 +4456,8 @@ def _render_summary_lines(results: list[RunResult], cycles: int, seed_label: str
             f"wrapped_gift={metrics['wrapped_gift']}/{total} "
             f"workbench_unlock={metrics['workbench_unlock']}/{total} "
             f"workbench_visit={metrics['workbench_visit']}/{total} "
+            f"store_buyout={metrics['store_buyout']}/{total} "
+            f"marvin_ready={metrics['marvin_ready']}/{total} "
             f"marvin_items={metrics['marvin_items']}/{total} "
             f"companion_roster={metrics['companion_roster']}/{total}"
         ),
@@ -4293,6 +4471,8 @@ def _render_summary_lines(results: list[RunResult], cycles: int, seed_label: str
         _named_ending_line(results),
         "",
     ]
+
+    lines.extend(_seed_order_lines(seeds))
 
     request_counts = Counter()
     request_context_counts = Counter()
@@ -4381,6 +4561,7 @@ def _render_summary_lines(results: list[RunResult], cycles: int, seed_label: str
     lines.extend(_distribution_lines(results))
     lines.extend(_max_rank_cohort_lines(results))
     lines.extend(_system_presence_lines(results))
+    lines.extend(_funnel_metrics_lines(results))
 
     _append_section(lines, "Seed Overview")
     row_data = []
@@ -4605,8 +4786,8 @@ def _write_cumulative_report(lines: list[str]) -> None:
         handle.write("\n")
 
 
-def render_summary(results: list[RunResult], cycles: int, seed_label: str) -> None:
-    lines = _render_summary_lines(results, cycles, seed_label)
+def render_summary(results: list[RunResult], cycles: int, seed_label: str, seeds: list[int]) -> None:
+    lines = _render_summary_lines(results, cycles, seed_label, seeds)
 
     for line in lines:
         print(line)
@@ -4644,6 +4825,7 @@ def main() -> int:
             continue
 
         results.append(result)
+        _write_cumulative_report(_render_summary_lines(results, cycles, seed_label, seeds))
         _render_live_progress(index, total, result, results, batch_started_at)
 
     if sys.stdout.isatty():
@@ -4657,7 +4839,7 @@ def main() -> int:
             flush=True,
         )
 
-    render_summary(results, cycles, seed_label)
+    render_summary(results, cycles, seed_label, seeds)
 
     if os.path.isfile(STORY_OUT) and results and not stopped_during_seed:
         last_completed_seed = results[-1].seed

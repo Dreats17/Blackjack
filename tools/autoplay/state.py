@@ -82,6 +82,17 @@ def _economy_hint_value(economy_hints: dict[str, Any], key: str) -> int:
     return int(economy_hints.get(key, 0) or 0)
 
 
+def _next_rank_balance_target(rank: int) -> int | None:
+    return {
+        0: 1000,
+        1: 10000,
+        2: 50000,
+        3: 100000,
+        4: 400000,
+        5: 750000,
+    }.get(int(rank))
+
+
 def _route_tokens(available_routes: tuple[str, ...]) -> set[str]:
     tokens: set[str] = set()
     for route in available_routes:
@@ -136,12 +147,12 @@ def _opportunity_flags(
     marvin_future_window = bool(
         has_car
         and (has_map or has_worn_map)
-        and health >= 54
-        and sanity >= 28
+        and health >= 62
+        and sanity >= 34
         and (
             (
                 rank <= 1
-                and balance >= 950
+                and balance >= 400
                 and marvin_future_priority >= 56
                 and 0 < marvin_future_shortfall <= 5000
             )
@@ -156,14 +167,14 @@ def _opportunity_flags(
     marvin_ready_window = bool(
         has_car
         and (has_map or has_worn_map)
-        and health >= 54
-        and sanity >= 28
+        and health >= 50
+        and sanity >= 26
         and (
             (marvin_affordable_priority > 0 and marvin_strong_window)
             or (
                 rank <= 1
                 and marvin_affordable_priority >= 44
-                and balance >= 1000
+                and balance >= 500
             )
             or marvin_future_window
         )
@@ -195,6 +206,11 @@ def _opportunity_flags(
         "can_cashout_pawn_inventory": has_car
         and "pawn" in route_tokens
         and _economy_hint_value(economy_hints, "pawn_planned_sale_value") > 0
+        and not (
+            rank <= 1
+            and marvin_future_priority >= 56
+            and 0 < marvin_future_shortfall <= 4500
+        )
         and not marvin_ready_window,
         # Proactive borrowing: Vinnie met, no current debt, balance low enough that a loan is
         # worth the 20%/week interest cost (rank-based thresholds verified from systems.py).
@@ -217,10 +233,10 @@ def _opportunity_flags(
                             and 0 < marvin_future_shortfall <= 5000
                         )
                     )
-                    and balance < (6000 if rank == 0 else 8000)
+                    and balance < (4500 if rank == 0 else 6500)
                 )
                 or (rank == 0 and balance < 900)
-                or (rank == 1 and not has_map and balance < 3000)
+                or (rank == 1 and not has_map and balance < 2200)
             )
         ),
     }
@@ -263,10 +279,48 @@ def _goal_candidates(
     candidates: list[str] = []
     debt = int(_safe_call(player, "get_loan_shark_debt", 0) or 0)
     fake_cash = int(_safe_call(player, "get_fraudulent_cash", 0) or 0)
+    active_goals = tuple(str(goal) for goal in (_safe_call(player, "get_active_progress_goals", ()) or ()))
+    rank = int(_safe_call(player, "get_rank", 0) or 0)
+    next_rank_target = _next_rank_balance_target(rank)
+    rank_push_window = bool(
+        player
+        and player.has_item("Car")
+        and next_rank_target is not None
+        and balance < next_rank_target
+        and health >= 64
+        and sanity >= 34
+        and fatigue < 76
+        and len(injuries) == 0
+        and len(statuses) <= 2
+        and debt <= 0
+        and (
+            (rank == 0 and balance >= 700 and (next_rank_target - balance) <= 2200)
+            or (rank == 1 and balance >= 1800 and (next_rank_target - balance) <= 9000)
+            or (rank == 2 and balance >= 15000 and health >= 78 and sanity >= 52 and (next_rank_target - balance) <= 35000)
+        )
+    )
+    millionaire_push_window = bool(
+        player
+        and player.has_item("Car")
+        and 100000 <= balance < 1000000
+        and health >= 76
+        and sanity >= 46
+        and fatigue < 68
+        and len(injuries) <= 1
+        and len(statuses) <= 1
+        and debt <= 0
+        and int(_safe_call(player, "get_loan_shark_warning_level", 0) or 0) <= 0
+    )
+
+    for goal in active_goals:
+        if goal not in candidates:
+            candidates.append(goal)
 
     if health < 45 or sanity < 20:
         candidates.append("survive_emergency")
-    if health < 75 or len(statuses) >= 2 or len(injuries) >= 1:
+    meaningful_injury_pressure = len(injuries) >= 2 or (len(injuries) >= 1 and (health < 88 or sanity < 42))
+
+    if health < 75 or len(statuses) >= 2 or meaningful_injury_pressure:
         candidates.append("stabilize_health")
     if sanity < 45:
         candidates.append("stabilize_sanity")
@@ -312,7 +366,7 @@ def _goal_candidates(
         candidates.append("reach_adventure_threshold")
     if flags["can_convert_millionaire_to_ending"]:
         candidates.append("convert_millionaire_to_ending")
-    if debt == 0 and balance < 1_000_000:
+    if (rank_push_window or millionaire_push_window) and "push_next_rank" not in candidates:
         candidates.append("push_next_rank")
 
     if not candidates:
@@ -364,6 +418,7 @@ class GameState:
     store_candidate_count: int = 0
     store_best_purchase_priority: int = 0
     store_target_spend: int = 0
+    crafting_best_priority: int = 0
     pawn_sellable_value: int = 0
     pawn_planned_sale_count: int = 0
     pawn_planned_sale_value: int = 0
@@ -374,6 +429,10 @@ class GameState:
     marvin_strong_window: bool = False
     edge_score: int = 0
     opportunity_flags: dict[str, bool] = field(default_factory=dict)
+    active_progress_goals: tuple[str, ...] = ()
+    completed_progress_goals: tuple[str, ...] = ()
+    recent_progress_goals: tuple[str, ...] = ()
+    last_progress_goal: str | None = None
     current_progress_goal_candidates: tuple[str, ...] = ()
 
     def to_dict(self) -> dict[str, Any]:
@@ -433,6 +492,26 @@ def build_game_state_snapshot(
     )
     bankroll_emergency = _bankroll_emergency(balance)
     fragile_post_car = _fragile_post_car(balance, has_car, rank, health, sanity, loan_debt, loan_warning_level)
+    active_progress_goals = tuple(str(goal) for goal in (_safe_call(player, "get_active_progress_goals", ()) or ()))
+    completed_progress_goals = tuple(str(goal) for goal in (_safe_call(player, "get_completed_progress_goals", ()) or ()))
+    recent_progress_requests = tuple(_safe_call(player, "get_recent_progress_requests", ()) or ())
+    recent_progress_goals = tuple(
+        str(entry.get("goal"))
+        for entry in recent_progress_requests
+        if isinstance(entry, dict) and str(entry.get("state", "")) == "requested" and entry.get("goal")
+    )[-8:]
+    last_progress_goal = _safe_call(player, "get_last_progress_goal", None)
+    derived_goal_candidates = _goal_candidates(
+        player,
+        flags,
+        health,
+        sanity,
+        statuses,
+        injuries,
+        balance,
+        fatigue,
+        companion_metrics,
+    )
 
     return GameState(
         day=int(getattr(player, "_day", 0) or 0),
@@ -477,6 +556,7 @@ def build_game_state_snapshot(
         store_candidate_count=_economy_hint_value(normalized_economy_hints, "store_candidate_count"),
         store_best_purchase_priority=_economy_hint_value(normalized_economy_hints, "store_best_priority"),
         store_target_spend=_economy_hint_value(normalized_economy_hints, "store_target_spend"),
+        crafting_best_priority=_economy_hint_value(normalized_economy_hints, "crafting_best_priority"),
         pawn_sellable_value=_economy_hint_value(normalized_economy_hints, "pawn_sellable_value"),
         pawn_planned_sale_count=_economy_hint_value(normalized_economy_hints, "pawn_planned_sale_count"),
         pawn_planned_sale_value=_economy_hint_value(normalized_economy_hints, "pawn_planned_sale_value"),
@@ -487,15 +567,9 @@ def build_game_state_snapshot(
         marvin_strong_window=bool(_economy_hint_value(normalized_economy_hints, "marvin_strong_window")),
         edge_score=_economy_hint_value(normalized_economy_hints, "edge_score"),
         opportunity_flags=flags,
-        current_progress_goal_candidates=_goal_candidates(
-            player,
-            flags,
-            health,
-            sanity,
-            statuses,
-            injuries,
-            balance,
-            fatigue,
-            companion_metrics,
-        ),
+        active_progress_goals=active_progress_goals,
+        completed_progress_goals=completed_progress_goals,
+        recent_progress_goals=recent_progress_goals,
+        last_progress_goal=str(last_progress_goal) if last_progress_goal not in {None, "", "None"} else None,
+        current_progress_goal_candidates=tuple(dict.fromkeys(active_progress_goals + derived_goal_candidates)),
     )

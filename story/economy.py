@@ -140,6 +140,7 @@ class EconomyMixin:
         return self._rank
 
     def update_rank(self):
+        previous_rank = getattr(self, "_rank", 0)
         if(1<=self._balance<1000):
             self._rank = 0
         elif(1000<=self._balance<10000):
@@ -156,6 +157,8 @@ class EconomyMixin:
             self._rank = 6
         else:
             self.status()
+        if previous_rank != self._rank and hasattr(self, "_sync_progress_goals"):
+            self._sync_progress_goals()
     
     def get_day(self):
         return self._day

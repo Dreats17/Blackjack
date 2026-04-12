@@ -86,7 +86,17 @@ def _score_purchase_option(option: DecisionOption, plan: StrategicPlan, request:
         # If run is over 15k, play much safer: only buy Marvin items if they are a clear upgrade or needed for stability
         marvin_safe_peak = int(tval("purchase.marvin.safe_peak_threshold", 15000))
         marvin_deep_peak = int(tval("purchase.marvin.deep_peak_threshold", 10000))
-        if run_peak_balance > marvin_safe_peak:
+        marvin_first_floor = int(tval("purchase.marvin.marvin_first_floor", 40000))
+        if balance and float(balance) >= marvin_first_floor:
+            # $40k+ Marvin-first: buy everything available aggressively
+            already_owned = option_meta.get("already_owned", False)
+            if not already_owned:
+                score += 200.0
+                if price > 0 and price <= float(balance):
+                    score += 80.0
+            else:
+                score -= float(tval("purchase.marvin.safe_already_owned_penalty", 40.0))
+        elif run_peak_balance > marvin_safe_peak:
             # Only buy if item is not already owned or is a direct upgrade
             already_owned = option_meta.get("already_owned", False)
             is_upgrade = option_meta.get("is_upgrade", False)

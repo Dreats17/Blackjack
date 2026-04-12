@@ -435,6 +435,13 @@ class LocationsMixin:
         self.update_rank()
         self.update_convenience_store_inventory()
 
+        # Millionaire afternoon should override ordinary travel restrictions. Once the
+        # visitor has appeared and the bankroll is still intact, the ending choice is
+        # the afternoon.
+        if self.was_millionaire_visited() and self._balance >= 1000000:
+            self.millionaire_afternoon()
+            return
+
         # Wind Restriction (1,000-10,000)
         if self.has_travel_restriction("Wind"):
             random_chance = random.randrange(3)
@@ -567,10 +574,6 @@ class LocationsMixin:
             self.remove_travel_restriction("Wasted Afternoon")
             self.start_night()
             return
-
-        # MILLIONAIRE AFTERNOON - Special choices after the visitor
-        elif self.was_millionaire_visited() and self._balance >= 1000000:
-            self.millionaire_afternoon()
         elif self.has_item("Car"):
             if len(self.get_all_companions()) > 0:
                 if self.has_travel_restriction("Skip Companion Dialogue"):
@@ -3980,6 +3983,7 @@ class LocationsMixin:
 
         for item_number in range(len(inventory)):
             item = inventory[item_number]
+            price = None
             if (item_number==0) and (len(inventory)==1):
                 type.type("The only item I've got right now is the " + self._lists.get_marvin_adjective() + " " + magenta(bright(item)))
             elif (item_number==0):
@@ -4041,6 +4045,17 @@ class LocationsMixin:
                 type.type("A polished monocle with a smoky lens and tiny etched markings around the rim. Slip it on, and you can tell exactly how much of your bankroll is hot.")
                 type.type("Useful knowledge. Dangerous knowledge. Marvin seems very proud of that distinction.")
                 price = random.choice([5000, 7000, 9000])
+            elif item == "Marvin's Eye":
+                type.type("A glass eye in a velvet case. Marvin swears it sees hidden outcomes before they happen.")
+                type.type("He seems almost reluctant to let you look at it for too long.")
+                price = 75000
+            elif item == "Bottle of Tomorrow":
+                type.type("A sealed bottle full of warm, golden light. Pop the cork and tomorrow comes early.")
+                price = 40000
+            elif item == "Blank Check":
+                type.type("An immaculate check with no name, no amount, and a signature that makes your skin crawl.")
+                type.type("Marvin taps the paper once. " + quote("This buys anything. Once."))
+                price = 200000
             # New mystical gambling items
             elif item == "Gambler's Chalice":
                 type.type("Ah, the Chalice! Legend says a desperate gambler drank from this cup and doubled his fortune in one night. ")
@@ -4078,6 +4093,16 @@ class LocationsMixin:
                 type.type(quote("But here's the secret—if you gather enough of them... if you truly become their shepherd... "))
                 type.type(quote("Something magical happens. I've heard stories of people who left this place with an ark of their own."))
                 price = 30000
+            elif item == "The Last Card":
+                type.type("A single playing card sealed in amber. Marvin insists it lands exactly how you need it to. Once.")
+                price = 100000
+
+            if price is None:
+                type.type("Marvin squints at the item like even he isn't sure how it ended up on the shelf.")
+                print()
+                type.type(quote("Not for sale. Not today."))
+                print()
+                continue
 
             print()
 
@@ -4092,7 +4117,10 @@ class LocationsMixin:
                 print()
                 type.type("Cmon man, you can't afford this.")
                 print()
-                break
+                if item_number != len(inventory)-1:
+                    type.type("Marvin shrugs and reaches for something else on the shelf.")
+                    print()
+                continue
             if yes_or_no == "yes":
                 print()
                 type.type("Great! It's all yours.")
@@ -4104,12 +4132,18 @@ class LocationsMixin:
                 self.add_item(item)
                 type.type("You got the " + magenta(bright(item)) + "!")
                 print()
-                type.type("Description: " + self.get_item_desc(item))
+                description = self.get_item_desc(item) or "No description available."
+                type.type("Description: " + description)
                 print()
                 break
 
             print()
             type.type("Not your thing, huh? Well that's ok. ")
+            if item_number != len(inventory)-1:
+                print()
+                type.type("Marvin digs around for another option.")
+                print()
+                continue
             break
 
         type.type("That's all I've got to sell you tonight. Maybe try coming back another day. ")

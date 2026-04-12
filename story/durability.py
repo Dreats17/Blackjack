@@ -442,6 +442,10 @@ class DurabilityMixin:
         elif item == "Rusty Compass": return "An old compass with a cracked glass face. It points towards nearby opportunities, occasionally revealing a hidden shop or event."
         elif item == "Pocket Watch": return "A small brass pocket watch that's always a few minutes slow. It sometimes gives you an extra round at the Blackjack table."
         elif item == "Marvin's Monocle": return "A smoky monocle that reveals exactly how much of your visible bankroll is hot money. Vinnie hates that you know."
+        elif item == "Marvin's Eye": return "A singular enchanted eye that reveals hidden outcomes before choices lock in. Fate hates being watched."
+        elif item == "Bottle of Tomorrow": return "A bottle filled with stolen daylight. Drink it to skip forward to tomorrow with your body and mind restored."
+        elif item == "Blank Check": return "A cursed blank check that can be exchanged for one free purchase from any shop."
+        elif item == "The Last Card": return "A final trump card that guarantees the exact draw you need, once."
 
         elif item == "Delight Manipulator": return "A small gadget, embedded in your right arm, with wires sticking into your veins. Attached is a small antenna that elicits complete and absolute happiness in anyone around you."
         elif item == "Health Manipulator": return "A small gadget, embedded in your left arm, with wires construed throughout your veins and into your heart. The device pumps artificial blood with a syntetic heartbeat throught your body, ensuring that you're always perfectly healthy."

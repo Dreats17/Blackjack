@@ -316,12 +316,141 @@ class Player(
         self._gift_wrapped_item = None  # Currently wrapped gift to give to Dealer
         self._convenience_store_purchases = 0  # Track purchases to unlock gift system
         self._gift_system_unlocked = False  # Unlocks after 3-5 purchases + out of poor rank
+        self._active_progress_goals = {}
+        self._completed_progress_goals = {}
+        self._goal_requests = []
+        self._last_progress_goal = None
         
         self._lists = lists.Lists(self)
         
         # STORYLINE SYSTEM - Manages sequential multi-part narrative events
         self._storyline_system = storylines.StorylineSystem(self)
         self._storyline_system.sync_with_existing_state()
+        self._sync_progress_goals()
+
+    def _goal_day(self):
+        return int(getattr(self, "_day", 0) or 0)
+
+    def _next_rank_balance_target(self):
+        return {
+            0: 1000,
+            1: 10000,
+            2: 50000,
+            3: 100000,
+            4: 400000,
+            5: 750000,
+        }.get(int(getattr(self, "_rank", 0) or 0))
+
+    def _record_progress_request(self, goal, state, reason="", source="system"):
+        if not goal:
+            return
+        self._goal_requests.append({
+            "goal": str(goal),
+            "state": str(state),
+            "reason": str(reason or ""),
+            "source": str(source or "system"),
+            "day": self._goal_day(),
+        })
+        self._goal_requests = self._goal_requests[-40:]
+
+    def _activate_progress_goal(self, goal, reason="", source="system"):
+        if not goal or self._is_progress_goal_fulfilled(goal):
+            return
+        current = dict(self._active_progress_goals.get(goal, {}))
+        current["goal"] = str(goal)
+        current["reason"] = str(reason or current.get("reason", ""))
+        current["source"] = str(source or current.get("source", "system"))
+        current["day"] = self._goal_day()
+        current["requests"] = int(current.get("requests", 0) or 0) + 1
+        self._active_progress_goals[str(goal)] = current
+        self._last_progress_goal = str(goal)
+
+    def _is_progress_goal_fulfilled(self, goal):
+        goal = str(goal or "")
+        if goal == "acquire_car":
+            return self.has_item("Car")
+        if goal == "unlock_marvin":
+            return self.has_item("Map") or self.has_item("Worn Map")
+        if goal == "reach_adventure_threshold":
+            return self.has_item("Car") and self.get_rank() >= 2
+        if goal == "push_next_rank":
+            next_target = self._next_rank_balance_target()
+            return next_target is None or self.get_balance() >= next_target
+        return False
+
+    def _sync_progress_goals(self):
+        for goal in list(self._active_progress_goals):
+            if self._is_progress_goal_fulfilled(goal):
+                self.complete_progress_goal(goal, reason="state fulfilled", source="sync")
+
+        baseline_goals = []
+        if not self.has_item("Car"):
+            baseline_goals.append(("acquire_car", "car not owned"))
+        if self.has_item("Car") and not (self.has_item("Map") or self.has_item("Worn Map")):
+            baseline_goals.append(("unlock_marvin", "marvin access not unlocked"))
+        if self.has_item("Car") and self.get_rank() < 2:
+            baseline_goals.append(("reach_adventure_threshold", "rank below adventure threshold"))
+
+        baseline_goal_names = {goal for goal, _reason in baseline_goals}
+        for goal in list(self._active_progress_goals):
+            if goal in {"unlock_marvin", "reach_adventure_threshold"} and goal not in baseline_goal_names:
+                self.clear_progress_goal(goal, reason="state no longer relevant", source="sync")
+
+        for goal, reason in baseline_goals:
+            if goal not in self._completed_progress_goals and goal not in self._active_progress_goals:
+                self._activate_progress_goal(goal, reason=reason, source="sync")
+
+    def request_progress_goal(self, goal, reason="", source="system", sticky=True):
+        goal = str(goal or "")
+        if not goal:
+            return
+        self._sync_progress_goals()
+        self._record_progress_request(goal, "requested", reason=reason, source=source)
+        if self._is_progress_goal_fulfilled(goal):
+            self.complete_progress_goal(goal, reason=reason or "already fulfilled", source=source)
+            return
+        if sticky and goal not in self._completed_progress_goals:
+            self._activate_progress_goal(goal, reason=reason, source=source)
+
+    def complete_progress_goal(self, goal, reason="", source="system"):
+        goal = str(goal or "")
+        if not goal:
+            return
+        self._active_progress_goals.pop(goal, None)
+        self._completed_progress_goals[goal] = {
+            "goal": goal,
+            "reason": str(reason or "fulfilled"),
+            "source": str(source or "system"),
+            "day": self._goal_day(),
+        }
+        self._record_progress_request(goal, "completed", reason=reason or "fulfilled", source=source)
+        if self._last_progress_goal == goal:
+            self._last_progress_goal = None
+
+    def clear_progress_goal(self, goal, reason="", source="system"):
+        goal = str(goal or "")
+        if not goal:
+            return
+        if goal in self._active_progress_goals:
+            self._active_progress_goals.pop(goal, None)
+            self._record_progress_request(goal, "cleared", reason=reason or "cleared", source=source)
+            if self._last_progress_goal == goal:
+                self._last_progress_goal = None
+
+    def get_active_progress_goals(self):
+        self._sync_progress_goals()
+        return tuple(self._active_progress_goals.keys())
+
+    def get_completed_progress_goals(self):
+        self._sync_progress_goals()
+        return tuple(self._completed_progress_goals.keys())
+
+    def get_recent_progress_requests(self):
+        return list(self._goal_requests)
+
+    def get_last_progress_goal(self):
+        self._sync_progress_goals()
+        return self._last_progress_goal
 
     def kill(self, cause_of_death=None):
         self._alive = False
@@ -388,6 +517,12 @@ class Player(
             type.type("You took damage!")
             print()
             self.health_indicator()
+
+    def lose_hp(self, value):
+        self.hurt(value)
+
+    def lose_health(self, value):
+        self.hurt(value)
 
     def heal(self, value):
         if(self._health + value >= 100):
@@ -537,6 +672,7 @@ class Player(
             return
         self._inventory.add(item)
         self._items_ever_owned.add(item)
+        self._sync_progress_goals()
 
     def has_item(self, item):
         return item in self._inventory
@@ -558,6 +694,7 @@ class Player(
     def use_item(self, item):
         self._inventory.discard(item)
         self._items_ever_used.add(item)
+        self._sync_progress_goals()
 
     def track_item_use(self, item_name):
         """Track item usage for evolution chains. Returns (old, new) tuple if evolved, else None."""
@@ -608,6 +745,7 @@ class Player(
 
     def remove_item(self, item):
         self._inventory.discard(item)
+        self._sync_progress_goals()
 
     def lose_item(self, item):
         self.remove_item(item)
@@ -918,6 +1056,7 @@ class Player(
 
     def set_car_mechanic(self, mechanic):
         self._car_mechanic = mechanic
+        self._sync_progress_goals()
 
     # Gus Pawn Shop tracking
     def get_gus_items_sold(self):
