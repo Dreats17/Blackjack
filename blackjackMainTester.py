@@ -6254,6 +6254,19 @@ def beach_dive():
     player = new_player(items=['Animal Whistle'])
     player.beach_dive()
 
+def beach_boardwalk():
+    print(bright(red("TESTING beach_boardwalk with no items")))
+    player = new_player()
+    player.beach_boardwalk()
+    print(bright(red("Testing beach_boardwalk with Pocket Knife")))
+    player = new_player(items=['Pocket Knife'])
+    player.beach_boardwalk()
+
+def beach_bonfire():
+    print(bright(red("TESTING beach_bonfire with no items")))
+    player = new_player()
+    player.beach_bonfire()
+
 def beach_stroll():
     print(bright(red("TESTING beach_stroll with no items")))
     player = new_player()
@@ -6297,6 +6310,11 @@ def chase_the_third_rabbit():
     print(bright(red("Testing chase_the_third_rabbit with Carrot")))
     player = new_player(items=['Carrot'])
     player.chase_the_third_rabbit()
+
+def ocean_jetty():
+    print(bright(red("TESTING ocean_jetty with no items")))
+    player = new_player()
+    player.ocean_jetty()
 
 def city_park():
     print(bright(red("TESTING city_park with no items")))
@@ -7484,13 +7502,85 @@ def woodlands_adventure():
     player.woodlands_adventure()
 
 
-def run_all_events():
-    for tester in ALL_EVENT_TESTERS:
+def _trace_signature(trace):
+    """Reduce a SeededAsk trace list to a hashable branch signature.
+
+    Only the decision *choices* matter (not the prompt text, which is
+    constant across seeds).  Two runs that made the same sequence of
+    choices exercised the same code path.
+    """
+    return tuple((kind, choice) for kind, _prompt, choice in trace)
+
+
+def _run_one_seeded(tester, seed):
+    """Run *tester* under a single deterministic seed.  Returns (trace_sig, crashed)."""
+    global ACTIVE_TEST_SEED, ACTIVE_TEST_SEED_COUNTER
+    seed_ask = SeededAsk(seed)
+    fast_type = FastType()
+    patched_ask = _patch_story_ask(seed_ask)
+    patched_type = _patch_story_type(fast_type)
+    ACTIVE_TEST_SEED = int(seed)
+    ACTIVE_TEST_SEED_COUNTER = 0
+    crashed = False
+    try:
         before = len(REROUTE_LOG)
         tester()
         after = len(REROUTE_LOG)
         if after > before:
-            print(bright(red("REROUTE SUMMARY for " + tester.__name__ + ": " + str(after - before) + " blocked redirect(s)")))
+            print(bright(red("REROUTE SUMMARY for " + tester.__name__ + " (seed " + str(seed) + "): " + str(after - before) + " blocked redirect(s)")))
+    except Exception as exc:
+        print(bright(red("CRASH in " + tester.__name__ + " (seed " + str(seed) + "): " + str(exc))))
+        crashed = True
+    finally:
+        ACTIVE_TEST_SEED = None
+        ACTIVE_TEST_SEED_COUNTER = 0
+        _restore_story_ask(patched_ask)
+        _restore_story_type(patched_type)
+    return _trace_signature(seed_ask.trace), crashed
+
+
+def run_all_events(seed_count=5, seed_start=0, max_seeds=50):
+    """Run every tester with seeded ask/type patching.
+
+    For each event the runner tries seeds starting at *seed_start*.  It
+    stops early once *seed_count* consecutive seeds produce no new branch
+    combination, or after *max_seeds* total attempts (whichever comes
+    first).  Events with zero decision points finish in 1 seed; events
+    with many branches get enough seeds to explore them.
+
+    Pass seed_count=0 to run each event exactly once with no seed patching
+    (legacy behaviour — will hang on interactive prompts).
+    """
+    if seed_count <= 0:
+        for tester in ALL_EVENT_TESTERS:
+            before = len(REROUTE_LOG)
+            tester()
+            after = len(REROUTE_LOG)
+            if after > before:
+                print(bright(red("REROUTE SUMMARY for " + tester.__name__ + ": " + str(after - before) + " blocked redirect(s)")))
+        return
+
+    total = len(ALL_EVENT_TESTERS)
+    stale_limit = int(seed_count)        # stop after this many seeds with no new path
+    hard_cap = max(int(max_seeds), stale_limit + 1)
+    total_paths = 0
+    for idx, tester in enumerate(ALL_EVENT_TESTERS, 1):
+        seen_paths = set()
+        stale_streak = 0
+        seed = int(seed_start)
+        attempts = 0
+        while stale_streak < stale_limit and attempts < hard_cap:
+            sig, _crashed = _run_one_seeded(tester, seed)
+            attempts += 1
+            if sig in seen_paths:
+                stale_streak += 1
+            else:
+                seen_paths.add(sig)
+                stale_streak = 0
+            seed += 1
+        total_paths += len(seen_paths)
+        if idx % 50 == 0:
+            print(bright(red(f"PROGRESS: {idx}/{total} events complete  ({total_paths} unique paths so far)")))
 
 
 class SeededAsk:
@@ -7671,40 +7761,46 @@ def run_seeded_subset(event_names, seeds):
             continue
         selected.append(fn)
 
-    global ACTIVE_TEST_SEED
-    global ACTIVE_TEST_SEED_COUNTER
-
     for seed in seeds:
         print(bright(red("SEED RUN " + str(seed))))
-        seed_ask = SeededAsk(seed)
-        fast_type = FastType()
-        patched_ask = _patch_story_ask(seed_ask)
-        patched_type = _patch_story_type(fast_type)
-        ACTIVE_TEST_SEED = int(seed)
-        ACTIVE_TEST_SEED_COUNTER = 0
-        try:
-            for tester in selected:
-                before = len(REROUTE_LOG)
-                print(bright(red("TESTER " + tester.__name__ + " (seed " + str(seed) + ")")))
-                tester()
-                after = len(REROUTE_LOG)
-                if after > before:
-                    print(bright(red("REROUTE SUMMARY for " + tester.__name__ + ": " + str(after - before) + " blocked redirect(s)")))
-        finally:
-            ACTIVE_TEST_SEED = None
-            ACTIVE_TEST_SEED_COUNTER = 0
-            _restore_story_ask(patched_ask)
-            _restore_story_type(patched_type)
-
-        if seed_ask.trace:
-            print(bright(red("SEED " + str(seed) + " DECISION TRACE")))
-            for index, (kind, prompt, choice) in enumerate(seed_ask.trace, start=1):
-                print(red(f"  [{index}] {kind} | {prompt} -> {choice}"))
+        for tester in selected:
+            sig, crashed = _run_one_seeded(tester, seed)
+            print(bright(red("TESTER " + tester.__name__ + " (seed " + str(seed) + ")")))
+            if sig:
+                print(red(f"  branch sig: {sig}"))
 
 
-def run_seeded_sweep(event_name, seed_start, seed_count):
-    seeds = list(range(int(seed_start), int(seed_start) + int(seed_count)))
-    run_seeded_subset([event_name], seeds)
+def run_seeded_sweep(event_name, seed_start, seed_count, max_seeds=50):
+    """Sweep one or more events with result-based seed expansion.
+
+    Tries seeds starting at *seed_start*.  Stops after *seed_count*
+    consecutive stale seeds (no new branch) or *max_seeds* total.
+    """
+    name_to_callable = {fn.__name__: fn for fn in ALL_EVENT_TESTERS}
+    fn = name_to_callable.get(event_name)
+    if fn is None:
+        print(bright(red("UNKNOWN TESTER: " + str(event_name))))
+        return
+
+    stale_limit = int(seed_count)
+    hard_cap = max(int(max_seeds), stale_limit + 1)
+    seen_paths = set()
+    stale_streak = 0
+    seed = int(seed_start)
+    attempts = 0
+    while stale_streak < stale_limit and attempts < hard_cap:
+        sig, crashed = _run_one_seeded(fn, seed)
+        attempts += 1
+        is_new = sig not in seen_paths
+        seen_paths.add(sig)
+        label = "NEW" if is_new else "dup"
+        print(bright(red(f"  seed {seed}: [{label}] {sig}")))
+        if is_new:
+            stale_streak = 0
+        else:
+            stale_streak += 1
+        seed += 1
+    print(bright(red(f"SWEEP DONE: {event_name} — {len(seen_paths)} unique path(s) found in {attempts} seed(s)")))
 
 
 ALL_EVENT_TESTERS = [
@@ -8354,6 +8450,8 @@ ALL_EVENT_TESTERS = [
     whiplash_injury,
     window_crash,
     workplace_injury,
+    beach_boardwalk,
+    beach_bonfire,
     beach_dive,
     beach_stroll,
     beach_swim,
@@ -8365,6 +8463,7 @@ ALL_EVENT_TESTERS = [
     city_park,
     city_streets,
     city_stroll,
+    ocean_jetty,
     ditched_wallet,
     dream_of_winning,
     giant_oyster_opening,
@@ -8457,16 +8556,32 @@ ALL_EVENT_TESTERS = [
 
 
 def main():
-    # Manual event calls: uncomment whichever you want to run.
-    # Example:
-    # item_hoarder()
-    # shiv_confrontation()
-    # lockpick_opportunity()
-    #
-    # To run every generated tester instead:
-    # run_all_events()
-    squirrel_invasion()
-    pass
+    import argparse
+    parser = argparse.ArgumentParser(description="Blackjack event tester")
+    parser.add_argument("mode", nargs="?", default="single",
+                        choices=["all", "sweep", "single"],
+                        help="'all' = run every event seeded, 'sweep' = seed-sweep one event, 'single' = run main()")
+    parser.add_argument("--seeds", type=int, default=5,
+                        help="Stale-seed convergence limit: stop after this many consecutive seeds yield no new branch (default 5)")
+    parser.add_argument("--max-seeds", type=int, default=50,
+                        help="Hard cap on total seeds per event (default 50)")
+    parser.add_argument("--seed-start", type=int, default=0,
+                        help="Starting seed value (default 0)")
+    parser.add_argument("--event", type=str, default=None,
+                        help="Event name for 'sweep' mode")
+    args = parser.parse_args()
+
+    if args.mode == "all":
+        run_all_events(seed_count=args.seeds, seed_start=args.seed_start, max_seeds=args.max_seeds)
+    elif args.mode == "sweep":
+        if not args.event:
+            print(bright(red("ERROR: --event required for sweep mode")))
+            sys.exit(1)
+        run_seeded_sweep(args.event, args.seed_start, args.seeds, max_seeds=args.max_seeds)
+    else:
+        # Manual single-event calls: edit below as needed.
+        squirrel_invasion()
+        pass
 
 
 if __name__ == "__main__":
